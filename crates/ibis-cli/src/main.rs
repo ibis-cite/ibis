@@ -60,8 +60,12 @@ enum Command {
     },
     /// Print selected references as CSL-JSON (for Pandoc, citeproc, scripts).
     Csl {
-        #[arg(required = true)]
+        /// Citation keys to export.
+        #[arg(required_unless_present = "all")]
         keys: Vec<String>,
+        /// Export every reference in the given files.
+        #[arg(long, conflicts_with = "keys")]
+        all: bool,
         #[arg(long = "bib", required = true)]
         bib: Vec<PathBuf>,
     },
@@ -214,7 +218,7 @@ fn run(cli: Cli) -> Result<ExitCode> {
                         "{:<24} {} ({year}) {}",
                         r.citekey.as_deref().unwrap_or("-"),
                         authors,
-                        r.title.as_deref().unwrap_or("[no title]")
+                        r.title_plain().as_deref().unwrap_or("[no title]")
                     );
                     println!("{:<24} matched: {why}", "");
                 }
@@ -297,11 +301,14 @@ fn run(cli: Cli) -> Result<ExitCode> {
                 ExitCode::from(2)
             })
         }
-        Command::Csl { keys, bib } => {
+        Command::Csl { keys, all, bib } => {
             let loaded = load(&bib)?;
             report_problems(&loaded);
             let references = all_references(&loaded);
             let mut items = Vec::new();
+            if all {
+                items.extend(references.iter().map(Reference::to_csl_json));
+            }
             for key in &keys {
                 items.push(resolve(key, &references)?.to_csl_json());
             }

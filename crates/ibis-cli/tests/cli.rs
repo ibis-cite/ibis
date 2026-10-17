@@ -81,3 +81,30 @@ fn unknown_keys_are_errors() {
     assert_eq!(out.status.code(), Some(1));
     assert!(String::from_utf8_lossy(&out.stderr).contains("not found"));
 }
+
+/// Cyclic cross-references once overflowed the stack and aborted the process.
+/// A subprocess proves the binary now reports them and exits normally.
+#[test]
+fn cross_reference_cycles_never_abort_the_process() {
+    for (name, text) in [
+        ("self.bib", "@book{a,title={A},crossref={a}}\n"),
+        (
+            "mutual.bib",
+            "@book{a,title={A},crossref={b}}\n@book{b,title={B},crossref={a}}\n",
+        ),
+        (
+            "xdata.bib",
+            "@book{a,title={A},xdata={b}}\n@book{b,title={B},xdata={a}}\n",
+        ),
+    ] {
+        let file = write("cli-cycles", name, text);
+        let out = ibis(&["check", s(&file)]);
+        assert_eq!(
+            out.status.code(),
+            Some(2),
+            "{name}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        assert!(String::from_utf8_lossy(&out.stdout).contains("cycle"), "{name}");
+    }
+}

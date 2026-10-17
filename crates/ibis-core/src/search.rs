@@ -80,7 +80,7 @@ impl<'a> Index<'a> {
                     .join(" ");
                 let fields = [
                     normalize(r.citekey.as_deref().unwrap_or("")),
-                    normalize(r.title.as_deref().unwrap_or("")),
+                    normalize(&r.title_plain().unwrap_or_default()),
                     normalize(&names),
                     r.year().map(|y| y.to_string()).unwrap_or_default(),
                     normalize(r.doi.as_deref().unwrap_or("")),
@@ -175,7 +175,7 @@ fn starts_word(text: &str, term: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{Name, PartialDate, RecordId};
+    use crate::model::{Issued, Name, RecordId};
 
     fn reference(key: &str, title: &str, family: &str, year: i32) -> Reference {
         Reference {
@@ -191,7 +191,7 @@ mod tests {
                 ..Name::default()
             }],
             editors: vec![],
-            issued: Some(PartialDate::year(year)),
+            issued: Some(Issued::year(year)),
             container_title: None,
             doi: None,
             url: None,
