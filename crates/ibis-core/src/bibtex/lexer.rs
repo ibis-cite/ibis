@@ -48,6 +48,8 @@ pub(crate) fn split_blocks(src: &str) -> Vec<Block<'_>> {
     let bytes = src.as_bytes();
     let mut blocks = Vec::new();
     let mut i = 0;
+    // Line numbers are counted incrementally so splitting stays linear.
+    let (mut line, mut counted_to) = (1, 0);
     while let Some(offset) = src[i..].find('@') {
         let start = i + offset;
         let mut j = start + 1;
@@ -63,7 +65,8 @@ pub(crate) fn split_blocks(src: &str) -> Vec<Block<'_>> {
             i = start + 1;
             continue;
         }
-        let line = src[..start].matches('\n').count() + 1;
+        line += src[counted_to..start].matches('\n').count();
+        counted_to = start;
         match find_close(bytes, k) {
             Some(end) => {
                 blocks.push(Block {
@@ -98,7 +101,13 @@ fn find_close(bytes: &[u8], open: usize) -> Option<usize> {
     let paren = bytes[open] == b'(';
     let mut depth = 0usize;
     let mut in_quote = false;
+    let mut escaped = false;
     for (pos, &b) in bytes.iter().enumerate().skip(open + 1) {
+        // `\"` (an umlaut command) inside a quoted value is not a quote.
+        if std::mem::take(&mut escaped) && b == b'"' {
+            continue;
+        }
+        escaped = b == b'\\';
         match b {
             b'{' => depth += 1,
             b'}' if depth > 0 => depth -= 1,
@@ -265,7 +274,13 @@ impl<'a> Parser<'a> {
         self.bump();
         let start = self.pos;
         let mut depth = 0usize;
+        let mut escaped = false;
         while let Some(c) = self.peek() {
+            if std::mem::take(&mut escaped) && c == '"' {
+                self.bump();
+                continue;
+            }
+            escaped = c == '\\';
             match c {
                 '{' => depth += 1,
                 '}' if depth > 0 => depth -= 1,

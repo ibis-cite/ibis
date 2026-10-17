@@ -122,7 +122,13 @@ impl<'a> Index<'a> {
                         matched.push(best.0);
                     }
                 }
-                if fields[0] == normalized.trim() {
+                let exact_key = reference
+                    .citekey
+                    .as_deref()
+                    .is_some_and(|k| k.to_lowercase() == query.trim().to_lowercase());
+                if exact_key {
+                    score += 2000;
+                } else if fields[0] == normalized.trim() {
                     score += 1000;
                 } else if fields[1] == normalized.trim() {
                     score += 500;
@@ -250,6 +256,17 @@ mod tests {
         assert_eq!(index.search("γνωσις", 10)[0].reference.id.native_key, "gr");
         assert_eq!(index.search("ΓΝΏΣΙΣ", 10)[0].reference.id.native_key, "gr");
         assert_eq!(index.search("strasse weiss", 10)[0].reference.id.native_key, "de");
+    }
+
+    #[test]
+    fn exact_key_match_is_exact_not_punctuation_folded() {
+        let refs = [
+            reference("a:b", "Newer", "X", 2024),
+            reference("a-b", "Older", "Y", 2001),
+        ];
+        let index = Index::new(&refs);
+        assert_eq!(index.search("a-b", 10)[0].reference.id.native_key, "a-b");
+        assert_eq!(index.search("a:b", 10)[0].reference.id.native_key, "a:b");
     }
 
     #[test]

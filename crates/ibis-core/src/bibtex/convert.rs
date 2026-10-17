@@ -2,7 +2,8 @@
 //! protected capitalization, italics, truncated author lists, organizations,
 //! date ranges and uncertainty, and proper language tags.
 
-use std::collections::{BTreeMap, HashMap};
+use std::cell::RefCell;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use biblatex::{Chunk, ChunksExt, DateValue, EditorType, Entry, PermissiveType, RetrievalError};
 
@@ -17,31 +18,51 @@ pub(crate) fn convert(
     own_fields: &HashMap<String, String>,
     problems: &mut Vec<String>,
 ) -> Reference {
+    // TeX commands that are not understood are kept as written and reported.
+    let unknown = RefCell::new(BTreeSet::new());
     let text = |field: &str| {
         entry
             .get(field)
-            .map(|c| clean(&strip_tex(&c.format_verbatim())))
+            .map(|c| clean(&strip_tex(&c.format_verbatim(), &mut unknown.borrow_mut())))
             .filter(|s| !s.is_empty())
+    };
+    let rich = |main: &str, sub: &[(&str, &str)]| -> Option<Vec<Piece>> {
+        let mut pieces = pieces_from_chunks(entry.get(main)?.iter().map(|c| &c.v), &mut unknown.borrow_mut());
+        for (field, separator) in sub {
+            if let Some(chunks) = entry.get(field) {
+                pieces.push(Piece::Text {
+                    text: (*separator).to_string(),
+                    protected: false,
+                });
+                pieces.extend(pieces_from_chunks(
+                    chunks.iter().map(|c| &c.v),
+                    &mut unknown.borrow_mut(),
+                ));
+            }
+        }
+        Some(pieces)
     };
 
     let language = language_tag(entry, problems);
     let english = language.as_deref().is_none_or(|l| l == "en" || l.starts_with("en-"));
-    let title = entry.get("title").map(|chunks| {
-        let pieces = pieces_from_chunks(chunks.iter().map(|c| &c.v));
-        render(&if english { sentence_case(pieces) } else { pieces })
-    });
+    let title = rich("title", &[("subtitle", ": "), ("titleaddon", ". ")])
+        .map(|pieces| render(&if english { sentence_case(pieces) } else { pieces }));
     // `booktitle` names the containing book only for parts of a book or of
     // proceedings; on a whole book or proceedings volume it repeats the title.
     let item_type = csl_type(kind);
-    let container_fields: &[&str] = if matches!(item_type, "chapter" | "paper-conference") {
-        &["booktitle", "journaltitle", "journal"]
+    let containers: &[(&str, &str)] = if matches!(item_type, "chapter" | "paper-conference") {
+        &[
+            ("booktitle", "booksubtitle"),
+            ("journaltitle", "journalsubtitle"),
+            ("journal", "journalsubtitle"),
+        ]
     } else {
-        &["journaltitle", "journal"]
+        &[("journaltitle", "journalsubtitle"), ("journal", "journalsubtitle")]
     };
-    let container_title = container_fields
+    let container_title = containers
         .iter()
-        .find_map(|f| entry.get(f))
-        .map(|chunks| render(&pieces_from_chunks(chunks.iter().map(|c| &c.v))))
+        .find_map(|(main, sub)| rich(main, &[(sub, ": ")]))
+        .map(|pieces| render(&pieces))
         .filter(|s| !s.is_empty());
 
     let authors = match entry.author() {
@@ -97,6 +118,28 @@ pub(crate) fn convert(
         variables.insert("genre".to_string(), readable.to_string());
     }
 
+    let issued = issued(entry, problems);
+    let doi = text("doi");
+    let abstract_text = text("abstract");
+    let keywords: Vec<String> = text("keywords")
+        .map(|k| {
+            k.split([',', ';'])
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .map(String::from)
+                .collect()
+        })
+        .unwrap_or_default();
+    let unknown = unknown.into_inner();
+    if !unknown.is_empty() {
+        let list = unknown
+            .iter()
+            .map(|c| format!("`\\{c}`"))
+            .collect::<Vec<_>>()
+            .join(", ");
+        problems.push(format!("TeX command {list} is not understood; it is kept as written"));
+    }
+
     Reference {
         id: RecordId {
             source: source.to_string(),
@@ -107,23 +150,15 @@ pub(crate) fn convert(
         title,
         authors,
         editors,
-        issued: issued(entry, problems),
+        issued,
         container_title,
-        doi: text("doi"),
+        doi,
         url: entry
             .get("url")
             .map(|c| clean(&c.format_verbatim()))
             .filter(|s| !s.is_empty()),
-        abstract_text: text("abstract"),
-        keywords: text("keywords")
-            .map(|k| {
-                k.split([',', ';'])
-                    .map(str::trim)
-                    .filter(|s| !s.is_empty())
-                    .map(String::from)
-                    .collect()
-            })
-            .unwrap_or_default(),
+        abstract_text,
+        keywords,
         language,
         variables,
         raw: Some(raw.to_string()),
@@ -224,10 +259,31 @@ fn issued(entry: &Entry, problems: &mut Vec<String>) -> Option<Issued> {
                 month: d.month.map(|m| m + 1),
                 day: d.day.map(|day| day + 1),
             };
+            let raw = entry
+                .get("date")
+                .map(|c| c.format_verbatim())
+                .unwrap_or_else(|| "year".to_string());
             let (start, end) = match date.value {
-                DateValue::At(d) | DateValue::After(d) | DateValue::Before(d) => (to_partial(d), None),
+                DateValue::At(d) => (to_partial(d), None),
                 DateValue::Between(a, b) => (to_partial(a), Some(to_partial(b))),
+                DateValue::Before(d) => {
+                    problems.push(format!(
+                        "date `{raw}` has no start; CSL cannot express that, so only its end is used"
+                    ));
+                    (to_partial(d), None)
+                }
+                DateValue::After(d) => {
+                    problems.push(format!(
+                        "date `{raw}` has no end; CSL cannot express that, so only its start is used"
+                    ));
+                    (to_partial(d), None)
+                }
             };
+            if date.uncertain {
+                problems.push(format!(
+                    "date `{raw}` is marked uncertain; CSL cannot express that, so it is used without the mark"
+                ));
+            }
             Some(Issued {
                 start,
                 end,
@@ -413,31 +469,201 @@ enum Piece {
 
 /// Turn parser chunks into text pieces and markup tags. Braced (verbatim)
 /// chunks are protected from case changes and wrapped in a `nocase` span.
-fn pieces_from_chunks<'a>(chunks: impl Iterator<Item = &'a Chunk>) -> Vec<Piece> {
+fn pieces_from_chunks<'a>(chunks: impl Iterator<Item = &'a Chunk>, unknown: &mut BTreeSet<String>) -> Vec<Piece> {
     let mut pieces = Vec::new();
     for chunk in chunks {
         match chunk {
-            Chunk::Normal(s) => tex_pieces(s, false, &mut pieces),
+            Chunk::Normal(s) => tex_pieces(s, false, &mut pieces, unknown),
             Chunk::Verbatim(s) => {
                 pieces.push(Piece::Tag("<span class=\"nocase\">"));
-                tex_pieces(s, true, &mut pieces);
+                tex_pieces(s, true, &mut pieces, unknown);
                 pieces.push(Piece::Tag("</span>"));
             }
-            Chunk::Math(s) => pieces.push(Piece::Text {
-                text: s.clone(),
-                protected: true,
-            }),
+            Chunk::Math(s) => tex_pieces(s, true, &mut pieces, unknown),
         }
     }
     pieces
 }
 
-/// Translate formatting commands (`\emph{}`, `\textit{}`, ...) into tags and
-/// drop any other command name, keeping its argument.
-fn tex_pieces(text: &str, protected: bool, out: &mut Vec<Piece>) {
+/// Commands whose argument is shown as-is.
+const TRANSPARENT: [&str; 16] = [
+    "ensuremath",
+    "mathrm",
+    "mathit",
+    "mathbf",
+    "mathsf",
+    "mathtt",
+    "mathcal",
+    "mathnormal",
+    "text",
+    "textrm",
+    "textup",
+    "textnormal",
+    "mbox",
+    "hbox",
+    "url",
+    "nolinkurl",
+];
+
+/// Formatting commands that take an argument, and their CSL tags.
+fn formatting(name: &str) -> Option<(&'static str, &'static str)> {
+    Some(match name {
+        "emph" | "textit" | "textsl" | "mkbibemph" | "mkbibitalic" => ("<i>", "</i>"),
+        "textbf" | "mkbibbold" => ("<b>", "</b>"),
+        "textsc" => ("<span style=\"font-variant:small-caps;\">", "</span>"),
+        "textsuperscript" | "mkbibsuperscript" => ("<sup>", "</sup>"),
+        "textsubscript" | "mkbibsubscript" => ("<sub>", "</sub>"),
+        _ => return None,
+    })
+}
+
+/// Old-style declarations such as `{\em text}` that apply to the rest of a group.
+fn declaration(name: &str) -> Option<(&'static str, &'static str)> {
+    Some(match name {
+        "em" | "it" | "itshape" | "sl" | "slshape" => ("<i>", "</i>"),
+        "bf" | "bfseries" => ("<b>", "</b>"),
+        "sc" | "scshape" => ("<span style=\"font-variant:small-caps;\">", "</span>"),
+        _ => return None,
+    })
+}
+
+/// Unicode for common text and math symbol commands.
+fn tex_symbol(name: &str) -> Option<&'static str> {
+    Some(match name {
+        "alpha" => "α",
+        "beta" => "β",
+        "gamma" => "γ",
+        "delta" => "δ",
+        "epsilon" => "ϵ",
+        "varepsilon" => "ε",
+        "zeta" => "ζ",
+        "eta" => "η",
+        "theta" => "θ",
+        "vartheta" => "ϑ",
+        "iota" => "ι",
+        "kappa" => "κ",
+        "lambda" => "λ",
+        "mu" => "μ",
+        "nu" => "ν",
+        "xi" => "ξ",
+        "pi" => "π",
+        "varpi" => "ϖ",
+        "rho" => "ρ",
+        "varrho" => "ϱ",
+        "sigma" => "σ",
+        "varsigma" => "ς",
+        "tau" => "τ",
+        "upsilon" => "υ",
+        "phi" => "ϕ",
+        "varphi" => "φ",
+        "chi" => "χ",
+        "psi" => "ψ",
+        "omega" => "ω",
+        "Gamma" => "Γ",
+        "Delta" => "Δ",
+        "Theta" => "Θ",
+        "Lambda" => "Λ",
+        "Xi" => "Ξ",
+        "Pi" => "Π",
+        "Sigma" => "Σ",
+        "Upsilon" => "Υ",
+        "Phi" => "Φ",
+        "Psi" => "Ψ",
+        "Omega" => "Ω",
+        "times" => "×",
+        "pm" => "±",
+        "mp" => "∓",
+        "cdot" => "·",
+        "div" => "÷",
+        "le" | "leq" => "≤",
+        "ge" | "geq" => "≥",
+        "ne" | "neq" => "≠",
+        "approx" => "≈",
+        "sim" => "∼",
+        "simeq" => "≃",
+        "equiv" => "≡",
+        "propto" => "∝",
+        "infty" => "∞",
+        "partial" => "∂",
+        "nabla" => "∇",
+        "sum" => "∑",
+        "prod" => "∏",
+        "int" => "∫",
+        "sqrt" => "√",
+        "to" | "rightarrow" => "→",
+        "leftarrow" => "←",
+        "Rightarrow" => "⇒",
+        "Leftarrow" => "⇐",
+        "leftrightarrow" => "↔",
+        "Leftrightarrow" => "⇔",
+        "uparrow" => "↑",
+        "downarrow" => "↓",
+        "in" => "∈",
+        "notin" => "∉",
+        "subset" => "⊂",
+        "subseteq" => "⊆",
+        "cup" => "∪",
+        "cap" => "∩",
+        "forall" => "∀",
+        "exists" => "∃",
+        "emptyset" | "varnothing" => "∅",
+        "circ" => "∘",
+        "prime" => "′",
+        "ell" => "ℓ",
+        "hbar" => "ℏ",
+        "degree" | "textdegree" => "°",
+        "ldots" | "dots" | "textellipsis" => "…",
+        "textendash" => "–",
+        "textemdash" => "—",
+        "textquoteleft" => "‘",
+        "textquoteright" => "’",
+        "textquotedblleft" => "“",
+        "textquotedblright" => "”",
+        "guillemotleft" => "«",
+        "guillemotright" => "»",
+        "S" | "textsection" => "§",
+        "P" | "textparagraph" => "¶",
+        "copyright" | "textcopyright" => "©",
+        "textregistered" => "®",
+        "texttrademark" => "™",
+        "euro" | "texteuro" => "€",
+        "pounds" | "textsterling" => "£",
+        "yen" | "textyen" => "¥",
+        "textmu" | "micro" => "µ",
+        "dag" | "textdagger" => "†",
+        "ddag" | "textdaggerdbl" => "‡",
+        "textbullet" => "•",
+        "ae" => "æ",
+        "AE" => "Æ",
+        "oe" => "œ",
+        "OE" => "Œ",
+        "o" => "ø",
+        "O" => "Ø",
+        "aa" => "å",
+        "AA" => "Å",
+        "ss" => "ß",
+        "l" => "ł",
+        "L" => "Ł",
+        "i" => "ı",
+        "LaTeX" => "LaTeX",
+        "TeX" => "TeX",
+        "BibTeX" => "BibTeX",
+        "textbackslash" => "\\",
+        "textasciitilde" => "~",
+        "textasciicircum" => "^",
+        "textunderscore" => "_",
+        _ => return None,
+    })
+}
+
+/// Translate TeX in a field: formatting commands and declarations become CSL
+/// tags, symbol commands become Unicode, wrapper commands keep their
+/// argument, and anything else is kept as written and recorded in `unknown`.
+fn tex_pieces(text: &str, protected: bool, out: &mut Vec<Piece>, unknown: &mut BTreeSet<String>) {
     let mut buf = String::new();
     let mut chars = text.char_indices().peekable();
-    let mut closers: Vec<Option<&'static str>> = Vec::new();
+    // Tags to close at the end of each open brace group; index 0 is the whole text.
+    let mut groups: Vec<Vec<&'static str>> = vec![Vec::new()];
     let flush = |buf: &mut String, out: &mut Vec<Piece>| {
         if !buf.is_empty() {
             out.push(Piece::Text {
@@ -451,50 +677,82 @@ fn tex_pieces(text: &str, protected: bool, out: &mut Vec<Piece>) {
             '\\' => {
                 let name: String = text[i + 1..].chars().take_while(char::is_ascii_alphabetic).collect();
                 if name.is_empty() {
-                    // Escaped character such as \& or \%.
-                    if let Some((_, next)) = chars.next() {
-                        buf.push(next);
+                    // Control symbols: spacing commands and escaped characters.
+                    match chars.next().map(|(_, s)| s) {
+                        Some(',' | ';' | ':' | ' ' | '~' | '\\') => buf.push(' '),
+                        Some('!' | '-' | '/') | None => {}
+                        Some(other) => buf.push(other),
                     }
                     continue;
                 }
                 for _ in 0..name.chars().count() {
                     chars.next();
                 }
-                let (open, close) = match name.as_str() {
-                    "emph" | "textit" | "textsl" | "mkbibemph" | "mkbibitalic" => ("<i>", "</i>"),
-                    "textbf" | "mkbibbold" => ("<b>", "</b>"),
-                    "textsc" => ("<span style=\"font-variant:small-caps;\">", "</span>"),
-                    "textsuperscript" | "mkbibsuperscript" => ("<sup>", "</sup>"),
-                    "textsubscript" | "mkbibsubscript" => ("<sub>", "</sub>"),
-                    _ => ("", ""),
-                };
-                while chars.peek().is_some_and(|(_, c)| c.is_whitespace()) && open.is_empty() {
-                    chars.next();
+                if let Some(symbol) = tex_symbol(&name) {
+                    buf.push_str(symbol);
+                    // `\alpha{}` or `\alpha ` ends the command name.
+                    let mut ahead = chars.clone();
+                    if ahead.next().is_some_and(|(_, c)| c == '{') && ahead.next().is_some_and(|(_, c)| c == '}') {
+                        chars.next();
+                        chars.next();
+                    } else if chars.peek().is_some_and(|(_, c)| *c == ' ') {
+                        chars.next();
+                    }
+                    continue;
                 }
-                if chars.peek().is_some_and(|(_, c)| *c == '{') {
+                if let Some((open, close)) = declaration(&name) {
+                    flush(&mut buf, out);
+                    out.push(Piece::Tag(open));
+                    if let Some(group) = groups.last_mut() {
+                        group.push(close);
+                    }
+                    if chars.peek().is_some_and(|(_, c)| *c == ' ') {
+                        chars.next();
+                    }
+                    continue;
+                }
+                let mut skipped_space = false;
+                while chars.peek().is_some_and(|(_, c)| c.is_whitespace()) {
+                    chars.next();
+                    skipped_space = true;
+                }
+                let has_argument = chars.peek().is_some_and(|(_, c)| *c == '{');
+                if has_argument {
                     chars.next();
                     flush(&mut buf, out);
-                    if open.is_empty() {
-                        closers.push(None);
-                    } else {
+                    let mut closes = Vec::new();
+                    if let Some((open, close)) = formatting(&name) {
                         out.push(Piece::Tag(open));
-                        closers.push(Some(close));
+                        closes.push(close);
+                    } else if !TRANSPARENT.contains(&name.as_str()) {
+                        unknown.insert(name);
+                    }
+                    groups.push(closes);
+                } else {
+                    // Unknown command without an argument: keep it visible.
+                    unknown.insert(name.clone());
+                    buf.push('\\');
+                    buf.push_str(&name);
+                    if skipped_space {
+                        buf.push(' ');
                     }
                 }
             }
-            '{' => closers.push(None),
-            '}' => {
-                if let Some(Some(close)) = closers.pop() {
+            '{' => groups.push(Vec::new()),
+            '}' if groups.len() > 1 => {
+                if let Some(closes) = groups.pop()
+                    && !closes.is_empty()
+                {
                     flush(&mut buf, out);
-                    out.push(Piece::Tag(close));
+                    out.extend(closes.into_iter().rev().map(Piece::Tag));
                 }
             }
             _ => buf.push(c),
         }
     }
     flush(&mut buf, out);
-    for close in closers.into_iter().rev().flatten() {
-        out.push(Piece::Tag(close));
+    for closes in groups.into_iter().rev() {
+        out.extend(closes.into_iter().rev().map(Piece::Tag));
     }
 }
 
@@ -598,10 +856,10 @@ fn render(pieces: &[Piece]) -> String {
 
 // ---------- Small helpers ----------
 
-/// Remove TeX command names (keeping arguments) and braces, for plain fields.
-fn strip_tex(text: &str) -> String {
+/// Plain text of a field: TeX symbols decoded, formatting removed.
+fn strip_tex(text: &str, unknown: &mut BTreeSet<String>) -> String {
     let mut pieces = Vec::new();
-    tex_pieces(text, false, &mut pieces);
+    tex_pieces(text, false, &mut pieces, unknown);
     pieces
         .into_iter()
         .filter_map(|p| match p {
@@ -656,7 +914,7 @@ mod tests {
     use super::*;
 
     fn title(chunks: &[Chunk], english: bool) -> String {
-        let pieces = pieces_from_chunks(chunks.iter());
+        let pieces = pieces_from_chunks(chunks.iter(), &mut BTreeSet::new());
         render(&if english { sentence_case(pieces) } else { pieces })
     }
 

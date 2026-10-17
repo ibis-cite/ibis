@@ -157,3 +157,108 @@ fn large_libraries_load_in_linear_time() {
     assert_eq!(r.references.len(), 5_001);
     assert!(start.elapsed().as_secs() < 20, "took {:?}", start.elapsed());
 }
+
+#[test]
+fn shared_ancestors_are_not_cycles() {
+    // a inherits from b and c (via crossref and xdata); both inherit from d.
+    let r = load(
+        "@book{d, title={D}, publisher={Shared}, year={2001}}\n@book{b, title={B}, crossref={d}}\n@book{c, title={C}, xdata={d}}\n@book{a, title={A}, crossref={b}, xdata={c}}",
+    );
+    assert!(!warned(&r, "cycle"), "{:?}", r.warnings);
+    let a = only(&r, "a");
+    assert_eq!(a.variables.get("publisher").map(String::as_str), Some("Shared"));
+    assert_eq!(a.year(), Some(2001));
+}
+
+#[test]
+fn escaped_quotes_inside_quoted_values_keep_the_record() {
+    let r = load("@book(q, title = \"G\\\"odel (test)\", year = 2020)\n@book{after, title={After}}");
+    assert!(only(&r, "q").title_plain().is_some_and(|t| t.contains("del (test)")));
+    only(&r, "after");
+}
+
+#[test]
+fn tex_symbols_and_math_are_kept_not_dropped() {
+    let r = load(
+        "@article{m, title={The \\ensuremath{\\alpha}-Helix and $\\beta$ Sheets at 37\\,\\textdegree C}, langid={american}}",
+    );
+    let title = only(&r, "m").title_plain().unwrap_or_default();
+    assert!(
+        title.contains('α') && title.contains('β') && title.contains('°'),
+        "{title}"
+    );
+}
+
+#[test]
+fn unknown_tex_commands_are_reported_not_silently_dropped() {
+    let r = load("@article{u, title={A \\frobnicate Title}}");
+    assert!(only(&r, "u").title_plain().is_some_and(|t| t.contains("frobnicate")));
+    assert!(warned(&r, "frobnicate"));
+}
+
+#[test]
+fn subtitles_are_part_of_the_title() {
+    let r = load(
+        "@book{s, title={Sleep}, subtitle={A Very Short Introduction}, langid={american}}\n@article{j, title={T}, journaltitle={Memory}, journalsubtitle={Theory and Practice}}",
+    );
+    assert_eq!(
+        only(&r, "s").title_plain().as_deref(),
+        Some("Sleep: A very short introduction")
+    );
+    assert_eq!(
+        only(&r, "j").container_title.as_deref(),
+        Some("Memory: Theory and Practice")
+    );
+}
+
+#[test]
+fn uncertain_and_open_ended_dates_are_reported() {
+    let r = load(
+        "@book{u, title={T}, date={2020?}}\n@book{before, title={T}, date={../2020}}\n@book{after, title={T}, date={2020/..}}",
+    );
+    for key in ["u", "before", "after"] {
+        assert!(
+            r.warnings.iter().any(|w| w.key.as_deref() == Some(key)),
+            "{key}: {:?}",
+            r.warnings
+        );
+    }
+}
+
+#[test]
+fn exponential_macro_expansion_is_bounded() {
+    let mut src = String::from("@string{m0 = \"xxxxxxxxxxxxxxxx\"}\n");
+    for i in 1..=24 {
+        src.push_str(&format!("@string{{m{i} = m{} # m{}}}\n", i - 1, i - 1));
+    }
+    src.push_str("@article{boom, title = m24}\n");
+    let start = std::time::Instant::now();
+    let r = load(&src);
+    assert!(start.elapsed().as_secs() < 5, "took {:?}", start.elapsed());
+    let title_len = only(&r, "boom").title.map_or(0, |t| t.len());
+    assert!(title_len < 1_000_000, "expanded to {title_len} bytes");
+    assert!(warned(&r, "too large"), "{:?}", r.warnings);
+}
+
+#[test]
+fn block_splitting_scales_linearly() {
+    let build = |n: usize| {
+        (0..n)
+            .map(|i| format!("@misc{{k{i}, title={{T{i}}}}}\n"))
+            .collect::<String>()
+    };
+    let time = |src: &str| {
+        (0..3)
+            .map(|_| {
+                let start = std::time::Instant::now();
+                let _ = load(src);
+                start.elapsed()
+            })
+            .min()
+            .unwrap_or_default()
+    };
+    let small = time(&build(2_000));
+    let large = time(&build(20_000));
+    // Ten times the input may take at most ~25x the time; quadratic growth would be ~100x.
+    assert!(large < small * 25, "2k: {small:?}, 20k: {large:?}");
+}

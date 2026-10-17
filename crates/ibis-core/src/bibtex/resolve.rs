@@ -27,8 +27,14 @@ const DATE_FIELDS: [&str; 9] = [
 /// Fields that link an entry to the entries it inherits from.
 const PARENT_FIELDS: [&str; 2] = ["crossref", "xdata"];
 
-/// Longest inheritance chain followed.
+/// Longest inheritance chain (and macro nesting) followed.
 const MAX_DEPTH: usize = 16;
+
+/// Deepest nesting of abbreviations defined in terms of other abbreviations.
+const MAX_MACRO_DEPTH: usize = 64;
+
+/// Largest field value accepted after expanding abbreviations.
+const MAX_VALUE_BYTES: usize = 64 * 1024;
 
 const MONTHS: [(&str, &str); 12] = [
     ("jan", "January"),
@@ -44,6 +50,14 @@ const MONTHS: [(&str, &str); 12] = [
     ("nov", "November"),
     ("dec", "December"),
 ];
+
+/// State of one depth-first inheritance walk.
+struct Walk {
+    chain: Vec<usize>,
+    edges: HashSet<(usize, usize)>,
+    visited: HashSet<usize>,
+    path: Vec<usize>,
+}
 
 /// Everything needed to resolve entries from one file.
 pub(crate) struct Resolver<'a> {
@@ -125,6 +139,10 @@ impl<'a> Resolver<'a> {
                 rendered.join(",\n")
             ));
         }
+        // The same problem can be found many times (for example an undefined
+        // abbreviation used in several fields); report each one once.
+        let mut unique = HashSet::new();
+        problems.retain(|p| unique.insert(p.clone()));
         Resolved {
             source,
             fields: own_fields,
@@ -132,46 +150,51 @@ impl<'a> Resolver<'a> {
         }
     }
 
-    /// Ancestors of entry `i` in breadth order, plus the links followed to
-    /// reach them. Cycles, missing targets and excessive depth stop the walk.
+    /// Ancestors of entry `i` and the links followed to reach them, found by a
+    /// depth-first walk. A link back to an entry on the current path is a
+    /// cycle and is dropped; reaching an ancestor again through another path
+    /// (a shared ancestor) is valid and keeps the link.
     fn ancestors(&self, i: usize, problems: &mut Vec<String>) -> (Vec<usize>, HashSet<(usize, usize)>) {
-        let mut chain = Vec::new();
-        let mut edges = HashSet::new();
-        let mut seen = HashSet::from([i]);
-        let mut frontier = vec![i];
-        let mut depth = 0;
-        while !frontier.is_empty() {
-            depth += 1;
-            if depth > MAX_DEPTH {
-                problems.push(format!(
-                    "inheritance is deeper than {MAX_DEPTH} levels; further levels are ignored"
-                ));
-                break;
-            }
-            let mut next = Vec::new();
-            for &idx in &frontier {
-                for target in self.parent_keys(idx) {
-                    match self.find(&target) {
-                        None => problems.push(format!(
-                            "`{}` refers to `{target}`, which is not in this file; nothing is inherited from it",
-                            self.entries[idx].key
-                        )),
-                        Some(t) if seen.contains(&t) => problems.push(format!(
-                            "cross-reference cycle through `{}` and `{}`; the repeated link is ignored",
-                            self.entries[idx].key, self.entries[t].key
-                        )),
-                        Some(t) => {
-                            seen.insert(t);
-                            edges.insert((idx, t));
-                            chain.push(t);
-                            next.push(t);
-                        }
-                    }
-                }
-            }
-            frontier = next;
+        let mut walk = Walk {
+            chain: Vec::new(),
+            edges: HashSet::new(),
+            visited: HashSet::from([i]),
+            path: vec![i],
+        };
+        self.visit(i, &mut walk, problems);
+        (walk.chain, walk.edges)
+    }
+
+    fn visit(&self, idx: usize, walk: &mut Walk, problems: &mut Vec<String>) {
+        if walk.path.len() > MAX_DEPTH {
+            problems.push(format!(
+                "inheritance is deeper than {MAX_DEPTH} levels; further levels are ignored"
+            ));
+            return;
         }
-        (chain, edges)
+        for target in self.parent_keys(idx) {
+            let Some(t) = self.find(&target) else {
+                problems.push(format!(
+                    "`{}` refers to `{target}`, which is not in this file; nothing is inherited from it",
+                    self.entries[idx].key
+                ));
+                continue;
+            };
+            if walk.path.contains(&t) {
+                problems.push(format!(
+                    "cross-reference cycle through `{}` and `{}`; the link back is ignored",
+                    self.entries[idx].key, self.entries[t].key
+                ));
+                continue;
+            }
+            walk.edges.insert((idx, t));
+            if walk.visited.insert(t) {
+                walk.chain.push(t);
+                walk.path.push(t);
+                self.visit(t, walk, problems);
+                walk.path.pop();
+            }
+        }
     }
 
     fn parent_keys(&self, idx: usize) -> Vec<String> {
@@ -190,13 +213,32 @@ impl<'a> Resolver<'a> {
     }
 
     /// Concatenate parts, expanding macros (and macros used inside macros).
+    /// Values that would exceed [`MAX_VALUE_BYTES`] are left empty and reported.
     fn expand(&self, field: &str, parts: &[Part], problems: &mut Vec<String>, report: bool) -> String {
         let mut out = String::new();
+        let mut too_large = false;
         for part in parts {
             match part {
                 Part::Text(t) | Part::Number(t) => out.push_str(t),
-                Part::Macro(name) => out.push_str(&self.expand_macro(field, name, problems, report, &mut Vec::new())),
+                Part::Macro(name) => {
+                    self.expand_macro(field, name, problems, report, &mut Vec::new(), &mut out, &mut too_large)
+                }
             }
+            if out.len() > MAX_VALUE_BYTES {
+                too_large = true;
+            }
+            if too_large {
+                break;
+            }
+        }
+        if too_large {
+            if report {
+                problems.push(format!(
+                    "field `{field}` is too large after expanding abbreviations (over {} KiB); it is left empty",
+                    MAX_VALUE_BYTES / 1024
+                ));
+            }
+            return String::new();
         }
         if DATE_FIELDS.contains(&field) {
             out = ascii_digits(&out);
@@ -204,6 +246,7 @@ impl<'a> Resolver<'a> {
         dotless_to_plain(&out)
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn expand_macro(
         &self,
         field: &str,
@@ -211,39 +254,53 @@ impl<'a> Resolver<'a> {
         problems: &mut Vec<String>,
         report: bool,
         stack: &mut Vec<String>,
-    ) -> String {
-        if stack.iter().any(|s| s == name) || stack.len() > MAX_DEPTH {
+        out: &mut String,
+        too_large: &mut bool,
+    ) {
+        if *too_large {
+            return;
+        }
+        if stack.iter().any(|s| s == name) {
             if report {
                 problems.push(format!("abbreviation `{name}` refers to itself; it is left empty"));
             }
-            return String::new();
+            return;
+        }
+        if stack.len() >= MAX_MACRO_DEPTH {
+            if report {
+                problems.push(format!(
+                    "abbreviations are nested more than {MAX_MACRO_DEPTH} levels deep; deeper levels are left empty"
+                ));
+            }
+            return;
         }
         if let Some(parts) = self.macros.get(name) {
             stack.push(name.to_string());
-            let mut out = String::new();
             for part in parts {
                 match part {
                     Part::Text(t) | Part::Number(t) => out.push_str(t),
-                    Part::Macro(inner) => out.push_str(&self.expand_macro(field, inner, problems, report, stack)),
+                    Part::Macro(inner) => self.expand_macro(field, inner, problems, report, stack, out, too_large),
+                }
+                if out.len() > MAX_VALUE_BYTES {
+                    *too_large = true;
+                }
+                if *too_large {
+                    break;
                 }
             }
             stack.pop();
-            return out;
+            return;
         }
         if let Some((abbr, full)) = MONTHS.iter().find(|(abbr, _)| *abbr == name) {
             // In a month field the parser understands the abbreviation itself.
-            return if field == "month" {
-                (*abbr).to_string()
-            } else {
-                (*full).to_string()
-            };
+            out.push_str(if field == "month" { abbr } else { full });
+            return;
         }
         if report {
             problems.push(format!(
                 "undefined abbreviation `{name}`; the field using it is left empty"
             ));
         }
-        String::new()
     }
 }
 

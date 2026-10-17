@@ -108,3 +108,17 @@ fn cross_reference_cycles_never_abort_the_process() {
         assert!(String::from_utf8_lossy(&out.stdout).contains("cycle"), "{name}");
     }
 }
+
+#[test]
+fn exporting_everything_refuses_duplicate_citation_keys() {
+    let a = write(
+        "cli-all-a",
+        "refs.bib",
+        "@article{same, title={From A}}\n@article{onlya, title={Only A}}\n",
+    );
+    let b = write("cli-all-b", "refs.bib", "@article{same, title={From B}}\n");
+    let out = ibis(&["csl", "--all", "--bib", s(&a), "--bib", s(&b)]);
+    assert!(!out.status.success());
+    assert!(String::from_utf8_lossy(&out.stderr).contains("same"));
+    assert!(ibis(&["csl", "--all", "--bib", s(&a)]).status.success());
+}
