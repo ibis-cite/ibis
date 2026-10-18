@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""Capture synthetic picker states in a debug evidence build, one app at a time."""
+import argparse
+import math
+import os
+from pathlib import Path
+import platform
+import signal
+import subprocess
+import sys
+import tempfile
+
+
+STATES = (
+    "first-run", "loading", "empty", "no-results", "many-results", "long-titles",
+    "rtl", "missing-file", "invalid-settings", "damaged-library",
+    "copy-confirmation", "large-text", "dark", "high-contrast",
+)
+PNG_HEADER = b"\x89PNG\r\n\x1a\n"
+WINDOWS_CAPTURE = r"""
+$ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+$bounds = [System.Windows.Forms.SystemInformation]::VirtualScreen
+$bitmap = [System.Drawing.Bitmap]::new($bounds.Width, $bounds.Height)
+$graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+try {
+  $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+  $bitmap.Save($env:IBIS_GALLERY_SCREENSHOT, [System.Drawing.Imaging.ImageFormat]::Png)
+} finally { $graphics.Dispose(); $bitmap.Dispose() }
+"""
+
+
+class CaptureError(Exception):
+    """A capture cannot be used as evidence."""
+
+
+def capture_screenshot(destination, platform_name):
+    """Paths are separate arguments or environment data, never shell text."""
+    env = os.environ.copy()
+    if platform_name == "Linux":
+        command = ["import", "-window", "root", str(destination)]
+    elif platform_name == "Darwin":
+        command = ["screencapture", "-x", "-m", "-t", "png", str(destination)]
+    elif platform_name == "Windows":
+        env["IBIS_GALLERY_SCREENSHOT"] = str(destination)
+        command = ["pwsh", "-NoProfile", "-NonInteractive", "-Command", WINDOWS_CAPTURE]
+    else:
+        raise CaptureError("unsupported screenshot platform")
+    try:
+        subprocess.run(command, env=env, check=True, timeout=30)
+    except FileNotFoundError as error:
+        raise CaptureError("native screenshot command is unavailable") from error
+    except subprocess.TimeoutExpired as error:
+        raise CaptureError("native screenshot capture timed out") from error
+    except (OSError, subprocess.SubprocessError) as error:
+        raise CaptureError("native screenshot capture failed") from error
+
+
+def stop_app(process, platform_name):
+    """Reap the app and stop its process group/tree, including on failed startup."""
+    if platform_name == "Windows":
+        try:
+            subprocess.run(
+                ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10,
+            )
+        except (OSError, subprocess.SubprocessError):
+            pass  # The process handle below still provides a reliable final kill.
+        if process.poll() is None:
+            process.kill()
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        if platform_name == "Windows":
+            process.kill()
+        else:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        process.wait(timeout=5)
+
+
+def capture_gallery(app, output, *, states=STATES, wait_seconds=8, platform_name=None):
+    platform_name = platform_name or platform.system()
+    if platform_name not in ("Linux", "Darwin", "Windows"):
+        raise CaptureError("unsupported screenshot platform")
+    if not math.isfinite(wait_seconds) or wait_seconds < 0 or not states or any(state not in STATES for state in states):
+        raise CaptureError("invalid gallery states or startup wait")
+    app, output = Path(app).resolve(), Path(output).resolve()
+    output.mkdir(parents=True, exist_ok=True)
+    # A failed rerun must not accidentally upload screenshots from an earlier run.
+    for state in states:
+        (output / f"{state}.png").unlink(missing_ok=True)
+    with tempfile.TemporaryDirectory(prefix="ibis-synthetic-gallery-") as temporary:
+        source = Path(temporary) / "synthetic.bib"
+        source.write_text("@misc{syntheticGallery, title={Synthetic gallery source}}\n", encoding="utf8")
+        env = {**os.environ, "IBIS_GALLERY": "1", "IBIS_LIBRARY": str(source)}
+        for state in states:
+            env["IBIS_GALLERY_STATE"] = state
+            staging = output / f".{state}.capture.png"
+            staging.unlink(missing_ok=True)
+            try:
+                with (output / f"startup-{state}.log").open("wb") as log:
+                    options = {"env": env.copy(), "stdout": log, "stderr": subprocess.STDOUT}
+                    if platform_name == "Windows":
+                        options["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+                    else:
+                        options["start_new_session"] = True
+                    process = subprocess.Popen([str(app)], **options)
+                    try:
+                        try:
+                            process.wait(timeout=wait_seconds)
+                        except subprocess.TimeoutExpired:
+                            pass
+                        else:
+                            raise CaptureError(f"app exited during {state} startup; see its startup log")
+                        capture_screenshot(staging, platform_name)
+                        if process.poll() is not None:
+                            raise CaptureError(f"app exited while capturing {state}; see its startup log")
+                        try:
+                            with staging.open("rb") as image:
+                                if image.read(len(PNG_HEADER)) != PNG_HEADER:
+                                    raise CaptureError(f"capture for {state} is not a PNG")
+                        except OSError as error:
+                            raise CaptureError(f"capture for {state} was not written") from error
+                        staging.replace(output / f"{state}.png")
+                    finally:
+                        stop_app(process, platform_name)
+            finally:
+                staging.unlink(missing_ok=True)
+            print(f"Captured {state}", flush=True)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--app", required=True, type=Path, help="debug ibis-desktop executable with evidence assets")
+    parser.add_argument("--output", required=True, type=Path, help="directory for PNGs and synthetic startup logs")
+    parser.add_argument("--wait", type=float, default=8, help="startup wait in seconds per state (default: 8)")
+    parser.add_argument("--state", choices=STATES, action="append", help="capture only this state (repeatable; default: all 14)")
+    args = parser.parse_args(argv)
+    if not args.app.is_file() or (os.name != "nt" and not os.access(args.app, os.X_OK)):
+        parser.error("--app must name an executable regular file")
+    if not math.isfinite(args.wait) or args.wait < 0:
+        parser.error("--wait must be a finite nonnegative number")
+    if args.output.exists() and not args.output.is_dir():
+        parser.error("--output must name a directory")
+    try:
+        capture_gallery(args.app, args.output, states=tuple(args.state or STATES), wait_seconds=args.wait)
+    except CaptureError as error:
+        print(f"Gallery capture failed: {error}.", file=sys.stderr)
+        return 1
+    except (OSError, subprocess.SubprocessError):
+        # Startup logs remain local artifacts; do not print their payloads here.
+        print("Gallery capture failed; inspect the state startup logs and native capture errors.", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
