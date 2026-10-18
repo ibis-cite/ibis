@@ -42,12 +42,12 @@ function run(argv) {
         state.owned = windows.length === 1 && state.owned_document_path_matches === 1;
         return state;
     };
-    const elements = () => {
-        const app = process(appId);
-        if (!app || app.windows.length === 0) return [];
-        const tree = app.windows[0].entireContents();
-        if (tree.length > 4000) throw Error('Accessibility tree exceeded smoke traversal bound');
-        return tree;
+    const frame = window => {
+        const position = window.position(), size = window.size();
+        if (position.length !== 2 || size.length !== 2 || !position.concat(size).every(numeric)) {
+            throw Error('Accessible window bounds unavailable');
+        }
+        return {position, size};
     };
     const onScreen = (ownerId, accessibleWindows) => {
         const windowRefs = $.CGWindowListCopyWindowInfo(
@@ -68,37 +68,75 @@ function run(argv) {
             }
             windows.push(window);
         }
-        const frames = accessibleWindows.map(window => {
-            const position = window.position(), size = window.size();
-            if (position.length !== 2 || size.length !== 2 ||
-                !position.concat(size).every(numeric)) {
-                throw Error('Accessible window bounds unavailable');
-            }
-            return {position, size};
-        });
-        // Hidden windows may remain in the AX tree. Match an on-screen CG
-        // window to an AX picker frame; owner PID alone can match a tray item.
-        const ownWindows = windows.filter(window => {
+        const frames = accessibleWindows.map(frame);
+        const owned = windows.filter(window => {
             if (!numeric(window.kCGWindowOwnerPID)) throw Error('Window ownership metadata unavailable');
             return Number(window.kCGWindowOwnerPID) === ownerId;
         });
-        ownWindows.forEach(window => {
+        owned.forEach(window => {
             const bounds = window.kCGWindowBounds || {};
             if (!numeric(window.kCGWindowAlpha) ||
                 !['X', 'Y', 'Width', 'Height'].every(key => numeric(bounds[key]))) {
                 throw Error('On-screen window bounds unavailable');
             }
         });
-        return ownWindows.some(window => {
-            const bounds = window.kCGWindowBounds || {};
-            return Number(window.kCGWindowAlpha) > 0 &&
-                Number(bounds.Width) > 0 && Number(bounds.Height) > 0 && frames.some(frame =>
-                    frame.position.length === 2 && frame.size.length === 2 &&
-                    Math.abs(frame.position[0] - Number(bounds.X)) <= 2 &&
-                    Math.abs(frame.position[1] - Number(bounds.Y)) <= 2 &&
-                    Math.abs(frame.size[0] - Number(bounds.Width)) <= 2 &&
-                    Math.abs(frame.size[1] - Number(bounds.Height)) <= 2);
+        return owned.some(window => {
+            const bounds = window.kCGWindowBounds;
+            return Number(window.kCGWindowAlpha) > 0 && Number(bounds.Width) > 0 && Number(bounds.Height) > 0 &&
+                frames.some(candidate =>
+                    Math.abs(candidate.position[0] - bounds.X) <= 2 &&
+                    Math.abs(candidate.position[1] - bounds.Y) <= 2 &&
+                    Math.abs(candidate.size[0] - bounds.Width) <= 2 &&
+                    Math.abs(candidate.size[1] - bounds.Height) <= 2);
         });
+    };
+    const contents = element => {
+        const tree = element.entireContents();
+        if (tree.length > 4000) throw Error('Accessibility tree exceeded smoke traversal bound');
+        return [element].concat(tree);
+    };
+    const labelled = (element, label) => [safe(() => element.title()), safe(() => element.description()),
+        safe(() => element.name()), safe(() => element.value())].includes(label);
+    const focused = element => safe(() => element.attributes.byName('AXFocused').value(), false) === true;
+    const pickerWindows = () => {
+        const app = process(appId);
+        return app ? app.windows().filter(window => labelled(window, 'Ibis')) : [];
+    };
+    const editorWindow = () => {
+        const editor = process(editorId);
+        const windows = editor ? editor.windows() : [];
+        if (windows.length !== 1) throw Error('A single synthetic editor window is required');
+        return windows[0];
+    };
+    const fullscreen = window => {
+        let state;
+        try { state = window.attributes.byName('AXFullScreen').value(); }
+        catch (_) { throw Error('Editor fullscreen accessibility state unavailable'); }
+        if (typeof state !== 'boolean') throw Error('Editor fullscreen accessibility state unavailable');
+        return state;
+    };
+    const chooser = () => {
+        const app = process(appId);
+        if (!app) throw Error('Native picker process unavailable');
+        const candidates = [];
+        app.windows().forEach(window => contents(window).forEach(element => {
+            const role = safe(() => element.role()), subrole = safe(() => element.subrole());
+            const titledWindow = role === 'AXWindow' && labelled(element, 'Choose a BibTeX or BibLaTeX library');
+            if (role !== 'AXSheet' && role !== 'AXDialog' && subrole !== 'AXDialog' && !titledWindow) return;
+            const nodes = contents(element);
+            if (nodes.some(node => labelled(node, 'Choose a BibTeX or BibLaTeX library'))) {
+                candidates.push({element, nodes});
+            }
+        }));
+        if (candidates.length > 10) throw Error('Native chooser scope exceeded smoke traversal bound');
+        return candidates.find(candidate => onScreen(appId, [candidate.element]));
+    };
+    const elements = () => {
+        const app = process(appId);
+        if (!app || app.windows.length === 0) return [];
+        const tree = app.windows[0].entireContents();
+        if (tree.length > 4000) throw Error('Accessibility tree exceeded smoke traversal bound');
+        return tree;
     };
     let result;
     switch (action) {
@@ -147,12 +185,51 @@ function run(argv) {
                 focused: safe(() => item.attributes.byName('AXFocused').value(), false) === true,
             }));
         });
+        // Hidden windows may remain in the AX tree. Match an on-screen CG
+        // window to an AX picker frame; owner PID alone can match a tray item.
         const visible = onScreen(appId, app ? app.windows() : []);
         // A nonactivating panel intentionally leaves the editor application
         // frontmost while accepting keyboard input in its own search field.
         // The AX keyboard focus is the relevant foreground proof here.
         result = {nodes, visible,
             foreground: visible && nodes.some(node => node.focused && node.name === 'Search references')};
+        break;
+    }
+    case 'editor-window-state': {
+        const window = editorWindow();
+        result = {fullscreen: fullscreen(window), visible: onScreen(editorId, [window])};
+        break;
+    }
+    case 'set-editor-fullscreen': {
+        if (!['true', 'false'].includes(text)) throw Error('Unsupported fullscreen request');
+        const desired = text === 'true';
+        if (fullscreen(editorWindow()) !== desired) {
+            try { editorWindow().attributes.byName('AXFullScreen').value = desired; }
+            catch (_) { throw Error('Editor fullscreen accessibility control unavailable'); }
+        }
+        const deadline = Date.now() + 20000;
+        while ((fullscreen(editorWindow()) !== desired || !onScreen(editorId, [editorWindow()])) && Date.now() < deadline) {
+            $.NSThread.sleepForTimeInterval(0.1);
+        }
+        if (fullscreen(editorWindow()) !== desired || !onScreen(editorId, [editorWindow()])) {
+            throw Error('Editor fullscreen transition did not complete on screen');
+        }
+        result = {fullscreen: desired, visible: onScreen(editorId, [editorWindow()])};
+        break;
+    }
+    case 'chooser-state': {
+        const dialog = chooser();
+        result = {visible: !!dialog, focused: !!dialog && dialog.nodes.some(focused),
+            picker_visible: onScreen(appId, pickerWindows())};
+        break;
+    }
+    case 'cancel-chooser': {
+        const dialog = chooser();
+        if (!dialog) throw Error('The named native library chooser is not on screen');
+        const cancel = dialog.nodes.find(node => safe(() => node.role()) === 'AXButton' && labelled(node, 'Cancel'));
+        if (!cancel) throw Error('Native library chooser Cancel control unavailable');
+        cancel.actions.byName('AXPress').perform();
+        result = true;
         break;
     }
     case 'key': {
