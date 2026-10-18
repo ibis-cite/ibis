@@ -104,7 +104,43 @@ impl ReadyAck {
     }
 }
 
-/// Called before navigation, and only inside the debug gallery opt-in block.
+/// Select the first document before Tauri creates its webviews. Navigating in
+/// setup can race the initial WebView2 load and leave a blank Windows picker.
+pub(crate) fn configure<R: tauri::Runtime>(context: &mut tauri::Context<R>) -> tauri::Result<()> {
+    let enabled = std::env::var("IBIS_GALLERY").ok();
+    let state = std::env::var("IBIS_GALLERY_STATE").ok();
+    configure_windows(
+        &mut context.config_mut().app.windows,
+        enabled.as_deref(),
+        state.as_deref(),
+    )
+}
+
+fn configure_windows(
+    windows: &mut [tauri::utils::config::WindowConfig],
+    enabled: Option<&str>,
+    state: Option<&str>,
+) -> tauri::Result<()> {
+    if enabled != Some("1") {
+        return Ok(());
+    }
+    // Use the shared encoder, then give Tauri a relative app URL. Tauri joins
+    // this with its own platform/dev origin when constructing each webview.
+    let origin = Url::parse("tauri://localhost/").map_err(tauri::Error::InvalidUrl)?;
+    if let Some(destination) = gallery_url(origin, enabled, state) {
+        let mut relative = destination.path().trim_start_matches('/').to_string();
+        if let Some(query) = destination.query() {
+            relative.push('?');
+            relative.push_str(query);
+        }
+        for window in windows.iter_mut().filter(|window| window.label == "main") {
+            window.url = tauri::WebviewUrl::App(PathBuf::from(&relative));
+        }
+    }
+    Ok(())
+}
+
+/// Called during setup, and only inside the debug gallery opt-in block.
 /// Normal and release windows retain their default event permissions.
 pub(crate) fn install_readiness(
     app: &AppHandle,
@@ -178,6 +214,97 @@ mod tests {
 
     fn parse(value: &str) -> Url {
         Url::parse(value).unwrap_or_else(|error| panic!("synthetic URL was invalid: {error}"))
+    }
+
+    fn synthetic_config() -> tauri::Config {
+        serde_json::from_str(include_str!("../tauri.conf.json"))
+            .unwrap_or_else(|error| panic!("invalid synthetic app config: {error}"))
+    }
+
+    #[test]
+    fn initial_gallery_configuration_changes_only_the_main_url() {
+        let mut config = synthetic_config();
+        let mut other = config.app.windows[0].clone();
+        other.label = "other".into();
+        other.url = tauri::WebviewUrl::App("other.html?keep=1".into());
+        config.app.windows.push(other);
+        let original_url = config.app.windows[0].url.clone();
+        let original = serde_json::to_value(&config).unwrap_or_else(|e| panic!("{e}"));
+        configure_windows(&mut config.app.windows, Some("1"), Some("first-run")).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            config.app.windows[0].url,
+            tauri::WebviewUrl::App("gallery.html?state=first-run".into())
+        );
+        // Includes WebView2 network arguments, placement and every other option.
+        config.app.windows[0].url = original_url;
+        assert_eq!(
+            serde_json::to_value(&config).unwrap_or_else(|e| panic!("{e}")),
+            original
+        );
+    }
+
+    #[test]
+    fn disabled_initial_gallery_configuration_preserves_all_windows() {
+        for enabled in [None, Some(""), Some("0"), Some("true"), Some(" 1"), Some("1 ")] {
+            let mut config = synthetic_config();
+            config.app.windows[0].url = tauri::WebviewUrl::App("original.html?keep=1#fragment".into());
+            let original = serde_json::to_value(&config).unwrap_or_else(|e| panic!("{e}"));
+            configure_windows(&mut config.app.windows, enabled, Some("loading")).unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(
+                serde_json::to_value(&config).unwrap_or_else(|e| panic!("{e}")),
+                original
+            );
+        }
+    }
+
+    #[test]
+    fn gallery_configuration_without_a_main_window_changes_nothing() {
+        let mut config = synthetic_config();
+        config.app.windows[0].label = "other".into();
+        let original = serde_json::to_value(&config).unwrap_or_else(|e| panic!("{e}"));
+        configure_windows(&mut config.app.windows, Some("1"), Some("loading")).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            serde_json::to_value(&config).unwrap_or_else(|e| panic!("{e}")),
+            original
+        );
+    }
+
+    #[test]
+    fn initial_gallery_relative_url_joins_all_tauri_origins_with_one_encoded_state() {
+        for state in [
+            "loading",
+            "//other.invalid/?state=empty#x",
+            "loading&state=empty",
+            "日本語 + % ? & #",
+            "",
+        ] {
+            let mut config = synthetic_config();
+            configure_windows(&mut config.app.windows, Some("1"), Some(state)).unwrap_or_else(|e| panic!("{e}"));
+            let tauri::WebviewUrl::App(relative) = &config.app.windows[0].url else {
+                panic!("gallery must remain a Tauri app document");
+            };
+            for origin in [
+                "tauri://localhost/",
+                "http://tauri.localhost/",
+                "https://tauri.localhost/",
+                "http://localhost:5173/",
+            ] {
+                let base = parse(origin);
+                let joined = base.join(&relative.to_string_lossy()).unwrap_or_else(|e| panic!("{e}"));
+                assert_eq!(joined.scheme(), base.scheme());
+                assert_eq!(joined.host_str(), base.host_str());
+                assert_eq!(joined.port(), base.port());
+                assert_eq!(joined.path(), "/gallery.html");
+                assert_eq!(joined.fragment(), None);
+                assert_eq!(
+                    joined.query_pairs().collect::<Vec<_>>(),
+                    [("state".into(), state.into())]
+                );
+            }
+        }
+        let mut config = synthetic_config();
+        configure_windows(&mut config.app.windows, Some("1"), None).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(config.app.windows[0].url, tauri::WebviewUrl::App("gallery.html".into()));
     }
 
     #[test]
