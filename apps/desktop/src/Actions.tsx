@@ -61,7 +61,9 @@ export function Actions({ actions, close, dialog }: {
         // Unconsumed events retain the picker's global shortcuts, including Quit.
       }}>
       <div className="actions-heading"><strong>Actions</strong><button type="button" aria-label="Close Actions" onClick={dismiss}>×</button></div>
-      <ul id="actions-list" role="listbox" aria-label="Available actions">
+      {/* Scroll containers can become automatic Tab stops. Keep keyboard
+          focus in the filter, which owns virtual action navigation. */}
+      <ul id="actions-list" role="listbox" aria-label="Available actions" tabIndex={-1}>
         {matches.map((action) => <li key={action.id} id={`action-${action.id}`} role="option"
           aria-selected={current?.id === action.id} aria-disabled={action.disabled || undefined}
           onClick={() => execute(action)}><span>{action.label}</span>{action.shortcut && <kbd aria-hidden="true">{action.shortcut}</kbd>}</li>)}
