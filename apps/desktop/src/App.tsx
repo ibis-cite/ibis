@@ -106,6 +106,13 @@ export function App() {
     document.getElementById(`result-${active}`)?.scrollIntoView?.({ block: "nearest" });
   }, [active]);
 
+  // Success is brief; warnings stay available until explicitly dismissed.
+  useEffect(() => {
+    if (!copied || copied.warnings.length > 0) return;
+    const timer = window.setTimeout(() => setCopied(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
+
   const toggle = (result: SearchResult) => {
     setSelected((previous) => {
       const next = new Map(previous);
@@ -158,76 +165,66 @@ export function App() {
             : `The shortcut ${shortcut.shortcut} is not available: ${shortcut.error}.`}
         </p>
       )}
-      <section aria-label="Library">
-        <span>
-          {library?.name
-            ? `${library.name}: ${library.references} references` +
-              (library.warnings > 0 ? `, ${library.warnings} could not be read fully` : "")
-            : "No library chosen"}
-        </span>{" "}
-        <button type="button" onClick={() => void chooseLibrary()}>
-          Choose library…
-        </button>
-        {library?.name && (
-          <button type="button" onClick={() => void reloadLibrary()}>
-            Reload
-          </button>
+      <div className="search-bar">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <path d="m16 16 5 5" />
+        </svg>
+        <label className="visually-hidden" htmlFor="search">
+          Search references
+        </label>
+        <input
+          id="search"
+          type="search"
+          placeholder="Search references…"
+          role="combobox"
+          aria-expanded={results.length > 0}
+          aria-controls="results"
+          aria-activedescendant={results[active] ? `result-${active}` : undefined}
+          ref={input}
+          autoFocus
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (composing(e)) return;
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+              e.preventDefault();
+              const step = e.key === "ArrowDown" ? 1 : -1;
+              setActive((i) => Math.min(Math.max(i + step, 0), Math.max(results.length - 1, 0)));
+            } else if (e.key === "Enter" && e.shiftKey) {
+              e.preventDefault();
+              const result = results[active];
+              if (result) toggle(result);
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              void copy();
+            }
+          }}
+        />
+      </div>
+      <div className="notices">
+        {error && <p role="alert">{error}</p>}
+        {copyError && <p role="alert">Nothing was copied: {copyError}</p>}
+        {copied && (
+          <div role="status" className="copy-notice">
+            <p>
+              Copied <code>{copied.text}</code>
+            </p>
+            {copied.warnings.length > 0 && (
+              <>
+                <button type="button" className="dismiss" aria-label="Dismiss copy warnings" onClick={() => setCopied(null)}>
+                  Dismiss
+                </button>
+                <ul aria-label="Copy warnings">
+                  {copied.warnings.map((w) => (
+                    <li key={w}>{w}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
         )}
-        {library?.error && <p role="alert">The library could not be opened: {library.error}</p>}
-        {library?.note && <p role="status">{library.note}</p>}
-      </section>
-      <label htmlFor="search">Search references</label>
-      <input
-        id="search"
-        type="search"
-        role="combobox"
-        aria-expanded={results.length > 0}
-        aria-controls="results"
-        aria-activedescendant={results[active] ? `result-${active}` : undefined}
-        ref={input}
-        autoFocus
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={(e) => {
-          if (composing(e)) return;
-          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-            e.preventDefault();
-            const step = e.key === "ArrowDown" ? 1 : -1;
-            setActive((i) => Math.min(Math.max(i + step, 0), Math.max(results.length - 1, 0)));
-          } else if (e.key === "Enter" && e.shiftKey) {
-            e.preventDefault();
-            const result = results[active];
-            if (result) toggle(result);
-          } else if (e.key === "Enter") {
-            e.preventDefault();
-            void copy();
-          }
-        }}
-      />
-      <label htmlFor="format">Copy as</label>
-      <select id="format" value={format} onChange={(e) => setFormat(e.target.value as CopyFormat)}>
-        {COPY_FORMATS.map((f) => (
-          <option key={f.value} value={f.value}>
-            {f.label}
-          </option>
-        ))}
-      </select>
-      {error && <p role="alert">{error}</p>}
-      {copyError && <p role="alert">Nothing was copied: {copyError}</p>}
-      {copied && (
-        <div role="status">
-          <p>
-            Copied <code>{copied.text}</code>
-          </p>
-          {copied.warnings.length > 0 && (
-            <ul aria-label="Copy warnings">
-              {copied.warnings.map((w) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+      </div>
       {selected.size > 0 && (
         <ul aria-label="Selected references">
           {[...selected.entries()].map(([key, r]) => (
@@ -240,29 +237,74 @@ export function App() {
           ))}
         </ul>
       )}
-      <ul id="results" role="listbox" aria-label="Results" aria-multiselectable="true">
-        {results.map((r, i) => (
-          <li
-            key={idKey(r.id)}
-            id={`result-${i}`}
-            role="option"
-            aria-selected={selected.has(idKey(r.id))}
-            data-active={i === active || undefined}
-            onClick={() => {
-              setActive(i);
-              toggle(r);
-            }}
-          >
-            <strong>{r.title}</strong> {r.authors} {r.year ?? "n.d."} <code>{r.key}</code>
-          </li>
-        ))}
-      </ul>
+      <div className="results-area">
+        <ul id="results" role="listbox" aria-label="Results" aria-multiselectable="true">
+          {results.map((r, i) => (
+            <li
+              key={idKey(r.id)}
+              id={`result-${i}`}
+              role="option"
+              aria-selected={selected.has(idKey(r.id))}
+              data-active={i === active || undefined}
+              onClick={() => {
+                setActive(i);
+                toggle(r);
+              }}
+            >
+              <span className="result-text">
+                <strong>{r.title}</strong>
+                <span className="result-meta">
+                  {r.authors} · {r.year ?? "n.d."}
+                </span>
+              </span>
+              <code className="result-key">{r.key}</code>
+            </li>
+          ))}
+        </ul>
+        {results.length === 0 && !error && (
+          <p className="empty-state">
+            {library?.name ? (query ? "No matching references" : "Type to find a reference") : "Choose a library to get started"}
+          </p>
+        )}
+      </div>
       <footer>
-        <small>Enter copies · Shift+Enter adds to the selection · Escape hides</small>{" "}
-        {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
-        <button type="button" onClick={() => void quit()}>
-          Quit Ibis
-        </button>
+        <section aria-label="Library" className="library-bar">
+          <span className="library-name">
+            {library?.name
+              ? `${library.name}: ${library.references} references` +
+                (library.warnings > 0 ? `, ${library.warnings} could not be read fully` : "")
+              : "No library chosen"}
+          </span>{" "}
+          <button type="button" onClick={() => void chooseLibrary()}>
+            Choose library…
+          </button>
+          {library?.name && (
+            <button type="button" onClick={() => void reloadLibrary()}>
+              Reload
+            </button>
+          )}
+          {library?.error && <p role="alert">The library could not be opened: {library.error}</p>}
+          {library?.note && <p role="status">{library.note}</p>}
+        </section>
+        <div className="footer-tools">
+          <label className="visually-hidden" htmlFor="format">
+            Copy as
+          </label>
+          <select id="format" value={format} onChange={(e) => setFormat(e.target.value as CopyFormat)}>
+            {COPY_FORMATS.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+          <small className="key-hints">
+            <kbd>↵</kbd> Copy · <kbd>⇧↵</kbd> Add · <kbd>Esc</kbd> Hide
+          </small>
+          {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
+          <button type="button" onClick={() => void quit()}>
+            Quit Ibis
+          </button>
+        </div>
       </footer>
     </main>
   );

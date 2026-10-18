@@ -1,15 +1,41 @@
-import { afterEach, expect, test } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, expect, test, vi } from "vitest";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { emit } from "@tauri-apps/api/event";
 import { App } from "./App";
 
 afterEach(async () => {
+  vi.useRealTimers();
   cleanup();
   // Event listeners are removed asynchronously after unmount; let that
   // finish before the mocked Tauri internals are cleared.
   await new Promise((resolve) => setTimeout(resolve, 0));
   clearMocks();
+});
+
+test("copy confirmation expires, but copy warnings remain until dismissed", async () => {
+  let warnings: string[] = [];
+  backend({
+    search: () => [result("a", "First")],
+    copy_citation: () => ({ text: "@a", warnings }),
+  });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  vi.useFakeTimers();
+  await act(async () => { fireEvent.keyDown(box, { key: "Enter" }); });
+  expect(screen.getByText("@a")).toBeTruthy();
+  await act(() => vi.advanceTimersByTimeAsync(3000));
+  expect(screen.queryByText("@a")).toBeNull();
+  vi.useRealTimers();
+  warnings = ["A warning to read"];
+  fireEvent.keyDown(box, { key: "Enter" });
+  await screen.findByText("A warning to read");
+  vi.useFakeTimers();
+  await act(() => vi.advanceTimersByTimeAsync(3000));
+  expect(screen.getByText("A warning to read")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Dismiss copy warnings" }));
+  expect(screen.queryByLabelText("Copy warnings")).toBeNull();
 });
 
 function result(key: string, title: string, source = "refs.bib") {
