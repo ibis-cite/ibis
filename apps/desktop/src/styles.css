@@ -79,15 +79,25 @@ main {
 [aria-label="Selected references"] li { border: 1px solid var(--line); border-radius: 6px; padding-inline-start: .5rem; overflow-wrap: anywhere; max-width: 100%; }
 [aria-label="Selected references"] button { border: 0; background: transparent; font-size: .8rem; }
 
-footer { border-top: 1px solid var(--line); padding: .55rem 1rem; font-size: .75rem; }
-.library-bar, .footer-tools { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
-.library-name { flex: 1; min-width: 8rem; overflow-wrap: anywhere; color: var(--muted); }
-.library-bar p { width: 100%; margin: .3rem 0; }
-.footer-tools { margin-top: .25rem; justify-content: space-between; }
-.quiet-button, .icon-button { background: transparent; border-color: transparent; color: var(--muted); }
-.icon-button { font-size: 1rem; padding: .15rem .4rem; }
-#format { max-width: 100%; font-size: .75rem; border-color: transparent; background: transparent; padding-inline-start: 0; }
-.key-hints { color: var(--muted); font-size: .75rem; }
+footer { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; border-top: 1px solid var(--line); padding: .55rem .8rem; font-size: .75rem; }
+.footer-context, .footer-actions { display: flex; align-items: center; gap: .4rem; min-width: 0; }
+.footer-context { flex: 1; }
+.library-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.library-notices { padding-inline: 1rem; overflow-wrap: anywhere; }
+.library-notices:empty { display: none; }
+#format { min-width: 0; max-width: 8rem; font-size: .75rem; border-color: transparent; background: transparent; }
+.footer-actions button { background: transparent; border-color: transparent; white-space: nowrap; }
+button:disabled, [aria-disabled="true"] { color: var(--muted); opacity: .65; }
+.actions-panel { position: fixed; inset: auto .8rem 3.5rem auto; margin: 0; width: 22rem; max-width: calc(100vw - 1.6rem); max-height: calc(100dvh - 5rem); padding: .4rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--text); box-shadow: 0 .5rem 2rem #0003; }
+.actions-panel::backdrop { background: transparent; }
+.actions-heading { display: flex; align-items: center; justify-content: space-between; padding-inline: .5rem; }
+.actions-heading button { border: 0; background: transparent; }
+#actions-list { list-style: none; padding: 0; margin: .3rem 0; max-height: min(17rem, 45dvh); overflow: auto; }
+#actions-list [role="option"] { padding: .45rem .55rem; border-radius: 5px; font-size: .85rem; overflow-wrap: anywhere; }
+#actions-list [aria-selected="true"] { background: Canvas; background: color-mix(in srgb, var(--text) 9%, var(--surface)); color: var(--text); border-color: var(--active-edge); }
+#action-search { width: 100%; min-width: 0; border: 0; border-top: 1px solid var(--line); background: transparent; padding: .65rem .5rem; }
+.actions-panel p { padding-inline: .5rem; }
+
 kbd { font: inherit; font-size: .65rem; display: inline-block; padding: .1rem .25rem; border: 1px solid var(--line); border-radius: 3px; margin-inline-start: .2rem; }
 
 @media (prefers-contrast: more) {
@@ -97,6 +107,7 @@ kbd { font: inherit; font-size: .65rem; display: inline-block; padding: .1rem .2
 @media (forced-colors: active) {
   :root { --surface: Canvas; --text: CanvasText; --muted: CanvasText; --line: ButtonText; --active-edge: CanvasText; }
   [role="option"][data-active] { border-color: Highlight; }
+  #actions-list [aria-selected="true"] { background: Highlight; color: HighlightText; }
   [role="option"][aria-selected="true"] { outline: 2px solid Highlight; outline-offset: -4px; }
   .search-bar:focus-within { outline: 2px solid Highlight; outline-offset: -3px; }
 }
@@ -106,6 +117,10 @@ kbd { font: inherit; font-size: .65rem; display: inline-block; padding: .1rem .2
   main { height: auto; min-height: 100dvh; overflow: visible; }
   .results-area { flex: none; overflow: visible; }
   .search-bar { padding: .9rem; }
+  .footer-context { flex-basis: 100%; flex-wrap: wrap; }
+  .library-name { white-space: normal; overflow-wrap: anywhere; }
+  .footer-actions { flex-wrap: wrap; }
+  .actions-panel { bottom: .8rem; max-height: calc(100dvh - 1.6rem); }
   [role="option"] { flex-wrap: wrap; gap: .4rem; }
   .result-text { flex-basis: 100%; }
   .result-key { max-width: 100%; }

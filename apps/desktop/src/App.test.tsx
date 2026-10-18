@@ -1,9 +1,16 @@
-import { afterEach, expect, test, vi } from "vitest";
+import { afterEach, beforeAll, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { emit } from "@tauri-apps/api/event";
 import { App } from "./App";
 import capability from "../src-tauri/capabilities/default.json";
+
+// jsdom does not implement modal dialogs; real webview checks cover native
+// focus containment. Model only opening/closing here, without a focus-trap shim.
+beforeAll(() => {
+  HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+  HTMLDialogElement.prototype.close = function () { this.open = false; };
+});
 
 afterEach(async () => {
   vi.useRealTimers();
@@ -133,7 +140,8 @@ test("a failed search clears the results of the previous query", async () => {
 test("Quit is available from the picker and from the keyboard", async () => {
   const calls = backend({ quit: () => null });
   render(<App />);
-  fireEvent.click(screen.getByRole("button", { name: "Quit Ibis" }));
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  fireEvent.click(screen.getByRole("option", { name: "Quit Ibis" }));
   await waitFor(() => expect(calls.filter((c) => c === "quit")).toHaveLength(1));
   fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "q", ctrlKey: true });
   await waitFor(() => expect(calls.filter((c) => c === "quit")).toHaveLength(2));
@@ -280,11 +288,13 @@ test("the library is shown, can be chosen and reloaded, and failures are explain
   render(<App />);
   const bar = screen.getByRole("region", { name: "Library" });
   await waitFor(() => expect(bar.textContent).toContain("No library chosen"));
-  fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  fireEvent.click(screen.getByRole("option", { name: "Choose library…" }));
   await waitFor(() => expect(calls).toContain("choose_library"));
   await emit("library:changed", { name: "refs.bib", references: 3, warnings: 1, error: null, note: null });
   await waitFor(() => expect(bar.textContent).toContain("refs.bib: 3 references, 1 could not be read fully"));
-  fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  fireEvent.click(screen.getByRole("option", { name: "Reload library" }));
   await waitFor(() => expect(calls).toContain("reload_library"));
   await emit("library:changed", {
     name: "refs.bib",
@@ -294,4 +304,97 @@ test("the library is shown, can be chosen and reloaded, and failures are explain
     note: null,
   });
   expect((await screen.findByText(/The library could not be opened/)).textContent).toContain("cannot read");
+});
+
+
+test("Actions keyboard toggle focuses its filter and Escape restores the query without hiding", async () => {
+  const calls = backend({ search: () => [result("a", "First")] });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "keep me" } });
+  fireEvent.keyDown(box, { key: "k", ctrlKey: true });
+  const filter = screen.getByLabelText("Search actions");
+  expect(document.activeElement).toBe(filter);
+  fireEvent.keyDown(filter, { key: "Escape" });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.activeElement).toBe(box);
+  expect((box as HTMLInputElement).value).toBe("keep me");
+  expect(calls).not.toContain("hide_picker");
+  fireEvent.keyDown(box, { key: "k", ctrlKey: true });
+  fireEvent.keyDown(screen.getByLabelText("Search actions"), { key: "k", ctrlKey: true });
+  expect(screen.queryByRole("dialog")).toBeNull();
+});
+
+test("filtered actions share selection and copy handlers, with no stale action after an empty match", async () => {
+  const copies: unknown[] = [];
+  backend({ search: () => [result("a", "First"), result("b", "Second")], copy_citation: (args) => {
+    copies.push(args); return { text: "@a", warnings: ["Check citation"] };
+  } });
+  render(<App />);
+  await screen.findByText("First");
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  let filter = screen.getByLabelText("Search actions");
+  fireEvent.keyDown(filter, { key: "ArrowDown" });
+  fireEvent.keyDown(filter, { key: "Enter" });
+  expect(screen.getByRole("button", { name: "Remove a from the selection" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  filter = screen.getByLabelText("Search actions");
+  fireEvent.change(filter, { target: { value: "no such action" } });
+  fireEvent.keyDown(filter, { key: "Enter" });
+  expect(screen.getByRole("dialog")).toBeTruthy();
+  expect(copies).toHaveLength(0);
+  fireEvent.change(filter, { target: { value: "copy citation" } });
+  fireEvent.keyDown(filter, { key: "Enter", isComposing: true });
+  fireEvent.keyDown(filter, { key: "Enter", keyCode: 229 });
+  expect(copies).toHaveLength(0);
+  fireEvent.keyDown(filter, { key: "Enter" });
+  expect(await screen.findByText("Check citation")).toBeTruthy();
+  expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "a" }], format: "pandoc" }]);
+});
+
+test("pending results cannot be selected or copied through Actions", async () => {
+  backend({ search: ({ query }) => query ? new Promise(() => undefined) : [result("old", "Old")] });
+  render(<App />);
+  await screen.findByText("Old");
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "new" } });
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  expect(screen.getByRole("option", { name: "Copy citation" }).getAttribute("aria-disabled")).toBe("true");
+  expect(screen.getByRole("option", { name: "Add to selection" }).getAttribute("aria-disabled")).toBe("true");
+});
+
+
+test("Actions preserves IME text editing and format commands affect the primary copy", async () => {
+  const copies: unknown[] = [];
+  const calls = backend({ search: () => [result("a", "First")], copy_citation: (args) => {
+    copies.push(args); return { text: "@a", warnings: [] };
+  } });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "k", ctrlKey: true, isComposing: true });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  const filter = screen.getByLabelText("Search actions");
+  fireEvent.keyDown(filter, { key: "Escape", isComposing: true });
+  expect(screen.getByRole("dialog")).toBeTruthy();
+  expect(calls).not.toContain("hide_picker");
+  fireEvent.change(filter, { target: { value: "copy as Typst" } });
+  fireEvent.keyDown(filter, { key: "Enter" });
+  expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst");
+  fireEvent.click(screen.getByRole("button", { name: /Copy citation/ }));
+  await waitFor(() => expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "a" }], format: "typst" }]));
+});
+
+test("macOS uses Command K and leaves Control K as a text-editing shortcut", async () => {
+  vi.resetModules();
+  const platform = vi.spyOn(navigator, "platform", "get").mockReturnValue("MacIntel");
+  try {
+    const { actionsShortcut, mac } = await import("./Actions");
+    expect(mac).toBe(true);
+    const event = { key: "k", ctrlKey: false, metaKey: true, shiftKey: false, altKey: false };
+    expect(actionsShortcut(event as never)).toBe(true);
+    expect(actionsShortcut({ ...event, ctrlKey: true, metaKey: false } as never)).toBe(false);
+    expect(actionsShortcut({ ...event, shiftKey: true } as never)).toBe(false);
+  } finally { platform.mockRestore(); }
 });
