@@ -18,9 +18,13 @@ test("bounded virtual results support distant keyboard targets, Space and indepe
   await list.press("Space");
   await page.getByLabel(/Page\(s\) for ref199/).fill("iv-vi");
   await search.fill("reverse");
+  await expect(page.locator("#result-0")).toContainText("Reference 199:");
   await list.focus();
   await list.press("End");
-  await list.press("Space");
+  await list.dispatchEvent("keydown", { key: "Enter", metaKey: true, ctrlKey: true, isComposing: true });
+  await expect(page.getByLabel(/Page\(s\) for ref0 /)).toHaveCount(0);
+  await list.press("ControlOrMeta+Enter");
+  await expect(page.getByLabel(/Page\(s\) for ref0 /)).toBeVisible();
   await page.getByLabel(/Page\(s\) for ref0 /).fill("12, 18-20");
   await search.press("Enter");
   await expect.poll(() => page.evaluate(() => window.pickerTest.copies)).toEqual([{ items: [

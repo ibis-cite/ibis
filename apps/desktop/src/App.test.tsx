@@ -513,3 +513,31 @@ test("details reject outdated responses and Escape closes details before hiding 
   fireEvent.keyDown(box, { key: "Escape" });
   await waitFor(() => expect(calls).toContain("hide_picker"));
 });
+
+
+test("closing details restores search when its selected-reference trigger was removed", async () => {
+  backend({ search: () => [result("a", "First")], reference_details: ({ id }) => ({ id, title: "Detail", authors: "", year: null, kind: "", container: null, doi: null, url: null, abstract_text: null }) });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  fireEvent.click(screen.getByRole("button", { name: "Details for a" }));
+  await screen.findByText("Detail");
+  fireEvent.click(screen.getByRole("button", { name: "Remove a from the selection" }));
+  fireEvent.keyDown(screen.getByRole("button", { name: "Close details" }), { key: "Escape" });
+  expect(document.activeElement).toBe(box);
+});
+
+
+test("pending search results ignore list navigation, selection and copy shortcuts", async () => {
+  const calls = backend({ search: ({ query }) => query ? new Promise(() => undefined) : [result("a", "First"), result("b", "Second")] });
+  render(<App />);
+  await screen.findByText("First");
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "pending" } });
+  const list = screen.getByRole("listbox", { name: "Results" });
+  for (const key of ["ArrowDown", "Home", "End", " ", "Enter"]) fireEvent.keyDown(list, { key });
+  fireEvent.keyDown(list, { key: "Enter", ctrlKey: true });
+  expect(list.getAttribute("aria-activedescendant")).toBe("result-0");
+  expect(screen.queryByRole("button", { name: /Remove .* from the selection/ })).toBeNull();
+  expect(calls).not.toContain("copy_citation");
+});

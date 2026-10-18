@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { defaultRangeExtractor, useVirtualizer, useWindowVirtualizer, type Range } from "@tanstack/react-virtual";
-import { composing } from "./Actions";
+import { composing, secondaryShortcut } from "./Actions";
 import type { SearchResult } from "./api";
 
 export function idKey(id: SearchResult["id"]): string { return `${id.source}\u0000${id.native_key}`; }
@@ -46,7 +46,12 @@ export function Results({ results, active, setActive, selected, toggle, copy, de
           tabIndex={0} aria-busy={pending} aria-activedescendant={results[active] ? `result-${active}` : undefined}
           style={{ height: rows.getTotalSize(), position: "relative" }}
           onKeyDown={(e) => {
-            if (composing(e) || pending || e.metaKey || e.ctrlKey || e.altKey) return;
+            if (composing(e) || pending) return;
+            if (secondaryShortcut(e)) {
+              e.preventDefault(); if (results[active]) toggle(results[active]);
+              return;
+            }
+            if (e.metaKey || e.ctrlKey || e.altKey) return;
             if (["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) {
               e.preventDefault();
               setActive(e.key === "Home" ? 0 : e.key === "End" ? Math.max(results.length - 1, 0) : Math.min(Math.max(active + (e.key === "ArrowDown" ? 1 : -1), 0), Math.max(results.length - 1, 0)));

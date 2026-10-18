@@ -151,7 +151,12 @@ export function App() {
     detailsReturn.current = trigger;
     setDetailsId(id);
   };
-  const closeDetails = () => { setDetailsId(null); detailsReturn.current?.focus(); };
+  const closeDetails = () => {
+    setDetailsId(null);
+    const trigger = detailsReturn.current;
+    if (trigger?.isConnected && !trigger.matches(":disabled")) trigger.focus();
+    else input.current?.focus();
+  };
   useEffect(() => {
     if (highlighted) setDetailsId((previous) => previous ? highlighted.id : null);
   }, [highlighted?.id.source, highlighted?.id.native_key]);
