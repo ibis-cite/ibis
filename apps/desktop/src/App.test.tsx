@@ -3,6 +3,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { emit } from "@tauri-apps/api/event";
 import { App } from "./App";
+import capability from "../src-tauri/capabilities/default.json";
 
 afterEach(async () => {
   vi.useRealTimers();
@@ -43,6 +44,17 @@ function result(key: string, title: string, source = "refs.bib") {
 }
 
 type Handler = (args: Record<string, unknown>) => unknown;
+
+test("the borderless picker has a permitted drag region around its editable search input", async () => {
+  backend();
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  expect(box.closest("[data-tauri-drag-region]")).toBeTruthy();
+  expect(box.hasAttribute("data-tauri-drag-region")).toBe(false);
+  expect(capability.permissions).toContain("core:window:allow-start-dragging");
+  fireEvent.change(box, { target: { value: "sleep" } });
+  await waitFor(() => expect((box as HTMLInputElement).value).toBe("sleep"));
+});
 
 /** Mock the Rust commands; returns the list of commands called. */
 function backend(overrides: Record<string, Handler> = {}): string[] {
