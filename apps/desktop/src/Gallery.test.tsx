@@ -2,6 +2,8 @@ import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { App, type PickerApi } from "./App";
+import { renderGalleryState } from "./gallery";
+import { libraryMessages } from "./messages";
 
 const syntheticApi: PickerApi = {
   libraryStatus: async () => ({ state: "loaded", has_snapshot: true, name: "gallery.bib", snapshot_name: "gallery.bib", references: 1, warnings: 0, error: null, note: null, settings_notice: null }),
@@ -22,6 +24,10 @@ afterEach(async () => {
   cleanup();
   await Promise.resolve();
   clearMocks();
+  vi.unstubAllGlobals();
+  delete document.documentElement.dataset.galleryTheme;
+  delete document.documentElement.dataset.gallerySize;
+  document.documentElement.removeAttribute("dir");
 });
 
 test("a gallery picker uses synthetic providers for search and copy without native IPC", async () => {
@@ -68,4 +74,102 @@ test("the many-results fixture exercises a scrollable real result list", async (
   render(<App {...galleryProvider(state!)} />);
   await screen.findByText("Memory study 20: a synthetic reference");
   expect(within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option")).toHaveLength(20);
+});
+
+test("render acknowledgment waits for the synthetic search and its actual result rows", async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
+  vi.stubGlobal("cancelAnimationFrame", (id: number) => window.clearTimeout(id));
+  const state = galleryStates.find((candidate) => candidate.id === "many-results")!;
+  const provider = galleryProvider(state);
+  let resolveSearch: (found: typeof state.results) => void = () => undefined;
+  provider.api.search = () => new Promise((resolve) => { resolveSearch = (found) => resolve(found ?? []); });
+  const acknowledge = vi.fn(async () => undefined);
+  const container = document.createElement("div");
+  document.body.append(container);
+  let stop: () => void = () => undefined;
+  try {
+    await act(async () => { stop = renderGalleryState(container, state, acknowledge, provider); });
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(acknowledge).not.toHaveBeenCalled();
+    await act(async () => resolveSearch(state.results));
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(container.querySelectorAll('[role="option"]')).toHaveLength(20);
+    expect(acknowledge).toHaveBeenCalledExactlyOnceWith("many-results");
+  } finally {
+    await act(async () => stop());
+    container.remove();
+  }
+});
+
+test("render acknowledgment waits for startup effects even after the first-run UI appears", async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
+  vi.stubGlobal("cancelAnimationFrame", (id: number) => window.clearTimeout(id));
+  const state = galleryStates.find((candidate) => candidate.id === "first-run")!;
+  const provider = galleryProvider(state);
+  let resolveFormat: () => void = () => undefined;
+  provider.api = { ...provider.api, copyFormat: () => new Promise((resolve) => { resolveFormat = () => resolve("pandoc"); }) };
+  const acknowledge = vi.fn(async () => undefined);
+  const container = document.createElement("div");
+  document.body.append(container);
+  let stop: () => void = () => undefined;
+  try {
+    await act(async () => { stop = renderGalleryState(container, state, acknowledge, provider); });
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(container.textContent).toContain("Choose a library to get started");
+    expect(acknowledge).not.toHaveBeenCalled();
+    await act(async () => resolveFormat());
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(acknowledge).toHaveBeenCalledExactlyOnceWith("first-run");
+  } finally {
+    await act(async () => stop());
+    container.remove();
+  }
+});
+
+test.each(galleryStates.map((state) => state.id))("the rendered %s fixture acknowledges exactly that state", async (id) => {
+  vi.useFakeTimers();
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
+  vi.stubGlobal("cancelAnimationFrame", (frame: number) => window.clearTimeout(frame));
+  const state = galleryStates.find((candidate) => candidate.id === id)!;
+  const acknowledge = vi.fn(async () => undefined);
+  const container = document.createElement("div");
+  document.body.append(container);
+  let stop: () => void = () => undefined;
+  try {
+    await act(async () => { stop = renderGalleryState(container, state, acknowledge); });
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(acknowledge).toHaveBeenCalledExactlyOnceWith(id);
+  } finally {
+    await act(async () => stop());
+    container.remove();
+  }
+});
+
+
+test("gallery readiness follows the shared library summary used by the picker", async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
+  vi.stubGlobal("cancelAnimationFrame", (frame: number) => window.clearTimeout(frame));
+  const messages = libraryMessages as typeof libraryMessages & { summary: (status: unknown) => string };
+  const summary = vi.spyOn(messages, "summary").mockReturnValue("Synthetic translated library summary");
+  const state = galleryStates.find((candidate) => candidate.id === "damaged-library")!;
+  const acknowledge = vi.fn(async () => undefined);
+  const container = document.createElement("div");
+  document.body.append(container);
+  let stop: () => void = () => undefined;
+  try {
+    await act(async () => { stop = renderGalleryState(container, state, acknowledge); });
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(container.querySelector('[aria-label="Library status"]')?.textContent).toBe("Synthetic translated library summary");
+    expect(acknowledge).toHaveBeenCalledExactlyOnceWith("damaged-library");
+  } finally {
+    await act(async () => stop());
+    summary.mockRestore();
+    container.remove();
+  }
 });

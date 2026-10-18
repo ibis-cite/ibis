@@ -356,10 +356,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       <footer>
         <section aria-label="Library" className="library-bar">
           <span className="library-name" role="status" aria-label="Library status" aria-live="polite" aria-atomic="true">
-            {library?.has_snapshot
-              ? `${library.snapshot_name}: ${library.references} references` +
-                (library.warnings > 0 ? `, ${library.warnings} could not be read fully` : "")
-              : library?.name ? library.name : library === null ? "Library status unavailable" : library === undefined ? "Checking library…" : "No library chosen"}
+            {libraryMessages.summary(library)}
           </span>{" "}
           <button type="button" className="quiet-button" aria-label="Choose library…" title="Choose a library" onClick={() => void perform("choose", chooseLibrary)}>
             Choose…

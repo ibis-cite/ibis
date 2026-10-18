@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Capture synthetic picker states in a debug evidence build, one app at a time."""
 import argparse
+import json
 import math
 import os
 from pathlib import Path
@@ -9,6 +10,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 
 
 STATES = (
@@ -86,11 +88,37 @@ def stop_app(process, platform_name):
         process.wait(timeout=5)
 
 
-def capture_gallery(app, output, *, states=STATES, wait_seconds=8, platform_name=None):
+def wait_until_rendered(process, ready_file, state, timeout):
+    deadline = time.monotonic() + timeout
+    while True:
+        if process.poll() is not None:
+            raise CaptureError(f"app exited before rendering {state}; see its startup log")
+        try:
+            with ready_file.open("rb") as acknowledgment:
+                payload = acknowledgment.read(1025)
+        except FileNotFoundError:
+            payload = None
+        if payload is not None:
+            try:
+                if len(payload) > 1024 or json.loads(payload) != {"state": state}:
+                    raise ValueError("wrong gallery acknowledgment")
+            except (ValueError, UnicodeError) as error:
+                raise CaptureError(f"app did not acknowledge the selected {state} state") from error
+            return
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise CaptureError(f"app did not acknowledge rendering {state}; use a debug evidence build")
+        try:
+            process.wait(timeout=min(0.1, remaining))
+        except subprocess.TimeoutExpired:
+            pass
+
+
+def capture_gallery(app, output, *, states=STATES, wait_seconds=8, ready_timeout=15, platform_name=None):
     platform_name = platform_name or platform.system()
     if platform_name not in ("Linux", "Darwin", "Windows"):
         raise CaptureError("unsupported screenshot platform")
-    if not math.isfinite(wait_seconds) or wait_seconds < 0 or not states or any(state not in STATES for state in states):
+    if any(not math.isfinite(value) or value < 0 for value in (wait_seconds, ready_timeout)) or not states or any(state not in STATES for state in states):
         raise CaptureError("invalid gallery states or startup wait")
     app, output = Path(app).resolve(), Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -103,7 +131,10 @@ def capture_gallery(app, output, *, states=STATES, wait_seconds=8, platform_name
         env = {**os.environ, "IBIS_GALLERY": "1", "IBIS_LIBRARY": str(source)}
         for state in states:
             env["IBIS_GALLERY_STATE"] = state
-            staging = output / f".{state}.capture.png"
+            ready_file = Path(temporary) / f"{state}.ready"
+            ready_file.unlink(missing_ok=True)
+            env["IBIS_GALLERY_READY_FILE"] = str(ready_file)
+            staging = output / f"{state}.capture.tmp.png"
             staging.unlink(missing_ok=True)
             try:
                 with (output / f"startup-{state}.log").open("wb") as log:
@@ -120,6 +151,7 @@ def capture_gallery(app, output, *, states=STATES, wait_seconds=8, platform_name
                             pass
                         else:
                             raise CaptureError(f"app exited during {state} startup; see its startup log")
+                        wait_until_rendered(process, ready_file, state, ready_timeout)
                         capture_screenshot(staging, platform_name)
                         if process.poll() is not None:
                             raise CaptureError(f"app exited while capturing {state}; see its startup log")
@@ -142,16 +174,19 @@ def main(argv=None):
     parser.add_argument("--app", required=True, type=Path, help="debug ibis-desktop executable with evidence assets")
     parser.add_argument("--output", required=True, type=Path, help="directory for PNGs and synthetic startup logs")
     parser.add_argument("--wait", type=float, default=8, help="startup wait in seconds per state (default: 8)")
+    parser.add_argument("--ready-timeout", type=float, default=15, help="maximum additional wait for rendered-state acknowledgment (default: 15)")
     parser.add_argument("--state", choices=STATES, action="append", help="capture only this state (repeatable; default: all 14)")
     args = parser.parse_args(argv)
     if not args.app.is_file() or (os.name != "nt" and not os.access(args.app, os.X_OK)):
         parser.error("--app must name an executable regular file")
     if not math.isfinite(args.wait) or args.wait < 0:
         parser.error("--wait must be a finite nonnegative number")
+    if not math.isfinite(args.ready_timeout) or args.ready_timeout < 0:
+        parser.error("--ready-timeout must be a finite nonnegative number")
     if args.output.exists() and not args.output.is_dir():
         parser.error("--output must name a directory")
     try:
-        capture_gallery(args.app, args.output, states=tuple(args.state or STATES), wait_seconds=args.wait)
+        capture_gallery(args.app, args.output, states=tuple(args.state or STATES), wait_seconds=args.wait, ready_timeout=args.ready_timeout)
     except CaptureError as error:
         print(f"Gallery capture failed: {error}.", file=sys.stderr)
         return 1

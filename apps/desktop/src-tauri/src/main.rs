@@ -84,6 +84,15 @@ fn main() {
                     && let Some(current) = checked(window.url(), NativeIssue::GalleryNavigation)
                 {
                     let state = std::env::var("IBIS_GALLERY_STATE").ok();
+                    report(
+                        gallery::install_readiness(
+                            app.handle(),
+                            &window,
+                            state.as_deref(),
+                            std::env::var_os("IBIS_GALLERY_READY_FILE").map(PathBuf::from),
+                        ),
+                        NativeIssue::GalleryNavigation,
+                    );
                     if let Some(destination) = gallery::gallery_url(current, enabled.as_deref(), state.as_deref()) {
                         report(window.navigate(destination), NativeIssue::GalleryNavigation);
                     }
