@@ -90,7 +90,9 @@ pub fn load_str(source: &str, text: &str) -> LoadResult {
     }
 
     let resolver = Resolver::new(macros, &entries);
-    for (i, entry) in entries.iter().enumerate() {
+    // `@xdata` entries only supply fields to other entries; they are not
+    // references themselves and are never shown or exported.
+    for (i, entry) in entries.iter().enumerate().filter(|(_, e)| e.kind != "xdata") {
         let outcome = std::panic::catch_unwind(AssertUnwindSafe(|| {
             load_entry(source, &resolver, i, entry, raw_texts[i])
         }));

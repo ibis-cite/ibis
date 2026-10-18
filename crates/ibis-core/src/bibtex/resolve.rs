@@ -33,6 +33,9 @@ const MAX_DEPTH: usize = 16;
 /// Deepest nesting of abbreviations defined in terms of other abbreviations.
 const MAX_MACRO_DEPTH: usize = 64;
 
+/// Most abbreviation expansions performed for one field value.
+const MAX_EXPANSION_STEPS: usize = 100_000;
+
 /// Largest field value accepted after expanding abbreviations.
 const MAX_VALUE_BYTES: usize = 64 * 1024;
 
@@ -55,7 +58,10 @@ const MONTHS: [(&str, &str); 12] = [
 struct Walk {
     chain: Vec<usize>,
     edges: HashSet<(usize, usize)>,
-    visited: HashSet<usize>,
+    /// Shortest path length at which each entry was explored. An entry first
+    /// reached through a long path (possibly cut off by the depth limit) is
+    /// explored again when a shorter path reaches it.
+    explored_at: HashMap<usize, usize>,
     path: Vec<usize>,
 }
 
@@ -158,7 +164,7 @@ impl<'a> Resolver<'a> {
         let mut walk = Walk {
             chain: Vec::new(),
             edges: HashSet::new(),
-            visited: HashSet::from([i]),
+            explored_at: HashMap::from([(i, 0)]),
             path: vec![i],
         };
         self.visit(i, &mut walk, problems);
@@ -188,8 +194,13 @@ impl<'a> Resolver<'a> {
                 continue;
             }
             walk.edges.insert((idx, t));
-            if walk.visited.insert(t) {
-                walk.chain.push(t);
+            let depth = walk.path.len();
+            let first_time = !walk.explored_at.contains_key(&t);
+            if walk.explored_at.get(&t).is_none_or(|&d| depth < d) {
+                walk.explored_at.insert(t, depth);
+                if first_time {
+                    walk.chain.push(t);
+                }
                 walk.path.push(t);
                 self.visit(t, walk, problems);
                 walk.path.pop();
@@ -213,60 +224,57 @@ impl<'a> Resolver<'a> {
     }
 
     /// Concatenate parts, expanding macros (and macros used inside macros).
-    /// Values that would exceed [`MAX_VALUE_BYTES`] are left empty and reported.
+    /// Values larger than [`MAX_VALUE_BYTES`], or needing more than
+    /// [`MAX_EXPANSION_STEPS`] expansions, are left empty and reported.
     fn expand(&self, field: &str, parts: &[Part], problems: &mut Vec<String>, report: bool) -> String {
-        let mut out = String::new();
-        let mut too_large = false;
+        let mut x = Expansion::default();
         for part in parts {
             match part {
-                Part::Text(t) | Part::Number(t) => out.push_str(t),
-                Part::Macro(name) => {
-                    self.expand_macro(field, name, problems, report, &mut Vec::new(), &mut out, &mut too_large)
-                }
+                Part::Text(t) | Part::Number(t) => x.out.push_str(t),
+                Part::Macro(name) => self.expand_macro(field, name, problems, report, &mut x),
             }
-            if out.len() > MAX_VALUE_BYTES {
-                too_large = true;
-            }
-            if too_large {
+            x.check_size();
+            if x.stopped() {
                 break;
             }
         }
-        if too_large {
+        if x.stopped() {
             if report {
-                problems.push(format!(
-                    "field `{field}` is too large after expanding abbreviations (over {} KiB); it is left empty",
-                    MAX_VALUE_BYTES / 1024
-                ));
+                problems.push(if x.too_large {
+                    format!(
+                        "field `{field}` is too large after expanding abbreviations (over {} KiB); it is left empty",
+                        MAX_VALUE_BYTES / 1024
+                    )
+                } else {
+                    format!(
+                        "field `{field}` uses abbreviations that are too complex to expand (over {MAX_EXPANSION_STEPS} steps); it is left empty"
+                    )
+                });
             }
             return String::new();
         }
+        let mut out = x.out;
         if DATE_FIELDS.contains(&field) {
             out = ascii_digits(&out);
         }
         dotless_to_plain(&out)
     }
 
-    #[allow(clippy::too_many_arguments)]
-    fn expand_macro(
-        &self,
-        field: &str,
-        name: &str,
-        problems: &mut Vec<String>,
-        report: bool,
-        stack: &mut Vec<String>,
-        out: &mut String,
-        too_large: &mut bool,
-    ) {
-        if *too_large {
+    fn expand_macro(&self, field: &str, name: &str, problems: &mut Vec<String>, report: bool, x: &mut Expansion) {
+        x.steps += 1;
+        if x.steps > MAX_EXPANSION_STEPS {
+            x.too_complex = true;
+        }
+        if x.stopped() {
             return;
         }
-        if stack.iter().any(|s| s == name) {
+        if x.stack.iter().any(|s| s == name) {
             if report {
                 problems.push(format!("abbreviation `{name}` refers to itself; it is left empty"));
             }
             return;
         }
-        if stack.len() >= MAX_MACRO_DEPTH {
+        if x.stack.len() >= MAX_MACRO_DEPTH {
             if report {
                 problems.push(format!(
                     "abbreviations are nested more than {MAX_MACRO_DEPTH} levels deep; deeper levels are left empty"
@@ -275,25 +283,23 @@ impl<'a> Resolver<'a> {
             return;
         }
         if let Some(parts) = self.macros.get(name) {
-            stack.push(name.to_string());
+            x.stack.push(name.to_string());
             for part in parts {
                 match part {
-                    Part::Text(t) | Part::Number(t) => out.push_str(t),
-                    Part::Macro(inner) => self.expand_macro(field, inner, problems, report, stack, out, too_large),
+                    Part::Text(t) | Part::Number(t) => x.out.push_str(t),
+                    Part::Macro(inner) => self.expand_macro(field, inner, problems, report, x),
                 }
-                if out.len() > MAX_VALUE_BYTES {
-                    *too_large = true;
-                }
-                if *too_large {
+                x.check_size();
+                if x.stopped() {
                     break;
                 }
             }
-            stack.pop();
+            x.stack.pop();
             return;
         }
         if let Some((abbr, full)) = MONTHS.iter().find(|(abbr, _)| *abbr == name) {
             // In a month field the parser understands the abbreviation itself.
-            out.push_str(if field == "month" { abbr } else { full });
+            x.out.push_str(if field == "month" { abbr } else { full });
             return;
         }
         if report {
@@ -301,6 +307,28 @@ impl<'a> Resolver<'a> {
                 "undefined abbreviation `{name}`; the field using it is left empty"
             ));
         }
+    }
+}
+
+/// State of expanding one field value.
+#[derive(Default)]
+struct Expansion {
+    out: String,
+    stack: Vec<String>,
+    steps: usize,
+    too_large: bool,
+    too_complex: bool,
+}
+
+impl Expansion {
+    fn check_size(&mut self) {
+        if self.out.len() > MAX_VALUE_BYTES {
+            self.too_large = true;
+        }
+    }
+
+    fn stopped(&self) -> bool {
+        self.too_large || self.too_complex
     }
 }
 

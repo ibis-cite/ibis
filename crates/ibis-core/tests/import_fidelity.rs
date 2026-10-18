@@ -262,3 +262,56 @@ fn block_splitting_scales_linearly() {
     // Ten times the input may take at most ~25x the time; quadratic growth would be ~100x.
     assert!(large < small * 25, "2k: {small:?}, 20k: {large:?}");
 }
+
+#[test]
+fn xdata_helpers_supply_fields_but_are_not_references() {
+    let r = load(
+        "@xdata{shared, publisher={Synthetic Press}, date={2024}}\n@book{work, author={Example, Ada}, title={Synthetic Book}, xdata={shared}}",
+    );
+    assert_eq!(
+        r.references.len(),
+        1,
+        "{:?}",
+        r.references.iter().map(|x| &x.id.native_key).collect::<Vec<_>>()
+    );
+    let work = only(&r, "work");
+    assert_eq!(
+        work.variables.get("publisher").map(String::as_str),
+        Some("Synthetic Press")
+    );
+    assert_eq!(work.year(), Some(2024));
+}
+
+#[test]
+fn a_short_path_still_reaches_ancestors_cut_off_on_a_long_path() {
+    let mut src = String::from("@book{a,crossref={c1},xdata={shared}}\n");
+    for i in 1..15 {
+        src.push_str(&format!("@book{{c{i},crossref={{c{}}}}}\n", i + 1));
+    }
+    src.push_str("@book{c15,crossref={shared}}\n@book{shared,crossref={grand}}\n@book{grand,year={2024}}\n");
+    assert_eq!(only(&load(&src), "a").year(), Some(2024));
+}
+
+#[test]
+fn translators_and_other_roles_reach_csl() {
+    let r = only(
+        &load(
+            "@book{t, author={Tolstoy, Leo}, translator={Garnett, Constance}, bookauthor={Editor, Book}, title={War and Peace}}",
+        ),
+        "t",
+    );
+    let csl = r.to_csl_json();
+    assert_eq!(csl["translator"][0]["family"], "Garnett");
+    assert_eq!(csl["container-author"][0]["family"], "Editor");
+}
+
+#[test]
+fn math_superscripts_and_subscripts_are_kept() {
+    let r = only(
+        &load("@article{m, title={Energy as $mc^2$ and $H_{2}O$}, langid={american}}"),
+        "m",
+    );
+    let title = r.title.unwrap_or_default();
+    assert!(title.contains("mc<sup>2</sup>"), "{title}");
+    assert!(title.contains("H<sub>2</sub>O"), "{title}");
+}

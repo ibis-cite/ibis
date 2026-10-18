@@ -198,6 +198,10 @@ pub struct Reference {
     pub authors: Vec<Name>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub editors: Vec<Name>,
+    /// Further CSL name variables (`translator`, `container-author`,
+    /// `compiler`, `director`, `contributor`, ...), keyed by CSL name.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub other_names: BTreeMap<String, Vec<Name>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub issued: Option<Issued>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -247,6 +251,11 @@ impl Reference {
         }
         if !self.editors.is_empty() {
             item.insert("editor".into(), self.editors.iter().map(Name::to_csl).collect());
+        }
+        for (role, names) in &self.other_names {
+            if !names.is_empty() {
+                item.insert(role.clone(), names.iter().map(Name::to_csl).collect());
+            }
         }
         let text_fields = [
             ("title", &self.title),

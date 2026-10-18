@@ -122,3 +122,31 @@ fn exporting_everything_refuses_duplicate_citation_keys() {
     assert!(String::from_utf8_lossy(&out.stderr).contains("same"));
     assert!(ibis(&["csl", "--all", "--bib", s(&a)]).status.success());
 }
+
+/// Doubling an empty abbreviation produces no output but exponential work.
+/// The expansion step budget must stop it; a subprocess with a deadline
+/// proves the binary finishes.
+#[test]
+fn empty_doubling_abbreviations_finish_quickly() {
+    let mut text = String::from("@string{m0=\"\"}\n");
+    for i in 1..=40 {
+        text.push_str(&format!("@string{{m{i}=m{} # m{}}}\n", i - 1, i - 1));
+    }
+    text.push_str("@article{a,title={Synthetic},journal=m40}\n");
+    let file = write("cli-empty-macros", "empty-macros.bib", &text);
+    let mut child = Command::new(env!("CARGO_BIN_EXE_ibis"))
+        .args(["check", s(&file)])
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .unwrap_or_else(|e| panic!("{e}"));
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+    while child.try_wait().ok().flatten().is_none() {
+        if std::time::Instant::now() > deadline {
+            let _ = child.kill();
+            panic!("ibis check did not finish within 10 seconds");
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
+    }
+    let out = child.wait_with_output().unwrap_or_else(|e| panic!("{e}"));
+    assert!(String::from_utf8_lossy(&out.stdout).contains("too complex"));
+}

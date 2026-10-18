@@ -73,17 +73,62 @@ pub(crate) fn convert(
             Vec::new()
         }
     };
-    let editors = match entry.editors() {
-        Ok(groups) => groups
-            .into_iter()
-            .filter(|(_, role)| *role == EditorType::Editor)
-            .flat_map(|(people, _)| names(people, own_fields.get("editor").map(String::as_str)))
-            .collect(),
-        Err(err) => {
-            problems.push(format!("editors could not be read: {err}"));
-            Vec::new()
+    // Editors by role. BibLaTeX roles without a CSL equivalent are exported
+    // as general contributors, and the loss of detail is reported.
+    let mut other_names: BTreeMap<String, Vec<Name>> = BTreeMap::new();
+    let mut editors = Vec::new();
+    match entry.editors() {
+        Ok(groups) => {
+            for (people, role) in groups {
+                let converted = names(people, None);
+                let csl_role = match &role {
+                    EditorType::Editor => {
+                        editors.extend(converted);
+                        continue;
+                    }
+                    EditorType::Compiler => "compiler",
+                    EditorType::Director => "director",
+                    EditorType::Organizer => "organizer",
+                    EditorType::Collaborator => "contributor",
+                    other => {
+                        problems.push(format!(
+                            "editor role `{}` has no CSL equivalent; those names are exported as contributors",
+                            editor_role_name(other)
+                        ));
+                        "contributor"
+                    }
+                };
+                other_names.entry(csl_role.to_string()).or_default().extend(converted);
+            }
         }
-    };
+        Err(err) => problems.push(format!("editors could not be read: {err}")),
+    }
+    let roles: [(&str, &str); 7] = [
+        ("translator", "translator"),
+        ("bookauthor", "container-author"),
+        ("annotator", "contributor"),
+        ("commentator", "contributor"),
+        ("introduction", "contributor"),
+        ("foreword", "contributor"),
+        ("afterword", "contributor"),
+    ];
+    for (field, csl_role) in roles {
+        match entry.get_as::<Vec<biblatex::Person>>(field) {
+            Ok(people) => {
+                if csl_role == "contributor" {
+                    problems.push(format!(
+                        "role `{field}` has no CSL equivalent; those names are exported as contributors"
+                    ));
+                }
+                other_names
+                    .entry(csl_role.to_string())
+                    .or_default()
+                    .extend(names(people, own_fields.get(field).map(String::as_str)));
+            }
+            Err(RetrievalError::Missing(_)) => {}
+            Err(err) => problems.push(format!("`{field}` could not be read: {err}")),
+        }
+    }
 
     let mut variables = BTreeMap::new();
     let mut set = |csl: &str, fields: &[&str]| {
@@ -150,6 +195,7 @@ pub(crate) fn convert(
         title,
         authors,
         editors,
+        other_names,
         issued,
         container_title,
         doi,
@@ -166,6 +212,13 @@ pub(crate) fn convert(
 }
 
 // ---------- Names ----------
+
+fn editor_role_name(role: &EditorType) -> String {
+    match role {
+        EditorType::Unknown(name) => name.clone(),
+        other => format!("{other:?}").to_lowercase(),
+    }
+}
 
 /// Convert parsed people, using the raw field to recognize names written in
 /// braces (organizations) and the "and others" marker.
@@ -479,10 +532,58 @@ fn pieces_from_chunks<'a>(chunks: impl Iterator<Item = &'a Chunk>, unknown: &mut
                 tex_pieces(s, true, &mut pieces, unknown);
                 pieces.push(Piece::Tag("</span>"));
             }
-            Chunk::Math(s) => tex_pieces(s, true, &mut pieces, unknown),
+            Chunk::Math(s) => math_pieces(s, &mut pieces, unknown),
         }
     }
     pieces
+}
+
+/// Math: symbols as in text, plus `^`/`_` as superscript and subscript.
+/// Math is protected from case changes.
+fn math_pieces(math: &str, out: &mut Vec<Piece>, unknown: &mut BTreeSet<String>) {
+    let mut rest = math;
+    let mut plain = String::new();
+    while let Some(pos) = rest.find(['^', '_']) {
+        plain.push_str(&rest[..pos]);
+        let (open, close) = if rest[pos..].starts_with('^') {
+            ("<sup>", "</sup>")
+        } else {
+            ("<sub>", "</sub>")
+        };
+        let after = &rest[pos + 1..];
+        let (script, remainder) = if let Some(inner) = after.strip_prefix('{') {
+            let mut depth = 1usize;
+            let end = inner
+                .char_indices()
+                .find(|(_, c)| {
+                    match c {
+                        '{' => depth += 1,
+                        '}' => depth -= 1,
+                        _ => {}
+                    }
+                    depth == 0
+                })
+                .map_or(inner.len(), |(i, _)| i);
+            (&inner[..end], inner.get(end + 1..).unwrap_or(""))
+        } else if let Some(command) = after.strip_prefix('\\') {
+            let len = 1 + command
+                .chars()
+                .take_while(char::is_ascii_alphabetic)
+                .map(char::len_utf8)
+                .sum::<usize>();
+            (&after[..len], &after[len..])
+        } else {
+            let len = after.chars().next().map_or(0, char::len_utf8);
+            (&after[..len], &after[len..])
+        };
+        tex_pieces(&std::mem::take(&mut plain), true, out, unknown);
+        out.push(Piece::Tag(open));
+        tex_pieces(script, true, out, unknown);
+        out.push(Piece::Tag(close));
+        rest = remainder;
+    }
+    plain.push_str(rest);
+    tex_pieces(&plain, true, out, unknown);
 }
 
 /// Commands whose argument is shown as-is.

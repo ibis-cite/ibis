@@ -197,6 +197,7 @@ mod tests {
                 ..Name::default()
             }],
             editors: vec![],
+            other_names: Default::default(),
             issued: Some(Issued::year(year)),
             container_title: None,
             doi: None,
