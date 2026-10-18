@@ -12,7 +12,7 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_dialog::DialogExt;
 
-use crate::diagnostics::{NativeIssue, report};
+use crate::diagnostics::{NativeIssue, application_message, report};
 use crate::picker::{DialogOpen, show_picker};
 use crate::preferences::SettingsFile;
 use crate::tray::{LibraryMenuItem, library_line};
@@ -121,7 +121,7 @@ fn candidate(path: PathBuf, loaded: ibis_core::model::LoadResult) -> Library {
 
 fn publish(app: &AppHandle, status: LibraryStatus) {
     for message in status.error.iter().chain(&status.note) {
-        eprintln!("ibis: {message}");
+        application_message(message);
     }
     if let Some(item) = app.try_state::<LibraryMenuItem>() {
         report(item.0.set_text(library_line(&status)), NativeIssue::TrayLibrary);

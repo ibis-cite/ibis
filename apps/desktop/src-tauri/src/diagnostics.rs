@@ -38,12 +38,16 @@ impl NativeIssue {
 }
 
 pub(crate) fn checked<T, E>(result: Result<T, E>, issue: NativeIssue) -> Option<T> {
-    checked_with(result, issue, |message| {
-        write_diagnostic(std::io::stderr().lock(), message)
-    })
+    checked_with(result, issue, application_message)
 }
 
-fn write_diagnostic(mut output: impl std::io::Write, message: &'static str) {
+/// Existing application messages have already passed their source's allowlist.
+/// Native errors must use `checked`/`report`, never this function.
+pub(crate) fn application_message(message: &str) {
+    write_diagnostic(std::io::stderr().lock(), message);
+}
+
+fn write_diagnostic(mut output: impl std::io::Write, message: &str) {
     // A closed/full diagnostic sink must not interrupt native recovery or events.
     let _ = writeln!(output, "ibis: {message}");
 }
@@ -133,8 +137,14 @@ mod tests {
             })
             .is_none()
         );
+        let application = String::from("the chosen file is not on this computer");
+        write_diagnostic(BrokenSink, &application);
         let mut output = Vec::new();
         write_diagnostic(&mut output, NativeIssue::Show.message());
-        assert_eq!(output, b"ibis: the picker could not be shown\n");
+        write_diagnostic(&mut output, &application);
+        assert_eq!(
+            output,
+            b"ibis: the picker could not be shown\nibis: the chosen file is not on this computer\n"
+        );
     }
 }
