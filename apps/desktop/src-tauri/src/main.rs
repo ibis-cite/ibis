@@ -23,7 +23,7 @@ use ibis_core::settings;
 use tauri::{Manager, WindowEvent};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
-use crate::diagnostics::{NativeIssue, checked, report};
+use crate::diagnostics::{NativeIssue, checked};
 use crate::library::{Library, LibraryWatch, LoadRequests, start_open};
 use crate::picker::{
     DialogOpen, ShortcutStatus, configured_shortcut, dismiss_picker, hides_on_blur, show_picker, toggle_picker,
