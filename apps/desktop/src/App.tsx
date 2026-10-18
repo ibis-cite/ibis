@@ -201,10 +201,10 @@ export function App() {
     { id: "copy", label: "Copy citation", shortcut: "↵", disabled: !canCopy, run: () => void copy() },
     { id: "selection", label: highlighted && selected.has(idKey(highlighted.id)) ? "Remove from selection" : "Add to selection",
       shortcut: mac ? "⌘↵" : "Ctrl+↵", disabled: !highlighted, run: () => { if (highlighted) toggle(highlighted); } },
-    { id: "choose", label: "Choose library…", run: () => void chooseLibrary() },
-    { id: "reload", label: "Reload library", disabled: !library?.name, run: () => void reloadLibrary() },
+    { id: "choose", label: "Choose library…", run: () => void perform("choose", chooseLibrary) },
+    { id: "reload", label: "Reload library", disabled: !library?.name, run: () => void perform("reload", reloadLibrary) },
     ...COPY_FORMATS.map((f) => ({ id: `format-${f.value}`, label: `Use ${f.label}${format === f.value ? " (current)" : ""}`, run: () => setFormat(f.value) })),
-    { id: "quit", label: "Quit Ibis", run: () => void quit() },
+    { id: "quit", label: "Quit Ibis", run: () => void perform("quit", quit) },
   ];
 
   return (
@@ -379,7 +379,7 @@ export function App() {
           </select>
         </section>
         <div className="footer-actions">
-          <button type="button" onClick={() => void chooseLibrary()}>{library?.name ? "Change library…" : "Choose library…"}</button>
+          <button type="button" onClick={() => void perform("choose", chooseLibrary)}>{library?.name ? "Change library…" : "Choose library…"}</button>
           <button type="button" disabled={!canCopy} onClick={() => void copy()}>Copy citation <kbd>↵</kbd></button>
           <button type="button" aria-haspopup="dialog" aria-expanded={actionsOpen} aria-keyshortcuts={mac ? "Meta+k" : "Control+k"}
             onClick={() => setActionsOpen(true)}>Actions <kbd>{mac ? "⌘K" : "Ctrl+K"}</kbd></button>

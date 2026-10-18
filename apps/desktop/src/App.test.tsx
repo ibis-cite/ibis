@@ -565,9 +565,12 @@ test.each([
 ])("%s failures are reported without rejected IPC payloads", async (command, notice) => {
   backend({ [command]: () => { throw new Error("SYNTHETIC_PRIVATE_PAYLOAD"); } });
   render(<App />);
-  await screen.findByRole("button", { name: "Reload" });
-  if (command === "choose_library") fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
-  else if (command === "reload_library") fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+  await waitFor(() => expect(screen.getByRole("region", { name: "Library" }).textContent).toContain("refs.bib"));
+  if (command === "choose_library") fireEvent.click(screen.getByRole("button", { name: "Change library…" }));
+  else if (command === "reload_library") {
+    fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+    fireEvent.click(screen.getByRole("option", { name: "Reload library" }));
+  }
   else fireEvent.keyDown(screen.getByLabelText("Search references"), command === "quit"
     ? { key: "q", ctrlKey: true } : { key: "Escape" });
   expect((await screen.findByText(notice)).getAttribute("role")).toBe("alert");
@@ -874,4 +877,20 @@ test("reopening the picker closes Actions before restoring and selecting search 
   expect(document.activeElement).toBe(box);
   expect(box.selectionStart).toBe(0);
   expect(box.selectionEnd).toBe(box.value.length);
+});
+
+
+test.each([
+  ["choose_library", "Choose library…", "The library chooser is unavailable. Try again."],
+  ["reload_library", "Reload library", "Reload is unavailable. Try choosing the library again."],
+  ["quit", "Quit Ibis", "Ibis could not quit. Try again."],
+])("Actions %s failures use the shared safe operation notices", async (command, label, notice) => {
+  backend({ [command]: () => { throw new Error("SYNTHETIC_PRIVATE_PAYLOAD"); } });
+  render(<App />);
+  await waitFor(() => expect(screen.getByRole("region", { name: "Library" }).textContent).toContain("refs.bib"));
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  fireEvent.click(screen.getByRole("option", { name: label }));
+  expect((await screen.findByText(notice)).getAttribute("role")).toBe("alert");
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
 });
