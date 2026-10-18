@@ -85,6 +85,11 @@ fn encode_escaped_braces(text: &str) -> String {
                 out.push(ESCAPE);
                 out.push(c);
             }
+            // An escaped backslash: keep both, so a following brace is a group.
+            '\\' if chars.peek() == Some(&'\\') => {
+                out.push('\\');
+                out.extend(chars.next());
+            }
             '\\' if matches!(chars.peek(), Some('{' | '}')) => {
                 out.push(if chars.next() == Some('{') {
                     LEFT_BRACE
@@ -217,7 +222,14 @@ impl<'a> Resolver<'a> {
                 "xdata" => xdata_keys.extend(value.split(',').map(|k| k.trim().to_string()).filter(|k| !k.is_empty())),
                 "crossref" => crossref_key = Some(value.trim().to_string()).filter(|k| !k.is_empty()),
                 _ => {
-                    if !own.iter().any(|(n, _)| n == &field.name) {
+                    // As in Biber and Pandoc, a repeated field keeps its last value.
+                    if let Some(existing) = own.iter_mut().find(|(n, _)| n == &field.name) {
+                        if root {
+                            walk.problems
+                                .push(format!("field `{}` appears twice; the last value is used", field.name));
+                        }
+                        existing.1 = value;
+                    } else {
                         own.push((field.name.clone(), value));
                     }
                 }
@@ -276,12 +288,12 @@ impl<'a> Resolver<'a> {
             let mapped = inherited
                 .iter()
                 .filter(|(name, _)| !NOT_INHERITED.contains(&name.as_str()))
-                .filter_map(|(name, value)| {
-                    let target = match crossref_kind {
-                        Some(parent_kind) => crossref_target(parent_kind, &entry.kind, name)?,
-                        None => name.as_str(),
+                .flat_map(|(name, value)| {
+                    let targets = match crossref_kind {
+                        Some(parent_kind) => crossref_targets(parent_kind, &entry.kind, name),
+                        None => vec![name.as_str()],
                     };
-                    Some((target.to_string(), value.clone()))
+                    targets.into_iter().map(move |t| (t.to_string(), value.clone()))
                 })
                 .collect();
             sources.push(mapped);
@@ -412,64 +424,65 @@ impl Expansion {
 /// The publication-date fields handled together by [`merge_dates`].
 const DATE_PARTS: [&str; 4] = ["date", "year", "month", "day"];
 
-/// Merge publication dates from sources ordered by precedence, component by
-/// component as Biber does: an entry's own month combined with an inherited
-/// `date = {2024-02-05}` gives 2024-03-05. A `date` that is not a plain
-/// `YYYY[-MM[-DD]]` (a range, an approximate or uncertain date) is kept whole
-/// and only when no higher-precedence source gives any date component.
+/// Merge publication dates from sources ordered by precedence (own fields
+/// first), following Biber: each of `date`, `year`, `month` and `day` is
+/// inherited as a field; an entry's own `date` is used as written and never
+/// gains inherited precision; an inherited plain `date` is combined with the
+/// entry's own year, month or day (own month `mar` with an inherited
+/// `2024-02-05` gives 2024-03-05). Ranges and approximate dates are kept
+/// whole.
 fn merge_dates(sources: &[Vec<(String, String)>]) -> Vec<(String, String)> {
-    let (mut year, mut month, mut day): (Option<String>, Option<String>, Option<String>) = (None, None, None);
-    let mut extra_month = None;
-    for source in sources {
-        let get = |n: &str| source.iter().find(|(f, _)| f == n).map(|(_, v)| v.trim().to_string());
-        if let Some(date) = get("date") {
-            match simple_date(&date) {
-                Some((y, m, d)) => {
-                    year = year.or(Some(y));
-                    month = month.or(m);
-                    day = day.or(d);
-                }
-                None if year.is_none() && month.is_none() && day.is_none() && extra_month.is_none() => {
-                    return vec![("date".to_string(), date)];
-                }
-                None => {}
-            }
-        }
-        if let Some(y) = get("year") {
-            year = year.or(Some(y));
-        }
-        if let Some(m) = get("month") {
-            match month_number(&m) {
-                Some(n) => month = month.or(Some(n)),
-                None => extra_month = extra_month.or(Some(m)),
-            }
-        }
-        if let Some(d) = get("day") {
-            day = day.or(Some(d));
-        }
+    let field = |source: &Vec<(String, String)>, n: &str| {
+        source.iter().find(|(f, _)| f == n).map(|(_, v)| v.trim().to_string())
+    };
+    let own = &sources[0];
+    if let Some(date) = field(own, "date") {
+        return vec![("date".to_string(), date)];
     }
-    let mut out = Vec::new();
-    match (&year, &month) {
-        (Some(y), Some(m)) if is_digits(y, 4) => {
-            let date = match &day {
-                Some(d) if d.parse::<u8>().is_ok() => format!("{y}-{m}-{:02}", d.parse::<u8>().unwrap_or(0)),
-                _ => format!("{y}-{m}"),
+    let inherited = |n: &str| sources.iter().find_map(|s| field(s, n));
+    if let Some(date) = sources[1..].iter().find_map(|s| field(s, "date")) {
+        let Some((y, m, d)) = simple_date(&date) else {
+            return vec![("date".to_string(), date)];
+        };
+        let year = field(own, "year").unwrap_or(y);
+        let month = field(own, "month").as_deref().and_then(month_number).or(m);
+        let day = field(own, "day").or(d);
+        return compose(year, month, day);
+    }
+    let month = inherited("month");
+    match (month.as_deref().map(month_number), inherited("year")) {
+        // A month that is not a number or abbreviation ("Spring") stays as written.
+        (Some(None), year) => year
+            .map(|y| ("year".to_string(), y))
+            .into_iter()
+            .chain(month.map(|m| ("month".to_string(), m)))
+            .collect(),
+        (numeric, Some(year)) => compose(year, numeric.flatten(), inherited("day")),
+        (numeric, None) => numeric
+            .flatten()
+            .map(|m| ("month".to_string(), m))
+            .into_iter()
+            .collect(),
+    }
+}
+
+/// Fields for a year with optional month and day, exactly as precise as given.
+fn compose(year: String, month: Option<String>, day: Option<String>) -> Vec<(String, String)> {
+    let day = day.and_then(|d| d.parse::<u8>().ok()).filter(|d| (1..=31).contains(d));
+    match month {
+        Some(m) if is_digits(&year, 4) => {
+            let date = match day {
+                Some(d) => format!("{year}-{m}-{d:02}"),
+                None => format!("{year}-{m}"),
             };
-            out.push(("date".to_string(), date));
+            vec![("date".to_string(), date)]
         }
-        _ => {
-            if let Some(y) = year {
-                out.push(("year".to_string(), y));
-            }
-            if let Some(m) = month {
-                out.push(("month".to_string(), m));
-            }
+        month => {
+            let mut out = vec![("year".to_string(), year)];
+            out.extend(month.map(|m| ("month".to_string(), m)));
+            out
         }
     }
-    if let Some(m) = extra_month {
-        out.push(("month".to_string(), m));
-    }
-    out
 }
 
 /// `YYYY`, `YYYY-MM` or `YYYY-MM-DD`, split into components (month and day
@@ -512,39 +525,49 @@ fn is_digits(text: &str, len: usize) -> bool {
     text.len() == len && text.bytes().all(|b| b.is_ascii_digit())
 }
 
-/// Field name in the child for a field inherited through `crossref`,
-/// following BibLaTeX's default inheritance rules. `None` means the field is
-/// not inherited.
-fn crossref_target<'n>(parent: &str, child: &str, field: &'n str) -> Option<&'n str> {
+/// Field names in the child for a field inherited through `crossref`,
+/// following BibLaTeX's default inheritance rules (`biblatex.def`). An empty
+/// list means the field is not inherited.
+fn crossref_targets<'n>(parent: &str, child: &str, field: &'n str) -> Vec<&'n str> {
+    const TITLE_FIELDS: [&str; 3] = ["title", "subtitle", "titleaddon"];
+    const SKIPPED: [&str; 4] = ["shorttitle", "sorttitle", "indextitle", "indexsorttitle"];
     let book_part = matches!(child, "inbook" | "bookinbook" | "suppbook");
-    let collection_part = matches!(child, "incollection" | "suppcollection" | "inreference");
-    let proceedings_part = child == "inproceedings";
-    let mapped = match (parent, field) {
-        ("mvbook" | "mvcollection" | "mvreference" | "mvproceedings", "title") => "maintitle",
-        ("mvbook" | "mvcollection" | "mvreference" | "mvproceedings", "subtitle") => "mainsubtitle",
-        ("mvbook" | "mvcollection" | "mvreference" | "mvproceedings", "titleaddon") => "maintitleaddon",
-        ("book", "title") if book_part => "booktitle",
-        ("book", "subtitle") if book_part => "booksubtitle",
-        ("book", "titleaddon") if book_part => "booktitleaddon",
-        ("book", "author") if book_part => "bookauthor",
-        ("collection" | "reference", "title") if collection_part => "booktitle",
-        ("collection" | "reference", "subtitle") if collection_part => "booksubtitle",
-        ("collection" | "reference", "titleaddon") if collection_part => "booktitleaddon",
-        ("proceedings", "title") if proceedings_part => "booktitle",
-        ("proceedings", "subtitle") if proceedings_part => "booksubtitle",
-        ("proceedings", "titleaddon") if proceedings_part => "booktitleaddon",
-        ("periodical", "title") if matches!(child, "article" | "suppperiodical") => "journaltitle",
-        ("periodical", "subtitle") if matches!(child, "article" | "suppperiodical") => "journalsubtitle",
-        // Titles are never inherited under their own name by a part of a
-        // larger work: it has its own title.
-        (_, "title" | "subtitle" | "titleaddon" | "shorttitle" | "indextitle" | "indexsorttitle")
-            if book_part || collection_part || proceedings_part =>
-        {
-            return None;
-        }
-        (_, other) => other,
+    let collection_like = matches!(
+        child,
+        "collection" | "reference" | "incollection" | "inreference" | "suppcollection"
+    );
+    let collection_part = matches!(child, "incollection" | "inreference" | "suppcollection");
+    let prefix = match (parent, child) {
+        ("mvbook", "book" | "inbook" | "bookinbook" | "suppbook") => Some("main"),
+        ("mvcollection" | "mvreference", _) if collection_like => Some("main"),
+        ("mvproceedings", "proceedings" | "inproceedings") => Some("main"),
+        ("book", _) if book_part => Some("book"),
+        ("collection" | "reference", _) if collection_part => Some("book"),
+        ("proceedings", "inproceedings") => Some("book"),
+        ("periodical", "article" | "suppperiodical") => Some("journal"),
+        _ => None,
     };
-    Some(mapped)
+    let mut targets = Vec::new();
+    // The authors of a book are also the book author of its parts.
+    if field == "author" && matches!(parent, "mvbook" | "book") && book_part {
+        targets.push("bookauthor");
+    }
+    match prefix {
+        Some(prefix) if TITLE_FIELDS.contains(&field) => targets.push(match (prefix, field) {
+            ("main", "title") => "maintitle",
+            ("main", "subtitle") => "mainsubtitle",
+            ("main", _) => "maintitleaddon",
+            ("book", "title") => "booktitle",
+            ("book", "subtitle") => "booksubtitle",
+            ("book", _) => "booktitleaddon",
+            ("journal", "title") => "journaltitle",
+            ("journal", "subtitle") => "journalsubtitle",
+            _ => "journaltitleaddon",
+        }),
+        Some(_) if SKIPPED.contains(&field) => {}
+        _ => targets.push(field),
+    }
+    targets
 }
 
 /// Render one field canonically. A month written as a three-letter
@@ -669,8 +692,8 @@ mod tests {
         let month = resolve("@xdata{p,year=2024}\n@book{a,title={T},month=mar,xdata={p}}", "a");
         assert_eq!(month.fields.get("date").map(String::as_str), Some("2024-03"));
         let date = resolve("@xdata{p,year=2000}\n@book{a,title={T},date={2024},xdata={p}}", "a");
-        assert_eq!(date.fields.get("year").map(String::as_str), Some("2024"));
-        assert_eq!(date.fields.get("date"), None);
+        assert_eq!(date.fields.get("date").map(String::as_str), Some("2024"));
+        assert_eq!(date.fields.get("year"), None);
     }
 
     #[test]

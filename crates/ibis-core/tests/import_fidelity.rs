@@ -516,3 +516,67 @@ fn inheritance_precedence_survives_large_graphs() {
     let r = only(&load(&src), "r");
     assert_eq!(r.variables.get("publisher").map(String::as_str), Some("G"));
 }
+
+#[test]
+fn chapter_authors_are_both_author_and_book_author() {
+    let r = load("@book{p,title={Book},author={Doe, Jane}}\n@inbook{c,title={Chapter},crossref={p}}");
+    let c = only(&r, "c").to_csl_json();
+    assert_eq!(c["author"][0]["family"], "Doe");
+    assert_eq!(c["container-author"][0]["family"], "Doe");
+}
+
+#[test]
+fn an_own_date_is_never_given_inherited_precision() {
+    let r =
+        load("@book{p,date={2000-02-05}}\n@book{c,date={2024},crossref={p}}\n@book{d,title={T},date={2024},month=mar}");
+    for key in ["c", "d"] {
+        let issued = only(&r, key).issued.unwrap_or_else(|| panic!("{key}: no date"));
+        assert_eq!(
+            (issued.start.year, issued.start.month, issued.start.day),
+            (2024, None, None),
+            "{key}"
+        );
+    }
+}
+
+#[test]
+fn escaped_backslash_before_a_group_keeps_the_record() {
+    let r = load("@book{c,title={A \\\\{B} C}}");
+    only(&r, "c");
+}
+
+#[test]
+fn periodical_title_addon_stays_with_the_journal() {
+    let r = load("@periodical{p,title={Journal},titleaddon={Annex}}\n@article{c,title={Paper},crossref={p}}");
+    let c = only(&r, "c");
+    assert_eq!(c.title_plain().as_deref(), Some("Paper"));
+    assert_eq!(c.container_title.as_deref(), Some("Journal. Annex"));
+}
+
+#[test]
+fn multivolume_mappings_apply_only_to_their_entry_types() {
+    let r = load("@mvbook{p,title={Whole}}\n@article{c,title={Paper},crossref={p}}");
+    let c = only(&r, "c");
+    assert_eq!(c.title_plain().as_deref(), Some("Paper"));
+    assert_eq!(c.variables.get("volume-title"), None);
+}
+
+#[test]
+fn private_use_characters_survive_the_unknown_command_fallback() {
+    let r = load("@book{c,title={\\foo \u{E000}x\u{E001}\u{E002}}}");
+    let title = only(&r, "c").title.unwrap_or_default();
+    assert!(
+        title.contains("\\foo")
+            && title.contains('\u{E000}')
+            && title.contains('\u{E001}')
+            && title.contains('\u{E002}'),
+        "{title:?}"
+    );
+}
+
+#[test]
+fn duplicate_fields_keep_the_last_value_and_warn() {
+    let r = load("@book{c,title={First},title={Second}}");
+    assert_eq!(only(&r, "c").title_plain().as_deref(), Some("Second"));
+    assert!(warned(&r, "twice"), "{:?}", r.warnings);
+}

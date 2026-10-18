@@ -114,10 +114,11 @@ fn find_close(bytes: &[u8], open: usize) -> Option<usize> {
             continue;
         }
         // `\"` (an umlaut command) inside a quoted value is not a quote.
-        if std::mem::take(&mut escaped) && b == b'"' {
+        let escaped_before = std::mem::take(&mut escaped);
+        if escaped_before && b == b'"' {
             continue;
         }
-        escaped = b == b'\\';
+        escaped = !escaped_before && b == b'\\';
         match b {
             b'{' => depth += 1,
             b'}' if depth > 0 => depth -= 1,
@@ -304,11 +305,12 @@ impl<'a> Parser<'a> {
         let mut depth = 0usize;
         let mut escaped = false;
         while let Some(c) = self.peek() {
-            if std::mem::take(&mut escaped) && c == '"' {
+            let escaped_before = std::mem::take(&mut escaped);
+            if escaped_before && c == '"' {
                 self.bump();
                 continue;
             }
-            escaped = c == '\\';
+            escaped = !escaped_before && c == '\\';
             match c {
                 '{' => depth += 1,
                 '}' if depth > 0 => depth -= 1,

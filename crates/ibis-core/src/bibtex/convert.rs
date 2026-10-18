@@ -23,7 +23,14 @@ pub(crate) fn convert(
     let unknown = RefCell::new(BTreeSet::new());
     // A field containing a TeX command that is not understood is kept exactly
     // as written (from the source text), so nothing is silently changed.
+    // Raw values still carry the escaped-brace encoding. It is decoded exactly
+    // once: by `clean` for plain fields, by `render` for rich ones.
     let raw_text = |field: &str| own_fields.get(field).map(|v| clean(v));
+    let raw_encoded = |field: &str| {
+        own_fields
+            .get(field)
+            .map(|v| v.split_whitespace().collect::<Vec<_>>().join(" "))
+    };
     let text = |field: &str| {
         entry
             .get(field)
@@ -47,7 +54,7 @@ pub(crate) fn convert(
         }
         unknown.borrow_mut().extend(found);
         Some(vec![Piece::Text {
-            text: raw_text(field).unwrap_or_default(),
+            text: raw_encoded(field).unwrap_or_default(),
             protected: true,
         }])
     };
@@ -81,18 +88,21 @@ pub(crate) fn convert(
         ("article", Some(sub)) if sub == "magazine" => "article-magazine",
         _ => csl_type(kind),
     };
-    let containers: &[(&str, &str)] = if matches!(item_type, "chapter" | "paper-conference") {
+    let containers: &[(&str, &str, &str)] = if matches!(item_type, "chapter" | "paper-conference") {
         &[
-            ("booktitle", "booksubtitle"),
-            ("journaltitle", "journalsubtitle"),
-            ("journal", "journalsubtitle"),
+            ("booktitle", "booksubtitle", "booktitleaddon"),
+            ("journaltitle", "journalsubtitle", "journaltitleaddon"),
+            ("journal", "journalsubtitle", "journaltitleaddon"),
         ]
     } else {
-        &[("journaltitle", "journalsubtitle"), ("journal", "journalsubtitle")]
+        &[
+            ("journaltitle", "journalsubtitle", "journaltitleaddon"),
+            ("journal", "journalsubtitle", "journaltitleaddon"),
+        ]
     };
     let mut container_title = containers
         .iter()
-        .find_map(|(main, sub)| rich(main, &[(sub, ": ")]))
+        .find_map(|(main, sub, addon)| rich(main, &[(sub, ": "), (addon, ". ")]))
         .map(|pieces| render(&pieces))
         .filter(|s| !s.is_empty());
 
