@@ -160,26 +160,40 @@ fn publish(app: &AppHandle, status: LibraryStatus) {
     for message in status.error.iter().chain(&status.note) {
         application_message(message);
     }
-    if let Some(item) = app.try_state::<LibraryMenuItem>() {
-        report(item.0.set_text(library_line(&status)), NativeIssue::TrayLibrary);
-    }
     report(app.emit("library:changed", status), NativeIssue::LibraryEvent);
+}
+
+fn refresh_tray(app: &AppHandle) {
+    let handle = app.clone();
+    // Menu setters wait for the main thread. Schedule there after releasing the
+    // library lock, then read fresh state so delayed menu work cannot go stale.
+    report(
+        app.run_on_main_thread(move || {
+            let current = current_status(&handle);
+            if let Some(item) = handle.try_state::<LibraryMenuItem>() {
+                report(item.0.set_text(library_line(&current)), NativeIssue::TrayLibrary);
+            }
+        }),
+        NativeIssue::TrayLibrary,
+    );
 }
 
 /// Derive and emit under the state lock: an older completion cannot publish
 /// an out-of-date status after a newer request has started.
 fn publish_current(app: &AppHandle) {
-    if let Ok(library) = app.state::<Mutex<Library>>().lock() {
-        publish(app, status(&library));
-    }
+    publish_current_with(&app.state(), |status| publish(app, status), || refresh_tray(app));
 }
 
-fn dialog_path_error(current: LibraryStatus) -> LibraryStatus {
-    LibraryStatus {
-        state: LibraryState::Error,
-        error: Some("the chosen file is not on this computer".to_string()),
-        ..current
+fn publish_current_with(library: &Mutex<Library>, emit: impl FnOnce(LibraryStatus), refresh: impl FnOnce()) {
+    if let Ok(library) = library.lock() {
+        emit(status(&library));
     }
+    refresh();
+}
+
+fn dialog_path_error(library: &mut Library) {
+    library.opening = false;
+    library.error = Some("the chosen file is not on this computer".to_string());
 }
 
 fn take_watch_source(
@@ -299,7 +313,10 @@ pub(crate) fn choose_library_file(app: &AppHandle) {
             None => {}
             Some(Ok(path)) => start_open(&handle, path, true),
             Some(Err(_)) => {
-                publish(&handle, dialog_path_error(current_status(&handle)));
+                if let Ok(mut library) = handle.state::<Mutex<Library>>().lock() {
+                    dialog_path_error(&mut library);
+                }
+                publish_current(&handle);
             }
         }
     });
@@ -416,6 +433,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn status_emission_is_serialized_but_native_menu_work_holds_no_library_lock() {
+        let library = Mutex::new(Library::default());
+        publish_current_with(
+            &library,
+            |_| assert!(library.try_lock().is_err()),
+            || assert!(library.try_lock().is_ok()),
+        );
+    }
+
+    #[test]
     fn opening_is_visible_before_loading_and_stale_completions_cannot_replace_it() {
         let library = Mutex::new(Library::default());
         let requests = LoadRequests::default();
@@ -464,18 +491,18 @@ mod tests {
 
     #[test]
     fn a_nonlocal_dialog_choice_keeps_the_open_library_and_reports_the_same_tray_error() {
-        let failed = dialog_path_error(LibraryStatus {
-            state: LibraryState::Loaded,
-            has_snapshot: true,
-            name: Some("synthetic.bib".to_string()),
-            references: 12,
-            warnings: 2,
-            error: None,
-            note: Some("the library choice was not saved".to_string()),
-        });
+        let mut library = candidate(
+            PathBuf::from("synthetic.bib"),
+            ibis_core::bibtex::load_str("synthetic", "@misc{k}\n@misc{bad,"),
+        );
+        library.note = Some("the library choice was not saved".to_string());
+        let before = status(&library);
+        dialog_path_error(&mut library);
+        let failed = status(&library);
+        assert_eq!(failed.state, LibraryState::Error);
         assert_eq!(failed.name.as_deref(), Some("synthetic.bib"));
-        assert_eq!(failed.references, 12);
-        assert_eq!(failed.warnings, 2);
+        assert_eq!(failed.references, before.references);
+        assert_eq!(failed.warnings, before.warnings);
         assert_eq!(failed.note.as_deref(), Some("the library choice was not saved"));
         assert_eq!(failed.error.as_deref(), Some("the chosen file is not on this computer"));
         assert!(
