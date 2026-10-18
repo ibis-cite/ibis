@@ -97,6 +97,22 @@ fn compatible_path(path: PathBuf) -> PathBuf {
     }
 }
 
+// Canonicalize only the directory: editor replacement must keep selecting the
+// filename. Preserve explicit verbatim semantics until the whole leaf is known;
+// simplifying just its parent can make `library.bib.` select `library.bib`.
+fn watched_path(path: &Path) -> std::io::Result<PathBuf> {
+    let path = std::path::absolute(path)?;
+    let parent = path.parent().ok_or(std::io::ErrorKind::InvalidInput)?;
+    let parent = std::fs::canonicalize(parent).or_else(|_| std::path::absolute(parent))?;
+    #[cfg(windows)]
+    if matches!(path.components().next(), Some(std::path::Component::Prefix(prefix)) if prefix.kind().is_verbatim()) {
+        return Ok(compatible_path(
+            parent.join(path.file_name().ok_or(std::io::ErrorKind::InvalidInput)?),
+        ));
+    }
+    Ok(compatible_path(parent).join(path.file_name().ok_or(std::io::ErrorKind::InvalidInput)?))
+}
+
 /// Initial loads remain tolerant of damaged entries. A reload additionally
 /// refuses unclosed blocks, while duplicate keys and other warnings still load.
 pub fn load_library_file(path: &Path, reload: bool) -> Result<LoadResult, SourceError> {
@@ -133,10 +149,8 @@ impl SourceWatch {
         mut changed: impl FnMut(Result<LoadResult, SourceError>) + Send + 'static,
     ) -> Result<Self, SourceError> {
         // Keep the selected filename, rather than canonicalizing the file inode.
-        let path = std::path::absolute(path).map_err(|_| SourceError::WatchUnavailable)?;
-        let parent = path.parent().ok_or(SourceError::WatchUnavailable)?;
-        let parent = resolved_path(parent).map_err(|_| SourceError::WatchUnavailable)?;
-        let path = parent.join(path.file_name().ok_or(SourceError::WatchUnavailable)?);
+        let path = watched_path(path).map_err(|_| SourceError::WatchUnavailable)?;
+        let parent = path.parent().ok_or(SourceError::WatchUnavailable)?.to_path_buf();
         let (signal, events) = mpsc::sync_channel(1);
         let failed = Arc::new(AtomicBool::new(false));
         let notify_failed = Arc::clone(&failed);
@@ -388,6 +402,7 @@ mod tests {
         let loaded = parse(path, "@misc{k}", false).unwrap_or_else(|e| panic!("{e}"));
         let absolute = std::path::absolute(path).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(loaded.references[0].id.source, absolute.to_string_lossy());
+        assert_eq!(watched_path(path).unwrap_or_else(|e| panic!("{e}")), absolute);
     }
 
     #[test]

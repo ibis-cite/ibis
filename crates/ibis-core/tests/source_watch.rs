@@ -177,3 +177,32 @@ fn a_symlink_retargeted_to_a_missing_file_recovers_when_the_file_appears() {
     let recovered = next(&rx).unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(recovered.references[0].id.native_key, "second");
 }
+
+#[cfg(windows)]
+#[test]
+fn verbatim_leaf_names_and_ordinary_aliases_watch_the_selected_file() {
+    for suffix in [".", " "] {
+        let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+        let parent = std::fs::canonicalize(dir.path()).unwrap_or_else(|e| panic!("{e}"));
+        let ordinary = dunce::simplified(&parent).join("library.bib");
+        let verbatim = parent.join(format!("library.bib{suffix}"));
+        std::fs::write(&ordinary, "@misc{ordinary}").unwrap_or_else(|e| panic!("{e}"));
+        std::fs::write(&verbatim, "@misc{verbatim}").unwrap_or_else(|e| panic!("{e}"));
+        for (selected, key) in [
+            (verbatim.clone(), "verbatim"),
+            (ordinary.with_file_name(format!("library.bib{suffix}")), "ordinary"),
+        ] {
+            let (tx, rx) = mpsc::channel();
+            let _watch = SourceWatch::new(&selected, move |result| {
+                let _ = tx.send(result);
+            })
+            .unwrap_or_else(|e| panic!("{e}"));
+            let initial = next(&rx).unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(initial.references[0].id.native_key, key);
+            std::fs::write(&selected, format!("@misc{{{key}_updated}}")).unwrap_or_else(|e| panic!("{e}"));
+            let loaded = next(&rx).unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(loaded.references[0].id.native_key, format!("{key}_updated"));
+            assert_eq!(loaded.references[0].id.source, initial.references[0].id.source);
+        }
+    }
+}
