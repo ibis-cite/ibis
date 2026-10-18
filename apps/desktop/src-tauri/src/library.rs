@@ -550,12 +550,19 @@ mod tests {
         let library = Mutex::new(Library::default());
         let requests = LoadRequests::default();
         let missing = PathBuf::from("synthetic-parent-does-not-exist/missing.bib");
-        let (request, _, _) = begin_open(&library, &requests, missing.clone()).unwrap();
-        let failed = install(&library, &requests, request, load_library(missing, false)).unwrap();
+        let (request, _, _) = begin_open(&library, &requests, missing.clone())
+            .unwrap_or_else(|| panic!("expected the current library request"));
+        let failed = install(&library, &requests, request, load_library(missing, false))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(failed.name.as_deref(), Some("missing.bib"));
         assert_eq!(failed.error.as_deref(), Some("the library file is unavailable"));
         assert!(!failed.has_snapshot);
-        assert!(!failed.error.unwrap().contains("synthetic-parent"));
+        assert!(
+            !failed
+                .error
+                .unwrap_or_else(|| panic!("expected a library failure"))
+                .contains("synthetic-parent")
+        );
     }
 
     #[test]
@@ -571,11 +578,11 @@ mod tests {
             0,
             Err(ibis_core::source::SourceError::Unavailable.to_string()),
         )
-        .unwrap();
+        .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(empty.error.as_deref(), Some("the library file is unavailable"));
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
         let path = dir.path().join("populated.bib");
-        std::fs::write(&path, "@misc{synthetic}").unwrap();
+        std::fs::write(&path, "@misc{synthetic}").unwrap_or_else(|e| panic!("{e}"));
         install(&library, &requests, 0, load_library(path, false));
         let retained = install(
             &library,
@@ -583,8 +590,13 @@ mod tests {
             0,
             Err(ibis_core::source::SourceError::Unavailable.to_string()),
         )
-        .unwrap();
-        assert!(retained.error.unwrap().contains("keeping the last loaded references"));
+        .unwrap_or_else(|| panic!("expected the current library request"));
+        assert!(
+            retained
+                .error
+                .unwrap_or_else(|| panic!("expected a library failure"))
+                .contains("keeping the last loaded references")
+        );
     }
 
     #[test]
