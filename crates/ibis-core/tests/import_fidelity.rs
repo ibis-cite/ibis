@@ -400,3 +400,119 @@ fn repeated_and_fanned_out_inheritance_is_bounded() {
         Some("P")
     );
 }
+
+#[test]
+fn later_xdata_parents_override_earlier_ones() {
+    let r = load(
+        "@xdata{first,publisher={First},year={2000}}\n@xdata{second,publisher={Second},year={2024}}\n@book{a,title={Synthetic},xdata={first,second}}",
+    );
+    let a = only(&r, "a");
+    assert_eq!(a.variables.get("publisher").map(String::as_str), Some("Second"));
+    assert_eq!(a.year(), Some(2024));
+}
+
+#[test]
+fn inherited_dates_merge_component_by_component() {
+    let r =
+        load("@book{parent,title={Parent},date={2024-02-05}}\n@book{child,title={Child},month=mar,crossref={parent}}");
+    let issued = only(&r, "child")
+        .issued
+        .unwrap_or_else(|| panic!("no date: {:?}", r.warnings));
+    assert_eq!(
+        (issued.start.year, issued.start.month, issued.start.day),
+        (2024, Some(3), Some(5))
+    );
+    let month_only = load("@xdata{p,year=2024}\n@book{a,title={T},month=mar,xdata={p}}");
+    let issued = only(&month_only, "a").issued.unwrap_or_else(|| panic!("no date"));
+    assert_eq!((issued.start.year, issued.start.month), (2024, Some(3)));
+}
+
+#[test]
+fn intermediate_entries_keep_their_own_dates() {
+    let r = load("@book{g,year=2000}\n@book{p,date={2024},crossref={g}}\n@book{a,title={T},crossref={p}}");
+    assert_eq!(only(&r, "p").year(), Some(2024));
+    assert_eq!(only(&r, "a").year(), Some(2024));
+}
+
+#[test]
+fn multi_volume_titles_keep_the_whole_work() {
+    let r = load(
+        "@book{volume,title={Volume One},maintitle={Collected Works},volume={2},year={2020},langid={american}}\n@inbook{part,title={A Letter},booktitle={Early Letters},maintitle={Collected Works},volume={2},year={2020}}",
+    );
+    let v = only(&r, "volume");
+    assert_eq!(v.title_plain().as_deref(), Some("Collected works"));
+    assert_eq!(v.variables.get("volume-title").map(String::as_str), Some("Volume one"));
+    let part = only(&r, "part");
+    assert_eq!(part.container_title.as_deref(), Some("Collected Works"));
+    assert_eq!(
+        part.variables.get("volume-title").map(String::as_str),
+        Some("Early Letters")
+    );
+}
+
+#[test]
+fn series_numbers_and_report_numbers_keep_their_meaning() {
+    let r = load(
+        "@book{b,title={Work},series={Example Series},number={12},year={2020}}\n@report{rep,title={R},number={TR-7},institution={I},series={Tech Series},year={2020}}",
+    );
+    assert_eq!(
+        only(&r, "b").variables.get("collection-number").map(String::as_str),
+        Some("12")
+    );
+    assert_eq!(only(&r, "b").variables.get("number"), None);
+    assert_eq!(
+        only(&r, "rep").variables.get("number").map(String::as_str),
+        Some("TR-7")
+    );
+}
+
+#[test]
+fn legacy_conference_alias_inherits_its_proceedings_title() {
+    let r = load(
+        "@proceedings{volume,title={Synthetic Proceedings},year={2024}}\n@conference{paper,title={Synthetic Paper},crossref={volume}}",
+    );
+    let paper = only(&r, "paper");
+    assert_eq!(paper.item_type, "paper-conference");
+    assert_eq!(paper.container_title.as_deref(), Some("Synthetic Proceedings"));
+}
+
+#[test]
+fn private_use_characters_in_text_are_not_mistaken_for_braces() {
+    let r = load("@book{pua,title={A \u{E000} and \u{E001} test \\{x\\}},year={2024}}");
+    let title = only(&r, "pua").title.unwrap_or_default();
+    assert!(
+        title.contains('\u{E000}') && title.contains('\u{E001}') && title.contains("{x}"),
+        "{title:?}"
+    );
+}
+
+#[test]
+fn comment_delimiters_and_protected_escaped_braces() {
+    let r = load("@book{a,title={T}, % }\n  year=2024}\n@book{b,title={{\\{B\\}}}}");
+    assert_eq!(only(&r, "a").year(), Some(2024));
+    assert_eq!(only(&r, "b").title_plain().as_deref(), Some("{B}"));
+}
+
+#[test]
+fn unknown_commands_across_chunks_are_kept_exactly() {
+    let r = load("@book{a,title={\\frac{1}{2}}}\n@book{b,title={$\\frac{1}{2^3}$}}");
+    assert_eq!(only(&r, "a").title_plain().as_deref(), Some("\\frac{1}{2}"));
+    assert_eq!(only(&r, "b").title_plain().as_deref(), Some("$\\frac{1}{2^3}$"));
+}
+
+#[test]
+fn inheritance_precedence_survives_large_graphs() {
+    let mut src =
+        String::from("@book{r,xdata={n0,n1,n2,n3,n4,n5,n6,n7,n8}}\n@xdata{n0,xdata={n2,n1,n3,n4,n5,n6,n7,n8}}\n");
+    src.push_str(
+        "@xdata{n1,publisher={B},xdata={n2,n3,n4,n5,n6,n7,n8}}\n@xdata{n2,publisher={G},xdata={n3,n4,n5,n6,n7,n8}}\n",
+    );
+    for i in 3..8 {
+        let rest: Vec<String> = ((i + 1)..9).map(|j| format!("n{j}")).collect();
+        src.push_str(&format!("@xdata{{n{i},xdata={{{}}}}}\n", rest.join(",")));
+    }
+    src.push_str("@xdata{n8}\n");
+    // Later xdata parents win: n8..n2 are listed after n1, and n2 sets G.
+    let r = only(&load(&src), "r");
+    assert_eq!(r.variables.get("publisher").map(String::as_str), Some("G"));
+}

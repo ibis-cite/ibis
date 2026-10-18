@@ -75,6 +75,7 @@ impl<'a> Index<'a> {
                     .authors
                     .iter()
                     .chain(&r.editors)
+                    .chain(r.other_names.values().flatten())
                     .map(|n| n.display())
                     .collect::<Vec<_>>()
                     .join(" ");
@@ -269,6 +270,18 @@ mod tests {
         let index = Index::new(&refs);
         assert_eq!(index.search("a-b", 10)[0].reference.id.native_key, "a-b");
         assert_eq!(index.search("a:b", 10)[0].reference.id.native_key, "a:b");
+    }
+
+    #[test]
+    fn translators_and_other_roles_are_searchable() {
+        let refs = crate::bibtex::load_str(
+            "t",
+            "@book{translation,title={Synthetic},translator={Translator, Taylor},year={2024}}\n@book{compilation,title={Another},editor={Compiler, Casey},editortype={compiler},year={2024}}",
+        )
+        .references;
+        let index = Index::new(&refs);
+        assert_eq!(index.search("Translator", 10).len(), 1);
+        assert_eq!(index.search("Compiler", 10).len(), 1);
     }
 
     #[test]

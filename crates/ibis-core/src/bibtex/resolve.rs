@@ -1,12 +1,17 @@
-//! Resolves `@string` macros and `crossref`/`xdata` inheritance as a checked
-//! graph, then renders each entry, with its ancestors, as canonical BibLaTeX
-//! that the field parser can read without any further lookups.
+//! Resolves `@string` macros and `crossref`/`xdata` inheritance, producing
+//! one flat entry per reference for the field parser.
 //!
-//! Cycles (`a` → `b` → `a`, or an entry referring to itself) are reported and
-//! broken here, so they can never reach the parser, which would otherwise
-//! recurse without end.
+//! Inheritance is computed here, field by field, rather than by the field
+//! parser: an entry's own fields always win; `xdata` parents then fill
+//! missing fields under the same names; a `crossref` parent fills the rest,
+//! following BibLaTeX's default mapping (for example a proceedings `title`
+//! becomes an inproceedings `booktitle`). Results are memoized per entry, so
+//! shared ancestors cost nothing extra, recursion is bounded by
+//! [`MAX_DEPTH`], cycles are reported and broken, and the parser never sees
+//! a link it could follow.
 
 use std::collections::{HashMap, HashSet};
+use std::rc::Rc;
 
 use super::lexer::{Part, RawEntry};
 
@@ -24,17 +29,33 @@ const DATE_FIELDS: [&str; 9] = [
     "pubstate-date",
 ];
 
-/// Date fields treated as one unit when deciding precedence.
-const DATE_FAMILY: [&str; 4] = ["date", "year", "month", "day"];
-
-/// Most distinct inheritance paths allowed before falling back to one path per ancestor.
-const MAX_INHERITANCE_PATHS: u64 = 256;
-
-/// Fields that link an entry to the entries it inherits from.
-const PARENT_FIELDS: [&str; 2] = ["crossref", "xdata"];
+/// Fields never inherited (BibLaTeX's non-inheritable fields plus links).
+const NOT_INHERITED: [&str; 18] = [
+    "ids",
+    "crossref",
+    "xref",
+    "xdata",
+    "entryset",
+    "entrysubtype",
+    "execute",
+    "label",
+    "options",
+    "presort",
+    "related",
+    "relatedoptions",
+    "relatedstring",
+    "relatedtype",
+    "shorthand",
+    "shorthandintro",
+    "sortkey",
+    "sorttitle",
+];
 
 /// Longest inheritance chain (and macro nesting) followed.
 const MAX_DEPTH: usize = 16;
+
+/// Most entry evaluations performed while resolving one entry.
+const MAX_EVALUATIONS: usize = 10_000;
 
 /// Deepest nesting of abbreviations defined in terms of other abbreviations.
 const MAX_MACRO_DEPTH: usize = 64;
@@ -44,6 +65,38 @@ const MAX_EXPANSION_STEPS: usize = 100_000;
 
 /// Largest field value accepted after expanding abbreviations.
 const MAX_VALUE_BYTES: usize = 64 * 1024;
+
+/// Private-use characters standing in for escaped braces (`\{`, `\}`) so they
+/// can never be mistaken for grouping braces; mapped back after conversion.
+pub(crate) const LEFT_BRACE: char = '\u{E000}';
+pub(crate) const RIGHT_BRACE: char = '\u{E001}';
+/// Marks a placeholder character that occurred in the source itself, so real
+/// text using these private-use characters is never altered.
+pub(crate) const ESCAPE: char = '\u{E002}';
+
+/// Encode `\\{` and `\\}` as placeholders, escaping placeholder characters
+/// already present in the text. Decoded by `convert::clean`.
+fn encode_escaped_braces(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut chars = text.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            LEFT_BRACE | RIGHT_BRACE | ESCAPE => {
+                out.push(ESCAPE);
+                out.push(c);
+            }
+            '\\' if matches!(chars.peek(), Some('{' | '}')) => {
+                out.push(if chars.next() == Some('{') {
+                    LEFT_BRACE
+                } else {
+                    RIGHT_BRACE
+                });
+            }
+            _ => out.push(c),
+        }
+    }
+    out
+}
 
 const MONTHS: [(&str, &str); 12] = [
     ("jan", "January"),
@@ -60,16 +113,8 @@ const MONTHS: [(&str, &str); 12] = [
     ("dec", "December"),
 ];
 
-/// State of one depth-first inheritance walk.
-struct Walk {
-    chain: Vec<usize>,
-    edges: HashSet<(usize, usize)>,
-    /// Shortest path length at which each entry was explored. An entry first
-    /// reached through a long path (possibly cut off by the depth limit) is
-    /// explored again when a shorter path reaches it.
-    explored_at: HashMap<usize, usize>,
-    path: Vec<usize>,
-}
+/// Ordered field list of one entry after inheritance: (name, value).
+type Fields = Rc<Vec<(String, String)>>;
 
 /// Everything needed to resolve entries from one file.
 pub(crate) struct Resolver<'a> {
@@ -81,10 +126,19 @@ pub(crate) struct Resolver<'a> {
 
 /// An entry ready for parsing, plus problems found while resolving it.
 pub(crate) struct Resolved {
+    /// One flat entry: own and inherited fields, no links.
     pub source: String,
-    /// Resolved field values (macros expanded), for checks that need raw text.
+    /// Field values after expansion and inheritance, for checks that need raw text.
     pub fields: HashMap<String, String>,
     pub problems: Vec<String>,
+}
+
+/// State of resolving one entry.
+struct Walk {
+    path: Vec<usize>,
+    memo: HashMap<(usize, usize), Fields>,
+    evaluations: usize,
+    problems: Vec<String>,
 }
 
 impl<'a> Resolver<'a> {
@@ -111,196 +165,139 @@ impl<'a> Resolver<'a> {
             .copied()
     }
 
-    /// Resolve entry `i`: expand macros, follow and validate inheritance, and
-    /// render the entry with its ancestors as canonical BibLaTeX.
+    /// Resolve entry `i` into one flat entry with inherited fields applied.
     pub(crate) fn resolve(&self, i: usize) -> Resolved {
-        let mut problems = Vec::new();
-        let (chain, mut edges) = self.ancestors(i, &mut problems);
-        // Links kept from different paths can still combine into a cycle, so
-        // the final graph is checked as a whole before anything is parsed.
-        self.break_cycles(i, &mut edges, &mut problems);
-        // The field parser resolves inheritance once per path, so a graph
-        // with many paths (fan-out repeated over several levels) costs
-        // exponential work. Above a limit, keep one path to each ancestor.
-        if count_paths(i, &edges) > MAX_INHERITANCE_PATHS {
-            problems.push(format!(
-                "inheritance has more than {MAX_INHERITANCE_PATHS} paths; each inherited entry is used through one path only"
-            ));
-            edges = spanning_tree(i, &edges);
-        }
-        // Fields the entry states itself take precedence over inherited ones;
-        // the date family is handled as one unit so an inherited `year` never
-        // replaces an explicit `date`.
-        let own_dates = self.entries[i]
-            .fields
-            .iter()
-            .any(|f| DATE_FAMILY.contains(&f.name.as_str()));
-
-        let mut source = String::new();
-        let mut own_fields = HashMap::new();
-        for &idx in chain.iter().rev().chain([i].iter()) {
-            let entry = &self.entries[idx];
-            let mut rendered = Vec::new();
-            let mut seen_parent_keys = HashSet::new();
-            for field in &entry.fields {
-                if idx != i && own_dates && DATE_FAMILY.contains(&field.name.as_str()) {
-                    continue;
-                }
-                let is_parent = PARENT_FIELDS.contains(&field.name.as_str());
-                // Problems in the entry itself, or in an `@xdata` helper it uses
-                // (helpers are not loaded on their own), are reported here.
-                let report = idx == i || entry.kind == "xdata";
-                let mut field_problems = Vec::new();
-                let value = self.expand(&field.name, &field.parts, &mut field_problems, report);
-                problems.extend(field_problems.into_iter().map(|p| {
-                    if idx == i {
-                        p
-                    } else {
-                        format!("in inherited `{}`: {p}", entry.key)
-                    }
-                }));
-                if is_parent {
-                    // Keep only links that were followed while building the
-                    // acyclic chain; cycles and missing targets are dropped.
-                    let keep: Vec<&str> = value
-                        .split(',')
-                        .map(str::trim)
-                        .filter(|k| {
-                            self.find(k)
-                                .is_some_and(|t| edges.contains(&(idx, t)) && seen_parent_keys.insert(t))
-                        })
-                        .collect();
-                    if keep.is_empty() {
-                        continue;
-                    }
-                    rendered.push(format!("  {} = {{{}}}", field.name, keep.join(", ")));
-                    continue;
-                }
-                if idx == i {
-                    own_fields.insert(field.name.clone(), value.clone());
-                }
-                rendered.push(render_field(&field.name, &field.parts, &value));
-            }
-            source.push_str(&format!(
-                "@{}{{{},\n{}}}\n",
-                entry.kind,
-                entry.key,
-                rendered.join(",\n")
-            ));
-        }
-        // The same problem can be found many times (for example an undefined
-        // abbreviation used in several fields); report each one once.
+        let mut walk = Walk {
+            path: vec![i],
+            memo: HashMap::new(),
+            evaluations: 0,
+            problems: Vec::new(),
+        };
+        let fields = self.effective(i, MAX_DEPTH, &mut walk);
+        let entry = &self.entries[i];
+        let rendered: Vec<String> = fields.iter().map(|(name, value)| render_field(name, value)).collect();
+        let source = format!("@{}{{{},\n{}}}\n", entry.kind, entry.key, rendered.join(",\n"));
+        let mut problems = walk.problems;
+        // The same problem can be found many times; report each one once.
         let mut unique = HashSet::new();
         problems.retain(|p| unique.insert(p.clone()));
         Resolved {
             source,
-            fields: own_fields,
+            fields: fields.iter().cloned().collect(),
             problems,
         }
     }
 
-    /// Remove links that close a cycle in the retained graph reachable from
-    /// `root`, using an iterative depth-first search in a fixed order.
-    fn break_cycles(&self, root: usize, edges: &mut HashSet<(usize, usize)>, problems: &mut Vec<String>) {
-        let mut children: HashMap<usize, Vec<usize>> = HashMap::new();
-        for &(from, to) in edges.iter() {
-            children.entry(from).or_default().push(to);
+    /// Fields of entry `idx` after inheritance, following at most `remaining`
+    /// further levels. Memoized by (entry, remaining depth).
+    fn effective(&self, idx: usize, remaining: usize, walk: &mut Walk) -> Fields {
+        if let Some(fields) = walk.memo.get(&(idx, remaining)) {
+            return Rc::clone(fields);
         }
-        for list in children.values_mut() {
-            list.sort_unstable();
-        }
-        // 1 = on the current path, 2 = finished.
-        let mut state: HashMap<usize, u8> = HashMap::from([(root, 1)]);
-        let mut stack: Vec<(usize, usize)> = vec![(root, 0)];
-        while let Some(&mut (node, ref mut next)) = stack.last_mut() {
-            let Some(&child) = children.get(&node).and_then(|c| c.get(*next)) else {
-                state.insert(node, 2);
-                stack.pop();
-                continue;
-            };
-            *next += 1;
-            match state.get(&child) {
-                Some(1) => {
-                    edges.remove(&(node, child));
-                    problems.push(format!(
-                        "cross-reference cycle through `{}` and `{}`; the link back is ignored",
-                        self.entries[node].key, self.entries[child].key
-                    ));
+        walk.evaluations += 1;
+        let entry = &self.entries[idx];
+        let root = walk.path.first().copied() == Some(idx);
+        // Problems in the entry itself, or in an `@xdata` helper it uses
+        // (helpers are not loaded on their own), are reported.
+        let report = root || entry.kind == "xdata";
+        let mut own: Vec<(String, String)> = Vec::new();
+        let mut xdata_keys = Vec::new();
+        let mut crossref_key = None;
+        for field in &entry.fields {
+            let mut field_problems = Vec::new();
+            let value = self.expand(&field.name, &field.parts, &mut field_problems, report);
+            walk.problems.extend(field_problems.into_iter().map(|p| {
+                if root {
+                    p
+                } else {
+                    format!("in inherited `{}`: {p}", entry.key)
                 }
-                Some(_) => {}
-                None => {
-                    state.insert(child, 1);
-                    stack.push((child, 0));
+            }));
+            match field.name.as_str() {
+                "xdata" => xdata_keys.extend(value.split(',').map(|k| k.trim().to_string()).filter(|k| !k.is_empty())),
+                "crossref" => crossref_key = Some(value.trim().to_string()).filter(|k| !k.is_empty()),
+                _ => {
+                    if !own.iter().any(|(n, _)| n == &field.name) {
+                        own.push((field.name.clone(), value));
+                    }
                 }
             }
         }
-    }
 
-    /// Ancestors of entry `i` and the links followed to reach them, found by a
-    /// depth-first walk. A link back to an entry on the current path is a
-    /// cycle and is dropped; reaching an ancestor again through another path
-    /// (a shared ancestor) is valid and keeps the link.
-    fn ancestors(&self, i: usize, problems: &mut Vec<String>) -> (Vec<usize>, HashSet<(usize, usize)>) {
-        let mut walk = Walk {
-            chain: Vec::new(),
-            edges: HashSet::new(),
-            explored_at: HashMap::from([(i, 0)]),
-            path: vec![i],
-        };
-        self.visit(i, &mut walk, problems);
-        (walk.chain, walk.edges)
-    }
-
-    fn visit(&self, idx: usize, walk: &mut Walk, problems: &mut Vec<String>) {
-        if walk.path.len() > MAX_DEPTH {
-            problems.push(format!(
-                "inheritance is deeper than {MAX_DEPTH} levels; further levels are ignored"
-            ));
-            return;
-        }
-        for target in self.parent_keys(idx) {
-            let Some(t) = self.find(&target) else {
-                problems.push(format!(
-                    "`{}` refers to `{target}`, which is not in this file; nothing is inherited from it",
-                    self.entries[idx].key
-                ));
-                continue;
-            };
-            if walk.path.contains(&t) {
-                problems.push(format!(
-                    "cross-reference cycle through `{}` and `{}`; the link back is ignored",
-                    self.entries[idx].key, self.entries[t].key
-                ));
-                continue;
-            }
-            walk.edges.insert((idx, t));
-            let depth = walk.path.len();
-            let first_time = !walk.explored_at.contains_key(&t);
-            if walk.explored_at.get(&t).is_none_or(|&d| depth < d) {
-                walk.explored_at.insert(t, depth);
-                if first_time {
-                    walk.chain.push(t);
-                }
-                walk.path.push(t);
-                self.visit(t, walk, problems);
-                walk.path.pop();
-            }
-        }
-    }
-
-    fn parent_keys(&self, idx: usize) -> Vec<String> {
-        self.entries[idx]
-            .fields
+        let mut parents: Vec<(Fields, Option<&str>)> = Vec::new();
+        let links = xdata_keys
             .iter()
-            .filter(|f| PARENT_FIELDS.contains(&f.name.as_str()))
-            .flat_map(|f| {
-                self.expand(&f.name, &f.parts, &mut Vec::new(), false)
-                    .split(',')
-                    .map(|k| k.trim().to_string())
-                    .filter(|k| !k.is_empty())
-                    .collect::<Vec<_>>()
-            })
-            .collect()
+            .map(|k| (k.as_str(), false))
+            .chain(crossref_key.iter().map(|k| (k.as_str(), true)));
+        let mut seen_targets = HashSet::new();
+        for (target, is_crossref) in links {
+            let Some(t) = self.find(target) else {
+                walk.problems.push(format!(
+                    "`{}` refers to `{target}`, which is not in this file; nothing is inherited from it",
+                    entry.key
+                ));
+                continue;
+            };
+            if !seen_targets.insert(t) {
+                continue;
+            }
+            if walk.path.contains(&t) {
+                walk.problems.push(format!(
+                    "cross-reference cycle through `{}` and `{}`; the link back is ignored",
+                    entry.key, self.entries[t].key
+                ));
+                continue;
+            }
+            if remaining == 0 {
+                walk.problems.push(format!(
+                    "inheritance is deeper than {MAX_DEPTH} levels; further levels are ignored"
+                ));
+                continue;
+            }
+            if walk.evaluations >= MAX_EVALUATIONS {
+                walk.problems.push(format!(
+                    "inheritance requires more than {MAX_EVALUATIONS} steps; remaining inherited entries are ignored"
+                ));
+                break;
+            }
+            walk.path.push(t);
+            let inherited = self.effective(t, remaining - 1, walk);
+            walk.path.pop();
+            let parent_kind = is_crossref.then(|| self.entries[t].kind.as_str());
+            parents.push((inherited, parent_kind));
+        }
+
+        // Precedence, highest first: the entry's own fields, then its `xdata`
+        // parents with later ones overriding earlier ones (as in Biber), then
+        // its `crossref` parent. Each source only fills fields still missing.
+        let mut sources: Vec<Vec<(String, String)>> = vec![own];
+        let (crossref, xdata): (Vec<_>, Vec<_>) = parents.into_iter().partition(|(_, kind)| kind.is_some());
+        for (inherited, crossref_kind) in xdata.into_iter().rev().chain(crossref) {
+            let mapped = inherited
+                .iter()
+                .filter(|(name, _)| !NOT_INHERITED.contains(&name.as_str()))
+                .filter_map(|(name, value)| {
+                    let target = match crossref_kind {
+                        Some(parent_kind) => crossref_target(parent_kind, &entry.kind, name)?,
+                        None => name.as_str(),
+                    };
+                    Some((target.to_string(), value.clone()))
+                })
+                .collect();
+            sources.push(mapped);
+        }
+        let mut merged: Vec<(String, String)> = Vec::new();
+        for source in &sources {
+            for (name, value) in source {
+                if !DATE_PARTS.contains(&name.as_str()) && !merged.iter().any(|(n, _)| n == name) {
+                    merged.push((name.clone(), value.clone()));
+                }
+            }
+        }
+        merged.extend(merge_dates(&sources));
+        let fields: Fields = Rc::new(merged);
+        walk.memo.insert((idx, remaining), Rc::clone(&fields));
+        fields
     }
 
     /// Concatenate parts, expanding macros (and macros used inside macros).
@@ -337,7 +334,7 @@ impl<'a> Resolver<'a> {
         if DATE_FIELDS.contains(&field) {
             out = ascii_digits(&out);
         }
-        dotless_to_plain(&out)
+        encode_escaped_braces(&dotless_to_plain(&out))
     }
 
     fn expand_macro(&self, field: &str, name: &str, problems: &mut Vec<String>, report: bool, x: &mut Expansion) {
@@ -412,55 +409,148 @@ impl Expansion {
     }
 }
 
-/// Number of distinct paths from `root` in an acyclic edge set (saturating).
-fn count_paths(root: usize, edges: &HashSet<(usize, usize)>) -> u64 {
-    fn visit(node: usize, children: &HashMap<usize, Vec<usize>>, memo: &mut HashMap<usize, u64>) -> u64 {
-        if let Some(&n) = memo.get(&node) {
-            return n;
-        }
-        let total = children.get(&node).map_or(1, |c| {
-            c.iter()
-                .fold(1u64, |acc, &child| acc.saturating_add(visit(child, children, memo)))
-        });
-        memo.insert(node, total);
-        total
-    }
-    let mut children: HashMap<usize, Vec<usize>> = HashMap::new();
-    for &(from, to) in edges {
-        children.entry(from).or_default().push(to);
-    }
-    visit(root, &children, &mut HashMap::new())
-}
+/// The publication-date fields handled together by [`merge_dates`].
+const DATE_PARTS: [&str; 4] = ["date", "year", "month", "day"];
 
-/// Keep the first link found to each ancestor in a breadth-first walk.
-fn spanning_tree(root: usize, edges: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)> {
-    let mut children: HashMap<usize, Vec<usize>> = HashMap::new();
-    for &(from, to) in edges {
-        children.entry(from).or_default().push(to);
+/// Merge publication dates from sources ordered by precedence, component by
+/// component as Biber does: an entry's own month combined with an inherited
+/// `date = {2024-02-05}` gives 2024-03-05. A `date` that is not a plain
+/// `YYYY[-MM[-DD]]` (a range, an approximate or uncertain date) is kept whole
+/// and only when no higher-precedence source gives any date component.
+fn merge_dates(sources: &[Vec<(String, String)>]) -> Vec<(String, String)> {
+    let (mut year, mut month, mut day): (Option<String>, Option<String>, Option<String>) = (None, None, None);
+    let mut extra_month = None;
+    for source in sources {
+        let get = |n: &str| source.iter().find(|(f, _)| f == n).map(|(_, v)| v.trim().to_string());
+        if let Some(date) = get("date") {
+            match simple_date(&date) {
+                Some((y, m, d)) => {
+                    year = year.or(Some(y));
+                    month = month.or(m);
+                    day = day.or(d);
+                }
+                None if year.is_none() && month.is_none() && day.is_none() && extra_month.is_none() => {
+                    return vec![("date".to_string(), date)];
+                }
+                None => {}
+            }
+        }
+        if let Some(y) = get("year") {
+            year = year.or(Some(y));
+        }
+        if let Some(m) = get("month") {
+            match month_number(&m) {
+                Some(n) => month = month.or(Some(n)),
+                None => extra_month = extra_month.or(Some(m)),
+            }
+        }
+        if let Some(d) = get("day") {
+            day = day.or(Some(d));
+        }
     }
-    for list in children.values_mut() {
-        list.sort_unstable();
-    }
-    let mut kept = HashSet::new();
-    let mut seen = HashSet::from([root]);
-    let mut queue = std::collections::VecDeque::from([root]);
-    while let Some(node) = queue.pop_front() {
-        for &child in children.get(&node).into_iter().flatten() {
-            if seen.insert(child) {
-                kept.insert((node, child));
-                queue.push_back(child);
+    let mut out = Vec::new();
+    match (&year, &month) {
+        (Some(y), Some(m)) if is_digits(y, 4) => {
+            let date = match &day {
+                Some(d) if d.parse::<u8>().is_ok() => format!("{y}-{m}-{:02}", d.parse::<u8>().unwrap_or(0)),
+                _ => format!("{y}-{m}"),
+            };
+            out.push(("date".to_string(), date));
+        }
+        _ => {
+            if let Some(y) = year {
+                out.push(("year".to_string(), y));
+            }
+            if let Some(m) = month {
+                out.push(("month".to_string(), m));
             }
         }
     }
-    kept
+    if let Some(m) = extra_month {
+        out.push(("month".to_string(), m));
+    }
+    out
 }
 
-/// Render one field canonically. A month given as a bare abbreviation stays
-/// bare so the parser reads it as a month; everything else is braced.
-fn render_field(name: &str, parts: &[Part], value: &str) -> String {
-    let bare_month = name == "month"
-        && matches!(parts, [Part::Macro(m)] if MONTHS.iter().any(|(abbr, _)| abbr == m))
-        && MONTHS.iter().any(|(abbr, _)| *abbr == value);
+/// `YYYY`, `YYYY-MM` or `YYYY-MM-DD`, split into components (month and day
+/// zero-padded to two digits).
+fn simple_date(text: &str) -> Option<(String, Option<String>, Option<String>)> {
+    let mut parts = text.split('-');
+    let year = parts.next().filter(|y| is_digits(y, 4))?.to_string();
+    let month = parts.next().map(|m| {
+        m.parse::<u8>()
+            .ok()
+            .filter(|m| (1..=12).contains(m))
+            .map(|m| format!("{m:02}"))
+    });
+    let day = parts.next().map(|d| {
+        d.parse::<u8>()
+            .ok()
+            .filter(|d| (1..=31).contains(d))
+            .map(|d| format!("{d:02}"))
+    });
+    if parts.next().is_some() || month == Some(None) || day == Some(None) {
+        return None;
+    }
+    Some((year, month.flatten(), day.flatten()))
+}
+
+/// Two-digit month for `3`, `03` or `mar`; `None` for anything else.
+fn month_number(text: &str) -> Option<String> {
+    let lower = text.trim().to_ascii_lowercase();
+    if let Some(i) = MONTHS.iter().position(|(abbr, _)| *abbr == lower) {
+        return Some(format!("{:02}", i + 1));
+    }
+    lower
+        .parse::<u8>()
+        .ok()
+        .filter(|m| (1..=12).contains(m))
+        .map(|m| format!("{m:02}"))
+}
+
+fn is_digits(text: &str, len: usize) -> bool {
+    text.len() == len && text.bytes().all(|b| b.is_ascii_digit())
+}
+
+/// Field name in the child for a field inherited through `crossref`,
+/// following BibLaTeX's default inheritance rules. `None` means the field is
+/// not inherited.
+fn crossref_target<'n>(parent: &str, child: &str, field: &'n str) -> Option<&'n str> {
+    let book_part = matches!(child, "inbook" | "bookinbook" | "suppbook");
+    let collection_part = matches!(child, "incollection" | "suppcollection" | "inreference");
+    let proceedings_part = child == "inproceedings";
+    let mapped = match (parent, field) {
+        ("mvbook" | "mvcollection" | "mvreference" | "mvproceedings", "title") => "maintitle",
+        ("mvbook" | "mvcollection" | "mvreference" | "mvproceedings", "subtitle") => "mainsubtitle",
+        ("mvbook" | "mvcollection" | "mvreference" | "mvproceedings", "titleaddon") => "maintitleaddon",
+        ("book", "title") if book_part => "booktitle",
+        ("book", "subtitle") if book_part => "booksubtitle",
+        ("book", "titleaddon") if book_part => "booktitleaddon",
+        ("book", "author") if book_part => "bookauthor",
+        ("collection" | "reference", "title") if collection_part => "booktitle",
+        ("collection" | "reference", "subtitle") if collection_part => "booksubtitle",
+        ("collection" | "reference", "titleaddon") if collection_part => "booktitleaddon",
+        ("proceedings", "title") if proceedings_part => "booktitle",
+        ("proceedings", "subtitle") if proceedings_part => "booksubtitle",
+        ("proceedings", "titleaddon") if proceedings_part => "booktitleaddon",
+        ("periodical", "title") if matches!(child, "article" | "suppperiodical") => "journaltitle",
+        ("periodical", "subtitle") if matches!(child, "article" | "suppperiodical") => "journalsubtitle",
+        // Titles are never inherited under their own name by a part of a
+        // larger work: it has its own title.
+        (_, "title" | "subtitle" | "titleaddon" | "shorttitle" | "indextitle" | "indexsorttitle")
+            if book_part || collection_part || proceedings_part =>
+        {
+            return None;
+        }
+        (_, other) => other,
+    };
+    Some(mapped)
+}
+
+/// Render one field canonically. A month written as a three-letter
+/// abbreviation stays bare so the parser reads it as a month.
+fn render_field(name: &str, value: &str) -> String {
+    let bare_month = name == "month" && MONTHS.iter().any(|(abbr, _)| *abbr == value);
     if bare_month {
         format!("  {name} = {value}")
     } else {
@@ -517,70 +607,82 @@ mod tests {
     use super::super::lexer::{parse_entry, parse_string, split_blocks};
     use super::*;
 
-    fn resolver_for(src: &str) -> (Vec<(String, Vec<Part>)>, Vec<RawEntry>) {
+    fn resolve(src: &str, key: &str) -> Resolved {
         let blocks = split_blocks(src);
         let macros = blocks
             .iter()
             .filter(|b| b.kind == "string")
             .filter_map(parse_string)
             .collect();
-        let entries = blocks
+        let entries: Vec<RawEntry> = blocks
             .iter()
             .filter(|b| b.kind != "string")
             .filter_map(|b| parse_entry(b).ok())
             .collect();
-        (macros, entries)
+        let i = entries
+            .iter()
+            .position(|e| e.key == key)
+            .unwrap_or_else(|| panic!("no {key}"));
+        Resolver::new(macros, &entries).resolve(i)
     }
 
     #[test]
-    fn self_and_mutual_cycles_are_broken_and_reported() {
+    fn output_is_one_flat_entry_without_links() {
         for src in [
             "@book{a,title={A},crossref={a}}",
             "@book{a,title={A},crossref={b}}\n@book{b,title={B},crossref={a}}",
         ] {
-            let (macros, entries) = resolver_for(src);
-            let r = Resolver::new(macros, &entries).resolve(0);
+            let r = resolve(src, "a");
             assert!(
                 r.problems.iter().any(|p| p.contains("cycle")),
                 "{src}: {:?}",
                 r.problems
             );
-            // The rendered source must contain no link back into the chain.
-            assert!(!r.source.contains("crossref = {a}"), "{}", r.source);
+            assert_eq!(r.source.matches('@').count(), 1, "{}", r.source);
+            assert!(!r.source.contains("crossref"), "{}", r.source);
         }
     }
 
     #[test]
     fn chained_macros_expand_fully() {
-        let (macros, entries) =
-            resolver_for("@string{a = \"Alpha\"}\n@string{b = a # \" Beta\"}\n@article{m, journal = b}");
-        let r = Resolver::new(macros, &entries).resolve(0);
+        let r = resolve(
+            "@string{a = \"Alpha\"}\n@string{b = a # \" Beta\"}\n@article{m, journal = b}",
+            "m",
+        );
         assert!(r.source.contains("journal = {Alpha Beta}"), "{}", r.source);
         assert!(r.problems.is_empty(), "{:?}", r.problems);
     }
 
     #[test]
-    fn nested_inheritance_includes_every_ancestor() {
-        let (macros, entries) = resolver_for(
-            "@proceedings{c, title={Grand}, year={2019}}\n@proceedings{b, title={Mid}, crossref={c}}\n@inproceedings{a, title={Leaf}, crossref={b}}",
+    fn proceedings_title_becomes_booktitle_through_every_level() {
+        let r = resolve(
+            "@mvproceedings{c, title={Series}, year={2019}}\n@proceedings{b, title={Volume}, crossref={c}}\n@inproceedings{a, title={Paper}, crossref={b}}",
+            "a",
         );
-        let r = Resolver::new(macros, &entries).resolve(2);
-        assert!(r.source.contains("@proceedings{c,") && r.source.contains("@proceedings{b,"));
-        assert!(r.problems.is_empty(), "{:?}", r.problems);
+        assert_eq!(r.fields.get("title").map(String::as_str), Some("Paper"));
+        assert_eq!(r.fields.get("booktitle").map(String::as_str), Some("Volume"));
+        assert_eq!(r.fields.get("year").map(String::as_str), Some("2019"));
+    }
+
+    #[test]
+    fn own_month_keeps_inherited_year_but_own_date_wins_over_it() {
+        let month = resolve("@xdata{p,year=2024}\n@book{a,title={T},month=mar,xdata={p}}", "a");
+        assert_eq!(month.fields.get("date").map(String::as_str), Some("2024-03"));
+        let date = resolve("@xdata{p,year=2000}\n@book{a,title={T},date={2024},xdata={p}}", "a");
+        assert_eq!(date.fields.get("year").map(String::as_str), Some("2024"));
+        assert_eq!(date.fields.get("date"), None);
+    }
+
+    #[test]
+    fn digits_in_date_fields_are_normalized_but_not_elsewhere() {
+        let r = resolve("@article{d, title={২০২০ পর্যবেক্ষণ}, year={২০২০}, month=mar}", "d");
+        assert!(r.source.contains("date = {2020-03}"), "{}", r.source);
+        assert!(r.source.contains("title = {২০২০ পর্যবেক্ষণ}"));
     }
 
     #[test]
     fn dotless_i_and_j_become_plain_letters() {
         assert_eq!(dotless_to_plain("Garc{\\'\\i}a"), "Garc{\\'i}a");
         assert_eq!(dotless_to_plain("\\i nt \\item \\j"), "int \\item j");
-    }
-
-    #[test]
-    fn digits_in_date_fields_are_normalized_but_not_elsewhere() {
-        let (macros, entries) = resolver_for("@article{d, title={২০২০ পর্যবেক্ষণ}, year={২০২০}, month=mar}");
-        let r = Resolver::new(macros, &entries).resolve(0);
-        assert!(r.source.contains("year = {2020}"));
-        assert!(r.source.contains("month = mar"));
-        assert!(r.source.contains("title = {২০২০ পর্যবেক্ষণ}"));
     }
 }

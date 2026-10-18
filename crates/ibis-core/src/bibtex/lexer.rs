@@ -102,7 +102,17 @@ fn find_close(bytes: &[u8], open: usize) -> Option<usize> {
     let mut depth = 0usize;
     let mut in_quote = false;
     let mut escaped = false;
+    let mut in_comment = false;
     for (pos, &b) in bytes.iter().enumerate().skip(open + 1) {
+        // `%` between fields starts a comment to the end of the line.
+        if in_comment {
+            in_comment = b != b'\n';
+            continue;
+        }
+        if b == b'%' && depth == 0 && !in_quote && !escaped {
+            in_comment = true;
+            continue;
+        }
         // `\"` (an umlaut command) inside a quoted value is not a quote.
         if std::mem::take(&mut escaped) && b == b'"' {
             continue;
@@ -173,11 +183,20 @@ pub(crate) fn parse_entry(block: &Block) -> Result<RawEntry, String> {
         });
     }
     Ok(RawEntry {
-        kind: block.kind.clone(),
+        kind: canonical_kind(&block.kind).to_string(),
         key,
         fields,
         line: block.line,
     })
+}
+
+/// BibLaTeX's canonical name for legacy entry-type aliases.
+fn canonical_kind(kind: &str) -> &str {
+    match kind {
+        "conference" => "inproceedings",
+        "electronic" | "www" => "online",
+        other => other,
+    }
 }
 
 /// Parse a `@string` body: `name = value`.

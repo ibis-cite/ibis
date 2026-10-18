@@ -7,6 +7,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use biblatex::{Chunk, ChunksExt, DateValue, EditorType, Entry, PermissiveType, RetrievalError};
 
+use super::resolve::{ESCAPE, LEFT_BRACE, RIGHT_BRACE};
 use crate::model::{Issued, Name, OTHERS, PartialDate, RecordId, Reference};
 
 /// Convert one entry. Problems that do not prevent loading are pushed to `problems`.
@@ -20,24 +21,45 @@ pub(crate) fn convert(
 ) -> Reference {
     // TeX commands that are not understood are kept as written and reported.
     let unknown = RefCell::new(BTreeSet::new());
+    // A field containing a TeX command that is not understood is kept exactly
+    // as written (from the source text), so nothing is silently changed.
+    let raw_text = |field: &str| own_fields.get(field).map(|v| clean(v));
     let text = |field: &str| {
         entry
             .get(field)
-            .map(|c| clean(&strip_tex(&c.format_verbatim(), &mut unknown.borrow_mut())))
+            .map(|c| {
+                let mut found = BTreeSet::new();
+                let plain = clean(&strip_tex(&c.format_verbatim(), &mut found));
+                if found.is_empty() {
+                    plain
+                } else {
+                    unknown.borrow_mut().extend(found);
+                    raw_text(field).unwrap_or(plain)
+                }
+            })
             .filter(|s| !s.is_empty())
     };
+    let field_pieces = |field: &str| -> Option<Vec<Piece>> {
+        let mut found = BTreeSet::new();
+        let pieces = pieces_from_chunks(entry.get(field)?.iter().map(|c| &c.v), &mut found);
+        if found.is_empty() {
+            return Some(pieces);
+        }
+        unknown.borrow_mut().extend(found);
+        Some(vec![Piece::Text {
+            text: raw_text(field).unwrap_or_default(),
+            protected: true,
+        }])
+    };
     let rich = |main: &str, sub: &[(&str, &str)]| -> Option<Vec<Piece>> {
-        let mut pieces = pieces_from_chunks(entry.get(main)?.iter().map(|c| &c.v), &mut unknown.borrow_mut());
+        let mut pieces = field_pieces(main)?;
         for (field, separator) in sub {
-            if let Some(chunks) = entry.get(field) {
+            if let Some(more) = field_pieces(field) {
                 pieces.push(Piece::Text {
                     text: (*separator).to_string(),
                     protected: false,
                 });
-                pieces.extend(pieces_from_chunks(
-                    chunks.iter().map(|c| &c.v),
-                    &mut unknown.borrow_mut(),
-                ));
+                pieces.extend(more);
             }
         }
         Some(pieces)
@@ -68,11 +90,27 @@ pub(crate) fn convert(
     } else {
         &[("journaltitle", "journalsubtitle"), ("journal", "journalsubtitle")]
     };
-    let container_title = containers
+    let mut container_title = containers
         .iter()
         .find_map(|(main, sub)| rich(main, &[(sub, ": ")]))
         .map(|pieces| render(&pieces))
         .filter(|s| !s.is_empty());
+
+    // A volume of a multi-volume work: the whole work's title (`maintitle`)
+    // is the CSL title of a book, or the container of a part, and the
+    // volume's own title becomes `volume-title`.
+    let main_title = rich("maintitle", &[("mainsubtitle", ": "), ("maintitleaddon", ". ")]);
+    let mut title = title;
+    let mut volume_title = None;
+    if let Some(main) = main_title {
+        if matches!(item_type, "chapter" | "paper-conference") {
+            volume_title = container_title.take();
+            container_title = Some(render(&main)).filter(|s| !s.is_empty());
+        } else {
+            volume_title = title.take();
+            title = Some(render(&if english { sentence_case(main) } else { main }));
+        }
+    }
 
     let authors = match entry.author() {
         Ok(people) => names(people, own_fields.get("author").map(String::as_str)),
@@ -148,6 +186,10 @@ pub(crate) fn convert(
     set("volume", &["volume"]);
     if kind == "article" {
         set("issue", &["number", "issue"]);
+    } else if entry.get("series").is_some() && !matches!(kind, "report" | "techreport") {
+        // In a book series, `number` is the volume's number within the series.
+        set("collection-number", &["number"]);
+        set("issue", &["issue"]);
     } else {
         set("number", &["number"]);
         set("issue", &["issue"]);
@@ -162,6 +204,9 @@ pub(crate) fn convert(
     set("genre", &["type"]);
     set("note", &["note"]);
     set("event-title", &["eventtitle"]);
+    if let Some(volume_title) = volume_title {
+        variables.insert("volume-title".to_string(), volume_title);
+    }
     let genre = variables.get("genre").map(String::as_str).or(match kind {
         "phdthesis" => Some("phdthesis"),
         "mastersthesis" => Some("mathesis"),
@@ -559,9 +604,7 @@ fn pieces_from_chunks<'a>(chunks: impl Iterator<Item = &'a Chunk>, unknown: &mut
     let mut pieces = Vec::new();
     for chunk in chunks {
         match chunk {
-            // The parser has already removed grouping braces from normal text,
-            // so any brace left there is a literal character (from `\{`).
-            Chunk::Normal(s) => tex_pieces(s, false, false, &mut pieces, unknown),
+            Chunk::Normal(s) => tex_pieces(s, false, true, &mut pieces, unknown),
             Chunk::Verbatim(s) => {
                 pieces.push(Piece::Tag("<span class=\"nocase\">"));
                 tex_pieces(s, true, true, &mut pieces, unknown);
@@ -1046,7 +1089,7 @@ fn render(pieces: &[Piece]) -> String {
 /// Plain text of a field: TeX symbols decoded, formatting removed.
 fn strip_tex(text: &str, unknown: &mut BTreeSet<String>) -> String {
     let mut pieces = Vec::new();
-    tex_pieces(text, false, false, &mut pieces, unknown);
+    tex_pieces(text, false, true, &mut pieces, unknown);
     pieces
         .into_iter()
         .filter_map(|p| match p {
@@ -1056,9 +1099,21 @@ fn strip_tex(text: &str, unknown: &mut BTreeSet<String>) -> String {
         .collect()
 }
 
-/// Collapse internal whitespace (BibTeX values often span lines).
+/// Collapse internal whitespace (BibTeX values often span lines) and turn
+/// escaped-brace placeholders back into literal braces.
 fn clean(s: &str) -> String {
-    s.split_whitespace().collect::<Vec<_>>().join(" ")
+    let joined = s.split_whitespace().collect::<Vec<_>>().join(" ");
+    let mut out = String::with_capacity(joined.len());
+    let mut chars = joined.chars();
+    while let Some(c) = chars.next() {
+        match c {
+            ESCAPE => out.extend(chars.next()),
+            LEFT_BRACE => out.push('{'),
+            RIGHT_BRACE => out.push('}'),
+            c => out.push(c),
+        }
+    }
+    out
 }
 
 /// English text for the BibLaTeX type keys that describe theses and reports.
