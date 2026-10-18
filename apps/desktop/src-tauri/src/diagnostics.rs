@@ -38,7 +38,14 @@ impl NativeIssue {
 }
 
 pub(crate) fn checked<T, E>(result: Result<T, E>, issue: NativeIssue) -> Option<T> {
-    checked_with(result, issue, |message| eprintln!("ibis: {message}"))
+    checked_with(result, issue, |message| {
+        write_diagnostic(std::io::stderr().lock(), message)
+    })
+}
+
+fn write_diagnostic(mut output: impl std::io::Write, message: &'static str) {
+    // A closed/full diagnostic sink must not interrupt native recovery or events.
+    let _ = writeln!(output, "ibis: {message}");
 }
 
 pub(crate) fn report<T, E>(result: Result<T, E>, issue: NativeIssue) {
@@ -107,5 +114,27 @@ mod tests {
         assert!(messages.is_empty());
         assert_eq!(checked(Ok::<_, PrivateError>(42), NativeIssue::Size), Some(42));
         report(Ok::<_, PrivateError>(()), NativeIssue::Show);
+    }
+
+    #[test]
+    fn an_unwritable_diagnostic_sink_does_not_interrupt_recovery() {
+        struct BrokenSink;
+        impl std::io::Write for BrokenSink {
+            fn write(&mut self, _: &[u8]) -> std::io::Result<usize> {
+                Err(std::io::Error::other("synthetic diagnostic sink failure"))
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+        assert!(
+            checked_with(Err::<(), _>(PrivateError), NativeIssue::Show, |message| {
+                write_diagnostic(BrokenSink, message)
+            })
+            .is_none()
+        );
+        let mut output = Vec::new();
+        write_diagnostic(&mut output, NativeIssue::Show.message());
+        assert_eq!(output, b"ibis: the picker could not be shown\n");
     }
 }
