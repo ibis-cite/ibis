@@ -5,19 +5,55 @@ use ibis_core::model::WarningKind;
 
 #[test]
 fn unbalanced_day_is_reported_before_date_normalization() {
-    let loaded = load_str(
-        "synthetic.bib",
+    for source in [
         r#"@article(k,title={Safe},year=2024,month=3,day="x}")"#,
-    );
-    assert_eq!(loaded.references.len(), 1);
-    assert_eq!(loaded.references[0].title.as_deref(), Some("Safe"));
-    assert_eq!(loaded.references[0].year(), Some(2024));
-    assert_eq!(loaded.warnings.len(), 1, "{:?}", loaded.warnings);
-    assert_eq!(loaded.warnings[0].kind, WarningKind::Field);
-    assert_eq!(
-        loaded.warnings[0].message,
-        "field `day` has unbalanced braces; it is omitted"
-    );
+        "@string(bad=\"x}\")\n@xdata(p,year=2024,month=3,day=bad)\n@article{k,title={Safe},xdata={p}}",
+    ] {
+        let loaded = load_str("synthetic.bib", source);
+        assert_eq!(loaded.references.len(), 1);
+        assert_eq!(loaded.references[0].title.as_deref(), Some("Safe"));
+        assert_eq!(loaded.references[0].year(), Some(2024));
+        assert_eq!(loaded.references[0].issued.and_then(|date| date.start.month), Some(3));
+        assert_eq!(loaded.warnings.len(), 1, "{:?}", loaded.warnings);
+        assert_eq!(loaded.warnings[0].kind, WarningKind::Field);
+        assert_eq!(loaded.warnings[0].key.as_deref(), Some("k"));
+        assert!(
+            loaded.warnings[0]
+                .message
+                .ends_with("field `day` has unbalanced braces; it is omitted")
+        );
+    }
+}
+
+#[test]
+fn cached_malformed_parents_and_macros_keep_each_consumers_warning() {
+    for (definition, fields) in [
+        (r#"@xdata(p,title="x}",publisher={Synthetic Press})"#, "xdata={p}"),
+        (r#"@string(bad="x}")"#, "title=bad,publisher={Synthetic Press}"),
+    ] {
+        let source = format!(
+            "{definition}\n@article(a,{fields},year=2024)\n@article(b,{fields},year=2024)\n\
+             @string(open={{{{\\}}}})\n@string(close={{\\{{}}}})\n\
+             @article{{safe,title={{Literal \\{{braces\\}}}},note=open # close,year=2025}}"
+        );
+        let loaded = load_str("synthetic.bib", &source);
+        assert_eq!(loaded.references.len(), 3, "{:?}", loaded.warnings);
+        assert_eq!(loaded.warnings.len(), 2);
+        for (index, key, line) in [(0, "a", 2), (1, "b", 3)] {
+            let reference = &loaded.references[index];
+            assert!(reference.title.is_none());
+            assert!(reference.authors.is_empty());
+            assert_eq!(reference.year(), Some(2024));
+            assert_eq!(reference.variables["publisher"], "Synthetic Press");
+            let warning = &loaded.warnings[index];
+            assert_eq!(warning.kind, WarningKind::Field);
+            assert_eq!(warning.key.as_deref(), Some(key));
+            assert_eq!(warning.line, Some(line));
+            assert_eq!(warning.message, "field `title` has unbalanced braces; it is omitted");
+        }
+        assert_eq!(loaded.references[2].title_plain().as_deref(), Some("Literal {braces}"));
+        assert_eq!(loaded.references[2].variables["note"], "}{");
+    }
 }
 
 #[test]
@@ -98,7 +134,10 @@ fn expanded_and_inherited_values_cannot_escape_known_or_unknown_fields() {
             assert_eq!(loaded.warnings[0].line, Some(3));
             assert_eq!(
                 loaded.warnings[0].message,
-                format!("field `{field}` has unbalanced braces; it is omitted")
+                format!(
+                    "{}field `{field}` has unbalanced braces; it is omitted",
+                    if field == "date" { "in inherited `p`: " } else { "" }
+                )
             );
         }
     }

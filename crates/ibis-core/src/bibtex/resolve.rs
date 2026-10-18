@@ -382,6 +382,27 @@ impl<'a> Resolver<'a> {
             }
         }
 
+        // Date normalization can consume components before the final field guard.
+        // Check selected, fully expanded values, retaining last-value precedence.
+        own.retain(|(name, value)| {
+            if !DATE_PARTS.contains(&name.as_str()) {
+                return true;
+            }
+            if !self.budget.charge(value.len()) {
+                return false;
+            }
+            let Err(problem) = validate_field_structure(value) else {
+                return true;
+            };
+            let message = format!("field `{name}` {problem}; it is omitted");
+            walk.problems.push(if root {
+                message
+            } else {
+                format!("in inherited `{}`: {message}", entry.key)
+            });
+            false
+        });
+
         // A parent listed more than once counts at its last position, where
         // it has the highest precedence (as in Biber).
         let mut last_seen = HashSet::new();
