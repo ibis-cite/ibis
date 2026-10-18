@@ -142,11 +142,10 @@ fn dialog_path_error(current: LibraryStatus) -> LibraryStatus {
 }
 
 fn watch_current(app: &AppHandle, request: u64) {
-    let path = app
-        .state::<Mutex<Library>>()
-        .lock()
-        .ok()
-        .and_then(|library| library.path.clone().map(|path| (path, library.snapshot.clone())));
+    let path = app.state::<Mutex<Library>>().lock().ok().and_then(|mut library| {
+        let path = library.path.clone()?;
+        Some((path, library.snapshot.take()))
+    });
     let Some((path, snapshot)) = path else {
         return;
     };
