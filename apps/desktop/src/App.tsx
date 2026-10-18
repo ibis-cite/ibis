@@ -1,5 +1,5 @@
-import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { Actions, actionsShortcut, composing, mac, type PickerAction } from "./Actions";
 import {
   COPY_FORMATS,
   chooseLibrary,
@@ -20,12 +20,6 @@ import {
   type SearchResult,
   type ShortcutStatus,
 } from "./api";
-
-/** True while an input method is composing text; Enter then confirms the text.
- * Some WebKit versions report the confirming Enter with key code 229 only. */
-function composing(e: React.KeyboardEvent): boolean {
-  return e.nativeEvent.isComposing || e.keyCode === 229;
-}
 
 /** Selection is keyed by record identity, never by list position or citation key. */
 function idKey(id: RecordId): string {
@@ -73,6 +67,8 @@ export function App() {
     try { await action(); report(operation, false); }
     catch { report(operation); }
   };
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const closeActions = () => { setActionsOpen(false); input.current?.focus(); };
 
   // When the picker is shown, put the cursor in the search box with the
   // previous query selected, so typing replaces it.
@@ -85,6 +81,7 @@ export function App() {
       return () => undefined;
     };
     const focusSearch = () => {
+      setActionsOpen(false);
       input.current?.focus();
       input.current?.select();
     };
@@ -196,11 +193,26 @@ export function App() {
     if (outcome.warnings.length === 0) void perform("hide", hidePicker);
   };
 
+  const highlighted = resultsQuery === query ? results[active] : undefined;
+  const canCopy = selected.size > 0 || !!highlighted;
+  const actions: PickerAction[] = [
+    { id: "copy", label: "Copy citation", disabled: !canCopy, run: () => void copy() },
+    { id: "selection", label: highlighted && selected.has(idKey(highlighted.id)) ? "Remove from selection" : "Add to selection",
+      disabled: !highlighted, run: () => { if (highlighted) toggle(highlighted); } },
+    { id: "choose", label: "Choose library…", run: () => void chooseLibrary() },
+    { id: "reload", label: "Reload library", disabled: !library?.name, run: () => void reloadLibrary() },
+    ...COPY_FORMATS.map((f) => ({ id: `format-${f.value}`, label: `Copy as ${f.label}${format === f.value ? " (current)" : ""}`, run: () => setFormat(f.value) })),
+    { id: "quit", label: "Quit Ibis", run: () => void quit() },
+  ];
+
   return (
     <main
       onKeyDown={(e) => {
         if (composing(e)) return;
-        if (e.key === "Escape") {
+        if (actionsShortcut(e)) {
+          e.preventDefault();
+          setActionsOpen((open) => !open);
+        } else if (e.key === "Escape") {
           e.preventDefault();
           void perform("hide", hidePicker);
         } else if (e.key === "q" && (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey) {
@@ -246,7 +258,7 @@ export function App() {
               setActive((i) => Math.min(Math.max(i + step, 0), Math.max(results.length - 1, 0)));
             } else if (e.key === "Enter" && e.shiftKey) {
               e.preventDefault();
-              const result = results[active];
+              const result = resultsQuery === query ? results[active] : undefined;
               if (result) toggle(result);
             } else if (e.key === "Enter") {
               e.preventDefault();
@@ -343,45 +355,31 @@ export function App() {
           </div>
         )}
       </div>
+      <div className="library-notices">
+        {library?.error && <p role="alert">The library could not be opened: {library.error}</p>}
+        {library?.note && <p role="status">{library.note}</p>}
+      </div>
       <footer>
-        <section aria-label="Library" className="library-bar">
-          <span className="library-name">
+        <section aria-label="Library" className="footer-context">
+          <span className="library-name" title={library?.name ?? undefined}>
             {library?.name
               ? `${library.name}: ${library.references} references` +
                 (library.warnings > 0 ? `, ${library.warnings} could not be read fully` : "")
               : library === null ? "Library status unavailable" : library === undefined ? "Checking library…" : "No library chosen"}
-          </span>{" "}
-          <button type="button" className="quiet-button" aria-label="Choose library…" title="Choose a library" onClick={() => void perform("choose", chooseLibrary)}>
-            Choose…
-          </button>
-          {library?.name && (
-            <button type="button" className="icon-button" aria-label="Reload" title="Reload library" onClick={() => void perform("reload", reloadLibrary)}>
-              ↻
-            </button>
-          )}
-          {library?.error && <p role="alert">The library could not be opened: {library.error}</p>}
-          {library?.note && <p role="status">{library.note}</p>}
-        </section>
-        <div className="footer-tools">
-          <label className="visually-hidden" htmlFor="format">
-            Copy as
-          </label>
+          </span>
+          <label className="visually-hidden" htmlFor="format">Copy as</label>
           <select id="format" value={format} onChange={(e) => setFormat(e.target.value as CopyFormat)}>
-            {COPY_FORMATS.map((f) => (
-              <option key={f.value} value={f.value}>
-                {f.label}
-              </option>
-            ))}
+            {COPY_FORMATS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
           </select>
-          <small className="key-hints">
-            <kbd>↵</kbd> Copy · <kbd>⇧↵</kbd> Add · <kbd>Esc</kbd> Hide
-          </small>
-          {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
-          <button type="button" className="quiet-button" aria-label="Quit Ibis" onClick={() => void perform("quit", quit)}>
-            Quit
-          </button>
+        </section>
+        <div className="footer-actions">
+          <button type="button" disabled={!canCopy} onClick={() => void copy()}>Copy citation <kbd>↵</kbd></button>
+          <button type="button" aria-haspopup="dialog" aria-expanded={actionsOpen} aria-keyshortcuts={mac ? "Meta+k" : "Control+k"}
+            onClick={() => setActionsOpen(true)}>Actions <kbd>{mac ? "⌘K" : "Ctrl+K"}</kbd></button>
         </div>
       </footer>
+      {actionsOpen && <Actions actions={actions} close={closeActions} />}
+
     </main>
   );
 }
