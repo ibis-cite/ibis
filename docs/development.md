@@ -69,6 +69,8 @@ Actions evidence for #103 also uses synthetic references: [browser dark](images/
 
 The reference Details control opens a text-only preview beside the results (below them at narrow widths). It follows the active result; Escape closes details and restores the trigger before another Escape hides the picker. Selected references each have their own Page(s) field, keyed by source and native key across searches. Blank fields mean no locator; Roman pages, ranges and lists pass through the core renderer, which retains warnings when the chosen syntax cannot express them. Detail responses from an earlier record or library snapshot are discarded. URLs are displayed as text and never fetched.
 
+Search requests up to 200 ranked results. At that cap, the picker asks for a narrower query instead of claiming an exact match total. TanStack Virtual measures wrapped rows and retains the active option in the DOM; ordinary layouts use the results scroller and narrow layouts use the document scroller. The search field and focusable multiselect results list have separate roles: Space types in search, and Space toggles the active reference when Results has focus. Home/End and arrows navigate Results; Enter still copies. Locator controls and Details remain outside listbox options.
+
 ## Desktop command contract
 
 `apps/desktop/src/bindings.ts` is generated from Rust command signatures and

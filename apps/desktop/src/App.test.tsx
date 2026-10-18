@@ -10,6 +10,12 @@ import capability from "../src-tauri/capabilities/default.json";
 beforeAll(() => {
   HTMLDialogElement.prototype.showModal = function () { this.open = true; };
   HTMLDialogElement.prototype.close = function () { this.open = false; };
+  // jsdom has no layout; real measurement/scrolling is covered by Playwright.
+  Object.defineProperty(HTMLElement.prototype, "clientHeight", { get: () => 300, configurable: true });
+  Object.defineProperty(HTMLElement.prototype, "clientWidth", { get: () => 720, configurable: true });
+  Object.defineProperty(HTMLElement.prototype, "offsetHeight", { get: () => 90, configurable: true });
+  HTMLElement.prototype.scrollTo = () => undefined;
+  window.matchMedia = () => ({ matches: false, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList;
 });
 
 afterEach(async () => {

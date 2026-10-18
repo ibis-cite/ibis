@@ -146,3 +146,14 @@ kbd { font: inherit; font-size: .65rem; display: inline-block; padding: .1rem .2
   .picker-body { display: block; }
   .reference-details { border-inline-start: 0; border-top: 1px solid var(--line); }
 }
+
+/* A single element scroller on wide layouts, the document scroller on narrow
+   layouts. TanStack Virtual measures wrapped rows in either mode. */
+.results-area { min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.results-scroll { flex: 1; min-height: 0; overflow: auto; }
+.virtual-results [role="option"] { position: absolute; top: 0; left: 0; width: 100%; margin: 0; }
+.result-limit { margin: .2rem .8rem .5rem; font-size: .75rem; color: var(--muted); }
+#results:focus-visible { outline-offset: -2px; }
+@media (max-width: 460px) {
+  .results-area, .results-scroll { overflow: visible; }
+}

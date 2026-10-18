@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Details } from "./Details";
+import { Results, idKey } from "./Results";
 import { Actions, actionsShortcut, composing, mac, secondaryShortcut, type PickerAction } from "./Actions";
 import {
   COPY_FORMATS,
@@ -22,16 +23,12 @@ import {
   type ShortcutStatus,
 } from "./api";
 
-/** Selection is keyed by record identity, never by list position or citation key. */
-function idKey(id: RecordId): string {
-  return `${id.source}\u0000${id.native_key}`;
-}
-
 // The picker: search, choose one or more references, copy them as a citation.
 export function App() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   // The query the shown results belong to; differs while a search is pending.
+  const [resultsVersion, setResultsVersion] = useState(-1);
   const [resultsQuery, setResultsQuery] = useState<string | null>(null);
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Map<string, SearchResult>>(new Map());
@@ -82,11 +79,12 @@ export function App() {
 
   useEffect(() => {
     let current = true;
-    search(query)
+    search(query, 200)
       .then((found) => {
         if (current) {
           setResults(found);
           setResultsQuery(query);
+          setResultsVersion(libraryVersion);
           setActive(0);
           setError(null);
         }
@@ -96,6 +94,7 @@ export function App() {
         if (current) {
           setResults([]);
           setResultsQuery(query);
+          setResultsVersion(libraryVersion);
           setError(String(e));
         }
       });
@@ -103,11 +102,6 @@ export function App() {
       current = false;
     };
   }, [query, libraryVersion]);
-
-  // Keep the highlighted result visible while moving with the arrow keys.
-  useEffect(() => {
-    document.getElementById(`result-${active}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [active]);
 
   // Success is brief; warnings stay available until explicitly dismissed.
   useEffect(() => {
@@ -127,7 +121,7 @@ export function App() {
   // Copy the selection, or the highlighted result when nothing is selected.
   const copy = async () => {
     // Never copy a highlighted result that belongs to an earlier query.
-    const current = resultsQuery === query ? results : [];
+    const current = resultsQuery === query && resultsVersion === libraryVersion ? results : [];
     const chosen = selected.size > 0 ? [...selected.values()] : current.slice(active, active + 1);
     if (chosen.length === 0) return;
     setCopied(null);
@@ -152,7 +146,7 @@ export function App() {
     if (outcome.warnings.length === 0) void hidePicker();
   };
 
-  const highlighted = resultsQuery === query ? results[active] : undefined;
+  const highlighted = resultsQuery === query && resultsVersion === libraryVersion ? results[active] : undefined;
   const openDetails = (id: RecordId, trigger: HTMLElement | null = input.current) => {
     detailsReturn.current = trigger;
     setDetailsId(id);
@@ -208,10 +202,8 @@ export function App() {
           id="search"
           type="search"
           placeholder="Search references…"
-          role="combobox"
-          aria-expanded={results.length > 0}
           aria-controls="results"
-          aria-activedescendant={results[active] ? `result-${active}` : undefined}
+          aria-describedby="search-help"
           ref={input}
           autoFocus
           value={query}
@@ -228,7 +220,7 @@ export function App() {
               setActive((i) => Math.min(Math.max(i + step, 0), Math.max(results.length - 1, 0)));
             } else if (e.key === "Enter" && e.shiftKey) {
               e.preventDefault();
-              const result = resultsQuery === query ? results[active] : undefined;
+              const result = resultsQuery === query && resultsVersion === libraryVersion ? results[active] : undefined;
               if (result) toggle(result);
             } else if (e.key === "Enter") {
               e.preventDefault();
@@ -237,6 +229,10 @@ export function App() {
           }}
         />
       </div>
+      <p id="search-help" className="visually-hidden">Arrow keys move the active result. Command or Control Enter adds or removes it. Tab to Results to use Space for selection.</p>
+      <span className="visually-hidden" aria-live="polite" aria-atomic="true">
+        {resultsQuery === query && resultsVersion === libraryVersion ? `${results.length} results returned. ${selected.size} selected.${highlighted ? ` Active: ${highlighted.title}` : ""}` : "Searching…"}
+      </span>
       <div className="notices">
         {error && <p role="alert">{error}</p>}
         {copyError && <p role="alert">Nothing was copied: {copyError}</p>}
@@ -276,41 +272,9 @@ export function App() {
         </ul>
       )}
       <div className="picker-body">
-      <div className="results-area">
-        <div className="results-heading">
-          <span>References</span><span>{results.length > 0 ? `${results.length} results` : ""}</span>
-          <button type="button" disabled={!highlighted} onClick={(e) => { if (highlighted) openDetails(highlighted.id, e.currentTarget); }} aria-label="Show reference details">Details</button>
-        </div>
-        <ul id="results" role="listbox" aria-label="Results" aria-multiselectable="true">
-          {results.map((r, i) => (
-            <li
-              key={idKey(r.id)}
-              id={`result-${i}`}
-              role="option"
-              aria-selected={selected.has(idKey(r.id))}
-              data-active={i === active || undefined}
-              onClick={() => {
-                setActive(i);
-                toggle(r);
-              }}
-            >
-              <span className="result-text">
-                <strong>{r.title}</strong>
-                <span className="result-meta">
-                  {r.authors} · {r.year ?? "n.d."}
-                </span>
-                {r.matched.length > 0 && <span className="match-explanation">Matched: {r.matched.join(", ")}</span>}
-              </span>
-              <code className="result-key">{r.key}</code>
-            </li>
-          ))}
-        </ul>
-        {results.length === 0 && !error && (
-          <p className="empty-state">
-            {library?.name ? (query ? "No matching references" : "Type to find a reference") : "Choose a library to get started"}
-          </p>
-        )}
-      </div>
+      <Results results={results} active={active} setActive={setActive} selected={selected} toggle={toggle} copy={() => void copy()}
+        details={(trigger) => { if (highlighted) openDetails(highlighted.id, trigger); }} pending={resultsQuery !== query || resultsVersion !== libraryVersion}
+        empty={error ? "Search unavailable" : library?.name ? query ? "No matching references" : "Type to find a reference" : "Choose a library to get started"} />
       {detailsId && <Details id={detailsId} version={libraryVersion} close={closeDetails} />}
       </div>
       <div className="library-notices">
