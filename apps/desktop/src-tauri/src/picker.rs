@@ -8,6 +8,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
 
 use crate::diagnostics::{NativeIssue, checked, report};
+use crate::placement::place_on_active_display;
 
 /// Whether the global shortcut is working, shown in the interface.
 #[derive(Default, Clone, Serialize, specta::Type)]
@@ -17,19 +18,19 @@ pub(crate) struct ShortcutStatus {
     pub(crate) error: Option<String>,
 }
 
-/// Default shortcut: Cmd+Shift+Space on macOS, Ctrl+Shift+Space elsewhere.
+/// Default shortcut: Control+Command+R on macOS, where Cmd+Shift+Space opens
+/// the Siri typing field (#133); Ctrl+Shift+Space elsewhere.
 pub(crate) fn default_shortcut() -> Shortcut {
-    let primary = if cfg!(target_os = "macos") {
-        Modifiers::SUPER
+    if cfg!(target_os = "macos") {
+        Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SUPER), Code::KeyR)
     } else {
-        Modifiers::CONTROL
-    };
-    Shortcut::new(Some(primary | Modifiers::SHIFT), Code::Space)
+        Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::Space)
+    }
 }
 
 pub(crate) fn shortcut_label() -> &'static str {
     if cfg!(target_os = "macos") {
-        "Cmd+Shift+Space"
+        "Control+Command+R"
     } else {
         "Ctrl+Shift+Space"
     }
@@ -54,10 +55,13 @@ pub(crate) fn configured_shortcut(setting: Option<&str>) -> (Shortcut, String, O
     }
 }
 
-/// Show the picker, focused, and tell the interface to focus the search box.
+/// Show the picker on the display with the pointer, focused, and tell the interface to focus the search box.
 pub(crate) fn show_picker(app: &AppHandle) {
     if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window) {
+        #[cfg(target_os = "macos")]
+        report(app.show(), NativeIssue::Show);
         report(window.unminimize(), NativeIssue::Unminimize);
+        place_on_active_display(app, &window, false);
         report(window.show(), NativeIssue::Show);
         report(window.set_focus(), NativeIssue::Focus);
         report(window.emit("picker:shown", ()), NativeIssue::PickerEvent);
@@ -71,7 +75,7 @@ pub(crate) fn toggle_picker(app: &AppHandle) {
             if checked(w.is_visible(), NativeIssue::Visibility).unwrap_or(false)
                 && checked(w.is_focused(), NativeIssue::FocusState).unwrap_or(false) =>
         {
-            report(w.hide(), NativeIssue::Hide);
+            dismiss_picker(app);
         }
         _ => show_picker(app),
     }
@@ -81,9 +85,29 @@ pub(crate) fn toggle_picker(app: &AppHandle) {
 #[tauri::command]
 #[specta::specta]
 pub(crate) fn hide_picker(app: AppHandle) {
+    dismiss_picker(&app);
+}
+
+/// A window hide alone leaves Ibis active on macOS, swallowing the next paste.
+/// Every dismissal path must also release application focus.
+pub(crate) fn dismiss_picker(app: &AppHandle) {
     if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window) {
-        report(window.hide(), NativeIssue::Hide);
+        dismiss_with(
+            || window.hide(),
+            || {
+                #[cfg(target_os = "macos")]
+                return app.hide();
+                #[cfg(not(target_os = "macos"))]
+                Ok::<(), tauri::Error>(())
+            },
+        );
     }
+}
+
+/// Still attempt to release application focus when a native window hide fails.
+fn dismiss_with<W, A>(hide_window: impl FnOnce() -> Result<(), W>, hide_application: impl FnOnce() -> Result<(), A>) {
+    report(hide_window(), NativeIssue::Hide);
+    report(hide_application(), NativeIssue::HideApplication);
 }
 
 /// End the app. Closing the window only hides it, so this is the way out on
@@ -133,8 +157,8 @@ mod tests {
 
     #[test]
     fn shortcuts_from_settings_are_parsed_and_invalid_ones_fall_back() {
-        let (_, label, error) = configured_shortcut(Some("Control+Command+R"));
-        assert_eq!(label, "Control+Command+R");
+        let (_, label, error) = configured_shortcut(Some("Alt+Shift+K"));
+        assert_eq!(label, "Alt+Shift+K");
         assert!(error.is_none());
         let (_, label, error) = configured_shortcut(Some("Control+Nonsense"));
         assert_eq!(label, shortcut_label());
@@ -144,6 +168,24 @@ mod tests {
         assert!(error.is_none());
     }
 
+    /// The label users see must name the shortcut that is registered.
+    #[test]
+    fn the_default_shortcut_label_matches_the_registered_shortcut() {
+        assert_eq!(shortcut_label().parse::<Shortcut>().ok(), Some(default_shortcut()));
+    }
+
+    /// Cmd+Shift+Space opens the macOS Siri typing field, which takes the
+    /// keystrokes meant for the picker (#133).
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn the_macos_default_does_not_collide_with_siri() {
+        assert_eq!(shortcut_label(), "Control+Command+R");
+        assert_eq!(
+            default_shortcut(),
+            Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SUPER), Code::KeyR)
+        );
+    }
+
     /// The file dialog takes the focus from the picker; hiding the picker then
     /// made the dialog disappear before it could be used.
     #[test]
@@ -151,6 +193,26 @@ mod tests {
         assert!(hides_on_blur(true, false));
         assert!(!hides_on_blur(true, true));
         assert!(!hides_on_blur(false, false));
+    }
+
+    #[test]
+    fn dismissing_releases_the_application_after_hiding_the_window_even_on_failure() {
+        use std::cell::RefCell;
+
+        for window_result in [Ok(()), Err(())] {
+            let operations = RefCell::new(Vec::new());
+            dismiss_with(
+                || {
+                    operations.borrow_mut().push("window");
+                    window_result
+                },
+                || {
+                    operations.borrow_mut().push("application");
+                    Ok::<(), ()>(())
+                },
+            );
+            assert_eq!(*operations.borrow(), ["window", "application"]);
+        }
     }
 
     #[test]

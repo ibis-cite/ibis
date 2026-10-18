@@ -13,6 +13,7 @@ mod diagnostics;
 mod gallery;
 mod library;
 mod picker;
+mod placement;
 mod preferences;
 mod tray;
 
@@ -24,9 +25,14 @@ use ibis_core::settings;
 use tauri::{Manager, WindowEvent};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
-use crate::diagnostics::{NativeIssue, checked, report};
+#[cfg(debug_assertions)]
+use crate::diagnostics::report;
+use crate::diagnostics::{NativeIssue, checked};
 use crate::library::{Library, LibraryWatch, LoadRequests, start_open};
-use crate::picker::{DialogOpen, ShortcutStatus, configured_shortcut, hides_on_blur, show_picker, toggle_picker};
+use crate::picker::{
+    DialogOpen, ShortcutStatus, configured_shortcut, dismiss_picker, hides_on_blur, show_picker, toggle_picker,
+};
+use crate::placement::place_on_active_display;
 use crate::preferences::SettingsFile;
 use crate::tray::create_tray;
 
@@ -55,14 +61,14 @@ fn main() {
             // Closing the picker hides it; the app keeps running for the shortcut.
             WindowEvent::CloseRequested { api, .. } => {
                 api.prevent_close();
-                report(window.hide(), NativeIssue::Hide);
+                dismiss_picker(window.app_handle());
             }
             // Like other launchers, the picker hides when it loses focus, but
             // not to its own file dialog.
             WindowEvent::Focused(false) => {
                 let dialog_open = window.state::<DialogOpen>().0.load(Ordering::SeqCst);
                 if hides_on_blur(!cfg!(debug_assertions), dialog_open) {
-                    report(window.hide(), NativeIssue::Hide);
+                    dismiss_picker(window.app_handle());
                 }
             }
             _ => {}
@@ -83,21 +89,9 @@ fn main() {
                     }
                 }
             }
-            // Place the launcher near the top of the usable screen, clear of
-            // menu bars and taskbars. Later shows keep the user's placement.
-            if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window)
-                && let (Some(Some(monitor)), Some(size)) = (
-                    checked(window.current_monitor(), NativeIssue::Monitor),
-                    checked(window.outer_size(), NativeIssue::Size),
-                )
-            {
-                let area = monitor.work_area();
-                let x = area.position.x + (area.size.width.saturating_sub(size.width) / 2) as i32;
-                let y = area.position.y + (area.size.height.saturating_sub(size.height) / 5) as i32;
-                report(
-                    window.set_position(tauri::PhysicalPosition::new(x, y)),
-                    NativeIssue::Position,
-                );
+            // The picker opens near the top of the display with the pointer.
+            if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window) {
+                place_on_active_display(app.handle(), &window, true);
             }
             // Settings live in the app's configuration folder, e.g. on macOS
             // ~/Library/Application Support/io.github.ibiscite.ibis/settings.json
@@ -167,5 +161,31 @@ fn main() {
             eprintln!("ibis: the app could not start: {err}");
             std::process::exit(1);
         }
+    }
+}
+
+#[cfg(test)]
+mod offline_tests {
+    /// WebView2 on Windows fetched updates and other background data over
+    /// HTTPS while Ibis ran, although PRIVACY.md promises no network use
+    /// (#201). These arguments replace wry's defaults, so they must keep them.
+    #[test]
+    fn the_windows_webview_keeps_wry_defaults_and_has_no_route_to_the_network() {
+        let config: serde_json::Value = serde_json::from_str(include_str!("../tauri.conf.json")).unwrap_or_default();
+        let args = config["app"]["windows"][0]["additionalBrowserArgs"]
+            .as_str()
+            .unwrap_or_default();
+        for arg in [
+            "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection",
+            "--disable-background-networking",
+            "--disable-component-update",
+            "--proxy-server=http://127.0.0.1:9",
+        ] {
+            assert!(args.split(' ').any(|a| a == arg), "missing {arg}");
+        }
+        assert!(
+            !args.contains("proxy-bypass-list"),
+            "the app's own *.localhost pages must keep bypassing the proxy"
+        );
     }
 }
