@@ -1,36 +1,55 @@
 //! The real platform watcher, using synthetic files only.
 use std::sync::mpsc::{self, Receiver};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use ibis_core::model::LoadResult;
 use ibis_core::source::{SourceError, SourceWatch};
 
 fn next(rx: &Receiver<Result<LoadResult, SourceError>>) -> Result<LoadResult, SourceError> {
-    rx.recv_timeout(Duration::from_secs(10))
-        .unwrap_or_else(|e| panic!("watcher did not report: {e}"))
+    let deadline = Instant::now() + Duration::from_secs(10);
+    loop {
+        let remaining = deadline
+            .checked_duration_since(Instant::now())
+            .unwrap_or_else(|| panic!("watcher did not settle before the deadline"));
+        match rx
+            .recv_timeout(remaining)
+            .unwrap_or_else(|e| panic!("watcher did not report: {e}"))
+        {
+            Err(SourceError::Changing) => continue,
+            result => return result,
+        }
+    }
+}
+
+#[test]
+fn settling_wait_ignores_the_watchers_transient_changing_notification() {
+    let (tx, rx) = mpsc::channel();
+    tx.send(Err(SourceError::Changing)).unwrap_or_else(|e| panic!("{e}"));
+    tx.send(Err(SourceError::Unavailable)).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
 }
 
 #[test]
 fn interrupted_writes_replacements_deletion_and_empty_files() {
     let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
-    let path = dir.path().join("library.bib");
+    let path = dir.path().join("références synthetic.bib");
     std::fs::write(&path, "@misc{old, title={Old}}").unwrap_or_else(|e| panic!("{e}"));
     let (tx, rx) = mpsc::channel();
     let _watch = SourceWatch::new(&path, move |result| {
         let _ = tx.send(result);
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    assert_eq!(next(&rx).map(|l| l.references.len()), Ok(1));
+    let initial = next(&rx).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(initial.references.len(), 1);
     std::fs::write(&path, "@misc{partial, title={Unclosed}").unwrap_or_else(|e| panic!("{e}"));
     assert!(matches!(next(&rx), Err(SourceError::Incomplete)));
     let replacement = dir.path().join("replacement.tmp");
     std::fs::write(&replacement, "@misc{new, title={New}}").unwrap_or_else(|e| panic!("{e}"));
-    // Windows rename cannot replace an existing path. Unix exercises atomic replacement.
-    #[cfg(windows)]
-    std::fs::remove_file(&path).unwrap_or_else(|e| panic!("{e}"));
+    // Exercise overwrite on Windows as well as Unix, as an editor save does.
     std::fs::rename(&replacement, &path).unwrap_or_else(|e| panic!("{e}"));
     let loaded = next(&rx).unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(loaded.references[0].id.native_key, "new");
+    assert_eq!(loaded.references[0].id.source, initial.references[0].id.source);
     std::fs::remove_file(&path).unwrap_or_else(|e| panic!("{e}"));
     assert!(matches!(next(&rx), Err(SourceError::Unavailable)));
     std::fs::write(&path, "").unwrap_or_else(|e| panic!("{e}"));
