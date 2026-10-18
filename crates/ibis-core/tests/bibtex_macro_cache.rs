@@ -30,7 +30,7 @@ fn repeated_doubling_abbreviations_finish_before_the_deadline() {
         return;
     }
     // Run this test's loader in a killable process, so a regression cannot hang CI.
-    let mut child = Command::new(std::env::current_exe().unwrap())
+    let mut child = Command::new(std::env::current_exe().unwrap_or_else(|e| panic!("{e}")))
         .args([
             "--exact",
             "repeated_doubling_abbreviations_finish_before_the_deadline",
@@ -38,16 +38,16 @@ fn repeated_doubling_abbreviations_finish_before_the_deadline() {
         ])
         .env(CHILD, "1")
         .spawn()
-        .unwrap();
+        .unwrap_or_else(|e| panic!("{e}"));
     let start = Instant::now();
     loop {
-        if let Some(status) = child.try_wait().unwrap() {
+        if let Some(status) = child.try_wait().unwrap_or_else(|e| panic!("{e}")) {
             assert!(status.success());
             break;
         }
         if start.elapsed() >= Duration::from_secs(2) {
-            child.kill().unwrap();
-            child.wait().unwrap();
+            child.kill().unwrap_or_else(|e| panic!("{e}"));
+            child.wait().unwrap_or_else(|e| panic!("{e}"));
             panic!("synthetic load exceeded the 2 second deadline");
         }
         std::thread::sleep(Duration::from_millis(10));
@@ -68,7 +68,7 @@ fn cached_abbreviations_keep_month_context_overrides_and_warning_locations() {
         for reference in &loaded.references {
             assert_eq!(reference.title.as_deref(), Some("March"));
             assert_eq!(reference.year(), Some(2024));
-            assert_eq!(reference.issued.unwrap().start.month, Some(3));
+            assert_eq!(reference.issued.and_then(|d| d.start.month), Some(3));
         }
         assert_eq!(loaded.warnings.len(), 4);
         for (key, line) in [("a", 5), ("b", 6)] {
@@ -95,7 +95,7 @@ fn cached_abbreviations_keep_month_context_overrides_and_warning_locations() {
             overridden
                 .references
                 .iter()
-                .all(|r| { r.title.as_deref() == Some("May") && r.issued.unwrap().start.month == Some(5) })
+                .all(|r| { r.title.as_deref() == Some("May") && r.issued.and_then(|d| d.start.month) == Some(5) })
         );
     }
 }
@@ -117,7 +117,11 @@ fn cached_parts_still_share_the_original_field_quotas() {
     assert_eq!(loaded.references.len(), 3);
     assert_eq!(loaded.warnings.len(), 2);
     for (key, message) in [("steps", "too complex"), ("bytes", "too large")] {
-        let reference = loaded.references.iter().find(|r| r.id.native_key == key).unwrap();
+        let reference = loaded
+            .references
+            .iter()
+            .find(|r| r.id.native_key == key)
+            .unwrap_or_else(|| panic!("missing {key}"));
         assert!(reference.title.as_deref().is_none_or(str::is_empty));
         assert_eq!(reference.year(), Some(2024));
         assert!(
@@ -143,7 +147,11 @@ fn caching_a_silent_parent_expansion_keeps_its_later_warning() {
     assert_eq!(loaded.references.len(), 4);
     assert_eq!(loaded.warnings.len(), 3);
     for (key, line) in [("parent", 3), ("a", 5), ("b", 6)] {
-        let warning = loaded.warnings.iter().find(|w| w.key.as_deref() == Some(key)).unwrap();
+        let warning = loaded
+            .warnings
+            .iter()
+            .find(|w| w.key.as_deref() == Some(key))
+            .unwrap_or_else(|| panic!("missing warning for {key}"));
         assert_eq!(warning.line, Some(line));
         assert!(warning.message.contains("undefined abbreviation `missing`"));
         assert_eq!(warning.message.contains("in inherited `helper`"), key != "parent");
