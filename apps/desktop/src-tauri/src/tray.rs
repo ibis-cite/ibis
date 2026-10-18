@@ -86,6 +86,7 @@ mod tests {
             state: LibraryState::Loaded,
             has_snapshot: name.is_some(),
             name: name.map(String::from),
+            snapshot_name: name.map(String::from),
             references: 12,
             warnings,
             error: error.map(String::from),

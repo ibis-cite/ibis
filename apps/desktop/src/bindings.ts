@@ -67,8 +67,10 @@ export type LibraryStatus = {
 	state: LibraryState,
 	/**  A successfully opened snapshot, including a valid empty library. */
 	has_snapshot: boolean,
-	/**  File name only; the full path is never shown. */
+	/**  Requested file name only, including during opening and after failure. */
 	name: string | null,
+	/**  File name of the searchable snapshot; may differ from the attempted file. */
+	snapshot_name: string | null,
 	references: number,
 	warnings: number,
 	error: string | null,

@@ -49,8 +49,10 @@ pub(crate) struct LibraryStatus {
     pub(crate) state: LibraryState,
     /// A successfully opened snapshot, including a valid empty library.
     pub(crate) has_snapshot: bool,
-    /// File name only; the full path is never shown.
+    /// Requested file name only, including during opening and after failure.
     pub(crate) name: Option<String>,
+    /// File name of the searchable snapshot; may differ from the attempted file.
+    pub(crate) snapshot_name: Option<String>,
     pub(crate) references: usize,
     pub(crate) warnings: usize,
     pub(crate) error: Option<String>,
@@ -126,6 +128,11 @@ pub(crate) fn status(library: &Library) -> LibraryStatus {
             .requested
             .as_ref()
             .or(library.path.as_ref())
+            .and_then(|p| p.file_name())
+            .map(|n| n.to_string_lossy().into_owned()),
+        snapshot_name: library
+            .path
+            .as_ref()
             .and_then(|p| p.file_name())
             .map(|n| n.to_string_lossy().into_owned()),
         references: library.index.references().len(),
@@ -330,6 +337,7 @@ pub(crate) fn current_status(app: &AppHandle) -> LibraryStatus {
             state: LibraryState::Error,
             has_snapshot: false,
             name: None,
+            snapshot_name: None,
             references: 0,
             warnings: 0,
             error: Some("library state is unavailable".to_string()),
@@ -487,6 +495,25 @@ mod tests {
         .unwrap();
         assert_eq!(loaded.state, LibraryState::Loaded);
         assert!(loaded.error.is_none());
+    }
+
+    #[test]
+    fn a_failed_switch_distinguishes_the_attempted_file_from_retained_search_results() {
+        let library = Mutex::new(candidate(
+            PathBuf::from("synthetic-parent/active.bib"),
+            ibis_core::bibtex::load_str("synthetic", "@misc{active, title={Retained snapshot}}"),
+        ));
+        let requests = LoadRequests::default();
+        let (request, _, opening) =
+            begin_open(&library, &requests, PathBuf::from("other-parent/attempted.bib")).unwrap();
+        assert_eq!(opening.name.as_deref(), Some("attempted.bib"));
+        assert_eq!(opening.snapshot_name.as_deref(), Some("active.bib"));
+        let failed = install(&library, &requests, request, Err("unavailable".to_string())).unwrap();
+        assert_eq!(failed.name.as_deref(), Some("attempted.bib"));
+        assert_eq!(failed.snapshot_name.as_deref(), Some("active.bib"));
+        assert_eq!(failed.references, 1);
+        assert_eq!(library.lock().unwrap().index.search("retained", 10).len(), 1);
+        assert!(!failed.snapshot_name.unwrap().contains("synthetic-parent"));
     }
 
     #[test]
