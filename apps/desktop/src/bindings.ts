@@ -60,8 +60,13 @@ export type KeyFormat =
 /**  Bare keys separated by commas. */
 "keys";
 
+export type LibraryState = "none" | "loading" | "loaded" | "reloading" | "error";
+
 /**  Sent to the interface with the `library:changed` event. */
 export type LibraryStatus = {
+	state: LibraryState,
+	/**  A successfully opened snapshot, including a valid empty library. */
+	has_snapshot: boolean,
 	/**  File name only; the full path is never shown. */
 	name: string | null,
 	references: number,
