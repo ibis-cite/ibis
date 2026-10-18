@@ -503,7 +503,7 @@ impl<'a> Resolver<'a> {
             return;
         }
         let available = MAX_PARENT_CACHE_BYTES.saturating_sub(self.parent_cache_bytes.get());
-        if memo.len().saturating_mul(128).saturating_add(128) > available
+        if memo.len().saturating_mul(256).saturating_add(256) > available
             || !self.budget.charge(memo.len().saturating_mul(128))
         {
             return;
@@ -512,13 +512,13 @@ impl<'a> Resolver<'a> {
         if !self.budget.charge(slots.saturating_mul(128)) {
             return;
         }
-        let bytes = memo.values().fold(128usize, |n, fields| {
+        let bytes = memo.values().fold(256usize, |n, fields| {
             let allocation = fields
                 .capacity()
                 .saturating_mul(std::mem::size_of::<(String, String)>());
             fields
                 .iter()
-                .fold(n.saturating_add(128).saturating_add(allocation), |n, (name, value)| {
+                .fold(n.saturating_add(256).saturating_add(allocation), |n, (name, value)| {
                     n.saturating_add(name.capacity()).saturating_add(value.capacity())
                 })
         });
@@ -1108,13 +1108,13 @@ mod tests {
         );
         resolver.cache_parent((0, 0), &memo);
         assert!(resolver.parent_cache.borrow().is_empty());
-        for i in 0..=MAX_PARENT_CACHE_BYTES / 256 {
+        for i in 0..=MAX_PARENT_CACHE_BYTES / 512 {
             memo.clear();
             memo.insert((i, 0), Rc::default());
             resolver.cache_parent((i, 0), &memo);
         }
         assert_eq!(resolver.parent_cache_bytes.get(), MAX_PARENT_CACHE_BYTES);
-        assert_eq!(resolver.parent_cache.borrow().len(), MAX_PARENT_CACHE_BYTES / 256);
+        assert_eq!(resolver.parent_cache.borrow().len(), MAX_PARENT_CACHE_BYTES / 512);
     }
 
     #[test]
