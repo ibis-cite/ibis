@@ -2,7 +2,7 @@ import type { Copied, LibraryStatus, SearchResult } from "./api";
 import type { PickerApi, PickerPreview } from "./App";
 
 // All names and references on this page are synthetic. Providers never call IPC.
-type GalleryLibrary = LibraryStatus & { settings_notice: string | null };
+type GalleryLibrary = LibraryStatus;
 export type GalleryState = {
   id: string;
   label: string;
