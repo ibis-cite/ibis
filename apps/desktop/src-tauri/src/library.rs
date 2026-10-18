@@ -141,11 +141,25 @@ fn dialog_path_error(current: LibraryStatus) -> LibraryStatus {
     }
 }
 
+fn take_watch_source(
+    library: &mut Library,
+    requests: &LoadRequests,
+    request: u64,
+) -> Option<(PathBuf, Option<SourceSnapshot>)> {
+    // Check while holding the library lock: an older open must not consume
+    // the source observation belonging to a newly installed library.
+    if requests.0.load(Ordering::SeqCst) != request {
+        return None;
+    }
+    Some((library.path.clone()?, library.snapshot.take()))
+}
+
 fn watch_current(app: &AppHandle, request: u64) {
-    let path = app.state::<Mutex<Library>>().lock().ok().and_then(|mut library| {
-        let path = library.path.clone()?;
-        Some((path, library.snapshot.take()))
-    });
+    let path = app
+        .state::<Mutex<Library>>()
+        .lock()
+        .ok()
+        .and_then(|mut library| take_watch_source(&mut library, &app.state(), request));
     let Some((path, snapshot)) = path else {
         return;
     };
@@ -383,6 +397,20 @@ mod tests {
         assert!(library.snapshot.is_some());
         assert_eq!(library.index.search("sleep", 10).len(), 1);
         assert!(load_library(std::env::temp_dir().join("ibis-missing-library.bib"), false).is_err());
+    }
+
+    #[test]
+    fn a_stale_watch_attachment_preserves_the_newer_initial_snapshot() {
+        let file = std::env::temp_dir().join(format!("ibis-watch-generation-{}.bib", std::process::id()));
+        std::fs::write(&file, "@misc{good}\n@misc{unfinished,").unwrap_or_else(|e| panic!("{e}"));
+        let mut library = load_library(file, false).unwrap_or_else(|e| panic!("{e}"));
+        let requests = LoadRequests::default();
+        requests.0.store(2, Ordering::SeqCst);
+        assert!(take_watch_source(&mut library, &requests, 1).is_none());
+        assert!(library.snapshot.is_some());
+        let current = take_watch_source(&mut library, &requests, 2);
+        assert!(current.is_some_and(|(_, snapshot)| snapshot.is_some()));
+        assert!(library.snapshot.is_none());
     }
 
     #[test]
