@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { search, type SearchResult } from "./api";
+import { useEffect, useRef, useState } from "react";
+import { hidePicker, onPickerShown, search, shortcutStatus, type SearchResult, type ShortcutStatus } from "./api";
 
 // Scaffold view: a search box wired to the core search through the Rust
 // side. The full picker interface (selection, locators, copy) follows in
@@ -8,6 +8,24 @@ export function App() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [shortcut, setShortcut] = useState<ShortcutStatus | null>(null);
+  const input = useRef<HTMLInputElement>(null);
+
+  // When the picker is shown, put the cursor in the search box with the
+  // previous query selected, so typing replaces it.
+  useEffect(() => {
+    const focusSearch = () => {
+      input.current?.focus();
+      input.current?.select();
+    };
+    const unlisten = onPickerShown(focusSearch);
+    shortcutStatus()
+      .then(setShortcut)
+      .catch(() => setShortcut(null));
+    return () => {
+      void unlisten.then((stop) => stop());
+    };
+  }, []);
 
   useEffect(() => {
     let current = true;
@@ -20,11 +38,24 @@ export function App() {
   }, [query]);
 
   return (
-    <main>
+    <main
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && !e.nativeEvent.isComposing) {
+          e.preventDefault();
+          void hidePicker();
+        }
+      }}
+    >
+      {shortcut && !shortcut.registered && (
+        <p role="status">
+          The shortcut {shortcut.shortcut} is not available: {shortcut.error}
+        </p>
+      )}
       <label htmlFor="search">Search references</label>
       <input
         id="search"
         type="search"
+        ref={input}
         autoFocus
         value={query}
         onChange={(e) => setQuery(e.target.value)}
