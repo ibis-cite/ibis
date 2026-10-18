@@ -3,6 +3,12 @@
 The picker keeps system fonts, system shadows and its existing opaque system-colour
 surface by default. Windows 11 rounded corners are already requested by Tauri's
 undecorated `shadow: true`; this change adds no custom corner geometry.
+macOS outer corners remain square in the inspected borderless-window capture.
+`window-vibrancy` rounds only its effect view (None means radius zero), not the
+outer native window or WebView. The panel crate's corner setter changes its content
+layer radius without enabling clipping. Neither establishes native outer corners;
+this macOS foundation requirement remains open. Changing native titlebar styles
+or choosing/clipping a custom radius needs separate native input/shadow evidence.
 
 On macOS and Windows, window and WebView transparency are configured together
 before window creation. A safe native accessibility check precedes macOS Popover
