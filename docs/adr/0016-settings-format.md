@@ -1,6 +1,6 @@
 # 0016. Keep versioned, human-editable settings in the platform configuration folder
 
-Status: proposed (2026-10-18)
+Status: accepted (2026-10-18)
 
 ## Context
 
