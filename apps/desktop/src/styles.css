@@ -40,7 +40,7 @@ main {
 [role="option"][data-active] { background: var(--active-background); border-color: var(--active-edge); box-shadow: inset var(--active-edge-width) 0 var(--accent); }
 [role="option"][data-citation-selected] { background: var(--selected-background); color: var(--selected-text); }
 [data-citation-selected] .result-meta, [data-citation-selected] .result-key { color: inherit; }
-[data-citation-selected] .result-key { background: var(--clear); border-color: currentColor; }
+[data-citation-selected] .result-key { background: var(--clear); border-color: var(--selected-key-border); }
 .empty-state { color: var(--muted); text-align: center; padding: var(--empty-padding); }
 
 .notices:empty { display: none; }
@@ -58,7 +58,7 @@ footer { border-top: var(--border-width) solid var(--line); padding: var(--foote
 .library-name { flex: 1; min-width: var(--library-min-width); overflow-wrap: anywhere; color: var(--muted); }
 .library-bar p { width: 100%; margin: var(--library-notice-margin); }
 .footer-tools { margin-top: var(--footer-tools-margin); justify-content: space-between; }
-.quiet-button, .icon-button { background: var(--clear); border-color: transparent; color: var(--muted); }
+.quiet-button, .icon-button { background: var(--clear); border-color: var(--clear); color: var(--muted); }
 .icon-button { font-size: var(--icon-size); padding: var(--icon-padding); }
 #format { max-width: 100%; font-size: var(--key-size); }
 .key-hints { color: var(--muted); font-size: var(--key-size); }

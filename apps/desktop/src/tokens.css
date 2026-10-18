@@ -15,6 +15,7 @@
   --selected-background: Highlight;
   --selected-text: HighlightText;
   --clear: transparent;
+  --selected-key-border: currentColor;
   --border-width: 1px;
   --focus-width: 2px;
   --focus-offset: 2px;
