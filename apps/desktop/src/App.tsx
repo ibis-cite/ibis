@@ -203,7 +203,7 @@ export function App() {
       shortcut: mac ? "⌘↵" : "Ctrl+↵", disabled: !highlighted, run: () => { if (highlighted) toggle(highlighted); } },
     { id: "choose", label: "Choose library…", run: () => void chooseLibrary() },
     { id: "reload", label: "Reload library", disabled: !library?.name, run: () => void reloadLibrary() },
-    ...COPY_FORMATS.map((f) => ({ id: `format-${f.value}`, label: `Copy as ${f.label}${format === f.value ? " (current)" : ""}`, run: () => setFormat(f.value) })),
+    ...COPY_FORMATS.map((f) => ({ id: `format-${f.value}`, label: `Use ${f.label}${format === f.value ? " (current)" : ""}`, run: () => setFormat(f.value) })),
     { id: "quit", label: "Quit Ibis", run: () => void quit() },
   ];
 
@@ -256,7 +256,7 @@ export function App() {
             if (composing(e)) return;
             if (secondaryShortcut(e)) {
               e.preventDefault();
-              const secondary = actions[1];
+              const secondary = actions.find((action) => action.id === "selection");
               if (secondary && !secondary.disabled) secondary.run();
             } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
               e.preventDefault();
@@ -379,6 +379,7 @@ export function App() {
           </select>
         </section>
         <div className="footer-actions">
+          <button type="button" onClick={() => void chooseLibrary()}>{library?.name ? "Change library…" : "Choose library…"}</button>
           <button type="button" disabled={!canCopy} onClick={() => void copy()}>Copy citation <kbd>↵</kbd></button>
           <button type="button" aria-haspopup="dialog" aria-expanded={actionsOpen} aria-keyshortcuts={mac ? "Meta+k" : "Control+k"}
             onClick={() => setActionsOpen(true)}>Actions <kbd>{mac ? "⌘K" : "Ctrl+K"}</kbd></button>

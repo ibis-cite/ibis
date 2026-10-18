@@ -2,6 +2,8 @@ import { afterEach, beforeAll, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { emit } from "@tauri-apps/api/event";
+import { createRef } from "react";
+import { Actions } from "./Actions";
 import { App } from "./App";
 import axe from "axe-core";
 import * as api from "./api";
@@ -269,6 +271,7 @@ test("Quit is available from the picker and from the keyboard", async () => {
   const calls = backend({ quit: () => null });
   render(<App />);
   fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  expect(screen.getByRole("option", { name: "Quit Ibis" }).closest('[role="group"]')?.getAttribute("aria-label")).toBe("Application");
   fireEvent.click(screen.getByRole("option", { name: "Quit Ibis" }));
   await waitFor(() => expect(calls.filter((c) => c === "quit")).toHaveLength(1));
   fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "q", ctrlKey: true });
@@ -703,11 +706,34 @@ test("Actions preserves IME text editing and format commands affect the primary 
   fireEvent.keyDown(filter, { key: "Escape", isComposing: true });
   expect(screen.getByRole("dialog")).toBeTruthy();
   expect(calls).not.toContain("hide_picker");
-  fireEvent.change(filter, { target: { value: "copy as Typst" } });
+  fireEvent.change(filter, { target: { value: "Use Typst" } });
   fireEvent.keyDown(filter, { key: "Enter" });
   expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst");
+  expect(copies).toHaveLength(0);
   fireEvent.click(screen.getByRole("button", { name: /Copy citation/ }));
   await waitFor(() => expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "a" }], format: "typst" }]));
+});
+
+test("a loaded library can be changed without opening Actions", async () => {
+  const calls = backend({ choose_library: () => null });
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: "Change library…" }));
+  await waitFor(() => expect(calls).toContain("choose_library"));
+  expect(screen.queryByRole("dialog")).toBeNull();
+});
+
+test.each([false, true])("the filtered secondary shortcut finds the selection by ID (disabled: %s)", (disabled) => {
+  const selection = vi.fn();
+  const unrelated = vi.fn();
+  render(<Actions dialog={createRef<HTMLDialogElement>()} close={() => undefined} actions={[
+    { id: "selection", label: "Add to selection", run: selection, disabled },
+    { id: "quit", label: "Quit Ibis", run: unrelated },
+  ]} />);
+  const filter = screen.getByLabelText("Search actions");
+  fireEvent.change(filter, { target: { value: "Quit" } });
+  fireEvent.keyDown(filter, { key: "Enter", ctrlKey: true });
+  expect(selection).toHaveBeenCalledTimes(disabled ? 0 : 1);
+  expect(unrelated).not.toHaveBeenCalled();
 });
 
 test("macOS uses Command K and leaves Control K as a text-editing shortcut", async () => {

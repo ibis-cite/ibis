@@ -92,6 +92,7 @@ button:disabled, [aria-disabled="true"] { color: var(--muted); opacity: .65; }
 .actions-heading { display: flex; align-items: center; justify-content: space-between; padding-inline: .5rem; }
 .actions-heading button { border: 0; background: transparent; }
 #actions-list { list-style: none; padding: 0; margin: .3rem 0; max-height: min(17rem, 45dvh); overflow: auto; }
+#actions-list [role="group"] + [role="group"] { border-top: 1px solid var(--line); margin-top: .3rem; padding-top: .3rem; }
 #actions-list [role="option"] { padding: .45rem .55rem; border-radius: 5px; font-size: .85rem; overflow-wrap: anywhere; }
 #actions-list kbd { margin-inline-start: auto; flex-shrink: 0; }
 #actions-list [aria-selected="true"] { background: Canvas; background: color-mix(in srgb, var(--text) 9%, var(--surface)); color: var(--text); border-color: var(--active-edge); }

@@ -56,7 +56,7 @@ export function Actions({ actions, close, dialog }: {
         if (e.key === "Escape" || actionsShortcut(e)) {
           e.stopPropagation(); e.preventDefault(); dismiss();
         } else if (secondaryShortcut(e)) {
-          e.stopPropagation(); e.preventDefault(); execute(actions[1]);
+          e.stopPropagation(); e.preventDefault(); execute(actions.find((action) => action.id === "selection"));
         }
         // Unconsumed events retain the picker's global shortcuts, including Quit.
       }}>
@@ -64,9 +64,14 @@ export function Actions({ actions, close, dialog }: {
       {/* Scroll containers can become automatic Tab stops. Keep keyboard
           focus in the filter, which owns virtual action navigation. */}
       <ul id="actions-list" role="listbox" aria-label="Available actions" tabIndex={-1}>
-        {matches.map((action) => <li key={action.id} id={`action-${action.id}`} role="option"
-          aria-selected={current?.id === action.id} aria-disabled={action.disabled || undefined}
-          onClick={() => execute(action)}><span>{action.label}</span>{action.shortcut && <kbd aria-hidden="true">{action.shortcut}</kbd>}</li>)}
+        {[false, true].map((application) => {
+          const group = matches.filter((action) => (action.id === "quit") === application);
+          return group.length > 0 && <li key={String(application)} role="group" aria-label={application ? "Application" : "Citation and library"}>
+            {group.map((action) => <div key={action.id} id={`action-${action.id}`} role="option"
+              aria-selected={current?.id === action.id} aria-disabled={action.disabled || undefined}
+              onClick={() => execute(action)}><span>{action.label}</span>{action.shortcut && <kbd aria-hidden="true">{action.shortcut}</kbd>}</div>)}
+          </li>;
+        })}
       </ul>
       {matches.length === 0 && <p role="status">No matching actions</p>}
       <label className="visually-hidden" htmlFor="action-search">Search actions</label>
