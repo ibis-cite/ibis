@@ -242,6 +242,12 @@ jobs:
           python3 scripts/check-offline.test.py
           python3 scripts/smoke-native.py --app target/debug/ibis-desktop --output screenshots/smoke-macOS --budgets scripts/smoke-budgets.json
 
+      - name: Exercise the full-screen macOS panel
+        if: always() && steps.native_build.outcome == 'success' && runner.os == 'macOS'
+        run: |
+          python3 scripts/check-panel-macos.py --self-test
+          python3 scripts/check-panel-macos.py --app target/debug/ibis-desktop --output screenshots/panel-macOS
+
       - name: Exercise the native picker (Windows)
         if: always() && steps.native_build.outcome == 'success' && runner.os == 'Windows'
         run: |
