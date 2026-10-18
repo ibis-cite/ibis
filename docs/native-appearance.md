@@ -87,8 +87,10 @@ compositor output. macOS still uses a private corner selector internally.
 Use the final integrated build, with gallery mode disabled and a synthetic
 library, for one combined native appearance/accessibility session per target OS:
 
-1. With OS transparency enabled and contrast disabled, summon over a controlled
-   nonuniform backdrop. Record exact commit, OS, fixed mode line and screenshot.
+1. With OS transparency enabled and contrast disabled, use a controlled
+   nonuniform window backdrop on macOS and a controlled desktop wallpaper for
+   Windows Mica, whose material is wallpaper-derived. Record exact commit, OS,
+   fixed mode line and screenshot.
    Require `vibrancy/applied` on supported macOS or `mica/applied` on Windows 11,
    then verify the backdrop/material is visible and text stays legible in both
    light and dark mode. An API success with a flat opaque surface fails this check.
