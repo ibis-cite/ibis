@@ -348,3 +348,55 @@ fn newspaper_and_magazine_articles_keep_their_type() {
     assert_eq!(only(&r, "news").item_type, "article-newspaper");
     assert_eq!(only(&r, "mag").item_type, "article-magazine");
 }
+
+#[test]
+fn comments_between_fields_do_not_lose_the_record() {
+    let r = load("@book{a,title={T}, % a comment\n  year=2024}");
+    assert_eq!(only(&r, "a").year(), Some(2024));
+}
+
+#[test]
+fn explicit_child_dates_win_over_inherited_dates() {
+    let r = load("@xdata{shared,year=2000}\n@book{a,title={T},date={2024},xdata={shared}}");
+    assert_eq!(only(&r, "a").year(), Some(2024));
+}
+
+#[test]
+fn escaped_braces_are_literal_text() {
+    let r = load("@book{a,title={The Set \\{x,y\\}}, publisher={A \\{B\\} Press}, langid={american}}");
+    let a = only(&r, "a");
+    assert_eq!(a.title_plain().as_deref(), Some("The set {x,y}"));
+    assert_eq!(a.variables.get("publisher").map(String::as_str), Some("A {B} Press"));
+}
+
+#[test]
+fn unknown_commands_with_arguments_stay_visible() {
+    let r = load("@book{a,title={The Ratio $\\frac{1}{2}$}}");
+    let title = only(&r, "a").title_plain().unwrap_or_default();
+    assert!(title.contains("\\frac{1}{2}"), "{title}");
+    assert!(warned(&r, "frac"));
+}
+
+#[test]
+fn repeated_and_fanned_out_inheritance_is_bounded() {
+    let mut src = String::from("@book{r,title={T},xdata={a}}\n@xdata{a,xdata={b,b,b,b,b,b,b,b}}\n");
+    for (x, y) in [("b", "c"), ("c", "d"), ("d", "e"), ("e", "f"), ("f", "g"), ("g", "h")] {
+        src.push_str(&format!("@xdata{{{x},xdata={{{y},{y},{y},{y},{y},{y},{y},{y}}}}}\n"));
+    }
+    src.push_str("@xdata{h,year=2024}\n");
+    // Distinct parents fanning out at every level (8 x 8 x 8 paths).
+    src.push_str("@book{wide,title={W},xdata={w0,w1,w2,w3,w4,w5,w6,w7}}\n");
+    for i in 0..8 {
+        src.push_str(&format!("@xdata{{w{i},xdata={{v0,v1,v2,v3,v4,v5,v6,v7}}}}\n"));
+        src.push_str(&format!("@xdata{{v{i},xdata={{u0,u1,u2,u3,u4,u5,u6,u7}}}}\n"));
+        src.push_str(&format!("@xdata{{u{i},publisher={{P}}}}\n"));
+    }
+    let start = std::time::Instant::now();
+    let r = load(&src);
+    assert!(start.elapsed().as_secs() < 5, "took {:?}", start.elapsed());
+    assert_eq!(only(&r, "r").year(), Some(2024));
+    assert_eq!(
+        only(&r, "wide").variables.get("publisher").map(String::as_str),
+        Some("P")
+    );
+}

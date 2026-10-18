@@ -215,9 +215,18 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Skip whitespace and `%` comments (to end of line) between fields.
     fn skip_ws(&mut self) {
-        while self.peek().is_some_and(char::is_whitespace) {
-            self.bump();
+        loop {
+            match self.peek() {
+                Some(c) if c.is_whitespace() => self.bump(),
+                Some('%') => {
+                    while self.peek().is_some_and(|c| c != '\n') {
+                        self.bump();
+                    }
+                }
+                _ => break,
+            }
         }
     }
 

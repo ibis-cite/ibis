@@ -24,6 +24,12 @@ const DATE_FIELDS: [&str; 9] = [
     "pubstate-date",
 ];
 
+/// Date fields treated as one unit when deciding precedence.
+const DATE_FAMILY: [&str; 4] = ["date", "year", "month", "day"];
+
+/// Most distinct inheritance paths allowed before falling back to one path per ancestor.
+const MAX_INHERITANCE_PATHS: u64 = 256;
+
 /// Fields that link an entry to the entries it inherits from.
 const PARENT_FIELDS: [&str; 2] = ["crossref", "xdata"];
 
@@ -113,13 +119,33 @@ impl<'a> Resolver<'a> {
         // Links kept from different paths can still combine into a cycle, so
         // the final graph is checked as a whole before anything is parsed.
         self.break_cycles(i, &mut edges, &mut problems);
+        // The field parser resolves inheritance once per path, so a graph
+        // with many paths (fan-out repeated over several levels) costs
+        // exponential work. Above a limit, keep one path to each ancestor.
+        if count_paths(i, &edges) > MAX_INHERITANCE_PATHS {
+            problems.push(format!(
+                "inheritance has more than {MAX_INHERITANCE_PATHS} paths; each inherited entry is used through one path only"
+            ));
+            edges = spanning_tree(i, &edges);
+        }
+        // Fields the entry states itself take precedence over inherited ones;
+        // the date family is handled as one unit so an inherited `year` never
+        // replaces an explicit `date`.
+        let own_dates = self.entries[i]
+            .fields
+            .iter()
+            .any(|f| DATE_FAMILY.contains(&f.name.as_str()));
 
         let mut source = String::new();
         let mut own_fields = HashMap::new();
         for &idx in chain.iter().rev().chain([i].iter()) {
             let entry = &self.entries[idx];
             let mut rendered = Vec::new();
+            let mut seen_parent_keys = HashSet::new();
             for field in &entry.fields {
+                if idx != i && own_dates && DATE_FAMILY.contains(&field.name.as_str()) {
+                    continue;
+                }
                 let is_parent = PARENT_FIELDS.contains(&field.name.as_str());
                 // Problems in the entry itself, or in an `@xdata` helper it uses
                 // (helpers are not loaded on their own), are reported here.
@@ -139,7 +165,10 @@ impl<'a> Resolver<'a> {
                     let keep: Vec<&str> = value
                         .split(',')
                         .map(str::trim)
-                        .filter(|k| self.find(k).is_some_and(|t| edges.contains(&(idx, t))))
+                        .filter(|k| {
+                            self.find(k)
+                                .is_some_and(|t| edges.contains(&(idx, t)) && seen_parent_keys.insert(t))
+                        })
                         .collect();
                     if keep.is_empty() {
                         continue;
@@ -381,6 +410,49 @@ impl Expansion {
     fn stopped(&self) -> bool {
         self.too_large || self.too_complex
     }
+}
+
+/// Number of distinct paths from `root` in an acyclic edge set (saturating).
+fn count_paths(root: usize, edges: &HashSet<(usize, usize)>) -> u64 {
+    fn visit(node: usize, children: &HashMap<usize, Vec<usize>>, memo: &mut HashMap<usize, u64>) -> u64 {
+        if let Some(&n) = memo.get(&node) {
+            return n;
+        }
+        let total = children.get(&node).map_or(1, |c| {
+            c.iter()
+                .fold(1u64, |acc, &child| acc.saturating_add(visit(child, children, memo)))
+        });
+        memo.insert(node, total);
+        total
+    }
+    let mut children: HashMap<usize, Vec<usize>> = HashMap::new();
+    for &(from, to) in edges {
+        children.entry(from).or_default().push(to);
+    }
+    visit(root, &children, &mut HashMap::new())
+}
+
+/// Keep the first link found to each ancestor in a breadth-first walk.
+fn spanning_tree(root: usize, edges: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)> {
+    let mut children: HashMap<usize, Vec<usize>> = HashMap::new();
+    for &(from, to) in edges {
+        children.entry(from).or_default().push(to);
+    }
+    for list in children.values_mut() {
+        list.sort_unstable();
+    }
+    let mut kept = HashSet::new();
+    let mut seen = HashSet::from([root]);
+    let mut queue = std::collections::VecDeque::from([root]);
+    while let Some(node) = queue.pop_front() {
+        for &child in children.get(&node).into_iter().flatten() {
+            if seen.insert(child) {
+                kept.insert((node, child));
+                queue.push_back(child);
+            }
+        }
+    }
+    kept
 }
 
 /// Render one field canonically. A month given as a bare abbreviation stays

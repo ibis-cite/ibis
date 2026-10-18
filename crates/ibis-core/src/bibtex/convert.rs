@@ -559,10 +559,12 @@ fn pieces_from_chunks<'a>(chunks: impl Iterator<Item = &'a Chunk>, unknown: &mut
     let mut pieces = Vec::new();
     for chunk in chunks {
         match chunk {
-            Chunk::Normal(s) => tex_pieces(s, false, &mut pieces, unknown),
+            // The parser has already removed grouping braces from normal text,
+            // so any brace left there is a literal character (from `\{`).
+            Chunk::Normal(s) => tex_pieces(s, false, false, &mut pieces, unknown),
             Chunk::Verbatim(s) => {
                 pieces.push(Piece::Tag("<span class=\"nocase\">"));
-                tex_pieces(s, true, &mut pieces, unknown);
+                tex_pieces(s, true, true, &mut pieces, unknown);
                 pieces.push(Piece::Tag("</span>"));
             }
             Chunk::Math(s) => math_pieces(s, &mut pieces, unknown),
@@ -609,14 +611,14 @@ fn math_pieces(math: &str, out: &mut Vec<Piece>, unknown: &mut BTreeSet<String>)
             let len = after.chars().next().map_or(0, char::len_utf8);
             (&after[..len], &after[len..])
         };
-        tex_pieces(&std::mem::take(&mut plain), true, out, unknown);
+        tex_pieces(&std::mem::take(&mut plain), true, true, out, unknown);
         out.push(Piece::Tag(open));
-        tex_pieces(script, true, out, unknown);
+        tex_pieces(script, true, true, out, unknown);
         out.push(Piece::Tag(close));
         rest = remainder;
     }
     plain.push_str(rest);
-    tex_pieces(&plain, true, out, unknown);
+    tex_pieces(&plain, true, true, out, unknown);
 }
 
 /// Commands whose argument is shown as-is.
@@ -793,11 +795,17 @@ fn tex_symbol(name: &str) -> Option<&'static str> {
 /// Translate TeX in a field: formatting commands and declarations become CSL
 /// tags, symbol commands become Unicode, wrapper commands keep their
 /// argument, and anything else is kept as written and recorded in `unknown`.
-fn tex_pieces(text: &str, protected: bool, out: &mut Vec<Piece>, unknown: &mut BTreeSet<String>) {
+fn tex_pieces(
+    text: &str,
+    protected: bool,
+    grouping_braces: bool,
+    out: &mut Vec<Piece>,
+    unknown: &mut BTreeSet<String>,
+) {
     let mut buf = String::new();
     let mut chars = text.char_indices().peekable();
-    // Tags to close at the end of each open brace group; index 0 is the whole text.
-    let mut groups: Vec<Vec<&'static str>> = vec![Vec::new()];
+    // Open brace groups; index 0 is the whole text.
+    let mut groups: Vec<Group> = vec![Group::default()];
     let flush = |buf: &mut String, out: &mut Vec<Piece>| {
         if !buf.is_empty() {
             out.push(Piece::Text {
@@ -838,7 +846,7 @@ fn tex_pieces(text: &str, protected: bool, out: &mut Vec<Piece>, unknown: &mut B
                     flush(&mut buf, out);
                     out.push(Piece::Tag(open));
                     if let Some(group) = groups.last_mut() {
-                        group.push(close);
+                        group.closes.push(close);
                     }
                     if chars.peek().is_some_and(|(_, c)| *c == ' ') {
                         chars.next();
@@ -853,15 +861,20 @@ fn tex_pieces(text: &str, protected: bool, out: &mut Vec<Piece>, unknown: &mut B
                 let has_argument = chars.peek().is_some_and(|(_, c)| *c == '{');
                 if has_argument {
                     chars.next();
-                    flush(&mut buf, out);
-                    let mut closes = Vec::new();
+                    let mut group = Group::default();
                     if let Some((open, close)) = formatting(&name) {
+                        flush(&mut buf, out);
                         out.push(Piece::Tag(open));
-                        closes.push(close);
+                        group.closes.push(close);
                     } else if !TRANSPARENT.contains(&name.as_str()) {
+                        // Unknown command: keep it, and its argument, as written.
+                        buf.push('\\');
+                        buf.push_str(&name);
+                        buf.push('{');
+                        group.literal = true;
                         unknown.insert(name);
                     }
-                    groups.push(closes);
+                    groups.push(group);
                 } else {
                     // Unknown command without an argument: keep it visible.
                     unknown.insert(name.clone());
@@ -872,22 +885,62 @@ fn tex_pieces(text: &str, protected: bool, out: &mut Vec<Piece>, unknown: &mut B
                     }
                 }
             }
-            '{' => groups.push(Vec::new()),
-            '}' if groups.len() > 1 => {
-                if let Some(closes) = groups.pop()
-                    && !closes.is_empty()
-                {
-                    flush(&mut buf, out);
-                    out.extend(closes.into_iter().rev().map(Piece::Tag));
+            '{' if grouping_braces => groups.push(Group::default()),
+            '{' => {
+                buf.push('{');
+                if let Some(group) = groups.last_mut() {
+                    group.literal_depth += 1;
+                }
+            }
+            '}' => {
+                let literal_close = groups.last().is_some_and(|g| g.literal_depth > 0);
+                if literal_close {
+                    buf.push('}');
+                    if let Some(group) = groups.last_mut() {
+                        group.literal_depth -= 1;
+                    }
+                } else if groups.len() > 1 {
+                    if let Some(group) = groups.pop() {
+                        if group.literal {
+                            buf.push('}');
+                            // A brace group right after is the command's next argument.
+                            if chars.peek().is_some_and(|(_, c)| *c == '{') {
+                                chars.next();
+                                buf.push('{');
+                                groups.push(Group {
+                                    literal: true,
+                                    ..Group::default()
+                                });
+                                continue;
+                            }
+                        }
+                        if !group.closes.is_empty() {
+                            flush(&mut buf, out);
+                            out.extend(group.closes.into_iter().rev().map(Piece::Tag));
+                        }
+                    }
+                } else if !grouping_braces {
+                    buf.push('}');
                 }
             }
             _ => buf.push(c),
         }
     }
     flush(&mut buf, out);
-    for closes in groups.into_iter().rev() {
-        out.extend(closes.into_iter().rev().map(Piece::Tag));
+    for group in groups.into_iter().rev() {
+        out.extend(group.closes.into_iter().rev().map(Piece::Tag));
     }
+}
+
+/// An open brace group while translating TeX.
+#[derive(Default)]
+struct Group {
+    /// CSL tags to close when the group ends.
+    closes: Vec<&'static str>,
+    /// The group is the argument of an unknown command kept as written.
+    literal: bool,
+    /// Literal `{` characters opened inside this group (non-grouping mode).
+    literal_depth: usize,
 }
 
 /// Convert BibTeX title case to CSL sentence case (English only): capitalized
@@ -993,7 +1046,7 @@ fn render(pieces: &[Piece]) -> String {
 /// Plain text of a field: TeX symbols decoded, formatting removed.
 fn strip_tex(text: &str, unknown: &mut BTreeSet<String>) -> String {
     let mut pieces = Vec::new();
-    tex_pieces(text, false, &mut pieces, unknown);
+    tex_pieces(text, false, false, &mut pieces, unknown);
     pieces
         .into_iter()
         .filter_map(|p| match p {
