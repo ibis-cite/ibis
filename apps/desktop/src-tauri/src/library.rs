@@ -454,15 +454,21 @@ mod tests {
     fn opening_is_visible_before_loading_and_stale_completions_cannot_replace_it() {
         let library = Mutex::new(Library::default());
         let requests = LoadRequests::default();
-        assert_eq!(status(&library.lock().unwrap()).state, LibraryState::None);
-        let (first, reload, opening) = begin_open(&library, &requests, PathBuf::from("synthetic/first.bib")).unwrap();
+        assert_eq!(
+            status(&library.lock().unwrap_or_else(|e| panic!("{e}"))).state,
+            LibraryState::None
+        );
+        let (first, reload, opening) = begin_open(&library, &requests, PathBuf::from("synthetic/first.bib"))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert!(!reload);
         assert_eq!(opening.state, LibraryState::Loading);
         assert_eq!(opening.name.as_deref(), Some("first.bib"));
         assert!(!opening.has_snapshot);
-        let (second, _, _) = begin_open(&library, &requests, PathBuf::from("synthetic/second.bib")).unwrap();
+        let (second, _, _) = begin_open(&library, &requests, PathBuf::from("synthetic/second.bib"))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert!(install(&library, &requests, first, Ok(Library::default())).is_none());
-        let failed = install(&library, &requests, second, Err("unavailable".into())).unwrap();
+        let failed = install(&library, &requests, second, Err("unavailable".into()))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(failed.state, LibraryState::Error);
         assert_eq!(failed.name.as_deref(), Some("second.bib"));
         assert!(!failed.has_snapshot);
@@ -475,11 +481,13 @@ mod tests {
             ..Library::default()
         });
         let requests = LoadRequests::default();
-        let (request, reload, loading) = begin_open(&library, &requests, PathBuf::from("empty.bib")).unwrap();
+        let (request, reload, loading) = begin_open(&library, &requests, PathBuf::from("empty.bib"))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert!(reload);
         assert_eq!(loading.state, LibraryState::Reloading);
         assert!(loading.has_snapshot);
-        let failed = install(&library, &requests, request, Err("unavailable".into())).unwrap();
+        let failed = install(&library, &requests, request, Err("unavailable".into()))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(failed.state, LibraryState::Error);
         assert!(failed.has_snapshot);
         assert_eq!(failed.references, 0);
@@ -492,7 +500,7 @@ mod tests {
                 ..Library::default()
             }),
         )
-        .unwrap();
+        .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(loaded.state, LibraryState::Loaded);
         assert!(loaded.error.is_none());
     }
@@ -504,16 +512,30 @@ mod tests {
             ibis_core::bibtex::load_str("synthetic", "@misc{active, title={Retained snapshot}}"),
         ));
         let requests = LoadRequests::default();
-        let (request, _, opening) =
-            begin_open(&library, &requests, PathBuf::from("other-parent/attempted.bib")).unwrap();
+        let (request, _, opening) = begin_open(&library, &requests, PathBuf::from("other-parent/attempted.bib"))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(opening.name.as_deref(), Some("attempted.bib"));
         assert_eq!(opening.snapshot_name.as_deref(), Some("active.bib"));
-        let failed = install(&library, &requests, request, Err("unavailable".to_string())).unwrap();
+        let failed = install(&library, &requests, request, Err("unavailable".to_string()))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(failed.name.as_deref(), Some("attempted.bib"));
         assert_eq!(failed.snapshot_name.as_deref(), Some("active.bib"));
         assert_eq!(failed.references, 1);
-        assert_eq!(library.lock().unwrap().index.search("retained", 10).len(), 1);
-        assert!(!failed.snapshot_name.unwrap().contains("synthetic-parent"));
+        assert_eq!(
+            library
+                .lock()
+                .unwrap_or_else(|e| panic!("{e}"))
+                .index
+                .search("retained", 10)
+                .len(),
+            1
+        );
+        assert!(
+            !failed
+                .snapshot_name
+                .unwrap_or_else(|| panic!("expected a retained snapshot name"))
+                .contains("synthetic-parent")
+        );
     }
 
     #[test]
