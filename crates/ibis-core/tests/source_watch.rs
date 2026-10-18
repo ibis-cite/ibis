@@ -280,6 +280,9 @@ fn unchanged_contents_after_a_gap_error_publish_recovery() {
         })
         .unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+        // Repeated unavailable reads must preserve the initial observation,
+        // including its tolerant damaged-data policy, until recovery.
+        assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
         std::fs::write(&path, contents).unwrap_or_else(|e| panic!("{e}"));
         let recovered = next(&rx).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(recovered.references[0].id.native_key, "same");
@@ -337,27 +340,29 @@ fn unavailable_reads_retry_without_another_file_event() {
 #[cfg(windows)]
 #[test]
 fn a_long_exclusive_lock_recovers_without_a_followup_save() {
-    use std::io::Write;
     use std::os::windows::fs::OpenOptionsExt;
     let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
     let path = dir.path().join("library.bib");
     std::fs::write(&path, "@misc{old}").unwrap_or_else(|e| panic!("{e}"));
+    let last_good = ibis_core::source::load_library_file(&path, false).unwrap_or_else(|e| panic!("{e}"));
+    // Finish the edit before watching, then hold a read-only exclusive handle.
+    // Registering while locked forces the initial check to observe Unavailable:
+    // Windows can defer a writer's change notification until its handle closes.
+    std::fs::write(&path, "@misc{new}").unwrap_or_else(|e| panic!("{e}"));
+    let locked = std::fs::OpenOptions::new()
+        .read(true)
+        .share_mode(0)
+        .open(&path)
+        .unwrap_or_else(|e| panic!("{e}"));
     let (tx, rx) = mpsc::channel();
     let _watch = SourceWatch::new(&path, move |result| {
         let _ = tx.send(result);
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    assert!(next(&rx).is_ok());
-    let mut locked = std::fs::OpenOptions::new()
-        .read(true)
-        .write(true)
-        .share_mode(0)
-        .open(&path)
-        .unwrap_or_else(|e| panic!("{e}"));
-    locked.write_all(b"@misc{new}").unwrap_or_else(|e| panic!("{e}"));
-    locked.flush().unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+    assert_eq!(last_good.references[0].id.native_key, "old");
     std::thread::sleep(Duration::from_secs(2));
+    // Closing this read-only handle does not save or modify the source.
     drop(locked);
     let deadline = Instant::now() + Duration::from_secs(10);
     loop {
