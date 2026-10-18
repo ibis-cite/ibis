@@ -138,9 +138,8 @@ jobs:
               screencapture -x screenshots/picker-macOS.png || echo "::warning::macOS screenshot capture failed."
             fi
           }
-          export -f capture
           if [ "$RUNNER_OS" = Linux ]; then
-            xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- bash -c capture
+            xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- bash -c "$(declare -f capture); capture"
           else
             capture
           fi
