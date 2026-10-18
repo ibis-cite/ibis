@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-One page per decision with lasting effect: context, decision, consequences. Status is *accepted*, *proposed* or *superseded by NNNN*. To change a decision, add a new ADR that supersedes the old one; do not rewrite history. ADRs about features that are not built yet (0006, 0007, 0009, 0010) record the direction; their details are settled when the feature is built, and a new ADR can change them then. See also `../architecture.md` and `../../ROADMAP.md`.
+One page per decision with lasting effect: context, decision, consequences. Status is *accepted*, *proposed* or *superseded by NNNN*. To change a decision, add a new ADR that supersedes the old one; do not rewrite history. ADRs whose features are not fully built yet (0006, 0007, 0009, 0010) record the direction for the unbuilt parts; those details are settled when the parts are built, and a new ADR can change them then. See also `../architecture.md` and `../../ROADMAP.md`.
 
 | # | Decision | Status |
 | --- | --- | --- |

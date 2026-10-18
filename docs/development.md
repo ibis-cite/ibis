@@ -38,7 +38,7 @@ CI takes a few minutes per pull request. Most delay comes from waiting, so work 
   test "$(git rev-parse next-branch^{tree})" = "$tree" && echo unchanged
   ```
 
-- **Review in parallel.** Run the one independent review of the final diff while CI runs, and save findings in the pull request (fixed, filed as an issue, or rejected with a reason).
+- **Review in parallel.** Run the one independent review of the final diff while CI runs, and save findings in the pull request (fixed, P3 filed as an issue, or rejected with a reason).
 - **Independent work in parallel.** Issues that touch different files can be worked on at the same time, each in its own worktree and branch. Two writers never share a checkout. Shared files (`Cargo.toml`, `Cargo.lock`, `apps/desktop/src-tauri/src/main.rs`, `ROADMAP.md`) are changed by one branch at a time.
 
 ## Progress reports
