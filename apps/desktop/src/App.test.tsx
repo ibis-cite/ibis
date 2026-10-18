@@ -73,7 +73,7 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
     search: () => [],
     hide_picker: () => null,
     copy_format: () => "pandoc",
-    library_status: () => ({ state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
   };
   mockIPC(
     (cmd, args) => {
@@ -126,7 +126,7 @@ test("first launch waits for library status and offers a chooser without a searc
   expect(calls).not.toContain("search");
 });
 
-test("typed searches without a library and genuine load failures remain visible", async () => {
+test("typing after a library load failure keeps its single explanation visible", async () => {
   backend({
     library_status: () => ({ state: "error", has_snapshot: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: "the synthetic library is unreadable", note: null }),
     search: () => { throw new Error("no library is open"); },
@@ -134,7 +134,8 @@ test("typed searches without a library and genuine load failures remain visible"
   render(<App />);
   expect((await screen.findByText(/The library could not be opened/)).textContent).toContain("synthetic library is unreadable");
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
-  expect((await screen.findByText("Search is unavailable; reload the library and try again.")).getAttribute("role")).toBe("alert");
+  expect(screen.queryByText("Search is unavailable; reload the library and try again.")).toBeNull();
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
 });
 
 test("the empty-state chooser opens the existing dialog and remains available after cancellation", async () => {
@@ -179,7 +180,7 @@ test("opening the first library searches the untouched empty query", async () =>
   render(<App />);
   await screen.findByRole("button", { name: "Choose library to get started" });
   expect(calls).not.toContain("search");
-  await emit("library:changed", { state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
+  await emit("library:changed", { state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
   expect(await screen.findByText("First reference")).toBeTruthy();
   expect(screen.queryByRole("button", { name: "Choose library to get started" })).toBeNull();
 });
@@ -210,7 +211,7 @@ test.each([
   await act(async () => { await Promise.resolve(); });
   await act(async () => {
     await emit("library:changed", {
-      name: "new.bib", references: failed ? 0 : 1, warnings: 0,
+      name: "new.bib", snapshot_name: "new.bib", references: failed ? 0 : 1, warnings: 0,
       error: failed ? "synthetic load failed" : null, note: null,
     });
   });
@@ -292,7 +293,7 @@ test("the query is searched again when a library finishes opening", async () => 
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
   expect((await screen.findByText("Search is unavailable; reload the library and try again.")).getAttribute("role")).toBe("alert");
   open = true;
-  await emit("library:changed", { state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
+  await emit("library:changed", { state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
   expect(await screen.findByText("Sleep and memory")).toBeTruthy();
   expect(screen.queryByRole("alert")).toBeNull();
 });
@@ -412,7 +413,7 @@ test("the library is shown, can be chosen and reloaded, and failures are explain
   await waitFor(() => expect(bar.textContent).toContain("No library chosen"));
   fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
   await waitFor(() => expect(calls).toContain("choose_library"));
-  await emit("library:changed", { state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", references: 3, warnings: 1, error: null, note: null });
+  await emit("library:changed", { state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", snapshot_name: "refs.bib", references: 3, warnings: 1, error: null, note: null });
   await waitFor(() => expect(bar.textContent).toContain("refs.bib: 3 references, 1 could not be read fully"));
   fireEvent.click(screen.getByRole("button", { name: "Reload" }));
   await waitFor(() => expect(calls).toContain("reload_library"));
@@ -438,7 +439,7 @@ test("opening the first library searches the query typed before choosing it", as
   render(<App />);
   await screen.findByRole("button", { name: "Choose library to get started" });
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
-  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }); });
+  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }); });
   await screen.findByText("Matching reference");
   expect(queries).toEqual(["sleep"]);
 });
@@ -635,7 +636,7 @@ test("a pending library check does not offer first-run setup", async () => {
 
 test("opening a chosen library shows its name and searches only when ready", async () => {
   const calls = backend({
-    library_status: () => ({ state: "loading", has_snapshot: false, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 0, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "loading", has_snapshot: false, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 0, warnings: 0, error: null, note: null }),
     choose_library: () => null,
   });
   render(<App />);
@@ -646,13 +647,13 @@ test("opening a chosen library shows its name and searches only when ready", asy
   expect(calls).not.toContain("search");
   fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
   await waitFor(() => expect(calls).toContain("choose_library"));
-  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 1, warnings: 0, error: null, note: null }); });
+  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 1, warnings: 0, error: null, note: null }); });
   await waitFor(() => expect(calls).toContain("search"));
 });
 
 test("a reload keeps the previous library searchable and announces the reload", async () => {
   backend({
-    library_status: () => ({ state: "reloading", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "reloading", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
     search: () => [result("kept", "Kept reference")],
   });
   render(<App />);
@@ -663,7 +664,7 @@ test("a reload keeps the previous library searchable and announces the reload", 
 
 test("a failed switch names the retained library in its accessible status", async () => {
   backend({
-    library_status: () => ({ state: "error", has_snapshot: true, name: "missing B.bib", snapshot_name: "active A.bib", references: 3, warnings: 0, error: "The library file is unavailable; keeping the last loaded references", note: null }),
+    library_status: () => ({ state: "error", has_snapshot: true, name: "missing B.bib", snapshot_name: "active A.bib", snapshot_name: "active A.bib", references: 3, warnings: 0, error: "The library file is unavailable; keeping the last loaded references", note: null }),
     search: () => [result("kept", "Reference from A")],
   });
   render(<App />);
@@ -671,4 +672,36 @@ test("a failed switch names the retained library in its accessible status", asyn
   const status = screen.getByRole("status", { name: "Library status" });
   expect(status.textContent).toBe("active A.bib: 3 references");
   expect(status.textContent).not.toContain("missing B.bib");
+});
+
+test("an unavailable initial library is named once without a duplicate search error", async () => {
+  const calls = backend({
+    library_status: () => ({ state: "error", has_snapshot: false, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 0, warnings: 0, error: "The library file is unavailable.", note: null }),
+    search: () => { throw new Error("no library is open"); },
+    choose_library: () => null,
+  });
+  render(<App />);
+  const notice = await screen.findByRole("alert");
+  expect(notice.textContent).toContain("研究 refs.bib");
+  expect(notice.textContent).toContain("Choose it again");
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
+  expect(document.body.textContent).not.toContain("No library chosen");
+  expect(document.body.textContent).not.toContain("keeping the last");
+  expect(document.body.textContent).not.toContain("No matching references");
+  expect(calls).not.toContain("search");
+  fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
+  await waitFor(() => expect(calls).toContain("choose_library"));
+});
+
+test("a failed reload reports one file error while kept references remain searchable", async () => {
+  backend({
+    library_status: () => ({ state: "error", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: "The library file is unavailable; keeping the last loaded references.", note: null }),
+    search: () => [result("kept", "Previously loaded reference")],
+  });
+  render(<App />);
+  await screen.findByText("Previously loaded reference");
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
+  expect(screen.getByRole("alert").textContent).toContain("refs.bib");
+  expect(screen.getByRole("alert").textContent).toContain("keeping the last loaded references");
 });
