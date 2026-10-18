@@ -26,10 +26,10 @@ export function Actions({ actions, close, dialog }: {
 }) {
   const filter = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
-  const [active, setActive] = useState(0);
+  const [activeId, setActiveId] = useState<string | undefined>(() => actions.find((a) => !a.disabled)?.id);
   const matches = actions.filter((a) => a.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
   const enabled = matches.filter((a) => !a.disabled);
-  const current = enabled[active] ?? enabled[0];
+  const current = enabled.find((a) => a.id === activeId) ?? enabled[0];
   useEffect(() => {
     const element = dialog.current!;
     element.showModal();
@@ -37,8 +37,10 @@ export function Actions({ actions, close, dialog }: {
     return () => element.close();
   }, []);
   useEffect(() => {
+    // Keep the fallback as the active identity if an action becomes unavailable.
+    if (activeId !== current?.id) setActiveId(current?.id);
     if (current) document.getElementById(`action-${current.id}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [current?.id]);
+  }, [activeId, current?.id]);
   const dismiss = () => { dialog.current?.close(); close(); };
   const execute = (action: PickerAction | undefined) => {
     if (!action || action.disabled) return;
@@ -78,12 +80,14 @@ export function Actions({ actions, close, dialog }: {
       <input id="action-search" ref={filter} type="search" placeholder="Search actions…" autoFocus
         role="combobox" aria-expanded="true" aria-controls="actions-list" aria-autocomplete="list"
         aria-activedescendant={current ? `action-${current.id}` : undefined} value={query}
-        onChange={(e) => { setQuery(e.target.value); setActive(0); }}
+        onChange={(e) => { setQuery(e.target.value); setActiveId(undefined); }}
         onKeyDown={(e) => {
           if (composing(e) || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
           if (e.key === "ArrowDown" || e.key === "ArrowUp") {
             e.preventDefault();
-            setActive((i) => Math.min(Math.max(i + (e.key === "ArrowDown" ? 1 : -1), 0), Math.max(enabled.length - 1, 0)));
+            const index = enabled.findIndex((a) => a.id === current?.id);
+            const next = Math.min(Math.max(index + (e.key === "ArrowDown" ? 1 : -1), 0), Math.max(enabled.length - 1, 0));
+            setActiveId(enabled[next]?.id);
           } else if (e.key === "Enter") { e.preventDefault(); if (current) execute(current); }
         }} />
     </dialog>

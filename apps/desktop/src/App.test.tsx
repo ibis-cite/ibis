@@ -690,6 +690,71 @@ test("pending results cannot be selected or copied through Actions", async () =>
   expect(screen.getByRole("option", { name: "Add to selection" }).getAttribute("aria-disabled")).toBe("true");
 });
 
+test("late search results preserve the highlighted format action", async () => {
+  let resolveSearch: (value: unknown) => void = () => undefined;
+  backend({ search: () => new Promise((resolve) => { resolveSearch = resolve; }) });
+  render(<App />);
+  await screen.findByRole("button", { name: "Change library…" });
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  const filter = screen.getByLabelText("Search actions");
+  for (let i = 0; i < 7; i++) fireEvent.keyDown(filter, { key: "ArrowDown" });
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-format-typst");
+  await act(async () => { resolveSearch([result("a", "First")]); });
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-format-typst");
+  fireEvent.keyDown(filter, { key: "Enter" });
+  expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst");
+});
+
+test.each(["disabled", "removed"])("action navigation falls back when the highlighted action is %s", (change) => {
+  const third = vi.fn();
+  const actions = [
+    { id: "first", label: "First", run: vi.fn() },
+    { id: "second", label: "Second", run: vi.fn() },
+    { id: "third", label: "Third", run: third },
+  ];
+  const dialog = createRef<HTMLDialogElement>();
+  const close = () => undefined;
+  const { rerender } = render(<Actions actions={actions} close={close} dialog={dialog} />);
+  const filter = screen.getByLabelText("Search actions");
+  fireEvent.keyDown(filter, { key: "ArrowDown" });
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-second");
+  const changed = change === "removed" ? actions.filter((a) => a.id !== "second")
+    : actions.map((a) => ({ ...a, disabled: a.id === "second" }));
+  rerender(<Actions actions={changed} close={close} dialog={dialog} />);
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-first");
+  fireEvent.keyDown(filter, { key: "ArrowDown" });
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-third");
+  rerender(<Actions actions={actions} close={close} dialog={dialog} />);
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-third");
+  fireEvent.keyDown(filter, { key: "Enter" });
+  expect(third).toHaveBeenCalledOnce();
+});
+
+test("filter resets keep the first matching action stable when earlier actions become available", () => {
+  const dialog = createRef<HTMLDialogElement>();
+  const close = () => undefined;
+  const actions = [
+    { id: "first", label: "Use First", run: vi.fn(), disabled: true },
+    { id: "second", label: "Use Second", run: vi.fn() },
+    { id: "third", label: "Use Third", run: vi.fn() },
+  ];
+  const { rerender } = render(<Actions actions={actions} close={close} dialog={dialog} />);
+  const filter = screen.getByLabelText("Search actions");
+  fireEvent.keyDown(filter, { key: "ArrowDown" });
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-third");
+  fireEvent.change(filter, { target: { value: "Use" } });
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-second");
+  fireEvent.change(filter, { target: { value: "Use " } });
+  rerender(<Actions actions={actions.map((a) => ({ ...a, disabled: false }))} close={close} dialog={dialog} />);
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-second");
+  fireEvent.change(filter, { target: { value: "no match" } });
+  expect(filter.hasAttribute("aria-activedescendant")).toBe(false);
+  fireEvent.change(filter, { target: { value: "" } });
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-first");
+  fireEvent.keyDown(filter, { key: "ArrowDown" });
+  expect(filter.getAttribute("aria-activedescendant")).toBe("action-second");
+});
+
 
 test("Actions preserves IME text editing and format commands affect the primary copy", async () => {
   const copies: unknown[] = [];
