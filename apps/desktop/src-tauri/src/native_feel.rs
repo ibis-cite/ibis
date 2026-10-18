@@ -83,8 +83,10 @@ fn refresh(app: &AppHandle) -> Appearance {
         .windows
         .iter()
         .any(|config| config.label == "main" && config.transparent);
+    let material = platform::material();
+    let preferences = if transparent { platform::preferences(app) } else { None };
     let requested = if transparent {
-        policy::requested(platform::material(), platform::preferences(app))
+        policy::requested(material, preferences)
     } else {
         Appearance::Opaque
     };
@@ -109,6 +111,14 @@ fn refresh(app: &AppHandle) -> Appearance {
         }
         policy::applied(requested, success)
     };
+    // Initial state and policy changes produce one fixed, allowlisted line in
+    // the existing native startup artifact. Success is an API observation,
+    // not proof of a visible material or accessibility-toggle acceptance.
+    eprintln!(
+        "ibis: native appearance mode={} reason={}",
+        next.name(),
+        policy::evidence_reason(material, preferences, transparent, next)
+    );
     if cache.applied != next {
         cache.applied = next;
         if window.emit("appearance:changed", next.name()).is_err() {

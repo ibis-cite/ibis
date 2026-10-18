@@ -30,6 +30,31 @@ pub(super) fn applied(material: Appearance, success: bool) -> Appearance {
     if success { material } else { Appearance::Opaque }
 }
 
+/// The evidence log accepts only native policy values, never an error payload.
+pub(super) fn evidence_reason(
+    material: Appearance,
+    preferences: Option<Preferences>,
+    transparent: bool,
+    actual: Appearance,
+) -> &'static str {
+    if material == Appearance::Opaque {
+        return "unsupported";
+    }
+    if !transparent {
+        return "not-transparent";
+    }
+    let Some(preferences) = preferences else {
+        return "unknown-preferences";
+    };
+    if preferences.high_contrast || preferences.reduce_transparency {
+        return "accessibility";
+    }
+    if actual != material {
+        return "native-failure";
+    }
+    "applied"
+}
+
 impl Appearance {
     pub(super) fn name(self) -> &'static str {
         match self {
@@ -45,6 +70,42 @@ impl Appearance {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn evidence_distinguishes_native_success_from_every_opaque_fallback() {
+        let normal = Some(Preferences {
+            high_contrast: false,
+            reduce_transparency: false,
+        });
+        let accessible = Some(Preferences {
+            high_contrast: false,
+            reduce_transparency: true,
+        });
+        assert_eq!(
+            evidence_reason(Appearance::Opaque, None, false, Appearance::Opaque),
+            "unsupported"
+        );
+        assert_eq!(
+            evidence_reason(Appearance::Mica, normal, false, Appearance::Opaque),
+            "not-transparent"
+        );
+        assert_eq!(
+            evidence_reason(Appearance::Mica, None, true, Appearance::Opaque),
+            "unknown-preferences"
+        );
+        assert_eq!(
+            evidence_reason(Appearance::Vibrancy, accessible, true, Appearance::Opaque),
+            "accessibility"
+        );
+        assert_eq!(
+            evidence_reason(Appearance::Mica, normal, true, Appearance::Opaque),
+            "native-failure"
+        );
+        assert_eq!(
+            evidence_reason(Appearance::Vibrancy, normal, true, Appearance::Vibrancy),
+            "applied"
+        );
+    }
 
     #[test]
     fn unknown_preferences_are_opaque_on_every_platform() {
