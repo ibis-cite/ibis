@@ -1926,6 +1926,7 @@ version = "0.0.0"
 dependencies = [
  "ibis-core",
  "objc2-app-kit",
+ "raw-window-handle",
  "serde",
  "serde_json",
  "specta",
@@ -1940,6 +1941,7 @@ dependencies = [
  "tempfile",
  "window-vibrancy",
  "windows",
+ "x11rb",
 ]
 
 [[package]]
