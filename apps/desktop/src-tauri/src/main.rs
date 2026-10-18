@@ -9,6 +9,8 @@
 mod bindings;
 mod copy;
 mod diagnostics;
+#[cfg(debug_assertions)]
+mod gallery;
 mod library;
 mod picker;
 mod preferences;
@@ -66,6 +68,21 @@ fn main() {
             _ => {}
         })
         .setup(|app| {
+            // Debug builds may opt into the synthetic evidence gallery. Keep
+            // both environment reads out of release binaries entirely.
+            #[cfg(debug_assertions)]
+            {
+                let enabled = std::env::var("IBIS_GALLERY").ok();
+                if enabled.as_deref() == Some("1")
+                    && let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window)
+                    && let Some(current) = checked(window.url(), NativeIssue::GalleryNavigation)
+                {
+                    let state = std::env::var("IBIS_GALLERY_STATE").ok();
+                    if let Some(destination) = gallery::gallery_url(current, enabled.as_deref(), state.as_deref()) {
+                        report(window.navigate(destination), NativeIssue::GalleryNavigation);
+                    }
+                }
+            }
             // Place the launcher near the top of the usable screen, clear of
             // menu bars and taskbars. Later shows keep the user's placement.
             if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window)
