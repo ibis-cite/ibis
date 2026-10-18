@@ -4,7 +4,9 @@
 pub(super) enum Appearance {
     #[default]
     Opaque,
+    #[cfg_attr(not(target_os = "windows"), allow(dead_code))] // Exercised by policy tests on every OS.
     Mica,
+    #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
     Vibrancy,
 }
 

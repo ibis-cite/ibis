@@ -43,7 +43,10 @@ pub(super) fn clear(window: &WebviewWindow) -> Result<(), ()> {
 pub(super) fn preferences(app: &AppHandle) -> Option<Preferences> {
     #[cfg(target_os = "macos")]
     {
-        let _ = app;
+        use tauri::Manager;
+        if !app.state::<WatchAvailable>().0 {
+            return None;
+        }
         let workspace = objc2_app_kit::NSWorkspace::sharedWorkspace();
         Some(Preferences {
             high_contrast: workspace.accessibilityDisplayShouldIncreaseContrast(),
@@ -84,34 +87,44 @@ pub(super) fn watch(app: &AppHandle) {
         // while visible, at most one pending main-thread refresh, instead.
         let handle = app.clone();
         let pending = Arc::new(AtomicBool::new(false));
-        std::thread::spawn(move || {
-            loop {
-                std::thread::sleep(std::time::Duration::from_secs(1));
-                let visible = handle
-                    .get_webview_window("main")
-                    .and_then(|window| window.is_visible().ok())
-                    .unwrap_or(false);
-                if !visible || pending.swap(true, Ordering::Relaxed) {
-                    continue;
+        let watcher = std::thread::Builder::new()
+            .name("native-appearance".to_owned())
+            .spawn(move || {
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    let visible = handle
+                        .get_webview_window("main")
+                        .and_then(|window| window.is_visible().ok())
+                        .unwrap_or(false);
+                    if !visible || pending.swap(true, Ordering::Relaxed) {
+                        continue;
+                    }
+                    let task = handle.clone();
+                    let complete = pending.clone();
+                    if handle
+                        .run_on_main_thread(move || {
+                            super::refresh(&task);
+                            complete.store(false, Ordering::Relaxed);
+                        })
+                        .is_err()
+                    {
+                        pending.store(false, Ordering::Relaxed);
+                        super::warning();
+                    }
                 }
-                let task = handle.clone();
-                let complete = pending.clone();
-                if handle
-                    .run_on_main_thread(move || {
-                        super::refresh(&task);
-                        complete.store(false, Ordering::Relaxed);
-                    })
-                    .is_err()
-                {
-                    pending.store(false, Ordering::Relaxed);
-                    super::warning();
-                }
-            }
-        });
+            });
+        let available = watcher.is_ok();
+        if !available {
+            super::warning();
+        }
+        app.manage(WatchAvailable(available));
     }
     #[cfg(not(any(target_os = "macos", target_os = "windows")))]
     let _ = app;
 }
+
+#[cfg(target_os = "macos")]
+struct WatchAvailable(bool);
 
 #[cfg(target_os = "windows")]
 struct WindowsPreferences {
