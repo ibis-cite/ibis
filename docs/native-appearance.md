@@ -108,3 +108,25 @@ No real OS accessibility-toggle or controlled-backdrop session has passed yet.
 Do not modify protected OS preference databases or infer permission denial from
 an unexplained helper error. IME/VoiceOver and display/provider cells remain in
 the shared compatibility checklist, not extra appearance-only hand checks.
+
+The focused macOS cloud probe uses ordinary System Settings Accessibility Display
+checkboxes. It refuses a preexisting System Settings process and existing Ibis
+settings, saves both native boolean values before changes, and restores them in
+`finally`, including after a failed observation. It never writes preference/TCC
+databases or requests permissions. Only its newly identified System Settings
+process and owned app/backdrop subprocesses can be closed.
+
+```sh
+python3 -B scripts/test_native_appearance_macos.py
+python3 scripts/check-native-appearance-macos.py --app target/debug/ibis-desktop \
+  --output screenshots/appearance-macOS
+```
+
+The ordinary picker stays over the same owned red/green/blue native window while
+the background settings controls are toggled. The probe requires new allowlisted
+mode observations for both accessibility fallbacks and material restoration;
+gallery mode is cleared. It captures each phase and records whether original OS
+preferences were restored. Exit2 means explicit missing native capability, and
+still supplies no acceptance pass. Exit0 records observed mode transitions and
+screenshots; a reviewer must inspect those captures to establish visible material
+and legibility, rather than treating API success alone as visual evidence.
