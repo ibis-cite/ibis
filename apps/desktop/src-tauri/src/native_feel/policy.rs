@@ -4,9 +4,9 @@
 pub(super) enum Appearance {
     #[default]
     Opaque,
-    #[cfg_attr(not(target_os = "windows"), allow(dead_code))] // Exercised by policy tests on every OS.
+    #[cfg(any(target_os = "windows", test))]
     Mica,
-    #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+    #[cfg(any(target_os = "macos", test))]
     Vibrancy,
 }
 
@@ -34,7 +34,9 @@ impl Appearance {
     pub(super) fn name(self) -> &'static str {
         match self {
             Self::Opaque => "opaque",
+            #[cfg(any(target_os = "windows", test))]
             Self::Mica => "mica",
+            #[cfg(any(target_os = "macos", test))]
             Self::Vibrancy => "vibrancy",
         }
     }

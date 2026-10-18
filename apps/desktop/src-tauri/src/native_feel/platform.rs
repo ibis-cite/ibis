@@ -56,11 +56,15 @@ pub(super) fn preferences(app: &AppHandle) -> Option<Preferences> {
     #[cfg(target_os = "windows")]
     {
         use tauri::Manager;
-        let observers = app.state::<Option<WindowsPreferences>>();
-        let observers = observers.as_ref()?;
+        let state = app.state::<std::sync::Mutex<Option<WindowsPreferences>>>();
+        let (contrast, effects) = {
+            let observers = state.lock().ok()?;
+            let observers = observers.as_ref()?;
+            (observers.contrast.clone(), observers.effects.clone())
+        };
         Some(Preferences {
-            high_contrast: observers.contrast.HighContrast().ok()?,
-            reduce_transparency: !observers.effects.AdvancedEffectsEnabled().ok()?,
+            high_contrast: contrast.HighContrast().ok()?,
+            reduce_transparency: !effects.AdvancedEffectsEnabled().ok()?,
         })
     }
     #[cfg(not(any(target_os = "macos", target_os = "windows")))]
@@ -74,7 +78,15 @@ pub(super) fn watch(app: &AppHandle) {
     #[cfg(target_os = "windows")]
     {
         use tauri::Manager;
-        app.manage(windows_watch(app));
+        // Register the empty state first: a preference callback can arrive
+        // during observer setup and must see an opaque fallback, not panic.
+        app.manage(std::sync::Mutex::new(None::<WindowsPreferences>));
+        let observers = windows_watch(app);
+        if let Ok(mut state) = app.state::<std::sync::Mutex<Option<WindowsPreferences>>>().lock() {
+            *state = observers;
+        } else {
+            super::warning();
+        }
     }
     #[cfg(target_os = "macos")]
     {
@@ -155,12 +167,18 @@ fn windows_watch(app: &AppHandle) -> Option<WindowsPreferences> {
         let contrast = AccessibilitySettings::new()?;
         let effects = UISettings::new()?;
         let handle = app.clone();
-        let contrast_token = contrast.HighContrastChanged(&TypedEventHandler::new(move |_, _| {
+        let contrast_token = contrast.HighContrastChanged(&TypedEventHandler::<
+            AccessibilitySettings,
+            windows::core::IInspectable,
+        >::new(move |_, _| {
             super::schedule(&handle);
             Ok(())
         }))?;
         let handle = app.clone();
-        let effects_token = match effects.AdvancedEffectsEnabledChanged(&TypedEventHandler::new(move |_, _| {
+        let effects_token = match effects.AdvancedEffectsEnabledChanged(&TypedEventHandler::<
+            UISettings,
+            windows::core::IInspectable,
+        >::new(move |_, _| {
             super::schedule(&handle);
             Ok(())
         })) {
