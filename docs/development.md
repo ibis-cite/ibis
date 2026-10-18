@@ -67,6 +67,8 @@ Visual evidence for #88 uses synthetic references: [browser light](images/picker
 
 Actions evidence for #103 also uses synthetic references: [browser dark](images/picker-actions-dark.png), [browser light](images/picker-actions-light.png), and [native macOS release](images/picker-actions-macos-dark.png). Real Chrome checks covered modal focus containment and inert background controls, Tab moving from Close to the filter, format execution, the contextual secondary shortcut while filtered, and Escape restoring search focus. At a 360 × 480 viewport with 200% text, the panel and filter remained reachable without horizontal overflow. The macOS release WebKit check covered Command+K, filtering and executing a format action, search focus restoration, Command+Enter selection, Escape closing only Actions, and choosing the synthetic library while keeping the picker open. Windows/Linux native behavior, VoiceOver/NVDA and real IME composition have not been manually verified; simulated composition events are covered by the interface tests.
 
+The reference Details control opens a text-only preview beside the results (below them at narrow widths). It follows the active result; Escape closes details and restores the trigger before another Escape hides the picker. Selected references each have their own Page(s) field, keyed by source and native key across searches. Blank fields mean no locator; Roman pages, ranges and lists pass through the core renderer, which retains warnings when the chosen syntax cannot express them. Detail responses from an earlier record or library snapshot are discarded. URLs are displayed as text and never fetched.
+
 ## Desktop command contract
 
 `apps/desktop/src/bindings.ts` is generated from Rust command signatures and

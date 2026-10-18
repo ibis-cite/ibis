@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Details } from "./Details";
 import { Actions, actionsShortcut, composing, mac, secondaryShortcut, type PickerAction } from "./Actions";
 import {
   COPY_FORMATS,
@@ -34,6 +35,9 @@ export function App() {
   const [resultsQuery, setResultsQuery] = useState<string | null>(null);
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Map<string, SearchResult>>(new Map());
+  const [locators, setLocators] = useState<Map<string, string>>(new Map());
+  const [detailsId, setDetailsId] = useState<RecordId | null>(null);
+  const detailsReturn = useRef<HTMLElement | null>(null);
   const [format, setFormat] = useState<CopyFormat>("pandoc");
   const [copied, setCopied] = useState<Copied | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -131,7 +135,10 @@ export function App() {
     let outcome: Copied;
     try {
       outcome = await copyCitation(
-        chosen.map((r) => ({ id: r.id, locator: null })),
+        chosen.map((r) => {
+          const value = selected.has(idKey(r.id)) ? locators.get(idKey(r.id))?.trim() : undefined;
+          return { id: r.id, locator: value ? { label: "page" as const, value } : null };
+        }),
         format,
       );
     } catch (e: unknown) {
@@ -140,16 +147,26 @@ export function App() {
     }
     setCopied(outcome);
     setSelected(new Map());
+    setLocators(new Map());
     // Get out of the way so the user can paste, unless there is something to read.
     if (outcome.warnings.length === 0) void hidePicker();
   };
 
   const highlighted = resultsQuery === query ? results[active] : undefined;
+  const openDetails = (id: RecordId, trigger: HTMLElement | null = input.current) => {
+    detailsReturn.current = trigger;
+    setDetailsId(id);
+  };
+  const closeDetails = () => { setDetailsId(null); detailsReturn.current?.focus(); };
+  useEffect(() => {
+    if (highlighted) setDetailsId((previous) => previous ? highlighted.id : null);
+  }, [highlighted?.id.source, highlighted?.id.native_key]);
   const canCopy = selected.size > 0 || !!highlighted;
   const actions: PickerAction[] = [
     { id: "copy", label: "Copy citation", shortcut: "↵", disabled: !canCopy, run: () => void copy() },
     { id: "selection", label: highlighted && selected.has(idKey(highlighted.id)) ? "Remove from selection" : "Add to selection",
       shortcut: mac ? "⌘↵" : "Ctrl+↵", disabled: !highlighted, run: () => { if (highlighted) toggle(highlighted); } },
+    { id: "details", label: "Show reference details", disabled: !highlighted, run: () => { if (highlighted) openDetails(highlighted.id); } },
     { id: "choose", label: "Choose library…", run: () => void chooseLibrary() },
     { id: "reload", label: "Reload library", disabled: !library?.name, run: () => void reloadLibrary() },
     ...COPY_FORMATS.map((f) => ({ id: `format-${f.value}`, label: `Copy as ${f.label}${format === f.value ? " (current)" : ""}`, run: () => setFormat(f.value) })),
@@ -165,7 +182,7 @@ export function App() {
           setActionsOpen((open) => !open);
         } else if (e.key === "Escape") {
           e.preventDefault();
-          void hidePicker();
+          if (detailsId) closeDetails(); else void hidePicker();
         } else if (e.key === "q" && (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey) {
           e.preventDefault();
           void quit();
@@ -248,6 +265,9 @@ export function App() {
           {[...selected.entries()].map(([key, r]) => (
             <li key={key}>
               <code>{r.key}</code>{" "}
+              <label>Page(s) <input type="text" aria-label={`Page(s) for ${r.key} (${r.title})`} value={locators.get(key) ?? ""}
+                onChange={(e) => setLocators((previous) => new Map(previous).set(key, e.target.value))} /></label>
+              <button type="button" aria-label={`Details for ${r.key}`} onClick={(e) => openDetails(r.id, e.currentTarget)}>Details</button>{" "}
               <button type="button" onClick={() => toggle(r)} aria-label={`Remove ${r.key} from the selection`}>
                 Remove
               </button>
@@ -255,9 +275,11 @@ export function App() {
           ))}
         </ul>
       )}
+      <div className="picker-body">
       <div className="results-area">
-        <div className="results-heading" aria-hidden="true">
+        <div className="results-heading">
           <span>References</span><span>{results.length > 0 ? `${results.length} results` : ""}</span>
+          <button type="button" disabled={!highlighted} onClick={(e) => { if (highlighted) openDetails(highlighted.id, e.currentTarget); }} aria-label="Show reference details">Details</button>
         </div>
         <ul id="results" role="listbox" aria-label="Results" aria-multiselectable="true">
           {results.map((r, i) => (
@@ -277,6 +299,7 @@ export function App() {
                 <span className="result-meta">
                   {r.authors} · {r.year ?? "n.d."}
                 </span>
+                {r.matched.length > 0 && <span className="match-explanation">Matched: {r.matched.join(", ")}</span>}
               </span>
               <code className="result-key">{r.key}</code>
             </li>
@@ -287,6 +310,8 @@ export function App() {
             {library?.name ? (query ? "No matching references" : "Type to find a reference") : "Choose a library to get started"}
           </p>
         )}
+      </div>
+      {detailsId && <Details id={detailsId} version={libraryVersion} close={closeDetails} />}
       </div>
       <div className="library-notices">
         {library?.error && <p role="alert">The library could not be opened: {library.error}</p>}

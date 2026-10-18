@@ -460,3 +460,50 @@ test("reopening the picker closes Actions before restoring and selecting search 
   expect(box.selectionStart).toBe(0);
   expect(box.selectionEnd).toBe(box.value.length);
 });
+
+
+test("locator drafts stay with selected identities across result re-sorting", async () => {
+  const copies: unknown[] = [];
+  backend({ search: ({ query }) => query === "reverse" ? [result("b", "Second"), result("a", "First")] : [result("a", "First"), result("b", "Second")],
+    copy_citation: (args) => { copies.push(args); return { text: "citation", warnings: [] }; } });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  fireEvent.change(screen.getByLabelText("Page(s) for a (First)"), { target: { value: "iv-vi" } });
+  fireEvent.change(box, { target: { value: "reverse" } });
+  await waitFor(() => expect(screen.getAllByRole("option")[0]?.textContent).toContain("Second"));
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  fireEvent.change(screen.getByLabelText("Page(s) for b (Second)"), { target: { value: "12, 18-20" } });
+  fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(copies).toHaveLength(1));
+  expect(copies[0]).toEqual({ items: [
+    { id: { source: "refs.bib", native_key: "a" }, locator: { label: "page", value: "iv-vi" } },
+    { id: { source: "refs.bib", native_key: "b" }, locator: { label: "page", value: "12, 18-20" } },
+  ], format: "pandoc" });
+});
+
+test("details reject outdated responses and Escape closes details before hiding without losing selection", async () => {
+  let release: (value: unknown) => void = () => undefined;
+  const calls = backend({ search: () => [result("a", "First"), result("b", "Second")],
+    reference_details: ({ id }) => (id as { native_key: string }).native_key === "a" ? new Promise((resolve) => { release = resolve; }) :
+      { id, title: "Second detail", authors: "Smith", year: 2020, kind: "article", container: null, doi: null, url: null, abstract_text: "<script>literal text</script>" } });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  const trigger = screen.getByRole("button", { name: "Show reference details" });
+  fireEvent.click(trigger);
+  fireEvent.keyDown(box, { key: "ArrowDown" });
+  expect(await screen.findByText("Second detail")).toBeTruthy();
+  await act(async () => { release({ id: { source: "refs.bib", native_key: "a" }, title: "Old detail", authors: "", year: null, kind: "", container: null, doi: null, url: null, abstract_text: null }); });
+  expect(screen.queryByText("Old detail")).toBeNull();
+  expect(screen.getByText("<script>literal text</script>")).toBeTruthy();
+  fireEvent.keyDown(screen.getByRole("button", { name: "Close details" }), { key: "Escape" });
+  expect(screen.queryByRole("region", { name: "Reference details" })).toBeNull();
+  expect(document.activeElement).toBe(trigger);
+  expect(calls).not.toContain("hide_picker");
+  expect(screen.getByRole("button", { name: "Remove a from the selection" })).toBeTruthy();
+  fireEvent.keyDown(box, { key: "Escape" });
+  await waitFor(() => expect(calls).toContain("hide_picker"));
+});

@@ -127,3 +127,22 @@ kbd { font: inherit; font-size: .65rem; display: inline-block; padding: .1rem .2
   .result-key { max-width: 100%; }
 }
 /* No animation: reduced-motion users get the same immediate feedback. */
+
+.picker-body { display: flex; flex: 1; min-height: 0; }
+.reference-details { flex: 1; min-width: 0; overflow: auto; padding: .8rem; border-inline-start: 1px solid var(--line); overflow-wrap: anywhere; }
+.details-heading { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.details-heading h2 { font-size: .85rem; }
+.reference-details h3 { font-size: 1rem; }
+.reference-details .abstract { white-space: pre-wrap; font-size: .85rem; line-height: 1.5; }
+.reference-details dl { font-size: .8rem; }
+.reference-details dt { color: var(--muted); margin-top: .8rem; }
+.reference-details dd { margin: .2rem 0; }
+.match-explanation { display: block; color: var(--muted); font-size: .7rem; margin-top: .2rem; }
+[aria-label="Selected references"] li { padding: .35rem; }
+[aria-label="Selected references"] input { width: 8rem; max-width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+[aria-label="Selected references"] label { font-size: .8rem; }
+.results-heading button { font-size: .75rem; }
+@media (max-width: 460px) {
+  .picker-body { display: block; }
+  .reference-details { border-inline-start: 0; border-top: 1px solid var(--line); }
+}
