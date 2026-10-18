@@ -33,6 +33,14 @@ function rendered(root: HTMLElement, state: GalleryState): boolean {
     && (root.querySelector('.library-bar p[role="status"]')?.textContent ?? null) === library.note;
 }
 
+type GalleryDiagnosticStage = "frontend-mounted" | "effects-settled" | "rendered";
+
+function reportGalleryStage(state: string, stage: GalleryDiagnosticStage): void {
+  if (isTauri() && window.top === window) {
+    void emitTo("main", "gallery:stage", { state, stage }).catch(() => console.error("Gallery diagnostic stage could not be sent."));
+  }
+}
+
 /** Only the evidence entry can acknowledge its completed synthetic App render. */
 export function renderGalleryState(
   root: HTMLElement,
@@ -41,11 +49,14 @@ export function renderGalleryState(
     if (isTauri() && window.top === window) await emitTo("main", "gallery:rendered", id);
   },
   provider = galleryProvider(state),
+  reportStage: (stage: GalleryDiagnosticStage) => void = (stage) => reportGalleryStage(state.id, stage),
 ): () => void {
   let pending = 0;
   let failed = false;
   let fontsReady = false;
   let stopped = false;
+  let mountedReported = false;
+  let settledReported = false;
   let stableFrames = 0;
   let frame = 0;
   const track = <T,>(action: () => Promise<T>) => {
@@ -72,9 +83,18 @@ export function renderGalleryState(
   void (document.fonts?.ready ?? Promise.resolve()).then(() => { fontsReady = true; }, () => { failed = true; });
   const check = () => {
     if (stopped || !root.isConnected) return;
+    if (!mountedReported && root.querySelector("#search")) {
+      reportStage("frontend-mounted");
+      mountedReported = true;
+    }
+    if (!settledReported && mountedReported && !failed && fontsReady && pending === 0) {
+      reportStage("effects-settled");
+      settledReported = true;
+    }
     stableFrames = !failed && fontsReady && document.fonts?.status !== "loading" && pending === 0 && rendered(root, state)
       ? stableFrames + 1 : 0;
     if (stableFrames >= 2) {
+      reportStage("rendered");
       void acknowledge(state.id).catch(() => console.error("Gallery render acknowledgment failed."));
       return;
     }

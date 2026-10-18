@@ -2,7 +2,9 @@
 
 use std::io::Write;
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 
 use tauri::ipc::CapabilityBuilder;
 use tauri::{AppHandle, Listener, Manager, Url, WebviewWindow};
@@ -23,6 +25,37 @@ const STATES: [&str; 14] = [
     "dark",
     "high-contrast",
 ];
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DiagnosticPayload {
+    state: String,
+    stage: String,
+}
+
+fn diagnostic_stage(payload: &str, expected: &str) -> Option<&'static str> {
+    if payload.len() > 128 {
+        return None;
+    }
+    let payload: DiagnosticPayload = serde_json::from_str(payload).ok()?;
+    if payload.state != expected {
+        return None;
+    }
+    match payload.stage.as_str() {
+        "frontend-mounted" => Some("frontend-mounted"),
+        "effects-settled" => Some("effects-settled"),
+        "rendered" => Some("rendered"),
+        _ => None,
+    }
+}
+
+fn selected_document(url: &Url, expected: &str) -> bool {
+    url.path() == "/gallery.html"
+        && url.query_pairs().count() == 1
+        && url
+            .query_pairs()
+            .any(|(key, value)| key == "state" && value == expected)
+}
 
 struct ReadyAck {
     state: String,
@@ -51,6 +84,7 @@ impl ReadyAck {
         {
             return Ok(false);
         }
+        eprintln!("ibis-gallery: event-accepted");
         // The renderer supplies only a fixed state. Its destination came from
         // the capture process environment; no web command accepts a file path.
         let temporary = self.path.with_extension("ready.tmp");
@@ -81,14 +115,43 @@ pub(crate) fn install_readiness(
     let Some(ready) = ReadyAck::new(window.label(), selected, ready_file) else {
         return Ok(());
     };
+    let ready = Arc::new(ready);
     app.add_capability(
         CapabilityBuilder::new("debug-gallery-rendered")
             .window("main")
             .permission("core:event:allow-emit-to"),
-    )?;
+    )
+    .inspect_err(|_| eprintln!("ibis-gallery: install-failed"))?;
+    let expected = ready.state.clone();
+    window.listen("gallery:stage", move |event| {
+        if let Some(stage) = diagnostic_stage(event.payload(), &expected) {
+            eprintln!("ibis-gallery: {stage}");
+        }
+    });
+    let accepted = Arc::clone(&ready);
     window.listen("gallery:rendered", move |event| {
-        if ready.accept(event.payload()).is_err() {
-            eprintln!("ibis: the debug gallery render could not be acknowledged");
+        if accepted.accept(event.payload()).is_err() {
+            eprintln!("ibis-gallery: write-failed");
+        }
+    });
+    eprintln!("ibis-gallery: installed");
+    // Inspect only the expected path/query, never print a URL. The bounded
+    // observations distinguish failed navigation from a renderer/IPC failure.
+    let observed = window.clone();
+    std::thread::spawn(move || {
+        for seconds in [1, 3, 6] {
+            std::thread::sleep(Duration::from_secs(seconds));
+            if ready.acknowledged.load(Ordering::SeqCst) {
+                return;
+            }
+            match observed.url() {
+                Ok(url) if selected_document(&url, &ready.state) => {
+                    eprintln!("ibis-gallery: navigated");
+                    return;
+                }
+                Ok(_) => eprintln!("ibis-gallery: navigation-pending"),
+                Err(_) => eprintln!("ibis-gallery: navigation-unavailable"),
+            }
         }
     });
     Ok(())
@@ -115,6 +178,38 @@ mod tests {
 
     fn parse(value: &str) -> Url {
         Url::parse(value).unwrap_or_else(|error| panic!("synthetic URL was invalid: {error}"))
+    }
+
+    #[test]
+    fn diagnostic_stages_require_the_selected_state_and_fixed_payloads() {
+        assert_eq!(
+            diagnostic_stage(r#"{"state":"loading","stage":"rendered"}"#, "loading"),
+            Some("rendered")
+        );
+        for payload in [
+            r#"{"state":"empty","stage":"rendered"}"#,
+            r#"{"state":"loading","stage":"private payload"}"#,
+            r#"{"state":"loading","stage":"rendered","path":"private"}"#,
+            "not JSON",
+        ] {
+            assert_eq!(diagnostic_stage(payload, "loading"), None);
+        }
+    }
+
+    #[test]
+    fn native_navigation_diagnostics_require_the_exact_selected_gallery_document() {
+        assert!(selected_document(
+            &parse("https://tauri.localhost/gallery.html?state=loading"),
+            "loading"
+        ));
+        for other in [
+            "https://tauri.localhost/index.html?state=loading",
+            "https://tauri.localhost/gallery.html?state=empty",
+            "https://tauri.localhost/gallery.html?state=loading&state=empty",
+            "https://tauri.localhost/gallery.html",
+        ] {
+            assert!(!selected_document(&parse(other), "loading"));
+        }
     }
 
     #[test]

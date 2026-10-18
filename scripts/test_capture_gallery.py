@@ -70,7 +70,7 @@ class CaptureTests(unittest.TestCase):
         self.assertEqual(capture.call_args.kwargs["states"], gallery.STATES)
         self.assertEqual(capture.call_args.kwargs["wait_seconds"], 8)
 
-    def test_a_live_app_without_the_selected_render_acknowledgment_cannot_be_captured(self):
+    def test_a_live_app_without_the_selected_render_acknowledgment_only_gets_a_failure_image(self):
         for acknowledgment in (None, "not JSON", '{"state":"empty"}'):
             process = Process()
 
@@ -82,8 +82,42 @@ class CaptureTests(unittest.TestCase):
             with self.subTest(acknowledgment=acknowledgment), patch.object(gallery.subprocess, "Popen", side_effect=launch), patch.object(gallery.os, "killpg", side_effect=lambda *_: process.kill(), create=True), patch.object(gallery, "capture_screenshot") as capture:
                 with self.assertRaises(gallery.CaptureError):
                     gallery.capture_gallery(self.app, self.output, states=("loading",), platform_name="Linux", wait_seconds=0, ready_timeout=0)
-                capture.assert_not_called()
+                capture.assert_called_once()
+                self.assertEqual(capture.call_args.args[0].name, "failure-loading.capture.tmp.png")
+                self.assertFalse((self.output / "loading.png").exists())
                 self.assertFalse(process.alive)
+
+    def test_missing_ack_keeps_one_explicit_failure_image_and_the_original_error(self):
+        for screenshot_fails in (False, True):
+            process = Process()
+            self.output.mkdir(exist_ok=True)
+            (self.output / "failure-loading.png").write_bytes(gallery.PNG_HEADER + b"stale")
+
+            def capture(destination, _platform):
+                self.assertTrue(process.alive)
+                destination.write_bytes(gallery.PNG_HEADER + b"diagnostic screen")
+                if screenshot_fails:
+                    raise gallery.CaptureError("secondary screenshot failure")
+
+            with self.subTest(screenshot_fails=screenshot_fails), patch.object(gallery.subprocess, "Popen", return_value=process), patch.object(gallery.os, "killpg", side_effect=lambda *_: process.kill(), create=True), patch.object(gallery, "capture_screenshot", side_effect=capture) as screenshot:
+                with self.assertRaisesRegex(gallery.CaptureError, "did not acknowledge rendering loading"):
+                    gallery.capture_gallery(self.app, self.output, states=("loading",), platform_name="Linux", wait_seconds=0, ready_timeout=0)
+                self.assertEqual(screenshot.call_count, 1)
+                self.assertFalse(process.alive)
+                self.assertFalse((self.output / "loading.png").exists())
+                self.assertFalse((self.output / "failure-loading.capture.tmp.png").exists())
+                failure = self.output / "failure-loading.png"
+                self.assertEqual(failure.exists(), not screenshot_fails)
+                if failure.exists():
+                    self.assertEqual(failure.read_bytes(), gallery.PNG_HEADER + b"diagnostic screen")
+
+    def test_failure_diagnostics_print_only_allowlisted_fixed_lines(self):
+        log = self.root / "startup.log"
+        log.write_bytes(b"private path and payload\nibis-gallery: installed\nibis-gallery: installed\nibis-gallery: unknown\nibis-gallery: rendered /private/path\nibis-gallery: navigated\n")
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            gallery.report_stages(log)
+        self.assertEqual(output.getvalue(), "Gallery stage: installed\nGallery stage: navigated\n")
 
     def test_each_state_has_its_own_process_synthetic_source_and_png(self):
         processes = []

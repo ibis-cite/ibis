@@ -18,6 +18,10 @@ STATES = (
     "rtl", "missing-file", "invalid-settings", "damaged-library",
     "copy-confirmation", "large-text", "dark", "high-contrast",
 )
+DIAGNOSTIC_STAGES = (
+    "installed", "install-failed", "navigated", "navigation-pending", "navigation-unavailable",
+    "frontend-mounted", "effects-settled", "rendered", "event-accepted", "write-failed",
+)
 PNG_HEADER = b"\x89PNG\r\n\x1a\n"
 WINDOWS_CAPTURE = r"""
 $ErrorActionPreference = 'Stop'
@@ -49,7 +53,7 @@ def capture_screenshot(destination, platform_name):
     else:
         raise CaptureError("unsupported screenshot platform")
     try:
-        subprocess.run(command, env=env, check=True, timeout=30)
+        subprocess.run(command, env=env, check=True, timeout=30, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except FileNotFoundError as error:
         raise CaptureError("native screenshot command is unavailable") from error
     except subprocess.TimeoutExpired as error:
@@ -114,6 +118,41 @@ def wait_until_rendered(process, ready_file, state, timeout):
             pass
 
 
+def report_stages(log_path):
+    """Print only fixed gallery diagnostics, never arbitrary native log lines."""
+    try:
+        with log_path.open("rb") as log:
+            lines = log.read(65536).splitlines()
+        allowed = {f"ibis-gallery: {stage}".encode("ascii"): stage for stage in DIAGNOSTIC_STAGES}
+        seen = set()
+        for line in lines:
+            if line in allowed and line not in seen:
+                print(f"Gallery stage: {allowed[line]}", flush=True)
+                seen.add(line)
+    except OSError:
+        print("Gallery stages unavailable.", flush=True)
+
+
+def capture_failure_screen(output, state, platform_name):
+    """One bounded diagnostic attempt; it can never become a valid state image."""
+    staging = output / f"failure-{state}.capture.tmp.png"
+    try:
+        staging.unlink(missing_ok=True)
+        capture_screenshot(staging, platform_name)
+        with staging.open("rb") as image:
+            if image.read(len(PNG_HEADER)) != PNG_HEADER:
+                raise CaptureError("diagnostic capture is not a PNG")
+        staging.replace(output / f"failure-{state}.png")
+        print("Gallery failure screenshot captured.", flush=True)
+    except (OSError, subprocess.SubprocessError, CaptureError):
+        print("Gallery failure screenshot unavailable.", flush=True)
+    finally:
+        try:
+            staging.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+
 def capture_gallery(app, output, *, states=STATES, wait_seconds=8, ready_timeout=15, platform_name=None):
     platform_name = platform_name or platform.system()
     if platform_name not in ("Linux", "Darwin", "Windows"):
@@ -125,6 +164,7 @@ def capture_gallery(app, output, *, states=STATES, wait_seconds=8, ready_timeout
     # A failed rerun must not accidentally upload screenshots from an earlier run.
     for state in states:
         (output / f"{state}.png").unlink(missing_ok=True)
+        (output / f"failure-{state}.png").unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(prefix="ibis-synthetic-gallery-") as temporary:
         source = Path(temporary) / "synthetic.bib"
         source.write_text("@misc{syntheticGallery, title={Synthetic gallery source}}\n", encoding="utf8")
@@ -151,7 +191,14 @@ def capture_gallery(app, output, *, states=STATES, wait_seconds=8, ready_timeout
                             pass
                         else:
                             raise CaptureError(f"app exited during {state} startup; see its startup log")
-                        wait_until_rendered(process, ready_file, state, ready_timeout)
+                        try:
+                            wait_until_rendered(process, ready_file, state, ready_timeout)
+                        except CaptureError:
+                            log.flush()
+                            report_stages(output / f"startup-{state}.log")
+                            if process.poll() is None:
+                                capture_failure_screen(output, state, platform_name)
+                            raise
                         capture_screenshot(staging, platform_name)
                         if process.poll() is not None:
                             raise CaptureError(f"app exited while capturing {state}; see its startup log")

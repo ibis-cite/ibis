@@ -103,6 +103,34 @@ test("render acknowledgment waits for the synthetic search and its actual result
   }
 });
 
+test("gallery diagnostics describe fixed render stages without acknowledging an unfinished App", async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
+  vi.stubGlobal("cancelAnimationFrame", (id: number) => window.clearTimeout(id));
+  const state = galleryStates.find((candidate) => candidate.id === "first-run")!;
+  const provider = galleryProvider(state);
+  let resolveFormat: () => void = () => undefined;
+  provider.api = { ...provider.api, copyFormat: () => new Promise((resolve) => { resolveFormat = () => resolve("pandoc"); }) };
+  const acknowledge = vi.fn(async () => undefined);
+  const stages: string[] = [];
+  const container = document.createElement("div");
+  document.body.append(container);
+  let stop: () => void = () => undefined;
+  try {
+    await act(async () => { stop = renderGalleryState(container, state, acknowledge, provider, (stage) => stages.push(stage)); });
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(stages).toEqual(["frontend-mounted"]);
+    expect(acknowledge).not.toHaveBeenCalled();
+    await act(async () => resolveFormat());
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(stages).toEqual(["frontend-mounted", "effects-settled", "rendered"]);
+    expect(acknowledge).toHaveBeenCalledExactlyOnceWith("first-run");
+  } finally {
+    await act(async () => stop());
+    container.remove();
+  }
+});
+
 test("render acknowledgment waits for startup effects even after the first-run UI appears", async () => {
   vi.useFakeTimers();
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
