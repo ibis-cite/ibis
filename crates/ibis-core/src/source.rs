@@ -240,6 +240,7 @@ impl SourceWatch {
             .name("ibis-library-watch".into())
             .spawn(move || {
                 // Also check once after registration to close the load/watch gap.
+                let mut error_reported = false;
                 while events.recv().is_ok() && !stop.load(Ordering::SeqCst) {
                     loop {
                         if stop.load(Ordering::SeqCst) {
@@ -255,24 +256,25 @@ impl SourceWatch {
                         return;
                     }
                     if failed.swap(false, Ordering::SeqCst) {
-                        snapshot = None;
+                        error_reported = true;
                         changed(Err(SourceError::WatchUnavailable));
                         continue;
                     }
                     // A selected symlink may now point into a different directory.
                     let candidate = rearm_target(&mut watcher, &path, &target, &mut target_parent)
-                        .and_then(|()| stable_read(&path, &events, &stop, &mut snapshot));
+                        .and_then(|()| stable_read(&path, &events, &stop, &mut snapshot, error_reported));
                     if !stop.load(Ordering::SeqCst) {
                         if matches!(candidate, Err(SourceError::Changing)) {
                             let _ = retry.try_send(());
                         }
                         match candidate {
-                            Ok(Some(loaded)) => changed(Ok(loaded)),
+                            Ok(Some(loaded)) => {
+                                error_reported = false;
+                                changed(Ok(loaded));
+                            }
                             Ok(None) => {}
                             Err(error) => {
-                                // Once an error is visible, even unchanged data
-                                // must publish a candidate to clear that error.
-                                snapshot = None;
+                                error_reported = true;
                                 changed(Err(error));
                             }
                         }
@@ -329,6 +331,7 @@ fn stable_read(
     events: &Receiver<()>,
     stopped: &AtomicBool,
     snapshot: &mut Option<SourceSnapshot>,
+    error_reported: bool,
 ) -> Result<Option<LoadResult>, SourceError> {
     let before = read_library_file(path)?;
     // A zero-length file and a valid prefix can both occur during a save.
@@ -350,7 +353,13 @@ fn stable_read(
         .take()
         .is_some_and(|previous| previous.source == source && previous.text.as_ref() == after)
     {
-        return Ok(None);
+        // An earlier gap error must clear even if the file returns unchanged.
+        // Only these exact initially accepted bytes retain tolerant loading.
+        return if error_reported {
+            parse(&source, &after, false).map(Some)
+        } else {
+            Ok(None)
+        };
     }
     parse(&source, &after, true).map(Some)
 }
