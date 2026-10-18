@@ -4,6 +4,23 @@ use ibis_core::bibtex::load_str;
 use ibis_core::model::WarningKind;
 
 #[test]
+fn unbalanced_day_is_reported_before_date_normalization() {
+    let loaded = load_str(
+        "synthetic.bib",
+        r#"@article(k,title={Safe},year=2024,month=3,day="x}")"#,
+    );
+    assert_eq!(loaded.references.len(), 1);
+    assert_eq!(loaded.references[0].title.as_deref(), Some("Safe"));
+    assert_eq!(loaded.references[0].year(), Some(2024));
+    assert_eq!(loaded.warnings.len(), 1, "{:?}", loaded.warnings);
+    assert_eq!(loaded.warnings[0].kind, WarningKind::Field);
+    assert_eq!(
+        loaded.warnings[0].message,
+        "field `day` has unbalanced braces; it is omitted"
+    );
+}
+
+#[test]
 fn unbalanced_values_never_create_metadata_or_hide_safe_data() {
     let loaded = load_str(
         "synthetic.bib",

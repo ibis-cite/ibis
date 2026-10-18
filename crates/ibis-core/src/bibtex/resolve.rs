@@ -1284,7 +1284,8 @@ mod tests {
                     parts: vec![Part::Text(value.into())],
                 }],
             };
-            let result = Resolver::new(Vec::new(), &[entry]).resolve(0);
+            let budget = Budget::new(usize::MAX);
+            let result = Resolver::new(Vec::new(), &[entry], &budget).resolve(0);
             assert_eq!(result.fields.contains_key("title"), accepted, "{value:?}");
             assert_eq!(result.problems.is_empty(), accepted, "{value:?}");
         }
