@@ -181,6 +181,40 @@ test("a failed status request does not suppress search errors", async () => {
   expect((await screen.findByRole("alert")).textContent).toContain("search unavailable");
 });
 
+test.each([
+  ["resolves", false], ["rejects", false],
+  ["resolves", true], ["rejects", true],
+] as const)("a startup status request that %s cannot overwrite a newer library event (failed: %s)", async (outcome, failed) => {
+  let resolveStatus: (value: unknown) => void = () => undefined;
+  let rejectStatus: (reason: Error) => void = () => undefined;
+  backend({
+    library_status: () => new Promise((resolve, reject) => {
+      resolveStatus = resolve;
+      rejectStatus = reject;
+    }),
+    search: () => failed ? [] : [result("new", "New library reference")],
+  });
+  render(<App />);
+  await act(async () => { await Promise.resolve(); });
+  await act(async () => {
+    await emit("library:changed", {
+      name: "new.bib", references: failed ? 0 : 1, warnings: 0,
+      error: failed ? "synthetic load failed" : null, note: null,
+    });
+  });
+  if (failed) await screen.findByText(/synthetic load failed/);
+  else await screen.findByText("New library reference");
+  await act(async () => {
+    if (outcome === "resolves") {
+      resolveStatus({ name: null, references: 0, warnings: 0, error: null, note: null });
+    } else rejectStatus(new Error("stale status unavailable"));
+  });
+  expect(screen.getByRole("region", { name: "Library" }).textContent).toContain("new.bib");
+  expect(screen.queryByRole("button", { name: "Choose library to get started" })).toBeNull();
+  if (failed) expect(screen.getByText(/synthetic load failed/)).toBeTruthy();
+  else expect(screen.getByText("New library reference")).toBeTruthy();
+});
+
 test("Escape hides the picker", async () => {
   const calls = backend();
   render(<App />);

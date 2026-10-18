@@ -55,18 +55,20 @@ export function App() {
   // When the picker is shown, put the cursor in the search box with the
   // previous query selected, so typing replaces it.
   useEffect(() => {
+    let acceptInitialStatus = true;
     const focusSearch = () => {
       input.current?.focus();
       input.current?.select();
     };
     const unlisten = onPickerShown(focusSearch);
     const unlistenLibrary = onLibraryChanged((status) => {
+      acceptInitialStatus = false;
       setLibrary(status);
       setLibraryVersion((v) => v + 1);
     });
     libraryStatus()
-      .then(setLibrary)
-      .catch(() => setLibrary(null));
+      .then((status) => { if (acceptInitialStatus) setLibrary(status); })
+      .catch(() => { if (acceptInitialStatus) setLibrary(null); });
     shortcutStatus()
       .then(setShortcut)
       .catch(() => setShortcut(null));
@@ -74,6 +76,7 @@ export function App() {
       .then(setFormat)
       .catch(() => undefined);
     return () => {
+      acceptInitialStatus = false;
       void unlisten.then((stop) => stop());
       void unlistenLibrary.then((stop) => stop());
     };
