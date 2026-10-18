@@ -343,6 +343,26 @@ Run the release build on macOS, quitting other Ibis instances first. Check:
   `.bib`; the dialog must receive input and the picker must remain available.
 - Windows/Linux dismissal, foreground activation and virtual desktops in #133.
 
+After integrating the native adapters from #217, run the focused scenario in
+that same disposable macOS session:
+
+```sh
+python3 scripts/check-panel-macos.py --self-test
+python3 scripts/check-panel-macos.py --app target/debug/ibis-desktop \
+  --output screenshots/panel-macOS
+```
+
+The scenario requires actual AXFullScreen state plus on-screen editor geometry,
+then checks that summoning keeps the editor in its full-screen Space while the
+picker is visible and focused. It verifies native search, an independently primed
+clipboard, Enter/Escape dismissal, and editor focus return. On the ordinary
+desktop it opens the real titled library chooser, verifies dialog focus while
+the picker stays visible, cancels, and checks keyboard access to the picker and
+return to the editor. Cancellation may restore the Choose-button focus. It does
+not select a file, change an input source, read VoiceOver speech, or establish
+second-display/Stage Manager acceptance. Exit 2 and an `unavailable` report mean
+no native pass; contract self-tests validate the probe only.
+
 Linux unit/interface checks do not execute AppKit. Hosted macOS compilation and
 these native interactions must be recorded before calling this change verified;
 full-screen, Stage Manager, IME, VoiceOver and second-display behavior remain
