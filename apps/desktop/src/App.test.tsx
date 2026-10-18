@@ -99,6 +99,88 @@ test("errors from the backend are shown, not swallowed", async () => {
   expect((await screen.findByRole("alert")).textContent).toContain("no library is open");
 });
 
+test("first launch waits for library status and offers a chooser without a search error", async () => {
+  let status: (value: unknown) => void = () => undefined;
+  const calls = backend({
+    library_status: () => new Promise((resolve) => { status = resolve; }),
+    search: () => { throw new Error("no library is open"); },
+    choose_library: () => null,
+  });
+  render(<App />);
+  await act(async () => { await Promise.resolve(); });
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(calls).not.toContain("search");
+  await act(async () => { status({ name: null, references: 0, warnings: 0, error: null, note: null }); });
+  fireEvent.click(await screen.findByRole("button", { name: "Choose library to get started" }));
+  await waitFor(() => expect(calls).toContain("choose_library"));
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(calls).not.toContain("search");
+});
+
+test("typed searches without a library and genuine load failures remain visible", async () => {
+  backend({
+    library_status: () => ({ name: null, references: 0, warnings: 0, error: "the synthetic library is unreadable", note: null }),
+    search: () => { throw new Error("no library is open"); },
+  });
+  render(<App />);
+  expect((await screen.findByText(/The library could not be opened/)).textContent).toContain("synthetic library is unreadable");
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
+  expect((await screen.findByText("Error: no library is open")).getAttribute("role")).toBe("alert");
+});
+
+test("the empty-state chooser opens the existing dialog and remains available after cancellation", async () => {
+  const calls = backend({
+    library_status: () => ({ name: null, references: 0, warnings: 0, error: null, note: null }),
+    choose_library: () => null,
+  });
+  render(<App />);
+  const chooser = await screen.findByRole("button", { name: "Choose library to get started" });
+  fireEvent.click(chooser);
+  await waitFor(() => expect(calls).toContain("choose_library"));
+  expect(screen.getByRole("button", { name: "Choose library to get started" })).toBe(chooser);
+  expect(screen.getByRole("button", { name: "Choose library…" })).toBeTruthy();
+});
+
+test("clearing a typed query without a library does not hide its search failure", async () => {
+  const queries: unknown[] = [];
+  backend({
+    library_status: () => ({ name: null, references: 0, warnings: 0, error: null, note: null }),
+    search: ({ query }) => {
+      queries.push(query);
+      throw new Error("no library is open");
+    },
+  });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "sleep" } });
+  await screen.findByRole("alert");
+  fireEvent.change(box, { target: { value: "" } });
+  await waitFor(() => expect(queries.at(-1)).toBe(""));
+  expect(screen.getByRole("alert").textContent).toContain("no library is open");
+});
+
+test("opening the first library searches the untouched empty query", async () => {
+  const calls = backend({
+    library_status: () => ({ name: null, references: 0, warnings: 0, error: null, note: null }),
+    search: () => [result("first", "First reference")],
+  });
+  render(<App />);
+  await screen.findByRole("button", { name: "Choose library to get started" });
+  expect(calls).not.toContain("search");
+  await emit("library:changed", { name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
+  expect(await screen.findByText("First reference")).toBeTruthy();
+  expect(screen.queryByRole("button", { name: "Choose library to get started" })).toBeNull();
+});
+
+test("a failed status request does not suppress search errors", async () => {
+  backend({
+    library_status: () => { throw new Error("status unavailable"); },
+    search: () => { throw new Error("search unavailable"); },
+  });
+  render(<App />);
+  expect((await screen.findByRole("alert")).textContent).toContain("search unavailable");
+});
+
 test("Escape hides the picker", async () => {
   const calls = backend();
   render(<App />);

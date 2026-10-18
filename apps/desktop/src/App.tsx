@@ -35,6 +35,7 @@ function idKey(id: RecordId): string {
 // The picker: search, choose one or more references, copy them as a citation.
 export function App() {
   const [query, setQuery] = useState("");
+  const [queryEdited, setQueryEdited] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   // The query the shown results belong to; differs while a search is pending.
   const [resultsQuery, setResultsQuery] = useState<string | null>(null);
@@ -47,7 +48,8 @@ export function App() {
   const [shortcut, setShortcut] = useState<ShortcutStatus | null>(null);
   // Changes whenever a library opens, so the current query is searched again.
   const [libraryVersion, setLibraryVersion] = useState(0);
-  const [library, setLibrary] = useState<LibraryStatus | null>(null);
+  // Undefined while loading; null means the status request itself failed.
+  const [library, setLibrary] = useState<LibraryStatus | null>();
   const input = useRef<HTMLInputElement>(null);
 
   // When the picker is shown, put the cursor in the search box with the
@@ -78,6 +80,15 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    // A fresh installation has nothing to search. Once the user types, or a
+    // library/status request fails, keep reporting search failures normally.
+    if (!queryEdited && library !== null && !library?.name && !library?.error) {
+      setResults([]);
+      setResultsQuery(query);
+      setActive(0);
+      setError(null);
+      return;
+    }
     let current = true;
     search(query)
       .then((found) => {
@@ -99,7 +110,7 @@ export function App() {
     return () => {
       current = false;
     };
-  }, [query, libraryVersion]);
+  }, [query, queryEdited, library, libraryVersion]);
 
   // Keep the highlighted result visible while moving with the arrow keys.
   useEffect(() => {
@@ -184,7 +195,10 @@ export function App() {
           ref={input}
           autoFocus
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQueryEdited(true);
+            setQuery(e.target.value);
+          }}
           onKeyDown={(e) => {
             if (composing(e)) return;
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
@@ -265,9 +279,18 @@ export function App() {
           ))}
         </ul>
         {results.length === 0 && !error && (
-          <p className="empty-state">
-            {library?.name ? (query ? "No matching references" : "Type to find a reference") : "Choose a library to get started"}
-          </p>
+          <div className="empty-state">
+            {library?.name ? (
+              <p>{query ? "No matching references" : "Type to find a reference"}</p>
+            ) : (
+              <>
+                <p>Choose a library to get started</p>
+                <button type="button" aria-label="Choose library to get started" onClick={() => void chooseLibrary()}>
+                  Choose library…
+                </button>
+              </>
+            )}
+          </div>
         )}
       </div>
       <footer>

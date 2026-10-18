@@ -21,6 +21,7 @@
         "shadow": true,
         "alwaysOnTop": true,
         "resizable": true,
+        "maximizable": false,
         "center": true
       }
     ],
