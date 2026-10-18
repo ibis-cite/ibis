@@ -150,3 +150,20 @@ fn empty_doubling_abbreviations_finish_quickly() {
     let out = child.wait_with_output().unwrap_or_else(|e| panic!("{e}"));
     assert!(String::from_utf8_lossy(&out.stdout).contains("too complex"));
 }
+
+/// Links kept from different paths must not combine into a cycle; this file
+/// once overflowed the stack.
+#[test]
+fn links_from_different_paths_never_form_a_cycle() {
+    let file = write(
+        "cli-graph-cycle",
+        "graph-cycle.bib",
+        "@book{root,title={Root},xdata={a,b}}\n@xdata{a,publisher={Synthetic},xdata={b}}\n@xdata{b,year={2024},xdata={a}}\n",
+    );
+    let out = ibis(&["csl", "--all", "--bib", s(&file)]);
+    assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+    let json: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(json[0]["id"], "root");
+    assert_eq!(json[0]["publisher"], "Synthetic");
+    assert_eq!(json[0]["issued"]["date-parts"][0][0], 2024);
+}

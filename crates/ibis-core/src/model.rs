@@ -204,6 +204,9 @@ pub struct Reference {
     pub other_names: BTreeMap<String, Vec<Name>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub issued: Option<Issued>,
+    /// Further CSL date variables (`accessed`, `original-date`, `event-date`).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub dates: BTreeMap<String, Issued>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub container_title: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -272,6 +275,9 @@ impl Reference {
         }
         if let Some(issued) = self.issued {
             item.insert("issued".into(), issued.to_csl());
+        }
+        for (name, date) in &self.dates {
+            item.insert(name.clone(), date.to_csl());
         }
         if !self.keywords.is_empty() {
             item.insert("keyword".into(), json!(self.keywords.join(", ")));

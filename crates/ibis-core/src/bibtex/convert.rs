@@ -49,7 +49,16 @@ pub(crate) fn convert(
         .map(|pieces| render(&if english { sentence_case(pieces) } else { pieces }));
     // `booktitle` names the containing book only for parts of a book or of
     // proceedings; on a whole book or proceedings volume it repeats the title.
-    let item_type = csl_type(kind);
+    let item_type = match (
+        kind,
+        entry
+            .get("entrysubtype")
+            .map(|c| c.format_verbatim().to_ascii_lowercase()),
+    ) {
+        ("article", Some(sub)) if sub == "newspaper" => "article-newspaper",
+        ("article", Some(sub)) if sub == "magazine" => "article-magazine",
+        _ => csl_type(kind),
+    };
     let containers: &[(&str, &str)] = if matches!(item_type, "chapter" | "paper-conference") {
         &[
             ("booktitle", "booksubtitle"),
@@ -164,6 +173,7 @@ pub(crate) fn convert(
     }
 
     let issued = issued(entry, problems);
+    let dates = other_dates(entry, problems);
     let doi = text("doi");
     let abstract_text = text("abstract");
     let keywords: Vec<String> = text("keywords")
@@ -197,6 +207,7 @@ pub(crate) fn convert(
         editors,
         other_names,
         issued,
+        dates,
         container_title,
         doi,
         url: entry
@@ -304,7 +315,29 @@ fn wholly_braced(name: &str) -> bool {
 // ---------- Dates ----------
 
 fn issued(entry: &Entry, problems: &mut Vec<String>) -> Option<Issued> {
-    match entry.date() {
+    date_value(entry.date(), entry, "date", problems)
+}
+
+/// Further CSL date variables: access date, original date, event date.
+fn other_dates(entry: &Entry, problems: &mut Vec<String>) -> BTreeMap<String, Issued> {
+    let sources = [
+        ("accessed", entry.url_date(), "urldate"),
+        ("original-date", entry.orig_date(), "origdate"),
+        ("event-date", entry.event_date(), "eventdate"),
+    ];
+    sources
+        .into_iter()
+        .filter_map(|(csl, value, field)| date_value(value, entry, field, problems).map(|d| (csl.to_string(), d)))
+        .collect()
+}
+
+fn date_value(
+    value: Result<PermissiveType<biblatex::Date>, RetrievalError>,
+    entry: &Entry,
+    field: &str,
+    problems: &mut Vec<String>,
+) -> Option<Issued> {
+    match value {
         Ok(PermissiveType::Typed(date)) => {
             let to_partial = |d: biblatex::Datetime| PartialDate {
                 year: d.year,
@@ -313,7 +346,7 @@ fn issued(entry: &Entry, problems: &mut Vec<String>) -> Option<Issued> {
                 day: d.day.map(|day| day + 1),
             };
             let raw = entry
-                .get("date")
+                .get(field)
                 .map(|c| c.format_verbatim())
                 .unwrap_or_else(|| "year".to_string());
             let (start, end) = match date.value {
@@ -367,7 +400,7 @@ fn issued(entry: &Entry, problems: &mut Vec<String>) -> Option<Issued> {
         }
         Err(RetrievalError::Missing(_)) => None,
         Err(err) => {
-            problems.push(format!("date could not be read: {err}"));
+            problems.push(format!("`{field}` could not be read: {err}"));
             None
         }
     }

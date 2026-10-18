@@ -198,6 +198,7 @@ mod tests {
             }],
             editors: vec![],
             other_names: Default::default(),
+            dates: Default::default(),
             issued: Some(Issued::year(year)),
             container_title: None,
             doi: None,

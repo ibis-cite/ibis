@@ -315,3 +315,36 @@ fn math_superscripts_and_subscripts_are_kept() {
     assert!(title.contains("mc<sup>2</sup>"), "{title}");
     assert!(title.contains("H<sub>2</sub>O"), "{title}");
 }
+
+#[test]
+fn errors_in_inherited_xdata_fields_are_reported_on_the_consumer() {
+    let r = load("@xdata{common,publisher=missing}\n@book{a,title={T},xdata={common}}");
+    only(&r, "a");
+    assert!(
+        r.warnings
+            .iter()
+            .any(|w| w.key.as_deref() == Some("a") && w.message.contains("missing")),
+        "{:?}",
+        r.warnings
+    );
+}
+
+#[test]
+fn access_and_original_dates_reach_csl() {
+    let r = only(
+        &load("@online{web,title={Live Status},urldate={2024-05-06},origdate={1999},url={https://example.org/}}"),
+        "web",
+    );
+    let csl = r.to_csl_json();
+    assert_eq!(csl["accessed"]["date-parts"][0], serde_json::json!([2024, 5, 6]));
+    assert_eq!(csl["original-date"]["date-parts"][0], serde_json::json!([1999]));
+}
+
+#[test]
+fn newspaper_and_magazine_articles_keep_their_type() {
+    let r = load(
+        "@article{news,entrysubtype={newspaper},title={H},journaltitle={Example News},date={2020-03-10}}\n@article{mag,entrysubtype={magazine},title={M},journaltitle={Example Monthly},date={2020-04}}",
+    );
+    assert_eq!(only(&r, "news").item_type, "article-newspaper");
+    assert_eq!(only(&r, "mag").item_type, "article-magazine");
+}

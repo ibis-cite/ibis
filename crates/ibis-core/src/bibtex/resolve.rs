@@ -109,7 +109,10 @@ impl<'a> Resolver<'a> {
     /// render the entry with its ancestors as canonical BibLaTeX.
     pub(crate) fn resolve(&self, i: usize) -> Resolved {
         let mut problems = Vec::new();
-        let (chain, edges) = self.ancestors(i, &mut problems);
+        let (chain, mut edges) = self.ancestors(i, &mut problems);
+        // Links kept from different paths can still combine into a cycle, so
+        // the final graph is checked as a whole before anything is parsed.
+        self.break_cycles(i, &mut edges, &mut problems);
 
         let mut source = String::new();
         let mut own_fields = HashMap::new();
@@ -118,7 +121,18 @@ impl<'a> Resolver<'a> {
             let mut rendered = Vec::new();
             for field in &entry.fields {
                 let is_parent = PARENT_FIELDS.contains(&field.name.as_str());
-                let value = self.expand(&field.name, &field.parts, &mut problems, idx == i);
+                // Problems in the entry itself, or in an `@xdata` helper it uses
+                // (helpers are not loaded on their own), are reported here.
+                let report = idx == i || entry.kind == "xdata";
+                let mut field_problems = Vec::new();
+                let value = self.expand(&field.name, &field.parts, &mut field_problems, report);
+                problems.extend(field_problems.into_iter().map(|p| {
+                    if idx == i {
+                        p
+                    } else {
+                        format!("in inherited `{}`: {p}", entry.key)
+                    }
+                }));
                 if is_parent {
                     // Keep only links that were followed while building the
                     // acyclic chain; cycles and missing targets are dropped.
@@ -153,6 +167,43 @@ impl<'a> Resolver<'a> {
             source,
             fields: own_fields,
             problems,
+        }
+    }
+
+    /// Remove links that close a cycle in the retained graph reachable from
+    /// `root`, using an iterative depth-first search in a fixed order.
+    fn break_cycles(&self, root: usize, edges: &mut HashSet<(usize, usize)>, problems: &mut Vec<String>) {
+        let mut children: HashMap<usize, Vec<usize>> = HashMap::new();
+        for &(from, to) in edges.iter() {
+            children.entry(from).or_default().push(to);
+        }
+        for list in children.values_mut() {
+            list.sort_unstable();
+        }
+        // 1 = on the current path, 2 = finished.
+        let mut state: HashMap<usize, u8> = HashMap::from([(root, 1)]);
+        let mut stack: Vec<(usize, usize)> = vec![(root, 0)];
+        while let Some(&mut (node, ref mut next)) = stack.last_mut() {
+            let Some(&child) = children.get(&node).and_then(|c| c.get(*next)) else {
+                state.insert(node, 2);
+                stack.pop();
+                continue;
+            };
+            *next += 1;
+            match state.get(&child) {
+                Some(1) => {
+                    edges.remove(&(node, child));
+                    problems.push(format!(
+                        "cross-reference cycle through `{}` and `{}`; the link back is ignored",
+                        self.entries[node].key, self.entries[child].key
+                    ));
+                }
+                Some(_) => {}
+                None => {
+                    state.insert(child, 1);
+                    stack.push((child, 0));
+                }
+            }
         }
     }
 
