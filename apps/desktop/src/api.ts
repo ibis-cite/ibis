@@ -35,6 +35,11 @@ export function hidePicker(): Promise<void> {
   return invoke("hide_picker");
 }
 
+/** End the app. Closing the window only hides the picker. */
+export function quit(): Promise<void> {
+  return invoke("quit");
+}
+
 export function shortcutStatus(): Promise<ShortcutStatus> {
   return invoke<ShortcutStatus>("shortcut_status");
 }

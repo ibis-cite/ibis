@@ -208,6 +208,13 @@ fn hide_picker(app: AppHandle) {
     }
 }
 
+/// End the app. Closing the window only hides it, so this is the way out on
+/// Windows and Linux, which have no application menu with Quit.
+#[tauri::command]
+fn quit(app: AppHandle) {
+    app.exit(0);
+}
+
 /// Current state of the global shortcut.
 #[tauri::command]
 fn shortcut_status(status: State<'_, Mutex<ShortcutStatus>>) -> ShortcutStatus {
@@ -233,6 +240,7 @@ fn main() {
             open_library,
             search,
             hide_picker,
+            quit,
             shortcut_status
         ])
         .on_window_event(|window, event| match event {
@@ -283,10 +291,21 @@ fn main() {
             }
             Ok(())
         })
-        .run(tauri::generate_context!());
-    if let Err(err) = app {
-        eprintln!("ibis: the app could not start: {err}");
-        std::process::exit(1);
+        .build(tauri::generate_context!());
+    match app {
+        Ok(app) => app.run(|app, event| {
+            // macOS: clicking the Dock icon brings back the hidden picker.
+            #[cfg(target_os = "macos")]
+            if let tauri::RunEvent::Reopen { .. } = event {
+                show_picker(app);
+            }
+            #[cfg(not(target_os = "macos"))]
+            let _ = (app, event);
+        }),
+        Err(err) => {
+            eprintln!("ibis: the app could not start: {err}");
+            std::process::exit(1);
+        }
     }
 }
 

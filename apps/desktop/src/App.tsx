@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { hidePicker, onPickerShown, search, shortcutStatus, type SearchResult, type ShortcutStatus } from "./api";
+import { hidePicker, onPickerShown, quit, search, shortcutStatus, type SearchResult, type ShortcutStatus } from "./api";
 
 // Scaffold view: a search box wired to the core search through the Rust
 // side. The full picker interface (selection, locators, copy) follows in
@@ -31,7 +31,13 @@ export function App() {
     let current = true;
     search(query)
       .then((found) => current && (setResults(found), setError(null)))
-      .catch((e: unknown) => current && setError(String(e)));
+      .catch((e: unknown) => {
+        // Results of an earlier query must not sit beside this query's error.
+        if (current) {
+          setResults([]);
+          setError(String(e));
+        }
+      });
     return () => {
       current = false;
     };
@@ -43,6 +49,9 @@ export function App() {
         if (e.key === "Escape" && !e.nativeEvent.isComposing) {
           e.preventDefault();
           void hidePicker();
+        } else if (e.key === "q" && (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey) {
+          e.preventDefault();
+          void quit();
         }
       }}
     >
@@ -68,6 +77,12 @@ export function App() {
           </li>
         ))}
       </ul>
+      <footer>
+        {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
+        <button type="button" onClick={() => void quit()}>
+          Quit Ibis
+        </button>
+      </footer>
     </main>
   );
 }

@@ -68,3 +68,28 @@ test("a shortcut that could not be registered is explained", async () => {
   render(<App />);
   expect((await screen.findByRole("status")).textContent).toContain("another app may be using it");
 });
+
+test("a failed search clears the results of the previous query", async () => {
+  backend({
+    search: ({ query }) => {
+      if (query === "diet") throw new Error("search failed");
+      return query ? [{ key: "smith2020", title: "Sleep and memory", authors: "Smith", year: 2020, matched: ["title"] }] : [];
+    },
+  });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "sleep" } });
+  expect(await screen.findByText("Sleep and memory")).toBeTruthy();
+  fireEvent.change(box, { target: { value: "diet" } });
+  expect((await screen.findByRole("alert")).textContent).toContain("search failed");
+  expect(screen.queryByText("Sleep and memory")).toBeNull();
+});
+
+test("Quit is available from the picker and from the keyboard", async () => {
+  const calls = backend({ quit: () => null });
+  render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Quit Ibis" }));
+  await waitFor(() => expect(calls.filter((c) => c === "quit")).toHaveLength(1));
+  fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "q", ctrlKey: true });
+  await waitFor(() => expect(calls.filter((c) => c === "quit")).toHaveLength(2));
+});
