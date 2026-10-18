@@ -199,18 +199,22 @@ mod tests {
     #[test]
     fn settings_recovery_reports_backup_or_defaults_from_the_same_read() {
         let path = dir("recovery-source").join("settings.json");
-        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::create_dir_all(
+            path.parent()
+                .unwrap_or_else(|| panic!("expected a synthetic settings directory")),
+        )
+        .unwrap_or_else(|e| panic!("{e}"));
         for primary in ["{ invalid", r#"{"schema_version":2}"#] {
-            fs::write(&path, primary).unwrap();
+            fs::write(&path, primary).unwrap_or_else(|e| panic!("{e}"));
             let fallback = load(&path);
             assert!(fallback.problem.is_some());
             assert!(!fallback.from_backup);
-            fs::write(backup_path(&path), "{}").unwrap();
+            fs::write(backup_path(&path), "{}").unwrap_or_else(|e| panic!("{e}"));
             let recovered = load(&path);
             assert!(recovered.problem.is_some());
             assert!(recovered.from_backup);
             assert_eq!(recovered.settings, Settings::default());
-            fs::remove_file(backup_path(&path)).unwrap();
+            fs::remove_file(backup_path(&path)).unwrap_or_else(|e| panic!("{e}"));
         }
     }
 

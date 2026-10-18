@@ -65,23 +65,25 @@ mod tests {
             ))),
             from_backup: false,
         };
-        let notice = settings_notice(Path::new("synthetic/settings.json"), &loaded).unwrap();
+        let notice = settings_notice(Path::new("synthetic/settings.json"), &loaded)
+            .unwrap_or_else(|| panic!("expected a settings recovery notice"));
         assert!(notice.contains("could not be read"));
         assert!(!notice.contains("synthetic-private-detail"));
     }
 
     #[test]
     fn invalid_and_newer_settings_report_the_recovery_and_file_without_raw_error_payloads() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
         let path = dir.path().join("settings.json");
         let private = "synthetic-private-payload";
         for (contents, problem) in [
             (format!(r#"{{"copy_format":"{private}"}}"#), "not valid"),
             (r#"{"schema_version":2}"#.to_string(), "newer version"),
         ] {
-            std::fs::write(&path, &contents).unwrap();
+            std::fs::write(&path, &contents).unwrap_or_else(|e| panic!("{e}"));
             let loaded = settings::load(&path);
-            let notice = settings_notice(&path, &loaded).unwrap();
+            let notice =
+                settings_notice(&path, &loaded).unwrap_or_else(|| panic!("expected a settings recovery notice"));
             assert!(notice.contains(problem));
             assert!(notice.contains("defaults"));
             assert!(notice.contains("not being saved"));
@@ -89,14 +91,26 @@ mod tests {
             assert!(!notice.contains(private));
             let failed = SettingsFile::new(path.clone()).update(|s| s.copy_format = Some(KeyFormat::Keys));
             assert!(failed.is_err());
-            assert!(!failed.unwrap_err().contains(private));
-            assert_eq!(std::fs::read_to_string(&path).unwrap(), contents);
-            std::fs::write(path.with_extension("json.bak"), "{}").unwrap();
+            assert!(
+                !failed
+                    .err()
+                    .unwrap_or_else(|| panic!("expected the invalid settings save to fail"))
+                    .contains(private)
+            );
+            assert_eq!(
+                std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{e}")),
+                contents
+            );
+            std::fs::write(path.with_extension("json.bak"), "{}").unwrap_or_else(|e| panic!("{e}"));
             let recovered = settings::load(&path);
-            assert!(settings_notice(&path, &recovered).unwrap().contains("backup"));
-            std::fs::remove_file(path.with_extension("json.bak")).unwrap();
+            assert!(
+                settings_notice(&path, &recovered)
+                    .unwrap_or_else(|| panic!("expected a settings recovery notice"))
+                    .contains("backup")
+            );
+            std::fs::remove_file(path.with_extension("json.bak")).unwrap_or_else(|e| panic!("{e}"));
         }
-        std::fs::remove_file(&path).unwrap();
+        std::fs::remove_file(&path).unwrap_or_else(|e| panic!("{e}"));
         assert!(settings_notice(&path, &settings::load(&path)).is_none());
     }
 

@@ -615,7 +615,8 @@ mod tests {
             ..Library::default()
         });
         let requests = LoadRequests::default();
-        let (request, _, opening) = begin_open(&library, &requests, PathBuf::from("synthetic.bib")).unwrap();
+        let (request, _, opening) = begin_open(&library, &requests, PathBuf::from("synthetic.bib"))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert!(opening.settings_notice.is_some());
         let loaded = install(
             &library,
@@ -626,9 +627,10 @@ mod tests {
                 ibis_core::bibtex::load_str("synthetic", "@misc{k}"),
             )),
         )
-        .unwrap();
+        .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(loaded.settings_notice, opening.settings_notice);
-        let failed = install(&library, &requests, request, Err("unavailable".to_string())).unwrap();
+        let failed = install(&library, &requests, request, Err("unavailable".to_string()))
+            .unwrap_or_else(|| panic!("expected the current library request"));
         assert_eq!(failed.settings_notice, opening.settings_notice);
     }
 
