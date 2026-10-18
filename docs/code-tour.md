@@ -13,7 +13,7 @@ work; today's picker searches a `.bib` library and copies citation keys.
 - **Coalesce**: merge a burst of file-change events into one reload.
 - **Quiet interval**: a short pause (250 ms, `SETTLE` in `source.rs`) with no new file events; the file is read again after it to make sure it stopped changing.
 - **Candidate load**: a freshly read library that has not replaced the current one yet.
-- **Generation**: a counter that goes up each time a library is chosen, so a slow, older load can never replace a newer choice.
+- **Generation**: a request counter that goes up each time a library is opened or reloaded, so a slow, older load can never replace a newer one.
 - **Replay / logical quotas**: cached work is reused (replayed), but still counts against the same per-field limits as if it were done again.
 
 ## One search: shortcut to results
