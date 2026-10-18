@@ -217,7 +217,7 @@ jobs:
   screenshots:
     name: Collect picker screenshots
     needs: desktop
-    if: always()
+    if: always() && (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     # GitHub cannot restrict GITHUB_TOKEN to a branch. Keep write permission in
