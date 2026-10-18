@@ -94,6 +94,7 @@ button:disabled, [aria-disabled="true"] { color: var(--muted); opacity: .65; }
 .actions-heading button { border: 0; background: transparent; }
 #actions-list { list-style: none; padding: 0; margin: .3rem 0; max-height: min(17rem, 45dvh); overflow: auto; }
 #actions-list [role="option"] { padding: .45rem .55rem; border-radius: 5px; font-size: .85rem; overflow-wrap: anywhere; }
+#actions-list kbd { margin-inline-start: auto; flex-shrink: 0; }
 #actions-list [aria-selected="true"] { background: Canvas; background: color-mix(in srgb, var(--text) 9%, var(--surface)); color: var(--text); border-color: var(--active-edge); }
 #action-search { width: 100%; min-width: 0; border: 0; border-top: 1px solid var(--line); background: transparent; padding: .65rem .5rem; }
 .actions-panel p { padding-inline: .5rem; }

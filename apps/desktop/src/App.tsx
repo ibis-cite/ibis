@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Actions, actionsShortcut, composing, mac, type PickerAction } from "./Actions";
+import { Actions, actionsShortcut, composing, mac, secondaryShortcut, type PickerAction } from "./Actions";
 import {
   COPY_FORMATS,
   chooseLibrary,
@@ -43,13 +43,15 @@ export function App() {
   const [libraryVersion, setLibraryVersion] = useState(0);
   const [library, setLibrary] = useState<LibraryStatus | null>(null);
   const input = useRef<HTMLInputElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
   const [actionsOpen, setActionsOpen] = useState(false);
-  const closeActions = () => { setActionsOpen(false); input.current?.focus(); };
+  const closeActions = () => { dialog.current?.close(); setActionsOpen(false); input.current?.focus(); };
 
   // When the picker is shown, put the cursor in the search box with the
   // previous query selected, so typing replaces it.
   useEffect(() => {
     const focusSearch = () => {
+      dialog.current?.close();
       setActionsOpen(false);
       input.current?.focus();
       input.current?.select();
@@ -145,9 +147,9 @@ export function App() {
   const highlighted = resultsQuery === query ? results[active] : undefined;
   const canCopy = selected.size > 0 || !!highlighted;
   const actions: PickerAction[] = [
-    { id: "copy", label: "Copy citation", disabled: !canCopy, run: () => void copy() },
+    { id: "copy", label: "Copy citation", shortcut: "↵", disabled: !canCopy, run: () => void copy() },
     { id: "selection", label: highlighted && selected.has(idKey(highlighted.id)) ? "Remove from selection" : "Add to selection",
-      disabled: !highlighted, run: () => { if (highlighted) toggle(highlighted); } },
+      shortcut: mac ? "⌘↵" : "Ctrl+↵", disabled: !highlighted, run: () => { if (highlighted) toggle(highlighted); } },
     { id: "choose", label: "Choose library…", run: () => void chooseLibrary() },
     { id: "reload", label: "Reload library", disabled: !library?.name, run: () => void reloadLibrary() },
     ...COPY_FORMATS.map((f) => ({ id: `format-${f.value}`, label: `Copy as ${f.label}${format === f.value ? " (current)" : ""}`, run: () => setFormat(f.value) })),
@@ -199,7 +201,11 @@ export function App() {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
             if (composing(e)) return;
-            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            if (secondaryShortcut(e)) {
+              e.preventDefault();
+              const secondary = actions[1];
+              if (secondary && !secondary.disabled) secondary.run();
+            } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
               e.preventDefault();
               const step = e.key === "ArrowDown" ? 1 : -1;
               setActive((i) => Math.min(Math.max(i + step, 0), Math.max(results.length - 1, 0)));
@@ -305,7 +311,7 @@ export function App() {
             onClick={() => setActionsOpen(true)}>Actions <kbd>{mac ? "⌘K" : "Ctrl+K"}</kbd></button>
         </div>
       </footer>
-      {actionsOpen && <Actions actions={actions} close={closeActions} />}
+      {actionsOpen && <Actions actions={actions} close={closeActions} dialog={dialog} />}
 
     </main>
   );
