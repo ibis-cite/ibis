@@ -316,7 +316,8 @@ class Scripted:
         except subprocess.CalledProcessError as error:
             details = error.stderr or ""
             if system == "Darwin" and any(marker in details for marker in (
-                "TCC Accessibility is not granted", "not allowed assistive access", "(-1743)",
+                "TCC Accessibility is not granted", "TCC event posting is not granted",
+                "not allowed assistive access", "(-1743)",
             )):
                 raise Unavailable("macOS Accessibility/Automation permission is unavailable; see helper diagnostics") from error
             raise RuntimeError("Native automation preflight failed; see helper diagnostics") from error
@@ -785,6 +786,10 @@ class ContractTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "metadata unavailable"):
                 editor_focus_facts(native, "copy-restoration-timeout")
 
+    def test_global_macos_hid_event_contracts_without_native_execution(self):
+        subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
+
     def test_macos_click_reacquires_a_missing_control_and_stops_after_one_press(self):
         native = Scripted.__new__(Scripted)
         native.system = "Darwin"
@@ -986,7 +991,8 @@ class ContractTests(unittest.TestCase):
                 Scripted("Darwin")
 
     def test_explicit_macos_permission_denials_remain_unavailable(self):
-        for details in ("not allowed assistive access. (-1719)", "not authorized to send Apple events. (-1743)"):
+        for details in ("not allowed assistive access. (-1719)", "not authorized to send Apple events. (-1743)",
+                        "TCC event posting is not granted; native smoke unavailable"):
             with self.subTest(details=details):
                 error = subprocess.CalledProcessError(1, ["osascript"], stderr=details)
                 with patch.object(Scripted, "call", side_effect=error):

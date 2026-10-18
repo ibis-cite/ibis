@@ -4,12 +4,76 @@ ObjC.import('ApplicationServices');
 ObjC.import('CoreGraphics');
 ObjC.import('CoreFoundation');
 
+// Global HID events follow the real key window, including a nonactivating
+// panel whose application intentionally is not frontmost. The callback keeps
+// event plans testable without claiming a native post happened on other OSes.
+function sendPhysicalChord(chord, post) {
+    const modifiers = {ctrl: [59, 1 << 18], shift: [56, 1 << 17],
+        super: [55, 1 << 20], alt: [58, 1 << 19]};
+    const codes = {a: 0, r: 15, escape: 53, return: 36, space: 49};
+    const keys = chord.toLowerCase().split('+');
+    const last = keys.pop();
+    if (!Object.hasOwn(codes, last) || keys.some(key => !Object.hasOwn(modifiers, key)) || new Set(keys).size !== keys.length) {
+        throw Error('Unsupported native HID chord');
+    }
+    const held = [];
+    let flags = 0, baseHeld = false, error;
+    try {
+        keys.forEach(key => {
+            const modifier = modifiers[key];
+            flags |= modifier[1];
+            held.push(modifier);
+            post(modifier[0], true, flags);
+        });
+        baseHeld = true;
+        post(codes[last], true, flags);
+        post(codes[last], false, flags);
+        baseHeld = false;
+    } catch (failure) { error = failure; }
+    // Attempt every release even if a later event could not be created.
+    if (baseHeld) {
+        try { post(codes[last], false, flags); } catch (failure) { error ||= failure; }
+    }
+    held.reverse().forEach(([code, mask]) => {
+        flags &= ~mask;
+        try { post(code, false, flags); } catch (failure) { error ||= failure; }
+    });
+    if (error) throw error;
+}
+
+function sendUnicodeText(text, post) {
+    for (const character of text) {
+        let error;
+        try { post(0, true, 0, character); } catch (failure) { error = failure; }
+        try { post(0, false, 0, character); } catch (failure) { error ||= failure; }
+        if (error) throw error;
+    }
+}
+
 function run(argv) {
     const action = argv[0], appId = Number(argv[1]), editorId = Number(argv[2]), text = argv[3];
     const events = Application('System Events');
     const process = id => events.applicationProcesses.whose({unixId: id})()[0];
     const safe = (fn, fallback = '') => { try { return fn(); } catch (_) { return fallback; } };
     const numeric = value => typeof value === 'number' && Number.isFinite(value);
+    const postEvent = () => {
+        if (!$.CGPreflightPostEventAccess()) throw Error('TCC event posting is not granted; native smoke unavailable');
+        const source = $.CGEventSourceCreate($.kCGEventSourceStateHIDSystemState);
+        if (!source) throw Error('Native HID event source unavailable');
+        return (code, down, flags, character) => {
+            const event = $.CGEventCreateKeyboardEvent(source, code, down);
+            if (!event) throw Error('Native HID keyboard event unavailable');
+            $.CGEventSetFlags(event, flags);
+            if (character !== undefined) {
+                // NSString/NSData retain the UTF-16 storage until posting.
+                // Each codepoint uses at most two units, retaining surrogates.
+                const data = $(character).dataUsingEncoding($.NSUTF16LittleEndianStringEncoding);
+                if (!data || Number(data.length) !== character.length * 2) throw Error('Native HID Unicode storage unavailable');
+                $.CGEventKeyboardSetUnicodeString(event, character.length, data.bytes);
+                $.CGEventPost($.kCGHIDEventTap, event);
+            } else $.CGEventPost($.kCGHIDEventTap, event);
+        };
+    };
     const editorState = () => {
         const state = {bundle_verified: false, window_count: 0, document_metadata_count: 0,
             exact_document_url_matches: 0, owned_document_path_matches: 0, owned: false};
@@ -144,6 +208,7 @@ function run(argv) {
         // AXIsProcessTrusted does not prompt or claim a grant. A hosted runner
         // without it is unavailable; no tccutil reset or permission bypass.
         if (!$.AXIsProcessTrusted()) throw Error('TCC Accessibility is not granted to osascript; native smoke unavailable');
+        if (!$.CGPreflightPostEventAccess()) throw Error('TCC event posting is not granted; native smoke unavailable');
         // Query the real scripting object. The obsolete UI-elements-enabled
         // property is not a valid JXA class on the macOS 15 hosted image.
         events.applicationProcesses.length; // Also checks Automation consent.
@@ -233,18 +298,11 @@ function run(argv) {
         break;
     }
     case 'key': {
-        const keys = text.toLowerCase().split('+');
-        const last = keys.pop();
-        const mods = {ctrl: 'control down', shift: 'shift down', super: 'command down', alt: 'option down'};
-        const using = keys.map(key => { if (!mods[key]) throw Error('Unsupported key'); return mods[key]; });
-        const codes = {escape: 53, return: 36, space: 49};
-        if (Object.hasOwn(codes, last)) events.keyCode(codes[last], {using});
-        else if (/^[a-z]$/.test(last)) events.keystroke(last, {using});
-        else throw Error('Unsupported key');
+        sendPhysicalChord(text, postEvent());
         result = true;
         break;
     }
-    case 'text': events.keystroke(text); result = true; break;
+    case 'text': sendUnicodeText(text, postEvent()); result = true; break;
     case 'click': {
         const aliases = text === 'Reload' ? ['Reload', 'Reload library'] :
             text === 'Choose library…' ? ['Choose library…', 'Choose a library'] : [text];
