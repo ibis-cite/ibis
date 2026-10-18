@@ -72,11 +72,39 @@ fn status(library: &Library) -> LibraryStatus {
     }
 }
 
+/// Largest library file read; far above any real BibTeX library.
+const MAX_LIBRARY_BYTES: u64 = 64 * 1024 * 1024;
+
+/// Read a library file, accepting only regular files up to [`MAX_LIBRARY_BYTES`],
+/// so a device or pipe can never exhaust memory or block the app.
+fn read_library_file(path: &std::path::Path) -> Result<String, String> {
+    use std::io::Read;
+    let metadata = std::fs::metadata(path).map_err(|e| format!("cannot read the library file: {e}"))?;
+    if !metadata.is_file() {
+        return Err("the library must be a regular file".to_string());
+    }
+    if metadata.len() > MAX_LIBRARY_BYTES {
+        return Err(format!(
+            "the library file is larger than {} MiB",
+            MAX_LIBRARY_BYTES / 1024 / 1024
+        ));
+    }
+    let file = std::fs::File::open(path).map_err(|e| format!("cannot read the library file: {e}"))?;
+    let mut text = String::new();
+    file.take(MAX_LIBRARY_BYTES + 1)
+        .read_to_string(&mut text)
+        .map_err(|e| format!("cannot read the library file as UTF-8 text: {e}"))?;
+    if text.len() as u64 > MAX_LIBRARY_BYTES {
+        return Err("the library file grew while it was being read".to_string());
+    }
+    Ok(text)
+}
+
 /// Load a BibTeX/BibLaTeX file read-only and make it the open library.
 #[tauri::command]
 fn open_library(path: String, library: State<'_, Mutex<Library>>) -> Result<LibraryStatus, String> {
     let path = PathBuf::from(path);
-    let text = std::fs::read_to_string(&path).map_err(|e| format!("cannot read the library file: {e}"))?;
+    let text = read_library_file(&path)?;
     let source = std::fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
     let loaded = bibtex::load_str(&source.to_string_lossy(), &text);
     let mut library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
@@ -124,5 +152,20 @@ fn main() {
     if let Err(err) = app {
         eprintln!("ibis: the app could not start: {err}");
         std::process::exit(1);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn only_regular_files_are_read() {
+        assert!(read_library_file(std::path::Path::new(".")).is_err());
+        #[cfg(unix)]
+        assert!(read_library_file(std::path::Path::new("/dev/zero")).is_err());
+        let file = std::env::temp_dir().join(format!("ibis-read-{}.bib", std::process::id()));
+        std::fs::write(&file, "@misc{k}").unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(read_library_file(&file).as_deref(), Ok("@misc{k}"));
     }
 }

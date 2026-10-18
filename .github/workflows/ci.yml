@@ -53,6 +53,9 @@ jobs:
         os: [ubuntu-24.04, macos-15, windows-2025]
     defaults:
       run:
+        # bash stops at the first failing command on every OS; PowerShell on
+        # Windows would continue and report only the last command's result.
+        shell: bash
         working-directory: apps/desktop
     steps:
       - name: Checkout
