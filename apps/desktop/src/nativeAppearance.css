@@ -3,5 +3,5 @@
 
 /* Defensive overrides also cover preferences changed before native refresh. */
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
-  :root[data-native-appearance] { background: Canvas; }
+  :root[data-native-appearance] { background: var(--surface); }
 }

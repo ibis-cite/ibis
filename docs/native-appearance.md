@@ -35,8 +35,11 @@ Policy and interface tests cover fallback decisions and event ordering. Real
 material appearance, live accessibility toggles, light/dark mode, corner silhouette,
 resize/shadow, fullscreen summon, chooser and focus/clipboard behavior still need
 native evidence. Existing opaque-picker screenshots do not establish these checks.
-This groundwork must remain draft until platform compilation and native evidence
-support the intended behavior. IME and VoiceOver speech are separate native checks.
+This groundwork remains draft while integration with current main/gallery/smoke
+and its exact checks are pending. Material appearance and live accessibility feel
+remain explicit cells in the final combined native session; a startup fallback
+is useful evidence but does not pass those cells. IME and VoiceOver speech are
+separate native checks.
 
 ## Evidence and remaining checks
 
@@ -51,6 +54,21 @@ was inspected directly:
 | macOS 15 | Picker visible, flat opaque surface matching the CSS fallback; startup log empty. | No selected-mode evidence yet; cannot distinguish accessibility fallback from an unexposed effect. |
 | Windows Server 2025 | Picker visible and opaque; fixed appearance-unavailable diagnostic. | Establishes a fallback observation, not Windows 11 Mica acceptance. |
 | Linux | Picker visible and opaque. | Expected unsupported-material fallback; no material is requested. |
+
+At evidence commit `365b136445a9bfcf982a5f983666d112a85bd8ae`,
+[CI 350](https://github.com/ibiscite/ibis/actions/runs/39174798201) passed all
+three desktop jobs and the full matrix. Its inspected
+[combined artifact](https://github.com/ibiscite/ibis/actions/runs/39174798201/artifacts/12153902926)
+contains these actual native startup selections:
+
+| Platform | Fixed mode/reason | Screenshot observation |
+| --- | --- | --- |
+| macOS 15 | `opaque / accessibility` | Visible opaque picker; square outer silhouette. |
+| Windows Server 2025 | `opaque / unknown-preferences` | Visible opaque picker; unavailable-preferences fallback. |
+| Linux | `opaque / unsupported` | Visible opaque picker, as expected. |
+
+These are real initial fallback observations. No run selected an applied material;
+no live OS preference toggle or controlled-backdrop material session passed.
 
 New startup logs emit one fixed `ibis: native appearance mode=… reason=…` line
 for initial selection and policy changes. Modes are `opaque`, `vibrancy` or

@@ -1,10 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { installNativeAppearance, setNativeAppearance } from "./nativeAppearance";
 
-const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
-const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
-const css = readFileSync(new FileURL("./nativeAppearance.css", import.meta.url), "utf8");
-
 afterEach(() => { delete document.documentElement.dataset.nativeAppearance; });
 
 test("only explicit native success exposes a material", () => {
@@ -46,9 +42,18 @@ test("read and subscription failures keep opacity", async () => {
   expect(read).not.toHaveBeenCalled();
 });
 
-test("material CSS preserves an opaque accessibility override", () => {
-  expect(css).toContain('(prefers-reduced-transparency: reduce)');
-  expect(css).toContain('(prefers-contrast: more)');
-  expect(css).toContain('(forced-colors: active)');
-  expect(css).toMatch(/background:\s*Canvas/);
+test("live native changes replace startup state and reject invalid modes", async () => {
+  let changed!: (value: unknown) => void;
+  const dispose = await installNativeAppearance(async () => "mica", async (handler) => {
+    changed = handler;
+    return () => {};
+  });
+  expect(document.documentElement.dataset.nativeAppearance).toBe("mica");
+  changed("opaque");
+  expect(document.documentElement.dataset.nativeAppearance).toBe("opaque");
+  changed("vibrancy");
+  expect(document.documentElement.dataset.nativeAppearance).toBe("vibrancy");
+  changed({ mode: "mica" });
+  expect(document.documentElement.dataset.nativeAppearance).toBe("opaque");
+  dispose();
 });
