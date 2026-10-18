@@ -20,9 +20,11 @@ CI takes a few minutes per pull request. Most delay comes from waiting, so work 
 
   ```sh
   root=$(git rev-parse --show-toplevel); sha=$(git rev-parse HEAD)
-  git worktree add --detach "$root/../ibis-verify" "$sha"
-  (cd "$root/../ibis-verify" && CARGO_TARGET_DIR="$root/target/verify" node scripts/check.mjs) && git push
-  git worktree remove --force "$root/../ibis-verify"
+  dir="$(mktemp -d)/ibis-verify"   # a new, empty path: never someone else's work
+  git worktree add --detach "$dir" "$sha" &&
+    (cd "$dir" && CARGO_TARGET_DIR="$root/target/verify" node scripts/check.mjs) &&
+    git push
+  git worktree remove --force "$dir" 2>/dev/null; git worktree prune
   ```
 
 - **Stack instead of waiting.** Start the next issue on a branch based on the previous one. After the previous pull request is squash-merged, move the branch onto `main` and confirm the content did not change:
