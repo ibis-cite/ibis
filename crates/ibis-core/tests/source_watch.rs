@@ -76,3 +76,53 @@ fn initial_damage_is_tolerated_and_reload_warnings_are_not_blanket_rejected() {
     std::fs::write(&path, "% Deliberately empty library\n").unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(load_library_file(&path, true).map(|l| l.references.len()), Ok(0));
 }
+
+#[cfg(unix)]
+#[test]
+fn symlink_target_changes_and_retargeting_keep_reloading() {
+    use std::os::unix::fs::symlink;
+    let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+    for name in ["selected", "first", "second"] {
+        std::fs::create_dir(dir.path().join(name)).unwrap_or_else(|e| panic!("{e}"));
+    }
+    let selected = dir.path().join("selected/library.bib");
+    let first = dir.path().join("first/target.bib");
+    let second = dir.path().join("second/target.bib");
+    std::fs::write(&first, "@misc{first}").unwrap_or_else(|e| panic!("{e}"));
+    std::fs::write(&second, "@misc{second}").unwrap_or_else(|e| panic!("{e}"));
+    symlink(&first, &selected).unwrap_or_else(|e| panic!("{e}"));
+    let (tx, rx) = mpsc::channel();
+    let _watch = SourceWatch::new(&selected, move |result| {
+        let _ = tx.send(result);
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("first".into())
+    );
+    std::fs::write(&first, "@misc{first_updated}").unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("first_updated".into())
+    );
+    std::fs::remove_file(&selected).unwrap_or_else(|e| panic!("{e}"));
+    symlink(&second, &selected).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("second".into())
+    );
+    std::fs::write(&first, "@misc{obsolete}").unwrap_or_else(|e| panic!("{e}"));
+    assert!(rx.recv_timeout(Duration::from_millis(800)).is_err());
+    std::fs::write(&second, "@misc{second_updated}").unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("second_updated".into())
+    );
+    std::fs::remove_file(&second).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+    std::fs::write(&second, "@misc{restored}").unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("restored".into())
+    );
+}

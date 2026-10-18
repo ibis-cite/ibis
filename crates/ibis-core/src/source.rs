@@ -1,10 +1,10 @@
 //! Bounded, read-only file loading and platform notifications. A failed reload
 //! never produces an empty candidate: callers keep their last good snapshot.
 use std::io::Read;
-use std::path::Path;
-use std::sync::Arc;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, SyncSender};
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use notify::{RecursiveMode, Watcher};
@@ -71,7 +71,6 @@ fn parse(path: &Path, text: &str, reload: bool) -> Result<LoadResult, SourceErro
 /// Dropping stops the worker; a callback already running must still be guarded
 /// by the caller's source-selection generation before installing its candidate.
 pub struct SourceWatch {
-    _watcher: notify::RecommendedWatcher,
     stopped: Arc<AtomicBool>,
     signal: SyncSender<()>,
 }
@@ -91,11 +90,22 @@ impl SourceWatch {
         let notify_failed = Arc::clone(&failed);
         let event_signal = signal.clone();
         let selected = path.clone();
+        let target = Arc::new(Mutex::new(None::<PathBuf>));
+        let event_target = Arc::clone(&target);
         let mut watcher = notify::recommended_watcher(move |event: notify::Result<notify::Event>| {
             let relevant = match event {
                 Ok(event) => {
                     !matches!(event.kind, notify::EventKind::Access(_))
-                        && (event.need_rescan() || event.paths.iter().any(|p| p == &selected || p == &parent))
+                        && (event.need_rescan()
+                            || event.paths.iter().any(|p| {
+                                p == &selected
+                                    || p == &parent
+                                    || event_target.lock().is_ok_and(|target| {
+                                        target
+                                            .as_ref()
+                                            .is_some_and(|target| p == target || Some(p.as_path()) == target.parent())
+                                    })
+                            }))
                 }
                 Err(_) => {
                     notify_failed.store(true, Ordering::SeqCst);
@@ -113,6 +123,8 @@ impl SourceWatch {
                 RecursiveMode::NonRecursive,
             )
             .map_err(|_| SourceError::WatchUnavailable)?;
+        let mut target_parent = None;
+        rearm_target(&mut watcher, &path, &target, &mut target_parent)?;
         let stopped = Arc::new(AtomicBool::new(false));
         let stop = Arc::clone(&stopped);
         let retry = signal.clone();
@@ -138,7 +150,9 @@ impl SourceWatch {
                         changed(Err(SourceError::WatchUnavailable));
                         continue;
                     }
-                    let candidate = stable_read(&path, &events, &stop);
+                    // A selected symlink may now point into a different directory.
+                    let candidate = rearm_target(&mut watcher, &path, &target, &mut target_parent)
+                        .and_then(|()| stable_read(&path, &events, &stop));
                     if !stop.load(Ordering::SeqCst) {
                         if matches!(candidate, Err(SourceError::Changing)) {
                             let _ = retry.try_send(());
@@ -149,12 +163,40 @@ impl SourceWatch {
             })
             .map_err(|_| SourceError::WatchUnavailable)?;
         let _ = signal.try_send(());
-        Ok(Self {
-            _watcher: watcher,
-            stopped,
-            signal,
-        })
+        Ok(Self { stopped, signal })
     }
+}
+
+/// Keep the selected path watched while following its resolved target as well.
+/// If the target disappears, keep its parent registered so recreation is seen.
+fn rearm_target(
+    watcher: &mut notify::RecommendedWatcher,
+    selected: &Path,
+    target: &Mutex<Option<PathBuf>>,
+    watched_parent: &mut Option<PathBuf>,
+) -> Result<(), SourceError> {
+    let Ok(resolved) = std::fs::canonicalize(selected) else {
+        return Ok(());
+    };
+    let resolved = (resolved != selected).then_some(resolved);
+    let parent = resolved
+        .as_deref()
+        .and_then(Path::parent)
+        .filter(|parent| Some(*parent) != selected.parent())
+        .map(Path::to_path_buf);
+    if parent != *watched_parent {
+        if let Some(parent) = &parent {
+            watcher
+                .watch(parent, RecursiveMode::NonRecursive)
+                .map_err(|_| SourceError::WatchUnavailable)?;
+        }
+        if let Some(old) = watched_parent.as_deref() {
+            watcher.unwatch(old).map_err(|_| SourceError::WatchUnavailable)?;
+        }
+        *watched_parent = parent;
+    }
+    *target.lock().map_err(|_| SourceError::WatchUnavailable)? = resolved;
+    Ok(())
 }
 
 fn stable_read(path: &Path, events: &Receiver<()>, stopped: &AtomicBool) -> Result<LoadResult, SourceError> {
