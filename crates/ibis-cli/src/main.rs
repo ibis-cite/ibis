@@ -207,7 +207,7 @@ fn run(cli: Cli) -> Result<ExitCode> {
                 report_problems(&loaded);
             }
             if json {
-                print_json(&serde_json::json!({"results": hits, "load_warnings": all_warnings(&loaded)}))?;
+                print_json(&serde_json::json!({"results": hits, "warnings": all_warnings(&loaded)}))?;
             } else if hits.is_empty() {
                 println!("No matches.");
             } else {
@@ -290,7 +290,9 @@ fn run(cli: Cli) -> Result<ExitCode> {
                     "load_warnings": load_warnings,
                 }))?;
             } else {
-                println!("{}", terminal_safe(&rendered.text));
+                // The citation is the command's product and its keys come from the
+                // command line, so it is printed exactly; only messages are escaped.
+                println!("{}", rendered.text);
                 for warning in &rendered.warnings {
                     eprintln!("note: {}", terminal_safe(warning));
                 }

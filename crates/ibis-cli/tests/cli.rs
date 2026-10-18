@@ -65,7 +65,7 @@ fn loading_problems_are_visible_in_every_command() {
 
     let json = ibis(&["search", "fine", "--bib", s(&damaged), "--json"]);
     let value: serde_json::Value = serde_json::from_slice(&json.stdout).unwrap_or_else(|e| panic!("{e}"));
-    assert_eq!(value["load_warnings"].as_array().map(Vec::len), Some(1));
+    assert_eq!(value["warnings"].as_array().map(Vec::len), Some(1));
 
     let csl = ibis(&["csl", "ok", "--bib", s(&damaged)]);
     assert!(String::from_utf8_lossy(&csl.stderr).contains("1 problem"));
@@ -200,4 +200,10 @@ fn bare_keys_say_when_page_numbers_are_dropped() {
     let value: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(value["text"], "k");
     assert_eq!(value["warnings"].as_array().map(Vec::len), Some(1));
+}
+
+#[test]
+fn cite_prints_keys_exactly_as_given() {
+    let out = ibis(&["cite", "a\u{200f}b", "--format", "keys"]);
+    assert_eq!(String::from_utf8_lossy(&out.stdout).trim_end(), "a\u{200f}b");
 }

@@ -1,6 +1,6 @@
 # Testing strategy
 
-Citation software fails at the edges: unusual names, damaged files, rare item types, other scripts, odd editors. Ibis relies on automated tests, rather than manual review, to find those edges before users do. Every layer below runs in CI; the slower ones run nightly.
+Citation software fails at the edges: unusual names, damaged files, rare item types, other scripts, odd editors. Ibis relies on automated tests, rather than manual review, to find those edges before users do. Layers marked "planned" are tracked in the linked issues and not yet running; all others run in CI on every change.
 
 ## Layers
 
@@ -12,9 +12,9 @@ Citation software fails at the edges: unusual names, damaged files, rare item ty
 | Property tests | Panics, hangs and broken invariants on generated input | `proptest` in `crates/ibis-core/tests/` |
 | Metamorphic tests | Different but equivalent inputs giving different results | planned (#67) |
 | Subprocess tests | Process aborts that in-process guards cannot catch (stack overflow) | `crates/ibis-cli/tests/cli.rs` |
-| Differential tests | Loss of meaning, measured against an independent implementation | `crates/ibis-cli/tests/fidelity.rs` (Pandoc); nightly on larger corpora (#69) |
-| Fuzzing | Crashes and runaway work on arbitrary bytes | nightly (#66) |
-| Open-data corpus | Real names, scripts and records synthetic data misses | nightly (#68) |
+| Differential tests | Loss of meaning, measured against an independent implementation | `crates/ibis-cli/tests/fidelity.rs` (Pandoc); planned nightly on larger corpora (#69) |
+| Fuzzing | Crashes and runaway work on arbitrary bytes | planned nightly (#66) |
+| Open-data corpus | Real names, scripts and records synthetic data misses | planned nightly (#68) |
 | Platform harness | Insertion, shortcuts and accessibility on each OS | planned for 0.3 |
 
 ## Rules
