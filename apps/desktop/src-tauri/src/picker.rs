@@ -107,7 +107,7 @@ pub(crate) fn dismiss_picker(app: &AppHandle) {
 /// Still attempt to release application focus when a native window hide fails.
 fn dismiss_with<W, A>(hide_window: impl FnOnce() -> Result<(), W>, hide_application: impl FnOnce() -> Result<(), A>) {
     report(hide_window(), NativeIssue::Hide);
-    let _ = hide_application;
+    report(hide_application(), NativeIssue::HideApplication);
 }
 
 /// End the app. Closing the window only hides it, so this is the way out on
