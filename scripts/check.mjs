@@ -17,6 +17,7 @@ const steps = [
   ["Desktop: generated contract", "cargo", ["test", "-p", "ibis-desktop", "generated_contract_is_current", "--locked"]],
   ["Desktop: type check", "pnpm", ["typecheck"], desktop],
   ["Desktop: interface tests", "pnpm", ["test"], desktop],
+  ["Desktop: browser keyboard tests", "pnpm", ["test:e2e"], desktop],
   ["Desktop: lint app", "cargo", ["clippy", "-p", "ibis-desktop", "--all-targets", "--locked", "--", "-D", "warnings"]],
 ];
 

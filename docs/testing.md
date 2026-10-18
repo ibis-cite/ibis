@@ -10,6 +10,7 @@ Citation software fails at the edges: unusual names, damaged files, rare item ty
 | Specification by example | Exact expected output for each citation syntax and source quirk | `crates/*/tests/*.rs` |
 | Fixture corpus with snapshots | Any change in how real-world quirks are read | `fixtures/`, `crates/ibis-core/tests/snapshots/` |
 | File watcher integration | Real platform notifications, interrupted writes, rename replacement, deletion, valid empty files, coalesced change bursts and symlink targets | `crates/ibis-core/tests/source_watch.rs` |
+| Browser keyboard flows | Focus, virtualized navigation, identity-keyed page fields, input-method composition events and narrow text reflow | `apps/desktop/e2e/`; Chromium in desktop CI |
 | Property tests | Panics, hangs and broken invariants on generated input | `proptest` in `crates/ibis-core/tests/` |
 | Metamorphic tests | Different but equivalent inputs giving different results | `crates/ibis-core/tests/metamorphic.rs`; larger run in `.github/workflows/metamorphic.yml` |
 | Subprocess tests | Process aborts that in-process guards cannot catch (stack overflow) | `crates/ibis-cli/tests/cli.rs` |
@@ -33,6 +34,8 @@ node scripts/check.mjs                         # everything CI runs on every cha
 cargo test -p ibis-core                        # fast core tests
 IBIS_METAMORPHIC_CASES=2048 cargo test -p ibis-core --test metamorphic --locked
 IBIS_REQUIRE_PANDOC=1 cargo test -p ibis --test fidelity   # differential tests (needs Pandoc)
+pnpm -C apps/desktop exec playwright install chromium # browser runtime (once)
+pnpm -C apps/desktop test:e2e                  # synthetic browser flows
 cargo insta review                             # review changed snapshots
 ```
 
@@ -66,3 +69,32 @@ issues. Fixed inputs become fixtures with regression coverage. Fuzz targets shar
 the root lockfile and are outside default application/test members. Only
 cargo-fuzz enables nightly instrumentation; the app toolchain stays pinned. See `fuzz/README.md` for
 reproduction, reporting and resource limits.
+
+The browser harness imports the production picker and replaces only its Tauri
+IPC adapter with synthetic responses. It is a separate Vite entry, excluded from
+the production build. It exercises the existing 200-result budget rather than
+pretending that the IPC returns an entire 100,000-record library. Tests check a
+bounded option count, distant active rows, list Space selection, independent
+locators across re-sorting, IME event guards, panel-first Escape, and document
+scrolling at narrow 200% text. Install Chromium once before the full local check;
+CI installs its pinned Playwright browser and system dependencies explicitly.
+Real IME, assistive technology and native-platform checks remain separate.
+
+## Synthetic library scale
+
+Run the backend measurement explicitly (it is ignored by the ordinary suite to
+avoid timing assertions tied to a particular machine):
+
+```sh
+cargo test -p ibis-desktop search_100000_references --release --locked -- --ignored --nocapture
+```
+
+On macOS 27.0.1 arm64 with pinned Rust 1.99.1, a synthetic 100,000-reference
+library took 315 ms to index. Ten searches per case, including the real desktop
+result adapter and JSON serialization, averaged 40.0 ms for a broad Latin query,
+36.6 ms for a broad CJK query, 3.6 ms for an exact key and 4.3 ms for no matches.
+The broad cases returned the existing cap of 200 results (35,935 JSON bytes).
+Records have short synthetic multilingual metadata; parsing a file, native IPC,
+window rendering and more complex real libraries are outside these timings.
+The separate Chromium tests exercise that bounded result payload shape and
+virtualized rendering, rather than claiming a native end-to-end benchmark.

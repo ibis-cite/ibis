@@ -91,10 +91,14 @@ jobs:
       - name: Install web dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install browser test runtime
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Type check and test the interface
         run: |
           pnpm typecheck
           pnpm test
+          pnpm test:e2e
           pnpm build
 
       - name: Lint and build the app

@@ -361,6 +361,10 @@ pub(crate) async fn search(
     library: State<'_, Mutex<Library>>,
 ) -> Result<Vec<SearchResult>, String> {
     let library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
+    search_library(&library, &query, limit)
+}
+
+fn search_library(library: &Library, query: &str, limit: usize) -> Result<Vec<SearchResult>, String> {
     if library.path.is_none() {
         return Err(match &library.error {
             Some(error) => format!("the library could not be opened: {error}"),
@@ -369,7 +373,7 @@ pub(crate) async fn search(
     }
     Ok(library
         .index
-        .search(&query, limit.min(200))
+        .search(query, limit.min(200))
         .into_iter()
         .map(|hit| {
             let matched = hit.matched.iter().map(|m| format!("{m:?}").to_lowercase()).collect();
@@ -381,6 +385,58 @@ pub(crate) async fn search(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[ignore = "manual synthetic scale measurement; no machine-dependent timing assertion"]
+    fn search_100000_references() {
+        use std::time::Instant;
+        let seed = ibis_core::bibtex::load_str("synthetic.bib", "@article{seed,title={Synthetic research 睡眠 والذاكرة},author={García, Alex},year={2024},abstract={A synthetic summary for scale measurement}}")
+            .references.remove(0);
+        let references = (0..100_000)
+            .map(|i| {
+                let mut reference = seed.clone();
+                reference.id.native_key = format!("ref{i}");
+                reference.citekey = Some(format!("ref{i}"));
+                reference
+            })
+            .collect();
+        let start = Instant::now();
+        let library = Library {
+            path: Some(PathBuf::from("synthetic.bib")),
+            index: OwnedIndex::new(references),
+            ..Library::default()
+        };
+        eprintln!("scale: records=100000 index_ms={}", start.elapsed().as_millis());
+        for query in ["research", "睡眠", "ref99999", "missing"] {
+            let start = Instant::now();
+            let mut bytes = 0;
+            let mut count = 0;
+            for _ in 0..10 {
+                let found = search_library(&library, query, 200).unwrap_or_else(|e| panic!("{e}"));
+                count = found.len();
+                bytes = serde_json::to_vec(&found).unwrap_or_else(|e| panic!("{e}")).len();
+                assert!(count <= 200);
+                if query == "ref99999" {
+                    assert_eq!(found.first().map(|r| r.key.as_str()), Some("ref99999"));
+                }
+            }
+            eprintln!(
+                "scale: case={} mean_us={} results={} payload_bytes={}",
+                if query == "research" {
+                    "many"
+                } else if query == "睡眠" {
+                    "nonlatin"
+                } else if query == "missing" {
+                    "none"
+                } else {
+                    "exact"
+                },
+                start.elapsed().as_micros() / 10,
+                count,
+                bytes
+            );
+        }
+    }
 
     #[test]
     fn details_resolve_full_identity_and_return_plain_display_text() {
