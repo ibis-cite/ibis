@@ -1,18 +1,8 @@
 import type React from "react";
+import * as nativeApi from "./api";
 import { useEffect, useRef, useState } from "react";
 import {
   COPY_FORMATS,
-  chooseLibrary,
-  libraryStatus,
-  reloadLibrary,
-  copyCitation,
-  copyFormat,
-  hidePicker,
-  onLibraryChanged,
-  onPickerShown,
-  quit,
-  search,
-  shortcutStatus,
   type Copied,
   type CopyFormat,
   type LibraryStatus,
@@ -45,9 +35,18 @@ const FAILURE_MESSAGES = {
 } as const;
 type Operation = keyof typeof FAILURE_MESSAGES;
 
+// A stable provider lets the development gallery use synthetic data without IPC.
+export type PickerApi = Pick<typeof nativeApi,
+  "chooseLibrary" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" |
+  "hidePicker" | "onLibraryChanged" | "onPickerShown" | "quit" | "search" | "shortcutStatus">;
+
+export type PickerPreview = { query?: string; copied?: Copied };
+
 // The picker: search, choose one or more references, copy them as a citation.
-export function App() {
-  const [query, setQuery] = useState("");
+export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: PickerPreview } = {}) {
+  const { chooseLibrary, libraryStatus, reloadLibrary, copyCitation, copyFormat,
+    hidePicker, onLibraryChanged, onPickerShown, quit, search, shortcutStatus } = api;
+  const [query, setQuery] = useState(preview?.query ?? "");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [announcement, setAnnouncement] = useState("");
   // The query the shown results belong to; differs while a search is pending.
@@ -56,7 +55,7 @@ export function App() {
   const [selected, setSelected] = useState<Map<string, SearchResult>>(new Map());
   const [selectionChanged, setSelectionChanged] = useState(false);
   const [format, setFormat] = useState<CopyFormat>("pandoc");
-  const [copied, setCopied] = useState<Copied | null>(null);
+  const [copied, setCopied] = useState<Copied | null>(preview?.copied ?? null);
   const [error, setError] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
   const [shortcut, setShortcut] = useState<ShortcutStatus | null>(null);
@@ -158,10 +157,10 @@ export function App() {
 
   // Success is brief; warnings stay available until explicitly dismissed.
   useEffect(() => {
-    if (!copied || copied.warnings.length > 0) return;
+    if (preview || !copied || copied.warnings.length > 0) return;
     const timer = window.setTimeout(() => setCopied(null), 2400);
     return () => window.clearTimeout(timer);
-  }, [copied]);
+  }, [copied, preview]);
 
   const toggle = (result: SearchResult) => {
     setSelectionChanged(true);
