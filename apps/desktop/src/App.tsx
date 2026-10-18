@@ -339,7 +339,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         {results.length === 0 && !error && library !== undefined && !busy && !library?.error && (
           <div className="empty-state">
             {library?.name ? (
-              <p>{query ? "No matching references" : "Type to find a reference"}</p>
+              <p>{library.references === 0
+                ? `No references found in ${library.name}. Choose a BibTeX or BibLaTeX export with references, then try again.`
+                : query ? "No matching references" : "Type to find a reference"}</p>
             ) : library?.state === "none" ? (
               <>
                 <p>Choose a library to get started</p>
