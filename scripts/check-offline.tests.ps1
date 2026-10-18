@@ -10,7 +10,10 @@ foreach ($address in @('fe80::1%12', '192.168.0.2', '10.0.0.1', '2001:db8::1', '
 
 # An inaccessible/broken TCP provider must fail, never print a clean result.
 function Get-Tree([int] $Root) { [pscustomobject]@{ ProcessId = $Root; Name = 'synthetic-ibis' } }
-function Get-NetTCPConnection { throw 'synthetic provider failure' }
+function Get-NetTCPConnection {
+  [CmdletBinding()] param()
+  Write-Error 'synthetic provider failure'
+}
 try {
   Invoke-OfflineCheck $PID 1 0
   throw 'Expected the provider failure to stop the check.'
