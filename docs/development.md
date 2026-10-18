@@ -83,7 +83,6 @@ CI runs every check on Windows too. Install, in this order:
 1. [Git for Windows](https://git-scm.com/download/win). Then clone to a short path, because build output paths are long:
 
    ```powershell
-   $ErrorActionPreference = 'Stop'
    git config --global core.longpaths true
    git config --global core.autocrlf false
    git clone https://github.com/ibiscite/ibis C:\src\ibis
@@ -100,6 +99,7 @@ CI runs every check on Windows too. Install, in this order:
    of `amd64` on Arm Windows. No administrator terminal is needed.
 
    ```powershell
+   $ErrorActionPreference = 'Stop'
    $arch = 'amd64'
    $asset = "actionlint_1.7.12_windows_$arch.zip"
    $release = 'https://github.com/rhysd/actionlint/releases/download/v1.7.12'
