@@ -726,3 +726,12 @@ test.each(["", "sleep"])("an empty loaded library is explained even for query %s
   expect(screen.queryByText("No matching references")).toBeNull();
   expect(screen.getByRole("button", { name: "Choose library…" })).toBeTruthy();
 });
+
+
+test.each([false, true])("a failed library open is not described as an empty export (retained: %s)", async (retained) => {
+  backend({ library_status: () => ({ state: "error", has_snapshot: retained, name: "missing B.bib", snapshot_name: retained ? "empty A.bib" : null, references: 0, warnings: 0, error: "The library file is unavailable", note: null }) });
+  render(<App />);
+  await screen.findByRole("alert");
+  expect(document.body.textContent).not.toContain("No references found");
+  expect(document.body.textContent).not.toContain("Choose a BibTeX or BibLaTeX export");
+});
