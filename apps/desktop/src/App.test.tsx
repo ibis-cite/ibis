@@ -6,6 +6,7 @@ import { App } from "./App";
 import axe from "axe-core";
 import * as api from "./api";
 import capability from "../src-tauri/capabilities/default.json";
+import config from "../src-tauri/tauri.conf.json";
 
 // Vitest can load these existing runtime builtins without a Node-types dependency.
 const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
@@ -587,10 +588,12 @@ test("event subscription and cleanup failures are handled with safe messages", a
   } finally { focus.mockRestore(); library.mockRestore(); log.mockRestore(); }
 });
 
-test("web permissions grant only event subscriptions and window dragging", () => {
+test("web permissions grant only event subscriptions and drag-region bootstrap", () => {
   expect([...capability.permissions].sort()).toEqual([
-    "core:event:allow-listen", "core:event:allow-unlisten", "core:window:allow-start-dragging",
+    "core:event:allow-listen", "core:event:allow-unlisten",
+    "core:window:allow-internal-toggle-maximize", "core:window:allow-start-dragging",
   ]);
+  expect(config.app.windows[0]?.maximizable).toBe(false);
 });
 
 test.each([false, true])("axe checks picker structure (library open: %s) and detects a broken combobox", async (open) => {
