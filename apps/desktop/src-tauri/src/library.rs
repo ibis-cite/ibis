@@ -87,6 +87,55 @@ impl SearchResult {
     }
 }
 
+/// Display-only details, excluding original source text and any executable markup.
+#[derive(Serialize, specta::Type)]
+pub(crate) struct ReferenceDetails {
+    id: RecordId,
+    title: String,
+    authors: String,
+    year: Option<i32>,
+    kind: String,
+    container: Option<String>,
+    doi: Option<String>,
+    url: Option<String>,
+    abstract_text: Option<String>,
+}
+
+fn details_from(references: &[Reference], id: &RecordId) -> Result<ReferenceDetails, String> {
+    let reference = references
+        .iter()
+        .find(|r| &r.id == id)
+        .ok_or_else(|| "the reference is no longer in the library".to_string())?;
+    let plain = |text: &Option<String>| text.as_deref().map(ibis_core::model::strip_markup);
+    Ok(ReferenceDetails {
+        id: reference.id.clone(),
+        title: reference.title_plain().unwrap_or_default(),
+        authors: reference
+            .authors
+            .iter()
+            .map(|name| name.display())
+            .collect::<Vec<_>>()
+            .join("; "),
+        year: reference.year(),
+        kind: reference.item_type.clone(),
+        container: plain(&reference.container_title),
+        doi: reference.doi.clone(),
+        url: reference.url.clone(),
+        abstract_text: plain(&reference.abstract_text),
+    })
+}
+
+/// Resolve a detail request against the current read-only library snapshot.
+#[tauri::command]
+#[specta::specta]
+pub(crate) async fn reference_details(
+    id: RecordId,
+    library: State<'_, Mutex<Library>>,
+) -> Result<ReferenceDetails, String> {
+    let library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
+    details_from(library.index.references(), &id)
+}
+
 pub(crate) fn status(library: &Library) -> LibraryStatus {
     LibraryStatus {
         name: library
@@ -332,6 +381,35 @@ pub(crate) async fn search(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn details_resolve_full_identity_and_return_plain_display_text() {
+        let mut loaded = ibis_core::bibtex::load_str(
+            "a.bib",
+            "@article{same, title={Protected {NASA} <b>title</b>}, author={Smith, Alex}, journal={Journal}, abstract={Synthetic summary}, doi={10.0000/example}, url={https://example.invalid}}\n",
+        );
+        let id = loaded.references[0].id.clone();
+        let details = details_from(&loaded.references, &id).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(details.id, id);
+        assert!(details.title.contains("<b>title</b>")); // literal source angles remain literal text
+        loaded.references[0].title = Some("<i>Rich</i> &amp; protected".into());
+        assert_eq!(
+            details_from(&loaded.references, &id).map(|d| d.title),
+            Ok("Rich & protected".into())
+        );
+        assert_eq!(details.authors, "Alex Smith");
+        assert_eq!(details.abstract_text.as_deref(), Some("Synthetic summary"));
+        assert!(
+            details_from(
+                &loaded.references,
+                &RecordId {
+                    source: "other.bib".into(),
+                    native_key: "same".into()
+                }
+            )
+            .is_err()
+        );
+    }
 
     #[test]
     fn only_regular_files_are_read() {

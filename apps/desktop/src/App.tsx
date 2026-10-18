@@ -131,7 +131,7 @@ export function App() {
     let outcome: Copied;
     try {
       outcome = await copyCitation(
-        chosen.map((r) => r.id),
+        chosen.map((r) => ({ id: r.id, locator: null })),
         format,
       );
     } catch (e: unknown) {

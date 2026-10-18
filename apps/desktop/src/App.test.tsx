@@ -194,7 +194,7 @@ test("Enter copies the highlighted result in the remembered format and hides the
   fireEvent.keyDown(box, { key: "ArrowDown" });
   fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(calls).toContain("hide_picker"));
-  expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "b" }], format: "typst" }]);
+  expect(copies).toEqual([{ items: [{ id: { source: "refs.bib", native_key: "b" }, locator: null }], format: "typst" }]);
   expect(screen.getByRole("status").textContent).toContain("Copied @b");
 });
 
@@ -219,9 +219,9 @@ test("the selection is kept by record identity across queries and copied in orde
   fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(copies).toHaveLength(1));
   expect(copies[0]).toEqual({
-    ids: [
-      { source: "a.bib", native_key: "same" },
-      { source: "b.bib", native_key: "same" },
+    items: [
+      { id: { source: "a.bib", native_key: "same" }, locator: null },
+      { id: { source: "b.bib", native_key: "same" }, locator: null },
     ],
     format: "pandoc",
   });
@@ -350,7 +350,7 @@ test("filtered actions share selection and copy handlers, with no stale action a
   expect(copies).toHaveLength(0);
   fireEvent.keyDown(filter, { key: "Enter" });
   expect(await screen.findByText("Check citation")).toBeTruthy();
-  expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "a" }], format: "pandoc" }]);
+  expect(copies).toEqual([{ items: [{ id: { source: "refs.bib", native_key: "a" }, locator: null }], format: "pandoc" }]);
 });
 
 test("pending results cannot be selected or copied through Actions", async () => {
@@ -383,7 +383,7 @@ test("Actions preserves IME text editing and format commands affect the primary 
   fireEvent.keyDown(filter, { key: "Enter" });
   expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst");
   fireEvent.click(screen.getByRole("button", { name: /Copy citation/ }));
-  await waitFor(() => expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "a" }], format: "typst" }]));
+  await waitFor(() => expect(copies).toEqual([{ items: [{ id: { source: "refs.bib", native_key: "a" }, locator: null }], format: "typst" }]));
 });
 
 test("macOS uses Command K and leaves Control K as a text-editing shortcut", async () => {

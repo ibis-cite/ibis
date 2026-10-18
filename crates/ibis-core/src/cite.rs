@@ -12,6 +12,7 @@ use thiserror::Error;
 /// Kind of locator ("p. 12", "chap. 3").
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
+#[cfg_attr(feature = "type-export", derive(specta::Type))]
 pub enum LocatorLabel {
     Page,
     Chapter,
@@ -45,6 +46,7 @@ impl LocatorLabel {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "type-export", derive(specta::Type))]
 pub struct Locator {
     pub label: LocatorLabel,
     /// As typed by the user, e.g. "12", "24-26", "3, 7".

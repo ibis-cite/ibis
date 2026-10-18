@@ -5,7 +5,7 @@ use std::sync::Mutex;
 use ibis_core::cite::{self, CiteItem, KeyFormat};
 use ibis_core::model::{RecordId, Reference};
 use ibis_core::settings;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, State};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
@@ -19,15 +19,23 @@ pub(crate) struct Copied {
     warnings: Vec<String>,
 }
 
+/// Identity plus per-citation data; keys are always resolved from the library.
+#[derive(Deserialize, Serialize, specta::Type)]
+pub(crate) struct SelectedReference {
+    pub(crate) id: RecordId,
+    pub(crate) locator: Option<cite::Locator>,
+}
+
 /// Render the selected records as one citation in `format`.
 pub(crate) fn render_citation(
     references: &[Reference],
-    ids: &[RecordId],
+    selected: &[SelectedReference],
     format: KeyFormat,
 ) -> Result<cite::Rendered, String> {
-    let items = ids
+    let items = selected
         .iter()
-        .map(|id| {
+        .map(|selected| {
+            let id = &selected.id;
             let reference = references
                 .iter()
                 .find(|r| &r.id == id)
@@ -40,6 +48,7 @@ pub(crate) fn render_citation(
             })?;
             Ok(CiteItem {
                 key,
+                locator: selected.locator.clone(),
                 ..CiteItem::default()
             })
         })
@@ -52,7 +61,7 @@ pub(crate) fn render_citation(
 #[tauri::command]
 #[specta::specta]
 pub(crate) fn copy_citation(
-    ids: Vec<RecordId>,
+    items: Vec<SelectedReference>,
     format: KeyFormat,
     app: AppHandle,
     library: State<'_, Mutex<Library>>,
@@ -60,7 +69,7 @@ pub(crate) fn copy_citation(
 ) -> Result<Copied, String> {
     let rendered = {
         let library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
-        render_citation(library.index.references(), &ids, format)?
+        render_citation(library.index.references(), &items, format)?
     };
     app.clipboard()
         .write_text(rendered.text.clone())
@@ -93,18 +102,65 @@ mod tests {
     use ibis_core::bibtex;
 
     #[test]
+    fn selected_locators_follow_identity_and_preserve_format_warnings() {
+        let loaded = bibtex::load_str(
+            "a.bib",
+            "@article{same, title={From A}}\n@article{other, title={Other}}\n",
+        );
+        let items = vec![
+            SelectedReference {
+                id: loaded.references[1].id.clone(),
+                locator: Some(cite::Locator {
+                    label: cite::LocatorLabel::Page,
+                    value: "iv–vi".into(),
+                }),
+            },
+            SelectedReference {
+                id: loaded.references[0].id.clone(),
+                locator: Some(cite::Locator {
+                    label: cite::LocatorLabel::Page,
+                    value: "12-14".into(),
+                }),
+            },
+        ];
+        let rendered = render_citation(&loaded.references, &items, KeyFormat::Pandoc).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(rendered.text, "[@other, pp. iv-vi; @same, pp. 12-14]");
+        let keys = render_citation(&loaded.references, &items, KeyFormat::Keys).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(keys.text, "other, same");
+        assert!(!keys.warnings.is_empty());
+    }
+
+    #[test]
     fn citations_are_rendered_by_record_identity_not_by_key() {
         let loaded = bibtex::load_str(
             "a.bib",
             "@article{same, title={From A}}\n@article{other, title={Other}}\n",
         );
-        let ids: Vec<RecordId> = loaded.references.iter().rev().map(|r| r.id.clone()).collect();
-        let rendered = render_citation(&loaded.references, &ids, KeyFormat::Pandoc).unwrap_or_else(|e| panic!("{e}"));
+        let items: Vec<SelectedReference> = loaded
+            .references
+            .iter()
+            .rev()
+            .map(|r| SelectedReference {
+                id: r.id.clone(),
+                locator: None,
+            })
+            .collect();
+        let rendered = render_citation(&loaded.references, &items, KeyFormat::Pandoc).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(rendered.text, "[@other; @same]");
         let missing = RecordId {
             source: "b.bib".into(),
             native_key: "same".into(),
         };
-        assert!(render_citation(&loaded.references, &[missing], KeyFormat::Pandoc).is_err());
+        assert!(
+            render_citation(
+                &loaded.references,
+                &[SelectedReference {
+                    id: missing,
+                    locator: None
+                }],
+                KeyFormat::Pandoc
+            )
+            .is_err()
+        );
     }
 }

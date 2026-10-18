@@ -2,7 +2,7 @@
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { commands, type KeyFormat, type LibraryStatus } from "./bindings";
 
-export type { Copied, LibraryStatus, RecordId, SearchResult, ShortcutStatus } from "./bindings";
+export type { Copied, LibraryStatus, RecordId, ReferenceDetails, SearchResult, SelectedReference, ShortcutStatus } from "./bindings";
 export type CopyFormat = KeyFormat;
 
 export const {
@@ -14,6 +14,7 @@ export const {
   shortcutStatus,
   copyCitation,
   copyFormat,
+  referenceDetails,
 } = commands;
 
 // This UI default is not part of the Rust command signature.

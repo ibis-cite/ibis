@@ -7,6 +7,7 @@ pub(crate) fn commands() -> tauri_specta::Builder<tauri::Wry> {
             crate::library::reload_library,
             crate::library::library_status,
             crate::library::search,
+            crate::library::reference_details,
             crate::copy::copy_citation,
             crate::copy::copy_format,
             crate::picker::hide_picker,

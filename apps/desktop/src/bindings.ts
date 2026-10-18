@@ -18,11 +18,13 @@ export const commands = {
 	 *  runs off the main thread.
 	 */
 	search: (query: string, limit: number) => __TAURI_INVOKE<SearchResult[]>("search", { query, limit }),
+	/**  Resolve a detail request against the current read-only library snapshot. */
+	referenceDetails: (id: RecordId) => __TAURI_INVOKE<ReferenceDetails>("reference_details", { id }),
 	/**
 	 *  Copy the selected records as a citation to the clipboard. The format is
 	 *  remembered for next time.
 	 */
-	copyCitation: (ids: RecordId[], format: KeyFormat) => __TAURI_INVOKE<Copied>("copy_citation", { ids, format }),
+	copyCitation: (items: SelectedReference[], format: KeyFormat) => __TAURI_INVOKE<Copied>("copy_citation", { items, format }),
 	/**  The format the picker starts with: the last one used, or Pandoc. */
 	copyFormat: () => __TAURI_INVOKE<KeyFormat>("copy_format"),
 	/**  Hide the picker (Escape in the interface). */
@@ -71,12 +73,34 @@ export type LibraryStatus = {
 	note: string | null,
 };
 
+export type Locator = {
+	label: LocatorLabel,
+	/**  As typed by the user, e.g. "12", "24-26", "3, 7". */
+	value: string,
+};
+
+/**  Kind of locator ("p. 12", "chap. 3"). */
+export type LocatorLabel = "page" | "chapter" | "section" | "paragraph" | "figure" | "line" | "note" | "volume" | "verse";
+
 /**  Stable identity of a record: which source it came from and its key there. */
 export type RecordId = {
 	/**  Source identifier, e.g. a canonical file path or `zotero:group:123`. */
 	source: string,
 	/**  Key of the record inside that source (BibTeX key, Zotero item key, ...). */
 	native_key: string,
+};
+
+/**  Display-only details, excluding original source text and any executable markup. */
+export type ReferenceDetails = {
+	id: RecordId,
+	title: string,
+	authors: string,
+	year: number | null,
+	kind: string,
+	container: string | null,
+	doi: string | null,
+	url: string | null,
+	abstract_text: string | null,
 };
 
 export type SearchResult = {
@@ -87,6 +111,12 @@ export type SearchResult = {
 	authors: string,
 	year: number | null,
 	matched: string[],
+};
+
+/**  Identity plus per-citation data; keys are always resolved from the library. */
+export type SelectedReference = {
+	id: RecordId,
+	locator: Locator | null,
 };
 
 /**  Whether the global shortcut is working, shown in the interface. */
