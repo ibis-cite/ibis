@@ -55,9 +55,11 @@ export function App() {
         }
       }}
     >
-      {shortcut && !shortcut.registered && (
+      {shortcut?.error && (
         <p role="status">
-          The shortcut {shortcut.shortcut} is not available: {shortcut.error}
+          {shortcut.registered
+            ? `Your shortcut setting was not used: ${shortcut.error}.`
+            : `The shortcut ${shortcut.shortcut} is not available: ${shortcut.error}.`}
         </p>
       )}
       <label htmlFor="search">Search references</label>

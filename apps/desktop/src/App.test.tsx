@@ -93,3 +93,15 @@ test("Quit is available from the picker and from the keyboard", async () => {
   fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "q", ctrlKey: true });
   await waitFor(() => expect(calls.filter((c) => c === "quit")).toHaveLength(2));
 });
+
+test("a rejected shortcut setting is explained even when the default works", async () => {
+  backend({
+    shortcut_status: () => ({
+      shortcut: "Cmd+Shift+Space",
+      registered: true,
+      error: 'the shortcut "Control+Nonsense" in settings is not valid; using Cmd+Shift+Space',
+    }),
+  });
+  render(<App />);
+  expect((await screen.findByRole("status")).textContent).toContain("Control+Nonsense");
+});

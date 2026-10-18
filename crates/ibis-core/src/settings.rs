@@ -59,11 +59,16 @@ fn backup_path(path: &Path) -> PathBuf {
 }
 
 fn parse(text: &str) -> Result<Settings, SettingsError> {
-    let settings: Settings = serde_json::from_str(text).map_err(|e| SettingsError::Invalid(e.to_string()))?;
-    if settings.schema_version > SCHEMA_VERSION {
-        return Err(SettingsError::NewerVersion(settings.schema_version));
+    let invalid = |e: serde_json::Error| SettingsError::Invalid(e.to_string());
+    let value: serde_json::Value = serde_json::from_str(text).map_err(invalid)?;
+    // The version is checked before any other field: a newer format may
+    // change field types, and must still be recognised as newer.
+    if let Some(version) = value.get("schema_version").and_then(serde_json::Value::as_u64)
+        && version > u64::from(SCHEMA_VERSION)
+    {
+        return Err(SettingsError::NewerVersion(u32::try_from(version).unwrap_or(u32::MAX)));
     }
-    Ok(settings)
+    serde_json::from_value(value).map_err(invalid)
 }
 
 /// Load settings. A missing file gives defaults. An unreadable or invalid file
@@ -172,5 +177,19 @@ mod tests {
             Err(SettingsError::NewerVersion(99))
         ));
         assert!(fs::read_to_string(&path).unwrap_or_default().contains("99"));
+    }
+
+    #[test]
+    fn newer_files_are_refused_even_when_their_fields_changed_type() {
+        let path = dir("newer-types").join("settings.json");
+        fs::create_dir_all(path.parent().unwrap_or_else(|| panic!("no parent"))).unwrap_or_else(|e| panic!("{e}"));
+        let newer = r#"{"schema_version": 99, "shortcut": {"key": "Space"}}"#;
+        fs::write(&path, newer).unwrap_or_else(|e| panic!("{e}"));
+        assert!(matches!(load(&path).problem, Some(SettingsError::NewerVersion(99))));
+        assert!(matches!(
+            save(&path, &Settings::default()),
+            Err(SettingsError::NewerVersion(99))
+        ));
+        assert_eq!(fs::read_to_string(&path).unwrap_or_default(), newer);
     }
 }
