@@ -261,6 +261,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         />
       </div>
       <div className="notices">
+        {library?.settings_notice && <p role="alert">{library.settings_notice}</p>}
         {busy && <p role="status">{loadingMessage}</p>}
         {library?.error && <p role="alert">{libraryMessages.openError(library.name, library.error)}</p>}
         {(Object.keys(failures) as Operation[]).filter((operation) => failures[operation]).map((operation) => (
