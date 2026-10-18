@@ -59,7 +59,7 @@ Choose a library from the picker or from the menu bar (tray) item. The choice an
 
 Every field is optional. Edits made while the app runs are kept, and a file that cannot be read is reported and never overwritten. For development, `IBIS_LIBRARY=/path/to/file.bib` opens a library without saving it.
 
-The picker opens without a title bar near the top of the usable screen. Its system colours follow light/dark mode and high contrast; text and controls wrap at larger text sizes. Enter still copies and hides, Shift+Enter selects, and Escape hides. Copy confirmations expire after 2.4 seconds; copy warnings stay until dismissed. Library controls, output format and Quit remain in the footer.
+The picker opens without a title bar near the top of the usable screen. Drag the search bar edge or search icon to move it; the input remains editable. This uses Tauri's built-in drag region and grants only the window drag permission. Its system colours follow light/dark mode and high contrast; text and controls wrap at larger text sizes. Enter still copies and hides, Shift+Enter selects, and Escape hides. Copy confirmations expire after 2.4 seconds; copy warnings stay until dismissed. Library controls, output format and Quit remain in the footer.
 
 Visual evidence for #88 uses synthetic references: [browser light](images/picker-browser-light.png), [browser dark](images/picker-browser-dark.png), and [native macOS dark](images/picker-macos-dark.png). The browser checks also covered forced colours and 200% text at a 360-pixel viewport (controls remain reachable by scrolling, without horizontal overflow). The native screenshot is a macOS development build; Windows/Linux native screenshots and release-build blur checks remain to be recorded before #88 is complete.
 
