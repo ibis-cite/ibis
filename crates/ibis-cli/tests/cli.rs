@@ -65,7 +65,7 @@ fn loading_problems_are_visible_in_every_command() {
 
     let json = ibis(&["search", "fine", "--bib", s(&damaged), "--json"]);
     let value: serde_json::Value = serde_json::from_slice(&json.stdout).unwrap_or_else(|e| panic!("{e}"));
-    assert_eq!(value["warnings"].as_array().map(Vec::len), Some(1));
+    assert_eq!(value["load_warnings"].as_array().map(Vec::len), Some(1));
 
     let csl = ibis(&["csl", "ok", "--bib", s(&damaged)]);
     assert!(String::from_utf8_lossy(&csl.stderr).contains("1 problem"));
@@ -166,4 +166,38 @@ fn links_from_different_paths_never_form_a_cycle() {
     assert_eq!(json[0]["id"], "root");
     assert_eq!(json[0]["publisher"], "Synthetic");
     assert_eq!(json[0]["issued"]["date-parts"][0][0], 2024);
+}
+
+#[test]
+fn library_text_cannot_inject_terminal_control_sequences() {
+    let file = write(
+        "cli-terminal",
+        "evil.bib",
+        "@article{esc, title={Evil \u{1b}[31mred\u{1b}[0m and \u{202e}reversed}, year={2020}}\n",
+    );
+    let out = ibis(&["search", "evil", "--bib", s(&file)]);
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(!stdout.contains('\u{1b}') && !stdout.contains('\u{202e}'), "{stdout:?}");
+    assert!(stdout.contains("\\u{1b}"), "{stdout:?}");
+}
+
+#[test]
+fn cite_json_includes_loading_problems() {
+    let file = write(
+        "cli-cite-json",
+        "damaged.bib",
+        "@article{ok, title={Fine}}\n@article{ok, title={Again}}\n",
+    );
+    let out = ibis(&["cite", "ok", "--bib", s(&file), "--json"]);
+    let value: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(value["text"], "[@ok]");
+    assert_eq!(value["load_warnings"].as_array().map(Vec::len), Some(1));
+}
+
+#[test]
+fn bare_keys_say_when_page_numbers_are_dropped() {
+    let out = ibis(&["cite", "k", "--format", "keys", "--page", "k=12", "--json"]);
+    let value: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(value["text"], "k");
+    assert_eq!(value["warnings"].as_array().map(Vec::len), Some(1));
 }
