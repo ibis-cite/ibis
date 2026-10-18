@@ -580,3 +580,23 @@ fn duplicate_fields_keep_the_last_value_and_warn() {
     assert_eq!(only(&r, "c").title_plain().as_deref(), Some("Second"));
     assert!(warned(&r, "twice"), "{:?}", r.warnings);
 }
+
+#[test]
+fn a_repeated_xdata_parent_counts_at_its_last_position() {
+    let r = load(
+        "@xdata{first,publisher={First}}\n@xdata{second,publisher={Second}}\n@book{a,title={T},xdata={first,second,first}}",
+    );
+    assert_eq!(
+        only(&r, "a").variables.get("publisher").map(String::as_str),
+        Some("First")
+    );
+}
+
+#[test]
+fn short_titles_reach_csl() {
+    let r = only(
+        &load("@book{a,title={A Very Long Title},shorttitle={Short},year={2020}}"),
+        "a",
+    );
+    assert_eq!(r.to_csl_json()["title-short"], "Short");
+}

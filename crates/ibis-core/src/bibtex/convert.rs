@@ -76,6 +76,9 @@ pub(crate) fn convert(
     let english = language.as_deref().is_none_or(|l| l == "en" || l.starts_with("en-"));
     let title = rich("title", &[("subtitle", ": "), ("titleaddon", ". ")])
         .map(|pieces| render(&if english { sentence_case(pieces) } else { pieces }));
+    let short_title = rich("shorttitle", &[])
+        .map(|pieces| render(&if english { sentence_case(pieces) } else { pieces }))
+        .filter(|s| !s.is_empty());
     // `booktitle` names the containing book only for parts of a book or of
     // proceedings; on a whole book or proceedings volume it repeats the title.
     let item_type = match (
@@ -214,6 +217,9 @@ pub(crate) fn convert(
     set("genre", &["type"]);
     set("note", &["note"]);
     set("event-title", &["eventtitle"]);
+    if let Some(short_title) = short_title {
+        variables.insert("title-short".to_string(), short_title);
+    }
     if let Some(volume_title) = volume_title {
         variables.insert("volume-title".to_string(), volume_title);
     }

@@ -236,6 +236,15 @@ impl<'a> Resolver<'a> {
             }
         }
 
+        // A parent listed more than once counts at its last position, where
+        // it has the highest precedence (as in Biber).
+        let mut last_seen = HashSet::new();
+        let mut xdata_keys: Vec<String> = xdata_keys
+            .into_iter()
+            .rev()
+            .filter(|k| last_seen.insert(k.to_lowercase()))
+            .collect();
+        xdata_keys.reverse();
         let mut parents: Vec<(Fields, Option<&str>)> = Vec::new();
         let links = xdata_keys
             .iter()
