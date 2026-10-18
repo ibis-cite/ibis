@@ -50,6 +50,20 @@ function sendUnicodeText(text, post) {
     }
 }
 
+function preflightPostAccess() {
+    // Older BridgeSupport metadata omits this public macOS 10.15+ symbol.
+    // Its SDK declaration is bool CGPreflightPostEventAccess(void).
+    // https://developer.apple.com/documentation/coregraphics/cgpreflightposteventaccess()?language=objc
+    if (typeof $.CGPreflightPostEventAccess !== 'function') {
+        try { ObjC.bindFunction('CGPreflightPostEventAccess', ['bool', []]); }
+        catch (_) { throw Error('Native event-posting preflight unavailable'); }
+    }
+    if (typeof $.CGPreflightPostEventAccess !== 'function') throw Error('Native event-posting preflight unavailable');
+    const granted = $.CGPreflightPostEventAccess();
+    if (typeof granted !== 'boolean') throw Error('Native event-posting preflight unavailable');
+    return granted;
+}
+
 function run(argv) {
     const action = argv[0], appId = Number(argv[1]), editorId = Number(argv[2]), text = argv[3];
     const events = Application('System Events');
@@ -57,7 +71,7 @@ function run(argv) {
     const safe = (fn, fallback = '') => { try { return fn(); } catch (_) { return fallback; } };
     const numeric = value => typeof value === 'number' && Number.isFinite(value);
     const postEvent = () => {
-        if (!$.CGPreflightPostEventAccess()) throw Error('TCC event posting is not granted; native smoke unavailable');
+        if (!preflightPostAccess()) throw Error('TCC event posting is not granted; native smoke unavailable');
         const source = $.CGEventSourceCreate($.kCGEventSourceStateHIDSystemState);
         if (!source) throw Error('Native HID event source unavailable');
         return (code, down, flags, character) => {
@@ -208,7 +222,7 @@ function run(argv) {
         // AXIsProcessTrusted does not prompt or claim a grant. A hosted runner
         // without it is unavailable; no tccutil reset or permission bypass.
         if (!$.AXIsProcessTrusted()) throw Error('TCC Accessibility is not granted to osascript; native smoke unavailable');
-        if (!$.CGPreflightPostEventAccess()) throw Error('TCC event posting is not granted; native smoke unavailable');
+        if (!preflightPostAccess()) throw Error('TCC event posting is not granted; native smoke unavailable');
         // Query the real scripting object. The obsolete UI-elements-enabled
         // property is not a valid JXA class on the macOS 15 hosted image.
         events.applicationProcesses.length; // Also checks Automation consent.

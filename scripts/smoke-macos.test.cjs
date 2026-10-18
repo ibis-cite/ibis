@@ -39,6 +39,20 @@ assert.throws(() => context.sendPhysicalChord('ctrl+unknown', () => assert.fail(
 context.Application = () => ({});
 context.$ = {AXIsProcessTrusted: () => true, CGPreflightPostEventAccess: () => false};
 assert.throws(() => context.run(['probe', '42', '0', '']), /TCC event posting is not granted/);
+context.Application = () => ({applicationProcesses: []});
+context.$ = {AXIsProcessTrusted: () => true};
+let bound = false;
+context.ObjC.bindFunction = (name, signature) => {
+    assert.equal(name, 'CGPreflightPostEventAccess');
+    assert.equal(JSON.stringify(signature), '["bool",[]]');
+    bound = true;
+    context.$.CGPreflightPostEventAccess = () => true;
+};
+assert.equal(context.run(['probe', '42', '0', '']), 'true');
+assert.equal(bound, true);
+context.$ = {AXIsProcessTrusted: () => true};
+context.ObjC.bindFunction = () => { throw Error('Synthetic missing native symbol'); };
+assert.throws(() => context.run(['probe', '42', '0', '']), /Native event-posting preflight unavailable/);
 context.$ = {CGPreflightPostEventAccess: () => true, CGEventSourceCreate: () => null};
 assert.throws(() => context.run(['key', '42', '0', 'escape']), /Native HID event source unavailable/);
 
