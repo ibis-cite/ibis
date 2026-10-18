@@ -31,6 +31,8 @@ struct Library {
     warnings: Vec<LoadWarning>,
     /// Why the last attempt to open a library failed, shown until one opens.
     error: Option<String>,
+    /// A problem that is not a failure to open, such as an unsaved choice.
+    note: Option<String>,
 }
 
 /// Counts requests to open a library, so a load that finishes after a newer
@@ -98,7 +100,7 @@ fn status(library: &Library) -> LibraryStatus {
         references: library.index.references().len(),
         warnings: library.warnings.len(),
         error: library.error.clone(),
-        note: None,
+        note: library.note.clone(),
     }
 }
 
@@ -141,6 +143,7 @@ fn load_library(path: PathBuf) -> Result<Library, String> {
         index: OwnedIndex::new(loaded.references),
         warnings: loaded.warnings,
         error: None,
+        note: None,
     })
 }
 
@@ -161,9 +164,15 @@ fn start_open(app: &AppHandle, path: PathBuf, remember: bool) {
         let current = install(&app.state(), &app.state(), request, loaded);
         if let Some(mut status) = current {
             if remember && status.error.is_none() {
-                let file = &app.state::<SettingsFile>().0;
-                if let Err(e) = settings::update(file, |s| s.library = Some(chosen)) {
-                    status.note = Some(format!("the library opened but could not be saved for next time: {e}"));
+                let saved = app.state::<SettingsFile>().update(|s| s.library = Some(chosen));
+                if let Err(e) = saved {
+                    let note = format!("the library opened but could not be saved for next time: {e}");
+                    if let Ok(mut library) = app.state::<Mutex<Library>>().lock() {
+                        library.note = Some(note.clone());
+                    }
+                    status.note = Some(note);
+                    // The choice may have come from the tray; make sure it is seen.
+                    show_picker(&app);
                 }
             }
             for message in status.error.iter().chain(&status.note) {
@@ -190,6 +199,10 @@ fn library_line(status: &LibraryStatus) -> String {
             format!("{name}: {} references{problems}", status.references)
         }
         (None, None) => "No library chosen".to_string(),
+    };
+    let line = match status.note {
+        Some(_) => format!("{line} (not saved for next time)"),
+        None => line,
     };
     // Menus do not wrap; keep long errors readable.
     if line.chars().count() > 90 {
@@ -308,7 +321,28 @@ async fn search(query: String, limit: usize, library: State<'_, Mutex<Library>>)
 }
 
 /// Where the settings file is, for saving choices made in the picker.
-struct SettingsFile(PathBuf);
+struct SettingsFile {
+    path: PathBuf,
+    /// Held for each whole read, change and save, so two saves never interleave.
+    writing: Mutex<()>,
+}
+
+impl SettingsFile {
+    fn new(path: PathBuf) -> Self {
+        SettingsFile {
+            path,
+            writing: Mutex::new(()),
+        }
+    }
+
+    fn update(&self, change: impl FnOnce(&mut settings::Settings)) -> Result<settings::Settings, String> {
+        let _writing = self
+            .writing
+            .lock()
+            .map_err(|_| "settings are unavailable".to_string())?;
+        settings::update(&self.path, change).map_err(|e| e.to_string())
+    }
+}
 
 #[derive(Serialize)]
 struct Copied {
@@ -361,7 +395,7 @@ fn copy_citation(
     let mut warnings = rendered.warnings;
     // Read and saved each time, so edits made to the file meanwhile are kept
     // and a failed save is reported on every copy.
-    if let Err(e) = settings::update(&settings_file.0, |s| s.copy_format = Some(format)) {
+    if let Err(e) = settings_file.update(|s| s.copy_format = Some(format)) {
         warnings.push(format!("the format choice could not be saved: {e}"));
     }
     Ok(Copied {
@@ -373,7 +407,7 @@ fn copy_citation(
 /// The format the picker starts with: the last one used, or Pandoc.
 #[tauri::command]
 fn copy_format(settings_file: State<'_, SettingsFile>) -> KeyFormat {
-    settings::load(&settings_file.0)
+    settings::load(&settings_file.path)
         .settings
         .copy_format
         .unwrap_or(KeyFormat::Pandoc)
@@ -549,7 +583,7 @@ fn main() {
             // ~/Library/Application Support/io.github.ibis-cite.ibis/settings.json
             let settings_path = app.path().app_config_dir()?.join("settings.json");
             let loaded = settings::load(&settings_path);
-            app.manage(SettingsFile(settings_path.clone()));
+            app.manage(SettingsFile::new(settings_path.clone()));
             if let Some(problem) = &loaded.problem {
                 eprintln!("ibis: {problem}");
             }
@@ -703,9 +737,47 @@ mod tests {
             library_line(&status(Some("refs.bib"), 2, None)),
             "refs.bib: 12 references, 2 problems"
         );
+        let unsaved = LibraryStatus {
+            note: Some("could not be saved".into()),
+            ..status(Some("refs.bib"), 0, None)
+        };
+        assert_eq!(
+            library_line(&unsaved),
+            "refs.bib: 12 references (not saved for next time)"
+        );
         let long = "x".repeat(200);
         let line = library_line(&status(Some("refs.bib"), 0, Some(&long)));
         assert!(line.starts_with("Library could not be opened: x"));
         assert_eq!(line.chars().count(), 90);
+    }
+
+    #[test]
+    fn settings_saves_from_several_threads_never_lose_each_other() {
+        let dir = std::env::temp_dir().join(format!("ibis-concurrent-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let file = std::sync::Arc::new(SettingsFile::new(dir.join("settings.json")));
+        let threads: Vec<_> = (0..8)
+            .map(|i| {
+                let file = file.clone();
+                std::thread::spawn(move || {
+                    for _ in 0..20 {
+                        let saved = if i % 2 == 0 {
+                            file.update(|s| s.library = Some(PathBuf::from("refs.bib")))
+                        } else {
+                            file.update(|s| s.copy_format = Some(KeyFormat::Typst))
+                        };
+                        saved.unwrap_or_else(|e| panic!("{e}"));
+                    }
+                })
+            })
+            .collect();
+        for thread in threads {
+            thread.join().unwrap_or_else(|_| panic!("a saving thread panicked"));
+        }
+        let loaded = settings::load(&file.path);
+        assert!(loaded.problem.is_none());
+        assert_eq!(loaded.settings.library, Some(PathBuf::from("refs.bib")));
+        assert_eq!(loaded.settings.copy_format, Some(KeyFormat::Typst));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
