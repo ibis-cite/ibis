@@ -65,6 +65,8 @@ The interaction follows Raycast’s [command Action Panel](https://developers.ra
 
 Visual evidence for #88 uses synthetic references: [browser light](images/picker-browser-light.png), [browser dark](images/picker-browser-dark.png), and [native macOS dark](images/picker-macos-dark.png). The browser checks also covered forced colours and 200% text at a 360-pixel viewport (one vertical scroller keeps controls reachable without horizontal overflow). Theme tokens retain system-colour fallbacks for older system webviews. The native screenshot is a macOS development build; Windows/Linux native screenshots and release-build blur checks remain to be recorded before #88 is complete.
 
+Actions evidence for #103 also uses synthetic references: [browser dark](images/picker-actions-dark.png), [browser light](images/picker-actions-light.png), and [native macOS release](images/picker-actions-macos-dark.png). Real Chrome checks covered modal focus containment and inert background controls, Tab moving from Close to the filter, format execution, the contextual secondary shortcut while filtered, and Escape restoring search focus. At a 360 × 480 viewport with 200% text, the panel and filter remained reachable without horizontal overflow. The macOS release WebKit check covered Command+K, filtering and executing a format action, search focus restoration, Command+Enter selection, Escape closing only Actions, and choosing the synthetic library while keeping the picker open. Windows/Linux native behavior, VoiceOver/NVDA and real IME composition have not been manually verified; simulated composition events are covered by the interface tests.
+
 ## Desktop command contract
 
 `apps/desktop/src/bindings.ts` is generated from Rust command signatures and
