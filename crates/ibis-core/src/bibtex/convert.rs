@@ -410,6 +410,7 @@ fn date_value(
     let guarded = entry
         .get(field)
         .filter(|chunks| unsafe_date_value(&chunks.format_verbatim()))
+        .map(|chunks| PermissiveType::Chunks(chunks.to_vec()))
         .or_else(|| {
             if entry.get(field).is_some() {
                 return None;
@@ -424,7 +425,7 @@ fn date_value(
                 .is_some_and(|rest| rest.starts_with(char::is_whitespace))
             {
                 problems.push(format!("`{year_field}` has whitespace after its sign; no date is used"));
-                return Some(year);
+                return Some(PermissiveType::Chunks(year.to_vec()));
             }
             let month_field = format!("{prefix}month");
             let month = entry.get(&month_field)?.format_verbatim();
@@ -434,12 +435,16 @@ fn date_value(
             problems.push(format!(
                 "`{month_field}` could not be read safely; month and day are ignored"
             ));
-            // Reuse the ordinary chunks fallback to retain a valid year and
-            // report invalid years, without passing malformed parts upstream.
-            Some(year)
+            // The separate-year parser preserves signs, short years and eras;
+            // the explicit-date fallback below has different syntax and semantics.
+            Some(
+                biblatex::Date::parse_three_fields(year, None, None)
+                    .map(PermissiveType::Typed)
+                    .unwrap_or_else(|_| PermissiveType::Chunks(year.to_vec())),
+            )
         });
     let value = match guarded {
-        Some(chunks) => Ok(PermissiveType::Chunks(chunks.to_vec())),
+        Some(value) => Ok(value),
         None => read(),
     };
     match value {

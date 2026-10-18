@@ -103,6 +103,31 @@ fn non_decimal_numerals_in_explicit_dates_are_reported_without_panics() {
 }
 
 #[test]
+fn unsafe_months_preserve_safe_signed_short_and_era_years() {
+    for (prefix, csl) in [
+        ("", "issued"),
+        ("url", "accessed"),
+        ("orig", "original-date"),
+        ("event", "event-date"),
+    ] {
+        for (year, expected) in [("2024 BC", -2023), ("-2024", -2024), ("+2024", 2024), ("24", 24)] {
+            for month in ["Ⅻ", "123"] {
+                let source = format!("@article{{kept,{prefix}year={{{year}}},{prefix}month={{{month}}}}}");
+                let loaded = load_str("synthetic.bib", &source);
+                assert_eq!(loaded.references.len(), 1);
+                assert!(loaded.warnings.iter().any(|warning| warning.kind == WarningKind::Field));
+                assert!(loaded.warnings.iter().all(|warning| warning.kind == WarningKind::Field));
+                assert_eq!(
+                    loaded.references[0].to_csl_json()[csl]["date-parts"],
+                    serde_json::json!([[expected]]),
+                    "{prefix}year={year}; month={month}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn ordinary_signed_years_and_named_months_keep_their_precision() {
     for (prefix, csl) in [
         ("", "issued"),
