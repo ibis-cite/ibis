@@ -6,15 +6,24 @@ export function composing(e: React.KeyboardEvent): boolean {
 }
 
 export const mac = navigator.platform.startsWith("Mac");
+function commandModifier(e: React.KeyboardEvent): boolean {
+  return (mac ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey) && !e.altKey && !e.shiftKey;
+}
 export function actionsShortcut(e: React.KeyboardEvent): boolean {
-  return e.key.toLowerCase() === "k" && (mac ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey) && !e.altKey && !e.shiftKey;
+  return e.key.toLowerCase() === "k" && commandModifier(e);
+}
+export function secondaryShortcut(e: React.KeyboardEvent): boolean {
+  return e.key === "Enter" && commandModifier(e);
 }
 
-export type PickerAction = { id: string; label: string; disabled?: boolean; run: () => void };
+export type PickerAction = { id: string; label: string; disabled?: boolean; shortcut?: string; run: () => void };
 
 /** Native modal focus containment; the filter owns virtual listbox focus. */
-export function Actions({ actions, close }: { actions: PickerAction[]; close: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null);
+export function Actions({ actions, close, dialog }: {
+  actions: PickerAction[];
+  close: () => void;
+  dialog: React.RefObject<HTMLDialogElement | null>;
+}) {
   const filter = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -31,23 +40,31 @@ export function Actions({ actions, close }: { actions: PickerAction[]; close: ()
     if (current) document.getElementById(`action-${current.id}`)?.scrollIntoView?.({ block: "nearest" });
   }, [current?.id]);
   const dismiss = () => { dialog.current?.close(); close(); };
-  const execute = (action: PickerAction) => {
-    if (action.disabled) return;
+  const execute = (action: PickerAction | undefined) => {
+    if (!action || action.disabled) return;
     dismiss();
     action.run();
   };
   return (
     <dialog ref={dialog} className="actions-panel" aria-label="Actions" onCancel={(e) => { e.preventDefault(); dismiss(); }}
       onKeyDown={(e) => {
-        e.stopPropagation();
-        if (composing(e)) { if (e.key === "Escape") e.preventDefault(); return; }
-        if (e.key === "Escape" || actionsShortcut(e)) { e.preventDefault(); dismiss(); }
+        if (composing(e)) {
+          e.stopPropagation();
+          if (e.key === "Escape") e.preventDefault();
+          return;
+        }
+        if (e.key === "Escape" || actionsShortcut(e)) {
+          e.stopPropagation(); e.preventDefault(); dismiss();
+        } else if (secondaryShortcut(e)) {
+          e.stopPropagation(); e.preventDefault(); execute(actions[1]);
+        }
+        // Unconsumed events retain the picker's global shortcuts, including Quit.
       }}>
       <div className="actions-heading"><strong>Actions</strong><button type="button" aria-label="Close Actions" onClick={dismiss}>×</button></div>
       <ul id="actions-list" role="listbox" aria-label="Available actions">
         {matches.map((action) => <li key={action.id} id={`action-${action.id}`} role="option"
           aria-selected={current?.id === action.id} aria-disabled={action.disabled || undefined}
-          onClick={() => execute(action)}>{action.label}</li>)}
+          onClick={() => execute(action)}><span>{action.label}</span>{action.shortcut && <kbd aria-hidden="true">{action.shortcut}</kbd>}</li>)}
       </ul>
       {matches.length === 0 && <p role="status">No matching actions</p>}
       <label className="visually-hidden" htmlFor="action-search">Search actions</label>

@@ -714,11 +714,73 @@ test("macOS uses Command K and leaves Control K as a text-editing shortcut", asy
   vi.resetModules();
   const platform = vi.spyOn(navigator, "platform", "get").mockReturnValue("MacIntel");
   try {
-    const { actionsShortcut, mac } = await import("./Actions");
+    const { actionsShortcut, secondaryShortcut, mac } = await import("./Actions");
     expect(mac).toBe(true);
     const event = { key: "k", ctrlKey: false, metaKey: true, shiftKey: false, altKey: false };
     expect(actionsShortcut(event as never)).toBe(true);
     expect(actionsShortcut({ ...event, ctrlKey: true, metaKey: false } as never)).toBe(false);
     expect(actionsShortcut({ ...event, shiftKey: true } as never)).toBe(false);
+    expect(secondaryShortcut({ ...event, key: "Enter" } as never)).toBe(true);
+    expect(secondaryShortcut({ ...event, key: "Enter", ctrlKey: true, metaKey: false } as never)).toBe(false);
   } finally { platform.mockRestore(); }
+});
+
+
+test("Quit remains available inside Actions and composition never invokes it", async () => {
+  const calls = backend({ quit: () => null });
+  render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  const filter = screen.getByLabelText("Search actions");
+  fireEvent.keyDown(filter, { key: "q", ctrlKey: true, isComposing: true });
+  expect(calls).not.toContain("quit");
+  fireEvent.keyDown(filter, { key: "q", ctrlKey: true });
+  await waitFor(() => expect(calls).toContain("quit"));
+});
+
+test("the secondary shortcut toggles the contextual reference even when actions are filtered", async () => {
+  backend({ search: () => [result("a", "First")] });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "Enter", ctrlKey: true });
+  expect(screen.getByRole("button", { name: "Remove a from the selection" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  expect(screen.getByRole("option", { name: "Copy citation" }).textContent).toContain("↵");
+  expect(screen.getByRole("option", { name: "Remove from selection" }).textContent).toContain("Ctrl+↵");
+  const filter = screen.getByLabelText("Search actions");
+  fireEvent.change(filter, { target: { value: "Quit" } });
+  fireEvent.keyDown(filter, { key: "Enter", ctrlKey: true, isComposing: true });
+  fireEvent.keyDown(filter, { key: "Enter", ctrlKey: true, keyCode: 229 });
+  expect(screen.getByRole("dialog")).toBeTruthy();
+  fireEvent.keyDown(filter, { key: "Enter", ctrlKey: true });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(screen.queryByRole("button", { name: "Remove a from the selection" })).toBeNull();
+});
+
+test("the secondary shortcut ignores a stale reference in search and filtered Actions", async () => {
+  backend({ search: ({ query }) => query ? new Promise(() => undefined) : [result("a", "First")] });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "pending" } });
+  fireEvent.keyDown(box, { key: "Enter", ctrlKey: true });
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  const filter = screen.getByLabelText("Search actions");
+  fireEvent.change(filter, { target: { value: "Quit" } });
+  fireEvent.keyDown(filter, { key: "Enter", ctrlKey: true });
+  expect(screen.queryByRole("button", { name: "Remove a from the selection" })).toBeNull();
+  expect(screen.getByRole("dialog")).toBeTruthy();
+});
+
+test("reopening the picker closes Actions before restoring and selecting search text", async () => {
+  backend();
+  render(<App />);
+  const box = screen.getByLabelText("Search references") as HTMLInputElement;
+  fireEvent.change(box, { target: { value: "previous query" } });
+  fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
+  await act(async () => { await emit("picker:shown"); });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.activeElement).toBe(box);
+  expect(box.selectionStart).toBe(0);
+  expect(box.selectionEnd).toBe(box.value.length);
 });
