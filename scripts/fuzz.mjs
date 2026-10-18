@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+import { minimize, findIssue } from "./testing.mjs";
+export { minimize } from "./testing.mjs";
 
 const targets = ["split_parse", "load_str", "csl_export"];
 const limits = ["-timeout=5", "-rss_limit_mb=1024", "-max_len=16384"];
@@ -19,27 +21,9 @@ export function failure(target, log) {
   return { kind, signature, detail: [detail, ...frames].join("\n") };
 }
 
-// Keep the original signature during deletion reduction, including resource
-// failures that have no sanitizer dedup token. Bound the entire reduction.
-export function minimize(input, reproduce, signature, budgetMs = 120_000) {
-  const deadline = Date.now() + budgetMs;
-  for (let width = Math.ceil(input.length / 2); width >= 1 && Date.now() < deadline; width = Math.floor(width / 2)) {
-    for (let start = 0; start < input.length && Date.now() < deadline;) {
-      const candidate = Buffer.concat([input.subarray(0, start), input.subarray(start + width)]);
-      if (reproduce(candidate) === signature) input = candidate;
-      else start += width;
-    }
-  }
-  return input;
-}
-
 export async function report(repository, target, input, problem, runUrl, request) {
   const marker = `<!-- fuzz:${problem.signature} -->`;
-  for (let page = 1; ; page++) {
-    const issues = await request(`/repos/${repository}/issues?state=open&labels=area%3Atesting&per_page=100&page=${page}`);
-    if (issues.some((issue) => issue.body?.includes(marker))) return false;
-    if (issues.length < 100) break;
-  }
+  if (await findIssue(repository, marker, request)) return false;
   const encoded = input.toString("base64");
   await request(`/repos/${repository}/issues`, {
     title: `fuzz: ${target} ${problem.kind} (${problem.signature.slice(0, 12)})`,
