@@ -255,3 +255,24 @@ fn changes_before_watch_registration_are_still_loaded_even_at_the_same_size() {
         Ok("new".into())
     );
 }
+
+#[test]
+fn unchanged_contents_after_a_gap_error_publish_recovery() {
+    use ibis_core::source::load_library_snapshot;
+    let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+    let path = dir.path().join("library.bib");
+    std::fs::write(&path, "@misc{same}").unwrap_or_else(|e| panic!("{e}"));
+    let (_, snapshot) = load_library_snapshot(&path, false).unwrap_or_else(|e| panic!("{e}"));
+    std::fs::remove_file(&path).unwrap_or_else(|e| panic!("{e}"));
+    let (tx, rx) = mpsc::channel();
+    let _watch = SourceWatch::with_snapshot(&path, snapshot, move |result| {
+        let _ = tx.send(result);
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+    std::fs::write(&path, "@misc{same}").unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("same".into())
+    );
+}

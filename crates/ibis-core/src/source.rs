@@ -255,6 +255,7 @@ impl SourceWatch {
                         return;
                     }
                     if failed.swap(false, Ordering::SeqCst) {
+                        snapshot = None;
                         changed(Err(SourceError::WatchUnavailable));
                         continue;
                     }
@@ -268,7 +269,12 @@ impl SourceWatch {
                         match candidate {
                             Ok(Some(loaded)) => changed(Ok(loaded)),
                             Ok(None) => {}
-                            Err(error) => changed(Err(error)),
+                            Err(error) => {
+                                // Once an error is visible, even unchanged data
+                                // must publish a candidate to clear that error.
+                                snapshot = None;
+                                changed(Err(error));
+                            }
                         }
                     }
                 }
