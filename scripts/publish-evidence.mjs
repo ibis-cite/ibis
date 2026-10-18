@@ -9,6 +9,15 @@ import { fileURLToPath } from "node:url";
 const commit = /^[a-f0-9]{40}$/;
 const platforms = ["Linux", "macOS", "Windows"];
 
+async function existing(path, kind) {
+  let stat;
+  try { stat = await lstat(path); }
+  catch (error) { if (error.code === "ENOENT") return false; throw error; }
+  if (stat.isSymbolicLink()) throw new Error("Evidence destination contains a symbolic link");
+  if (kind === "directory" ? !stat.isDirectory() : !stat.isFile()) throw new Error("Invalid evidence destination type");
+  return true;
+}
+
 async function captures(source, relative = "") {
   const files = [];
   for (const entry of await readdir(join(source, relative), { withFileTypes: true })) {
@@ -26,14 +35,17 @@ export async function prepareEvidence({ root, source, sha, os, now = Date.now() 
   if ((await lstat(source)).isSymbolicLink()) throw new Error("Capture root is a symbolic link");
   const files = await captures(source);
   if (files.length === 0) return false;
+  await existing(root, "directory");
   const indexPath = join(root, "index.json");
-  let index;
-  try { index = JSON.parse(await readFile(indexPath, "utf8")); }
-  catch (error) { if (error.code !== "ENOENT") throw error; index = []; }
+  const index = await existing(indexPath, "file") ? JSON.parse(await readFile(indexPath, "utf8")) : [];
   if (!Array.isArray(index) || index.some(row => !commit.test(row.sha) || !Number.isFinite(row.firstSeen))) {
     throw new Error("Invalid evidence index; refusing to prune");
   }
+  // Validate existing ancestors before recursive removal or file creation.
+  for (const row of index) await existing(join(root, row.sha), "directory");
+  await existing(join(root, sha), "directory");
   const target = join(root, sha, os);
+  await existing(target, "directory");
   await rm(target, { recursive: true, force: true });
   for (const file of files) {
     await mkdir(dirname(join(target, file)), { recursive: true });

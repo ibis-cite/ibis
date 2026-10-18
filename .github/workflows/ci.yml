@@ -61,7 +61,7 @@ jobs:
           cargo +1.90.0 test --locked
 
       - name: Fuzz reporter tests
-        run: node --test scripts/fuzz.test.mjs
+        run: node --test scripts/fuzz.test.mjs scripts/evidence.test.mjs
 
   web:
     name: Web interface

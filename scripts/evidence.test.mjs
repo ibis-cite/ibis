@@ -42,3 +42,22 @@ test("rejects path traversal and capture symlinks before publishing", async () =
     await assert.rejects(prepareEvidence(options), /symbolic/);
   } finally { await rm(temp, { recursive: true, force: true }); }
 });
+
+test("rejects destination symlinks without deleting or writing outside the branch", async () => {
+  const temp = await mkdtemp(join(tmpdir(), "ibis-evidence-"));
+  try {
+    const source = join(temp, "capture");
+    const root = join(temp, "branch");
+    const outside = join(temp, "outside");
+    const sha = "b".repeat(40);
+    await mkdir(source);
+    await mkdir(root);
+    await mkdir(join(outside, "Linux"), { recursive: true });
+    await writeFile(join(source, "picker.png"), "synthetic screenshot");
+    await writeFile(join(outside, "Linux", "keep.txt"), "must survive");
+    await symlink(outside, join(root, sha));
+    await assert.rejects(prepareEvidence({ root, source, sha, os: "Linux", now: 1 }), /symbolic/);
+    assert.equal(await readFile(join(outside, "Linux", "keep.txt"), "utf8"), "must survive");
+    assert.deepEqual(await readdir(join(outside, "Linux")), ["keep.txt"]);
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
