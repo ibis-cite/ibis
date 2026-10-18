@@ -920,6 +920,33 @@ mod tests {
     }
 
     #[test]
+    fn shared_parent_dag_fits_one_load_budget() {
+        let mut text = String::from("@xdata{p0,publisher={Press}}\n");
+        for i in 1..10 {
+            let parents = (0..i).map(|j| format!("p{j}")).collect::<Vec<_>>().join(",");
+            text.push_str(&format!("@xdata{{p{i},xdata={{{parents}}}}}\n"));
+        }
+        for i in 0..1_000 {
+            text.push_str(&format!("@book{{k{i},title={{Book}},xdata={{p9}}}}\n"));
+        }
+        let start = std::time::Instant::now();
+        let loaded = super::super::load_str("synthetic.bib", &text);
+        eprintln!(
+            "shared parent DAG: {:?}; references: {}",
+            start.elapsed(),
+            loaded.references.len()
+        );
+        assert_eq!(loaded.references.len(), 1_000);
+        assert!(loaded.warnings.is_empty(), "{:?}", loaded.warnings);
+        assert!(
+            loaded
+                .references
+                .iter()
+                .all(|r| r.variables.get("publisher").map(String::as_str) == Some("Press"))
+        );
+    }
+
+    #[test]
     fn wide_parent_shared_children_finish_before_the_deadline() {
         use std::process::Command;
         use std::time::{Duration, Instant};
