@@ -281,7 +281,7 @@ mod tests {
                 assert_eq!(hits.len(), count);
                 let ids: Vec<_> = hits.iter().map(|hit| hit.reference.id.clone()).collect();
                 if count == 1 {
-                    assert_eq!(ids, [last.clone()]);
+                    assert_eq!(ids.as_slice(), std::slice::from_ref(&last));
                 } else {
                     assert_eq!(ids, expected[..count]);
                 }
