@@ -7,6 +7,9 @@
 use std::path::Path;
 use std::process::Command;
 
+#[path = "support/pandoc.rs"]
+mod pandoc;
+
 fn pandoc_available() -> bool {
     Command::new("pandoc")
         .arg("--version")
@@ -17,25 +20,17 @@ fn pandoc_available() -> bool {
 fn render(bibliography: &Path) -> String {
     let doc = Path::new(env!("CARGO_TARGET_TMPDIR")).join("fidelity-doc.md");
     std::fs::write(&doc, "---\nnocite: '@*'\n---\n").unwrap_or_else(|e| panic!("{e}"));
-    let out = Command::new("pandoc")
-        .args(["--citeproc", "-t", "plain", "--wrap=none", "--bibliography"])
-        .arg(bibliography)
-        .arg(&doc)
-        .output()
-        .unwrap_or_else(|e| panic!("cannot run pandoc: {e}"));
-    assert!(
-        out.status.success(),
-        "pandoc failed: {}",
-        String::from_utf8_lossy(&out.stderr)
-    );
-    known_pandoc_quirks(&String::from_utf8_lossy(&out.stdout))
-}
-
-/// Pandoc decodes `{\\'\\i}` as a dotless ı plus a combining accent ("Garcı́a")
-/// instead of "í". Ibis produces the composed letter; normalize Pandoc's form
-/// so the comparison checks meaning, not this encoding detail.
-fn known_pandoc_quirks(text: &str) -> String {
-    text.replace("ı\u{301}", "í")
+    pandoc::render_attempt(
+        bibliography,
+        &doc,
+        Path::new(env!("CARGO_TARGET_TMPDIR")),
+        "fidelity-render",
+    )
+    .map(|(success, text)| {
+        assert!(success, "Pandoc could not render fixture");
+        text
+    })
+    .unwrap_or_else(|e| panic!("{e}"))
 }
 
 #[test]

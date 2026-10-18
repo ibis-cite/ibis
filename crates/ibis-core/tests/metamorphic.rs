@@ -218,3 +218,44 @@ proptest! {
         equivalent(&entries, Transform::Comments);
     }
 }
+
+/// Explicit nightly export reuses the property-test generator and transforms.
+#[test]
+#[ignore = "writes generated libraries only when explicitly requested"]
+fn export_differential_corpus() {
+    use proptest::strategy::ValueTree;
+    use proptest::test_runner::{RngAlgorithm, TestRng, TestRunner};
+    let directory = std::path::PathBuf::from(
+        std::env::var_os("IBIS_DIFFERENTIAL_GENERATED").unwrap_or_else(|| panic!("set IBIS_DIFFERENTIAL_GENERATED")),
+    );
+    std::fs::create_dir_all(&directory).unwrap_or_else(|e| panic!("{e}"));
+    let mut runner = TestRunner::new_with_rng(
+        ProptestConfig::default(),
+        TestRng::from_seed(RngAlgorithm::ChaCha, &[69; 32]),
+    );
+    for case in 0..8 {
+        let entries = libraries()
+            .new_tree(&mut runner)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .current();
+        for (variant, transform) in [
+            Transform::None,
+            Transform::EntryOrder,
+            Transform::FieldOrder,
+            Transform::Whitespace,
+            Transform::Delimiters,
+            Transform::Case,
+            Transform::Macros,
+            Transform::Comments,
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            std::fs::write(
+                directory.join(format!("metamorphic-{case}-{variant}.bib")),
+                render(&entries, transform),
+            )
+            .unwrap_or_else(|e| panic!("{e}"));
+        }
+    }
+}

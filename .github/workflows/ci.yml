@@ -44,7 +44,7 @@ jobs:
         run: cargo test --locked
 
       - name: Fuzz reporter tests
-        run: node --test scripts/fuzz.test.mjs
+        run: node --test scripts/fuzz.test.mjs scripts/differential.test.mjs
 
   desktop:
     name: Desktop (${{ matrix.os }})

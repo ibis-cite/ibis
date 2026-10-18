@@ -1,0 +1,91 @@
+name: Nightly Pandoc differential
+
+on:
+  workflow_run:
+    workflows: [Nightly fuzzing]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-pandoc-differential
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Execute only trusted current main, never code/artifacts from a PR.
+          ref: refs/heads/main
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - name: Initialize summary outside the checkout
+        run: |
+          echo "DIFFERENTIAL_DIRECTORY=$RUNNER_TEMP/ibis-differential" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/ibis-differential/results"
+          echo 'Infrastructure setup incomplete; 0 entries compared.' > "$RUNNER_TEMP/ibis-differential/results/summary.md"
+      - name: Install Pandoc
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pandoc
+      - name: Set directories and record tool/source provenance
+        run: |
+          git rev-parse HEAD > "$RUNNER_TEMP/ibis-differential/results/source-commit.txt"
+          pandoc --version > "$RUNNER_TEMP/ibis-differential/results/pandoc-version.txt"
+          rustc -Vv > "$RUNNER_TEMP/ibis-differential/results/rustc-version.txt"
+          cp corpus/manifest.json "$RUNNER_TEMP/ibis-differential/results/cc0-manifest.json"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: fuzz/corpus/load_str
+          key: differential-load-${{ github.run_id }}
+          restore-keys: fuzz-v1-load_str-
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: fuzz/corpus/split_parse
+          key: differential-split-${{ github.run_id }}
+          restore-keys: fuzz-v1-split_parse-
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: fuzz/corpus/csl_export
+          key: differential-csl-${{ github.run_id }}
+          restore-keys: fuzz-v1-csl_export-
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/ibis-corpus/raw
+          key: corpus-wikidata-${{ hashFiles('corpus/manifest.json') }}
+      - name: Reuse generators and pinned CC0 conversion
+        env:
+          IBIS_DIFFERENTIAL_GENERATED: ${{ runner.temp }}/ibis-differential/generated
+        run: |
+          cargo test -p ibis-core --test metamorphic export_differential_corpus --locked -- --ignored
+          node scripts/corpus.mjs fetch "$RUNNER_TEMP/ibis-corpus"
+          cargo build -p ibis --example pandoc_differential --locked
+      - name: Compare, reduce and report new classes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/differential.mjs target/debug/examples/pandoc_differential "$DIFFERENTIAL_DIRECTORY/results" "$DIFFERENTIAL_DIRECTORY/generated" "$RUNNER_TEMP/ibis-corpus" "$GITHUB_WORKSPACE/fuzz/corpus/load_str" "$GITHUB_WORKSPACE/fuzz/corpus/split_parse" "$GITHUB_WORKSPACE/fuzz/corpus/csl_export"
+      - name: Attach summary and reproducible findings
+        if: always()
+        run: |
+          if [ -f "$DIFFERENTIAL_DIRECTORY/results/summary.md" ]; then
+            cat "$DIFFERENTIAL_DIRECTORY/results/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: pandoc-differential-${{ github.run_id }}
+          path: ${{ runner.temp }}/ibis-differential/results
+          retention-days: 30
+          if-no-files-found: error

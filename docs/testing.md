@@ -13,9 +13,9 @@ Citation software fails at the edges: unusual names, damaged files, rare item ty
 | Property tests | Panics, hangs and broken invariants on generated input | `proptest` in `crates/ibis-core/tests/` |
 | Metamorphic tests | Different but equivalent inputs giving different results | `crates/ibis-core/tests/metamorphic.rs`; larger run in `.github/workflows/metamorphic.yml` |
 | Subprocess tests | Process aborts that in-process guards cannot catch (stack overflow) | `crates/ibis-cli/tests/cli.rs` |
-| Differential tests | Loss of meaning, measured against an independent implementation | `crates/ibis-cli/tests/fidelity.rs` (Pandoc); planned nightly on larger corpora (#69) |
+| Differential tests | Loss of meaning, measured against an independent implementation | `crates/ibis-cli/tests/fidelity.rs`; nightly `.github/workflows/differential.yml` |
 | Fuzzing | Crashes and runaway work on arbitrary bytes | `fuzz/fuzz_targets/`, nightly `.github/workflows/fuzz.yml` |
-| Open-data corpus | Real names, scripts and records synthetic data misses | planned nightly (#68) |
+| Open-data corpus | Real names, scripts and records synthetic data misses | `corpus/manifest.json`, `scripts/corpus.mjs`, `.github/workflows/corpus.yml` |
 | Platform harness | Insertion, shortcuts and accessibility on each OS | planned for 0.3 |
 
 ## Rules
@@ -66,3 +66,63 @@ issues. Fixed inputs become fixtures with regression coverage. Fuzz targets shar
 the root lockfile and are outside default application/test members. Only
 cargo-fuzz enables nightly instrumentation; the app toolchain stays pinned. See `fuzz/README.md` for
 reproduction, reporting and resource limits.
+
+## Nightly Pandoc differential comparison
+
+The differential workflow follows the scheduled **Nightly fuzzing** run and can
+also be dispatched on `main`. Run fuzzing first if its caches have never been
+populated. It executes trusted current `main` only, restores existing generated
+fuzz inputs, and reuses the pinned CC0 metadata cache and converter. It writes
+no source libraries. Local execution never creates issues merely because a token
+is present; reporting requires a trusted main-branch workflow event.
+
+The explicitly ignored `export_differential_corpus` test reuses the actual
+metamorphic generator: eight libraries, each in its original form and all seven
+transformations, using ChaCha seed `[69; 32]`. Up to eight generated mutations
+from each fuzz target are added; original `seed-` fixtures are excluded. Input
+files are limited to 16 KiB, 64 entries and 128 files overall. Skipped sizes,
+counts, invalid UTF-8 and empty/unrenderable inputs appear in the summary.
+Each Pandoc process has a five-second/1 MiB output budget, each library a
+20-second comparison budget, each reduction a 60-second budget, and the complete
+comparison a ten-minute budget. Infrastructure failures fail the run and still
+produce a summary; input rejection by one parser is preserved distinctly from mutually unrenderable input.
+
+The engineering runner shares `tests/support/pandoc.rs` with the normal fidelity
+test. It is the single normalization allowlist: it ignores blank lines and reconciles Pandoc's dotless
+ı plus combining accent for `{\'\i}`; title case,
+missing data and other rendering differences remain visible. Normalization has
+an explicit regression test that keeps multilingual case differences distinct.
+
+Reduction keeps the same native key, entry type, outcome and a subset of the
+original differing field paths; it cannot migrate into an unrelated author or
+parser failure. Comparable classes use the minimized category/entry type/outcome/changed field paths,
+with array indices folded and prose/identities excluded. This is a structural
+classification, not a claim that every occurrence has the same root cause.
+Only supported renderings with no relevant Ibis warnings auto-file issues.
+Known Pandoc parenthesis rejection, explicitly warned syntax/duplicate recovery,
+and unknown-language fallback with case-only title differences retain named categories, counts and
+original artifacts without auto-filing or failing the run. Unrecognized parser,
+renderer or warning cases retain distinct review-required categories and fail
+for review; warnings are never normalized away. An unrelated author mismatch
+cannot be hidden by an unknown-language warning. These policies share the same
+Rust helper as the rendering normalizer, with regression tests. Syntax/duplicate
+warnings from sibling entries apply only when Pandoc rejects the entire library;
+rendering differences keep warning context scoped to their own key. Title
+content loss cannot be hidden by an unknown-language warning.
+Open and closed issues are searched for stable markers before creating a report.
+Previously reported comparable classes still fail and link the existing issue. Minimal
+comparable inputs, original unsupported inputs, both renderings, category/class counts, source/tool versions and CC0 provenance
+are uploaded for 30 days; reduction is bounded, not guaranteed globally minimal.
+
+For a local run (Pandoc installed), use fresh temporary output directories:
+
+```sh
+IBIS_DIFFERENTIAL_GENERATED=/tmp/ibis-generated cargo test -p ibis-core --test metamorphic export_differential_corpus --locked -- --ignored
+cargo build -p ibis --example pandoc_differential --locked
+node scripts/differential.mjs target/debug/examples/pandoc_differential /tmp/ibis-differential /tmp/ibis-generated
+```
+
+Add the directory produced by `node scripts/corpus.mjs fetch DIRECTORY` and
+existing `fuzz/corpus/{load_str,split_parse,csl_export}` directories as additional
+arguments to exercise those sources. The regular full check runs synthetic
+reporter tests and the existing fixture comparison, without corpus downloads.
