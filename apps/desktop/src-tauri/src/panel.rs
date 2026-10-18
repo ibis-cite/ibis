@@ -60,6 +60,14 @@ pub(crate) fn show(app: &AppHandle) {
                     tauri_nspanel::objc2_app_kit::NSApplication::sharedApplication(main_thread)
                         .unhideWithoutActivation();
                     panel.show_and_make_key();
+                    // Observe actual AppKit keyboard ownership independently
+                    // of the WebView's accessible/DOM focused search field.
+                    #[cfg(debug_assertions)]
+                    eprintln!(
+                        "ibis: panel show key={} first_responder={}",
+                        panel.as_panel().isKeyWindow(),
+                        panel.as_panel().firstResponder().is_some()
+                    );
                 } else {
                     report(Err::<(), ()>(()), NativeIssue::Show);
                 }
