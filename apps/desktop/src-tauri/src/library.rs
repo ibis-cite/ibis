@@ -186,7 +186,9 @@ pub(crate) fn choose_library_file(app: &AppHandle) {
     // from the tray), attach the dialog to it, and keep the picker open while
     // the dialog has the focus.
     show_picker(app);
-    app.state::<DialogOpen>().0.store(true, Ordering::SeqCst);
+    if !app.state::<DialogOpen>().begin() {
+        return; // a dialog is already open on the picker
+    }
     let mut dialog = app
         .dialog()
         .file()
@@ -197,7 +199,7 @@ pub(crate) fn choose_library_file(app: &AppHandle) {
     }
     let handle = app.clone();
     dialog.pick_file(move |picked| {
-        handle.state::<DialogOpen>().0.store(false, Ordering::SeqCst);
+        handle.state::<DialogOpen>().end();
         match picked.map(|p| p.into_path()) {
             None => {}
             Some(Ok(path)) => start_open(&handle, path, true),

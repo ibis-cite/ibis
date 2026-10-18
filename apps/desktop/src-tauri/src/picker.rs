@@ -1,7 +1,7 @@
 //! Showing, hiding and quitting, and the global shortcut.
 
 use std::sync::Mutex;
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -98,6 +98,20 @@ pub(crate) fn shortcut_status(status: State<'_, Mutex<ShortcutStatus>>) -> Short
 #[derive(Default)]
 pub(crate) struct DialogOpen(pub(crate) AtomicBool);
 
+impl DialogOpen {
+    /// Claim the dialog slot. Returns false when a dialog is already open, so
+    /// only one is shown at a time and closing it cannot unprotect another.
+    pub(crate) fn begin(&self) -> bool {
+        self.0
+            .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+            .is_ok()
+    }
+
+    pub(crate) fn end(&self) {
+        self.0.store(false, Ordering::SeqCst);
+    }
+}
+
 /// Whether the picker hides when it loses focus. Release builds hide it, like
 /// other launchers, except while one of its own dialogs has the focus;
 /// development builds never do, so the developer tools stay usable.
@@ -129,5 +143,14 @@ mod tests {
         assert!(hides_on_blur(true, false));
         assert!(!hides_on_blur(true, true));
         assert!(!hides_on_blur(false, false));
+    }
+
+    #[test]
+    fn only_one_dialog_is_open_at_a_time() {
+        let dialog = DialogOpen::default();
+        assert!(dialog.begin());
+        assert!(!dialog.begin());
+        dialog.end();
+        assert!(dialog.begin());
     }
 }
