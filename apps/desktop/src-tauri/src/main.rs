@@ -16,8 +16,11 @@ use ibis_core::model::{LoadWarning, RecordId, Reference};
 use ibis_core::search::OwnedIndex;
 use ibis_core::settings;
 use serde::Serialize;
+use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
+use tauri::tray::TrayIconBuilder;
 use tauri::{AppHandle, Emitter, Manager, State, WindowEvent};
 use tauri_plugin_clipboard_manager::ClipboardExt;
+use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 /// The library currently open in the app, indexed once when it is opened.
@@ -38,10 +41,13 @@ struct LoadRequests(AtomicU64);
 /// Sent to the interface with the `library:changed` event.
 #[derive(Clone, Serialize)]
 struct LibraryStatus {
-    path: Option<String>,
+    /// File name only; the full path is never shown.
+    name: Option<String>,
     references: usize,
     warnings: usize,
     error: Option<String>,
+    /// Something to tell the user that is not a failure to open.
+    note: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -84,10 +90,15 @@ impl SearchResult {
 
 fn status(library: &Library) -> LibraryStatus {
     LibraryStatus {
-        path: library.path.as_ref().map(|p| p.display().to_string()),
+        name: library
+            .path
+            .as_ref()
+            .and_then(|p| p.file_name())
+            .map(|n| n.to_string_lossy().into_owned()),
         references: library.index.references().len(),
         warnings: library.warnings.len(),
         error: library.error.clone(),
+        note: None,
     }
 }
 
@@ -137,21 +148,103 @@ fn load_library(path: PathBuf) -> Result<Library, String> {
 /// synchronously and in the order requests arrive, so a load that finishes
 /// after a newer request is discarded. The outcome reaches the interface as
 /// the `library:changed` event.
-fn start_open(app: &AppHandle, path: PathBuf) {
+///
+/// With `remember`, a library that opens becomes the one opened at start.
+fn start_open(app: &AppHandle, path: PathBuf, remember: bool) {
     let request = app.state::<LoadRequests>().0.fetch_add(1, Ordering::SeqCst) + 1;
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
+        let chosen = path.clone();
         let loaded = tauri::async_runtime::spawn_blocking(move || load_library(path))
             .await
             .unwrap_or_else(|_| Err("loading the library stopped unexpectedly".to_string()));
         let current = install(&app.state(), &app.state(), request, loaded);
-        if let Some(status) = current {
-            if let Some(error) = &status.error {
-                eprintln!("ibis: {error}");
+        if let Some(mut status) = current {
+            if remember && status.error.is_none() {
+                let file = &app.state::<SettingsFile>().0;
+                if let Err(e) = settings::update(file, |s| s.library = Some(chosen)) {
+                    status.note = Some(format!("the library opened but could not be saved for next time: {e}"));
+                }
+            }
+            for message in status.error.iter().chain(&status.note) {
+                eprintln!("ibis: {message}");
+            }
+            if let Some(item) = app.try_state::<LibraryMenuItem>() {
+                let _ = item.0.set_text(library_line(&status));
             }
             let _ = app.emit("library:changed", status);
         }
     });
+}
+
+/// One line describing the library, for the menu bar or tray menu.
+fn library_line(status: &LibraryStatus) -> String {
+    let line = match (&status.error, &status.name) {
+        (Some(error), _) => format!("Library could not be opened: {error}"),
+        (None, Some(name)) => {
+            let problems = match status.warnings {
+                0 => String::new(),
+                1 => ", 1 problem".to_string(),
+                n => format!(", {n} problems"),
+            };
+            format!("{name}: {} references{problems}", status.references)
+        }
+        (None, None) => "No library chosen".to_string(),
+    };
+    // Menus do not wrap; keep long errors readable.
+    if line.chars().count() > 90 {
+        format!("{}…", line.chars().take(89).collect::<String>())
+    } else {
+        line
+    }
+}
+
+/// The disabled menu item that shows the library line.
+struct LibraryMenuItem(MenuItem<tauri::Wry>);
+
+/// Show the system file dialog and open the chosen library. Cancelling
+/// changes nothing.
+fn choose_library_file(app: &AppHandle) {
+    let handle = app.clone();
+    app.dialog()
+        .file()
+        .set_title("Choose a BibTeX or BibLaTeX library")
+        .add_filter("BibTeX and BibLaTeX", &["bib"])
+        .pick_file(move |picked| match picked.map(|p| p.into_path()) {
+            None => {}
+            Some(Ok(path)) => start_open(&handle, path, true),
+            Some(Err(_)) => {
+                let _ = handle.emit(
+                    "library:changed",
+                    LibraryStatus {
+                        error: Some("the chosen file is not on this computer".to_string()),
+                        ..current_status(&handle)
+                    },
+                );
+            }
+        });
+}
+
+fn current_status(app: &AppHandle) -> LibraryStatus {
+    app.state::<Mutex<Library>>()
+        .lock()
+        .map(|l| status(&l))
+        .unwrap_or_else(|_| LibraryStatus {
+            name: None,
+            references: 0,
+            warnings: 0,
+            error: Some("library state is unavailable".to_string()),
+            note: None,
+        })
+}
+
+/// Open the current library file again, for example after editing it.
+fn reload_library_file(app: &AppHandle) {
+    let path = app.state::<Mutex<Library>>().lock().ok().and_then(|l| l.path.clone());
+    match path {
+        Some(path) => start_open(app, path, false),
+        None => choose_library_file(app),
+    }
 }
 
 /// Make a loaded library current, or record why it failed to open. Returns
@@ -173,11 +266,23 @@ fn install(
     Some(status(&library))
 }
 
-/// Open a library file. Not async, so requests are numbered in the order
-/// they arrive; the result arrives as the `library:changed` event.
+/// Choose a library with the system file dialog. The interface never passes
+/// file paths; the result arrives as the `library:changed` event.
 #[tauri::command]
-fn open_library(path: String, app: AppHandle) {
-    start_open(&app, PathBuf::from(path));
+fn choose_library(app: AppHandle) {
+    choose_library_file(&app);
+}
+
+/// Open the current library again; the result arrives as `library:changed`.
+#[tauri::command]
+fn reload_library(app: AppHandle) {
+    reload_library_file(&app);
+}
+
+/// The library as it is now, for the interface when it starts.
+#[tauri::command]
+fn library_status(app: AppHandle) -> LibraryStatus {
+    current_status(&app)
 }
 
 /// Search the open library. An empty query returns no results. Async so it
@@ -360,11 +465,50 @@ fn shortcut_status(status: State<'_, Mutex<ShortcutStatus>>) -> ShortcutStatus {
     status.lock().map(|s| s.clone()).unwrap_or_default()
 }
 
+/// The menu bar (macOS) or tray (Windows, Linux) item and its menu.
+fn create_tray(app: &AppHandle, shortcut: Option<&str>) -> tauri::Result<()> {
+    let open_label = match shortcut {
+        Some(shortcut) => format!("Open Picker ({shortcut})"),
+        None => "Open Picker".to_string(),
+    };
+    let line = MenuItem::with_id(app, "library", library_line(&current_status(app)), false, None::<&str>)?;
+    let menu = Menu::with_items(
+        app,
+        &[
+            &MenuItem::with_id(app, "open", open_label, true, None::<&str>)?,
+            &PredefinedMenuItem::separator(app)?,
+            &line,
+            &MenuItem::with_id(app, "choose", "Choose Library File…", true, None::<&str>)?,
+            &MenuItem::with_id(app, "reload", "Reload Library", true, None::<&str>)?,
+            &PredefinedMenuItem::separator(app)?,
+            &MenuItem::with_id(app, "quit", "Quit Ibis", true, None::<&str>)?,
+        ],
+    )?;
+    app.manage(LibraryMenuItem(line));
+    let mut tray = TrayIconBuilder::with_id("ibis")
+        .tooltip("Ibis")
+        .menu(&menu)
+        .show_menu_on_left_click(true)
+        .on_menu_event(|app, event| match event.id.as_ref() {
+            "open" => show_picker(app),
+            "choose" => choose_library_file(app),
+            "reload" => reload_library_file(app),
+            "quit" => app.exit(0),
+            _ => {}
+        });
+    if let Some(icon) = app.default_window_icon() {
+        tray = tray.icon(icon.clone());
+    }
+    tray.build(app)?;
+    Ok(())
+}
+
 fn main() {
     let app = tauri::Builder::default()
         // Must be registered first: a second launch brings the running picker forward.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show_picker(app)))
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, _shortcut, event| {
@@ -378,7 +522,9 @@ fn main() {
         .manage(LoadRequests::default())
         .manage(Mutex::new(ShortcutStatus::default()))
         .invoke_handler(tauri::generate_handler![
-            open_library,
+            choose_library,
+            reload_library,
+            library_status,
             search,
             hide_picker,
             copy_citation,
@@ -423,13 +569,29 @@ fn main() {
             if let Ok(mut current) = app.state::<Mutex<ShortcutStatus>>().lock() {
                 *current = status;
             }
+            let shown_shortcut = app
+                .state::<Mutex<ShortcutStatus>>()
+                .lock()
+                .ok()
+                .filter(|s| s.registered)
+                .map(|s| s.shortcut.clone());
+            // A missing tray library on Linux panics inside the tray crate; the
+            // picker's own library controls still work without the tray.
+            let tray = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                create_tray(app.handle(), shown_shortcut.as_deref())
+            }));
+            match tray {
+                Ok(Ok(())) => {}
+                Ok(Err(e)) => eprintln!("ibis: the menu bar item could not be created ({e})"),
+                Err(_) => eprintln!("ibis: the menu bar item is not available on this system"),
+            }
             // The library from settings; IBIS_LIBRARY overrides it for development.
             let library = std::env::var("IBIS_LIBRARY")
                 .ok()
                 .or_else(|| loaded.settings.library.as_ref().map(|p| p.display().to_string()));
             if let Some(path) = library {
                 // Opened in the background so the window appears at once.
-                start_open(app.handle(), PathBuf::from(path));
+                start_open(app.handle(), PathBuf::from(path), false);
             }
             Ok(())
         })
@@ -521,5 +683,29 @@ mod tests {
             native_key: "same".into(),
         };
         assert!(render_citation(&loaded.references, &[missing], KeyFormat::Pandoc).is_err());
+    }
+
+    #[test]
+    fn the_library_line_explains_failures_and_stays_short() {
+        let status = |name: Option<&str>, warnings, error: Option<&str>| LibraryStatus {
+            name: name.map(String::from),
+            references: 12,
+            warnings,
+            error: error.map(String::from),
+            note: None,
+        };
+        assert_eq!(library_line(&status(None, 0, None)), "No library chosen");
+        assert_eq!(
+            library_line(&status(Some("refs.bib"), 0, None)),
+            "refs.bib: 12 references"
+        );
+        assert_eq!(
+            library_line(&status(Some("refs.bib"), 2, None)),
+            "refs.bib: 12 references, 2 problems"
+        );
+        let long = "x".repeat(200);
+        let line = library_line(&status(Some("refs.bib"), 0, Some(&long)));
+        assert!(line.starts_with("Library could not be opened: x"));
+        assert_eq!(line.chars().count(), 90);
     }
 }
