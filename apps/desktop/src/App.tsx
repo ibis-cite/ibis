@@ -238,6 +238,9 @@ export function App() {
         </ul>
       )}
       <div className="results-area">
+        <div className="results-heading" aria-hidden="true">
+          <span>References</span><span>{results.length > 0 ? `${results.length} results` : ""}</span>
+        </div>
         <ul id="results" role="listbox" aria-label="Results" aria-multiselectable="true">
           {results.map((r, i) => (
             <li
@@ -275,12 +278,12 @@ export function App() {
                 (library.warnings > 0 ? `, ${library.warnings} could not be read fully` : "")
               : "No library chosen"}
           </span>{" "}
-          <button type="button" onClick={() => void chooseLibrary()}>
-            Choose library…
+          <button type="button" className="quiet-button" aria-label="Choose library…" title="Choose a library" onClick={() => void chooseLibrary()}>
+            Choose…
           </button>
           {library?.name && (
-            <button type="button" onClick={() => void reloadLibrary()}>
-              Reload
+            <button type="button" className="icon-button" aria-label="Reload" title="Reload library" onClick={() => void reloadLibrary()}>
+              ↻
             </button>
           )}
           {library?.error && <p role="alert">The library could not be opened: {library.error}</p>}
@@ -301,8 +304,8 @@ export function App() {
             <kbd>↵</kbd> Copy · <kbd>⇧↵</kbd> Add · <kbd>Esc</kbd> Hide
           </small>
           {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
-          <button type="button" onClick={() => void quit()}>
-            Quit Ibis
+          <button type="button" className="quiet-button" aria-label="Quit Ibis" onClick={() => void quit()}>
+            Quit
           </button>
         </div>
       </footer>
