@@ -314,6 +314,40 @@ window manager; its theme and shadows may differ from a user's desktop. These
 images do not establish result-list behavior, typing, focus, shortcuts, clipboard
 integration or screen-reader accessibility; those still need separate checks.
 
+## macOS launcher regression (#198)
+
+The native reproducer is a document in TextEdit in its own full-screen Space:
+summon Ibis, search the synthetic `who2020` reference, press Enter, and paste.
+Before the panel change macOS switches to the desktop or leaves the picker
+outside the full-screen Space; a window-only hide also leaves Ibis active (#195).
+The picker should stay over the document and paste should reach that document.
+
+The macOS-only `tauri-nspanel` dependency converts the existing Tauri window to
+an NSPanel with non-activating style, all-Spaces/full-screen auxiliary behavior,
+and a floating level. Its safe API confines native calls to Tauri's main-thread
+callbacks; the app retains `forbid(unsafe_code)`. It enables Tauri's macOS private
+API feature, as the adapter requires. `Accessory` policy removes the Dock icon;
+Quit stays available in the footer and menu bar item. These flags on a normal
+window were already tested natively and did not solve the full-screen problem
+(see the evidence in #198).
+
+Run the release build on macOS, quitting other Ibis instances first. Check:
+
+- Full-screen TextEdit and another Space, with the pointer on each display of a
+  mixed-scale pair; the Space must not switch and the picker must be visible.
+- Stage Manager; typing and Japanese Kana conversion; VoiceOver search/result
+  announcements. A compiling panel does not prove IME or accessibility behavior.
+- Enter, Escape, shortcut and close; the previous app must receive the next
+  paste. Repeat after a library dialog, which intentionally activates Ibis.
+- Choose library from the picker and tray, then cancel and select a synthetic
+  `.bib`; the dialog must receive input and the picker must remain available.
+- Windows/Linux dismissal, foreground activation and virtual desktops in #133.
+
+Linux unit/interface checks do not execute AppKit. Hosted macOS compilation and
+these native interactions must be recorded before calling this change verified;
+full-screen, Stage Manager, IME, VoiceOver and second-display behavior remain
+unverified until that evidence is attached to #198.
+
 ## Nightly fuzzing
 
 Install `cargo-fuzz` with `cargo install --locked cargo-fuzz --version 0.13.1` and

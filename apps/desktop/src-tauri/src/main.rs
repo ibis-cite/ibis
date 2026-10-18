@@ -12,6 +12,8 @@ mod diagnostics;
 #[cfg(debug_assertions)]
 mod gallery;
 mod library;
+#[cfg(target_os = "macos")]
+mod panel;
 mod picker;
 mod placement;
 mod preferences;
@@ -82,6 +84,8 @@ fn main() {
             _ => {}
         })
         .setup(|app| {
+            #[cfg(target_os = "macos")]
+            panel::configure(app.handle())?;
             // Debug builds may opt into the synthetic evidence gallery. Keep
             // both environment reads out of release binaries entirely.
             #[cfg(debug_assertions)]
