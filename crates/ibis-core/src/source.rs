@@ -119,6 +119,30 @@ pub fn load_library_file(path: &Path, reload: bool) -> Result<LoadResult, Source
     parse(path, &read_library_file(path)?, reload)
 }
 
+/// The exact bytes and source identity seen by a completed load. Pass this to
+/// `SourceWatch::with_snapshot` to avoid parsing an unchanged source again.
+#[derive(Clone, PartialEq, Eq)]
+pub struct SourceSnapshot {
+    source: PathBuf,
+    text: Arc<str>,
+}
+
+/// Load once and retain an observation for the watch-registration gap check.
+/// This compares contents, so same-size edits with preserved timestamps remain
+/// visible. Clones share the bounded source text rather than copying it.
+pub fn load_library_snapshot(path: &Path, reload: bool) -> Result<(LoadResult, SourceSnapshot), SourceError> {
+    let text = read_library_file(path)?;
+    let source = resolved_path(path).map_err(|_| SourceError::Unavailable)?;
+    let loaded = parse(&source, &text, reload)?;
+    Ok((
+        loaded,
+        SourceSnapshot {
+            source,
+            text: text.into(),
+        },
+    ))
+}
+
 fn parse(path: &Path, text: &str, reload: bool) -> Result<LoadResult, SourceError> {
     parse_with_budget(path, text, reload, bibtex::Budget::for_input(text.len()))
 }
@@ -146,6 +170,24 @@ pub struct SourceWatch {
 impl SourceWatch {
     pub fn new(
         path: &Path,
+        changed: impl FnMut(Result<LoadResult, SourceError>) + Send + 'static,
+    ) -> Result<Self, SourceError> {
+        Self::start(path, None, changed)
+    }
+
+    /// Check once after registration, but publish only if the source differs
+    /// from the completed load. Ordinary notifications retain strict reloads.
+    pub fn with_snapshot(
+        path: &Path,
+        snapshot: SourceSnapshot,
+        changed: impl FnMut(Result<LoadResult, SourceError>) + Send + 'static,
+    ) -> Result<Self, SourceError> {
+        Self::start(path, Some(snapshot), changed)
+    }
+
+    fn start(
+        path: &Path,
+        mut snapshot: Option<SourceSnapshot>,
         mut changed: impl FnMut(Result<LoadResult, SourceError>) + Send + 'static,
     ) -> Result<Self, SourceError> {
         // Keep the selected filename, rather than canonicalizing the file inode.
@@ -218,12 +260,16 @@ impl SourceWatch {
                     }
                     // A selected symlink may now point into a different directory.
                     let candidate = rearm_target(&mut watcher, &path, &target, &mut target_parent)
-                        .and_then(|()| stable_read(&path, &events, &stop));
+                        .and_then(|()| stable_read(&path, &events, &stop, &mut snapshot));
                     if !stop.load(Ordering::SeqCst) {
                         if matches!(candidate, Err(SourceError::Changing)) {
                             let _ = retry.try_send(());
                         }
-                        changed(candidate);
+                        match candidate {
+                            Ok(Some(loaded)) => changed(Ok(loaded)),
+                            Ok(None) => {}
+                            Err(error) => changed(Err(error)),
+                        }
                     }
                 }
             })
@@ -272,7 +318,12 @@ fn rearm_target(
     Ok(())
 }
 
-fn stable_read(path: &Path, events: &Receiver<()>, stopped: &AtomicBool) -> Result<LoadResult, SourceError> {
+fn stable_read(
+    path: &Path,
+    events: &Receiver<()>,
+    stopped: &AtomicBool,
+    snapshot: &mut Option<SourceSnapshot>,
+) -> Result<Option<LoadResult>, SourceError> {
     let before = read_library_file(path)?;
     // A zero-length file and a valid prefix can both occur during a save.
     // Require identical observations separated by another quiet interval.
@@ -288,7 +339,14 @@ fn stable_read(path: &Path, events: &Receiver<()>, stopped: &AtomicBool) -> Resu
     if before != after {
         return Err(SourceError::Changing);
     }
-    parse(path, &after, true)
+    let source = resolved_path(path).map_err(|_| SourceError::Unavailable)?;
+    if snapshot
+        .take()
+        .is_some_and(|previous| previous.source == source && previous.text.as_ref() == after)
+    {
+        return Ok(None);
+    }
+    parse(&source, &after, true).map(Some)
 }
 
 impl Drop for SourceWatch {
