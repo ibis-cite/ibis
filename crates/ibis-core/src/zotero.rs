@@ -214,11 +214,6 @@ fn is_trashed(data: &Map<String, Value>) -> bool {
     }
 }
 
-/// Zotero's own citation key field (Zotero 7 and later), then the
-/// `Citation Key:` line Better BibTeX and older versions keep in Extra, then
-/// the key in the CSL export.
-/// A key with spaces or the characters `,`, `{` and `}` would break LaTeX and
-/// Pandoc citations, so it is reported and the next source is tried.
 /// The item's CSL-JSON. The web API sends it as an object; Zotero's local API
 /// sends the text of its CSL JSON export, an array holding this one item.
 fn csl_data(item: &Value) -> Option<Cow<'_, Map<String, Value>>> {
@@ -236,6 +231,11 @@ fn csl_data(item: &Value) -> Option<Cow<'_, Map<String, Value>>> {
     }
 }
 
+/// Zotero's own citation key field (Zotero 7 and later), then the
+/// `Citation Key:` line Better BibTeX and older versions keep in Extra, then
+/// the key in the CSL export.
+/// A key with spaces or the characters `,`, `{` and `}` would break LaTeX and
+/// Pandoc citations, so it is reported and the next source is tried.
 fn citation_key(data: &Map<String, Value>, csl: &Map<String, Value>, problems: &mut Vec<String>) -> Option<String> {
     let mut usable = |key: &str| {
         let key = key.trim();
