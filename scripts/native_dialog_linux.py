@@ -40,6 +40,15 @@ def row_target(nodes, filename, showing):
     raise AssertionError("Native filename is not in an owned file table")
 
 
+def select_exact_row(table, row):
+    if list(table.getSelectedRows()) == [row]:
+        return
+    # GTK returns false for an already-selected row. A concurrent native
+    # selection update is acceptable only when the exact target is confirmed.
+    if not table.addRowSelection(row) and list(table.getSelectedRows()) != [row]:
+        raise AssertionError("Native file table rejected the synthetic row selection")
+
+
 class Dialog:
     def __init__(self, native, run):
         self.native, self.run = native, run
@@ -140,8 +149,7 @@ class Dialog:
         if not all(state.values()):
             print("NATIVE CHOOSER OWNERSHIP " + __import__("json").dumps(state), flush=True)
             raise AssertionError("Native chooser lost foreground before selection")
-        if not table.addRowSelection(row):
-            raise AssertionError("Native file table rejected the synthetic row selection")
+        select_exact_row(table, row)
         while list(table.getSelectedRows()) != [row]:
             if time.monotonic() >= deadline:
                 raise AssertionError("Owned synthetic file selection was not confirmed")

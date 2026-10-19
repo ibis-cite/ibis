@@ -236,6 +236,13 @@ def check(app_path, output, system):
                 report["checks"].append({"name": name, "status": "passed"})
                 print("PASS " + name, flush=True)
 
+            def chooser_ready():
+                state = dialog.state()
+                if state != report.get("last_dialog_state"):
+                    report["last_dialog_state"] = state
+                    print("NATIVE CHOOSER STATE " + json.dumps(state), flush=True)
+                return ready(state)
+
             def saved_library(expected=None):
                 try:
                     return Path(json.loads(settings.read_text(encoding="utf-8"))["library"]).samefile(expected or library)
@@ -256,7 +263,7 @@ def check(app_path, output, system):
             smoke.wait_for(lambda: bool(smoke.named(snapshot(), "Choose library to get started")), "first-run library choice is visible")
             dialog = Dialog(native, system)
             native.click("Choose library to get started")
-            smoke.wait_for(lambda: ready(dialog.state()), "exact owned chooser is visible and foreground")
+            smoke.wait_for(chooser_ready, "exact owned chooser is visible and foreground")
             assert (dialog.linux.picker_visible() if dialog.linux else snapshot()["visible"]), "Chooser hid the picker"
             dialog.call("cancel")
             smoke.wait_for(lambda: not dialog.state()["visible"], "Cancel closes the native chooser")
@@ -265,7 +272,7 @@ def check(app_path, output, system):
             passed("C1 owned chooser cancellation preserves first run")
             report["stage"] = "C2"
             native.click("Choose library…")
-            smoke.wait_for(lambda: ready(dialog.state()), "chooser can reopen after Cancel")
+            smoke.wait_for(chooser_ready, "chooser can reopen after Cancel")
             dialog.select(library)
             smoke.wait_for(lambda: f"{library.name}: 3 references" in smoke.strings(snapshot()) and saved_library(), "chosen library loads and is remembered")
             smoke.wait_for(lambda: snapshot()["foreground"], "picker receives focus after selection")
@@ -273,7 +280,7 @@ def check(app_path, output, system):
             passed("C2 native selection loads and remembers a Unicode path")
             report["stage"] = "C3"
             native.click("Choose library…")
-            smoke.wait_for(lambda: ready(dialog.state()), "chooser opens for unreadable fixture")
+            smoke.wait_for(chooser_ready, "chooser opens for unreadable fixture")
             dialog.select(damaged)
             def unreadable_explained():
                 text = smoke.strings(snapshot())
@@ -310,7 +317,7 @@ def check(app_path, output, system):
             assert large.stat().st_size == boundary.FILE_LIMIT, "Boundary fixture has the wrong byte count"
             dialog = Dialog(native, system)
             native.click("Choose library…")
-            smoke.wait_for(lambda: ready(dialog.state()), "chooser opens for the exact size boundary")
+            smoke.wait_for(chooser_ready, "chooser opens for the exact size boundary")
             dialog.select(large)
             smoke.wait_for(lambda: f"{large.name}: 100000 references" in smoke.strings(snapshot()) and saved_library(large),
                            "exact 64 MiB library loads all 100000 references", timeout=120)
@@ -511,6 +518,19 @@ class Tests(unittest.TestCase):
         outer.parent = cell
         with self.assertRaises(AssertionError):
             linux.row_target(nodes, cell.name, 1)
+
+    def test_native_row_already_selected_skips_add_and_wrong_row_rejection_fails(self):
+        from types import SimpleNamespace
+        actions = []
+        selected = SimpleNamespace(getSelectedRows=lambda: [1], addRowSelection=lambda _: actions.append("add"))
+        linux.select_exact_row(selected, 1)
+        self.assertEqual(actions, [])
+        wrong = SimpleNamespace(getSelectedRows=lambda: [2], addRowSelection=lambda _: False)
+        with self.assertRaises(AssertionError):
+            linux.select_exact_row(wrong, 1)
+        rows = iter([[2], [1]])
+        changed = SimpleNamespace(getSelectedRows=lambda: next(rows), addRowSelection=lambda _: False)
+        linux.select_exact_row(changed, 1)
 
     def test_loaded_state_cannot_substitute_for_quitting_during_reload(self):
         clicks = []
