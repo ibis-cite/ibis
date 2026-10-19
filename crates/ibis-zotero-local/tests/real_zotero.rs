@@ -56,11 +56,14 @@ const LATER: &str = r#"{
   "extra": "Citation Key: standin2022"
 }"#;
 
+/// The throwaway Zotero's port. The script sets it; there is no default,
+/// so the test cannot write into a Zotero someone is using.
 fn port() -> u16 {
     std::env::var("IBIS_ZOTERO_PORT")
         .ok()
         .and_then(|port| port.parse().ok())
-        .unwrap_or(DEFAULT_PORT)
+        .filter(|port| *port != DEFAULT_PORT)
+        .unwrap_or(0)
 }
 
 /// Saves items the way the browser connector does, into the library
@@ -71,6 +74,8 @@ fn save(items: &[&str], session: &str) -> Result<(), Box<dyn Error>> {
         items.join(",")
     );
     let mut stream = TcpStream::connect(("127.0.0.1", port()))?;
+    stream.set_read_timeout(Some(Duration::from_secs(30)))?;
+    stream.set_write_timeout(Some(Duration::from_secs(30)))?;
     write!(
         stream,
         "POST /connector/saveItems HTTP/1.1\r\nHost: 127.0.0.1:{}\r\nContent-Type: application/json\r\n\
@@ -107,6 +112,15 @@ fn scan_until(count: usize) -> (LoadResult, Snapshot) {
 #[test]
 #[ignore = "needs a running Zotero; see scripts/real-zotero.sh"]
 fn ibis_reads_what_a_real_zotero_sends() -> Result<(), Box<dyn Error>> {
+    // Items are added to the library, so only ever run against the empty
+    // Zotero that scripts/real-zotero.sh starts.
+    if std::env::var_os("IBIS_THROWAWAY_ZOTERO").is_none() || port() == 0 {
+        return Err("run this through scripts/real-zotero.sh, which starts a throwaway Zotero".into());
+    }
+    let (empty, _) = api::scan(&mut LocalZotero::on_port(port()), Library::User)?;
+    if !empty.references.is_empty() {
+        return Err("this Zotero library is not empty; refusing to add synthetic items".into());
+    }
     save(&[ARTICLE, BOOK, KEYLESS], "ibis-synthetic-1")?;
     let (result, snapshot) = scan_until(3);
     assert_eq!(result.references.len(), 3, "{:#?}", result.references);
