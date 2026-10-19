@@ -457,8 +457,10 @@ pub(crate) fn choose_library_file(app: &AppHandle) {
 
 /// Read the personal Zotero library from now on.
 pub(crate) fn use_zotero_library(app: &AppHandle) {
-    show_picker(app);
+    // Start first: the picker then sees a request in progress and does not
+    // start a second check of Zotero.
     start_open(app, Source::Zotero(ZoteroLibrary::User), true);
+    show_picker(app);
 }
 
 /// Check the open Zotero library for changes, for example when the picker
@@ -468,12 +470,27 @@ pub(crate) fn refresh_zotero(app: &AppHandle) {
         .state::<Mutex<Library>>()
         .lock()
         .ok()
-        // A failed choice stays visible until the next request; checking
-        // Zotero now would replace it.
-        .filter(|library| !library.opening && library.requested == library.source)
-        .and_then(|library| library.source.clone());
-    if let Some(source @ Source::Zotero(_)) = source {
-        start_open(app, source, false);
+        .filter(|library| !library.opening)
+        .and_then(|library| zotero_to_check(&library).map(|source| retry(&library, source)));
+    if let Some((source, remember)) = source {
+        start_open(app, source, remember);
+    }
+}
+
+/// The Zotero library to read again: the one asked for, even if it has not
+/// opened yet (Zotero was closed). A failed file choice stays visible until
+/// the next request, so a retained Zotero library is not checked then.
+/// A choice that has not opened yet is saved once it does, like any other
+/// choice; rereading the open library changes no setting.
+fn retry(library: &Library, source: Source) -> (Source, bool) {
+    let remember = library.source.as_ref() != Some(&source);
+    (source, remember)
+}
+
+fn zotero_to_check(library: &Library) -> Option<Source> {
+    match library.requested.as_ref().or(library.source.as_ref())? {
+        source @ Source::Zotero(_) => Some(source.clone()),
+        Source::File(_) => None,
     }
 }
 
@@ -497,9 +514,16 @@ pub(crate) fn current_status(app: &AppHandle) -> LibraryStatus {
 
 /// Open the current library again, for example after editing the file.
 pub(crate) fn reload_library_file(app: &AppHandle) {
-    let source = app.state::<Mutex<Library>>().lock().ok().and_then(|l| l.source.clone());
+    let source = app
+        .state::<Mutex<Library>>()
+        .lock()
+        .ok()
+        .and_then(|l| match zotero_to_check(&l) {
+            Some(source) => Some(retry(&l, source)),
+            None => l.source.clone().map(|source| (source, false)),
+        });
     match source {
-        Some(source) => start_open(app, source, false),
+        Some((source, remember)) => start_open(app, source, remember),
         None => choose_library_file(app),
     }
 }
@@ -604,6 +628,7 @@ fn install_loaded(
             }
             library.opening = false;
             library.error = None;
+            library.note = None;
             library.requested = library.source.clone();
             Some(status(&library))
         }
@@ -1221,5 +1246,40 @@ mod tests {
             Source::Zotero(ZoteroLibrary::User).name().as_deref(),
             Some("Zotero library")
         );
+    }
+
+    #[test]
+    fn a_zotero_choice_that_has_not_opened_yet_is_what_reload_and_the_picker_retry() {
+        let zotero = Source::Zotero(ZoteroLibrary::User);
+        let file = Source::File(PathBuf::from("synthetic.bib"));
+        // Zotero was closed when Ibis started: nothing opened yet.
+        let library = Mutex::new(Library::default());
+        let requests = LoadRequests::default();
+        let (request, _, _) = begin_open(&library, &requests, zotero.clone()).unwrap_or_else(|| panic!("starts"));
+        install_loaded(&library, &requests, request, Err("Zotero is not running".into()));
+        assert_eq!(
+            library.lock().ok().and_then(|l| zotero_to_check(&l)),
+            Some(zotero.clone())
+        );
+
+        // A failed Zotero choice over a loaded file retries Zotero, not the file.
+        let mut over_file = candidate(file.clone(), ibis_core::bibtex::load_str("synthetic", ""));
+        over_file.requested = Some(zotero.clone());
+        over_file.error = Some("Zotero is not running".into());
+        assert_eq!(zotero_to_check(&over_file), Some(zotero.clone()));
+        assert!(retry(&over_file, zotero.clone()).1, "the choice is saved once it opens");
+
+        // A failed file choice over a loaded Zotero library stays visible.
+        let mut over_zotero = candidate(zotero, ibis_core::bibtex::load_str("synthetic", ""));
+        over_zotero.requested = Some(file.clone());
+        over_zotero.error = Some("the file could not be read".into());
+        assert_eq!(zotero_to_check(&over_zotero), None);
+
+        assert!(
+            !retry(&over_zotero, Source::Zotero(ZoteroLibrary::User)).1,
+            "rereading saves nothing"
+        );
+        let loaded_file = candidate(file, ibis_core::bibtex::load_str("synthetic", ""));
+        assert_eq!(zotero_to_check(&loaded_file), None);
     }
 }
