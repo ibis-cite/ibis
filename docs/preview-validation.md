@@ -58,14 +58,18 @@ build. No human acceptance or release authorization is inferred from automation.
   Windows Server 2025 and Linux used their opaque fallbacks. This does not
   establish Windows 11 Mica or macOS outer corners.
 - **Native outer corners (#236/#248):** source
-  `8633f5d66a9e8385bad52c9a8ac6b323435cf475` passed
-  [CI 414](https://github.com/ibiscite/ibis/actions/runs/39192097334), including
+  `b758e7d2cc62f5be433738d89702c7f9461463e8` passed
+  [CI 451](https://github.com/ibiscite/ibis/actions/runs/39199292301), including
   all three ordinary native suites and budgeted samples, plus five Mac panel
-  checks. The [ten-image inspection](https://github.com/ibiscite/ibis/pull/248#issuecomment-6258866004)
+  checks. The [ten-image inspection](https://github.com/ibiscite/ibis/pull/248#issuecomment-6259916453)
   verifies rounded material/opaque clipping, visible native shadow and intact
   controls at 720×480 and 840×560 in all five appearance phases. Every size and
   original accessibility preference was restored. The 12-point radius is a
   provisional native foundation; it does not implement the future redesign.
+  The controlled Linux-only rerun also passed the actual singleton collector
+  path: [archive and preservation proof](https://github.com/ibiscite/ibis/pull/248#issuecomment-6272953675).
+  Its attempt-2 archive contains Linux only; the original full three-OS archive
+  and published Windows/Mac evidence were preserved. These fixes are merged.
 - **Full-screen panel and initial focus (#214):** source
   `ba878fe82cf5cade58293c246008d5c725af428a` passed
   [CI 415](https://github.com/ibiscite/ibis/actions/runs/39192986919): all thirteen
