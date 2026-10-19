@@ -3,6 +3,7 @@ name: Preview builds
 # Builds the desktop app for Windows, macOS and Linux with checksums and
 # build-provenance attestations.
 #
+# - Same-repository PRs changing this workflow verify packages without publishing.
 # - Run manually (Actions → Preview builds → Run workflow) for a dry run:
 #   leave publication unchecked; packages stay in workflow artifacts.
 # - A maintainer's tag push, or Release Please's explicit dispatch at its tag,
@@ -14,6 +15,8 @@ name: Preview builds
 on:
   push:
     tags: ["v*"]
+  pull_request:
+    paths: [".github/workflows/preview.yml"]
   workflow_dispatch:
     inputs:
       publish:
@@ -31,6 +34,8 @@ concurrency:
 jobs:
   build:
     name: Build (${{ matrix.name }})
+    # PR dry runs are limited to this repository; forks receive no build token.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     permissions:
@@ -72,7 +77,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev librsvg2-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libayatana-appindicator3-dev patchelf
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev librsvg2-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libayatana-appindicator3-dev patchelf xvfb xauth xdotool xclip xterm openbox python3-pyatspi fonts-noto-core fonts-noto-cjk iproute2
 
       - name: Add the Rust target
         run: rustup target add ${{ matrix.target }}
@@ -112,6 +117,89 @@ jobs:
             fi
           fi
 
+      - name: Select the native release executable
+        id: native
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          expected=x86_64
+          if [ "$TARGET" = aarch64-apple-darwin ]; then expected=arm64; fi
+          if [ "$(uname -m)" != "$expected" ]; then
+            echo "Cross-target package: compilation and packaging only; no native execution claim."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          case "$RUNNER_OS" in
+            macOS)
+              bundle="target/$TARGET/release/bundle/macos/Ibis.app"
+              executable=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$bundle/Contents/Info.plist")
+              case "$executable" in ''|*/*|*$'\n'*|.|..) exit 1 ;; esac
+              app="$bundle/Contents/MacOS/$executable"
+              ;;
+            Windows) app="target/$TARGET/release/ibis-desktop.exe" ;;
+            Linux)
+              # Qualify an installed package, with native build prerequisites
+              # already present. Installation cannot fetch anything online.
+              debs=(target/"$TARGET"/release/bundle/deb/*.deb)
+              test "${#debs[@]}" -eq 1
+              test -f "${debs[0]}"
+              sudo unshare --net -- dpkg --install "${debs[0]}"
+              app=/usr/bin/ibis-desktop
+              ;;
+            *) exit 1 ;;
+          esac
+          test -f "$app"
+          echo "app=$app" >> "$GITHUB_OUTPUT"
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+
+      - name: Exercise the native release app
+        if: steps.native.outputs.enabled == 'true'
+        env:
+          NATIVE_APP: ${{ steps.native.outputs.app }}
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then
+            # Keep local IPC available; the fresh namespace has no external link.
+            sudo unshare --net -- bash -e -c 'ip link set lo up; exec "$@"' -- \
+              runuser -u "$(id -un)" -- \
+              xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- \
+              /usr/bin/python3 scripts/smoke-native.py --app "$NATIVE_APP" --output "native-validation/$RUNNER_OS"
+          elif [ "$RUNNER_OS" = Windows ]; then
+            python scripts/smoke-native.py --app "$NATIVE_APP" --output "native-validation/$RUNNER_OS"
+          else
+            python3 scripts/smoke-native.py --app "$NATIVE_APP" --output "native-validation/$RUNNER_OS"
+          fi
+
+      - name: Exercise the full-screen native release panel
+        if: runner.os == 'macOS' && steps.native.outputs.enabled == 'true'
+        env:
+          NATIVE_APP: ${{ steps.native.outputs.app }}
+        run: python3 scripts/check-panel-macos.py --app "$NATIVE_APP" --output native-validation/panel-macOS
+
+      - name: Exercise the release library chooser and Quit
+        if: steps.native.outputs.enabled == 'true'
+        env:
+          NATIVE_APP: ${{ steps.native.outputs.app }}
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then
+            sudo unshare --net -- bash -e -c 'ip link set lo up; exec "$@"' -- \
+              runuser -u "$(id -un)" -- \
+              xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- \
+              /usr/bin/python3 scripts/check-native-chooser.py --app "$NATIVE_APP" --output "native-validation/chooser-$RUNNER_OS"
+          elif [ "$RUNNER_OS" = Windows ]; then
+            python scripts/check-native-chooser.py --app "$NATIVE_APP" --output "native-validation/chooser-$RUNNER_OS"
+          else
+            python3 scripts/check-native-chooser.py --app "$NATIVE_APP" --output "native-validation/chooser-$RUNNER_OS"
+          fi
+
+      - name: Keep native release validation
+        if: always() && steps.native.outputs.enabled == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: native-validation-${{ matrix.target }}
+          path: native-validation/
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Collect packages and checksums
         id: collect
         run: |
@@ -131,9 +219,37 @@ jobs:
           cat "dist/SHA256SUMS-${{ matrix.target }}.txt"
 
       - name: Attest build provenance
+        id: attest
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: dist/*
+
+      - name: Collect compact package verification
+        env:
+          ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if command -v sha256sum >/dev/null; then
+            (cd dist && sha256sum --check SHA256SUMS-*.txt)
+          else
+            (cd dist && shasum -a 256 --check SHA256SUMS-*.txt)
+          fi
+          test -f "$ATTESTATION_BUNDLE"
+          for file in dist/*; do
+            gh attestation verify "$file" --bundle "$ATTESTATION_BUNDLE" --repo "$GITHUB_REPOSITORY" --source-digest "$GITHUB_SHA" --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/preview.yml" --deny-self-hosted-runners
+          done
+          mkdir -p package-proof
+          cp dist/SHA256SUMS-${{ matrix.target }}.txt package-proof/
+          cp "$ATTESTATION_BUNDLE" package-proof/attestation.json
+          git rev-parse HEAD > package-proof/SOURCE_SHA.txt
+
+      - name: Keep package verification
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: package-proof-${{ matrix.target }}
+          path: package-proof/*
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Keep the packages
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -179,7 +295,11 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           cat > notes.md <<'EOF'
-          **Preview build. Not signed.** macOS may say the app cannot be checked for malicious software: right-click Ibis in Applications and choose Open. Windows SmartScreen may warn: choose More info, then Run anyway.
+          **Preview build. Not signed.** After verifying your download below, macOS may say the app cannot be checked for malicious software. Follow [Apple's instructions](https://support.apple.com/en-us/102445): try opening Ibis, then use System Settings → Privacy & Security → Open Anyway and confirm Open. Windows SmartScreen may warn: choose More info, then Run anyway.
+
+          **Automated checks:** matching-host Windows, macOS and Linux package builds pass native shortcut, search, copy, focus, library recovery and shutdown checks. Linux runs the installed Debian package with no external network interface; matching-host macOS also checks the full-screen panel. Cross-target Mac builds establish packaging only. See [preview validation](https://github.com/ibiscite/ibis/blob/main/docs/preview-validation.md) for the tested scope and measurement limits.
+
+          **Hand testing:** [issue #80](https://github.com/ibiscite/ibis/issues/80) records actual hand-test results and pending checks. Automation does not establish screen-reader speech, physical display changes, sleep/wake, every keyboard layout or synced-folder behavior. The short Windows and Mac hand lists are in [the testing guide](https://github.com/ibiscite/ibis/blob/main/docs/testing.md#remaining-hand-checks-after-all-three-cloud-runs-pass).
 
           Verify a download before opening it:
 

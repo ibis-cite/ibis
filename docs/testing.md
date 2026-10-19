@@ -222,8 +222,11 @@ and [Windows at 8d64d85](https://github.com/ibiscite/ibis/actions/runs/391777228
 passed all 13 interaction checks. Earlier Windows evidence comes from the separate
 macOS-panel stack based on `bacb54d`; its Windows app and native harness are
 unchanged from that baseline. The JSON records the exact runner images and links jobs.
-An enforced final run is still required before claiming the performance gate
-passed. These ceilings include UIA/accessibility/native-control probing and
+The final source of #217, `9f3a58116fc1013c6be1aa0efc913ff1e7f630a2`,
+passed [all three enforced native runs](https://github.com/ibiscite/ibis/actions/runs/39179422161):
+thirteen behavior checks and three budgeted samples per OS. Later changes keep
+these gates enabled and need their own final integration result; see
+[preview validation](preview-validation.md). These ceilings include UIA/accessibility/native-control probing and
 input overhead; they do not describe app search latency alone. They qualify
 those debug runner cells only. Release packages, other images/architectures,
 peak memory and local container/proot observations need separate evidence.
@@ -241,52 +244,103 @@ An exceeded budget records `performance.status: failed`, the metric and numeric
 ceilings, retaining and printing all three samples instead of calling the
 attempted gate `measured-without-budget`.
 
+### Native library choice and shutdown
+
+`scripts/check-native-chooser.py` reuses the native smoke adapters in a fresh,
+owned desktop session. It starts without `IBIS_LIBRARY` and uses the real file
+dialog to cancel, choose a synthetic Unicode path, recover from an unreadable
+choice, quit normally and reopen the remembered library. A rename-away check
+requires the old filename's missing-file message, searchable retained references
+and byte-identical saved preferences. Recovery must load different content and
+find a new reference before restoring the original synthetic library.
+It also opens an
+exactly 64 MiB, 100,000-reference fixture and proves the late record is searchable.
+The shutdown scenario requires an observed native Reloading state before Quit;
+a settled load or cleanup termination cannot satisfy it. Normal Quit must exit
+zero within ten seconds, including the native click, and relaunch must preserve
+the saved path and accept a new query.
+
+Use the same disposable-session precautions and Linux Xvfb/D-Bus wrapper as
+the smoke suite, passing `--app PATH --output DIRECTORY`. `--self-test` exercises
+checker contracts without running the app. `chooser.json` records the executable
+SHA256 and each completed assertion. Failed helpers retain only fixed stages,
+bounded counts and ownership booleans; no provider error payloads are printed.
+Native Windows and macOS acceptance must come from the final hosted reports,
+not helper self-tests or another platform's results; see [preview validation](preview-validation.md).
+
 ### Remaining hand checks (after all three cloud runs pass)
 
 Once stable packages are ready, use the matching OS artifact from the exact
 workflow run linked in [#80](https://github.com/ibiscite/ibis/issues/80), with
-`fixtures/bibtex/real-world.bib` from that same source SHA. The final handoff will
+[`fixtures/bibtex/real-world.bib`](../fixtures/bibtex/real-world.bib) from that same
+source SHA. It contains synthetic records only. For the speech and paste checks,
+search `who` to find `who2020`, titled "Synthetic Report on Global Sleep".
+The final handoff will
 add that run link; no hand testing is requested before then. These lists cover
 automation gaps before any tag or publishing authorization. Linux preview
 acceptance relies on automation; its optional future checklist is not a
-maintainer handoff requirement.
+maintainer handoff requirement. Record the package source SHA, OS version and
+screen-reader version with the hand-test results in #80.
 
-- **Windows:** (1) With NVDA or Narrator, hear the search label, changed result
-  count and selected result. (2) At your normal scaling, check text is readable and
-  the picker feels responsive; type using your usual input method, including
-  composition if you use an IME. (3) On the keyboard layouts you use, verify the
-  displayed shortcut. (4) Paste a copied citation into your real writing app.
-  (5) Sleep and wake the computer, then search and copy again. (6) If you use
-  several displays, disconnect and reconnect one and summon the picker on the
-  remaining screen; if displays use different scales, move the picker between
-  them and check readability. (7) If you use an existing cloud folder or network drive,
-  put only the synthetic library there, edit it and check the picker recovers
-  after a sync or brief disconnect. (8) Quit while a large synthetic library is
-  reloading, reopen and search.
-- **macOS:** (1) With VoiceOver, hear the search label, changed result count and
-  selected result. (2) Check permission prompts and recovery on a fresh user
-  account. (3) From a full-screen writing app, summon the picker and paste.
-  (4) At your normal scaling and keyboard layout, check readability and feel;
-  type using your usual input method, including composition if you use an IME.
-  (5) Sleep and wake, then search and copy again. (6) If you use several
-  displays, disconnect and reconnect one and summon the picker on the remaining
-  screen; if displays use different scales, move the picker between them and
-  check readability. (7) If you already use iCloud or a network drive, try only the synthetic
-  library there and check recovery after syncing or a brief disconnect. (8) Quit
-  while a large synthetic library is reloading, reopen and search.
-- **Linux (optional future coverage):** (1) With Orca in your desktop session, hear the search label, changed
-  result count and selected result. (2) In your actual Wayland compositor, check
-  shortcut/copy behavior and any permission explanation. (3) Check readability
-  at your normal scaling and keyboard layout. (4) Paste into your writing app.
-  (5) Suspend and resume, then search and copy again. (6) If you use several
-  displays, disconnect and reconnect one and summon the picker on the remaining
-  screen. (7) If you use an existing synced folder or network drive, try only
-  the synthetic library there and check recovery after syncing or disconnecting.
-  (8) Quit while a large synthetic library is reloading, reopen and search.
+#### Windows
 
-Hosted UI automation does not establish real screen-reader speech, full-screen
-Spaces, mixed-DPI/multiple-monitor behavior, non-US layouts/IMEs, sleep/wake,
-display unplugging, cloud/network-drive synchronization, or subjective feel.
+1. Install the matching Windows build from the linked run. Check the unsigned-app
+   prompt and first launch; install Microsoft's WebView2 Runtime first if needed.
+2. With NVDA, hear the search label, changed result count and active result.
+   Add and remove a selection; hear both changes announced.
+3. Check readability and responsiveness at your normal scaling and 200% text,
+   with every control reachable and no clipping, in light and dark mode. Also
+   try Windows contrast themes (forced colours) and transparency settings.
+4. Use your usual keyboard layout and input method. Check the shortcut label,
+   compose text if you use an IME, and search without losing entered characters.
+5. Paste a copied citation into your actual writing app.
+6. Sleep and wake, then search and copy again.
+7. If you use several displays, disconnect and reconnect one. Open the picker on
+   the remaining screen; move it between different display scales and check readability.
+8. If you already use a cloud folder or network drive, put only the synthetic
+   library there. Edit it and check recovery after syncing or a brief disconnect.
+
+#### macOS
+
+1. Install the matching Mac build from the linked run. Check the unsigned-app
+   prompt and first launch. After verifying the download, use
+   [Apple's opening instructions](https://support.apple.com/en-us/102445) if needed:
+   try opening Ibis, then System Settings → Privacy & Security → Open Anyway.
+2. Check the permission prompts and recovery. Reopen Ibis with its shortcut or
+   menu-bar item; the accessory app has no Dock icon.
+3. With VoiceOver, hear the search label, changed result count and active result.
+   Add and remove a selection; hear both changes announced.
+4. From your full-screen writing app, open the picker, copy and paste. Check
+   that returning to your document feels natural.
+5. Check readability and responsiveness at normal scaling and 200% text, in
+   light and dark mode, with every control reachable and no clipping. Also try
+   Reduce Transparency and Increase Contrast.
+6. Use your usual keyboard layout and input method. Check the shortcut label
+   and compose text if you use an IME; the known label limitation is #196.
+7. Sleep and wake, then search and copy again.
+8. If you use several displays, disconnect and reconnect one. Open the picker
+   on the remaining screen and check readability across different display scales.
+9. If you already use iCloud or a network drive, put only the synthetic library
+   there and check recovery after syncing or a brief disconnect.
+
+#### Linux (optional future coverage)
+
+1. With Orca in your desktop session, hear the search label, changed result count and selected result.
+2. In your Wayland desktop, check shortcut/copy behavior and any permission explanation.
+3. Check readability at normal scaling and 200% text, in light and dark mode.
+   Try your usual keyboard layout and input method.
+4. Paste into your writing app.
+5. Suspend and resume, then search and copy again.
+6. If you use several displays, disconnect and reconnect one and open the
+   picker on the remaining screen.
+7. If you already use a synced folder or network drive, put only the synthetic
+   library there and check recovery after syncing or disconnecting.
+
+These lists are used only after the native chooser, exact-size load and Quit
+during reload gates pass on the final packages; those checks stay automated.
+Hosted UI automation does not establish real screen-reader speech, interaction
+with your own full-screen writing app, mixed-DPI/multiple-monitor behavior,
+non-US layouts/IMEs, sleep/wake, display unplugging, cloud/network-drive synchronization, or subjective feel.
 Deterministic parser/watcher tests cover underlying data cases; they do not prove
 these desktop-session scenarios.
 
@@ -299,11 +353,14 @@ No development server or app startup switch is needed: the build embeds the web
 interface with `--features tauri/custom-protocol`, and debug windows stay visible
 when they lose focus.
 
-Open the run's **Artifacts** and download `picker-<commit SHA>`. The SHA identifies
-the checked-out source (the merge commit for a pull request). It contains
+Open the run's **Artifacts** and download
+`picker-combined-<commit SHA>-attempt-<number>`. The SHA identifies
+the checked-out source (the merge commit for a pull request). A complete artifact contains
 `picker-Windows.png`, `picker-macOS.png`, `picker-Linux.png` and startup logs, kept
-for 14 days. The three platform shards are combined after the desktop jobs finish;
-failed jobs can leave a partial artifact. A process that exits during the startup
+for 14 days. The available platform shards are combined after the desktop jobs finish;
+failed jobs or a single-platform retry can leave a partial artifact. Earlier
+attempts remain available separately; a later attempt does not certify an OS
+whose report it does not contain. A process that exits during the startup
 wait fails its job; capture errors produce warnings. Check that all three PNGs
 exist and actually show the picker before claiming cross-platform evidence.
 
@@ -318,35 +375,22 @@ integration or screen-reader accessibility; those still need separate checks.
 
 ## macOS launcher regression (#198)
 
-The native reproducer is a document in TextEdit in its own full-screen Space:
-summon Ibis, search the synthetic `who2020` reference, press Enter, and paste.
-Before the panel change macOS switches to the desktop or leaves the picker
-outside the full-screen Space; a window-only hide also leaves Ibis active (#195).
-The picker should stay over the document and paste should reach that document.
+The macOS picker uses a non-activating NSPanel so it can appear over an editor's
+full-screen Space. The macOS-only `tauri-nspanel` adapter converts the existing
+window through safe main-thread APIs; Ibis retains `forbid(unsafe_code)`. The
+adapter requires Tauri's macOS private-API feature. `Accessory` activation policy
+removes the Dock icon; the shortcut and menu-bar item reopen the picker.
 
-The macOS-only `tauri-nspanel` dependency converts the existing Tauri window to
-an NSPanel with non-activating style, all-Spaces/full-screen auxiliary behavior,
-and a floating level. Its safe API confines native calls to Tauri's main-thread
-callbacks; the app retains `forbid(unsafe_code)`. It enables Tauri's macOS private
-API feature, as the adapter requires. `Accessory` policy removes the Dock icon;
-Quit stays available in the footer and menu bar item. These flags on a normal
-window were already tested natively and did not solve the full-screen problem
-(see the evidence in #198).
+Conversion and activation-policy setup happen while the window is hidden.
+Initial presentation waits for both panel setup and the first completed page
+load, regardless of which finishes first. It consumes the original visibility/focus intent
+once; explicit show or dismissal cancels queued initial presentation. A hidden
+startup window is not shown as a side effect. Summoning then makes the panel key
+and focuses the actual WKWebView through Tauri's Webview API without activating
+the application. Focusing the outer content view alone did not route real typing.
 
-Run the release build on macOS, quitting other Ibis instances first. Check:
-
-- Full-screen TextEdit and another Space, with the pointer on each display of a
-  mixed-scale pair; the Space must not switch and the picker must be visible.
-- Stage Manager; typing and Japanese Kana conversion; VoiceOver search/result
-  announcements. A compiling panel does not prove IME or accessibility behavior.
-- Enter, Escape, shortcut and close; the previous app must receive the next
-  paste. Repeat after a library dialog, which intentionally activates Ibis.
-- Choose library from the picker and tray, then cancel and select a synthetic
-  `.bib`; the dialog must receive input and the picker must remain available.
-- Windows/Linux dismissal, foreground activation and virtual desktops in #133.
-
-After integrating the native adapters from #217, run the focused scenario in
-that same disposable macOS session:
+Run the focused scenario in the same disposable, permission-granted macOS
+session used by the ordinary smoke suite:
 
 ```sh
 python3 scripts/check-panel-macos.py --self-test
@@ -354,43 +398,27 @@ python3 scripts/check-panel-macos.py --app target/debug/ibis-desktop \
   --output screenshots/panel-macOS
 ```
 
-The scenario requires actual AXFullScreen state plus on-screen editor geometry,
-then checks that summoning keeps the editor in its full-screen Space while the
-picker is visible and focused. It verifies native search, an independently primed
-clipboard, Enter/Escape dismissal, and editor focus return. On the ordinary
-desktop it opens the real titled library chooser, verifies dialog focus while
-the picker stays visible, cancels, and checks keyboard access to the picker and
-return to the editor. Cancellation may restore the Choose-button focus. It does
-not select a file, change an input source, read VoiceOver speech, or establish
-second-display/Stage Manager acceptance. Exit 2 and an `unavailable` report mean
-no native pass; contract self-tests validate the probe only.
+The five native checks verify an actual AXFullScreen editor plus on-screen
+geometry; shortcut summon without leaving that Space; search and an independently
+primed clipboard; Enter/Escape dismissal and editor focus return; and an ordinary
+desktop library chooser that receives focus without hiding the picker. Cancel
+must return keyboard access to the picker and then to the editor. An unavailable
+full-screen attribute is unknown, never proof that the editor left full screen.
+This scenario cancels the chooser; the separate chooser suite selects files.
 
-Global HID events target the actual key window, including a nonactivating panel
-whose editor application intentionally remains frontmost. System Events keyboard
-dispatch alone could target that editor instead. Unicode storage is retained
-through each event post, and physical chords attempt every key release after a
-failure. Debug builds log only actual AppKit key-window and first-responder
-booleans after showing the panel; accessible focus alone is not that proof.
-The panel helper initially makes its outer NSView the first responder. Ibis then
-uses the stable Tauri Webview API to focus the actual WKWebView without activating
-the application; AppKit key/responder booleans alone do not prove HID delivery.
-The same WebView focus is applied after initial panel configuration only when
-the native window is already visible. This covers fresh startup after damaged
-settings recovery without showing a future hidden startup window.
-Initial setup uses the same panel ordering and responder sequence as summons.
-Debug builds observe initial state, native focus changes and the first completed
-page load without adjusting focus in those event callbacks. These fixed booleans
-include whether the first responder is the outer content view; no object identity
-or page data is logged. Native key-window state alone did not prove that a fresh
-startup received hardware typing, so the damaged-library startup assertion remains
-required alongside all five fullscreen and chooser checks.
-The prior hosted probe showed the panel in the full-screen Space, then failed
-native search. That observation does not establish input, copy or chooser success.
+The driver uses global CoreGraphics HID events because a non-activating panel
+can own keyboard focus while the editor application stays frontmost. It checks
+`CGPreflightPostEventAccess` without requesting permission, retains Unicode
+storage through event posting, and attempts every physical key release after
+failure. Debug AppKit key-window/responder booleans are diagnostics; actual
+query, clipboard and focus assertions establish input. Damaged-library startup
+must also accept a fresh typed query.
 
-Linux unit/interface checks do not execute AppKit. Hosted macOS compilation and
-these native interactions must be recorded before calling this change verified;
-full-screen, Stage Manager, IME, VoiceOver and second-display behavior remain
-unverified until that evidence is attached to #198.
+The final run and exact source are recorded in [#80](https://github.com/ibiscite/ibis/issues/80).
+Contract self-tests and Linux compilation do not establish AppKit behavior.
+The matching release executable repeats all five checks because release builds
+hide on blur. Stage Manager, real writing-app feel, IME composition, speech and
+physical display behavior remain in the final hand-check scope.
 
 ## Nightly fuzzing
 

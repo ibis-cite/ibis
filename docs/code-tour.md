@@ -6,6 +6,10 @@ Paths below describe the current desktop picker and CLI. The broader design in
 import, citeproc styles and direct insertion into other applications are future
 work; today's picker searches a `.bib` library and copies citation keys.
 
+The accepted [picker design](design.md) guides the staged redesign in #223 after
+the preview. Its rollout describes future changes to values, layout and window
+behavior; use this tour to locate the current implementation and its tests.
+
 ## Words used here
 
 - **Tauri**: the framework that turns the web interface (`apps/desktop/src`) and the Rust code (`apps/desktop/src-tauri`) into one desktop app.
@@ -37,10 +41,25 @@ work; today's picker searches a `.bib` library and copies citation keys.
    results. Rust returns record identities, display fields and matched fields;
    React displays them. The UI requests 20 results; Rust caps the limit at 200.
 
+On macOS, [panel.rs](../apps/desktop/src-tauri/src/panel.rs) converts the hidden
+window before its first presentation. Both panel setup and the first page load
+must finish before that one-time show; an explicit show or dismissal cancels it.
+The accessory app has no Dock icon, so use its shortcut or menu-bar item.
+Platform appearance is applied in
+[native_feel.rs](../apps/desktop/src-tauri/src/native_feel.rs). macOS outer
+clipping is separate in
+[native_corners.rs](../apps/desktop/src-tauri/src/native_corners.rs): it clips the
+content view after panel conversion, covering both the webview and its material
+background. A cosmetic setup failure retains a working rectangular window.
+
 The search effect's `current` flag ignores replies for superseded queries.
 `resultsQuery` records which query produced the visible results and also guards
-copying. Initial library status and `library:changed` events have a separate
-ordering problem: follow their state updates when debugging startup (#91).
+copying. Rust's `LibraryState` explicitly distinguishes `none`, `loading`,
+`loaded`, `reloading` and `error`. Its status also distinguishes the attempted
+filename from `snapshot_name`, the library still available for searching.
+`has_snapshot` remains true for a successfully loaded empty library. Initial
+status and `library:changed` events have a separate ordering problem: follow
+their state updates when debugging startup (#91).
 
 The command bridge has one registry:
 [Rust bindings.rs](../apps/desktop/src-tauri/src/bindings.rs). It registers commands
@@ -115,25 +134,35 @@ so editor save-by-rename works, and also manages symlink target watches.
 The bounded worker coalesces events and calls `stable_read`: two identical
 bounded reads separated by a quiet interval produce a candidate load.
 
-Startup and manual `load_library_file` calls read once; only the watcher uses
-`stable_read`. Reload parsing rejects demonstrably unfinished entries and work
-limit exhaustion. A quiet interval cannot prove a writer has finished at an
-otherwise valid prefix.
+Desktop startup and manual opens use `load_library_snapshot`: parsing and the
+watcher's baseline come from the same bounded read. `take_watch_source` hands
+that baseline to `SourceWatch::with_snapshot` only for the current request;
+it cannot consume a newer request's baseline. Only subsequent watcher reads use
+`stable_read`. Windows sharing violations receive bounded, interruptible retries;
+the watcher keeps watching after reporting an error. Reload parsing rejects
+demonstrably unfinished entries and work limit exhaustion. A quiet interval
+cannot prove a writer has finished at an otherwise valid prefix.
 
 The **desktop** owns the last good snapshot. `install` compares the request with
 `LoadRequests`, discards outdated work, replaces the index on success, and records
 an error while retaining the index on failure. Core returns candidates or errors;
 it does not store an installed library. A valid empty file intentionally installs
-an empty index. `publish` sends `library:changed`; the React listener updates
+an empty index. Automatic refreshes of that retained source preserve a failed
+choice of a different file. Its automatic read errors become a separate note
+that names the retained source; recovery clears that note. Retention wording
+follows the current reference count, including a valid empty refresh.
+`publish` sends `library:changed`; the React listener updates
 status and increments `libraryVersion` to rerun the current search.
 
 ## Settings: location and writes
 
 `main.rs` obtains Tauri's `app_config_dir` and appends `settings.json`.
 [core settings.rs](../crates/ibis-core/src/settings.rs) defines `schema_version`,
-`shortcut`, `library` and `copy_format`. `load` reports problems and can recover
-from backup or defaults. `save` uses a temporary file, rename and backup, and
-refuses to overwrite a newer schema.
+`shortcut`, `library` and `copy_format`. Format 2 stores a file choice as
+`{"bibtex": "/path/refs.bib"}`; legacy path strings migrate in memory when read.
+[ADR 0018](adr/0018-settings-format-2.md) records the format and backup rules.
+`load` reports problems and can recover from backup or defaults. `save` uses a
+temporary file, rename and backup, and refuses to overwrite a newer schema.
 
 [preferences.rs](../apps/desktop/src-tauri/src/preferences.rs)'s
 `SettingsFile::update` serializes the complete read-change-save operation, so
@@ -141,6 +170,25 @@ intervening edits are preserved. A successful remembered library choice saves it
 path; a successful clipboard write saves the format. Shortcut configuration is
 read at startup. Follow these callers before changing the settings format; its
 versioning is separate from picker UI behavior.
+
+## Changing text or appearance
+
+[messages.ts](../apps/desktop/src/messages.ts) holds the interface's English
+labels, recovery guidance and plural forms. Native error reasons and settings
+notices still arrive as English strings from Rust; translating those requires
+structured codes across the bridge. Keep accessible names stable when changing
+wording: native checks use names such as Search references and Quit Ibis.
+
+[tokens.css](../apps/desktop/src/tokens.css) defines colors, typography, spacing,
+corners and motion for the light, dark and high-contrast sets.
+[styles.css](../apps/desktop/src/styles.css) applies them to the production
+interface. Change these files for appearance and use `App.tsx` for behavior.
+The development [gallery](../apps/desktop/src/gallery.tsx) renders the same
+interface with isolated synthetic providers from
+[gallery-fixtures.ts](../apps/desktop/src/gallery-fixtures.ts). Its captures
+cover states and multilingual text; they do not establish real screen-reader
+speech or operating-system accessibility preferences. Gallery entry points are
+omitted from production builds.
 
 ## Debugging: choose the smallest relevant test
 

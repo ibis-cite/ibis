@@ -57,3 +57,12 @@ Every insertion ends in one visible state: inserted, or copied with a reason. Se
 The desktop app (`apps/desktop`) is a Tauri 2 shell: a React and TypeScript interface in the system web view, and a thin Rust layer that calls `ibis-core`. The web interface has no file system, shell or network permissions; it can only call the app's own commands.
 
 Until measurements justify more, the app is a single process that keeps the library index in memory and hides its window between uses (ADR 0012). The original plan of a small background engine plus an on-demand picker process (ADR 0004) remains the option if idle memory or wakeups exceed the budgets.
+
+The preview's hosted debug qualification limits are recorded in
+[`scripts/smoke-budgets.json`](../scripts/smoke-budgets.json), with measurements
+and their scope in [the testing strategy](testing.md#performance-evidence-and-budgets-9).
+CI enforces startup, first-result and current process-tree memory limits for
+three fresh 100,000-reference processes on each hosted OS. Native automation
+overhead is included. These are regression limits for those runner cells;
+idle memory, CPU wakeups, peak memory and user-perceived summon latency still
+need separate measurements under #9.
