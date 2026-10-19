@@ -628,7 +628,8 @@ fn install_loaded(
             }
             library.opening = false;
             library.error = None;
-            library.note = None;
+            // Keep the note: a "not saved for next time" warning must outlive
+            // the check that showing the picker starts right after it.
             library.requested = library.source.clone();
             Some(status(&library))
         }
@@ -1227,6 +1228,20 @@ mod tests {
             .unwrap_or_else(|| panic!("the refresh is current"));
         assert_eq!(unchanged.state, LibraryState::Loaded);
         assert_eq!(unchanged.references, 1);
+
+        let saved = "the library opened but could not be saved for next time: synthetic";
+        if let Ok(mut library) = library.lock() {
+            library.note = Some(saved.to_string());
+        }
+        let (request, _, _) = begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7)))
+            .unwrap_or_else(|| panic!("the refresh should start"));
+        let kept = install_loaded(&library, &requests, request, Ok(Loaded::Unchanged))
+            .unwrap_or_else(|| panic!("the refresh is current"));
+        assert_eq!(
+            kept.note.as_deref(),
+            Some(saved),
+            "an unchanged check keeps the warning"
+        );
 
         let (request, _, _) = begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7)))
             .unwrap_or_else(|| panic!("the refresh should start"));
