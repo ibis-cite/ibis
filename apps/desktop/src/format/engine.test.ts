@@ -109,10 +109,23 @@ describe("formatted citations", () => {
     expect(citation.problems.map((problem) => problem.id)).toEqual(["broken"]);
   });
 
+  it("numbers and disambiguates a citation as the bibliography does", () => {
+    const zed: CslItem = { ...garcia, id: "zed2021", title: "Third study", author: [{ family: "Zed", given: "Bo" }] };
+    expect(formatter.citation("ieee", [garcia, zed], [{ id: "zed2021" }], "text").output).toBe("[2]");
+    const second = { ...garcia, id: "garcia2021b", title: "Another study" };
+    const bibliography = formatter.bibliography("apa", [garcia, second], "text").output;
+    expect(bibliography).toContain("(2021a)");
+    const suffix = bibliography.includes("(2021a). Another") ? "b" : "a";
+    expect(formatter.citation("apa", [garcia, second], [{ id: "garcia2021" }], "text").output)
+      .toBe(`(Garcia, 2021${suffix})`);
+  });
+
   it("keeps each entry on one line", () => {
     const multiline = { ...garcia, title: "First line\nsecond line" };
     const rtf = formatter.bibliography("apa", [multiline, mueller], "rtf").output;
     expect(rtf.match(/\\par/g)).toHaveLength(1);
+    const broken: CslItem = { id: "broken", type: "book", title: "Broken\ntitle", author: [{ family: 5 }] };
+    expect(formatter.bibliography("apa", [garcia, broken], "text").output.split("\n")).toHaveLength(2);
   });
 
   it("escapes fallback text for each output", () => {

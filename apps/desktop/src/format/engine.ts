@@ -98,33 +98,27 @@ export class Formatter {
         found.push({ ...cite, id: key });
       }
     }
-    const cluster = (chosen: CiteItem[]) =>
-      chosen.length === 0
-        ? ""
-        : this.attempt(style, keyed.filter((item) => chosen.some((cite) => cite.id === item.id)), format, (engine) =>
-          engine.makeCitationCluster(chosen),
-        );
+    // Load every reference, not only the cited ones, so numbers and year
+    // suffixes match the bibliography for the same items.
+    const cluster = (chosen: CiteItem[], loaded: CslItem[]) =>
+      chosen.length === 0 ? "" : this.attempt(style, loaded, format, (engine) => engine.makeCitationCluster(chosen));
     let output: string;
     try {
-      output = cluster(found);
+      output = cluster(found, keyed);
     } catch {
-      // Find the references this style cannot format; cite the rest together.
-      const failing = found.filter((cite) => !succeeds(() => cluster([cite])));
-      const good = found.filter((cite) => !failing.includes(cite));
-      for (const cite of failing) {
-        const item = keyed.find((candidate) => candidate.id === cite.id);
-        problems.push({ id: callerId(items, cite.id), reason: FALLBACK_REASON });
-        missing.push(escape(item?.title || callerId(items, cite.id), format));
-      }
+      // Leave out the references this style cannot format; cite the rest together.
+      const loadable = keyed.filter((item) => succeeds(() => cluster([{ id: item.id }], [item])));
+      let good = found.filter((cite) => loadable.some((item) => item.id === cite.id));
       try {
-        output = cluster(good);
+        output = cluster(good, loadable);
       } catch {
         output = "";
-        for (const cite of good) {
-          problems.push({ id: callerId(items, cite.id), reason: FALLBACK_REASON });
-          const item = keyed.find((candidate) => candidate.id === cite.id);
-          missing.push(escape(item?.title || callerId(items, cite.id), format));
-        }
+        good = [];
+      }
+      for (const cite of found.filter((cite) => !good.includes(cite))) {
+        const item = keyed.find((candidate) => candidate.id === cite.id);
+        problems.push({ id: callerId(items, cite.id), reason: FALLBACK_REASON });
+        missing.push(escape(oneLine(item?.title || callerId(items, cite.id)), format));
       }
     }
     const text = [output, ...missing].filter(Boolean).join("; ");
@@ -152,7 +146,7 @@ export class Formatter {
       }
       const shown = keyed.filter((item) => !good.includes(item));
       const problems = shown.map((item) => ({ id: callerId(items, item.id), reason: FALLBACK_REASON }));
-      const fallback = shown.map((item) => entry(escape(item.title || callerId(items, item.id), format), format));
+      const fallback = shown.map((item) => entry(escape(oneLine(item.title || callerId(items, item.id)), format), format));
       const output = [...formatted, ...fallback].join("\n");
       return { output: wrap(output, format, "bibliography"), problems };
     }
@@ -194,7 +188,11 @@ function entries(engine: Engine): string[] {
   const bibliography = engine.makeBibliography();
   if (!bibliography) throw new Error("the style has no bibliography");
   // One line per entry: a line break inside a field must not split it.
-  return bibliography[1].map((text) => text.replace(/\s*\n\s*/g, " ").trim());
+  return bibliography[1].map(oneLine);
+}
+
+function oneLine(text: string): string {
+  return text.replace(/\s*\n\s*/g, " ").trim();
 }
 
 function entry(text: string, format: OutputFormat): string {
