@@ -248,6 +248,12 @@ jobs:
           python scripts/smoke-native.py --self-test
           python scripts/smoke-native.py --app target/debug/ibis-desktop.exe --output screenshots/smoke-Windows --budgets scripts/smoke-budgets.json
 
+      - name: Observe native materials and accessibility changes (macOS)
+        if: always() && steps.native_build.outcome == 'success' && runner.os == 'macOS'
+        run: |
+          python3 -B scripts/test_native_appearance_macos.py
+          python3 scripts/check-native-appearance-macos.py --app target/debug/ibis-desktop --output screenshots/appearance-macOS
+
       - name: Exercise native library chooser and Quit
         if: always() && steps.native_build.outcome == 'success'
         working-directory: .
