@@ -10,12 +10,14 @@
 //! references and are left out without a warning, as Zotero's own citation
 //! dialog does. Anything else that cannot be read becomes a [`LoadWarning`].
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
 use serde_json::{Map, Value};
 
-use crate::model::{Issued, LoadResult, LoadWarning, Name, PartialDate, RecordId, Reference, WarningKind};
+use crate::model::{
+    Issued, LoadResult, LoadWarning, Name, PartialDate, RecordId, Reference, WarningKind, days_in_month,
+};
 
 /// Which Zotero library items belong to. Identity is the library plus the
 /// item key, never a citation key (ADR 0006).
@@ -50,12 +52,26 @@ const IGNORED: [&str; 4] = ["id", "type", "citation-key", "keyword"];
 
 /// Turn Zotero items (each an object with `key`, `data` and `csljson`, as
 /// the API returns them with `include=data,csljson`) into references.
+///
+/// An item key seen twice keeps the first item. A citation key shared by
+/// several items keeps them all, since their identity differs, but is
+/// reported because a citation would be ambiguous.
 pub fn load_items(library: Library, items: &[Value]) -> LoadResult {
     let mut result = LoadResult::default();
+    let mut seen = BTreeSet::new();
     for item in items {
         match load_item(library, item) {
             Ok(Some((reference, problems))) => {
                 let key = reference.id.native_key.clone();
+                if !seen.insert(key.clone()) {
+                    result.warnings.push(LoadWarning {
+                        kind: WarningKind::DuplicateKey,
+                        line: None,
+                        message: format!("the Zotero item `{key}` appears twice; the first copy is used"),
+                        key: Some(key),
+                    });
+                    continue;
+                }
                 result.warnings.extend(problems.into_iter().map(|message| LoadWarning {
                     kind: WarningKind::Field,
                     line: None,
@@ -73,6 +89,27 @@ pub fn load_items(library: Library, items: &[Value]) -> LoadResult {
             }),
         }
     }
+    let mut owners: BTreeMap<&str, Vec<&str>> = BTreeMap::new();
+    for reference in &result.references {
+        if let Some(citekey) = &reference.citekey {
+            owners.entry(citekey).or_default().push(&reference.id.native_key);
+        }
+    }
+    let shared: Vec<LoadWarning> = owners
+        .into_iter()
+        .filter(|(_, items)| items.len() > 1)
+        .map(|(citekey, items)| LoadWarning {
+            kind: WarningKind::DuplicateKey,
+            line: None,
+            key: Some(citekey.to_string()),
+            message: format!(
+                "the citation key `{citekey}` is used by {} items ({}); citing it is ambiguous",
+                items.len(),
+                items.join(", ")
+            ),
+        })
+        .collect();
+    result.warnings.extend(shared);
     result
 }
 
@@ -104,20 +141,21 @@ fn load_item(library: Library, item: &Value) -> Result<Loaded, (Option<String>, 
             source: library.to_string(),
             native_key: key.to_string(),
         },
-        citekey: citation_key(data, csl),
-        item_type: csl
-            .get("type")
-            .and_then(Value::as_str)
-            .filter(|t| !t.is_empty())
-            .unwrap_or("document")
-            .to_string(),
+        citekey: citation_key(data, csl, &mut problems),
+        item_type: match csl.get("type").and_then(Value::as_str).filter(|t| !t.is_empty()) {
+            Some(kind) => kind.to_string(),
+            None => {
+                problems.push("the item has no CSL type; it is treated as a document".to_string());
+                "document".to_string()
+            }
+        },
         title: text(csl, "title").map(|t| rich_text(&t)),
         authors: names(csl, "author", &mut problems),
         editors: names(csl, "editor", &mut problems),
         other_names: BTreeMap::new(),
         issued: None,
         dates: BTreeMap::new(),
-        container_title: text(csl, "container-title"),
+        container_title: text(csl, "container-title").map(|t| rich_text(&t)),
         doi: text(csl, "DOI"),
         url: text(csl, "URL"),
         abstract_text: text(csl, "abstract"),
@@ -137,7 +175,7 @@ fn load_item(library: Library, item: &Value) -> Result<Loaded, (Option<String>, 
                 reference.other_names.insert(name.to_string(), list);
             }
         } else if value.get("date-parts").is_some() || value.get("raw").is_some() || value.get("literal").is_some() {
-            match date(value) {
+            match date(value, name, &mut problems) {
                 Some(date) if name == "issued" => reference.issued = Some(date),
                 Some(date) => {
                     reference.dates.insert(name.to_string(), date);
@@ -160,7 +198,7 @@ fn load_item(library: Library, item: &Value) -> Result<Loaded, (Option<String>, 
             }
         } else if let Some(text) = scalar(value) {
             reference.variables.insert(name.to_string(), text);
-        } else if !value.is_null() {
+        } else if !value.is_null() && value.as_str().is_none() {
             problems.push(format!("the field `{name}` could not be read"));
         }
     }
@@ -178,12 +216,21 @@ fn is_trashed(data: &Map<String, Value>) -> bool {
 /// Zotero's own citation key field (Zotero 7 and later), then the
 /// `Citation Key:` line Better BibTeX and older versions keep in Extra, then
 /// the key in the CSL export.
-fn citation_key(data: &Map<String, Value>, csl: &Map<String, Value>) -> Option<String> {
-    let usable = |key: &str| {
+/// A key with spaces or the characters `,`, `{` and `}` would break LaTeX and
+/// Pandoc citations, so it is reported and the next source is tried.
+fn citation_key(data: &Map<String, Value>, csl: &Map<String, Value>, problems: &mut Vec<String>) -> Option<String> {
+    let mut usable = |key: &str| {
         let key = key.trim();
-        (!key.is_empty() && !key.chars().any(char::is_whitespace)).then(|| key.to_string())
+        if key.is_empty() {
+            None
+        } else if key.chars().any(|c| c.is_whitespace() || matches!(c, ',' | '{' | '}')) {
+            problems.push("a citation key contains spaces, commas or braces and was not used".to_string());
+            None
+        } else {
+            Some(key.to_string())
+        }
     };
-    if let Some(key) = data.get("citationKey").and_then(Value::as_str).and_then(usable) {
+    if let Some(key) = data.get("citationKey").and_then(Value::as_str).and_then(&mut usable) {
         return Some(key);
     }
     let from_extra = data.get("extra").and_then(Value::as_str).and_then(|extra| {
@@ -195,7 +242,7 @@ fn citation_key(data: &Map<String, Value>, csl: &Map<String, Value>) -> Option<S
                 .then(|| usable(value))?
         })
     });
-    from_extra.or_else(|| csl.get("citation-key").and_then(Value::as_str).and_then(usable))
+    from_extra.or_else(|| csl.get("citation-key").and_then(Value::as_str).and_then(&mut usable))
 }
 
 fn text(csl: &Map<String, Value>, name: &str) -> Option<String> {
@@ -204,7 +251,7 @@ fn text(csl: &Map<String, Value>, name: &str) -> Option<String> {
 
 fn scalar(value: &Value) -> Option<String> {
     match value {
-        Value::String(s) => Some(s.trim().to_string()),
+        Value::String(s) => Some(s.trim().to_string()).filter(|s| !s.is_empty()),
         Value::Number(n) => Some(n.to_string()),
         _ => None,
     }
@@ -257,38 +304,67 @@ fn names(csl: &Map<String, Value>, field: &str, problems: &mut Vec<String>) -> V
     out
 }
 
-/// A CSL date with `date-parts`. Seasons (months 13–16) and impossible days
-/// keep only the parts that are valid; a date with no valid year is `None`.
-fn date(value: &Value) -> Option<Issued> {
+/// A CSL date with `date-parts`. Seasons (months 13–16), impossible days and
+/// an unreadable range end are left out and reported; a date with no valid
+/// year is `None`.
+fn date(value: &Value, name: &str, problems: &mut Vec<String>) -> Option<Issued> {
     let parts = value.get("date-parts")?.as_array()?;
-    let start = partial_date(parts.first()?)?;
-    let end = parts.get(1).and_then(partial_date).filter(|end| *end != start);
+    let start = partial_date(parts.first()?, name, problems)?;
+    let end = match parts.get(1) {
+        None => None,
+        Some(end) => {
+            let end = partial_date(end, name, problems);
+            if end.is_none() {
+                problems.push(format!(
+                    "the end of the date `{name}` could not be read and was left out"
+                ));
+            }
+            end.filter(|end| *end != start)
+        }
+    };
     let circa = match value.get("circa") {
         Some(Value::Bool(b)) => *b,
         Some(Value::Number(n)) => n.as_u64().is_some_and(|n| n != 0),
-        Some(Value::String(s)) => !s.is_empty(),
+        Some(Value::String(s)) => !matches!(s.trim().to_ascii_lowercase().as_str(), "" | "0" | "false"),
         _ => false,
     };
     Some(Issued { start, end, circa })
 }
 
-fn partial_date(parts: &Value) -> Option<PartialDate> {
+fn partial_date(parts: &Value, name: &str, problems: &mut Vec<String>) -> Option<PartialDate> {
     let parts = parts.as_array()?;
-    let number = |i: usize| -> Option<i64> {
+    let number = |i: usize| -> Option<Option<i64>> {
         match parts.get(i)? {
-            Value::Number(n) => n.as_i64(),
-            Value::String(s) => s.trim().parse().ok(),
-            _ => None,
+            Value::Number(n) => Some(n.as_i64()),
+            Value::String(s) => Some(s.trim().parse().ok()),
+            _ => Some(None),
         }
     };
-    let year = i32::try_from(number(0)?).ok()?;
-    let month = number(1)
-        .and_then(|m| u8::try_from(m).ok())
-        .filter(|m| (1..=12).contains(m));
-    let day = month
-        .and(number(2))
-        .and_then(|d| u8::try_from(d).ok())
-        .filter(|d| (1..=31).contains(d));
+    let year = i32::try_from(number(0)??).ok()?;
+    let month = match number(1) {
+        None => None,
+        Some(m) => {
+            let m = m.and_then(|m| u8::try_from(m).ok()).filter(|m| (1..=12).contains(m));
+            if m.is_none() {
+                problems.push(format!(
+                    "the month of the date `{name}` is not a calendar month and was left out"
+                ));
+            }
+            m
+        }
+    };
+    let day = match (month, number(2)) {
+        (Some(month), Some(d)) => {
+            let d = d
+                .and_then(|d| u8::try_from(d).ok())
+                .filter(|d| (1..=days_in_month(year, month)).contains(d));
+            if d.is_none() {
+                problems.push(format!("the day of the date `{name}` does not exist and was left out"));
+            }
+            d
+        }
+        _ => None,
+    };
     Some(PartialDate { year, month, day })
 }
 
@@ -507,30 +583,116 @@ mod tests {
     }
 
     #[test]
-    fn dates_keep_ranges_and_uncertainty_but_drop_invalid_parts() {
-        let parsed = |value: Value| date(&value);
+    fn dates_keep_ranges_and_uncertainty_but_report_invalid_parts() {
+        let parsed = |value: Value| {
+            let mut problems = Vec::new();
+            (date(&value, "issued", &mut problems), problems)
+        };
         assert_eq!(
             parsed(json!({ "date-parts": [[2019, 21], [2020, 2, 31]], "circa": 1 })),
-            Some(Issued {
-                start: PartialDate::year(2019),
-                end: Some(PartialDate {
-                    year: 2020,
-                    month: Some(2),
-                    day: Some(31)
+            (
+                Some(Issued {
+                    start: PartialDate::year(2019),
+                    end: Some(PartialDate {
+                        year: 2020,
+                        month: Some(2),
+                        day: None
+                    }),
+                    circa: true
                 }),
-                circa: true
-            })
+                vec![
+                    "the month of the date `issued` is not a calendar month and was left out".to_string(),
+                    "the day of the date `issued` does not exist and was left out".to_string(),
+                ]
+            )
+        );
+        assert_eq!(
+            parsed(json!({ "date-parts": [[2020, 2, 29]] })).0.map(|d| d.start.day),
+            Some(Some(29))
+        );
+        assert_eq!(
+            parsed(json!({ "date-parts": [[2019], ["x"]] })),
+            (
+                Some(Issued::year(2019)),
+                vec!["the end of the date `issued` could not be read and was left out".to_string()]
+            )
         );
         assert_eq!(
             parsed(json!({ "date-parts": [[2019], [2019]] })),
-            Some(Issued::year(2019))
+            (Some(Issued::year(2019)), vec![])
         );
         assert_eq!(
-            parsed(json!({ "date-parts": [[-50]] })).map(|d| d.start.year),
+            parsed(json!({ "date-parts": [[-50]] })).0.map(|d| d.start.year),
             Some(-50)
         );
-        assert_eq!(parsed(json!({ "date-parts": [[]] })), None);
-        assert_eq!(parsed(json!({ "date-parts": [[99999999999_i64]] })), None);
+        for circa in [json!("false"), json!("0"), json!(""), json!(false), json!(0)] {
+            let (d, _) = parsed(json!({ "date-parts": [[2019]], "circa": circa }));
+            assert_eq!(d.map(|d| d.circa), Some(false), "{circa}");
+        }
+        assert_eq!(parsed(json!({ "date-parts": [[]] })).0, None);
+        assert_eq!(parsed(json!({ "date-parts": [[99999999999_i64]] })).0, None);
+    }
+
+    #[test]
+    fn repeated_items_and_shared_citation_keys_are_reported() {
+        let with_key =
+            |key: &str, citekey: &str| item(key, json!({ "citationKey": citekey }), json!({ "type": "book" }));
+        let result = load_items(
+            Library::User,
+            &[
+                with_key("A", "same"),
+                with_key("A", "other"),
+                with_key("B", "same"),
+                with_key("C", "own"),
+            ],
+        );
+        let keys: Vec<_> = result.references.iter().map(|r| r.id.native_key.as_str()).collect();
+        assert_eq!(keys, ["A", "B", "C"]);
+        let warnings: Vec<_> = result
+            .warnings
+            .iter()
+            .map(|w| (w.kind, w.key.as_deref(), w.message.as_str()))
+            .collect();
+        assert_eq!(
+            warnings,
+            [
+                (
+                    WarningKind::DuplicateKey,
+                    Some("A"),
+                    "the Zotero item `A` appears twice; the first copy is used"
+                ),
+                (
+                    WarningKind::DuplicateKey,
+                    Some("same"),
+                    "the citation key `same` is used by 2 items (A, B); citing it is ambiguous"
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn unusable_citation_keys_missing_types_and_empty_fields_are_handled_visibly() {
+        let result = load_items(
+            Library::User,
+            &[item(
+                "K",
+                json!({ "citationKey": "a,b", "extra": "Citation Key: {x}" }),
+                json!({ "citation-key": "good", "volume": "  ", "publisher": "" }),
+            )],
+        );
+        let r = &result.references[0];
+        assert_eq!(r.citekey.as_deref(), Some("good"));
+        assert_eq!(r.item_type, "document");
+        assert!(r.variables.is_empty());
+        let messages: Vec<_> = result.warnings.iter().map(|w| w.message.as_str()).collect();
+        assert_eq!(
+            messages,
+            [
+                "a citation key contains spaces, commas or braces and was not used",
+                "a citation key contains spaces, commas or braces and was not used",
+                "the item has no CSL type; it is treated as a document",
+            ]
+        );
     }
 
     #[test]
@@ -547,5 +709,21 @@ mod tests {
         )
         .references[0];
         assert_eq!(r.title_plain().as_deref(), Some("a < b"));
+    }
+
+    #[test]
+    fn container_titles_are_rich_text_and_entities_round_trip() {
+        let r = &load_items(
+            Library::User,
+            &[item(
+                "K",
+                json!({}),
+                json!({ "type": "chapter", "title": "Already &amp; escaped &lt;x&gt;", "container-title": "<i>Q</i> & A" }),
+            )],
+        )
+        .references[0];
+        assert_eq!(r.container_title.as_deref(), Some("<i>Q</i> &amp; A"));
+        assert_eq!(r.title.as_deref(), Some("Already &amp;amp; escaped &amp;lt;x&amp;gt;"));
+        assert_eq!(r.title_plain().as_deref(), Some("Already &amp; escaped &lt;x&gt;"));
     }
 }
