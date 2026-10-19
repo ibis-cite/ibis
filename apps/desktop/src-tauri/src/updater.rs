@@ -395,5 +395,9 @@ mod tests {
             fetch(&other_key, "latest.json").is_err(),
             "a package signed with another key must be refused"
         );
+        // Every request, manifest and package alike, names Ibis and only Ibis.
+        let agents = agents.lock().map(|a| a.clone()).unwrap_or_default();
+        assert_eq!(agents.len(), 6, "{agents:?}");
+        assert!(agents.iter().all(|agent| agent.starts_with("ibis/")), "{agents:?}");
     }
 }
