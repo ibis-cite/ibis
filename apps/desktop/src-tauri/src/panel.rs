@@ -3,7 +3,98 @@
 use tauri::{AppHandle, Manager};
 use tauri_nspanel::{CollectionBehavior, ManagerExt, PanelLevel, WebviewWindowExt, tauri_panel};
 
-use crate::diagnostics::{NativeIssue, report};
+use crate::diagnostics::{NativeIssue, checked, report};
+use crate::panel_startup::InitialPresentation;
+
+pub(crate) struct StartupPresentation(std::sync::Mutex<InitialPresentation>);
+
+/// Preserve user-visible intent while preventing a visible NSWindow-to-NSPanel
+/// conversion before AppKit has settled its launch and activation changes.
+pub(crate) fn prepare_startup(context: &mut tauri::Context<tauri::Wry>) -> StartupPresentation {
+    let intent = context
+        .config_mut()
+        .app
+        .windows
+        .iter_mut()
+        .find(|window| window.label == "main");
+    let startup = if let Some(window) = intent {
+        let startup = InitialPresentation::new(window.visible, window.focus);
+        window.visible = false;
+        window.focus = false;
+        startup
+    } else {
+        // configure() already rejects a missing main window; do not invent one.
+        InitialPresentation::new(false, false)
+    };
+    StartupPresentation(std::sync::Mutex::new(startup))
+}
+
+pub(crate) fn cancel_initial_presentation(app: &AppHandle) {
+    report(update_startup(app, InitialPresentation::cancel), NativeIssue::Focus);
+}
+
+pub(crate) fn allows_automatic_blur(app: &AppHandle) -> bool {
+    checked(
+        update_startup(app, |startup| startup.allows_automatic_blur()),
+        NativeIssue::Focus,
+    )
+    .unwrap_or(true)
+}
+
+fn update_startup<T>(app: &AppHandle, change: impl FnOnce(&mut InitialPresentation) -> T) -> Result<T, ()> {
+    let state = app.try_state::<StartupPresentation>().ok_or(())?;
+    let mut startup = state.0.lock().map_err(|_| ())?;
+    Ok(change(&mut startup))
+}
+
+pub(crate) fn page_loaded(app: &AppHandle) {
+    startup_readiness(app, false);
+}
+
+fn startup_readiness(app: &AppHandle, panel_ready: bool) {
+    let handle = app.clone();
+    report(
+        app.run_on_main_thread(move || {
+            let intent = checked(
+                update_startup(&handle, |startup| {
+                    if panel_ready {
+                        startup.panel_ready()
+                    } else {
+                        startup.page_loaded()
+                    }
+                }),
+                NativeIssue::Focus,
+            )
+            .flatten();
+            // Readiness is consumed on the main thread immediately before
+            // presentation. An earlier explicit show/dismiss cancels it even
+            // if this readiness callback had already been queued.
+            if let Some(focused) = intent {
+                let Some(panel) = checked(handle.get_webview_panel("main"), NativeIssue::Window) else {
+                    return;
+                };
+                if focused {
+                    panel.show_and_make_key();
+                    if let Some(window) = checked(handle.get_webview_window("main").ok_or(()), NativeIssue::Window) {
+                        focus_webview(&window);
+                    }
+                } else {
+                    panel.order_front_regardless();
+                }
+                #[cfg(debug_assertions)]
+                eprintln!(
+                    "ibis: panel initial presented focused={} visible={} key={} first_responder={} outer_responder={}",
+                    focused,
+                    panel.as_panel().isVisible(),
+                    panel.as_panel().isKeyWindow(),
+                    panel.as_panel().firstResponder().is_some(),
+                    outer_is_responder(panel.as_panel())
+                );
+            }
+        }),
+        NativeIssue::Focus,
+    );
+}
 
 tauri_panel! {
     panel!(PickerPanel {
@@ -45,9 +136,9 @@ pub(crate) fn configure(app: &AppHandle) -> Result<(), Box<dyn std::error::Error
     panel.set_works_when_modal(true);
     app.set_activation_policy(tauri::ActivationPolicy::Accessory)
         .map_err(|_| "the launcher activation policy could not be set")?;
-    // Tauri creates the initial visible window before setup. Conversion can
-    // leave its outer NSView as responder even when search reports DOM focus.
-    // A future hidden startup window must remain hidden and unfocused.
+    // Conversion and activation changes run while the native window is hidden.
+    // Its original visibility/focus intent is presented once both this setup
+    // and the first actual page navigation have finished.
     #[cfg(debug_assertions)]
     eprintln!(
         "ibis: panel initial before visible={} key={} first_responder={} outer_responder={}",
@@ -56,28 +147,7 @@ pub(crate) fn configure(app: &AppHandle) -> Result<(), Box<dyn std::error::Error
         panel.as_panel().firstResponder().is_some(),
         outer_is_responder(panel.as_panel())
     );
-    if panel.as_panel().isVisible() {
-        // Use the same ordering and responder sequence as later summons.
-        // Initial AppKit key ownership alone did not prove hardware delivery.
-        panel.show_and_make_key();
-        #[cfg(debug_assertions)]
-        eprintln!(
-            "ibis: panel initial after_show visible={} key={} first_responder={} outer_responder={}",
-            panel.as_panel().isVisible(),
-            panel.as_panel().isKeyWindow(),
-            panel.as_panel().firstResponder().is_some(),
-            outer_is_responder(panel.as_panel())
-        );
-        focus_webview(&window);
-        #[cfg(debug_assertions)]
-        eprintln!(
-            "ibis: panel initial after_webview visible={} key={} first_responder={} outer_responder={}",
-            panel.as_panel().isVisible(),
-            panel.as_panel().isKeyWindow(),
-            panel.as_panel().firstResponder().is_some(),
-            outer_is_responder(panel.as_panel())
-        );
-    }
+    startup_readiness(app, true);
     Ok(())
 }
 
@@ -151,6 +221,7 @@ fn observe_lifecycle(app: &AppHandle, focused: Option<bool>) {
 /// A panel takes keyboard focus without activating Ibis or switching Spaces.
 /// Commands and global shortcut callbacks can arrive from worker threads.
 pub(crate) fn show(app: &AppHandle) {
+    cancel_initial_presentation(app);
     let handle = app.clone();
     report(
         app.run_on_main_thread(move || match handle.get_webview_panel("main") {

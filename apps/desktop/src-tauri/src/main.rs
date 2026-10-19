@@ -15,6 +15,8 @@ mod library;
 mod native_feel;
 #[cfg(target_os = "macos")]
 mod panel;
+#[cfg(any(target_os = "macos", test))]
+mod panel_startup;
 mod picker;
 mod placement;
 mod preferences;
@@ -43,9 +45,14 @@ use crate::tray::create_tray;
 fn main() {
     let mut context = tauri::generate_context!();
     native_feel::configure(&mut context);
+    #[cfg(target_os = "macos")]
+    let initial_panel = panel::prepare_startup(&mut context);
     #[cfg(debug_assertions)]
     report(gallery::configure(&mut context), NativeIssue::GalleryNavigation);
-    let builder = tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    #[cfg(target_os = "macos")]
+    let builder = builder.manage(initial_panel);
+    let builder = builder
         // Must be registered first: a second launch brings the running picker forward.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show_picker(app)))
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -82,7 +89,11 @@ fn main() {
                 // not to its own file dialog.
                 WindowEvent::Focused(false) => {
                     let dialog_open = window.state::<DialogOpen>().0.load(Ordering::SeqCst);
-                    if hides_on_blur(!cfg!(debug_assertions), dialog_open) {
+                    #[cfg(target_os = "macos")]
+                    let startup_allows_blur = panel::allows_automatic_blur(window.app_handle());
+                    #[cfg(not(target_os = "macos"))]
+                    let startup_allows_blur = true;
+                    if startup_allows_blur && hides_on_blur(!cfg!(debug_assertions), dialog_open) {
                         dismiss_picker(window.app_handle());
                     }
                 }
@@ -167,16 +178,18 @@ fn main() {
             }
             Ok(())
         });
-    #[cfg(all(target_os = "macos", debug_assertions))]
+    #[cfg(target_os = "macos")]
     let builder = builder.on_page_load(|webview, payload| {
         if webview.label() == "main" && payload.event() == tauri::webview::PageLoadEvent::Finished {
+            #[cfg(debug_assertions)]
             panel::observe_page_load_finished(webview.app_handle());
+            panel::page_loaded(webview.app_handle());
         }
     });
     let app = builder.build(context);
     match app {
         Ok(app) => app.run(|app, event| {
-            // macOS: clicking the Dock icon brings back the hidden picker.
+            // macOS: a repeated OS open request brings back the hidden picker.
             #[cfg(target_os = "macos")]
             if let tauri::RunEvent::Reopen { .. } = event {
                 show_picker(app);

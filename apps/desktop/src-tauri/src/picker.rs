@@ -175,6 +175,8 @@ pub(crate) fn hide_picker(app: AppHandle) {
 /// A window hide alone leaves Ibis active on macOS, swallowing the next paste.
 /// Every dismissal path must also release application focus.
 pub(crate) fn dismiss_picker(app: &AppHandle) {
+    #[cfg(target_os = "macos")]
+    crate::panel::cancel_initial_presentation(app);
     if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window) {
         dismiss_with(
             || window.hide(),
