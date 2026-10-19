@@ -98,15 +98,14 @@ export class Formatter {
         found.push({ ...cite, id: key });
       }
     }
-    // Load every reference, not only the cited ones, so numbers and year
-    // suffixes match the bibliography. In a numbered style also build the
-    // bibliography, so a reference it leaves out takes no number here.
-    const numbered = STYLES[style].xml.includes('"citation-number"');
+    // Load every reference, not only the cited ones, and build the
+    // bibliography too, so a reference the bibliography leaves out is left out
+    // here as well and numbers and year suffixes match it.
     const cluster = (chosen: CiteItem[], loaded: CslItem[]) =>
       chosen.length === 0
         ? ""
         : this.attempt(style, loaded, format, (engine) => {
-          if (numbered) engine.makeBibliography();
+          engine.makeBibliography();
           return engine.makeCitationCluster(chosen);
         });
     let output: string;

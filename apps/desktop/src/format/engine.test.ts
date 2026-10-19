@@ -127,6 +127,23 @@ describe("formatted citations", () => {
       .toBe(`(Garcia, 2021${suffix})`);
   });
 
+  it("gives no year suffix for a reference the bibliography leaves out", () => {
+    const smith = (title: string): CslItem => ({
+      id: title,
+      type: "book",
+      title,
+      author: [{ family: "Smith", given: "Jo" }],
+      issued: { "date-parts": [[2020]] },
+    });
+    // A bad editor breaks only the bibliography entry in author-date styles.
+    const two = { ...smith("Two"), editor: [{ family: 5 }] };
+    for (const style of ["apa", "harvard-cite-them-right"] as const) {
+      expect(formatter.bibliography(style, [smith("One"), two], "text").problems.map((p) => p.id)).toEqual(["Two"]);
+      expect(formatter.citation(style, [smith("One"), two], [{ id: "One" }], "text").output).toMatch(/2020\)$/);
+      expect(formatter.citation(style, [smith("One"), two], [{ id: "Two" }], "text").output).toBe("Two");
+    }
+  });
+
   it("keeps each entry on one line", () => {
     const multiline = { ...garcia, title: "First line\nsecond line" };
     const rtf = formatter.bibliography("apa", [multiline, mueller], "rtf").output;
