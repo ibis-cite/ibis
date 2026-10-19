@@ -167,10 +167,136 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  # Install each package the way a user would, start the installed app and
+  # drive it with the native smoke test, so a broken installer or a package
+  # that will not start is never published. The Intel disk image is built but
+  # not installed: this job uses only Apple silicon macOS runners.
+  install:
+    name: Install and start (${{ matrix.name }})
+    needs: build
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: macOS (Apple silicon), os: macos-15, target: aarch64-apple-darwin }
+          - { name: Windows, os: windows-2025, target: x86_64-pc-windows-msvc }
+          - { name: Linux, os: ubuntu-24.04, target: x86_64-unknown-linux-gnu }
+    defaults:
+      run:
+        shell: bash
+    env:
+      IBIS_LIBRARY: ${{ github.workspace }}/fixtures/bibtex/real-world.bib
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Download the packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ibis-${{ matrix.target }}
+          path: dist
+
+      # Starts an installed app with the synthetic library and fails if it
+      # exits within 20 seconds. The steps below reuse it.
+      - name: Prepare the startup check
+        run: |
+          cat > "$RUNNER_TEMP/stays-up.py" <<'PY'
+          import subprocess, sys, time
+          app = subprocess.Popen(sys.argv[1:])
+          time.sleep(20)
+          if app.poll() is not None:
+              sys.exit(f"::error::{sys.argv[1]} exited with code {app.returncode} during startup")
+          app.terminate()
+          try:
+              app.wait(timeout=10)
+          except subprocess.TimeoutExpired:
+              app.kill()
+          print(f"{sys.argv[1]} started and stayed up")
+          PY
+
+      - name: Install, start and remove (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          # Only test tools here; the .deb must bring its own runtime libraries.
+          sudo apt-get install -y --no-install-recommends xvfb xauth xdotool openbox xterm python3-pyatspi xclip at-spi2-core fonts-noto-core fonts-noto-cjk
+          sudo apt-get install -y ./dist/Ibis-Linux.deb
+          package=$(dpkg-deb --field dist/Ibis-Linux.deb Package)
+          app=$(dpkg -L "$package" | grep -m1 '^/usr/bin/')
+          echo "installed $package at $app"
+          display() { xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- "$@"; }
+          display /usr/bin/python3 scripts/smoke-native.py --app "$app" --output screenshots/install-Linux
+          display /usr/bin/python3 "$RUNNER_TEMP/stays-up.py" "$app"
+          sudo apt-get remove -y "$package"
+          test ! -e "$app"
+          # The AppImage needs FUSE 2, which Ubuntu 24.04 lacks by default;
+          # extract-and-run starts the same bundled files without it.
+          chmod +x dist/Ibis-Linux.AppImage
+          APPIMAGE_EXTRACT_AND_RUN=1 display /usr/bin/python3 "$RUNNER_TEMP/stays-up.py" "$PWD/dist/Ibis-Linux.AppImage"
+
+      - name: Install, start and remove (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          mount="$RUNNER_TEMP/ibis-dmg"
+          apps="$RUNNER_TEMP/Applications"
+          mkdir -p "$apps"
+          hdiutil attach -nobrowse -readonly -mountpoint "$mount" dist/Ibis-macOS-Apple-silicon.dmg
+          ditto "$mount/Ibis.app" "$apps/Ibis.app"
+          hdiutil detach "$mount"
+          codesign --verify --deep --strict "$apps/Ibis.app"
+          app=$(find "$apps/Ibis.app/Contents/MacOS" -type f -perm -u+x | head -n 1)
+          echo "installed at $app"
+          python3 scripts/smoke-native.py --app "$app" --output screenshots/install-macOS
+          python3 "$RUNNER_TEMP/stays-up.py" "$app"
+          rm -rf "$apps/Ibis.app"
+
+      - name: Install, start and remove (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # The setup executable installs for the current user without prompts.
+          ./dist/Ibis-Windows-setup.exe //S
+          dir="$LOCALAPPDATA/Ibis"
+          app=$(find "$dir" -maxdepth 1 -iname '*.exe' ! -iname 'uninstall*' | head -n 1)
+          test -n "$app" || { echo "::error::The setup executable installed no app in $dir"; exit 1; }
+          echo "installed at $app"
+          python scripts/smoke-native.py --app "$app" --output screenshots/install-Windows
+          python "$RUNNER_TEMP/stays-up.py" "$app"
+          "$dir/uninstall.exe" //S
+          # The uninstaller copies itself and returns early; wait for removal.
+          for _ in $(seq 30); do [ -e "$app" ] || break; sleep 2; done
+          test ! -e "$app" || { echo "::error::The uninstaller left $app behind"; exit 1; }
+          # The MSI installs for all users; the runner has administrator rights.
+          msi=$(cygpath -w "$PWD/dist/Ibis-Windows.msi")
+          log=$(cygpath -w "$RUNNER_TEMP/msi.log")
+          if ! MSYS2_ARG_CONV_EXCL='*' msiexec /i "$msi" /qn /norestart '/l*v' "$log"; then
+            tail -n 60 "$RUNNER_TEMP/msi.log"
+            exit 1
+          fi
+          app=$(find "$PROGRAMFILES/Ibis" -maxdepth 1 -iname '*.exe' ! -iname 'uninstall*' | head -n 1)
+          test -n "$app" || { echo "::error::The MSI installed no app in $PROGRAMFILES/Ibis"; exit 1; }
+          echo "installed at $app"
+          python "$RUNNER_TEMP/stays-up.py" "$app"
+          MSYS2_ARG_CONV_EXCL='*' msiexec /x "$msi" /qn /norestart
+          test ! -e "$app"
+
+      - name: Keep install screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: install-${{ matrix.target }}
+          path: screenshots/*
+          if-no-files-found: warn
+          retention-days: 14
+
   publish:
     name: Publish pre-release
     if: startsWith(github.ref, 'refs/tags/v') && (github.event_name == 'push' || inputs.publish)
-    needs: build
+    needs: [build, install]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -239,7 +365,7 @@ jobs:
   nightly:
     name: Publish nightly pre-release
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
-    needs: build
+    needs: [build, install]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
