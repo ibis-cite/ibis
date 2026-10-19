@@ -9,7 +9,11 @@ fn pandoc_quotes_alphabetic_combining_marks_in_keys() {
     // Pandoc's bare citation-key parser stops before them. With `[@key]`, the
     // remaining text becomes a suffix and silently cites a different key.
     // Pandoc 3.1.11.1 reads the braced spelling back without changing the key.
-    for key in ["synthetic\u{0345}2024", "synthetic\u{05b0}2024", "synthetic\u{093e}2024"] {
+    for key in [
+        "synthetic\u{0345}2024",
+        "synthetic\u{05b0}2024",
+        "synthetic\u{093e}2024",
+    ] {
         let item = CiteItem {
             key: key.to_owned(),
             ..CiteItem::default()
