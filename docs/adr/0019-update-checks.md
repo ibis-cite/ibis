@@ -3,7 +3,7 @@
 Status: accepted (2026-10-19)
 
 ## Context
-Testers should get fixes without reinstalling by hand. Builds are already published on GitHub Releases: numbered previews, and a rolling `nightly` pre-release rebuilt after every change to `main` (#284). All `0.x` releases are pre-releases, so GitHub's `releases/latest` link never finds them. ADR 0008 requires every network feature to be off by default, explained once, to state what is sent, and to be listed in `PRIVACY.md`. The maintainer approved update checks on 2026-10-19 and chose to build them after friends have tried the nightly.
+Testers should get fixes without reinstalling by hand. Builds are already published on GitHub Releases: numbered previews, and a rolling `nightly` pre-release rebuilt after every change to `main` (#284). All `0.x` releases are pre-releases, so GitHub's `releases/latest` link never finds them. ADR 0008 requires every network feature to be off by default, explained once, to state what is sent, and to be listed in `PRIVACY.md`. The maintainer approved update checks on 2026-10-19; they ship in the 0.2 Shared preview milestone.
 
 ## Decision
 - **Tauri's updater plugin**, run from the Rust process only. The web interface gets no network permission and its content security policy is unchanged.
