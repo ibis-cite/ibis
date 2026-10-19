@@ -60,6 +60,15 @@ pub(crate) fn show(app: &AppHandle) {
                     tauri_nspanel::objc2_app_kit::NSApplication::sharedApplication(main_thread)
                         .unhideWithoutActivation();
                     panel.show_and_make_key();
+                    // The panel helper makes its outer content NSView the
+                    // responder. Route hardware keys to the WKWebView itself
+                    // without activating Ibis or changing the user's Space.
+                    if let Some(window) = handle.get_webview_window("main") {
+                        let view: &tauri::Webview<tauri::Wry> = window.as_ref();
+                        report(view.set_focus(), NativeIssue::Focus);
+                    } else {
+                        report(Err::<(), ()>(()), NativeIssue::Window);
+                    }
                     // Observe actual AppKit keyboard ownership independently
                     // of the WebView's accessible/DOM focused search field.
                     #[cfg(debug_assertions)]
