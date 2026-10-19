@@ -31,7 +31,7 @@ fn page(total: usize, items: &[Value]) -> Response {
             ("Total-Results".into(), total.to_string()),
             ("Zotero-Server-ID".into(), "synthetic-server".into()),
         ],
-        body: serde_json::to_vec(items).expect("synthetic items serialize"),
+        body: serde_json::to_vec(items).unwrap_or_else(|error| panic!("synthetic items failed to serialize: {error}")),
     }
 }
 
