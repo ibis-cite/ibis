@@ -57,6 +57,16 @@ context.$ = {CGPreflightPostEventAccess: () => true, CGEventSourceCreate: () => 
 assert.throws(() => context.run(['key', '42', '0', 'escape']), /Native HID event source unavailable/);
 
 const posted = [];
+let unicodeBindings = 0;
+context.ObjC.bindFunction = (name, signature) => {
+    assert.equal(name, 'CGEventKeyboardSetUnicodeString');
+    assert.equal(JSON.stringify(signature), '["void",["void *","unsigned long","void *"]]');
+    unicodeBindings++;
+    context.$.CGEventKeyboardSetUnicodeString = (event, length, bytes) => {
+        assert.equal(bytes.length, length * 2);
+        event.text = bytes.toString('utf16le');
+    };
+};
 context.$ = Object.assign(character => ({dataUsingEncoding: () => {
     const bytes = Buffer.from(character, 'utf16le');
     return {length: bytes.length, bytes};
@@ -64,14 +74,12 @@ context.$ = Object.assign(character => ({dataUsingEncoding: () => {
     CGPreflightPostEventAccess: () => true, CGEventSourceCreate: () => ({}),
     CGEventCreateKeyboardEvent: (_source, code, down) => ({code, down}),
     CGEventSetFlags: (event, flags) => { event.flags = flags; },
-    CGEventKeyboardSetUnicodeString: (event, length, bytes) => {
-        assert.equal(bytes.length, length * 2);
-        event.text = bytes.toString('utf16le');
-    },
+    CGEventKeyboardSetUnicodeString: () => { throw Error('Ref has incompatible type'); },
     kCGHIDEventTap: 9,
     CGEventPost: (tap, event) => { assert.equal(tap, 9); posted.push(event); },
 });
 context.run(['text', '42', '0', '汉😀']);
+assert.equal(unicodeBindings, 1);
 assert.deepEqual(posted.map(event => [event.text, event.down, event.flags]), [
     ['汉', true, 0], ['汉', false, 0], ['😀', true, 0], ['😀', false, 0],
 ]);

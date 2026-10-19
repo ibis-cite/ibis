@@ -74,11 +74,22 @@ function run(argv) {
         if (!preflightPostAccess()) throw Error('TCC event posting is not granted; native smoke unavailable');
         const source = $.CGEventSourceCreate($.kCGEventSourceStateHIDSystemState);
         if (!source) throw Error('Native HID event source unavailable');
+        let unicodeBridgeReady = false;
         return (code, down, flags, character) => {
             const event = $.CGEventCreateKeyboardEvent(source, code, down);
             if (!event) throw Error('Native HID keyboard event unavailable');
             $.CGEventSetFlags(event, flags);
             if (character !== undefined) {
+                if (!unicodeBridgeReady) {
+                    // NSData.bytes is void*, while BridgeSupport insists on a
+                    // UniChar* Ref. Both are pointer arguments in the public
+                    // C ABI; UniCharCount is unsigned long on 64-bit macOS.
+                    // https://developer.apple.com/documentation/coregraphics/cgevent/keyboardsetunicodestring(stringlength:unicodestring:)?language=objc
+                    // https://developer.apple.com/library/archive/documentation/Carbon/Conceptual/Carbon64BitGuide/PortingTo64Bit/PortingTo64Bit.html
+                    try { ObjC.bindFunction('CGEventKeyboardSetUnicodeString', ['void', ['void *', 'unsigned long', 'void *']]); }
+                    catch (_) { throw Error('Native HID Unicode bridge unavailable'); }
+                    unicodeBridgeReady = true;
+                }
                 // NSString/NSData retain the UTF-16 storage until posting.
                 // Each codepoint uses at most two units, retaining surrogates.
                 const data = $(character).dataUsingEncoding($.NSUTF16LittleEndianStringEncoding);
