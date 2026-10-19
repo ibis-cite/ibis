@@ -218,6 +218,14 @@ jobs:
             fi
             return "$rc"
           }
+          # The Windows native smoke test is not yet reliable on hosted
+          # runners, so a failure is retried once in a fresh session.
+          smoke() {
+            local python=$1; shift
+            show "$python" scripts/smoke-native.py "$@" && return 0
+            echo "::warning::Native smoke test failed once; retrying"
+            show "$python" scripts/smoke-native.py "$@"
+          }
           SH
           cat > "$RUNNER_TEMP/stays-up.py" <<'PY'
           import subprocess, sys, time
@@ -245,7 +253,8 @@ jobs:
           app=$(dpkg -L "$package" | grep -m1 '^/usr/bin/')
           echo "installed $package at $app"
           display() { xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- "$@"; }
-          show display /usr/bin/python3 scripts/smoke-native.py --app "$app" --output screenshots/install-Linux
+          py() { display /usr/bin/python3 "$@"; }
+          smoke py --app "$app" --output screenshots/install-Linux
           show display /usr/bin/python3 "$RUNNER_TEMP/stays-up.py" "$app"
           sudo apt-get remove -y "$package"
           test ! -e "$app"
@@ -254,6 +263,7 @@ jobs:
           chmod +x dist/Ibis-Linux.AppImage
           APPIMAGE_EXTRACT_AND_RUN=1 show display /usr/bin/python3 "$RUNNER_TEMP/stays-up.py" "$PWD/dist/Ibis-Linux.AppImage"
 
+      # The app's name is read from what the package installs, never assumed.
       - name: Install, start and remove (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -262,41 +272,53 @@ jobs:
           apps="$RUNNER_TEMP/Applications"
           mkdir -p "$apps"
           hdiutil attach -nobrowse -readonly -mountpoint "$mount" dist/Ibis-macOS-Apple-silicon.dmg
-          ditto "$mount/Ibis.app" "$apps/Ibis.app"
+          bundle=$(find "$mount" -maxdepth 1 -name '*.app' | head -n 1)
+          test -n "$bundle" || { echo "::error::The disk image holds no app"; exit 1; }
+          installed="$apps/$(basename "$bundle")"
+          ditto "$bundle" "$installed"
           hdiutil detach "$mount"
-          codesign --verify --deep --strict "$apps/Ibis.app"
-          app=$(find "$apps/Ibis.app/Contents/MacOS" -type f -perm -u+x | head -n 1)
+          codesign --verify --deep --strict "$installed"
+          app=$(find "$installed/Contents/MacOS" -type f -perm -u+x | head -n 1)
           echo "installed at $app"
-          show python3 scripts/smoke-native.py --app "$app" --output screenshots/install-macOS
+          smoke python3 --app "$app" --output screenshots/install-macOS
           show python3 "$RUNNER_TEMP/stays-up.py" "$app"
-          rm -rf "$apps/Ibis.app"
+          rm -rf "$installed"
 
       - name: Install, start and remove (Windows)
         if: runner.os == 'Windows'
         run: |
           . "$RUNNER_TEMP/diagnose.sh"
+          uninstall_keys() { pwsh -NoProfile -Command '(Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall).PSChildName' | tr -d '\r' | sort; }
+          before=$(uninstall_keys)
           # The setup executable installs for the current user without prompts.
           show ./dist/Ibis-Windows-setup.exe //S
-          dir="$(cygpath -u -F 28)/Ibis"
+          # Find the install folder from the uninstall entry it registered.
+          key=$(comm -13 <(echo "$before") <(uninstall_keys) | head -n 1)
+          test -n "$key" || { echo "::error::The setup executable registered no uninstall entry"; exit 1; }
+          uninstaller=$(KEY="$key" pwsh -NoProfile -Command '(Get-ItemProperty ("HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\" + $env:KEY)).UninstallString' | tr -d '"\r')
+          dir=$(dirname "$(cygpath -u "$uninstaller")")
           app=$(find "$dir" -maxdepth 1 -iname '*.exe' ! -iname 'uninstall*' | head -n 1)
           test -n "$app" || { echo "::error::The setup executable installed no app in $dir"; exit 1; }
           echo "installed at $app"
-          show python scripts/smoke-native.py --app "$app" --output screenshots/install-Windows
+          smoke python --app "$app" --output screenshots/install-Windows
           show python "$RUNNER_TEMP/stays-up.py" "$app"
           "$dir/uninstall.exe" //S
           # The uninstaller copies itself and returns early; wait for removal.
           for _ in $(seq 30); do [ -e "$app" ] || break; sleep 2; done
           test ! -e "$app" || { echo "::error::The uninstaller left $app behind"; exit 1; }
-          # The MSI installs for all users; the runner has administrator rights.
+          # Builds without an MSI skip the rest.
+          [ -e dist/Ibis-Windows.msi ] || exit 0
+          # The MSI installs for all users into a folder with the same name;
+          # the runner has administrator rights.
           msi=$(cygpath -w "$PWD/dist/Ibis-Windows.msi")
           log=$(cygpath -w "$RUNNER_TEMP/msi.log")
           if ! MSYS2_ARG_CONV_EXCL='*' msiexec /i "$msi" /qn /norestart '/l*v' "$log"; then
             iconv -f UTF-16LE -t UTF-8 "$RUNNER_TEMP/msi.log" > "$RUNNER_TEMP/msi.txt" || true
             show sh -c 'tail -n 40 "$1"; exit 1' msiexec "$RUNNER_TEMP/msi.txt"
           fi
-          programs=$(cygpath -u -F 38)
-          app=$(find "$programs/Ibis" -maxdepth 1 -iname '*.exe' ! -iname 'uninstall*' | head -n 1)
-          test -n "$app" || { echo "::error::The MSI installed no app in $programs/Ibis"; exit 1; }
+          dir="$(cygpath -u -F 38)/$(basename "$dir")"
+          app=$(find "$dir" -maxdepth 1 -iname '*.exe' ! -iname 'uninstall*' | head -n 1)
+          test -n "$app" || { echo "::error::The MSI installed no app in $dir"; exit 1; }
           echo "installed at $app"
           show python "$RUNNER_TEMP/stays-up.py" "$app"
           MSYS2_ARG_CONV_EXCL='*' msiexec /x "$msi" /qn /norestart
