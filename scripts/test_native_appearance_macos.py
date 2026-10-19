@@ -1,5 +1,4 @@
 import importlib.util
-import json
 from pathlib import Path
 import subprocess
 import unittest
@@ -32,7 +31,7 @@ class PreferenceTransactionTests(unittest.TestCase):
         self.assertTrue(ui.cleanup_facts["terminated"])
         self.assertFalse(any(call.args[0] == "force-close" for call in helper.call_args_list))
 
-    def test_native_cached_controls_revalidate_before_invoking(self):
+    def test_native_controls_require_fresh_unique_ownership_before_invoking(self):
         subprocess.run(["node", str(Path(__file__).with_name("appearance-macos.test.cjs"))],
                        check=True, capture_output=True, timeout=20)
 
@@ -50,14 +49,6 @@ class PreferenceTransactionTests(unittest.TestCase):
         self.assertTrue(observations[0]["matches_original"])
         self.assertEqual(observations[0]["attempts"][0]["stage"], "helper-timeout")
         self.assertEqual(len(observations[0]["attempts"]), 3)
-
-    def test_cache_metadata_rejects_noninteger_positions_without_changing_owner(self):
-        ui = appearance.NativeUI()
-        ui.owner = json.dumps({"pid": 42, "started": 100})
-        with self.assertRaisesRegex(RuntimeError, "Native control cache metadata unavailable"):
-            ui.cache({"window_count": 1, "contrast": {"window": 0, "index": "bad", "tree_count": 3},
-                      "transparency": {"window": 0, "index": 2, "tree_count": 3}})
-        self.assertEqual(json.loads(ui.owner), {"pid": 42, "started": 100})
 
     def test_restores_original_preferences_after_failed_observation(self):
         state = {"contrast": True, "transparency": True}

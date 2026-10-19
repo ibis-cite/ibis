@@ -127,10 +127,12 @@ settings, saves both native boolean values before changes, and restores them in
 `finally`, including after a failed observation. It never writes preference/TCC
 databases or requests permissions. Only its newly identified System Settings
 process and owned app/backdrop subprocesses can be closed.
-Cached numeric positions are hints into newly read AX arrays: process identity,
-tree counts, checkbox roles and exact fixed labels are revalidated on every
-action. A mismatch triggers one bounded rediscovery; stale indices are never
-invoked. Restoration records all attempts, the actual final booleans and whether
+Each action checks fresh AX arrays across all owned Settings windows, with the
+same process identity and traversal bounds. A single pass reads each node's role
+once and labels only checkbox nodes, rather than scanning the entire tree twice.
+Every action requires one exact match for each fixed preference label. Positions
+and unchanged tree counts cannot prove uniqueness; no control cache is reused.
+Restoration records all attempts, the actual final booleans and whether
 they match the originals. An attempt failure still fails the run even when a
 later read matches. Cleanup observes termination after a normal quit request;
 only a still-live revalidated owned Settings process, after verified restoration,

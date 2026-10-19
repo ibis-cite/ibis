@@ -30,40 +30,23 @@ function run(argv) {
         const windows = owned().process.windows();
         if (windows.length > 10) throw Error('System Settings window traversal exceeded bound');
         const labels = {contrast: 'Increase contrast', transparency: 'Reduce transparency'};
-        const trees = new Map();
-        const tree = index => {
-            if (!trees.has(index)) trees.set(index, windows[index].entireContents());
-            if ([...trees.values()].reduce((sum, nodes) => sum + nodes.length, 0) > 6000) {
-                throw Error('System Settings control traversal exceeded bound');
-            }
-            return trees.get(index);
-        };
-        const exact = (node, key) => node && safe(() => node.role()) === 'AXCheckBox' &&
-            [safe(() => node.title()), safe(() => node.description()), safe(() => node.name())].includes(labels[key]);
-        const cached = JSON.parse(identity).controls;
-        const result = {refs: {}, paths: {window_count: windows.length}};
-        if (cached && cached.window_count === windows.length && Object.keys(labels).every(key => {
-            const position = cached[key];
-            if (!position || !['window', 'index', 'tree_count'].every(field => Number.isInteger(position[field])) ||
-                position.window < 0 || position.window >= windows.length || position.index < 0) return false;
-            const nodes = tree(position.window);
-            if (position.tree_count !== nodes.length || position.index >= nodes.length || !exact(nodes[position.index], key)) return false;
-            result.refs[key] = nodes[position.index];
-            return true;
-        })) return {refs: result.refs, paths: cached};
-        // A cached index is only a hint into a fresh bounded AX array. Changed
-        // counts, ownership, role or fixed label invalidate it; rediscover once.
-        result.refs = {};
+        const result = {};
+        let count = 0;
+        // Check every fresh owned array: unchanged counts or positions cannot
+        // establish uniqueness. One shared pass reads each node's role once,
+        // then reads labels only for checkbox nodes, unlike the original
+        // separate full-tree pass for each preference.
         for (let window = 0; window < windows.length; window++) {
-            const nodes = tree(window);
-            nodes.forEach((node, index) => {
+            const nodes = windows[window].entireContents();
+            count += nodes.length;
+            if (count > 6000) throw Error('System Settings control traversal exceeded bound');
+            nodes.forEach(node => {
                 if (safe(() => node.role()) !== 'AXCheckBox') return;
                 const names = [safe(() => node.title()), safe(() => node.description()), safe(() => node.name())];
                 for (const key of Object.keys(labels)) {
                     if (!names.includes(labels[key])) continue;
-                    if (result.refs[key]) throw Error('Exact accessibility preference control is ambiguous');
-                    result.refs[key] = node;
-                    result.paths[key] = {window, index, tree_count: nodes.length};
+                    if (result[key]) throw Error('Exact accessibility preference control is ambiguous');
+                    result[key] = node;
                 }
             });
         }
@@ -90,13 +73,12 @@ function run(argv) {
     case 'owner': result = owner(); break;
     case 'controls-ready': {
         const found = controls();
-        result = {ready: Boolean(found.refs.contrast && found.refs.transparency)};
-        if (result.ready) result.controls = found.paths;
+        result = {ready: Boolean(found.contrast && found.transparency)};
         break;
     }
     case 'read': {
         const found = controls();
-        result = {...state(found.refs), controls: found.paths};
+        result = state(found);
         break;
     }
     case 'set': {
@@ -105,9 +87,9 @@ function run(argv) {
             throw Error('Unsupported accessibility preference request');
         }
         const found = controls();
-        const changed = state(found.refs)[requested.key] !== requested.value;
-        if (changed) found.refs[requested.key].actions.byName('AXPress').perform();
-        result = {changed, controls: found.paths};
+        const changed = state(found)[requested.key] !== requested.value;
+        if (changed) found[requested.key].actions.byName('AXPress').perform();
+        result = {changed};
         break;
     }
     case 'close':

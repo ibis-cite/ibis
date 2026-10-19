@@ -83,19 +83,6 @@ class NativeUI:
         self.command = ["osascript", "-l", "JavaScript", str(Path(__file__).with_name("appearance-macos.js"))]
         self.owner = ""
 
-    def cache(self, value):
-        valid = isinstance(value, dict) and type(value.get("window_count")) is int and 0 < value["window_count"] <= 10
-        for key in ("contrast", "transparency"):
-            position = value.get(key) if valid else None
-            valid = valid and isinstance(position, dict) and all(type(position.get(field)) is int for field in ("window", "index", "tree_count"))
-            if valid:
-                valid = 0 <= position["window"] < value["window_count"] and 0 <= position["index"] < position["tree_count"] <= 6000
-        if not valid:
-            raise RuntimeError("Native control cache metadata unavailable")
-        token = json.loads(self.owner)
-        token["controls"] = value
-        self.owner = json.dumps(token)
-
     def call(self, action, value=""):
         if getattr(self, "last_action", None) != action:
             print("NATIVE APPEARANCE ACTION " + action, flush=True)
@@ -110,8 +97,6 @@ class NativeUI:
                 raise Unavailable("Native appearance Accessibility/Automation permission unavailable")
             raise RuntimeError("Native appearance helper failed")
         value = json.loads(result.stdout)
-        if isinstance(value, dict) and "controls" in value:
-            self.cache(value["controls"])
         return value
 
     def read(self):

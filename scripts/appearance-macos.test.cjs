@@ -1,10 +1,10 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-let nodes, presses, roles;
+let nodes, presses, roles, windows;
 const app = {bundleIdentifier: 'com.apple.systempreferences', launchDate: {timeIntervalSince1970: 100},
     isTerminated: false, terminate: () => false, forceTerminate: () => { app.isTerminated = true; return true; }};
-const process = {windows: () => [{entireContents: () => nodes}]};
+const process = {windows: () => windows};
 const context = {ObjC: {import() {}, unwrap: value => value},
     $: {NSRunningApplication: {runningApplicationWithProcessIdentifier: () => app}},
     Application: () => ({applicationProcesses: {whose: () => () => [process]}})};
@@ -19,15 +19,16 @@ function checkbox(name) {
 const contrast = checkbox('Increase contrast'), transparency = checkbox('Reduce transparency');
 const other = checkbox('Unrelated control');
 nodes = [contrast, other, transparency]; presses = []; roles = 0;
+windows = [{entireContents: () => nodes}];
 const identity = {pid: 42, started: 100};
 const initial = JSON.parse(context.run(['read', JSON.stringify(identity), '']));
-assert.equal(initial.controls.contrast.index, 0);
-assert.equal(initial.controls.transparency.index, 2);
-const cached = {...identity, controls: initial.controls};
+assert.deepEqual(initial, {contrast: false, transparency: false});
+const cached = {...identity, controls: {window_count: 1, contrast: {window: 0, index: 0, tree_count: 3},
+    transparency: {window: 0, index: 2, tree_count: 3}}};
 roles = 0;
 context.run(['set', JSON.stringify(cached), JSON.stringify({key: 'transparency', value: true})]);
 assert.deepEqual(presses, ['Reduce transparency']);
-assert.equal(roles, 2, 'Cached lookup must validate both exact controls without scanning unrelated nodes');
+assert.equal(roles, nodes.length, 'Fresh uniqueness requires every current role, exactly once per node');
 
 nodes = [other, transparency, contrast]; presses = [];
 context.run(['set', JSON.stringify(cached), JSON.stringify({key: 'contrast', value: true})]);
@@ -37,6 +38,18 @@ nodes = [contrast, other, transparency, checkbox('Reduce transparency')]; presse
 assert.throws(() => context.run(['set', JSON.stringify(cached), JSON.stringify({key: 'transparency', value: false})]), /ambiguous/);
 assert.deepEqual(presses, [], 'Changed tree count must rediscover and reject duplicate exact controls');
 
+nodes = [contrast, checkbox('Reduce transparency'), transparency]; presses = [];
+assert.throws(() => context.run(['set', JSON.stringify(cached), JSON.stringify({key: 'transparency', value: false})]), /ambiguous/);
+assert.deepEqual(presses, [], 'A same-count duplicate replacing an unrelated node must prevent any action');
+
+nodes = [contrast, other, transparency];
+let secondWindow = [other];
+windows = [{entireContents: () => nodes}, {entireContents: () => secondWindow}];
+context.run(['read', JSON.stringify(identity), '']);
+secondWindow = [checkbox('Reduce transparency')]; presses = [];
+assert.throws(() => context.run(['set', JSON.stringify({...cached, controls: {...cached.controls, window_count: 2}}), JSON.stringify({key: 'transparency', value: false})]), /ambiguous/);
+assert.deepEqual(presses, [], 'A duplicate in another same-count owned window must prevent any action');
+
 assert.throws(() => context.run(['set', JSON.stringify({...cached, started: 99}), JSON.stringify({key: 'contrast', value: false})]), /identity changed/);
 assert.deepEqual(presses, []);
 assert.throws(() => context.run(['force-close', JSON.stringify({...identity, started: 99}), '{"restoration_verified":true}']), /identity changed/);
@@ -45,4 +58,4 @@ assert.throws(() => context.run(['force-close', JSON.stringify(identity), '{}'])
 assert.equal(app.isTerminated, false);
 assert.equal(context.run(['force-close', JSON.stringify(identity), '{"restoration_verified":true}']), 'true');
 assert.equal(app.isTerminated, true);
-console.log('Exact cached controls, ownership and cleanup contracts passed; no macOS execution claimed.');
+console.log('Fresh exact control uniqueness, ownership and cleanup contracts passed; no macOS execution claimed.');
