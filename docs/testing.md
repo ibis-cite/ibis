@@ -377,6 +377,13 @@ the application; AppKit key/responder booleans alone do not prove HID delivery.
 The same WebView focus is applied after initial panel configuration only when
 the native window is already visible. This covers fresh startup after damaged
 settings recovery without showing a future hidden startup window.
+Initial setup uses the same panel ordering and responder sequence as summons.
+Debug builds observe initial state, native focus changes and the first completed
+page load without adjusting focus in those event callbacks. These fixed booleans
+include whether the first responder is the outer content view; no object identity
+or page data is logged. Native key-window state alone did not prove that a fresh
+startup received hardware typing, so the damaged-library startup assertion remains
+required alongside all five fullscreen and chooser checks.
 The prior hosted probe showed the panel in the full-screen Space, then failed
 native search. That observation does not establish input, copy or chooser success.
 

@@ -12,6 +12,7 @@ mod diagnostics;
 #[cfg(debug_assertions)]
 mod gallery;
 mod library;
+mod native_feel;
 #[cfg(target_os = "macos")]
 mod panel;
 mod picker;
@@ -40,14 +41,11 @@ use crate::preferences::SettingsFile;
 use crate::tray::create_tray;
 
 fn main() {
-    let context = tauri::generate_context!();
+    let mut context = tauri::generate_context!();
+    native_feel::configure(&mut context);
     #[cfg(debug_assertions)]
-    let context = {
-        let mut context = context;
-        report(gallery::configure(&mut context), NativeIssue::GalleryNavigation);
-        context
-    };
-    let app = tauri::Builder::default()
+    report(gallery::configure(&mut context), NativeIssue::GalleryNavigation);
+    let builder = tauri::Builder::default()
         // Must be registered first: a second launch brings the running picker forward.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show_picker(app)))
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -67,25 +65,34 @@ fn main() {
         .manage(DialogOpen::default())
         .manage(Mutex::new(ShortcutStatus::default()))
         .invoke_handler(bindings::commands().invoke_handler())
-        .on_window_event(|window, event| match event {
-            // Closing the picker hides it; the app keeps running for the shortcut.
-            WindowEvent::CloseRequested { api, .. } => {
-                api.prevent_close();
-                dismiss_picker(window.app_handle());
+        .on_window_event(|window, event| {
+            #[cfg(all(target_os = "macos", debug_assertions))]
+            if window.label() == "main"
+                && let WindowEvent::Focused(focused) = event
+            {
+                panel::observe_window_focus(window.app_handle(), *focused);
             }
-            // Like other launchers, the picker hides when it loses focus, but
-            // not to its own file dialog.
-            WindowEvent::Focused(false) => {
-                let dialog_open = window.state::<DialogOpen>().0.load(Ordering::SeqCst);
-                if hides_on_blur(!cfg!(debug_assertions), dialog_open) {
+            match event {
+                // Closing the picker hides it; the app keeps running for the shortcut.
+                WindowEvent::CloseRequested { api, .. } => {
+                    api.prevent_close();
                     dismiss_picker(window.app_handle());
                 }
+                // Like other launchers, the picker hides when it loses focus, but
+                // not to its own file dialog.
+                WindowEvent::Focused(false) => {
+                    let dialog_open = window.state::<DialogOpen>().0.load(Ordering::SeqCst);
+                    if hides_on_blur(!cfg!(debug_assertions), dialog_open) {
+                        dismiss_picker(window.app_handle());
+                    }
+                }
+                _ => {}
             }
-            _ => {}
         })
         .setup(|app| {
             #[cfg(target_os = "macos")]
             panel::configure(app.handle())?;
+            native_feel::install(app.handle());
             // Debug builds may opt into the synthetic evidence gallery. Keep
             // both environment reads out of release binaries entirely.
             #[cfg(debug_assertions)]
@@ -159,8 +166,14 @@ fn main() {
                 start_open(app.handle(), PathBuf::from(path), false);
             }
             Ok(())
-        })
-        .build(context);
+        });
+    #[cfg(all(target_os = "macos", debug_assertions))]
+    let builder = builder.on_page_load(|webview, payload| {
+        if webview.label() == "main" && payload.event() == tauri::webview::PageLoadEvent::Finished {
+            panel::observe_page_load_finished(webview.app_handle());
+        }
+    });
+    let app = builder.build(context);
     match app {
         Ok(app) => app.run(|app, event| {
             // macOS: clicking the Dock icon brings back the hidden picker.

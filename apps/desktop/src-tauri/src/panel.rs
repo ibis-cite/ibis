@@ -50,29 +50,32 @@ pub(crate) fn configure(app: &AppHandle) -> Result<(), Box<dyn std::error::Error
     // A future hidden startup window must remain hidden and unfocused.
     #[cfg(debug_assertions)]
     eprintln!(
-        "ibis: panel initial before visible={} key={} first_responder={}",
+        "ibis: panel initial before visible={} key={} first_responder={} outer_responder={}",
         panel.as_panel().isVisible(),
         panel.as_panel().isKeyWindow(),
-        panel.as_panel().firstResponder().is_some()
+        panel.as_panel().firstResponder().is_some(),
+        outer_is_responder(panel.as_panel())
     );
     if panel.as_panel().isVisible() {
-        // Assigning a WKWebView responder alone cannot reacquire native key
-        // ownership after converting the window and changing activation policy.
-        panel.as_panel().makeKeyWindow();
+        // Use the same ordering and responder sequence as later summons.
+        // Initial AppKit key ownership alone did not prove hardware delivery.
+        panel.show_and_make_key();
         #[cfg(debug_assertions)]
         eprintln!(
-            "ibis: panel initial after_key visible={} key={} first_responder={}",
+            "ibis: panel initial after_show visible={} key={} first_responder={} outer_responder={}",
             panel.as_panel().isVisible(),
             panel.as_panel().isKeyWindow(),
-            panel.as_panel().firstResponder().is_some()
+            panel.as_panel().firstResponder().is_some(),
+            outer_is_responder(panel.as_panel())
         );
         focus_webview(&window);
         #[cfg(debug_assertions)]
         eprintln!(
-            "ibis: panel initial after_webview visible={} key={} first_responder={}",
+            "ibis: panel initial after_webview visible={} key={} first_responder={} outer_responder={}",
             panel.as_panel().isVisible(),
             panel.as_panel().isKeyWindow(),
-            panel.as_panel().firstResponder().is_some()
+            panel.as_panel().firstResponder().is_some(),
+            outer_is_responder(panel.as_panel())
         );
     }
     Ok(())
@@ -82,6 +85,67 @@ fn focus_webview(window: &tauri::WebviewWindow) {
     // Focus the actual WKWebView without activating Ibis or switching Spaces.
     let view: &tauri::Webview<tauri::Wry> = window.as_ref();
     report(view.set_focus(), NativeIssue::Focus);
+}
+
+#[cfg(debug_assertions)]
+fn outer_is_responder(native: &tauri_nspanel::objc2_app_kit::NSPanel) -> bool {
+    match (native.firstResponder(), native.contentView()) {
+        (Some(responder), Some(content)) => std::ptr::eq(
+            std::ptr::from_ref(&*responder).cast::<()>(),
+            std::ptr::from_ref(&*content).cast::<()>(),
+        ),
+        _ => false,
+    }
+}
+
+#[cfg(debug_assertions)]
+pub(crate) fn observe_window_focus(app: &AppHandle, focused: bool) {
+    observe_lifecycle(app, Some(focused));
+}
+
+#[cfg(debug_assertions)]
+pub(crate) fn observe_page_load_finished(app: &AppHandle) {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    static OBSERVED: AtomicBool = AtomicBool::new(false);
+    if !OBSERVED.swap(true, Ordering::Relaxed) {
+        observe_lifecycle(app, None);
+    }
+}
+
+/// Observe late native changes without adjusting focus or exposing page data.
+#[cfg(debug_assertions)]
+fn observe_lifecycle(app: &AppHandle, focused: Option<bool>) {
+    let handle = app.clone();
+    report(
+        app.run_on_main_thread(move || {
+            if tauri_nspanel::objc2::MainThreadMarker::new().is_none() {
+                return;
+            }
+            if let Ok(panel) = handle.get_webview_panel("main") {
+                let native = panel.as_panel();
+                match focused {
+                    Some(focused) => eprintln!(
+                        "ibis: panel focus focused={} visible={} key={} first_responder={} outer_responder={}",
+                        focused,
+                        native.isVisible(),
+                        native.isKeyWindow(),
+                        native.firstResponder().is_some(),
+                        outer_is_responder(native)
+                    ),
+                    None => eprintln!(
+                        "ibis: panel page_loaded visible={} key={} first_responder={} outer_responder={}",
+                        native.isVisible(),
+                        native.isKeyWindow(),
+                        native.firstResponder().is_some(),
+                        outer_is_responder(native)
+                    ),
+                }
+            } else {
+                eprintln!("ibis: panel lifecycle available=false");
+            }
+        }),
+        NativeIssue::Focus,
+    );
 }
 
 /// A panel takes keyboard focus without activating Ibis or switching Spaces.
