@@ -57,6 +57,13 @@ def ready(value):
     return all(flags(value, ("visible", "foreground", "owned")).values())
 
 
+def query_ready(current, index):
+    key = f"smoke{index:06d}"
+    text = smoke.strings(current)
+    return (any(node.get("value") == key for node in smoke.named(current, "Search references"))
+            and f"Ibis smoke reference {index:06d}" in text and "1 result" in text)
+
+
 def normal_quit(process, click, timeout=10):
     if process.poll() is not None:
         raise AssertionError("App exited before native Quit")
@@ -253,10 +260,7 @@ def check(app_path, output, system):
                 key = f"smoke{index:06d}"
                 native.key("ctrl+a" if system != "Darwin" else "super+a")
                 native.text(key)
-                def found():
-                    current = snapshot()
-                    return any(node.get("value") == key for node in smoke.named(current, "Search references")) and f"Ibis smoke reference {index:06d}" in smoke.strings(current)
-                smoke.wait_for(found, "chosen library accepts a new query and is searchable")
+                smoke.wait_for(lambda: query_ready(snapshot(), index), "chosen library accepts a new query and is searchable")
 
             report["stage"] = "C1"
             launch("first-run")
@@ -347,9 +351,12 @@ def check(app_path, output, system):
                 if state != report.get("last_shortcut_state"):
                     report["last_shortcut_state"] = state
                     print("NATIVE CHOOSER SHORTCUT " + json.dumps(state), flush=True)
-                return all(state.values())
-            smoke.wait_for(shortcut_ready, "relaunch reacquires the shortcut after native Quit")
-            passed("relaunch reacquires the shortcut after native Quit")
+                return state["visible"] and state["foreground"] and bool(smoke.named(current, "Search references"))
+            smoke.wait_for(shortcut_ready, "relaunch shows the foreground picker after native Quit")
+            # AT-SPI may focus aria-activedescendant while the combobox receives
+            # input. Prove keyboard routing with a different exact query/result.
+            query(99997)
+            passed("relaunch reacquires the shortcut and routes a new native query after Quit")
             normal_quit(process, native.click)
             log.close()
             process, log = None, None
@@ -518,6 +525,19 @@ class Tests(unittest.TestCase):
         outer.parent = cell
         with self.assertRaises(AssertionError):
             linux.row_target(nodes, cell.name, 1)
+
+    def test_native_query_requires_new_value_and_result_even_when_ax_focuses_the_option(self):
+        current = {"nodes": [
+            {"name": "Search references", "value": "smoke099997", "focused": False},
+            {"name": "Ibis smoke reference 099997", "role": "option", "focused": True},
+            {"name": "1 result"},
+        ]}
+        self.assertTrue(query_ready(current, 99997))
+        current["nodes"][0]["value"] = "smoke099998"
+        self.assertFalse(query_ready(current, 99997))
+        current["nodes"][0]["value"] = "smoke099997"
+        current["nodes"][1]["name"] = "Ibis smoke reference 099998"
+        self.assertFalse(query_ready(current, 99997))
 
     def test_native_row_already_selected_skips_add_and_wrong_row_rejection_fails(self):
         from types import SimpleNamespace
