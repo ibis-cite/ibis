@@ -50,6 +50,15 @@ function discoveryFacts(value) {
     }
     return {...value};
 }
+function budgetFacts(value) {
+    if (!exactKeys(value, ['kind', 'calls', 'stage']) ||
+        !['call-limit', 'time-limit', 'clock-regression'].includes(value.kind) ||
+        !Number.isInteger(value.calls) || value.calls < 0 || value.calls > 256 ||
+        !['scope', 'windows', 'candidates', 'sheets', 'bounds', 'location', 'controls'].includes(value.stage)) {
+        throw Error('Native budget facts unavailable');
+    }
+    return {...value};
+}
 function locationProgress(windows, token, foreground) {
     validateToken(token, token && token.owner && token.owner.pid, token && token.owner && token.owner.executable);
     if (!Array.isArray(windows) || windows.length > 10000 || typeof foreground !== 'boolean') {
@@ -90,7 +99,10 @@ function locationProgress(windows, token, foreground) {
 // https://developer.apple.com/documentation/applicationservices/1462085-axuielementcopyattributevalue
 // https://developer.apple.com/documentation/applicationservices/1462933-axvaluegetvalue
 // https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
-function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unready, collectDiscovery = false) {
+function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unready, collectDiscovery = false, budgetDiagnostic) {
+    let lastStage = 'scope', budgetReported = false;
+    const emitStage = stage;
+    stage = name => { lastStage = name; emitStage(name); };
     stage('scope');
     const bindings = {
         AXUIElementCreateSystemWide: ['id', []], AXUIElementCreateApplication: ['id', ['int']],
@@ -135,7 +147,16 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unread
     let calls = 0;
     const budget = () => {
         const elapsed = now() - began;
-        if (elapsed < 0 || elapsed > 4000 || calls >= 256) fail('budget-exceeded', 'Native AX observation budget exceeded');
+        const kind = elapsed < 0 ? 'clock-regression' : elapsed > 4000 ? 'time-limit' : calls >= 256 ? 'call-limit' : null;
+        if (kind) {
+            if (!budgetReported) {
+                budgetReported = true;
+                // A secondary diagnostic must not replace the original AX
+                // failure or prevent its existing fixed reason from reporting.
+                try { budgetDiagnostic({kind, calls, stage: lastStage}); } catch (_) { /* best effort */ }
+            }
+            fail('budget-exceeded', 'Native AX observation budget exceeded');
+        }
     };
     const call = (name, ...args) => {
         lastAPI = name;
@@ -179,10 +200,18 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unread
         if (!present) fail('missing-reference', 'Native AX value type unavailable', origin);
         return object;
     };
+    // CFTypeID is a constant type identifier within this runtime. Query only
+    // the expected SDK identifier lazily; actual object types remain fresh.
+    // https://developer.apple.com/documentation/corefoundation/cftypeid
+    const expectedTypeIDs = new Map();
     const typed = (value, name) => {
         value = cfObject(value, 'CFGetTypeID');
         const actual = typeID(call('CFGetTypeID', value), 'CFGetTypeID');
-        const expected = typeID(call(name), name);
+        let expected = expectedTypeIDs.get(name);
+        if (expected === undefined) {
+            expected = typeID(call(name), name);
+            expectedTypeIDs.set(name, expected); // Only successfully normalized results.
+        }
         if (actual !== expected) fail('type-mismatch', 'Native AX value type unavailable', 'CFGetTypeID');
         return value;
     };
@@ -411,7 +440,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unread
         },
     };
 }
-if (typeof module !== 'undefined') module.exports = {unique, flags, locationFlags, validateToken, locationProgress, discoveryFacts};
+if (typeof module !== 'undefined') module.exports = {unique, flags, locationFlags, validateToken, locationProgress, discoveryFacts, budgetFacts};
 
 function run(argv) {
     ObjC.import('AppKit');
@@ -487,7 +516,10 @@ function run(argv) {
     };
     const diagnostic = (api, reason) => $.NSFileHandle.fileHandleWithStandardError.writeData(
         $('NATIVE CHOOSER MACOS AX ' + JSON.stringify({api, reason}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
-    const ax = (discovering = false) => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage, diagnostic, unready, discovering);
+    const budgetDiagnostic = facts => $.NSFileHandle.fileHandleWithStandardError.writeData(
+        $('NATIVE CHOOSER MACOS BUDGET ' + JSON.stringify(budgetFacts(facts)) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
+    const ax = (discovering = false) => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000,
+        stage, diagnostic, unready, discovering, budgetDiagnostic);
     const panelForAX = (observations, windows, token) => {
         const matching = [];
         for (const element of observations.panels()) {

@@ -60,13 +60,35 @@ function New-PickerKeyboardFacts {
   @{available=$false;owned_picker=$false;native_child_focus=$false;unique_search=$false;unique_results=$false;
     direct_search_focus=$false;controller_for_results=$false;controlled_results_focus=$false;ready=$false}
 }
-function Observe-PickerKeyboardFocus([scriptblock] $ReadNative, [scriptblock] $ReadUia) {
+# Observation fields are never readiness inputs. False can mean unqueried when
+# an earlier original guard short-circuited; stage/exception retain that context.
+function New-NativeKeyboardObservation {
+  @{stage='unobserved';exception=$false;owned=$false;gui_available=$false;gui_idle=$false;active_picker=$false;
+    focus_present=$false;focus_is_picker=$false;focus_live=$false;focus_visible=$false;focus_strict_child=$false;
+    focus_pid_matches=$false;focus_thread_matches=$false}
+}
+function New-UiaKeyboardObservation {
+  @{stage='unobserved';exception=$false;root_identity=$false;enumeration_complete=$false;search_matches=0;results_matches=0;
+    search_owned=$false;results_owned=$false;focused_present=$false;focused_owned=$false;focused_is_search=$false;
+    focused_is_results=$false;focused_is_picker=$false;final_focus_same=$false;final_owned=$false;
+    ownership_pid_mismatch=$false;ownership_offscreen=$false;ownership_disabled=$false;ownership_walk_failed=$false}
+}
+function New-KeyboardObservation {
+  @{native_before=(New-NativeKeyboardObservation);native_after=(New-NativeKeyboardObservation);focus_stable=$false;uia=(New-UiaKeyboardObservation)}
+}
+function Set-KeyboardIdentityObservation($Observation,[string] $Field,[scriptblock] $Compare) {
+  try { $value=& $Compare; $Observation[$Field]=$value -is [bool] -and $value }
+  catch { $Observation.exception=$true }
+}
+function Observe-PickerKeyboardFocus([scriptblock] $ReadNative, [scriptblock] $ReadUia, $Observation = $null) {
+  if ($null -eq $Observation) { $Observation=New-KeyboardObservation }
   $facts = New-PickerKeyboardFacts
   try {
-    $before = & $ReadNative
+    $before = & $ReadNative $Observation.native_before
     if (!$before.owned) { return $facts }
-    $uia = & $ReadUia
-    $after = & $ReadNative
+    $uia = & $ReadUia $Observation.uia
+    $after = & $ReadNative $Observation.native_after
+    $Observation.focus_stable = $before.focus -gt 0 -and $before.focus -eq $after.focus
     if (!$after.owned -or $before.handle -ne $after.handle -or $before.thread -ne $after.thread) { return $facts }
     $facts.owned_picker = $true
     $facts.native_child_focus = $before.available -and $after.available -and $before.child -and $after.child -and
@@ -94,61 +116,106 @@ function Test-FocusedAncestry($Focused, $Target, [scriptblock] $Parent, [scriptb
   $false
 }
 function Observe-PickerUiaFocus([object[]] $Searches, [object[]] $Results, [scriptblock] $ReadFocused,
-    [scriptblock] $Controllers, [scriptblock] $Parent, [scriptblock] $Same, [scriptblock] $Owned) {
+    [scriptblock] $Controllers, [scriptblock] $Parent, [scriptblock] $Same, [scriptblock] $Owned,
+    $Observation = $null, $Root = $null) {
+  if ($null -eq $Observation) { $Observation=New-UiaKeyboardObservation }
   $facts = New-PickerKeyboardFacts
   try {
+    $Observation.search_matches = if ($Searches.Count -le 4000) { [int] $Searches.Count } else { 0 }
+    $Observation.results_matches = if ($Results.Count -le 4000) { [int] $Results.Count } else { 0 }
+    $Observation.stage='focused'
     $focused = & $ReadFocused
+    $Observation.focused_present = $null -ne $focused
+    if ($null -ne $focused) {
+      if ($null -ne $Root) { Set-KeyboardIdentityObservation $Observation 'focused_is_picker' { & $Same $focused $Root } }
+      if ($Searches.Count -eq 1) { Set-KeyboardIdentityObservation $Observation 'focused_is_search' { & $Same $focused $Searches[0] } }
+      if ($Results.Count -eq 1) { Set-KeyboardIdentityObservation $Observation 'focused_is_results' { & $Same $focused $Results[0] } }
+    }
+    $Observation.stage='ownership'
     $facts.unique_search = $Searches.Count -eq 1 -and (& $Owned $Searches[0])
+    $Observation.search_owned = $facts.unique_search
     $facts.unique_results = $Results.Count -eq 1 -and (& $Owned $Results[0])
-    if ($facts.unique_search -and $null -ne $focused -and (& $Owned $focused)) {
+    $Observation.results_owned = $facts.unique_results
+    $focusedOwned = $facts.unique_search -and $null -ne $focused -and (& $Owned $focused)
+    $Observation.focused_owned = [bool] $focusedOwned
+    if ($focusedOwned) {
       $facts.direct_search_focus = [bool] (& $Same $focused $Searches[0])
       if ($facts.unique_results -and !$facts.direct_search_focus) {
+        $Observation.stage='relation'
         # Missing ControllerFor capability disables only the virtual-focus path.
         $targets = $null
-        try { $targets = & $Controllers $Searches[0] $Results[0] $focused } catch { }
+        try { $targets = & $Controllers $Searches[0] $Results[0] $focused } catch { $Observation.exception=$true }
         $facts.controller_for_results = $targets -is [bool] -and $targets
         if ($facts.controller_for_results) {
+          $Observation.stage='ancestry'
           $facts.controlled_results_focus = Test-FocusedAncestry $focused $Results[0] $Parent $Same $Owned
+          if (!$facts.controlled_results_focus) { $Observation.ownership_walk_failed=$true }
         }
       }
     }
+    $Observation.stage='final'
     $last = & $ReadFocused
-    if ($null -eq $focused -or $null -eq $last -or !(& $Same $focused $last) -or !(& $Owned $last) -or
-        ($facts.unique_search -and !(& $Owned $Searches[0])) -or
-        ($facts.unique_results -and !(& $Owned $Results[0]))) { return (New-PickerKeyboardFacts) }
+    $sameFocus = $null -ne $focused -and $null -ne $last -and (& $Same $focused $last)
+    $Observation.final_focus_same = [bool] $sameFocus
+    $finalOwned = $sameFocus -and (& $Owned $last) -and
+      (!$facts.unique_search -or (& $Owned $Searches[0])) -and (!$facts.unique_results -or (& $Owned $Results[0]))
+    $Observation.final_owned = [bool] $finalOwned
+    if (!$finalOwned) { return (New-PickerKeyboardFacts) }
     $facts.available = $true
+    $Observation.stage='complete'
     $facts
-  } catch { New-PickerKeyboardFacts }
+  } catch { $Observation.exception=$true; New-PickerKeyboardFacts }
 }
 
-function Read-PickerNativeFocus([IntPtr] $Handle) {
+function Read-PickerNativeFocus([IntPtr] $Handle, $Observation = $null) {
+  if ($null -eq $Observation) { $Observation=New-NativeKeyboardObservation }
   $state = @{owned=$false;available=$false;handle=$Handle.ToInt64();thread=0;focus=0;child=$false}
-  if ($AppId -le 0 -or $Handle.ToInt64() -le 0 -or ![IbisSmoke]::IsWindow($Handle) -or
-      [IbisSmoke]::OwnerPid($Handle) -ne $AppId -or ![IbisSmoke]::IsWindowVisible($Handle) -or
-      [IbisSmoke]::GetForegroundWindow() -ne $Handle) { return $state }
-  [uint32] $owner = 0
-  $thread = [IbisSmoke]::GetWindowThreadProcessId($Handle,[ref] $owner)
-  if ($owner -ne $AppId -or $thread -eq 0) { return $state }
-  $state.owned = $true; $state.thread = $thread
-  $info = [IbisSmoke+GUITHREADINFO]::new()
-  $info.Size = [System.Runtime.InteropServices.Marshal]::SizeOf($info)
-  # Zero queries the foreground thread, never a remembered background queue.
-  $state.available = [IbisSmoke]::GetGUIThreadInfo(0,[ref] $info)
-  if ($state.available) {
-    $state.focus = $info.Focus.ToInt64()
-    [uint32] $focusOwner = 0
-    $focusThread = [IbisSmoke]::GetWindowThreadProcessId($info.Focus,[ref] $focusOwner)
-    $state.child = $info.Focus -ne [IntPtr]::Zero -and $info.Focus -ne $Handle -and
-      $info.Active -eq $Handle -and ($info.Flags -band 30) -eq 0 -and
-      [IbisSmoke]::IsWindow($info.Focus) -and [IbisSmoke]::IsWindowVisible($info.Focus) -and
-      $focusOwner -eq $AppId -and $focusThread -eq $thread -and [IbisSmoke]::IsChild($Handle,$info.Focus)
-  }
-  [uint32] $lastOwner = 0
-  $lastThread = [IbisSmoke]::GetWindowThreadProcessId($Handle,[ref] $lastOwner)
-  $state.owned = [IbisSmoke]::IsWindow($Handle) -and [IbisSmoke]::IsWindowVisible($Handle) -and
-    $lastOwner -eq $AppId -and $lastThread -eq $thread -and [IbisSmoke]::GetForegroundWindow() -eq $Handle
-  if (!$state.owned) { $state.child = $false }
-  $state
+  try {
+    $Observation.stage='picker'
+    if ($AppId -le 0 -or $Handle.ToInt64() -le 0 -or ![IbisSmoke]::IsWindow($Handle) -or
+        [IbisSmoke]::OwnerPid($Handle) -ne $AppId -or ![IbisSmoke]::IsWindowVisible($Handle) -or
+        [IbisSmoke]::GetForegroundWindow() -ne $Handle) { return $state }
+    [uint32] $owner = 0
+    $thread = [IbisSmoke]::GetWindowThreadProcessId($Handle,[ref] $owner)
+    if ($owner -ne $AppId -or $thread -eq 0) { return $state }
+    $state.owned = $true; $state.thread = $thread
+    $info = [IbisSmoke+GUITHREADINFO]::new()
+    $info.Size = [System.Runtime.InteropServices.Marshal]::SizeOf($info)
+    $Observation.stage='gui'
+    # Zero queries the foreground thread, never a remembered background queue.
+    $state.available = [IbisSmoke]::GetGUIThreadInfo(0,[ref] $info)
+    $Observation.gui_available=$state.available
+    if ($state.available) {
+      $Observation.stage='focus'
+      $state.focus = $info.Focus.ToInt64()
+      [uint32] $focusOwner = 0
+      $focusThread = [IbisSmoke]::GetWindowThreadProcessId($info.Focus,[ref] $focusOwner)
+      $Observation.focus_present=$info.Focus -ne [IntPtr]::Zero
+      $Observation.focus_is_picker=$info.Focus -eq $Handle
+      $Observation.active_picker=$info.Active -eq $Handle
+      $Observation.gui_idle=($info.Flags -band 30) -eq 0
+      $Observation.focus_pid_matches=$focusOwner -eq $AppId
+      $Observation.focus_thread_matches=$focusThread -eq $thread
+      # Assign only where the original expression queried the predicate. An
+      # earlier false guard must not cause extra Win32 observations.
+      $state.child = $info.Focus -ne [IntPtr]::Zero -and $info.Focus -ne $Handle -and
+        $info.Active -eq $Handle -and ($info.Flags -band 30) -eq 0 -and
+        ($Observation.focus_live=[IbisSmoke]::IsWindow($info.Focus)) -and
+        ($Observation.focus_visible=[IbisSmoke]::IsWindowVisible($info.Focus)) -and
+        $focusOwner -eq $AppId -and $focusThread -eq $thread -and
+        ($Observation.focus_strict_child=[IbisSmoke]::IsChild($Handle,$info.Focus))
+    }
+    $phase=$Observation.stage
+    $Observation.stage='picker'
+    [uint32] $lastOwner = 0
+    $lastThread = [IbisSmoke]::GetWindowThreadProcessId($Handle,[ref] $lastOwner)
+    $state.owned = [IbisSmoke]::IsWindow($Handle) -and [IbisSmoke]::IsWindowVisible($Handle) -and
+      $lastOwner -eq $AppId -and $lastThread -eq $thread -and [IbisSmoke]::GetForegroundWindow() -eq $Handle
+    if (!$state.owned) { $state.child = $false }
+    $Observation.stage=if ($state.child) { 'complete' } elseif ($state.owned) { $phase } else { 'picker' }
+    $state
+  } catch { $Observation.exception=$true; throw }
+  finally { $Observation.owned=[bool] $state.owned }
 }
 function Initialize-PickerProjection([string] $SelfTestDefinitions = '') {
   # Public Windows SDK UIAutomationClient.idl prefixes; unused pointer arguments
@@ -441,9 +508,9 @@ public static class IbisSmoke {
   public static bool Live=true, Visible=true, Child=true, Available=true;
   public static uint Pid=41, ChildPid=41, Thread=7, ChildThread=7, Flags=0;
   public static long Foreground=10, Focus=11, Active=10;
-  public static int Queries=0, ForegroundReads=0, LoseForegroundAfter=0;
-  public static bool IsWindow(IntPtr w) { return Live; }
-  public static bool IsWindowVisible(IntPtr w) { return Visible; }
+  public static int Queries=0, ForegroundReads=0, LoseForegroundAfter=0, FocusWindowReads=0, FocusVisibleReads=0, ChildReads=0, WindowReads=0, VisibleReads=0;
+  public static bool IsWindow(IntPtr w) { WindowReads++; if(w.ToInt64()!=10) FocusWindowReads++; return Live; }
+  public static bool IsWindowVisible(IntPtr w) { VisibleReads++; if(w.ToInt64()!=10) FocusVisibleReads++; return Visible; }
   public static uint OwnerPid(IntPtr w) { return Pid; }
   public static IntPtr GetForegroundWindow() {
     ForegroundReads++;
@@ -452,7 +519,7 @@ public static class IbisSmoke {
   public static uint GetWindowThreadProcessId(IntPtr w, out uint pid) {
     pid=w.ToInt64()==10 ? Pid : ChildPid; return w.ToInt64()==10 ? Thread : ChildThread;
   }
-  public static bool IsChild(IntPtr parent, IntPtr child) { return Child; }
+  public static bool IsChild(IntPtr parent, IntPtr child) { ChildReads++; return Child; }
   public static bool GetGUIThreadInfo(uint thread, ref GUITHREADINFO info) {
     if(thread!=0) throw new Exception("Background GUI thread query");
     Queries++; info.Focus=new IntPtr(Focus); info.Active=new IntPtr(Active); info.Flags=Flags; return Available;
@@ -487,7 +554,87 @@ public static class IbisSmoke {
   }
 
 }
-if ($SelfTest) { Test-GuardedDialogKey; Test-PickerKeyboardFocus; Test-PickerProjection; return }
+function Test-KeyboardObservation {
+  $AppId=41
+  [IbisSmoke]::Foreground=10; [IbisSmoke]::ForegroundReads=0; [IbisSmoke]::LoseForegroundAfter=0
+  [IbisSmoke]::Focus=10; [IbisSmoke]::Available=$false
+  [IbisSmoke]::FocusWindowReads=0; [IbisSmoke]::FocusVisibleReads=0; [IbisSmoke]::ChildReads=0
+  [IbisSmoke]::WindowReads=0; [IbisSmoke]::VisibleReads=0
+  $unavailable=New-KeyboardObservation
+  $uiaFailure={ param($Observation) Observe-PickerUiaFocus @('search') @('results') { throw 'private provider text' } { $false } { $null } { $false } { $true } $Observation }
+  $first=Observe-PickerKeyboardFocus { param($Observation) Read-PickerNativeFocus ([IntPtr]::new(10)) $Observation } $uiaFailure $unavailable
+  [IbisSmoke]::Available=$true; [IbisSmoke]::Queries=0
+  $topWindow=New-KeyboardObservation
+  $second=Observe-PickerKeyboardFocus { param($Observation) Read-PickerNativeFocus ([IntPtr]::new(10)) $Observation } $uiaFailure $topWindow
+  foreach ($key in $first.Keys) { if ($first[$key] -ne $second[$key]) { throw 'Diagnostics changed collapsed keyboard evidence' } }
+  if (!$first.owned_picker -or $first.ready -or $second.ready) { throw 'Collapsed readiness regression was not reproduced' }
+  if ($unavailable.native_before.gui_available -or !$topWindow.native_before.gui_available -or !$topWindow.native_before.focus_is_picker -or
+      !$topWindow.native_after.focus_is_picker -or !$topWindow.uia.exception -or $topWindow.uia.stage -cne 'focused' -or [IbisSmoke]::Queries -ne 2) {
+    throw 'Collapsed all-false readiness lost its distinguishing same-read facts'
+  }
+  if ($topWindow.native_before.stage -cne 'focus' -or $unavailable.native_before.stage -cne 'gui' -or
+      [IbisSmoke]::FocusWindowReads -ne 0 -or [IbisSmoke]::FocusVisibleReads -ne 0 -or [IbisSmoke]::ChildReads -ne 0 -or [IbisSmoke]::WindowReads -ne 8 -or [IbisSmoke]::VisibleReads -ne 8) {
+    throw 'Diagnostics queried original short-circuited native predicates'
+  }
+  [IbisSmoke]::Focus=11; [IbisSmoke]::ChildPid=99
+  $foreign=New-NativeKeyboardObservation
+  if ((Read-PickerNativeFocus ([IntPtr]::new(10)) $foreign).child -or $foreign.focus_pid_matches -or !$foreign.focus_present -or
+      !$foreign.focus_live -or !$foreign.focus_visible -or $foreign.focus_strict_child -or [IbisSmoke]::ChildReads -ne 0) {
+    throw 'Same-read foreign focus facts changed native short-circuiting'
+  }
+  [IbisSmoke]::ChildPid=41
+  if (($topWindow | ConvertTo-Json -Depth 5 -Compress).Contains('private')) { throw 'Keyboard observation exposed provider text' }
+  $same={param($Left,$Right) if ($Right -ceq 'picker') { throw 'private comparison payload' }; $Left -ceq $Right}
+  $owned={param($Element) $true}
+  $parent={param($Element) if ($Element -ceq 'option') { 'results' } else { $null }}
+  $diagnostic=New-KeyboardObservation
+  $ordinary=Observe-PickerUiaFocus @('search') @('results') { 'option' } { $true } $parent $same $owned
+  $script:observedFocusReads=0
+  $observed=Observe-PickerUiaFocus @('search') @('results') { $script:observedFocusReads++; 'option' } { $true } $parent $same $owned $diagnostic.uia 'picker'
+  foreach ($key in $ordinary.Keys) { if ($ordinary[$key] -ne $observed[$key]) { throw 'Diagnostic comparison changed primary UIA evidence' } }
+  if (!$observed.controlled_results_focus -or !$diagnostic.uia.exception -or $diagnostic.uia.focused_is_results -or $script:observedFocusReads -ne 2) { throw 'Comparison diagnostic did not preserve primary proof' }
+  $blank=New-KeyboardObservation
+  if (($blank.Keys | Sort-Object) -join ',' -cne 'focus_stable,native_after,native_before,uia') { throw 'Observation outer schema changed' }
+  foreach ($native in @($blank.native_before,$blank.native_after)) {
+    if (($native.Keys | Sort-Object) -join ',' -cne 'active_picker,exception,focus_is_picker,focus_live,focus_pid_matches,focus_present,focus_strict_child,focus_thread_matches,focus_visible,gui_available,gui_idle,owned,stage') { throw 'Native observation schema changed' }
+    foreach ($key in $native.Keys) { if ($key -cne 'stage' -and ($native[$key] -isnot [bool] -or $native[$key])) { throw 'Unobserved native field was invented' } }
+  }
+  if (($blank.uia.Keys | Sort-Object) -join ',' -cne 'enumeration_complete,exception,final_focus_same,final_owned,focused_is_picker,focused_is_results,focused_is_search,focused_owned,focused_present,ownership_disabled,ownership_offscreen,ownership_pid_mismatch,ownership_walk_failed,results_matches,results_owned,root_identity,search_matches,search_owned,stage') { throw 'UIA observation schema changed' }
+  if ($blank.native_before.stage -cne 'unobserved' -or $blank.native_after.stage -cne 'unobserved' -or $blank.uia.stage -cne 'unobserved') { throw 'Unobserved phase changed' }
+  foreach ($key in $blank.uia.Keys) {
+    if ($key -ceq 'stage') { continue }
+    if ($key -cin @('search_matches','results_matches')) {
+      if ($blank.uia[$key] -isnot [int] -or $blank.uia[$key] -ne 0) { throw 'Unobserved count was invented' }
+    } elseif ($blank.uia[$key] -isnot [bool] -or $blank.uia[$key]) { throw 'Unobserved UIA field was invented' }
+  }
+  $bounded=New-UiaKeyboardObservation
+  Observe-PickerUiaFocus (@('search')*4001) @() { 'option' } { $false } $parent $same $owned $bounded | Out-Null
+  if ($bounded.search_matches -ne 0) { throw 'Overflowed UIA count was serialized' }
+  # Exercise the production ownership predicate itself, preserving its original
+  # short-circuit Current getters; no UIA assembly or desktop is involved.
+  $tree=[System.Management.Automation.Language.Parser]::ParseFile($PSCommandPath,[ref] $null,[ref] $null)
+  $assignment=$tree.Find({param($Node) $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+    $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and $Node.Left.VariablePath.UserPath -ceq 'ownedProcess'},$true)
+  if (!$assignment) { throw 'Runtime ownership predicate missing' }
+  Invoke-Expression $assignment.Extent.Text
+  $script:currentReads=0
+  $script:currentInfo=[pscustomobject]@{ProcessId=99;IsOffscreen=$true;IsEnabled=$false}
+  $element=[pscustomobject]@{}
+  $element | Add-Member -MemberType ScriptProperty -Name Current -Value { $script:currentReads++; $script:currentInfo }
+  foreach ($kind in @('pid','offscreen','disabled','valid')) {
+    $Observation=New-UiaKeyboardObservation; $script:currentReads=0
+    $script:currentInfo.ProcessId=if ($kind -ceq 'pid') {99} else {41}
+    $script:currentInfo.IsOffscreen=$kind -cin @('pid','offscreen')
+    $script:currentInfo.IsEnabled=$kind -ceq 'valid'
+    $proof=& $ownedProcess $element
+    $expectedReads=if ($kind -ceq 'pid') {1} elseif ($kind -ceq 'offscreen') {2} else {3}
+    if ($proof -ne ($kind -ceq 'valid') -or $script:currentReads -ne $expectedReads -or
+        $Observation.ownership_pid_mismatch -ne ($kind -ceq 'pid') -or
+        $Observation.ownership_offscreen -ne ($kind -ceq 'offscreen') -or
+        $Observation.ownership_disabled -ne ($kind -ceq 'disabled')) { throw 'Ownership observation changed original predicate reads' }
+  }
+}
+if ($SelfTest) { Test-GuardedDialogKey; Test-PickerKeyboardFocus; Test-PickerProjection; Test-KeyboardObservation; return }
 
 [Console]::Error.WriteLine('NATIVE HELPER STAGE windows-encoding-start')
 # JSON crosses a pipe to Python; neither end may inherit an OEM/ANSI code page.
@@ -560,53 +707,66 @@ function Get-AppWindow([int] $Id) {
   }
   return $null
 }
-function Read-PickerUiaFocus($Window, [IntPtr] $Handle) {
-  if ($Window.Current.ProcessId -ne $AppId -or $Window.Current.NativeWindowHandle -ne $Handle.ToInt64()) {
-    return (New-PickerKeyboardFacts)
-  }
-  $elements = $Window.FindAll([System.Windows.Automation.TreeScope]::Descendants,[System.Windows.Automation.Condition]::TrueCondition)
-  if ($elements.Count -gt 4000) { return (New-PickerKeyboardFacts) }
-  $searches = @($elements | Where-Object { $_.Current.Name -ceq 'Search references' -and
-    ($_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Edit -or
-     $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::ComboBox) })
-  $results = @($elements | Where-Object { $_.Current.Name -ceq 'Results' -and
-    $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::List })
-  $parent = { param($Element) [System.Windows.Automation.TreeWalker]::RawViewWalker.GetParent($Element) }
-  $same = { param($Left,$Right) [System.Windows.Automation.Automation]::Compare($Left,$Right) }
-  $ownedProcess = {
-    param($Element) $Element.Current.ProcessId -eq $AppId -and !$Element.Current.IsOffscreen -and $Element.Current.IsEnabled
-  }
-  $owned = {
-    param($Element)
-    Test-FocusedAncestry $Element $Window $parent $same $ownedProcess
-  }
-  $facts = Observe-PickerUiaFocus $searches $results { [System.Windows.Automation.AutomationElement]::FocusedElement } {
-    param($Search,$Results,$Focused)
-    $rectangle = $Search.Current.BoundingRectangle
-    [IbisPickerProjection]::Read($AppId,$rectangle.X,$rectangle.Y,$rectangle.Width,$rectangle.Height,
-      $Search.GetRuntimeId(),$Results.GetRuntimeId(),$Focused.GetRuntimeId())
-  } $parent $same $owned
-  if ($Window.Current.ProcessId -ne $AppId -or $Window.Current.NativeWindowHandle -ne $Handle.ToInt64()) {
-    return (New-PickerKeyboardFacts)
-  }
-  $facts
+function Read-PickerUiaFocus($Window, [IntPtr] $Handle, $Observation = $null) {
+  if ($null -eq $Observation) { $Observation=New-UiaKeyboardObservation }
+  try {
+    $Observation.stage='root'
+    $Observation.root_identity=$Window.Current.ProcessId -eq $AppId -and $Window.Current.NativeWindowHandle -eq $Handle.ToInt64()
+    if (!$Observation.root_identity) { return (New-PickerKeyboardFacts) }
+    $Observation.stage='enumeration'
+    $elements = $Window.FindAll([System.Windows.Automation.TreeScope]::Descendants,[System.Windows.Automation.Condition]::TrueCondition)
+    if ($elements.Count -gt 4000) { return (New-PickerKeyboardFacts) }
+    $Observation.enumeration_complete=$true
+    $searches = @($elements | Where-Object { $_.Current.Name -ceq 'Search references' -and
+      ($_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Edit -or
+       $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::ComboBox) })
+    $results = @($elements | Where-Object { $_.Current.Name -ceq 'Results' -and
+      $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::List })
+    $parent = { param($Element) [System.Windows.Automation.TreeWalker]::RawViewWalker.GetParent($Element) }
+    $same = { param($Left,$Right) [System.Windows.Automation.Automation]::Compare($Left,$Right) }
+    $ownedProcess = {
+      param($Element)
+      if ($Element.Current.ProcessId -ne $AppId) { $Observation.ownership_pid_mismatch=$true; return $false }
+      if ($Element.Current.IsOffscreen) { $Observation.ownership_offscreen=$true; return $false }
+      if (!$Element.Current.IsEnabled) { $Observation.ownership_disabled=$true; return $false }
+      $true
+    }
+    $owned = {
+      param($Element)
+      $result=Test-FocusedAncestry $Element $Window $parent $same $ownedProcess
+      if (!$result) { $Observation.ownership_walk_failed=$true }
+      $result
+    }
+    $facts = Observe-PickerUiaFocus $searches $results { [System.Windows.Automation.AutomationElement]::FocusedElement } {
+      param($Search,$Results,$Focused)
+      $rectangle = $Search.Current.BoundingRectangle
+      [IbisPickerProjection]::Read($AppId,$rectangle.X,$rectangle.Y,$rectangle.Width,$rectangle.Height,
+        $Search.GetRuntimeId(),$Results.GetRuntimeId(),$Focused.GetRuntimeId())
+    } $parent $same $owned $Observation $Window
+    $phase=$Observation.stage
+    $Observation.stage='final'
+    $Observation.root_identity=$Window.Current.ProcessId -eq $AppId -and $Window.Current.NativeWindowHandle -eq $Handle.ToInt64()
+    if (!$Observation.root_identity) { return (New-PickerKeyboardFacts) }
+    $Observation.stage=$phase
+    $facts
+  } catch { $Observation.exception=$true; throw }
 }
 function Get-Tree {
   if ($Text -and $Text -ne '0') {
     $handle = [IntPtr]::new([long]::Parse($Text, [System.Globalization.CultureInfo]::InvariantCulture))
     if (![IbisSmoke]::IsWindow($handle) -or [IbisSmoke]::OwnerPid($handle) -ne $AppId) { throw 'Verified picker window identity was lost' }
-    if (![IbisSmoke]::IsWindowVisible($handle)) { return @{nodes=@();visible=$false;foreground=$false;picker_handle=$handle.ToInt64();keyboard=(New-PickerKeyboardFacts)} }
+    if (![IbisSmoke]::IsWindowVisible($handle)) { return @{nodes=@();visible=$false;foreground=$false;picker_handle=$handle.ToInt64();keyboard=(New-PickerKeyboardFacts);keyboard_observation=(New-KeyboardObservation)} }
     $window = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
   } else {
     $window = Get-AppWindow $AppId
   }
-  if (!$window) { return @{nodes=@();visible=$false;foreground=$false;keyboard=(New-PickerKeyboardFacts)} }
+  if (!$window) { return @{nodes=@();visible=$false;foreground=$false;keyboard=(New-PickerKeyboardFacts);keyboard_observation=(New-KeyboardObservation)} }
   $handle = [IntPtr] $window.Current.NativeWindowHandle
   if ($handle -eq [IntPtr]::Zero) { throw 'Native picker window handle unavailable' }
   # Retained UIA state and unrelated same-PID tray windows cannot establish
   # visibility. Keep querying the verified picker HWND's actual OS bit.
   $visible = [IbisSmoke]::IsWindowVisible($handle)
-  if (!$visible) { return @{nodes=@();visible=$false;foreground=$false;picker_handle=$handle.ToInt64();keyboard=(New-PickerKeyboardFacts)} }
+  if (!$visible) { return @{nodes=@();visible=$false;foreground=$false;picker_handle=$handle.ToInt64();keyboard=(New-PickerKeyboardFacts);keyboard_observation=(New-KeyboardObservation)} }
   $elements = $window.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)
   if ($elements.Count -gt 4000) { throw 'Accessibility tree exceeded smoke traversal bound' }
   $nodes = @()
@@ -623,8 +783,11 @@ function Get-Tree {
     }
     $nodes += @{role=$current.ControlType.ProgrammaticName;name=$current.Name;value=$value;focused=$current.HasKeyboardFocus}
   }
-  $keyboard = Observe-PickerKeyboardFocus { Read-PickerNativeFocus $handle } { Read-PickerUiaFocus $window $handle }
-  @{nodes=$nodes;visible=$visible;foreground=([IbisSmoke]::ForegroundPid() -eq $AppId);picker_handle=$handle.ToInt64();keyboard=$keyboard}
+  $observation=New-KeyboardObservation
+  $keyboard = Observe-PickerKeyboardFocus { param($Diagnostic) Read-PickerNativeFocus $handle $Diagnostic } {
+    param($Diagnostic) Read-PickerUiaFocus $window $handle $Diagnostic
+  } $observation
+  @{nodes=$nodes;visible=$visible;foreground=([IbisSmoke]::ForegroundPid() -eq $AppId);picker_handle=$handle.ToInt64();keyboard=$keyboard;keyboard_observation=$observation}
 }
 function Send-Chord([string] $Chord) {
   $map = @{ctrl=0x11;shift=0x10;alt=0x12;super=0x5b;space=0x20;escape=0x1b;return=0x0d}

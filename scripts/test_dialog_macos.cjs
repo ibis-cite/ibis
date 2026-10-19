@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const { unique, flags, locationFlags, validateToken, locationProgress, discoveryFacts } = require('./dialog-macos.js');
+const { unique, flags, locationFlags, validateToken, locationProgress, discoveryFacts, budgetFacts } = require('./dialog-macos.js');
 const executable = '/private/tmp/ibis-native/ibis';
 
 test('native dialog actions refuse ambiguous targets', () => {
@@ -182,7 +182,7 @@ function axScenario(options = {}) {
   const bridged = new WeakMap();
   const asObject = value => {
     if (value.nativeObject) return value;
-    if (!bridged.has(value)) bridged.set(value, Object.assign(Object.create(value),
+    if (!bridged.has(value) || options.freshWrappers) bridged.set(value, Object.assign(Object.create(value),
       {nativeObject: true, nativeRef: value, isNil: () => false}));
     return bridged.get(value);
   };
@@ -206,7 +206,7 @@ function axScenario(options = {}) {
   const unknown = ax('AXSheet', {AXParent: panel, ...frames(sheetBounds)});
   let windows = [{kCGWindowNumber: 10, kCGWindowOwnerPID: 123, kCGWindowAlpha: 1, kCGWindowBounds: panelBounds}];
   let foreground = 123, processPid = 123, processExecutable = executable, registered = true, terminated = false, elapsed = 0, failure = null;
-  const timeouts = [], posted = [], reads = [], stages = [], diagnostics = [], readiness = [], discovery = [], pidReads = [];
+  const timeouts = [], posted = [], reads = [], stages = [], diagnostics = [], readiness = [], discovery = [], pidReads = [], budgets = [], typeIdReads = [];
   const status = (name, attribute) => {
     reads.push([name, attribute]);
     if (options.onRead) options.onRead(api, name, attribute);
@@ -240,6 +240,11 @@ function axScenario(options = {}) {
       }, bindFunction() { throw Error('Missing ABI binding'); }},
     $: Object.assign(string, {
       NSFileHandle: {fileHandleWithStandardError: {writeData(value) {
+        const budgetPrefix = 'NATIVE CHOOSER MACOS BUDGET ';
+        if (value.startsWith(budgetPrefix)) {
+          if (options.throwBudgetDiagnostic) throw Error('Synthetic private diagnostic writer payload');
+          budgets.push(JSON.parse(value.slice(budgetPrefix.length))); return;
+        }
         const discoveryPrefix = 'NATIVE CHOOSER MACOS DISCOVERY ';
         if (value.startsWith(discoveryPrefix)) { discovery.push(JSON.parse(value.slice(discoveryPrefix.length))); return; }
         const readyPrefix = 'NATIVE CHOOSER MACOS READY ';
@@ -257,7 +262,7 @@ function axScenario(options = {}) {
         const payload = JSON.parse(value.slice(prefix.length));
         assert.deepEqual(Object.keys(payload), ['stage']); stages.push(payload.stage);
       }}},
-      NSProcessInfo: {processInfo: {get systemUptime() { return elapsed / 1000; }}},
+      NSProcessInfo: {processInfo: {get systemUptime() { return (options.backwardClock ? -elapsed : elapsed) / 1000; }}},
       AXIsProcessTrusted: () => true,
       NSRunningApplication: {runningApplicationWithProcessIdentifier: () => registered ? ({isTerminated: terminated,
         processIdentifier: processPid, get launchDate() { throw Error('Launch Services metadata is unavailable for direct children'); },
@@ -275,8 +280,9 @@ function axScenario(options = {}) {
         if (options.genericCFBoxing && !value.nativeObject) return 99;
         if (Object.hasOwn(options, 'actualTypeId')) return options.actualTypeId;
         return options.actualTypeIdsAsStrings ? String(types[value.type]) : types[value.type];
-      }, CFStringGetTypeID: () => types.string,
-      CFBooleanGetTypeID: () => types.bool, CFArrayGetTypeID: () => types.array,
+      }, CFStringGetTypeID: () => { typeIdReads.push('string'); return types.string; },
+      CFBooleanGetTypeID: () => { typeIdReads.push('bool'); return types.bool; },
+      CFArrayGetTypeID: () => { typeIdReads.push('array'); return types.array; },
       CFBooleanGetValue: value => {
         if (options.requireNativeObjects && !value.nativeObject) throw Error('Expected native CFBoolean');
         return options.numericBoolean ? Number(value.value) : value.value;
@@ -287,8 +293,15 @@ function axScenario(options = {}) {
           (left.nativeRef || left) === (right.nativeRef || right);
         return options.numericBoolean ? Number(equal) : equal;
       },
-      AXUIElementGetTypeID: () => options.expectedTypeIdsAsStrings ? String(types.AX) : types.AX,
-      AXValueGetTypeID: () => options.expectedTypeIdsAsStrings ? String(types.value) : types.value,
+      AXUIElementGetTypeID: () => {
+        typeIdReads.push('AX');
+        if (options.invalidExpectedOnce && typeIdReads.filter(value => value === 'AX').length === 1) return 0;
+        return options.expectedTypeIdsAsStrings ? String(types.AX) : types.AX;
+      },
+      AXValueGetTypeID: () => {
+        typeIdReads.push('value');
+        return options.expectedTypeIdsAsStrings ? String(types.value) : types.value;
+      },
       AXUIElementCreateSystemWide: () => options.nilSystem ? null : options.sdkReturnsObjects ? asObject(system) : system,
       AXUIElementCreateApplication: () => options.sdkReturnsObjects ? asObject(app) : app,
       AXUIElementSetMessagingTimeout: (element, seconds) => {
@@ -334,7 +347,7 @@ function axScenario(options = {}) {
   };
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(require.resolve('./dialog-macos.js'), 'utf8'), context);
-  const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, diagnostics, readiness, discovery, pidReads, system, bool, array, string,
+  const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, diagnostics, readiness, discovery, pidReads, budgets, typeIdReads, system, bool, array, string,
     call: (action, token, expectedExecutable = executable) => JSON.parse(context.run([action, '123', expectedExecutable, JSON.stringify(token)].slice(0, token === undefined ? 3 : 4))), setPathOpen,
     fail: (attribute, code = -25204) => { failure = {attribute, code}; },
     setWindows: value => { windows = value; }, setForeground: value => { foreground = value; },
@@ -912,4 +925,93 @@ test('cached AX identities cannot suppress fresh attribute errors or the 256-cal
   assert.throws(() => large.call('location-identity'), /budget/);
   assert.equal(large.diagnostics.at(-1).reason, 'budget-exceeded');
   assert.equal(large.posted.length, 0);
+});
+
+
+test('budget failures distinguish the existing call, elapsed-time and monotonic-clock guards once', () => {
+  const calls = untitledSheetScenario();
+  calls.panel.attrs.AXChildren.value.push(...Array.from({length: 12}, () =>
+    calls.element('AXStaticText', calls.panel, {AXValue: calls.string('Synthetic other label')})));
+  const time = axScenario({callMilliseconds: 1000});
+  const clock = axScenario({callMilliseconds: 1, backwardClock: true});
+  for (const [native, kind] of [[calls, 'call-limit'], [time, 'time-limit'], [clock, 'clock-regression']]) {
+    assert.throws(() => native.call('location-identity'), /budget/);
+    assert.equal(native.budgets.length, 1);
+    const row = native.budgets[0];
+    assert.deepEqual(Object.keys(row).sort(), ['calls', 'kind', 'stage']);
+    assert.equal(row.kind, kind);
+    assert.equal(Number.isInteger(row.calls) && row.calls >= 0 && row.calls <= 256, true);
+    if (kind === 'call-limit') assert.equal(row.calls, 256);
+    assert.equal(['scope', 'windows', 'candidates', 'sheets', 'bounds', 'location', 'controls'].includes(row.stage), true);
+    assert.equal(native.diagnostics.at(-1).reason, 'budget-exceeded');
+    assert.equal(native.posted.length, 0);
+  }
+});
+
+test('budget facts reject extra payloads, unbounded numbers and non-fixed classifications', () => {
+  const valid = {kind: 'call-limit', calls: 256, stage: 'sheets'};
+  assert.deepEqual(budgetFacts(valid), valid);
+  for (const value of [{...valid, path: '/synthetic/private'}, {...valid, calls: true}, {...valid, calls: 257},
+    {...valid, calls: -1}, {...valid, calls: 0.5}, {...valid, calls: Infinity}, {...valid, kind: 'private'},
+    {...valid, stage: 'private'}, {...valid, kind: []}, {...valid, stage: []}]) {
+    assert.throws(() => budgetFacts(value), /budget facts/);
+  }
+  const success = axScenario(); assert.equal(success.call('location-identity').ready, true);
+  assert.deepEqual(success.budgets, []);
+  const other = axScenario(); other.fail('AXWindows');
+  assert.throws(() => other.call('location-identity'), /AX/);
+  assert.deepEqual(other.budgets, []);
+});
+
+
+test('immutable expected CF type IDs are queried once per helper while actual objects still validate', () => {
+  const native = axScenario();
+  assert.equal(native.call('location-identity').ready, true);
+  for (const name of ['AX', 'string', 'array', 'value', 'bool']) assert.equal(native.typeIdReads.filter(value => value === name).length, 1);
+  assert.equal(native.call('location-identity').ready, true);
+  for (const name of ['AX', 'string', 'array', 'value', 'bool']) assert.equal(native.typeIdReads.filter(value => value === name).length, 2);
+  const changedType = axScenario(); changedType.field.attrs.AXRole = changedType.bool(true);
+  assert.throws(() => changedType.call('location-identity'), /type/);
+  const foreign = axScenario(); foreign.field.pid = 456;
+  assert.throws(() => foreign.call('location-identity'), /ownership/);
+  for (const sample of [changedType, foreign]) assert.equal(sample.posted.length, 0);
+});
+
+test('expected-type memo saves calls on bounded graphs without raising the 256-call cap', () => {
+  for (const [options, fillers] of [[{}, 5], [{freshWrappers: true}, 3]]) {
+    const native = untitledSheetScenario(options);
+    native.panel.attrs.AXChildren.value.push(...Array.from({length: fillers}, () =>
+      native.element('AXStaticText', native.panel, {AXValue: native.string('Synthetic different label')})));
+    assert.deepEqual(native.call('location-identity'), {ready: true, owned: true, token: identity()});
+    assert.deepEqual(native.budgets, []);
+  }
+  const limited = untitledSheetScenario();
+  limited.panel.attrs.AXChildren.value.push(...Array.from({length: 12}, () =>
+    limited.element('AXStaticText', limited.panel, {AXValue: limited.string('Synthetic different label')})));
+  assert.throws(() => limited.call('location-identity'), /budget/);
+  assert.equal(limited.budgets[0].kind, 'call-limit');
+  assert.equal(limited.budgets[0].calls, 256);
+  assert.equal(limited.posted.length, 0);
+});
+
+
+test('an invalid expected type identifier fails without poisoning a later helper', () => {
+  const native = axScenario({invalidExpectedOnce: true});
+  assert.throws(() => native.call('location-identity'), /type/);
+  assert.deepEqual(native.diagnostics, [{api: 'AXUIElementGetTypeID', reason: 'invalid-type-id'}]);
+  assert.equal(native.call('location-identity').ready, true);
+  assert.equal(native.typeIdReads.filter(value => value === 'AX').length, 2);
+  assert.equal(native.posted.length, 0);
+});
+
+
+test('a failed best-effort budget diagnostic preserves the original fixed AX failure', () => {
+  const native = untitledSheetScenario({throwBudgetDiagnostic: true});
+  native.panel.attrs.AXChildren.value.push(...Array.from({length: 12}, () =>
+    native.element('AXStaticText', native.panel, {AXValue: native.string('Synthetic different label')})));
+  assert.throws(() => native.call('location-identity'), error => error.message === 'Native AX observation budget exceeded');
+  assert.deepEqual(native.budgets, []);
+  assert.equal(native.diagnostics.at(-1).reason, 'budget-exceeded');
+  assert.equal(JSON.stringify(native.diagnostics).includes('private'), false);
+  assert.equal(native.posted.length, 0);
 });

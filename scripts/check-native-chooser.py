@@ -101,6 +101,41 @@ def windows_keyboard_state(value):
     return value
 
 
+WINDOWS_NATIVE_OBSERVATION_FIELDS = (
+    "exception", "owned", "gui_available", "gui_idle", "active_picker", "focus_present", "focus_is_picker",
+    "focus_live", "focus_visible", "focus_strict_child", "focus_pid_matches", "focus_thread_matches",
+)
+WINDOWS_UIA_OBSERVATION_FIELDS = (
+    "exception", "root_identity", "enumeration_complete", "search_owned", "results_owned", "focused_present", "focused_owned",
+    "focused_is_search", "focused_is_results", "focused_is_picker", "final_focus_same", "final_owned",
+    "ownership_pid_mismatch", "ownership_offscreen", "ownership_disabled", "ownership_walk_failed",
+)
+
+
+def windows_keyboard_observation(value):
+    # These optional facts only explain a failed predicate. They never authorize
+    # typing, and malformed diagnostics must not replace the original error.
+    if (not isinstance(value, dict) or set(value) != {"native_before", "native_after", "focus_stable", "uia"}
+            or type(value["focus_stable"]) is not bool):
+        return None
+    result = {"focus_stable": value["focus_stable"]}
+    for section in ("native_before", "native_after", "uia"):
+        uia = section == "uia"
+        fields = WINDOWS_UIA_OBSERVATION_FIELDS if uia else WINDOWS_NATIVE_OBSERVATION_FIELDS
+        counts = ("search_matches", "results_matches") if uia else ()
+        stages = (("unobserved", "root", "enumeration", "focused", "ownership", "relation", "ancestry", "final", "complete")
+                  if uia else ("unobserved", "picker", "gui", "focus", "complete"))
+        observed = value[section]
+        if (not isinstance(observed, dict) or set(observed) != {"stage", *fields, *counts}
+                or type(observed["stage"]) is not str or observed["stage"] not in stages
+                or any(type(observed[key]) is not bool for key in fields)
+                or any(type(observed[key]) is not int or not 0 <= observed[key] <= 4000 for key in counts)
+                or observed["stage"] == "unobserved" and any(observed[key] for key in (*fields, *counts))):
+            return None
+        result[section] = {key: observed[key] for key in ("stage", *fields, *counts)}
+    return result
+
+
 def windows_focused_nodes(current, previous_index):
     roles = {"edit": "edit", "combobox": "combobox", "button": "button", "listitem": "option", "option": "option",
              "list": "list", "text": "text", "pane": "pane", "document": "document", "window": "window"}
@@ -214,8 +249,9 @@ def helper_diagnostics(stderr):
     ax_reported = False
     ready_reported = False
     discovery_reported = False
+    budget_reported = False
     for line in stderr[:65536].splitlines():
-        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS AX ", "NATIVE CHOOSER MACOS READY ", "NATIVE CHOOSER MACOS DISCOVERY ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
+        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS AX ", "NATIVE CHOOSER MACOS READY ", "NATIVE CHOOSER MACOS DISCOVERY ", "NATIVE CHOOSER MACOS BUDGET ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
         if prefix is None:
             continue
         try:
@@ -226,7 +262,7 @@ def helper_diagnostics(stderr):
                         raise ValueError("Duplicate diagnostic field")
                     value[key] = item
                 return value
-            value = json.loads(line[len(prefix):], object_pairs_hook=unique_fields if prefix == "NATIVE CHOOSER MACOS DISCOVERY " else None)
+            value = json.loads(line[len(prefix):], object_pairs_hook=unique_fields if prefix in ("NATIVE CHOOSER MACOS DISCOVERY ", "NATIVE CHOOSER MACOS BUDGET ") else None)
         except ValueError:
             continue
         if not isinstance(value, dict):
@@ -244,6 +280,12 @@ def helper_diagnostics(stderr):
             valid = (not discovery_reported and set(value) == set(MACOS_DISCOVERY_BOUNDS)
                      and all(type(count) is int and 0 <= count <= MACOS_DISCOVERY_BOUNDS[key] for key, count in value.items()))
             discovery_reported = discovery_reported or valid
+        elif prefix == "NATIVE CHOOSER MACOS BUDGET ":
+            valid = (not budget_reported and set(value) == {"kind", "calls", "stage"}
+                     and type(value["kind"]) is str and value["kind"] in ("call-limit", "time-limit", "clock-regression")
+                     and type(value["calls"]) is int and 0 <= value["calls"] <= 256
+                     and type(value["stage"]) is str and value["stage"] in ("scope", "windows", "candidates", "sheets", "bounds", "location", "controls"))
+            budget_reported = budget_reported or valid
         elif prefix == "NATIVE CHOOSER WINDOWS LOCATION ":
             valid = set(value) == set(WINDOWS_LOCATION_FIELDS) and all(type(item) is bool for item in value.values())
         elif prefix == "NATIVE CHOOSER MACOS ":
@@ -318,6 +360,10 @@ def prepare_rename_query(native, snapshot, system, previous_index=None, report=N
             facts.update(windows_focused_nodes(current, previous_index))
             facts["keyboard_metadata_valid"] = keyboard is not None
             facts["keyboard"] = dict(keyboard) if keyboard is not None else {key: False for key in WINDOWS_KEYBOARD_FIELDS}
+            observation = windows_keyboard_observation(current.get("keyboard_observation"))
+            facts["keyboard_observation_valid"] = observation is not None
+            if observation is not None:
+                facts["keyboard_observation"] = observation
             print("NATIVE CHOOSER RENAME FOCUS FAILURE " + json.dumps(facts), file=sys.stderr)
         if system == "Windows" and capture_failure is not None:
             try:
@@ -851,6 +897,117 @@ class Tests(unittest.TestCase):
                 "unique_results": virtual, "direct_search_focus": not virtual and ready,
                 "controller_for_results": virtual, "controlled_results_focus": virtual and ready, "ready": ready}
 
+    def observation_evidence(self):
+        native = {"stage": "complete", **dict.fromkeys(("exception", "owned", "gui_available", "gui_idle", "active_picker", "focus_present", "focus_is_picker", "focus_live", "focus_visible", "focus_strict_child", "focus_pid_matches", "focus_thread_matches"), False)}
+        uia = {"stage": "complete", "search_matches": 1, "results_matches": 1,
+               **dict.fromkeys(("exception", "root_identity", "enumeration_complete", "search_owned", "results_owned", "focused_present", "focused_owned", "focused_is_search", "focused_is_results", "focused_is_picker", "final_focus_same", "final_owned", "ownership_pid_mismatch", "ownership_offscreen", "ownership_disabled", "ownership_walk_failed"), False)}
+        return {"native_before": dict(native), "native_after": dict(native), "focus_stable": False, "uia": uia}
+
+    def test_keyboard_observations_accept_only_fixed_typed_bounded_metadata(self):
+        import copy
+        value = self.observation_evidence()
+        result = windows_keyboard_observation(value)
+        self.assertEqual(result, value)
+        self.assertIsNot(result, value)
+        self.assertIsNot(result["native_before"], value["native_before"])
+        for section in ("native_before", "native_after", "uia"):
+            for key in value[section]:
+                invalid_values = ("/private/provider/text", None, [], {})
+                if type(value[section][key]) is bool:
+                    invalid_values += (0, 1, 1.0)
+                for bad in invalid_values:
+                    invalid = copy.deepcopy(value)
+                    invalid[section][key] = bad
+                    self.assertIsNone(windows_keyboard_observation(invalid), (section, key, bad))
+            for key in value[section]:
+                invalid = copy.deepcopy(value)
+                del invalid[section][key]
+                self.assertIsNone(windows_keyboard_observation(invalid), (section, key))
+            invalid = copy.deepcopy(value)
+            invalid[section]["pid"] = 123
+            self.assertIsNone(windows_keyboard_observation(invalid))
+        for key in ("search_matches", "results_matches"):
+            for count in (-1, 4001, True, 1.0, float("nan"), None):
+                invalid = copy.deepcopy(value); invalid["uia"][key] = count
+                self.assertIsNone(windows_keyboard_observation(invalid), (key, count))
+            for count in (0, 4000):
+                valid = copy.deepcopy(value); valid["uia"][key] = count
+                self.assertEqual(windows_keyboard_observation(valid), valid)
+        for invalid in (None, {}, {**value, "focus_stable": 1}, {**value, "raw": "/private/path"}):
+            self.assertIsNone(windows_keyboard_observation(invalid))
+
+    def test_keyboard_observation_stages_do_not_claim_unobserved_facts(self):
+        import copy
+        value = self.observation_evidence()
+        for section, stages in (("native_before", ("unobserved", "picker", "gui", "focus", "complete")),
+                                ("native_after", ("unobserved", "picker", "gui", "focus", "complete")),
+                                ("uia", ("unobserved", "root", "enumeration", "focused", "ownership", "relation", "ancestry", "final", "complete"))):
+            for stage in stages:
+                valid = copy.deepcopy(value); valid[section]["stage"] = stage
+                if stage == "unobserved":
+                    for key in ("search_matches", "results_matches"):
+                        if key in valid[section]: valid[section][key] = 0
+                self.assertEqual(windows_keyboard_observation(valid), valid)
+            invalid = copy.deepcopy(value); invalid[section]["stage"] = "private stage"
+            self.assertIsNone(windows_keyboard_observation(invalid))
+            invalid[section]["stage"] = "unobserved"; invalid[section]["exception"] = True
+            self.assertIsNone(windows_keyboard_observation(invalid))
+        invalid = copy.deepcopy(value); invalid["uia"]["stage"] = "unobserved"
+        self.assertIsNone(windows_keyboard_observation(invalid))
+
+    def test_rename_failure_projects_only_same_final_observation_without_more_reads_or_inputs(self):
+        from io import StringIO
+        actions, report, stderr = [], {}, StringIO()
+        class Native:
+            def key(self, key): actions.append(key)
+        current = {"visible": True, "foreground": True, "keyboard": self.keyboard_evidence(ready=False),
+                   "nodes": [{"name": "Search references", "role": "ControlType.ComboBox"}],
+                   "keyboard_observation": self.observation_evidence()}
+        current["keyboard_observation"]["native_after"]["focus_is_picker"] = True
+        snapshot = Mock(side_effect=[{"visible": False}, current])
+        failure = AssertionError("original readiness timeout")
+        def wait(predicate, message):
+            if "hides" in message: self.assertTrue(predicate())
+            else:
+                self.assertFalse(predicate()); raise failure
+        capture = Mock(side_effect=RuntimeError("secondary private failure"))
+        with patch.object(smoke, "wait_for", side_effect=wait), patch.object(sys, "stderr", stderr):
+            with self.assertRaises(AssertionError) as caught:
+                prepare_rename_query(Native(), snapshot, "Windows", 1, report, capture)
+        self.assertIs(caught.exception, failure)
+        facts = report["rename_focus_failure"]
+        self.assertTrue(facts["keyboard_observation_valid"])
+        self.assertEqual(facts["keyboard_observation"], current["keyboard_observation"])
+        self.assertEqual(snapshot.call_count, 2)
+        self.assertEqual(actions, ["Escape", "ctrl+shift+y"])
+        capture.assert_called_once_with()
+        self.assertNotIn("private", stderr.getvalue())
+
+    def test_diagnostic_payload_failure_never_changes_readiness_or_reuses_earlier_observations(self):
+        from io import StringIO
+        current = {"visible": True, "foreground": True, "keyboard": self.keyboard_evidence(),
+                   "nodes": [{"name": "Search references", "role": "ControlType.ComboBox"}],
+                   "keyboard_observation": {"private": "/private/path"}}
+        snapshots = iter([{"visible": False}, current])
+        with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate())):
+            prepare_rename_query(Mock(), lambda: next(snapshots), "Windows")
+        earlier = {**current, "keyboard": self.keyboard_evidence(ready=False), "keyboard_observation": self.observation_evidence()}
+        final = {**earlier, "keyboard_observation": current["keyboard_observation"]}
+        snapshot = Mock(side_effect=[{"visible": False}, earlier, final]); report = {}; stderr = StringIO()
+        failure = AssertionError("original readiness timeout")
+        def wait(predicate, message):
+            if "hides" in message: self.assertTrue(predicate())
+            else:
+                self.assertFalse(predicate()); self.assertFalse(predicate()); raise failure
+        with patch.object(smoke, "wait_for", side_effect=wait), patch.object(sys, "stderr", stderr):
+            with self.assertRaises(AssertionError) as caught:
+                prepare_rename_query(Mock(), snapshot, "Windows", 1, report)
+        self.assertIs(caught.exception, failure)
+        self.assertFalse(report["rename_focus_failure"]["keyboard_observation_valid"])
+        self.assertNotIn("keyboard_observation", report["rename_focus_failure"])
+        self.assertEqual(snapshot.call_count, 3)
+        self.assertNotIn("private", stderr.getvalue())
+
     def test_windows_rename_accepts_only_proven_controller_focus_with_native_child_focus(self):
         actions = []
         class Native:
@@ -879,6 +1036,29 @@ class Tests(unittest.TestCase):
                         {**value, "payload": "/private/path"}, {}, None):
             with self.assertRaises(AssertionError):
                 windows_keyboard_state(invalid)
+
+    def test_macos_budget_facts_accept_only_one_fixed_typed_record(self):
+        prefix = "NATIVE CHOOSER MACOS BUDGET "
+        for kind in ("call-limit", "time-limit", "clock-regression"):
+            for stage in ("scope", "windows", "candidates", "sheets", "bounds", "location", "controls"):
+                for calls in (0, 256):
+                    facts = {"kind": kind, "calls": calls, "stage": stage}
+                    line = prefix + json.dumps(facts, sort_keys=True)
+                    self.assertEqual(helper_diagnostics(line), [line])
+                    self.assertEqual(helper_diagnostics("\n".join([line] * 20)), [line])
+        valid = {"kind": "call-limit", "calls": 256, "stage": "sheets"}
+        invalid = [{**valid, "calls": value} for value in (-1, 257, True, 1.0, float("nan"), float("inf"), "private", None)]
+        invalid += [{**valid, "kind": value} for value in ("private provider text", True, [], {})]
+        invalid += [{**valid, "stage": value} for value in ("private provider text", True, [], {})]
+        invalid += [{**valid, "path": "/private/path"}, {}, {"kind": "call-limit", "stage": "scope"}]
+        for value in invalid:
+            self.assertEqual(helper_diagnostics(prefix + json.dumps(value)), [])
+        self.assertEqual(helper_diagnostics(prefix + '{"kind":"call-limit","calls":0,"calls":1,"stage":"scope"}'), [])
+        budget = prefix + json.dumps(valid, sort_keys=True)
+        ax = 'NATIVE CHOOSER MACOS AX {"api": "CFEqual", "reason": "budget-exceeded"}'
+        self.assertEqual(helper_diagnostics(budget + "\n" + ax), [budget, ax])
+        stage = 'NATIVE CHOOSER MACOS {"stage": "scope"}'
+        self.assertEqual(helper_diagnostics(budget + "\n" + "\n".join([stage] * 25)), [stage] * 16)
 
     def test_macos_discovery_counts_are_exact_bounded_and_failure_only_metadata(self):
         prefix = "NATIVE CHOOSER MACOS DISCOVERY "
