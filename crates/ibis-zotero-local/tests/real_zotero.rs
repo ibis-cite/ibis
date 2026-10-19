@@ -6,6 +6,7 @@
 //! endpoint, so what Ibis reads is exactly what Zotero itself sends, not a
 //! hand-written imitation of it.
 
+use std::error::Error;
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::thread;
@@ -64,27 +65,27 @@ fn port() -> u16 {
 
 /// Saves items the way the browser connector does, into the library
 /// selected in Zotero (My Library in a fresh profile).
-fn save(items: &[&str], session: &str) {
+fn save(items: &[&str], session: &str) -> Result<(), Box<dyn Error>> {
     let body = format!(
         r#"{{"items": [{}], "uri": "https://example.org/synthetic", "sessionID": "{session}"}}"#,
         items.join(",")
     );
-    let mut stream = TcpStream::connect(("127.0.0.1", port())).expect("Zotero is running");
+    let mut stream = TcpStream::connect(("127.0.0.1", port()))?;
     write!(
         stream,
         "POST /connector/saveItems HTTP/1.1\r\nHost: 127.0.0.1:{}\r\nContent-Type: application/json\r\n\
          Content-Length: {}\r\nConnection: close\r\n\r\n{body}",
         port(),
         body.len()
-    )
-    .unwrap();
+    )?;
     let mut answer = String::new();
-    stream.read_to_string(&mut answer).unwrap();
+    stream.read_to_string(&mut answer)?;
     let status = answer.split(' ').nth(1).unwrap_or_default();
     assert!(
         status == "201" || status == "200",
         "Zotero refused the synthetic items: {answer}"
     );
+    Ok(())
 }
 
 /// Scans until Zotero lists `count` items; saving finishes after the
@@ -105,8 +106,8 @@ fn scan_until(count: usize) -> (LoadResult, Snapshot) {
 
 #[test]
 #[ignore = "needs a running Zotero; see scripts/real-zotero.sh"]
-fn ibis_reads_what_a_real_zotero_sends() {
-    save(&[ARTICLE, BOOK, KEYLESS], "ibis-synthetic-1");
+fn ibis_reads_what_a_real_zotero_sends() -> Result<(), Box<dyn Error>> {
+    save(&[ARTICLE, BOOK, KEYLESS], "ibis-synthetic-1")?;
     let (result, snapshot) = scan_until(3);
     assert_eq!(result.references.len(), 3, "{:#?}", result.references);
     assert!(result.warnings.is_empty(), "{:#?}", result.warnings);
@@ -115,7 +116,7 @@ fn ibis_reads_what_a_real_zotero_sends() {
         .references
         .iter()
         .find(|r| r.citekey.as_deref() == Some("example2020sleep"))
-        .expect("the article keeps its citation key from Extra");
+        .ok_or("the article lost its citation key from Extra")?;
     assert!(
         article
             .title
@@ -133,7 +134,7 @@ fn ibis_reads_what_a_real_zotero_sends() {
         .references
         .iter()
         .find(|r| r.citekey.as_deref() == Some("institute2019"))
-        .expect("the book keeps its citation key");
+        .ok_or("the book lost its citation key")?;
     assert!(book.title.as_deref().unwrap_or_default().contains("数据与记忆"));
     assert_eq!(book.item_type, "book");
 
@@ -146,18 +147,18 @@ fn ibis_reads_what_a_real_zotero_sends() {
                 .unwrap_or_default()
                 .contains("without a citation key")
         })
-        .expect("an item without a citation key is still listed");
+        .ok_or("an item without a citation key was not listed")?;
     assert_eq!(keyless.citekey, None);
 
     // Nothing changed: the cheap check says so without reading everything.
-    let again = api::refresh(&mut LocalZotero::on_port(port()), Library::User, Some(&snapshot)).unwrap();
+    let again = api::refresh(&mut LocalZotero::on_port(port()), Library::User, Some(&snapshot))?;
     assert_eq!(again, Refresh::Unchanged);
 
     // A new item is noticed and the whole library is read again.
-    save(&[LATER], "ibis-synthetic-2");
+    save(&[LATER], "ibis-synthetic-2")?;
     let started = Instant::now();
     loop {
-        match api::refresh(&mut LocalZotero::on_port(port()), Library::User, Some(&snapshot)).unwrap() {
+        match api::refresh(&mut LocalZotero::on_port(port()), Library::User, Some(&snapshot))? {
             Refresh::Loaded {
                 result,
                 snapshot: newer,
@@ -170,7 +171,7 @@ fn ibis_reads_what_a_real_zotero_sends() {
                         .iter()
                         .any(|r| r.citekey.as_deref() == Some("standin2022"))
                 );
-                break;
+                return Ok(());
             }
             Refresh::Unchanged if started.elapsed() < Duration::from_secs(60) => {
                 thread::sleep(Duration::from_millis(500))
