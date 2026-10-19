@@ -180,6 +180,8 @@ pub(crate) fn dismiss_picker(app: &AppHandle) {
     #[cfg(target_os = "macos")]
     crate::panel::cancel_initial_presentation(app);
     if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window) {
+        // The interface keeps its search for a minute after a real hide.
+        report(window.emit("picker:hidden", ()), NativeIssue::PickerEvent);
         dismiss_with(
             || window.hide(),
             || {

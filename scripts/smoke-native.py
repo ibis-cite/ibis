@@ -98,6 +98,19 @@ def search_focused(snapshot):
     return any(n.get("focused") for n in named(snapshot, "Search references"))
 
 
+def has_search_text(snapshot):
+    return any(n.get("value") for n in named(snapshot, "Search references"))
+
+
+def escape_to_hide(native, snapshot, description):
+    """Escape clears a search first and hides on the next press."""
+    if has_search_text(snapshot()):
+        native.key("Escape")
+        wait_for(lambda: not has_search_text(snapshot()), "Escape clears the search before hiding")
+    native.key("Escape")
+    wait_for(lambda: not snapshot()["visible"], description)
+
+
 def prepare_initial_picker_show(native, snapshot):
     # A nonactivating panel can remain key while the editor is already the
     # frontmost application. Prove it is hidden before testing shortcut SHOW.
@@ -106,8 +119,7 @@ def prepare_initial_picker_show(native, snapshot):
             current = snapshot()
             return current["visible"] and search_focused(current)
         wait_for(ready, "initial picker search ready")
-        native.key("Escape")
-        wait_for(lambda: not snapshot()["visible"], "initial Escape hides picker")
+        escape_to_hide(native, snapshot, "initial Escape hides picker")
 
 
 EDITABLE_ROLES = {"edit", "text", "entry", "combobox", "axcombobox", "axtextfield", "axsearchfield", "controltype.edit", "controltype.combobox"}
@@ -611,8 +623,7 @@ def main():
                 native.key(shortcut)
                 focus_state("after-first-shortcut")
                 wait_for(picker_ready, "global shortcut visible, foreground and search focus")
-                native.key("Escape")
-                wait_for(lambda: not snapshot()["visible"], "Escape hides picker")
+                escape_to_hide(native, snapshot, "Escape hides picker")
                 native.focus_editor()
                 wait_for(native.editor_focused, "previous editor focused")
                 focus_state("before-second-shortcut")
@@ -623,8 +634,7 @@ def main():
             check("global shortcut shows foreground picker with focused search", show)
 
             def second_instance():
-                native.key("Escape")
-                wait_for(lambda: not snapshot()["visible"], "picker hidden before second launch")
+                escape_to_hide(native, snapshot, "picker hidden before second launch")
                 native.focus_editor()
                 wait_for(native.editor_focused, "editor focused before second launch")
                 capture_editor_focus("before-second-launch")
@@ -857,6 +867,20 @@ class ContractTests(unittest.TestCase):
         native.key("ctrl+super+r")
         self.assertEqual(native.events, [("Escape", True), ("editor", False), ("ctrl+super+r", False)])
         self.assertTrue(native.visible)
+
+    def test_escape_clears_a_search_before_it_hides(self):
+        state = {"visible": True, "value": "query"}
+        native = Mock()
+        def key(name):
+            if state["value"]:
+                state["value"] = ""
+            else:
+                state["visible"] = False
+        native.key.side_effect = key
+        snapshot = lambda: {"visible": state["visible"], "nodes": [{"name": "Search references", "value": state["value"]}]}
+        escape_to_hide(native, snapshot, "hidden")
+        self.assertEqual(native.key.call_args_list, [call("Escape"), call("Escape")])
+        self.assertFalse(state["visible"])
 
     def test_hidden_initial_picker_does_not_send_escape_into_the_editor(self):
         native = self.InitialPickerModel(visible=False)

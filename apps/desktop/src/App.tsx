@@ -103,14 +103,14 @@ function MenuItem({ label, title, keys, onSelect }: { label: string; title?: str
 // A stable provider lets the development gallery use synthetic data without IPC.
 export type PickerApi = Pick<typeof nativeApi,
   "chooseLibrary" | "useZotero" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" |
-  "hidePicker" | "setPinned" | "onLibraryChanged" | "onPickerShown" | "quit" | "search" | "shortcutStatus">;
+  "hidePicker" | "setPinned" | "onLibraryChanged" | "onPickerShown" | "onPickerHidden" | "quit" | "search" | "shortcutStatus">;
 
 export type PickerPreview = { query?: string; copied?: Copied };
 
 // The picker: search, choose one or more references, copy them as a citation.
 export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: PickerPreview } = {}) {
   const { chooseLibrary, useZotero, libraryStatus, reloadLibrary, copyCitation, copyFormat,
-    hidePicker, setPinned, onLibraryChanged, onPickerShown, quit, search, shortcutStatus } = api;
+    hidePicker, setPinned, onLibraryChanged, onPickerShown, onPickerHidden, quit, search, shortcutStatus } = api;
   const [query, setQuery] = useState(preview?.query ?? "");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [announcement, setAnnouncement] = useState("");
@@ -142,10 +142,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     try { await action(); report(operation, false); }
     catch { report(operation); }
   };
-  const hide = () => {
-    hiddenAt.current = Date.now();
-    void perform("hide", hidePicker);
-  };
+  const hide = () => void perform("hide", hidePicker);
   const clearSearch = () => {
     setQuery("");
     setSelected(new Map());
@@ -154,7 +151,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const togglePin = () => {
     const on = !pinned;
     setPinnedState(on);
-    void perform("pin", () => setPinned(on));
+    // Show the pin as it really is if the window could not change.
+    void perform("pin", () => setPinned(on).catch((error: unknown) => { setPinnedState(!on); throw error; }));
   };
 
   // When the picker is shown, put the cursor in the search box with the
@@ -168,14 +166,15 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       return () => undefined;
     };
     const focusSearch = () => {
-      if (hiddenAt.current !== null && Date.now() - hiddenAt.current > KEEP_SEARCH_MS) clearSearch();
+      if (hiddenAt.current !== null && performance.now() - hiddenAt.current > KEEP_SEARCH_MS) clearSearch();
       hiddenAt.current = null;
       input.current?.focus();
       input.current?.select();
     };
-    // Focus moving to another app hides an unpinned picker natively.
-    const noteBlur = () => { hiddenAt.current ??= Date.now(); };
-    window.addEventListener("blur", noteBlur);
+    // Every hide is reported, including the native one when focus moves away;
+    // a monotonic clock keeps clock changes from clearing or keeping a search.
+    const unlistenHidden = onPickerHidden(() => { hiddenAt.current = performance.now(); })
+      .catch(() => subscriptionFailure("pickerEvents"));
     const unlisten = onPickerShown(focusSearch).catch(() => subscriptionFailure("pickerEvents"));
     const unlistenLibrary = onLibraryChanged((status) => {
       acceptInitialStatus = false;
@@ -195,7 +194,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     return () => {
       acceptInitialStatus = false;
       mounted = false;
-      window.removeEventListener("blur", noteBlur);
+      void unlistenHidden.then((stop) => stop()).catch(() => console.error("Picker event cleanup failed."));
       void unlisten.then((stop) => stop()).catch(() => console.error("Picker event cleanup failed."));
       void unlistenLibrary.then((stop) => stop()).catch(() => console.error("Library event cleanup failed."));
     };
@@ -311,10 +310,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         if (composing(e)) return;
         if (e.key === "Escape") {
           e.preventDefault();
-          // Escape steps back one layer: the menu, then the search, then the picker.
+          // Escape steps back one layer: the menu, then the search, then the
+          // picker. Chosen references stay; hiding keeps them for a minute.
           if (menuOpen) closeMenu(true);
-          else if (query || selected.size > 0) {
-            clearSearch();
+          else if (query) {
+            setQuery("");
             input.current?.focus();
           } else hide();
         } else if (isMenuShortcut(e)) {

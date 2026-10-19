@@ -29,6 +29,11 @@ export function onPickerShown(handler: () => void): Promise<UnlistenFn> {
   return listen("picker:shown", handler);
 }
 
+/** Called whenever the picker is hidden, by any route. */
+export function onPickerHidden(handler: () => void): Promise<UnlistenFn> {
+  return listen("picker:hidden", handler);
+}
+
 /** Called when a library finishes opening, or fails to open. */
 export function onLibraryChanged(handler: (status: LibraryStatus) => void): Promise<UnlistenFn> {
   return listen<LibraryStatus>("library:changed", (event) => handler(event.payload));
