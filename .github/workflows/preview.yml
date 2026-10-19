@@ -29,10 +29,11 @@ on:
 permissions:
   contents: read
 
-# A newer push to main replaces an older nightly build; tag builds always finish.
+# Runs are never cancelled, so publication is never cut off halfway. While one
+# runs, only the newest waiting push to main is kept.
 concurrency:
   group: preview-${{ github.ref_name }}
-  cancel-in-progress: ${{ github.ref == 'refs/heads/main' }}
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -255,21 +256,34 @@ jobs:
           SHA: ${{ github.sha }}
           TAG: nightly
         run: |
+          set -euo pipefail
+          # An older run must not replace a newer nightly.
+          latest=$(git ls-remote "https://github.com/$REPO" refs/heads/main | cut -f1)
+          if [ "$latest" != "$SHA" ]; then
+            echo "main has moved on to $latest; leaving the nightly to that run."
+            exit 0
+          fi
           built=$(date -u '+%Y-%m-%d %H:%M UTC')
           cat > notes.md <<EOF
-          **Nightly development build of \`${SHA:0:12}\` on main, built $built.** It is replaced after every change to main and may be unfinished or broken. For the steadier version, use the newest numbered preview release.
+          **Nightly development build of \`${SHA:0:12}\` on main, built $built.** It is replaced after changes to main and may be unfinished or broken. For the steadier version, use the newest numbered preview release.
 
           **Not signed.** macOS may say the app cannot be checked for malicious software: open System Settings → Privacy & Security and choose Open Anyway. Windows SmartScreen may warn: choose More info, then Run anyway. On Windows, if Microsoft WebView2 Runtime is missing, the installer downloads it once; Ibis works offline after setup.
 
           Verify a download: compare \`shasum -a 256 <file>\` (macOS, Linux) or \`Get-FileHash <file>\` (Windows) with the \`SHA256SUMS-*.txt\` files below, and check provenance with \`gh attestation verify <file> --repo $REPO --source-ref refs/heads/main --signer-workflow $REPO/.github/workflows/preview.yml\`.
           EOF
+          # The first run starts from a draft, so an empty release is never public.
           if ! gh release view "$TAG" --repo "$REPO" > /dev/null 2>&1; then
-            gh release create "$TAG" --repo "$REPO" --prerelease --target "$SHA" --title "Ibis nightly" --notes-file notes.md
+            gh release create "$TAG" --repo "$REPO" --draft --prerelease --target "$SHA" --title "Ibis nightly" --notes-file notes.md
           fi
-          gh api --method PATCH "repos/$REPO/git/refs/tags/$TAG" -f sha="$SHA" -F force=true > /dev/null
           gh release upload "$TAG" dist/* --repo "$REPO" --clobber
           # Remove packages this build no longer produces, such as an old version number.
-          gh release view "$TAG" --repo "$REPO" --json assets --jq '.assets[].name' | while IFS= read -r name; do
-            if [ ! -e "dist/$name" ]; then gh release delete-asset "$TAG" "$name" --repo "$REPO" --yes; fi
-          done
+          names=$(gh release view "$TAG" --repo "$REPO" --json assets --jq '.assets[].name')
+          while IFS= read -r name; do
+            if [ -n "$name" ] && [ ! -e "dist/$name" ]; then gh release delete-asset "$TAG" "$name" --repo "$REPO" --yes; fi
+          done <<< "$names"
+          # Move the tag (or create it, on the first run or if it was removed),
+          # then publish the notes last, so they never name a commit early.
+          if ! gh api --method PATCH "repos/$REPO/git/refs/tags/$TAG" -f sha="$SHA" -F force=true > /dev/null; then
+            gh api --method POST "repos/$REPO/git/refs" -f ref="refs/tags/$TAG" -f sha="$SHA" > /dev/null
+          fi
           gh release edit "$TAG" --repo "$REPO" --prerelease --draft=false --title "Ibis nightly" --notes-file notes.md
