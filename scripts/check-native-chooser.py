@@ -38,6 +38,14 @@ def first_run_environment(inherited, config):
     return env
 
 
+def claim_owned_settings(candidate):
+    # Path.exists() alone misses dangling links. Never claim or later remove
+    # an existing preference link, even when its destination is absent.
+    if any(candidate.with_suffix(suffix).is_symlink() for suffix in (".json", ".json.bak", ".json.tmp")):
+        raise smoke.Unavailable("Use a disposable desktop account without existing Ibis settings")
+    return smoke.claim_settings(candidate)
+
+
 def flags(value, keys):
     if not isinstance(value, dict) or set(value) != set(keys) or any(type(value[key]) is not bool for key in keys):
         raise AssertionError("Native chooser state must contain exact boolean fields")
@@ -87,17 +95,22 @@ def cleanup_owned(process, log, native, owned):
     if native:
         try:
             native.close()
-            # Existing Linux.close requests termination; also reap the two
-            # process handles created by this check's own driver instance.
-            for process in (getattr(native, "editor", None), getattr(native, "wm", None)):
-                if process:
+        except (OSError, RuntimeError, AssertionError, subprocess.SubprocessError):
+            successful = False
+        # These Popen handles belong to this check. Reap them even if a separate
+        # native cleanup action failed; never find or kill processes by name.
+        for process in (getattr(native, "editor", None), getattr(native, "wm", None)):
+            if process:
+                try:
+                    if process.poll() is None:
+                        process.terminate()
                     try:
                         process.wait(timeout=5)
                     except subprocess.TimeoutExpired:
                         process.kill()
                         process.wait(timeout=5)
-        except (OSError, RuntimeError, AssertionError, subprocess.SubprocessError):
-            successful = False
+                except (OSError, subprocess.SubprocessError):
+                    successful = False
     if owned:
         try:
             smoke.clean_settings(owned)
@@ -133,7 +146,11 @@ class OwnedLinux(smoke.Linux):
             for process in self.clipboard_processes:
                 if process.poll() is None:
                     process.terminate()
-                process.wait(timeout=5)
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait(timeout=5)
         finally:
             super().close()
 
@@ -205,7 +222,7 @@ def check(app_path, output, system):
         if system not in ("Linux", "Windows", "Darwin"):
             raise smoke.Unavailable("Unsupported native chooser platform")
         if system == "Darwin":
-            owned = smoke.claim_settings(smoke.settings_path(system, Path(".")))
+            owned = claim_owned_settings(smoke.settings_path(system, Path(".")))
         if system == "Windows":
             subprocess.run(["pwsh", "-NoProfile", "-File", str(ROOT / "dialog-windows.ps1"), "-SelfTest"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
         native = OwnedLinux() if system == "Linux" else smoke.Scripted(system)
@@ -213,7 +230,7 @@ def check(app_path, output, system):
             folder = Path(temporary)
             settings = smoke.settings_path(system, folder, native)
             if system != "Darwin":
-                owned = smoke.claim_settings(settings)
+                owned = claim_owned_settings(settings)
             library = folder / "example 引用.bib"
             library.write_text(smoke.fixture(), encoding="utf-8")
             damaged = folder / "unreadable 引用.bib"
@@ -399,11 +416,16 @@ class Tests(unittest.TestCase):
 
     def test_cleanup_failure_still_attempts_settings_and_other_owned_resources(self):
         actions = []
+        class Editor:
+            def poll(self): return None
+            def terminate(self): actions.append("terminate-editor")
+            def wait(self, timeout): actions.append("reap-editor"); return 0
         class Native:
+            editor = Editor()
             def close(self): actions.append("native"); raise RuntimeError("private")
         with patch.object(smoke, "clean_settings", side_effect=lambda _: actions.append("settings")):
             self.assertFalse(cleanup_owned(None, None, Native(), Path("owned")))
-        self.assertEqual(actions, ["native", "settings"])
+        self.assertEqual(actions, ["native", "terminate-editor", "reap-editor", "settings"])
 
     def test_macos_go_to_file_can_finish_selection_without_a_second_open(self):
         class Native:
@@ -495,6 +517,12 @@ class Tests(unittest.TestCase):
         with patch.object(smoke, "wait_for", side_effect=lambda predicate, _: self.assertTrue(predicate())):
             quit_during_reload(Process(), actions.append, snapshot, "synthetic.bib")
         self.assertEqual(actions, ["Reload", "Quit Ibis", ("exit", 10)])
+
+    def test_a_dangling_settings_symlink_is_not_owned(self):
+        with patch.object(Path, "is_symlink", return_value=True), patch.object(smoke, "claim_settings") as claim:
+            with self.assertRaises(smoke.Unavailable):
+                claim_owned_settings(Path("synthetic/settings.json"))
+        claim.assert_not_called()
 
     def test_existing_settings_are_refused_and_preserved(self):
         with tempfile.TemporaryDirectory() as folder:
