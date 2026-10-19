@@ -793,6 +793,12 @@ test("Ctrl+K opens More with every action, Escape closes it before hiding the pi
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   fireEvent.pointerDown(document.body);
   expect(screen.queryByRole("menu")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: /^More/ }));
+  fireEvent.keyDown(within(screen.getByRole("menu")).getAllByRole("menuitem")[0]!, { key: "Tab" });
+  expect(screen.queryByRole("menu")).toBeNull();
+  expect(document.activeElement).toBe(box);
+  expect(screen.getByRole("button", { name: /^More/ }).textContent).toContain("K");
+  expect(screen.getByRole("button", { name: /^More/ }).getAttribute("aria-keyshortcuts")).toBe("Control+K");
 });
 
 test("a row says why it matched only when the match is not visible", async () => {
