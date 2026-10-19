@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 $OutputEncoding = [Console]::OutputEncoding
 $ChooserTitle = 'Choose a BibTeX or BibLaTeX library'
-$script:ChooserFacts = @{stage='startup';matches=0;enumerated=0;owned=$false;foreground=$false}
+$script:ChooserFacts = @{stage='startup';matches=0;enumerated=0;owned=$false;foreground=$false;selector=@{buttons=0;exact_id=0;exact_name=0;offscreen=0;eligible=0}}
 
 function Format-ChooserFailure([hashtable] $Facts, [string] $Failure) {
   $stages = @('startup', 'assembly', 'resolve', 'tree', 'target', 'verify', 'pattern', 'invoke')
@@ -26,6 +26,11 @@ function Format-ChooserFailure([hashtable] $Facts, [string] $Failure) {
     'Native chooser action is ambiguous or unavailable'='target-unavailable'
     'Native chooser ownership changed before action'='ownership-changed'
   }
+  $selector = @{}
+  foreach ($key in @('buttons','exact_id','exact_name','offscreen','eligible')) {
+    $value = if ($Facts.selector -is [hashtable]) { $Facts.selector[$key] } else { $null }
+    $selector[$key] = if ($value -is [int] -and $value -ge 0 -and $value -le 4000) { $value } else { 0 }
+  }
   $safe = @{
     stage=$(if ($Facts.stage -is [string] -and $Facts.stage -cin $stages) { $Facts.stage } else { 'startup' })
     reason=$(if ($reasons.ContainsKey($Failure)) { $reasons[$Failure] } else { 'provider-unavailable' })
@@ -33,8 +38,50 @@ function Format-ChooserFailure([hashtable] $Facts, [string] $Failure) {
     enumerated=$(if ($Facts.enumerated -is [int] -and $Facts.enumerated -ge 0 -and $Facts.enumerated -le 4000) { $Facts.enumerated } else { 0 })
     owned=$(if ($Facts.owned -is [bool]) { $Facts.owned } else { $false })
     foreground=$(if ($Facts.foreground -is [bool]) { $Facts.foreground } else { $false })
+    selector=$selector
   }
   'NATIVE CHOOSER WINDOWS ' + (ConvertTo-Json -InputObject $safe -Compress)
+}
+
+# Readiness never retries the action. Every observation first revalidates the
+# same owned foreground HWND, then reads the current accessibility tree.
+function Wait-ChooserTarget([scriptblock] $Observe, [scriptblock] $Clock, [scriptblock] $Pause, [int] $Budget = 8000) {
+  $deadline = (& $Clock) + $Budget
+  while ($true) {
+    $observation = & $Observe
+    if (!$observation.Owned -or !$observation.Foreground -or !$observation.SameDialog) {
+      throw 'Native chooser ownership changed before action'
+    }
+    $targets = @($observation.Targets)
+    if ($targets.Count -gt 1) { throw 'Native chooser action is ambiguous or unavailable' }
+    if ($targets.Count -eq 1 -and $targets[0].Enabled) { return $targets[0].Element }
+    if ((& $Clock) -ge $deadline) { throw 'Native chooser action is ambiguous or unavailable' }
+    & $Pause | Out-Null
+  }
+}
+
+function Invoke-ReadyChooserAction([scriptblock] $Observe, [scriptblock] $Clock, [scriptblock] $Pause, [scriptblock] $Verify, [scriptblock] $Invoke, [int] $Budget = 8000) {
+  $target = Wait-ChooserTarget $Observe $Clock $Pause $Budget
+  & $Verify | Out-Null
+  & $Invoke $target | Out-Null
+}
+
+function Select-ChooserTargets([object[]] $Candidates, [string] $Id, [string] $Name) {
+  $counts = @{buttons=0;exact_id=0;exact_name=0;offscreen=0;eligible=0}
+  $targets = [System.Collections.Generic.List[object]]::new()
+  foreach ($candidate in $Candidates) {
+    if (!$candidate.IsButton) { continue }
+    $counts.buttons++
+    $sameId = $candidate.Id -ceq $Id
+    $sameName = $candidate.Name -ceq $Name
+    if ($sameId) { $counts.exact_id++ }
+    if ($sameName) { $counts.exact_name++ }
+    if (!$sameId -and !$sameName) { continue }
+    if ($candidate.Offscreen) { $counts.offscreen++; continue }
+    if ($candidate.Enabled) { $counts.eligible++ }
+    $targets.Add(@{Element=$candidate.Element;Enabled=$candidate.Enabled})
+  }
+  @{Selector=$counts;Targets=@($targets.ToArray())}
 }
 
 function Invoke-OwnershipTests {
@@ -68,24 +115,88 @@ function Invoke-OwnershipTests {
   Reject { Resolve-OwnedDialog @($windows[20], (Window 23 42)) 41 10 $resolve } 'Native chooser is ambiguous'
   Reject { Resolve-OwnedDialog @($windows[20]) 42 10 $resolve } 'Verified picker window identity was lost'
   Reject { Resolve-OwnedDialog (@($windows[20]) * 513) 41 10 $resolve } 'Native chooser enumeration exceeded bound'
-  $facts = @{stage='target';matches=2;enumerated=12;owned=$true;foreground=$true}
+  $target = @{Element='owned-button';Enabled=$true}
+  $script:observations = 0
+  $script:elapsed = 0
+  $script:invocations = 0
+  $script:verifications = 0
+  $observe = {
+    $script:observations++
+    if ($script:invocations -ne 0) { throw 'Chooser invoked before readiness' }
+    @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=$(if ($script:observations -eq 1) { @() } else { @($target) })}
+  }
+  $clock = { $script:elapsed }
+  $pause = { $script:elapsed += 100 }
+  $selected = Wait-ChooserTarget $observe $clock $pause 200
+  if ($selected -cne 'owned-button' -or $script:observations -ne 2) { throw 'Chooser readiness regression failed' }
+  $script:observations = 0
+  $script:elapsed = 0
+  $verify = { $script:verifications++ }
+  $invoke = { param($Element) if ($Element -cne 'owned-button') { throw 'Wrong chooser target' }; $script:invocations++ }
+  Invoke-ReadyChooserAction $observe $clock $pause $verify $invoke 200
+  if ($script:invocations -ne 1 -or $script:verifications -ne 1 -or $script:observations -ne 2) { throw 'Chooser action count regression failed' }
+  $duplicate = { @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@($target,$target)} }
+  Reject { Wait-ChooserTarget $duplicate $clock $pause 200 } 'Native chooser action is ambiguous or unavailable'
+  foreach ($property in @('Owned','Foreground','SameDialog')) {
+    $lost = @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@($target)}
+    $lost[$property] = $false
+    $readLost = { $lost }
+    Reject { Wait-ChooserTarget $readLost $clock $pause 200 } 'Native chooser ownership changed before action'
+  }
+  $script:elapsed = 0
+  $never = { @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@()} }
+  Reject { Wait-ChooserTarget $never $clock $pause 200 } 'Native chooser action is ambiguous or unavailable'
+  if ($script:elapsed -ne 200) { throw 'Chooser readiness deadline regression failed' }
+  $script:elapsed = 0
+  $disabled = { @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@(@{Element='disabled';Enabled=$false})} }
+  Reject { Wait-ChooserTarget $disabled $clock $pause 200 } 'Native chooser action is ambiguous or unavailable'
+  foreach ($failure in @('ambiguous','ownership')) {
+    $script:observations = 0
+    $script:elapsed = 0
+    $pendingThenUnsafe = {
+      $script:observations++
+      if ($script:observations -eq 1) { return @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@()} }
+      @{Owned=($failure -ne 'ownership');Foreground=$true;SameDialog=$true;Targets=@($target,$target)}
+    }
+    $expected = if ($failure -eq 'ownership') { 'Native chooser ownership changed before action' } else { 'Native chooser action is ambiguous or unavailable' }
+    Reject { Invoke-ReadyChooserAction $pendingThenUnsafe $clock $pause $verify $invoke 200 } $expected
+    if ($script:invocations -ne 1 -or $script:verifications -ne 1 -or $script:observations -ne 2) {
+      throw 'Chooser unsafe readiness invoked an action'
+    }
+  }
+  $candidates = @(
+    @{IsButton=$true;Id='2';Name='Cancel';Offscreen=$false;Enabled=$true;Element='owned-button'},
+    @{IsButton=$true;Id='2';Name='other';Offscreen=$true;Enabled=$true;Element='hidden'},
+    @{IsButton=$true;Id='other';Name='Cancel';Offscreen=$false;Enabled=$false;Element='disabled'},
+    @{IsButton=$false;Id='2';Name='Cancel';Offscreen=$false;Enabled=$true;Element='not-button'}
+  )
+  $selection = Select-ChooserTargets $candidates '2' 'Cancel'
+  if ($selection.Targets.Count -ne 2 -or $selection.Selector.buttons -ne 3 -or
+      $selection.Selector.exact_id -ne 2 -or $selection.Selector.exact_name -ne 2 -or
+      $selection.Selector.offscreen -ne 1 -or $selection.Selector.eligible -ne 1) { throw 'Chooser selector regression failed' }
+  $facts = @{stage='target';matches=2;enumerated=12;owned=$true;foreground=$true;selector=$selection.Selector}
   $line = Format-ChooserFailure $facts 'Native chooser action is ambiguous or unavailable'
   $prefix = 'NATIVE CHOOSER WINDOWS '
   if (!$line.StartsWith($prefix)) { throw 'Chooser safe diagnostic regression failed' }
   $diagnostic = $line.Substring($prefix.Length) | ConvertFrom-Json
   $keys = @($diagnostic.PSObject.Properties.Name | Sort-Object)
-  if ([string]::Join(',', $keys) -cne 'enumerated,foreground,matches,owned,reason,stage') { throw 'Chooser diagnostic schema regression failed' }
+  if ([string]::Join(',', $keys) -cne 'enumerated,foreground,matches,owned,reason,selector,stage') { throw 'Chooser diagnostic schema regression failed' }
+  if ([string]::Join(',', @($diagnostic.selector.PSObject.Properties.Name | Sort-Object)) -cne 'buttons,eligible,exact_id,exact_name,offscreen' -or
+      $diagnostic.selector.buttons -ne 3 -or $diagnostic.selector.eligible -ne 1) { throw 'Chooser selector diagnostic regression failed' }
   if ($diagnostic.stage -cne 'target' -or $diagnostic.reason -cne 'target-unavailable' -or
       $diagnostic.matches -ne 2 -or $diagnostic.enumerated -ne 12 -or
       $diagnostic.owned -isnot [bool] -or !$diagnostic.owned -or
       $diagnostic.foreground -isnot [bool] -or !$diagnostic.foreground) { throw 'Chooser safe diagnostic regression failed' }
   $private = 'private provider payload /private/synthetic-path'
-  $line = Format-ChooserFailure @{stage=$private;matches=$private;enumerated=4001;owned=$private;foreground=1} $private
+  $line = Format-ChooserFailure @{stage=$private;matches=$private;enumerated=4001;owned=$private;foreground=1;selector=@{buttons=$private;eligible=4001;exact_id=-1;exact_name=$true;offscreen=1.5}} $private
   $diagnostic = $line.Substring($prefix.Length) | ConvertFrom-Json
   if ($line.Contains($private) -or $diagnostic.stage -cne 'startup' -or $diagnostic.reason -cne 'provider-unavailable' -or
       $diagnostic.matches -ne 0 -or $diagnostic.enumerated -ne 0 -or
       $diagnostic.owned -isnot [bool] -or $diagnostic.owned -or
       $diagnostic.foreground -isnot [bool] -or $diagnostic.foreground) { throw 'Chooser private diagnostic regression failed' }
+  foreach ($property in $diagnostic.selector.PSObject.Properties) {
+    if ($property.Value -ne 0) { throw 'Chooser private selector diagnostic regression failed' }
+  }
   $true
 }
 
@@ -209,28 +320,47 @@ public static class IbisChooser {
       if (!$dialog -or !$foreground) { throw 'Owned native chooser is not foreground' }
       $name = if ($Action -eq 'cancel') { 'Cancel' } else { 'Open' }
       $id = if ($Action -eq 'cancel') { '2' } else { '1' }
-      $script:ChooserFacts.stage = 'tree'
-      $elements = @(Get-DialogElements $dialog)
-      $script:ChooserFacts.stage = 'target'
-      $buttons = @($elements | Where-Object {
-        $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Button -and
-        !$_.Current.IsOffscreen -and
-        ($_.Current.AutomationId -ceq $id -or $_.Current.Name -ceq $name)
-      })
-      $script:ChooserFacts.matches = [Math]::Min($buttons.Count, 4000)
-      if ($buttons.Count -ne 1 -or !$buttons[0].Current.IsEnabled) { throw 'Native chooser action is ambiguous or unavailable' }
-      # Revalidate PID/owner/foreground immediately before the only mutation.
-      $script:ChooserFacts.stage = 'verify'
-      $verified = Get-Dialog
-      $script:ChooserFacts.owned = [bool] ($null -ne $verified)
-      $script:ChooserFacts.foreground = [IbisChooser]::GetForegroundWindow().ToInt64() -eq $dialog.Handle
-      if (!$verified -or $verified.Handle -ne $dialog.Handle -or !$script:ChooserFacts.foreground) {
-        throw 'Native chooser ownership changed before action'
+      $observe = {
+        $script:ChooserFacts.stage = 'verify'
+        $currentDialog = Get-Dialog
+        $script:ChooserFacts.owned = [bool] ($null -ne $currentDialog)
+        $script:ChooserFacts.foreground = $null -ne $currentDialog -and [IbisChooser]::GetForegroundWindow().ToInt64() -eq $currentDialog.Handle
+        $observation = @{Owned=$script:ChooserFacts.owned;Foreground=$script:ChooserFacts.foreground;
+          SameDialog=($null -ne $currentDialog -and $currentDialog.Handle -eq $dialog.Handle);Targets=@()}
+        if (!$observation.Owned -or !$observation.Foreground -or !$observation.SameDialog) { return $observation }
+        $script:ChooserFacts.stage = 'tree'
+        $elements = @(Get-DialogElements $currentDialog)
+        $script:ChooserFacts.stage = 'target'
+        $candidates = @($elements | ForEach-Object {
+          $current = $_.Current
+          if ($current.ControlType -eq [System.Windows.Automation.ControlType]::Button) {
+            @{IsButton=$true;Id=$current.AutomationId;Name=$current.Name;Offscreen=$current.IsOffscreen;Enabled=$current.IsEnabled;Element=$_}
+          }
+        })
+        $selection = Select-ChooserTargets $candidates $id $name
+        $script:ChooserFacts.selector = $selection.Selector
+        $script:ChooserFacts.matches = [Math]::Min($selection.Targets.Count, 4000)
+        $observation.Targets = $selection.Targets
+        $observation
       }
-      $script:ChooserFacts.stage = 'pattern'
-      $pattern = $buttons[0].GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
-      $script:ChooserFacts.stage = 'invoke'
-      $pattern.Invoke()
+      # Revalidate PID/owner/foreground immediately before the only mutation.
+      $verify = {
+        $script:ChooserFacts.stage = 'verify'
+        $verified = Get-Dialog
+        $script:ChooserFacts.owned = [bool] ($null -ne $verified)
+        $script:ChooserFacts.foreground = [IbisChooser]::GetForegroundWindow().ToInt64() -eq $dialog.Handle
+        if (!$verified -or $verified.Handle -ne $dialog.Handle -or !$script:ChooserFacts.foreground) {
+          throw 'Native chooser ownership changed before action'
+        }
+      }
+      $invoke = {
+        param($Button)
+        $script:ChooserFacts.stage = 'pattern'
+        $pattern = $Button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+        $script:ChooserFacts.stage = 'invoke'
+        $pattern.Invoke()
+      }
+      Invoke-ReadyChooserAction $observe { [Environment]::TickCount64 } { Start-Sleep -Milliseconds 100 } $verify $invoke
       $true
     }
   }

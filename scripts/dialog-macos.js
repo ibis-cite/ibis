@@ -36,8 +36,12 @@ function run(argv) {
     const app = processes[0];
     const read = (fn, fallback) => { try { return fn(); } catch (_) { return fallback; } };
     const title = 'Choose a BibTeX or BibLaTeX library';
-    const labelled = (node, name) => [read(() => node.name(), ''), read(() => node.title(), ''),
-        read(() => node.description(), ''), read(() => node.value(), '')].includes(name);
+    const labelled = (node, name) => ['name', 'title', 'description', 'value']
+        .some(property => read(() => node[property](), '') === name);
+    // Windows have titles, not editable values. Do not ask an unrelated or
+    // closing native window for an AXValue while discovering the dialog.
+    const titled = node => ['name', 'title', 'description']
+        .some(property => read(() => node[property](), '') === title);
     const focused = node => read(() => node.attributes.byName('AXFocused').value(), false) === true;
     const role = node => read(() => node.role(), '');
     const contents = node => {
@@ -45,10 +49,18 @@ function run(argv) {
         if (!Array.isArray(nodes) || nodes.length > 4000) throw Error('Native dialog traversal exceeded bound');
         return [node].concat(nodes);
     };
+    const sheets = node => {
+        const result = node.sheets();
+        if (!Array.isArray(result) || result.length > 20) throw Error('Native sheet enumeration exceeded bound');
+        if (result.some(sheet => role(sheet) !== 'AXSheet')) throw Error('Native path sheet role unavailable');
+        return result;
+    };
     const numeric = value => typeof value === 'number' && Number.isFinite(value);
     stage('scope');
+    stage('windows');
     const windows = app.windows();
     if (windows.length > 20) throw Error('Native app window enumeration exceeded bound');
+    stage('metadata');
     const refs = $.CGWindowListCopyWindowInfo(
         $.kCGWindowListOptionOnScreenOnly | $.kCGWindowListExcludeDesktopElements, $.kCGNullWindowID);
     if (!refs) throw Error('Native on-screen window metadata unavailable');
@@ -65,6 +77,7 @@ function run(argv) {
         if (window.kCGWindowOwnerPID === appId) owned.push(window);
     }
     const onScreen = window => {
+        stage('bounds');
         const position = window.position(), size = window.size();
         if (position.length !== 2 || size.length !== 2 || !position.concat(size).every(numeric)) {
             throw Error('Native accessible window bounds unavailable');
@@ -81,13 +94,18 @@ function run(argv) {
     };
     // A panel may be a titled top-level AXWindow or an AXSheet attached to
     // an owned window. Choose one representation, never its ancestor too.
-    const direct = windows.filter(window => labelled(window, title) && onScreen(window));
+    stage('candidates');
+    const direct = windows.filter(window => titled(window) && onScreen(window));
     const candidates = direct.map(window => ({element: window}));
     if (candidates.length === 0) {
+        stage('sheets');
         windows.filter(onScreen).forEach(window => {
-            contents(window).filter(node => role(node) === 'AXSheet').forEach(sheet => {
-                const nodes = contents(sheet);
-                if (nodes.some(node => labelled(node, title))) candidates.push({element: sheet, nodes});
+            sheets(window).forEach(sheet => {
+                if (titled(sheet)) candidates.push({element: sheet});
+                else {
+                    const nodes = contents(sheet);
+                    if (nodes.some(node => labelled(node, title))) candidates.push({element: sheet, nodes});
+                }
             });
         });
     }
@@ -102,11 +120,8 @@ function run(argv) {
         // the fresh sheet collection directly: enumerating every file-browser
         // descendant after Return can exceed the helper's deadline even when
         // the path sheet has already closed.
-        const sheets = dialog.element.sheets();
-        if (!Array.isArray(sheets) || sheets.length > 20) throw Error('Native sheet enumeration exceeded bound');
         const fields = [];
-        sheets.forEach(sheet => {
-            if (role(sheet) !== 'AXSheet') throw Error('Native path sheet role unavailable');
+        sheets(dialog.element).forEach(sheet => {
             contents(sheet).filter(node => ['AXTextField', 'AXComboBox'].includes(role(node)) && focused(node))
                 .forEach(node => fields.push(node));
         });

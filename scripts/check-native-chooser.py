@@ -74,17 +74,20 @@ def helper_diagnostics(stderr):
         if not isinstance(value, dict):
             continue
         if prefix == "NATIVE CHOOSER MACOS ":
-            valid = set(value) == {"stage"} and value["stage"] in ("identity", "scope", "location", "controls", "invoke")
+            valid = set(value) == {"stage"} and value["stage"] in ("identity", "scope", "windows", "metadata", "bounds", "candidates", "sheets", "location", "controls", "invoke")
         else:
-            valid = (set(value) == {"stage", "reason", "matches", "enumerated", "owned", "foreground"}
+            valid = (set(value) == {"stage", "reason", "matches", "enumerated", "owned", "foreground", "selector"}
                      and value["stage"] in ("startup", "assembly", "resolve", "tree", "target", "verify", "pattern", "invoke")
                      and value["reason"] in ("provider-unavailable", "picker-identity", "enumeration-bound", "dialog-ambiguous", "dialog-ownership", "owner-bound", "accessibility-identity", "tree-bound", "not-foreground", "target-unavailable", "ownership-changed")
                      and all(type(value[key]) is int and 0 <= value[key] <= 4000 for key in ("matches", "enumerated"))
-                     and all(type(value[key]) is bool for key in ("owned", "foreground")))
+                     and all(type(value[key]) is bool for key in ("owned", "foreground"))
+                     and isinstance(value["selector"], dict)
+                     and set(value["selector"]) == {"buttons", "exact_id", "exact_name", "offscreen", "eligible"}
+                     and all(type(count) is int and 0 <= count <= 4000 for count in value["selector"].values()))
         if valid:
             safe.append(prefix + json.dumps(value, sort_keys=True))
-            if len(safe) == 16:
-                break
+            if len(safe) > 16:
+                safe.pop(0)
     return safe
 
 
@@ -163,9 +166,21 @@ def cleanup_owned(process, log, native, owned):
 
 
 class Dialog:
-    def __init__(self, native, system):
-        self.native, self.system = native, system
+    def __init__(self, native, system, output=None):
+        self.native, self.system, self.output = native, system, output
         self.linux = linux.Dialog(native, smoke.run) if system == "Linux" else None
+
+    def capture_failure(self):
+        if self.system != "Darwin" or self.output is None or self.native.app.poll() is not None:
+            return
+        # Capture before the fixture context exits or owned processes stop.
+        # The suite requires a disposable desktop with synthetic files.
+        try:
+            subprocess.run(["screencapture", "-x", str(self.output / "chooser-failure.png")],
+                           check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+            self.native.dialog_failure_capture = "captured"
+        except (OSError, subprocess.SubprocessError):
+            self.native.dialog_failure_capture = "unavailable"
 
     def call(self, action):
         if self.linux:
@@ -184,10 +199,12 @@ class Dialog:
         except subprocess.TimeoutExpired as error:
             for line in helper_diagnostics(error.stderr):
                 print(line, file=sys.stderr, flush=True)
+            self.capture_failure()
             raise AssertionError("Native chooser helper timed out") from None
         if result.returncode:
             for line in helper_diagnostics(result.stderr):
                 print(line, file=sys.stderr, flush=True)
+            self.capture_failure()
             raise smoke.Unavailable("Native chooser action unavailable")
         try:
             value = json.loads(result.stdout)
@@ -303,7 +320,7 @@ def check(app_path, output, system):
             report["stage"] = "C1"
             launch("first-run")
             smoke.wait_for(lambda: bool(smoke.named(snapshot(), "Choose library to get started")), "first-run library choice is visible")
-            dialog = Dialog(native, system)
+            dialog = Dialog(native, system, output)
             native.click("Choose library to get started")
             smoke.wait_for(chooser_ready, "exact owned chooser is visible and foreground")
             assert (dialog.linux.picker_visible() if dialog.linux else snapshot()["visible"]), "Chooser hid the picker"
@@ -357,7 +374,7 @@ def check(app_path, output, system):
             boundary.write_boundary_library(large, first, last + "\n")
             del records, first, last
             assert large.stat().st_size == boundary.FILE_LIMIT, "Boundary fixture has the wrong byte count"
-            dialog = Dialog(native, system)
+            dialog = Dialog(native, system, output)
             native.click("Choose library…")
             smoke.wait_for(chooser_ready, "chooser opens for the exact size boundary")
             dialog.select(large)
@@ -401,6 +418,8 @@ def check(app_path, output, system):
             passed("relaunch after Quit during reload retains valid preferences and searchable records")
             report["status"] = "passed"
     except BaseException as error:
+        if native and getattr(native, "dialog_failure_capture", None):
+            report["failure_capture"] = native.dialog_failure_capture
         report["failure_locations"] = [{"source": Path(frame.filename).name, "line": frame.lineno}
             for frame in traceback.extract_tb(error.__traceback__)
             if Path(frame.filename).name in ("check-native-chooser.py", "native_dialog_linux.py", "smoke-native.py")]
@@ -419,7 +438,8 @@ def check(app_path, output, system):
 
 class Tests(unittest.TestCase):
     def test_helper_diagnostics_reject_provider_text_and_untrusted_metadata(self):
-        windows = {"stage": "target", "reason": "target-unavailable", "matches": 0, "enumerated": 20, "owned": True, "foreground": True}
+        windows = {"stage": "target", "reason": "target-unavailable", "matches": 0, "enumerated": 20, "owned": True, "foreground": True,
+                   "selector": {"buttons": 4, "exact_id": 0, "exact_name": 0, "offscreen": 0, "eligible": 0}}
         prefix = "NATIVE CHOOSER WINDOWS "
         mac = 'NATIVE CHOOSER MACOS {"stage":"location"}'
         allowed = prefix + json.dumps(windows)
@@ -428,8 +448,12 @@ class Tests(unittest.TestCase):
         for field, value in (("stage", "private path"), ("reason", "private payload"), ("matches", True), ("enumerated", 4001), ("owned", 1)):
             rejected.append(prefix + json.dumps({**windows, field: value}))
         rejected += [prefix + json.dumps({**windows, "payload": "private"}), 'NATIVE CHOOSER MACOS {"stage":"private"}', 'NATIVE CHOOSER MACOS {"stage":"location","payload":"private"}']
+        for selector in (None, [], {}, {**windows["selector"], "buttons": True}, {**windows["selector"], "exact_name": 4001}, {**windows["selector"], "payload": "private"}):
+            rejected.append(prefix + json.dumps({**windows, "selector": selector}))
         self.assertEqual(helper_diagnostics("\n".join(rejected)), [])
         self.assertEqual(len(helper_diagnostics("\n".join([allowed] * 100))), 16)
+        last = 'NATIVE CHOOSER MACOS {"stage":"invoke"}'
+        self.assertIn('"invoke"', helper_diagnostics("\n".join([allowed] * 100 + [last]))[-1])
 
     def test_binary_hashing_supports_the_python_310_native_atspi_runner(self):
         import io
