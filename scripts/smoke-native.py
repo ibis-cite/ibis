@@ -86,6 +86,34 @@ def search_focused(snapshot):
     return any(n.get("focused") for n in named(snapshot, "Search references"))
 
 
+EDITABLE_ROLES = {"edit", "text", "entry", "combobox", "axcombobox", "axtextfield", "axsearchfield", "controltype.edit", "controltype.combobox"}
+
+
+def query_failure_facts(snapshot, query, expected):
+    values = [n.get("value") for n in named(snapshot, "Search references")
+              if n.get("role", "").lower().replace(" ", "") in EDITABLE_ROLES]
+    text = strings(snapshot)
+    return {"exact_search_value": query in values,
+            "search_empty": bool(values) and all(value == "" for value in values),
+            "expected_result": expected in text, "one_result": "1 result" in text.splitlines()}
+
+
+def wait_for_query(snapshot, query, expected, report):
+    last = {"nodes": []}
+    def matched():
+        nonlocal last
+        last = snapshot()
+        return expected in strings(last)
+    try:
+        wait_for(matched, "native typed query")
+    except AssertionError:
+        # Keep the final observed snapshot; do not make another native read or
+        # expose accessible query/result text just to diagnose a failure.
+        report["query_failure"] = query_failure_facts(last, query, expected)
+        print("NATIVE QUERY FAILURE " + json.dumps(report["query_failure"]), file=sys.stderr)
+        raise
+
+
 def fixed_toggle_diagnostics(paths):
     allowed = {
         "ibis-picker: toggle visible focused hide",
@@ -149,8 +177,7 @@ def require_tree(snapshot):
     for name in ("Search references", "Search results", "Results"):
         assert named(snapshot, name), f"Accessibility tree omits named {name!r}"
     search = named(snapshot, "Search references")
-    editable = {"edit", "text", "entry", "combobox", "axcombobox", "axtextfield", "axsearchfield", "controltype.edit", "controltype.combobox"}
-    assert any(n["role"].lower().replace(" ", "") in editable for n in search), "Named search is not an editable control"
+    assert any(n["role"].lower().replace(" ", "") in EDITABLE_ROLES for n in search), "Named search is not an editable control"
     results = named(snapshot, "Results")
     assert any("list" in n["role"].lower() and "item" not in n["role"].lower() for n in results), "Named Results is not a list"
 
@@ -525,7 +552,7 @@ def main():
                         wait_for(picker_ready, "Windows picker activated before typing")
                 native.key("ctrl+a" if system != "Darwin" else "super+a")
                 native.text(text)
-                wait_for(lambda: expected in strings(snapshot()), f"native typed query {text}")
+                wait_for_query(snapshot, text, expected, report)
 
             shortcut = args.shortcut or ("ctrl+super+r" if system == "Darwin" else "ctrl+shift+space")
             launch("small")
@@ -761,6 +788,45 @@ def main():
 
 
 class ContractTests(unittest.TestCase):
+    def test_query_failure_facts_distinguish_empty_partial_and_exact_editable_values(self):
+        for value, exact, empty in (("", False, True), ("priv", False, False), ("private query", True, False)):
+            current = {"nodes": [
+                {"name": "Search references", "role": "static text", "value": ""},
+                {"name": "Search references", "role": "AXComboBox", "value": value},
+                {"name": "private result", "value": "11 results"},
+            ]}
+            self.assertEqual(query_failure_facts(current, "private query", "private result"), {
+                "exact_search_value": exact, "search_empty": empty,
+                "expected_result": True, "one_result": False,
+            })
+
+    def test_failed_query_records_only_last_snapshot_booleans_and_static_description(self):
+        states = iter([{"nodes": []}, {"nodes": [
+            {"name": "Search references", "role": "AXTextField", "value": "private partial"},
+            {"name": "1 result", "value": "private document"},
+        ]}])
+        report = {}
+        def fail(predicate, description):
+            self.assertFalse(predicate())
+            self.assertFalse(predicate())
+            raise AssertionError(f"Timed out: {description}")
+        with patch(__name__ + ".wait_for", side_effect=fail), patch("sys.stderr") as stderr, patch("builtins.print") as output:
+            with self.assertRaisesRegex(AssertionError, "^Timed out: native typed query$"):
+                wait_for_query(lambda: next(states), "private query", "private result", report)
+        self.assertEqual(report, {"query_failure": {
+            "exact_search_value": False, "search_empty": False,
+            "expected_result": False, "one_result": True,
+        }})
+        self.assertNotIn("private", json.dumps(report) + str(output.call_args))
+        self.assertIs(output.call_args.kwargs["file"], stderr)
+
+    def test_successful_query_does_not_emit_failure_facts(self):
+        report = {}
+        with patch(__name__ + ".wait_for", side_effect=lambda predicate, _description: self.assertTrue(predicate())), patch("builtins.print") as output:
+            wait_for_query(lambda: {"nodes": [{"name": "expected private title"}]}, "private query", "expected private title", report)
+        self.assertEqual(report, {})
+        output.assert_not_called()
+
     def test_helper_timeout_emits_only_allowlisted_stages_from_bytes_stderr(self):
         native = Scripted.__new__(Scripted)
         native.system, native.command = "Windows", ["synthetic-helper", "private argument"]
