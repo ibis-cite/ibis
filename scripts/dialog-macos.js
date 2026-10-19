@@ -99,12 +99,18 @@ function run(argv) {
     const candidates = direct.map(window => ({element: window}));
     if (candidates.length === 0) {
         stage('sheets');
-        windows.filter(onScreen).forEach(window => {
+        // The attached sheet is the dialog's native surface. Its ancestor's
+        // AX bounds can be unavailable while a modal child is open, and a
+        // visible ancestor does not establish the sheet's on-screen identity.
+        // Do not query unrelated picker bounds when no sheet exists.
+        windows.forEach(window => {
             sheets(window).forEach(sheet => {
-                if (titled(sheet)) candidates.push({element: sheet});
+                if (titled(sheet)) {
+                    if (onScreen(sheet)) candidates.push({element: sheet});
+                }
                 else {
                     const nodes = contents(sheet);
-                    if (nodes.some(node => labelled(node, title))) candidates.push({element: sheet, nodes});
+                    if (nodes.some(node => labelled(node, title)) && onScreen(sheet)) candidates.push({element: sheet, nodes});
                 }
             });
         });

@@ -64,7 +64,7 @@ def helper_diagnostics(stderr):
         return []
     safe = []
     for line in stderr[:65536].splitlines():
-        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
+        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
         if prefix is None:
             continue
         try:
@@ -96,6 +96,59 @@ def query_ready(current, index):
     text = smoke.strings(current)
     return (any(node.get("value") == key for node in smoke.named(current, "Search references"))
             and f"Ibis smoke reference {index:06d}" in text and "1 result" in text)
+
+
+def rename_library_roundtrip(library, settings, click, snapshot, query):
+    original, preferences = library.read_bytes(), settings.read_bytes()
+    renamed = library.with_name("renamed 引用.bib")
+    assert not renamed.exists() and not renamed.is_symlink(), "Owned rename destination already exists"
+
+    def unchanged_settings():
+        # samefile cannot check the remembered path while it is missing.
+        assert settings.read_bytes() == preferences, "Rename saved settings bytes changed"
+
+    def loaded(count):
+        unchanged_settings()
+        text = smoke.strings(snapshot())
+        return (f"{library.name}: {count} references" in text
+                and "The library could not be opened:" not in text)
+
+    try:
+        library.rename(renamed)
+        click("Reload")
+
+        def missing_explained():
+            unchanged_settings()
+            text = smoke.strings(snapshot())
+            return (f"The library could not be opened: {library.name}." in text
+                    and "the library file is unavailable; keeping the last loaded references" in text
+                    and "Choose it again or reconnect the drive." in text
+                    and f"{library.name}: 3 references" in text)
+
+        smoke.wait_for(missing_explained, "renamed-away library names the missing old path and retains its snapshot")
+        query(1)
+        assert query_ready(snapshot(), 1), "Renamed-away library lost searchable retained records"
+        unchanged_settings()
+
+        renamed.rename(library)
+        library.write_text(smoke.fixture(5), encoding="utf-8")
+        click("Reload")
+        smoke.wait_for(lambda: loaded(5), "distinct recovery content replaces the retained snapshot")
+        query(4)
+        assert loaded(5) and query_ready(snapshot(), 4), "Distinct recovery content is not searchable"
+
+        library.write_bytes(original)
+        click("Reload")
+        smoke.wait_for(lambda: loaded(3), "rename roundtrip restores the original three references")
+        query(2)
+        assert loaded(3) and query_ready(snapshot(), 2), "Rename roundtrip did not restore searchable baseline"
+    finally:
+        # Only suite-owned files are touched. Return the selected path even if
+        # the missing-file assertion or native input fails midway through.
+        if renamed.exists():
+            renamed.replace(library)
+        if not library.exists() or library.read_bytes() != original:
+            library.write_bytes(original)
 
 
 def normal_quit(process, click, timeout=10):
@@ -190,6 +243,8 @@ class Dialog:
             command = ["pwsh", "-NoProfile", "-File", str(ROOT / "dialog-windows.ps1"),
                        "-Action", action, "-AppId", str(self.native.app.pid),
                        "-PickerHandle", str(self.native.picker_handle)]
+            if self.output is not None:
+                command += ["-FailureImage", str(self.output / "chooser-failure.png")]
         else:
             command = ["osascript", "-l", "JavaScript", str(ROOT / "dialog-macos.js"),
                        action, str(self.native.app.pid)]
@@ -356,6 +411,9 @@ def check(app_path, output, system):
             assert saved_library(), "Unreadable choice replaced saved library"
             query(1)
             passed("C3 unreadable native choice retains searchable library and settings")
+            report["stage"] = "rename-away"
+            rename_library_roundtrip(library, settings, native.click, snapshot, query)
+            passed("rename-away retains searchable references and settings and recovers distinct content")
             report["stage"] = "C4"
             normal_quit(process, native.click)
             log.close()
@@ -437,6 +495,81 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def rename_case(self, folder, *, stale=False, change_settings=False):
+        library = Path(folder) / "example 引用.bib"
+        library.write_text(smoke.fixture(), encoding="utf-8")
+        renamed = library.with_name("renamed 引用.bib")
+        settings = Path(folder) / "settings.json"
+        settings.write_text(json.dumps({"library": str(library)}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        state = {"count": 3, "missing": False, "query": None, "queries": []}
+
+        def click(name):
+            self.assertEqual(name, "Reload")
+            state["missing"] = not library.exists()
+            if state["missing"]:
+                self.assertTrue(renamed.is_file())
+                # A path-identity predicate fails while the selected file is
+                # absent. Persisted settings must instead be compared by bytes.
+                with self.assertRaises(FileNotFoundError):
+                    Path(json.loads(settings.read_text(encoding="utf-8"))["library"]).samefile(library)
+                if change_settings:
+                    settings.write_text(json.dumps(json.loads(settings.read_text(encoding="utf-8"))), encoding="utf-8")
+            elif not stale:
+                state["count"] = library.read_text(encoding="utf-8").count("@article{")
+
+        def query(index):
+            state["query"] = index
+            state["queries"].append(index)
+
+        def snapshot():
+            nodes = [{"name": f"{library.name}: {state['count']} references"}]
+            if state["missing"]:
+                nodes.append({"name": f"The library could not be opened: {library.name}. the library file is unavailable; keeping the last loaded references. Choose it again or reconnect the drive."})
+            if state["query"] is not None:
+                index = state["query"]
+                nodes.append({"name": "Search references", "value": f"smoke{index:06d}"})
+                if index < state["count"]:
+                    nodes.extend([{"name": f"Ibis smoke reference {index:06d}"}, {"name": "1 result"}])
+            return {"nodes": nodes}
+
+        return library, renamed, settings, state, click, query, snapshot
+
+    def test_rename_roundtrip_requires_new_content_then_restores_the_baseline(self):
+        with tempfile.TemporaryDirectory() as folder:
+            library, renamed, settings, state, click, query, snapshot = self.rename_case(folder)
+            original, preferences = library.read_bytes(), settings.read_bytes()
+            with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
+                rename_library_roundtrip(library, settings, click, snapshot, query)
+            self.assertEqual(state["queries"], [1, 4, 2])
+            self.assertEqual(state["count"], 3)
+            self.assertEqual(library.read_bytes(), original)
+            self.assertEqual(settings.read_bytes(), preferences)
+            self.assertFalse(renamed.exists())
+
+    def test_rename_recovery_rejects_a_stale_retained_snapshot_and_returns_the_owned_path(self):
+        with tempfile.TemporaryDirectory() as folder:
+            library, renamed, settings, state, click, query, snapshot = self.rename_case(folder, stale=True)
+            original = library.read_bytes()
+            with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
+                with self.assertRaisesRegex(AssertionError, "distinct recovery"):
+                    rename_library_roundtrip(library, settings, click, snapshot, query)
+            self.assertEqual(state["queries"], [1])
+            self.assertEqual(library.read_bytes(), original)
+            self.assertFalse(renamed.exists())
+
+    def test_rename_rejects_even_semantically_identical_rewritten_settings(self):
+        with tempfile.TemporaryDirectory() as folder:
+            library, renamed, settings, state, click, query, snapshot = self.rename_case(folder, change_settings=True)
+            original, preferences = library.read_bytes(), settings.read_bytes()
+            expected_choice = json.loads(preferences)
+            with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
+                with self.assertRaisesRegex(AssertionError, "saved settings bytes changed"):
+                    rename_library_roundtrip(library, settings, click, snapshot, query)
+            self.assertNotEqual(settings.read_bytes(), preferences)
+            self.assertEqual(json.loads(settings.read_bytes()), expected_choice)
+            self.assertEqual(library.read_bytes(), original)
+            self.assertFalse(renamed.exists())
+
     def test_helper_diagnostics_reject_provider_text_and_untrusted_metadata(self):
         windows = {"stage": "target", "reason": "target-unavailable", "matches": 0, "enumerated": 20, "owned": True, "foreground": True,
                    "selector": {"buttons": 4, "exact_id": 0, "exact_name": 0, "offscreen": 0, "eligible": 0}}
@@ -454,6 +587,29 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(helper_diagnostics("\n".join([allowed] * 100))), 16)
         last = 'NATIVE CHOOSER MACOS {"stage":"invoke"}'
         self.assertIn('"invoke"', helper_diagnostics("\n".join([allowed] * 100 + [last]))[-1])
+
+    def test_windows_raw_diagnostics_use_the_same_strict_metadata_schema(self):
+        prefix = "NATIVE CHOOSER WINDOWS RAW "
+        value = {"stage": "target", "reason": "target-unavailable", "matches": 0, "enumerated": 20,
+                 "owned": True, "foreground": True,
+                 "selector": {"buttons": 4, "exact_id": 0, "exact_name": 0, "offscreen": 0, "eligible": 0}}
+        self.assertEqual(helper_diagnostics(prefix + json.dumps(value)), [prefix + json.dumps(value, sort_keys=True)])
+        for invalid in ({**value, "payload": "private"}, {**value, "matches": True},
+                        {**value, "selector": {**value["selector"], "buttons": 4001}}):
+            self.assertEqual(helper_diagnostics(prefix + json.dumps(invalid)), [])
+        self.assertEqual(helper_diagnostics(prefix + "private provider data"), [])
+
+    def test_windows_failure_image_is_scoped_to_the_requested_output(self):
+        from types import SimpleNamespace
+        native = SimpleNamespace(app=SimpleNamespace(pid=10), picker_handle=12)
+        for output in (None, Path("owned output")):
+            with patch.object(subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout="true")) as run:
+                Dialog(native, "Windows", output).call("cancel")
+            command = run.call_args.args[0]
+            if output is None:
+                self.assertNotIn("-FailureImage", command)
+            else:
+                self.assertEqual(command[-2:], ["-FailureImage", str(output / "chooser-failure.png")])
 
     def test_binary_hashing_supports_the_python_310_native_atspi_runner(self):
         import io

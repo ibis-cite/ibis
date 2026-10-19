@@ -4,6 +4,7 @@ param(
   [int] $AppId,
   [long] $PickerHandle,
   [string] $Text,
+  [string] $FailureImage,
   [switch] $SelfTest
 )
 $ErrorActionPreference = 'Stop'
@@ -64,6 +65,22 @@ function Invoke-ReadyChooserAction([scriptblock] $Observe, [scriptblock] $Clock,
   $target = Wait-ChooserTarget $Observe $Clock $Pause $Budget
   & $Verify | Out-Null
   & $Invoke $target | Out-Null
+}
+
+function Save-OwnedChooserFailure([string] $Destination, [scriptblock] $Observe, [scriptblock] $Capture) {
+  if ([string]::IsNullOrWhiteSpace($Destination)) { return }
+  try {
+    $view = & $Observe
+    foreach ($key in @('Owned','Foreground','SameDialog')) {
+      if ($view[$key] -isnot [bool] -or !$view[$key]) { return }
+    }
+    if ($view.Width -isnot [int] -or $view.Height -isnot [int] -or
+        $view.Width -le 0 -or $view.Height -le 0 -or $view.Width -gt 8192 -or $view.Height -gt 8192 -or
+        [long] $view.Width * $view.Height -gt 33554432) { return }
+    & $Capture $view $Destination | Out-Null
+  } catch {
+    # Failure evidence must never replace the original helper failure.
+  }
 }
 
 function Select-ChooserTargets([object[]] $Candidates, [string] $Id, [string] $Name) {
@@ -197,6 +214,29 @@ function Invoke-OwnershipTests {
   foreach ($property in $diagnostic.selector.PSObject.Properties) {
     if ($property.Value -ne 0) { throw 'Chooser private selector diagnostic regression failed' }
   }
+  $script:captures = 0
+  $script:captureObservations = 0
+  $captureView = @{Owned=$true;Foreground=$true;SameDialog=$true;Width=800;Height=600}
+  $readCapture = { $script:captureObservations++; $captureView }
+  $capture = { param($View,$Destination) $script:captures++; if ($Destination -cne 'synthetic.png') { throw 'Wrong failure destination' } }
+  Save-OwnedChooserFailure 'synthetic.png' $readCapture $capture
+  if ($script:captures -ne 1) { throw 'Owned chooser failure image was not captured' }
+  foreach ($key in @('Owned','Foreground','SameDialog')) {
+    $captureView[$key] = $false
+    Save-OwnedChooserFailure 'synthetic.png' $readCapture $capture
+    $captureView[$key] = $true
+  }
+  foreach ($size in @(@(0,600),@(-1,600),@(8193,600),@(8192,8192))) {
+    $captureView.Width = $size[0]; $captureView.Height = $size[1]
+    Save-OwnedChooserFailure 'synthetic.png' $readCapture $capture
+  }
+  $captureView.Width = 800; $captureView.Height = 600
+  $beforeMissingDestination = $script:captureObservations
+  Save-OwnedChooserFailure '' $readCapture $capture
+  if ($script:captureObservations -ne $beforeMissingDestination) { throw 'Missing destination inspected windows' }
+  Save-OwnedChooserFailure 'synthetic.png' { throw 'Unavailable provider' } $capture
+  Save-OwnedChooserFailure 'synthetic.png' $readCapture { throw 'Unavailable screenshot' }
+  if ($script:captures -ne 1) { throw 'Unverified chooser failure image was captured' }
   $true
 }
 
@@ -238,12 +278,14 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 public static class IbisChooser {
+  [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
   public delegate bool EnumProc(IntPtr window, IntPtr data);
   [DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc callback, IntPtr data);
   [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr window);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr window);
   [DllImport("user32.dll")] public static extern IntPtr GetWindow(IntPtr window, uint command);
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+  [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr window, out Rect rectangle);
   [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr window, out uint process);
   [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern int GetWindowText(IntPtr window, StringBuilder text, int length);
   [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern int GetClassName(IntPtr window, StringBuilder text, int length);
@@ -268,24 +310,85 @@ public static class IbisChooser {
     $windows = @([IbisChooser]::Windows() | ForEach-Object { Get-WindowInfo $_ })
     Resolve-OwnedDialog $windows $AppId $PickerHandle { param($Handle) Get-WindowInfo $Handle }
   }
-  function Get-DialogElements($Dialog) {
+  function Get-DialogElements($Dialog, [switch] $Raw, [int] $Limit = 4000) {
     $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]::new($Dialog.Handle))
     if ($root.Current.ProcessId -ne $AppId) { throw 'Native chooser accessibility identity was lost' }
-    $walker = [System.Windows.Automation.TreeWalker]::ControlViewWalker
+    $walker = if ($Raw) { [System.Windows.Automation.TreeWalker]::RawViewWalker } else { [System.Windows.Automation.TreeWalker]::ControlViewWalker }
     $queue = [System.Collections.Generic.Queue[object]]::new()
     $queue.Enqueue($root)
     $count = 0
     while ($queue.Count -gt 0) {
       $element = $queue.Dequeue()
       $count++
-      $script:ChooserFacts.enumerated = [Math]::Min($count, 4000)
-      if ($count -gt 4000) { throw 'Native chooser accessibility tree exceeded bound' }
+      $script:ChooserFacts.enumerated = [Math]::Min($count, $Limit)
+      if ($count -gt $Limit) { throw 'Native chooser accessibility tree exceeded bound' }
       $element
       $child = $walker.GetFirstChild($element)
       while ($null -ne $child) {
-        if ($queue.Count + $count -ge 4000) { throw 'Native chooser accessibility tree exceeded bound' }
+        if ($queue.Count + $count -ge $Limit) { throw 'Native chooser accessibility tree exceeded bound' }
         $queue.Enqueue($child)
         $child = $walker.GetNextSibling($child)
+      }
+    }
+  }
+  function Get-ChooserSelection($Elements, [string] $Id, [string] $Name) {
+    $candidates = @($Elements | ForEach-Object {
+      $current = $_.Current
+      if ($current.ControlType -eq [System.Windows.Automation.ControlType]::Button) {
+        @{IsButton=$true;Id=$current.AutomationId;Name=$current.Name;Offscreen=$current.IsOffscreen;Enabled=$current.IsEnabled;Element=$_}
+      }
+    })
+    Select-ChooserTargets $candidates $Id $Name
+  }
+  function Write-ChooserRawFailure([string] $OriginalFailure) {
+    if ($Action -cnotin @('cancel','confirm') -or !$dialog) { return }
+    $previousFacts = $script:ChooserFacts
+    try {
+      $currentDialog = Get-Dialog
+      if (!$currentDialog -or $currentDialog.Handle -ne $dialog.Handle -or
+          [IbisChooser]::GetForegroundWindow().ToInt64() -ne $currentDialog.Handle) { return }
+      $script:ChooserFacts = @{stage='tree';matches=0;enumerated=0;owned=$true;foreground=$true;selector=@{}}
+      $elements = @(Get-DialogElements $currentDialog -Raw -Limit 512)
+      $rawId = if ($Action -ceq 'cancel') { '2' } else { '1' }
+      $rawName = if ($Action -ceq 'cancel') { 'Cancel' } else { 'Open' }
+      $selection = Get-ChooserSelection $elements $rawId $rawName
+      $script:ChooserFacts.stage = 'target'
+      $script:ChooserFacts.selector = $selection.Selector
+      $script:ChooserFacts.matches = [Math]::Min($selection.Targets.Count, 4000)
+      $safe = Format-ChooserFailure $script:ChooserFacts $OriginalFailure
+      [Console]::Error.WriteLine('NATIVE CHOOSER WINDOWS RAW ' + $safe.Substring('NATIVE CHOOSER WINDOWS '.Length))
+    } catch {
+      # A secondary provider failure cannot replace the original diagnostic.
+    } finally {
+      $script:ChooserFacts = $previousFacts
+    }
+  }
+  function Save-ChooserFailureImage {
+    Save-OwnedChooserFailure $FailureImage {
+      $currentDialog = Get-Dialog
+      if (!$currentDialog -or !$dialog) { return @{} }
+      $view = @{Owned=$true;SameDialog=($currentDialog.Handle -eq $dialog.Handle);
+        Foreground=([IbisChooser]::GetForegroundWindow().ToInt64() -eq $currentDialog.Handle)}
+      if (!$view.SameDialog -or !$view.Foreground) { return $view }
+      $rectangle = [IbisChooser+Rect]::new()
+      if (![IbisChooser]::GetWindowRect([IntPtr]::new($currentDialog.Handle), [ref] $rectangle)) { return @{} }
+      $view.Left = $rectangle.Left; $view.Top = $rectangle.Top
+      $view.Width = $rectangle.Right - $rectangle.Left; $view.Height = $rectangle.Bottom - $rectangle.Top
+      $view
+    } {
+      param($View,$Destination)
+      Add-Type -AssemblyName System.Drawing
+      $bitmap = $null; $graphics = $null; $stream = $null
+      try {
+        $bitmap = [System.Drawing.Bitmap]::new($View.Width,$View.Height)
+        $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+        $graphics.CopyFromScreen([System.Drawing.Point]::new($View.Left,$View.Top),[System.Drawing.Point]::Empty,$bitmap.Size)
+        $stream = [System.IO.File]::Open($Destination,[System.IO.FileMode]::CreateNew,[System.IO.FileAccess]::Write,[System.IO.FileShare]::None)
+        $bitmap.Save($stream,[System.Drawing.Imaging.ImageFormat]::Png)
+      } finally {
+        if ($stream) { $stream.Dispose() }
+        if ($graphics) { $graphics.Dispose() }
+        if ($bitmap) { $bitmap.Dispose() }
       }
     }
   }
@@ -331,13 +434,7 @@ public static class IbisChooser {
         $script:ChooserFacts.stage = 'tree'
         $elements = @(Get-DialogElements $currentDialog)
         $script:ChooserFacts.stage = 'target'
-        $candidates = @($elements | ForEach-Object {
-          $current = $_.Current
-          if ($current.ControlType -eq [System.Windows.Automation.ControlType]::Button) {
-            @{IsButton=$true;Id=$current.AutomationId;Name=$current.Name;Offscreen=$current.IsOffscreen;Enabled=$current.IsEnabled;Element=$_}
-          }
-        })
-        $selection = Select-ChooserTargets $candidates $id $name
+        $selection = Get-ChooserSelection $elements $id $name
         $script:ChooserFacts.selector = $selection.Selector
         $script:ChooserFacts.matches = [Math]::Min($selection.Targets.Count, 4000)
         $observation.Targets = $selection.Targets
@@ -367,7 +464,10 @@ public static class IbisChooser {
   ConvertTo-Json -InputObject $result -Compress
 } catch {
   # UIA exception text can contain filenames or accessible document text.
-  [Console]::Error.WriteLine((Format-ChooserFailure $script:ChooserFacts $_.Exception.Message))
+  $originalFailure = $_.Exception.Message
+  [Console]::Error.WriteLine((Format-ChooserFailure $script:ChooserFacts $originalFailure))
+  if (Get-Command Save-ChooserFailureImage -ErrorAction SilentlyContinue) { Save-ChooserFailureImage }
+  if (Get-Command Write-ChooserRawFailure -ErrorAction SilentlyContinue) { Write-ChooserRawFailure $originalFailure }
   [Console]::Error.WriteLine('Windows native chooser action failed')
   exit 1
 }

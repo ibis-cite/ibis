@@ -25,7 +25,7 @@ test('missing and malformed native metadata cannot become a passed state', () =>
   assert.deepEqual(locationFlags(false, true), { ready: false, owned: true });
 });
 
-function nativeScenario({owner = 123, foreground = 123, duplicate = false, pressFailure = false, location = false, duplicateLocation = false, forbidBrowserTraversal = false, windowTitle = 'Choose a BibTeX or BibLaTeX library', attached = false} = {}) {
+function nativeScenario({owner = 123, foreground = 123, duplicate = false, pressFailure = false, location = false, duplicateLocation = false, forbidBrowserTraversal = false, windowTitle = 'Choose a BibTeX or BibLaTeX library', attached = false, parentBoundsUnavailable = false, dialogFrameMismatch = false} = {}) {
   let presses = 0, windowValueReads = 0;
   const node = (name, role, focused = false, children = []) => ({
     name: () => name, title: () => name, description: () => '', value: () => '', role: () => role,
@@ -41,11 +41,13 @@ function nativeScenario({owner = 123, foreground = 123, duplicate = false, press
   const window = node(windowTitle, 'AXWindow', false,
     location ? [open, cancel, focus, sheet, field] : [open, cancel, focus]);
   window.value = () => { windowValueReads++; return ''; };
+  if (parentBoundsUnavailable) window.position = () => { throw Error('Unrelated parent bounds unavailable'); };
   window.sheets = () => location ? (duplicateLocation ? [sheet, sheet] : [sheet]) : [];
   if (attached) {
     const dialog = node('Choose a BibTeX or BibLaTeX library', 'AXSheet', false,
       location ? [open, cancel, focus, sheet, field] : [open, cancel, focus]);
     dialog.sheets = window.sheets;
+    if (dialogFrameMismatch) dialog.position = () => [800, 600];
     window.name = () => 'Ibis'; window.title = () => 'Ibis';
     window.sheets = () => duplicate ? [dialog, dialog] : [dialog];
   }
@@ -137,4 +139,24 @@ test('an owned attached chooser uses the direct sheet collection and keeps ambig
   assert.deepEqual(native.call('cancel'), {invoked: true});
   assert.equal(native.presses(), 1);
   assert.throws(() => nativeScenario({attached: true, duplicate: true}).call('confirm'), /ambiguous/);
+});
+
+test('attached chooser discovery verifies its own frame without querying unrelated parent bounds', () => {
+  const native = nativeScenario({attached: true, location: true, parentBoundsUnavailable: true});
+  assert.deepEqual(native.call('location-state'), {ready: true, owned: true});
+  assert.deepEqual(native.call('confirm'), {invoked: true});
+  assert.equal(native.presses(), 1);
+});
+
+test('a visible parent cannot authorize an attached dialog with a different native frame', () => {
+  const native = nativeScenario({attached: true, dialogFrameMismatch: true});
+  assert.deepEqual(native.call('state'), {visible: false, foreground: false, owned: false});
+  assert.throws(() => native.call('confirm'), /not foreground/);
+  assert.equal(native.presses(), 0);
+});
+
+test('a window with no native sheets needs no unrelated bounds query', () => {
+  const native = nativeScenario({windowTitle: 'Ibis', parentBoundsUnavailable: true});
+  assert.deepEqual(native.call('location-state'), {ready: false, owned: false});
+  assert.deepEqual(native.call('state'), {visible: false, foreground: false, owned: false});
 });
