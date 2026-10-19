@@ -803,7 +803,7 @@ test("a row says why it matched only when the match is not visible", async () =>
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "spindle" } });
   await screen.findByText("Hidden match");
   const rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
-  expect(rows[0].textContent).not.toContain("Matched in");
-  expect(rows[1].textContent).toContain("Matched in the abstract");
+  expect(rows[0]?.textContent).not.toContain("Matched in");
+  expect(rows[1]?.textContent).toContain("Matched in the abstract");
   expect(screen.getByText("Best matches")).toBeTruthy();
 });
