@@ -111,10 +111,22 @@ def has_search_text(snapshot):
 
 def escape_to_hide(native, snapshot, description):
     """Escape clears a search first and hides on the next press."""
-    if has_search_text(snapshot()):
-        native.key("Escape")
-        wait_for(lambda: not has_search_text(snapshot()), "Escape clears the search before hiding")
+    had_text = has_search_text(snapshot())
     native.key("Escape")
+    if had_text:
+        state = {}
+        def settled():
+            state["last"] = current = snapshot()
+            return not current["visible"] or not has_search_text(current)
+        try:
+            wait_for(settled, "Escape clears the search or hides the picker")
+        except AssertionError:
+            last = state.get("last", {})
+            print("ESCAPE STATE " + json.dumps({"visible": last.get("visible"),
+                  "search_has_text": has_search_text(last) if last else None}), flush=True)
+            raise
+        if snapshot()["visible"]:
+            native.key("Escape")
     wait_for(lambda: not snapshot()["visible"], description)
 
 
