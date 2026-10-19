@@ -111,7 +111,9 @@ are stored locally as "seen" flags only, never as usage data.
 pointer, or last position), at the position last used on that display. Focus is
 in the search box at once; typing must work without a click. If Ibis was closed
 less than a minute ago, the last search returns, selected so typing replaces it
-(adjustable up to three minutes, as Raycast and PowerToys Command Palette do).
+(adjustable up to three minutes; Raycast and PowerToys Command Palette offer
+the same setting in their documentation). The kept search lives in memory only
+and is never written to disk.
 It appears in 120 ms with a short fade. The at-cursor form opens under the text
 caret and flips above it near the bottom of the screen.
 
@@ -148,8 +150,9 @@ asks once before discarding them. Escape never unpins.
 focus until clicked or summoned. It is the only time Ibis stays on top.
 
 **Never** take keys people type with (Ctrl+Shift+Space is the non-breaking space
-in Word and LibreOffice; Ctrl+Alt types letters on many European layouts;
-Ctrl+Space switches input languages), open by itself, appear in the taskbar,
+in Word and LibreOffice, yet it is still the Windows and Linux default, which
+#133 changes; Ctrl+Alt types letters on many European layouts; Ctrl+Space
+switches input languages), open by itself, appear in the taskbar,
 Dock or Alt+Tab (only the settings window does), or animate longer than 280 ms.
 The shortcut is ignored while a full-screen app or presentation runs, unless it
 is pressed again.
@@ -165,8 +168,9 @@ is pressed again.
 - Linux on Wayland: the compositor places windows and pinning on top is not
   available, so Ibis opens centred and "pinned" means "stays open". Pasting into
   other apps is generally not allowed, so Ibis copies and says "Press Ctrl+V".
-  The global shortcut goes through the system's shortcut dialog. X11 behaves
-  like Windows.
+  The global shortcut goes through the system's shortcut dialog. On X11, Ibis
+  can place its window, stay on top when pinned and register its shortcut
+  directly, as on Windows.
 
 **Accessibility.** Reduced motion uses fades only. Screen readers hear the
 result count and, per row, title, first author, year and why it matched;
@@ -176,18 +180,24 @@ visible (2 px, accent). Right-to-left titles align right within their row.
 ## Rollout
 
 Each step is one pull request against #223 (or an issue split from it), reviewed
-with the states gallery on every platform. Steps 1–3 need no new data.
+with the states gallery on every platform. Steps 1–3 need no new data or
+settings. Anything remembered across restarts (window position per display,
+display choice, density, text size, how long a search is kept, which tips were
+seen) needs new `settings.json` fields; ADR 0016 fixes the current fields, so
+step 4 starts with a superseding ADR.
 
 1. Design values in `tokens.css`: type scale, densities, radii, motion and
    colour roles, without changing layout.
 2. Picker layout: header (search, format, pin), rows, footer with library status
    and More, empty and no-result text.
-3. Window behaviour already possible today: outside-click hiding, keeping the
-   search for a minute, Escape ladder, display choice, remembered position.
-4. Density and Larger text as settings.
+3. Window behaviour that needs no settings: outside-click hiding, keeping the
+   search in memory for a minute, the Escape ladder, and staying on top only
+   when pinned (today the window is always on top).
+4. A superseding settings ADR, then display choice, remembered position,
+   density and Larger text as settings.
 5. Footer tips, and `#tag`, `y:` and `a:` filters (tags need source support).
-6. Recently cited and Recently added (needs a local history; nothing leaves the
-   machine).
+6. Recently cited and Recently added (needs a local history that stays on the
+   device and, as PRIVACY.md promises, can be turned off and cleared).
 7. Citation tray with page numbers (0.2, with #24).
 8. Attachments: the PDF or Web label and the preview pane (needs attachment
    data from Zotero).
