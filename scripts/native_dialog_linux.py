@@ -13,6 +13,33 @@ def owned_candidate(candidates, app_pid):
     return candidates[0][0]
 
 
+def row_target(nodes, filename, showing):
+    matches = [item for item in nodes if item.getRoleName() == "table cell" and item.name == filename
+               and item.getState().contains(showing)]
+    if len(matches) > 1:
+        raise AssertionError("Synthetic native filename is ambiguous")
+    if not matches:
+        return None
+    cell = matches[0]
+    # GTK may nest a text renderer cell inside a container cell. Keep every
+    # ancestor inside the already-owned dialog tree and bound malformed cycles.
+    for _ in range(16):
+        parent = cell.parent
+        if parent is None or parent not in nodes:
+            raise AssertionError("Native filename ancestry is outside the owned dialog")
+        role = parent.getRoleName()
+        if role in ("table", "tree table"):
+            table = parent.queryTable()
+            row = table.getRowAtIndex(cell.getIndexInParent())
+            if row < 0 or row >= table.nRows:
+                raise AssertionError("Native filename row is unavailable")
+            return table, row
+        if role != "table cell":
+            break
+        cell = parent
+    raise AssertionError("Native filename is not in an owned file table")
+
+
 class Dialog:
     def __init__(self, native, run):
         self.native, self.run = native, run
@@ -98,41 +125,28 @@ class Dialog:
         return {"ready": len(entries) == 1, "owned": True}
 
     def select_path(self, path):
-        if not all(self.state().values()):
-            raise AssertionError("Cannot select through an unowned chooser")
-        tables = [item for item in self._nodes() if item.getRoleName() == "table"
-                  and item.getState().contains(self.native.atspi.STATE_SHOWING)]
-        if len(tables) != 1 or not tables[0].queryComponent().grabFocus():
-            raise AssertionError("Owned native file list focus is unavailable")
-        deadline = time.monotonic() + 10
-        while not tables[0].getState().contains(self.native.atspi.STATE_FOCUSED):
-            if time.monotonic() >= deadline:
-                raise AssertionError("Owned native file list did not receive focus")
-            time.sleep(0.1)
-        # GTK's Ctrl+V file-list action selects a file URI. Verify the native
-        # selected filename before invoking Open; never infer selection from a key.
-        self.native.set_clipboard(path.resolve().as_uri())
-        self.native.key("ctrl+v")
+        # The disposable GTK session opens this check's synthetic working
+        # directory. Select the exact visible filename through native AT-SPI.
         deadline = time.monotonic() + 20
-        while True:
-            state = self.state()
-            if not all(state.values()):
-                active = self.run("xdotool", "getactivewindow")
-                focus = self.run("xdotool", "getwindowfocus")
-                state.update(active_is_picker=active == self.picker, input_is_picker=focus == self.picker)
-                print("NATIVE CHOOSER OWNERSHIP " + __import__("json").dumps(state), flush=True)
-                raise AssertionError("Chooser lost foreground during native selection")
-            nodes = self._nodes()
-            selected = [item for item in nodes if item.getState().contains(self.native.atspi.STATE_SELECTED)]
-            matches = [item for item in selected if item.name == path.name]
-            if len(matches) > 1:
-                raise AssertionError("Synthetic filename selection is ambiguous")
-            if len(matches) == 1:
-                self.confirm()
-                return
+        target = None
+        while target is None:
+            target = row_target(self._nodes(), path.name, self.native.atspi.STATE_SHOWING)
             if time.monotonic() >= deadline:
-                raise AssertionError("Owned synthetic filename was not selected")
+                raise AssertionError("Owned synthetic filename was not visible")
+            if target is None:
+                time.sleep(0.1)
+        table, row = target
+        state = self.state()
+        if not all(state.values()):
+            print("NATIVE CHOOSER OWNERSHIP " + __import__("json").dumps(state), flush=True)
+            raise AssertionError("Native chooser lost foreground before selection")
+        if not table.addRowSelection(row):
+            raise AssertionError("Native file table rejected the synthetic row selection")
+        while list(table.getSelectedRows()) != [row]:
+            if time.monotonic() >= deadline:
+                raise AssertionError("Owned synthetic file selection was not confirmed")
             time.sleep(0.1)
+        self.confirm()
 
     def cancel(self):
         if not all(self.state().values()):

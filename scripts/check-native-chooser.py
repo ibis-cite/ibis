@@ -10,6 +10,7 @@ import platform
 import subprocess
 import sys
 import tempfile
+import time
 import traceback
 import unittest
 from unittest.mock import patch
@@ -59,9 +60,13 @@ def ready(value):
 def normal_quit(process, click, timeout=10):
     if process.poll() is not None:
         raise AssertionError("App exited before native Quit")
+    started = time.monotonic()
     click("Quit Ibis")
+    remaining = timeout - (time.monotonic() - started)
+    if remaining <= 0:
+        raise AssertionError("Native Quit did not end the app promptly")
     try:
-        result = process.wait(timeout=timeout)
+        result = process.wait(timeout=remaining)
     except subprocess.TimeoutExpired:
         raise AssertionError("Native Quit did not end the app promptly") from None
     if result != 0:
@@ -119,42 +124,6 @@ def cleanup_owned(process, log, native, owned):
     return successful
 
 
-class OwnedLinux(smoke.Linux):
-    """Keep the X clipboard owner foreground and reap only our processes."""
-    def __init__(self):
-        self.clipboard_processes = []
-        super().__init__()
-
-    def set_clipboard(self, text):
-        process = subprocess.Popen(["xclip", "-quiet", "-selection", "clipboard", "-in"],
-                                   stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
-                                   stderr=subprocess.DEVNULL, text=True)
-        self.clipboard_processes.append(process)
-        process.stdin.write(text)
-        process.stdin.close()
-        def established():
-            if process.poll() is not None:
-                raise AssertionError("Owned clipboard process exited before verification")
-            try:
-                return self.clipboard() == text
-            except subprocess.CalledProcessError:
-                return False
-        smoke.wait_for(established, "owned synthetic clipboard value is available")
-
-    def close(self):
-        try:
-            for process in self.clipboard_processes:
-                if process.poll() is None:
-                    process.terminate()
-                try:
-                    process.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    process.kill()
-                    process.wait(timeout=5)
-        finally:
-            super().close()
-
-
 class Dialog:
     def __init__(self, native, system):
         self.native, self.system = native, system
@@ -178,9 +147,15 @@ class Dialog:
         if result.returncode:
             raise smoke.Unavailable("Native chooser action unavailable")
         try:
-            return json.loads(result.stdout)
+            value = json.loads(result.stdout)
         except ValueError:
             raise AssertionError("Native chooser helper returned invalid metadata") from None
+        if action in ("confirm", "cancel"):
+            invoked = value is True if self.system == "Windows" else (
+                isinstance(value, dict) and set(value) == {"invoked"} and value["invoked"] is True)
+            if not invoked:
+                raise AssertionError("Native chooser action was not acknowledged")
+        return value
 
     def state(self):
         return flags(self.call("state"), ("visible", "foreground", "owned"))
@@ -225,7 +200,7 @@ def check(app_path, output, system):
             owned = claim_owned_settings(smoke.settings_path(system, Path(".")))
         if system == "Windows":
             subprocess.run(["pwsh", "-NoProfile", "-File", str(ROOT / "dialog-windows.ps1"), "-SelfTest"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
-        native = OwnedLinux() if system == "Linux" else smoke.Scripted(system)
+        native = smoke.Linux() if system == "Linux" else smoke.Scripted(system)
         with tempfile.TemporaryDirectory(prefix="ibis chooser synthetic ") as temporary:
             folder = Path(temporary)
             settings = smoke.settings_path(system, folder, native)
@@ -236,11 +211,16 @@ def check(app_path, output, system):
             damaged = folder / "unreadable 引用.bib"
             damaged.write_bytes(b"\xff\xfe invalid UTF-8 synthetic fixture")
             env = first_run_environment(os.environ, folder / "config")
+            if system == "Linux":
+                gtk = folder / "config/gtk-3.0"
+                gtk.mkdir(parents=True)
+                (gtk / "settings.ini").write_text("[Settings]\ngtk-recent-files-enabled=false\n", encoding="utf-8")
 
             def launch(label):
                 nonlocal process, log
                 log = (output / f"startup-{label}.log").open("wb")
-                process = subprocess.Popen([str(app_path.resolve())], env=env, stdout=log, stderr=log)
+                process = subprocess.Popen([str(app_path.resolve())], env=env, cwd=folder if system == "Linux" else None,
+                                           stdout=log, stderr=log)
                 native.app = process
 
             def snapshot():
@@ -320,13 +300,7 @@ def check(app_path, output, system):
             smoke.wait_for(lambda: f"{library.name}: 3 references" in smoke.strings(snapshot()), "relaunch remembers library without override")
             smoke.wait_for(lambda: snapshot()["foreground"], "relaunch is foreground")
             query(0)
-            native.key("Escape")
-            smoke.wait_for(lambda: not snapshot()["visible"], "relaunch can hide before shortcut check")
-            native.focus_editor()
-            smoke.wait_for(native.editor_focused, "owned editor receives focus")
-            native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+space")
-            smoke.wait_for(lambda: snapshot()["visible"] and snapshot()["foreground"] and smoke.search_focused(snapshot()), "relaunch reacquires the shortcut after native Quit")
-            passed("relaunch remembers the chosen library and reacquires the shortcut")
+            passed("relaunch remembers the chosen library and accepts a new query")
             report["stage"] = "boundary"
             large = folder / "boundary 引用.bib"
             records = smoke.fixture(100000)
@@ -353,6 +327,22 @@ def check(app_path, output, system):
             smoke.wait_for(lambda: f"{large.name}: 100000 references" in smoke.strings(snapshot()),
                            "relaunch loads the saved boundary library after Quit during reload", timeout=120)
             query(99998)
+            report["stage"] = "relaunch-shortcut"
+            native.key("Escape")
+            smoke.wait_for(lambda: not snapshot()["visible"], "relaunch can hide before shortcut check")
+            native.focus_editor()
+            smoke.wait_for(native.editor_focused, "owned editor receives focus")
+            native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+space")
+            def shortcut_ready():
+                current = snapshot()
+                state = {"visible": current["visible"], "foreground": current["foreground"],
+                         "search_focused": smoke.search_focused(current)}
+                if state != report.get("last_shortcut_state"):
+                    report["last_shortcut_state"] = state
+                    print("NATIVE CHOOSER SHORTCUT " + json.dumps(state), flush=True)
+                return all(state.values())
+            smoke.wait_for(shortcut_ready, "relaunch reacquires the shortcut after native Quit")
+            passed("relaunch reacquires the shortcut after native Quit")
             normal_quit(process, native.click)
             log.close()
             process, log = None, None
@@ -402,6 +392,14 @@ class Tests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "promptly"):
             normal_quit(Process(), clicks.append)
         self.assertEqual(clicks, ["Quit Ibis"])
+
+    def test_native_quit_click_time_counts_toward_the_ten_second_limit(self):
+        class Process:
+            def poll(self): return None
+            def wait(self, timeout): return 0
+        with patch.object(time, "monotonic", side_effect=[0, 11]):
+            with self.assertRaisesRegex(AssertionError, "promptly"):
+                normal_quit(Process(), lambda _: None)
 
     def test_a_visible_dialog_alone_cannot_prove_the_picker_stayed_visible(self):
         class Native:
@@ -476,27 +474,43 @@ class Tests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     dialog.select(Path("owned synthetic.bib"))
 
-    def test_linux_foreign_selection_never_invokes_open(self):
+    def test_external_actions_require_exact_success_metadata(self):
         from types import SimpleNamespace
-        class Item:
-            def __init__(self, name, role, states): self.name, self.role, self.states = name, role, states
-            def getRoleName(self): return self.role
-            def getState(self): return self
-            def contains(self, flag): return flag in self.states
-            def queryComponent(self): return self
-            def grabFocus(self): return True
-        actions = []
-        native = SimpleNamespace(atspi=SimpleNamespace(STATE_SHOWING=1, STATE_FOCUSED=2, STATE_SELECTED=3),
-                                 set_clipboard=lambda _: actions.append("clipboard"), key=actions.append)
-        dialog = linux.Dialog.__new__(linux.Dialog)
-        dialog.native = native
-        dialog.state = lambda: {"visible": True, "foreground": True, "owned": True}
-        dialog._nodes = lambda: [Item("", "table", {1, 2}), Item("foreign.bib", "table cell", {1, 3})]
-        dialog.confirm = lambda: actions.append("Open")
-        with patch.object(linux.time, "monotonic", side_effect=[0, 0, 21]):
-            with self.assertRaisesRegex(AssertionError, "not selected"):
-                dialog.select_path(Path("owned synthetic.bib"))
-        self.assertEqual(actions, ["clipboard", "ctrl+v"])
+        native = SimpleNamespace(app=SimpleNamespace(pid=10), picker_handle=12)
+        for system, accepted, rejected in (
+            ("Windows", "true", ["false", "1", "null", '{"invoked":true}']),
+            ("Darwin", '{"invoked":true}', ["false", "true", '{"invoked":1}', '{"invoked":false}']),
+        ):
+            dialog = Dialog(native, system)
+            for value in rejected:
+                with patch.object(subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout=value)):
+                    with self.assertRaises(AssertionError):
+                        dialog.call("confirm")
+            with patch.object(subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout=accepted)):
+                dialog.call("confirm")
+
+    def test_linux_native_row_target_handles_nested_cells_and_rejects_ambiguity(self):
+        from types import SimpleNamespace
+        class Cell:
+            def __init__(self, name, parent): self.name, self.parent = name, parent
+            def getRoleName(self): return "table cell"
+            def getState(self): return SimpleNamespace(contains=lambda _: True)
+            def getIndexInParent(self): return 4
+        table = SimpleNamespace(getRowAtIndex=lambda _: 1, nRows=3)
+        parent = SimpleNamespace(name="", getRoleName=lambda: "table", queryTable=lambda: table)
+        outer = Cell("", parent)
+        cell = Cell("owned 引用.bib", outer)
+        nodes = [cell, outer, parent]
+        self.assertIsNone(linux.row_target([], cell.name, 1))
+        self.assertEqual(linux.row_target(nodes, cell.name, 1), (table, 1))
+        self.assertIsNone(linux.row_target(nodes, "foreign.bib", 1))
+        with self.assertRaises(AssertionError):
+            linux.row_target(nodes + [cell], cell.name, 1)
+        with self.assertRaises(AssertionError):
+            linux.row_target([cell], cell.name, 1)
+        outer.parent = cell
+        with self.assertRaises(AssertionError):
+            linux.row_target(nodes, cell.name, 1)
 
     def test_loaded_state_cannot_substitute_for_quitting_during_reload(self):
         clicks = []
@@ -514,7 +528,7 @@ class Tests(unittest.TestCase):
             def poll(self): return None
             def wait(self, timeout): actions.append(("exit", timeout)); return 0
         snapshot = lambda: {"nodes": [{"name": "Reloading synthetic.bib…"}]}
-        with patch.object(smoke, "wait_for", side_effect=lambda predicate, _: self.assertTrue(predicate())):
+        with patch.object(smoke, "wait_for", side_effect=lambda predicate, _: self.assertTrue(predicate())), patch.object(time, "monotonic", side_effect=[0, 0]):
             quit_during_reload(Process(), actions.append, snapshot, "synthetic.bib")
         self.assertEqual(actions, ["Reload", "Quit Ibis", ("exit", 10)])
 
