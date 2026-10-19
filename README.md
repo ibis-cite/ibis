@@ -16,6 +16,10 @@ Ibis is free, open source and private by design: everything works offline, nothi
 - Gentle library health checks: missing data, odd names, duplicate keys.
 - Windows, macOS and Linux. Keyboard, mouse and screen-reader friendly.
 
+## Try the latest build
+
+The newest development build for Windows, macOS and Linux is always at **[Releases → Ibis nightly](https://github.com/ibiscite/ibis/releases/tag/nightly)**. It is rebuilt after every change, so it can be unfinished; numbered preview releases are steadier. Builds are not signed yet, so your system may warn before opening them (the release page says what to click). Tell us what works and what you miss through [a problem report or an idea](https://github.com/ibiscite/ibis/issues/new/choose).
+
 ## Try the command line tool (developers)
 
 ```sh
