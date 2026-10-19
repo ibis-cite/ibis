@@ -374,6 +374,9 @@ booleans after showing the panel; accessible focus alone is not that proof.
 The panel helper initially makes its outer NSView the first responder. Ibis then
 uses the stable Tauri Webview API to focus the actual WKWebView without activating
 the application; AppKit key/responder booleans alone do not prove HID delivery.
+The same WebView focus is applied after initial panel configuration only when
+the native window is already visible. This covers fresh startup after damaged
+settings recovery without showing a future hidden startup window.
 The prior hosted probe showed the panel in the full-screen Space, then failed
 native search. That observation does not establish input, copy or chooser success.
 

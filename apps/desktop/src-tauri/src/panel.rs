@@ -45,7 +45,19 @@ pub(crate) fn configure(app: &AppHandle) -> Result<(), Box<dyn std::error::Error
     panel.set_works_when_modal(true);
     app.set_activation_policy(tauri::ActivationPolicy::Accessory)
         .map_err(|_| "the launcher activation policy could not be set")?;
+    // Tauri creates the initial visible window before setup. Conversion can
+    // leave its outer NSView as responder even when search reports DOM focus.
+    // A future hidden startup window must remain hidden and unfocused.
+    if panel.as_panel().isVisible() {
+        focus_webview(&window);
+    }
     Ok(())
+}
+
+fn focus_webview(window: &tauri::WebviewWindow) {
+    // Focus the actual WKWebView without activating Ibis or switching Spaces.
+    let view: &tauri::Webview<tauri::Wry> = window.as_ref();
+    report(view.set_focus(), NativeIssue::Focus);
 }
 
 /// A panel takes keyboard focus without activating Ibis or switching Spaces.
@@ -64,8 +76,7 @@ pub(crate) fn show(app: &AppHandle) {
                     // responder. Route hardware keys to the WKWebView itself
                     // without activating Ibis or changing the user's Space.
                     if let Some(window) = handle.get_webview_window("main") {
-                        let view: &tauri::Webview<tauri::Wry> = window.as_ref();
-                        report(view.set_focus(), NativeIssue::Focus);
+                        focus_webview(&window);
                     } else {
                         report(Err::<(), ()>(()), NativeIssue::Window);
                     }

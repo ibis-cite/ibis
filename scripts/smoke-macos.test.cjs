@@ -13,6 +13,18 @@ assert.deepEqual(events, [
     [55, false, 1 << 18], [59, false, 0],
 ]);
 
+const goToFolder = [];
+context.sendPhysicalChord('super+shift+g', (...event) => goToFolder.push(event));
+assert.deepEqual(goToFolder, [
+    [55, true, 1 << 20], [56, true, (1 << 20) | (1 << 17)],
+    [5, true, (1 << 20) | (1 << 17)], [5, false, (1 << 20) | (1 << 17)],
+    [56, false, 1 << 20], [55, false, 0],
+]);
+
+const pastePath = [];
+context.sendPhysicalChord('super+v', (...event) => pastePath.push(event));
+assert.deepEqual(pastePath, [[55, true, 1 << 20], [9, true, 1 << 20], [9, false, 1 << 20], [55, false, 0]]);
+
 const failed = [];
 assert.throws(() => context.sendPhysicalChord('ctrl+shift+space', (code, down, flags) => {
     failed.push([code, down, flags]);
