@@ -3,19 +3,42 @@
 //! Settings are small and human-editable. Saving is atomic and keeps the
 //! previous file as a backup, so a crash or a bad edit never loses the last
 //! working settings. A file written by a newer version of Ibis is refused
-//! rather than overwritten.
+//! rather than overwritten; a file written by an older version is migrated
+//! when it is read, one version step at a time (ADR 0018).
 
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use thiserror::Error;
 
 use crate::cite::KeyFormat;
 
 /// Version of the settings format this build reads and writes.
-pub const SCHEMA_VERSION: u32 = 1;
+pub const SCHEMA_VERSION: u32 = 2;
+
+/// The library Ibis opens at start.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum LibrarySetting {
+    /// A BibTeX/BibLaTeX file: `{"bibtex": "/path/refs.bib"}`.
+    Bibtex(PathBuf),
+    /// A Zotero library, read from Zotero itself: `{"zotero": "user"}` or
+    /// `{"zotero": {"group": 42}}`.
+    Zotero(ZoteroLibrary),
+}
+
+/// Which Zotero library to read.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ZoteroLibrary {
+    /// The personal library ("My Library").
+    User,
+    /// A group library, by its numeric group ID.
+    Group(u64),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
@@ -24,9 +47,9 @@ pub struct Settings {
     /// Global shortcut, e.g. `"Control+Command+R"`. `None` uses the default.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shortcut: Option<String>,
-    /// BibTeX/BibLaTeX file to open at start.
+    /// Library to open at start.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub library: Option<PathBuf>,
+    pub library: Option<LibrarySetting>,
     /// Syntax the picker copies citations in; remembered from the last copy.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub copy_format: Option<KeyFormat>,
@@ -58,6 +81,8 @@ pub enum SettingsError {
 pub struct Loaded {
     pub settings: Settings,
     pub problem: Option<SettingsError>,
+    /// Recovery provenance from the same read, even if the backup equals defaults.
+    pub from_backup: bool,
 }
 
 fn backup_path(path: &Path) -> PathBuf {
@@ -66,15 +91,34 @@ fn backup_path(path: &Path) -> PathBuf {
 
 fn parse(text: &str) -> Result<Settings, SettingsError> {
     let invalid = |e: serde_json::Error| SettingsError::Invalid(e.to_string());
-    let value: serde_json::Value = serde_json::from_str(text).map_err(invalid)?;
+    let mut value: Value = serde_json::from_str(text).map_err(invalid)?;
     // The version is checked before any other field: a newer format may
     // change field types, and must still be recognised as newer.
-    if let Some(version) = value.get("schema_version").and_then(serde_json::Value::as_u64)
-        && version > u64::from(SCHEMA_VERSION)
-    {
+    let version = match value.get("schema_version") {
+        None | Some(Value::Null) => 1,
+        Some(v) => v
+            .as_u64()
+            .ok_or_else(|| SettingsError::Invalid("schema_version must be a whole number".into()))?,
+    };
+    if version > u64::from(SCHEMA_VERSION) {
         return Err(SettingsError::NewerVersion(u32::try_from(version).unwrap_or(u32::MAX)));
     }
+    if version < 2 {
+        value = v1_to_v2(value);
+    }
     serde_json::from_value(value).map_err(invalid)
+}
+
+/// Version 1 named the library by a bare path, always a BibTeX file.
+/// Version 2 says which kind of library it is. Other fields are unchanged.
+fn v1_to_v2(mut value: Value) -> Value {
+    if let Some(object) = value.as_object_mut() {
+        if let Some(path) = object.get("library").filter(|l| l.is_string()).cloned() {
+            object.insert("library".into(), serde_json::json!({ "bibtex": path }));
+        }
+        object.insert("schema_version".into(), Value::from(2));
+    }
+    value
 }
 
 /// Load settings. A missing file gives defaults. An unreadable or invalid file
@@ -86,6 +130,7 @@ pub fn load(path: &Path) -> Loaded {
             return Loaded {
                 settings: Settings::default(),
                 problem: None,
+                from_backup: false,
             };
         }
         Err(e) => Err(SettingsError::Unreadable(e)),
@@ -94,15 +139,17 @@ pub fn load(path: &Path) -> Loaded {
         Ok(settings) => Loaded {
             settings,
             problem: None,
+            from_backup: false,
         },
         Err(problem) => {
-            let settings = fs::read_to_string(backup_path(path))
+            let backup = fs::read_to_string(backup_path(path))
                 .ok()
-                .and_then(|text| parse(&text).ok())
-                .unwrap_or_default();
+                .and_then(|text| parse(&text).ok());
+            let from_backup = backup.is_some();
             Loaded {
-                settings,
+                settings: backup.unwrap_or_default(),
                 problem: Some(problem),
+                from_backup,
             }
         }
     }
@@ -188,6 +235,29 @@ mod tests {
         let loaded = load(&path);
         assert_eq!(loaded.settings, good);
         assert!(matches!(loaded.problem, Some(SettingsError::Invalid(_))));
+        assert!(loaded.from_backup);
+    }
+
+    #[test]
+    fn settings_recovery_reports_backup_or_defaults_from_the_same_read() {
+        let path = dir("recovery-source").join("settings.json");
+        fs::create_dir_all(
+            path.parent()
+                .unwrap_or_else(|| panic!("expected a synthetic settings directory")),
+        )
+        .unwrap_or_else(|e| panic!("{e}"));
+        for primary in ["{ invalid", r#"{"schema_version":3}"#] {
+            fs::write(&path, primary).unwrap_or_else(|e| panic!("{e}"));
+            let fallback = load(&path);
+            assert!(fallback.problem.is_some());
+            assert!(!fallback.from_backup);
+            fs::write(backup_path(&path), "{}").unwrap_or_else(|e| panic!("{e}"));
+            let recovered = load(&path);
+            assert!(recovered.problem.is_some());
+            assert!(recovered.from_backup);
+            assert_eq!(recovered.settings, Settings::default());
+            fs::remove_file(backup_path(&path)).unwrap_or_else(|e| panic!("{e}"));
+        }
     }
 
     #[test]
@@ -233,5 +303,89 @@ mod tests {
             Err(SettingsError::Invalid(_))
         ));
         assert_eq!(fs::read_to_string(&path).unwrap_or_default(), "{ not json");
+    }
+
+    #[test]
+    fn version_1_files_are_migrated_when_read() {
+        let v1 = serde_json::json!({ "schema_version": 1, "library": "/synthetic/refs.bib", "shortcut": "Alt+Y" });
+        assert_eq!(
+            v1_to_v2(v1),
+            serde_json::json!({ "schema_version": 2, "library": { "bibtex": "/synthetic/refs.bib" }, "shortcut": "Alt+Y" })
+        );
+        // No library, no version, and already-migrated values pass through.
+        assert_eq!(
+            v1_to_v2(serde_json::json!({})),
+            serde_json::json!({ "schema_version": 2 })
+        );
+        let migrated = serde_json::json!({ "schema_version": 2, "library": { "bibtex": "/x.bib" } });
+        assert_eq!(v1_to_v2(migrated.clone()), migrated);
+
+        for text in [
+            r#"{"schema_version": 1, "library": "/synthetic/refs.bib", "copy_format": "typst"}"#,
+            r#"{"library": "/synthetic/refs.bib", "copy_format": "typst"}"#,
+            r#"{"schema_version": 0, "library": "/synthetic/refs.bib", "copy_format": "typst"}"#,
+        ] {
+            let settings = parse(text).unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(settings.schema_version, SCHEMA_VERSION);
+            assert_eq!(
+                settings.library,
+                Some(LibrarySetting::Bibtex(PathBuf::from("/synthetic/refs.bib")))
+            );
+            assert_eq!(settings.copy_format, Some(KeyFormat::Typst));
+        }
+        assert!(matches!(
+            parse(r#"{"schema_version": "1"}"#),
+            Err(SettingsError::Invalid(_))
+        ));
+    }
+
+    #[test]
+    fn a_migrated_file_is_written_in_the_new_format_and_the_old_one_is_kept_as_backup() {
+        let path = dir("migrate").join("settings.json");
+        fs::create_dir_all(path.parent().unwrap_or_else(|| panic!("no parent"))).unwrap_or_else(|e| panic!("{e}"));
+        let v1 = r#"{"schema_version": 1, "library": "/synthetic/refs.bib"}"#;
+        fs::write(&path, v1).unwrap_or_else(|e| panic!("{e}"));
+        assert!(load(&path).problem.is_none());
+        update(&path, |s| s.copy_format = Some(KeyFormat::Keys)).unwrap_or_else(|e| panic!("{e}"));
+        let written: Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap_or_default()).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(written["schema_version"], 2);
+        assert_eq!(
+            written["library"],
+            serde_json::json!({ "bibtex": "/synthetic/refs.bib" })
+        );
+        assert_eq!(fs::read_to_string(backup_path(&path)).unwrap_or_default(), v1);
+    }
+
+    #[test]
+    fn zotero_libraries_are_written_as_documented() {
+        let cases = [
+            (
+                LibrarySetting::Zotero(ZoteroLibrary::User),
+                serde_json::json!({ "zotero": "user" }),
+            ),
+            (
+                LibrarySetting::Zotero(ZoteroLibrary::Group(42)),
+                serde_json::json!({ "zotero": { "group": 42 } }),
+            ),
+            (
+                LibrarySetting::Bibtex(PathBuf::from("/synthetic/refs.bib")),
+                serde_json::json!({ "bibtex": "/synthetic/refs.bib" }),
+            ),
+        ];
+        for (setting, json) in cases {
+            assert_eq!(serde_json::to_value(&setting).unwrap_or_else(|e| panic!("{e}")), json);
+            let text = serde_json::json!({ "schema_version": 2, "library": json }).to_string();
+            assert_eq!(parse(&text).unwrap_or_else(|e| panic!("{e}")).library, Some(setting));
+        }
+        for bad in [
+            r#"{"zotero": "everyone"}"#,
+            r#"{"zotero": {"group": -1}}"#,
+            r#"{"onedrive": "x"}"#,
+            r#""/a/bare/path.bib""#,
+        ] {
+            let text = format!(r#"{{"schema_version": 2, "library": {bad}}}"#);
+            assert!(matches!(parse(&text), Err(SettingsError::Invalid(_))), "{bad}");
+        }
     }
 }

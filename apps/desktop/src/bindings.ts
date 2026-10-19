@@ -11,6 +11,11 @@ export const commands = {
 	chooseLibrary: () => __TAURI_INVOKE<void>("choose_library"),
 	/**  Open the current library again; the result arrives as `library:changed`. */
 	reloadLibrary: () => __TAURI_INVOKE<void>("reload_library"),
+	/**
+	 *  Read the personal Zotero library while Zotero runs; the result arrives as
+	 *  `library:changed`.
+	 */
+	useZotero: () => __TAURI_INVOKE<void>("use_zotero"),
 	/**  The library as it is now, for the interface when it starts. */
 	libraryStatus: () => __TAURI_INVOKE<LibraryStatus>("library_status"),
 	/**
@@ -34,6 +39,8 @@ export const commands = {
 	quit: () => __TAURI_INVOKE<void>("quit"),
 	/**  Current state of the global shortcut. */
 	shortcutStatus: () => __TAURI_INVOKE<ShortcutStatus>("shortcut_status"),
+	/**  Initial command runs asynchronously; native mutations stay on the main thread. */
+	nativeAppearance: () => __TAURI_INVOKE<string>("native_appearance"),
 };
 
 /* Types */
@@ -60,15 +67,26 @@ export type KeyFormat =
 /**  Bare keys separated by commas. */
 "keys";
 
+export type LibraryState = "none" | "loading" | "loaded" | "reloading" | "error";
+
 /**  Sent to the interface with the `library:changed` event. */
 export type LibraryStatus = {
-	/**  File name only; the full path is never shown. */
+	state: LibraryState,
+	/**  Whether the requested library is Zotero rather than a file. */
+	zotero: boolean,
+	/**  A successfully opened snapshot, including a valid empty library. */
+	has_snapshot: boolean,
+	/**  Requested file name only, including during opening and after failure. */
 	name: string | null,
+	/**  File name of the searchable snapshot; may differ from the attempted file. */
+	snapshot_name: string | null,
 	references: number,
 	warnings: number,
 	error: string | null,
 	/**  Something to tell the user that is not a failure to open. */
 	note: string | null,
+	/**  Startup settings recovery, separate from transient library status. */
+	settings_notice: string | null,
 };
 
 /**  Stable identity of a record: which source it came from and its key there. */

@@ -3,11 +3,15 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testi
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { emit } from "@tauri-apps/api/event";
 import { App } from "./App";
+import axe from "axe-core";
+import * as api from "./api";
 import capability from "../src-tauri/capabilities/default.json";
+import config from "../src-tauri/tauri.conf.json";
 
 // Vitest can load these existing runtime builtins without a Node-types dependency.
 const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
 const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
+const tokens = readFileSync(new FileURL("./tokens.css", import.meta.url), "utf8");
 const styles = readFileSync(new FileURL("./styles.css", import.meta.url), "utf8");
 
 afterEach(async () => {
@@ -65,11 +69,11 @@ test("the borderless picker has a permitted drag region around its editable sear
 function backend(overrides: Record<string, Handler> = {}): string[] {
   const calls: string[] = [];
   const defaults: Record<string, Handler> = {
-    shortcut_status: () => ({ shortcut: "Cmd+Shift+Space", registered: true, error: null }),
+    shortcut_status: () => ({ shortcut: "Control+Command+R", registered: true, error: null }),
     search: () => [],
     hide_picker: () => null,
     copy_format: () => "pandoc",
-    library_status: () => ({ name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
   };
   mockIPC(
     (cmd, args) => {
@@ -101,7 +105,7 @@ test("errors from the backend are shown, not swallowed", async () => {
     },
   });
   render(<App />);
-  expect((await screen.findByRole("alert")).textContent).toContain("no library is open");
+  expect((await screen.findByText("Ibis could not search your library. Use Reload, then try again.")).getAttribute("role")).toBe("alert");
 });
 
 test("first launch waits for library status and offers a chooser without a search error", async () => {
@@ -115,27 +119,28 @@ test("first launch waits for library status and offers a chooser without a searc
   await act(async () => { await Promise.resolve(); });
   expect(screen.queryByRole("alert")).toBeNull();
   expect(calls).not.toContain("search");
-  await act(async () => { status({ name: null, references: 0, warnings: 0, error: null, note: null }); });
+  await act(async () => { status({ state: "none", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: null, note: null }); });
   fireEvent.click(await screen.findByRole("button", { name: "Choose library to get started" }));
   await waitFor(() => expect(calls).toContain("choose_library"));
   expect(screen.queryByRole("alert")).toBeNull();
   expect(calls).not.toContain("search");
 });
 
-test("typed searches without a library and genuine load failures remain visible", async () => {
+test("typing after a library load failure keeps its single explanation visible", async () => {
   backend({
-    library_status: () => ({ name: null, references: 0, warnings: 0, error: "the synthetic library is unreadable", note: null }),
+    library_status: () => ({ state: "error", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: "the synthetic library is unreadable", note: null }),
     search: () => { throw new Error("no library is open"); },
   });
   render(<App />);
   expect((await screen.findByText(/The library could not be opened/)).textContent).toContain("synthetic library is unreadable");
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
-  expect((await screen.findByText("Error: no library is open")).getAttribute("role")).toBe("alert");
+  expect(screen.queryByText("Ibis could not search your library. Use Reload, then try again.")).toBeNull();
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
 });
 
 test("the empty-state chooser opens the existing dialog and remains available after cancellation", async () => {
   const calls = backend({
-    library_status: () => ({ name: null, references: 0, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "none", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: null, note: null }),
     choose_library: () => null,
   });
   render(<App />);
@@ -148,7 +153,7 @@ test("the empty-state chooser opens the existing dialog and remains available af
 
 test("typing and clearing before choosing a library keeps the calm hint and chooser", async () => {
   const calls = backend({
-    library_status: () => ({ name: null, references: 0, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "none", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: null, note: null }),
     search: () => { throw new Error("no library is open"); },
     choose_library: () => null,
   });
@@ -169,13 +174,13 @@ test("typing and clearing before choosing a library keeps the calm hint and choo
 
 test("opening the first library searches the untouched empty query", async () => {
   const calls = backend({
-    library_status: () => ({ name: null, references: 0, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "none", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: null, note: null }),
     search: () => [result("first", "First reference")],
   });
   render(<App />);
   await screen.findByRole("button", { name: "Choose library to get started" });
   expect(calls).not.toContain("search");
-  await emit("library:changed", { name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
+  await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
   expect(await screen.findByText("First reference")).toBeTruthy();
   expect(screen.queryByRole("button", { name: "Choose library to get started" })).toBeNull();
 });
@@ -186,7 +191,7 @@ test("a failed status request does not suppress search errors", async () => {
     search: () => { throw new Error("search unavailable"); },
   });
   render(<App />);
-  expect((await screen.findByRole("alert")).textContent).toContain("search unavailable");
+  expect((await screen.findByText("Ibis could not search your library. Use Reload, then try again.")).getAttribute("role")).toBe("alert");
 });
 
 test.each([
@@ -206,7 +211,7 @@ test.each([
   await act(async () => { await Promise.resolve(); });
   await act(async () => {
     await emit("library:changed", {
-      name: "new.bib", references: failed ? 0 : 1, warnings: 0,
+      name: "new.bib", snapshot_name: "new.bib", references: failed ? 0 : 1, warnings: 0,
       error: failed ? "synthetic load failed" : null, note: null,
     });
   });
@@ -214,7 +219,7 @@ test.each([
   else await screen.findByText("New library reference");
   await act(async () => {
     if (outcome === "resolves") {
-      resolveStatus({ name: null, references: 0, warnings: 0, error: null, note: null });
+      resolveStatus({ state: "none", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: null, note: null });
     } else rejectStatus(new Error("stale status unavailable"));
   });
   expect(screen.getByRole("region", { name: "Library" }).textContent).toContain("new.bib");
@@ -232,7 +237,7 @@ test("Escape hides the picker", async () => {
 
 test("a shortcut that could not be registered is explained", async () => {
   backend({
-    shortcut_status: () => ({ shortcut: "Cmd+Shift+Space", registered: false, error: "another app may be using it" }),
+    shortcut_status: () => ({ shortcut: "Control+Command+R", registered: false, error: "another app may be using it" }),
   });
   render(<App />);
   expect((await screen.findByText(/another app may be using it/)).getAttribute("role")).toBe("status");
@@ -241,7 +246,7 @@ test("a shortcut that could not be registered is explained", async () => {
 test("a failed search clears the results of the previous query", async () => {
   backend({
     search: ({ query }) => {
-      if (query === "diet") throw new Error("search failed");
+      if (query === "diet") throw new Error("SYNTHETIC_PRIVATE_PAYLOAD");
       return query ? [result("smith2020", "Sleep and memory")] : [];
     },
   });
@@ -250,8 +255,9 @@ test("a failed search clears the results of the previous query", async () => {
   fireEvent.change(box, { target: { value: "sleep" } });
   expect(await screen.findByText("Sleep and memory")).toBeTruthy();
   fireEvent.change(box, { target: { value: "diet" } });
-  expect((await screen.findByRole("alert")).textContent).toContain("search failed");
+  expect((await screen.findByText("Ibis could not search your library. Use Reload, then try again.")).getAttribute("role")).toBe("alert");
   expect(screen.queryByText("Sleep and memory")).toBeNull();
+  expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
 });
 
 test("Quit is available from the picker and from the keyboard", async () => {
@@ -266,9 +272,9 @@ test("Quit is available from the picker and from the keyboard", async () => {
 test("a rejected shortcut setting is explained even when the default works", async () => {
   backend({
     shortcut_status: () => ({
-      shortcut: "Cmd+Shift+Space",
+      shortcut: "Control+Command+R",
       registered: true,
-      error: 'the shortcut "Control+Nonsense" in settings is not valid; using Cmd+Shift+Space',
+      error: 'the shortcut "Control+Nonsense" in settings is not valid; using Control+Command+R',
     }),
   });
   render(<App />);
@@ -285,9 +291,9 @@ test("the query is searched again when a library finishes opening", async () => 
   });
   render(<App />);
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
-  expect((await screen.findByRole("alert")).textContent).toContain("no library is open");
+  expect((await screen.findByText("Ibis could not search your library. Use Reload, then try again.")).getAttribute("role")).toBe("alert");
   open = true;
-  await emit("library:changed", { name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
+  await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
   expect(await screen.findByText("Sleep and memory")).toBeTruthy();
   expect(screen.queryByRole("alert")).toBeNull();
 });
@@ -348,7 +354,7 @@ test("warnings keep the picker open and failures say nothing was copied", async 
   const calls = backend({
     search: ({ query }) => (query ? [result("a", "First")] : []),
     copy_citation: () => {
-      if (fail) throw new Error("the clipboard could not be written");
+      if (fail) throw new Error("SYNTHETIC_PRIVATE_PAYLOAD");
       return { text: "a", warnings: ["bare keys cannot carry page numbers"] };
     },
   });
@@ -362,6 +368,7 @@ test("warnings keep the picker open and failures say nothing was copied", async 
   fail = true;
   fireEvent.keyDown(box, { key: "Enter" });
   expect((await screen.findByRole("alert")).textContent).toContain("Nothing was copied");
+  expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
 });
 
 test("Enter while composing text with an input method copies nothing", async () => {
@@ -397,7 +404,7 @@ test("Enter never copies a result left over from the previous query", async () =
 
 test("the library is shown, can be chosen and reloaded, and failures are explained", async () => {
   const calls = backend({
-    library_status: () => ({ name: null, references: 0, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "none", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: null, note: null }),
     choose_library: () => null,
     reload_library: () => null,
   });
@@ -406,12 +413,15 @@ test("the library is shown, can be chosen and reloaded, and failures are explain
   await waitFor(() => expect(bar.textContent).toContain("No library chosen"));
   fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
   await waitFor(() => expect(calls).toContain("choose_library"));
-  await emit("library:changed", { name: "refs.bib", references: 3, warnings: 1, error: null, note: null });
-  await waitFor(() => expect(bar.textContent).toContain("refs.bib: 3 references, 1 could not be read fully"));
+  await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 3, warnings: 1, error: null, note: null });
+  await waitFor(() => expect(bar.textContent).toContain("refs.bib: 3 references, 1 reading notice"));
   fireEvent.click(screen.getByRole("button", { name: "Reload" }));
   await waitFor(() => expect(calls).toContain("reload_library"));
   await emit("library:changed", {
+    state: "error",
+    has_snapshot: true, zotero: false,
     name: "refs.bib",
+    snapshot_name: "refs.bib",
     references: 3,
     warnings: 1,
     error: "cannot read the library file",
@@ -423,13 +433,13 @@ test("the library is shown, can be chosen and reloaded, and failures are explain
 test("opening the first library searches the query typed before choosing it", async () => {
   const queries: unknown[] = [];
   backend({
-    library_status: () => ({ name: null, references: 0, warnings: 0, error: null, note: null }),
+    library_status: () => ({ state: "none", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: null, note: null }),
     search: ({ query }) => { queries.push(query); return [result("first", "Matching reference")]; },
   });
   render(<App />);
   await screen.findByRole("button", { name: "Choose library to get started" });
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
-  await act(async () => { await emit("library:changed", { name: "refs.bib", references: 1, warnings: 0, error: null, note: null }); });
+  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }); });
   await screen.findByText("Matching reference");
   expect(queries).toEqual(["sleep"]);
 });
@@ -465,10 +475,10 @@ test("counts use singular and plural and announce only settled current searches"
 });
 
 test("the focus ring contrasts with both themes independent of the system accent", () => {
-  const focusToken = styles.match(/:focus-visible\s*\{[^}]*outline:\s*2px solid var\((--[\w-]+)/)?.[1];
+  const focusToken = styles.match(/:focus-visible\s*\{[^}]*outline:\s*[^;]*solid var\((--[\w-]+)/)?.[1];
   expect(focusToken).toBeTruthy();
   const theme = (token: string) => {
-    const pair = styles.match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]+),\\s*(#[0-9a-f]+)\\)`));
+    const pair = tokens.match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]+),\\s*(#[0-9a-f]+)\\)`));
     expect(pair, `${token} needs defined theme colors`).not.toBeNull();
     return [pair?.[1], pair?.[2]].map((hex) => [1, 3, 5].map((i) => parseInt(hex?.slice(i, i + 2) ?? "", 16) / 255));
   };
@@ -522,4 +532,206 @@ test("combobox focus is separate from citation selection and only additions/remo
   expect(screen.getByText("First").closest('[role="option"]')?.hasAttribute("data-citation-selected")).toBe(false);
   fireEvent.click(screen.getByText("Second"));
   expect(notice.textContent).toBe("0 references selected for citation");
+});
+
+test("failed status and saved format reads show safe notices without hiding search results", async () => {
+  backend({
+    library_status: () => { throw new Error("SYNTHETIC_PRIVATE_PAYLOAD"); },
+    copy_format: () => { throw new Error("SYNTHETIC_PRIVATE_PAYLOAD"); },
+    search: () => [result("a", "Available reference")],
+  });
+  render(<App />);
+  await screen.findByText("Available reference");
+  expect(screen.getByText("Ibis could not check your library. Choose the file again.").getAttribute("role")).toBe("alert");
+  expect(screen.getByText("Ibis could not read your saved copy format. Check Copy as before copying.").getAttribute("role")).toBe("alert");
+  expect(screen.getByRole("region", { name: "Library" }).textContent).not.toContain("No library chosen");
+  expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("pandoc");
+  expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
+});
+
+test.each([
+  ["choose_library", "The file chooser did not open. Try again."],
+  ["reload_library", "Ibis could not reload your library. Choose the file again."],
+  ["hide_picker", "Ibis could not hide this window. Try again."],
+  ["quit", "Ibis could not quit. Try again."],
+])("%s failures are reported without rejected IPC payloads", async (command, notice) => {
+  backend({ [command]: () => { throw new Error("SYNTHETIC_PRIVATE_PAYLOAD"); } });
+  render(<App />);
+  await screen.findByRole("button", { name: "Reload" });
+  if (command === "choose_library") fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
+  else if (command === "reload_library") fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+  else fireEvent.keyDown(screen.getByLabelText("Search references"), command === "quit"
+    ? { key: "q", ctrlKey: true } : { key: "Escape" });
+  expect((await screen.findByText(notice)).getAttribute("role")).toBe("alert");
+  expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
+});
+
+test("copy remains confirmed when hiding after a successful copy fails", async () => {
+  backend({ search: () => [result("a", "First")], copy_citation: () => ({ text: "@a", warnings: [] }),
+    hide_picker: () => { throw new Error("SYNTHETIC_PRIVATE_PAYLOAD"); } });
+  render(<App />);
+  await screen.findByText("First");
+  fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
+  await screen.findByText("Ibis could not hide this window. Try again.");
+  expect(screen.getByText("@a")).toBeTruthy();
+  expect(document.body.textContent).not.toContain("Nothing was copied");
+  expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
+});
+
+test("event subscription and cleanup failures are handled with safe messages", async () => {
+  const focus = vi.spyOn(api, "onPickerShown").mockRejectedValue(new Error("SYNTHETIC_PRIVATE_PAYLOAD"));
+  const library = vi.spyOn(api, "onLibraryChanged").mockResolvedValue(async () => { throw new Error("SYNTHETIC_PRIVATE_PAYLOAD"); });
+  const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+  try {
+    backend();
+    const view = render(<App />);
+    await screen.findByText("Ibis could not focus the search box. Restart Ibis to try again.");
+    expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
+    view.unmount();
+    await waitFor(() => expect(log).toHaveBeenCalledWith("Library event cleanup failed."));
+    expect(log.mock.calls.flat().join(" ")).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
+  } finally { focus.mockRestore(); library.mockRestore(); log.mockRestore(); }
+});
+
+test("web permissions grant only event subscriptions and drag-region bootstrap", () => {
+  expect([...capability.permissions].sort()).toEqual([
+    "core:event:allow-listen", "core:event:allow-unlisten",
+    "core:window:allow-internal-toggle-maximize", "core:window:allow-start-dragging",
+  ]);
+  expect(config.app.windows[0]?.maximizable).toBe(false);
+});
+
+test.each([false, true])("axe checks picker structure (library open: %s) and detects a broken combobox", async (open) => {
+  backend({
+    library_status: () => ({ state: open ? "loaded" : "none", has_snapshot: open, zotero: false, name: open ? "refs.bib" : null, snapshot_name: open ? "refs.bib" : null, references: open ? 1 : 0, warnings: 0, error: null, note: null }),
+    search: () => [result("synthetic", "Synthetic reference")],
+  });
+  render(<App />);
+  if (open) await screen.findByText("Synthetic reference");
+  else await screen.findByRole("button", { name: "Choose library to get started" });
+  const options: axe.RunOptions = {
+    runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] },
+    // JSDOM has no layout/canvas: theme contrast has its own numeric test above.
+    rules: { "color-contrast": { enabled: false } },
+  };
+  // Report the actual lack of canvas support; do not emulate rendered pixels.
+  const canvas = vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+  try {
+    expect((await axe.run(document.body, options)).violations.map((v) => v.id)).toEqual([]);
+    screen.getByRole("combobox", { name: "Search references" }).removeAttribute("aria-expanded");
+    const broken = await axe.run(document.body, options);
+    expect(broken.violations.map((v) => v.id)).toContain("aria-required-attr");
+  } finally {
+    canvas.mockRestore();
+  }
+});
+
+
+test("a pending library check does not offer first-run setup", async () => {
+  backend({ library_status: () => new Promise(() => undefined) });
+  render(<App />);
+  await screen.findByText("Checking library…");
+  expect(screen.queryByText("Choose a library to get started")).toBeNull();
+});
+
+test("opening a chosen library shows its name and searches only when ready", async () => {
+  const calls = backend({
+    library_status: () => ({ state: "loading", has_snapshot: false, zotero: false, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 0, warnings: 0, error: null, note: null }),
+    choose_library: () => null,
+  });
+  render(<App />);
+  await screen.findByText("Opening 研究 refs.bib…");
+  expect(screen.queryByText("Choose a library to get started")).toBeNull();
+  expect(document.body.textContent).not.toContain("No library chosen");
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
+  expect(calls).not.toContain("search");
+  fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
+  await waitFor(() => expect(calls).toContain("choose_library"));
+  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 1, warnings: 0, error: null, note: null }); });
+  await waitFor(() => expect(calls).toContain("search"));
+});
+
+test("a reload keeps the previous library searchable and announces the reload", async () => {
+  backend({
+    library_status: () => ({ state: "reloading", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
+    search: () => [result("kept", "Kept reference")],
+  });
+  render(<App />);
+  await screen.findByText("Reloading refs.bib…");
+  await screen.findByText("Kept reference");
+});
+
+
+test("a failed switch names the retained library in its accessible status", async () => {
+  backend({
+    library_status: () => ({ state: "error", has_snapshot: true, zotero: false, name: "missing B.bib", snapshot_name: "active A.bib", references: 3, warnings: 0, error: "The library file is unavailable; keeping the last loaded references", note: null }),
+    search: () => [result("kept", "Reference from A")],
+  });
+  render(<App />);
+  await screen.findByText("Reference from A");
+  const status = screen.getByRole("status", { name: "Library status" });
+  expect(status.textContent).toBe("active A.bib: 3 references");
+  expect(status.textContent).not.toContain("missing B.bib");
+});
+
+test("an unavailable initial library is named once without a duplicate search error", async () => {
+  const calls = backend({
+    library_status: () => ({ state: "error", has_snapshot: false, zotero: false, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 0, warnings: 0, error: "The library file is unavailable.", note: null }),
+    search: () => { throw new Error("no library is open"); },
+    choose_library: () => null,
+  });
+  render(<App />);
+  const notice = await screen.findByRole("alert");
+  expect(notice.textContent).toContain("研究 refs.bib");
+  expect(notice.textContent).toContain("Choose it again");
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
+  expect(document.body.textContent).not.toContain("No library chosen");
+  expect(document.body.textContent).not.toContain("keeping the last");
+  expect(document.body.textContent).not.toContain("No matching references");
+  expect(calls).not.toContain("search");
+  fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
+  await waitFor(() => expect(calls).toContain("choose_library"));
+});
+
+test("a failed reload reports one file error while kept references remain searchable", async () => {
+  backend({
+    library_status: () => ({ state: "error", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: "The library file is unavailable; keeping the last loaded references.", note: null }),
+    search: () => [result("kept", "Previously loaded reference")],
+  });
+  render(<App />);
+  await screen.findByText("Previously loaded reference");
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
+  expect(screen.getByRole("alert").textContent).toContain("refs.bib");
+  expect(screen.getByRole("alert").textContent).toContain("keeping the last loaded references");
+});
+
+test.each(["backup", "defaults"])("settings recovery from %s stays visible through a library reload", async (fallback) => {
+  const notice = `settings.json could not be read. Using ${fallback}. Changes are not being saved. Repair /synthetic/settings.json and restart Ibis.`;
+  backend({ library_status: () => ({ state: "loading", has_snapshot: false, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 0, warnings: 0, error: null, note: null, settings_notice: notice }) });
+  render(<App />);
+  expect((await screen.findByText(notice)).getAttribute("role")).toBe("alert");
+  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null, settings_notice: notice }); });
+  expect(screen.getByText(notice).getAttribute("role")).toBe("alert");
+  expect(screen.getAllByText(notice)).toHaveLength(1);
+});
+
+test.each(["", "sleep"])("an empty loaded library is explained even for query %s", async (query) => {
+  backend({ library_status: () => ({ state: "loaded", has_snapshot: true, zotero: false, name: "empty 研究.bib", snapshot_name: "empty 研究.bib", references: 0, warnings: 0, error: null, note: null }) });
+  render(<App />);
+  await screen.findByText("empty 研究.bib: 0 references");
+  if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
+  await screen.findByText("No references found in empty 研究.bib. Choose a BibTeX or BibLaTeX export with references, then try again.");
+  expect(screen.queryByText("Type to find a reference")).toBeNull();
+  expect(screen.queryByText("No matching references")).toBeNull();
+  expect(screen.getByRole("button", { name: "Choose library…" })).toBeTruthy();
+});
+
+
+test.each([false, true])("a failed library open is not described as an empty export (retained: %s)", async (retained) => {
+  backend({ library_status: () => ({ state: "error", has_snapshot: retained, zotero: false, name: "missing B.bib", snapshot_name: retained ? "empty A.bib" : null, references: 0, warnings: 0, error: "The library file is unavailable", note: null }) });
+  render(<App />);
+  await screen.findByRole("alert");
+  expect(document.body.textContent).not.toContain("No references found");
+  expect(document.body.textContent).not.toContain("Choose a BibTeX or BibLaTeX export");
 });

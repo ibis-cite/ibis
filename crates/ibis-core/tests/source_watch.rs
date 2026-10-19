@@ -172,7 +172,16 @@ fn a_symlink_retargeted_to_a_missing_file_recovers_when_the_file_appears() {
     assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
     assert_eq!(last_good.references[0].id.native_key, "first");
     std::fs::write(&first, "@misc{obsolete}").unwrap_or_else(|e| panic!("{e}"));
-    assert!(rx.recv_timeout(Duration::from_millis(800)).is_err());
+    // Retrying the missing target is allowed; the obsolete target must never
+    // become a successful candidate again.
+    let deadline = Instant::now() + Duration::from_millis(800);
+    while let Some(remaining) = deadline.checked_duration_since(Instant::now()) {
+        match rx.recv_timeout(remaining) {
+            Ok(result) => assert_eq!(result.err(), Some(SourceError::Unavailable)),
+            Err(mpsc::RecvTimeoutError::Timeout) => break,
+            Err(error) => panic!("{error}"),
+        }
+    }
     std::fs::write(&second, "@misc{second}").unwrap_or_else(|e| panic!("{e}"));
     let recovered = next(&rx).unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(recovered.references[0].id.native_key, "second");
@@ -203,6 +212,169 @@ fn verbatim_leaf_names_and_ordinary_aliases_watch_the_selected_file() {
             let loaded = next(&rx).unwrap_or_else(|e| panic!("{e}"));
             assert_eq!(loaded.references[0].id.native_key, format!("{key}_updated"));
             assert_eq!(loaded.references[0].id.source, initial.references[0].id.source);
+        }
+    }
+}
+
+#[test]
+fn unchanged_damaged_initial_load_does_not_publish_a_strict_reload() {
+    use ibis_core::source::load_library_snapshot;
+    let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+    let path = dir.path().join("library.bib");
+    std::fs::write(&path, "@misc{good}\n@misc{unfinished,").unwrap_or_else(|e| panic!("{e}"));
+    let (initial, snapshot) = load_library_snapshot(&path, false).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(initial.references.len(), 1);
+    assert_eq!(initial.warnings.len(), 1);
+    let (tx, rx) = mpsc::channel();
+    let _watch = SourceWatch::with_snapshot(&path, snapshot, move |result| {
+        let _ = tx.send(result);
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert!(rx.recv_timeout(Duration::from_millis(900)).is_err());
+    std::fs::write(&path, "@misc{updated}").unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("updated".into())
+    );
+}
+
+#[test]
+fn changes_before_watch_registration_are_still_loaded_even_at_the_same_size() {
+    use ibis_core::source::load_library_snapshot;
+    let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+    let path = dir.path().join("library.bib");
+    std::fs::write(&path, "@misc{old}").unwrap_or_else(|e| panic!("{e}"));
+    let (_, snapshot) = load_library_snapshot(&path, false).unwrap_or_else(|e| panic!("{e}"));
+    let modified = std::fs::metadata(&path)
+        .and_then(|m| m.modified())
+        .unwrap_or_else(|e| panic!("{e}"));
+    std::fs::write(&path, "@misc{new}").unwrap_or_else(|e| panic!("{e}"));
+    std::fs::File::options()
+        .write(true)
+        .open(&path)
+        .and_then(|f| f.set_modified(modified))
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (tx, rx) = mpsc::channel();
+    let _watch = SourceWatch::with_snapshot(&path, snapshot, move |result| {
+        let _ = tx.send(result);
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("new".into())
+    );
+}
+
+#[test]
+fn unchanged_contents_after_a_gap_error_publish_recovery() {
+    use ibis_core::source::load_library_snapshot;
+    for contents in ["@misc{same}", "@misc{same}\n@misc{unfinished,"] {
+        let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+        let path = dir.path().join("library.bib");
+        std::fs::write(&path, contents).unwrap_or_else(|e| panic!("{e}"));
+        let (initial, snapshot) = load_library_snapshot(&path, false).unwrap_or_else(|e| panic!("{e}"));
+        std::fs::remove_file(&path).unwrap_or_else(|e| panic!("{e}"));
+        let (tx, rx) = mpsc::channel();
+        let _watch = SourceWatch::with_snapshot(&path, snapshot, move |result| {
+            let _ = tx.send(result);
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+        // Repeated unavailable reads must preserve the initial observation,
+        // including its tolerant damaged-data policy, until recovery.
+        assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+        std::fs::write(&path, contents).unwrap_or_else(|e| panic!("{e}"));
+        let recovered = next(&rx).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(recovered.references[0].id.native_key, "same");
+        assert_eq!(recovered.warnings.len(), initial.warnings.len());
+    }
+}
+
+#[test]
+fn damaged_changes_in_the_registration_gap_still_use_strict_reloads() {
+    use ibis_core::source::load_library_snapshot;
+    let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+    let path = dir.path().join("library.bib");
+    std::fs::write(&path, "@misc{old}").unwrap_or_else(|e| panic!("{e}"));
+    let (initial, snapshot) = load_library_snapshot(&path, false).unwrap_or_else(|e| panic!("{e}"));
+    std::fs::write(&path, "@misc{changed}\n@misc{unfinished,").unwrap_or_else(|e| panic!("{e}"));
+    let (tx, rx) = mpsc::channel();
+    let _watch = SourceWatch::with_snapshot(&path, snapshot, move |result| {
+        let _ = tx.send(result);
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(next(&rx).err(), Some(SourceError::Incomplete));
+    assert_eq!(initial.references[0].id.native_key, "old");
+}
+
+#[test]
+fn unavailable_reads_retry_without_another_file_event() {
+    let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+    let path = dir.path().join("library.bib");
+    std::fs::write(&path, "@misc{old}").unwrap_or_else(|e| panic!("{e}"));
+    let (tx, rx) = mpsc::channel();
+    let watch = SourceWatch::new(&path, move |result| {
+        let _ = tx.send(result);
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    let last_good = next(&rx).unwrap_or_else(|e| panic!("{e}"));
+    std::fs::remove_file(&path).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+    assert_eq!(
+        rx.recv_timeout(Duration::from_secs(2)).ok().and_then(Result::err),
+        Some(SourceError::Unavailable)
+    );
+    assert_eq!(last_good.references[0].id.native_key, "old");
+    std::fs::write(&path, "@misc{new}").unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        next(&rx).map(|l| l.references[0].id.native_key.clone()),
+        Ok("new".into())
+    );
+    assert!(rx.recv_timeout(Duration::from_millis(800)).is_err());
+    std::fs::remove_file(&path).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+    drop(watch);
+    assert!(rx.recv_timeout(Duration::from_millis(900)).is_err());
+}
+
+#[cfg(windows)]
+#[test]
+fn a_long_exclusive_lock_recovers_without_a_followup_save() {
+    use std::os::windows::fs::OpenOptionsExt;
+    let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+    let path = dir.path().join("library.bib");
+    std::fs::write(&path, "@misc{old}").unwrap_or_else(|e| panic!("{e}"));
+    let last_good = ibis_core::source::load_library_file(&path, false).unwrap_or_else(|e| panic!("{e}"));
+    // Finish the edit before watching, then hold a read-only exclusive handle.
+    // Registering while locked forces the initial check to observe Unavailable:
+    // Windows can defer a writer's change notification until its handle closes.
+    std::fs::write(&path, "@misc{new}").unwrap_or_else(|e| panic!("{e}"));
+    let locked = std::fs::OpenOptions::new()
+        .read(true)
+        .share_mode(0)
+        .open(&path)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (tx, rx) = mpsc::channel();
+    let _watch = SourceWatch::new(&path, move |result| {
+        let _ = tx.send(result);
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(next(&rx).err(), Some(SourceError::Unavailable));
+    assert_eq!(last_good.references[0].id.native_key, "old");
+    std::thread::sleep(Duration::from_secs(2));
+    // Closing this read-only handle does not save or modify the source.
+    drop(locked);
+    let deadline = Instant::now() + Duration::from_secs(10);
+    loop {
+        let remaining = deadline
+            .checked_duration_since(Instant::now())
+            .unwrap_or_else(|| panic!("lock did not recover"));
+        match rx.recv_timeout(remaining).unwrap_or_else(|e| panic!("{e}")) {
+            Err(SourceError::Unavailable | SourceError::Changing) => continue,
+            loaded => {
+                assert_eq!(loaded.map(|l| l.references[0].id.native_key.clone()), Ok("new".into()));
+                break;
+            }
         }
     }
 }

@@ -4,7 +4,7 @@
 
 Ibis is free, open source and private by design: everything works offline, nothing is tracked, and your libraries are never changed.
 
-> **Status: early development, working towards the first preview (0.1).** The core engine and the `ibis` command line tool read BibTeX/BibLaTeX files. The desktop picker runs from source: a global shortcut opens it, you search a `.bib` library, automatically reload its changes and copy a citation in Pandoc, BibLaTeX, LaTeX or Typst syntax. Installable preview builds, Zotero support, formatted styles and direct insertion follow. See the [roadmap](ROADMAP.md).
+> **Status: early development, working towards the first preview (0.1).** The core engine and the `ibis` command line tool read BibTeX/BibLaTeX files. The desktop picker runs from source: a global shortcut (Ctrl+Shift+Y, or Control+Command+R on macOS) opens it, you search a `.bib` library or, while Zotero is open, your Zotero library, automatically pick up changes and copy a citation in Pandoc, BibLaTeX, LaTeX or Typst syntax. Installable preview builds, Zotero group libraries, reading Zotero while it is closed, formatted styles and direct insertion follow. See the [roadmap](ROADMAP.md).
 
 ## Planned for 1.0
 
@@ -19,6 +19,21 @@ Ibis is free, open source and private by design: everything works offline, nothi
 ## Try the latest build
 
 The newest development build for Windows, macOS and Linux is always at **[Releases → Ibis nightly](https://github.com/ibiscite/ibis/releases/tag/nightly)**. It is rebuilt whenever the app changes, so it can be unfinished; numbered preview releases are steadier. Builds are not signed yet, so your system may warn before opening them (the release page says what to click). Tell us what works and what you miss through [a problem report or an idea](https://github.com/ibiscite/ibis/issues/new/choose).
+
+## Use with Zotero
+
+With Zotero open, choose **Use Zotero** in the picker (or **Use Zotero Library** in the menu bar or tray menu). Ibis reads your personal library through Zotero's local API, on your computer only, and checks it for changes each time the picker opens. It never changes anything in Zotero.
+
+The first time, turn on Zotero's local API: in Zotero, open **Settings > Advanced** and tick **Allow other applications on this computer to communicate with Zotero**. Citation keys come from Zotero's own Citation Key field, or from Better BibTeX if you use it.
+
+If you prefer a file, or Zotero is usually closed, let Zotero keep a `.bib` file up to date instead:
+
+1. Install the [Better BibTeX](https://retorque.re/zotero-better-bibtex/installation/) plugin for Zotero.
+2. In Zotero, right-click **My Library** (or a collection) and choose **Export Library…** (or **Export Collection…**).
+3. Choose the **Better BibLaTeX** format, tick **Keep updated**, and save the file somewhere that stays put.
+4. In Ibis, choose that file as your library.
+
+Better BibTeX rewrites the file whenever your library changes, and Ibis reloads it automatically. Ibis only reads the file; it never changes Zotero or the export.
 
 ## Try the command line tool (developers)
 

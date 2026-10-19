@@ -64,7 +64,13 @@ with the explicit `bindings::tests::export_contract` test described in that file
 5. The desktop command writes the rendered text with the clipboard plugin, then
    remembers the format in settings. It returns text and warnings to React.
    React hides the picker after a successful copy with no warnings; otherwise
-   it keeps the result or error visible.
+   it keeps the result or error visible. Every dismissal (copy, Escape, shortcut,
+   blur or close) uses `picker::dismiss_picker`: it hides the window and, on
+   macOS, the application, returning focus for the next paste. On macOS the
+   picker is a non-activating NSPanel; summoning unhides Ibis without activating
+   it and makes the panel key. Library dialogs explicitly activate Ibis while
+   `DialogOpen` protects the picker. Windows/Linux rely on the
+   window manager's focus behavior when the window hides.
 
 ## Opening a library: file to references
 

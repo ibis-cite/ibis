@@ -1,18 +1,9 @@
 import type React from "react";
+import * as nativeApi from "./api";
+import { libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
 import { useEffect, useRef, useState } from "react";
 import {
   COPY_FORMATS,
-  chooseLibrary,
-  libraryStatus,
-  reloadLibrary,
-  copyCitation,
-  copyFormat,
-  hidePicker,
-  onLibraryChanged,
-  onPickerShown,
-  quit,
-  search,
-  shortcutStatus,
   type Copied,
   type CopyFormat,
   type LibraryStatus,
@@ -32,9 +23,20 @@ function idKey(id: RecordId): string {
   return `${id.source}\u0000${id.native_key}`;
 }
 
+type Operation = keyof typeof FAILURE_MESSAGES;
+
+// A stable provider lets the development gallery use synthetic data without IPC.
+export type PickerApi = Pick<typeof nativeApi,
+  "chooseLibrary" | "useZotero" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" |
+  "hidePicker" | "onLibraryChanged" | "onPickerShown" | "quit" | "search" | "shortcutStatus">;
+
+export type PickerPreview = { query?: string; copied?: Copied };
+
 // The picker: search, choose one or more references, copy them as a citation.
-export function App() {
-  const [query, setQuery] = useState("");
+export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: PickerPreview } = {}) {
+  const { chooseLibrary, useZotero, libraryStatus, reloadLibrary, copyCitation, copyFormat,
+    hidePicker, onLibraryChanged, onPickerShown, quit, search, shortcutStatus } = api;
+  const [query, setQuery] = useState(preview?.query ?? "");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [announcement, setAnnouncement] = useState("");
   // The query the shown results belong to; differs while a search is pending.
@@ -43,7 +45,7 @@ export function App() {
   const [selected, setSelected] = useState<Map<string, SearchResult>>(new Map());
   const [selectionChanged, setSelectionChanged] = useState(false);
   const [format, setFormat] = useState<CopyFormat>("pandoc");
-  const [copied, setCopied] = useState<Copied | null>(null);
+  const [copied, setCopied] = useState<Copied | null>(preview?.copied ?? null);
   const [error, setError] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
   const [shortcut, setShortcut] = useState<ShortcutStatus | null>(null);
@@ -52,34 +54,50 @@ export function App() {
   // Undefined while loading; null means the status request itself failed.
   const [library, setLibrary] = useState<LibraryStatus | null>();
   const input = useRef<HTMLInputElement>(null);
+  const [failures, setFailures] = useState<Partial<Record<Operation, boolean>>>({});
+  const report = (operation: Operation, failed = true) => {
+    setFailures((previous) => ({ ...previous, [operation]: failed }));
+  };
+  const perform = async (operation: Operation, action: () => Promise<unknown>) => {
+    try { await action(); report(operation, false); }
+    catch { report(operation); }
+  };
 
   // When the picker is shown, put the cursor in the search box with the
   // previous query selected, so typing replaces it.
   useEffect(() => {
     let acceptInitialStatus = true;
+    let mounted = true;
+    const subscriptionFailure = (operation: Operation) => {
+      if (mounted) report(operation);
+      else console.error(FAILURE_MESSAGES[operation]);
+      return () => undefined;
+    };
     const focusSearch = () => {
       input.current?.focus();
       input.current?.select();
     };
-    const unlisten = onPickerShown(focusSearch);
+    const unlisten = onPickerShown(focusSearch).catch(() => subscriptionFailure("pickerEvents"));
     const unlistenLibrary = onLibraryChanged((status) => {
       acceptInitialStatus = false;
       setLibrary(status);
+      report("status", false);
       setLibraryVersion((v) => v + 1);
-    });
+    }).catch(() => subscriptionFailure("libraryEvents"));
     libraryStatus()
       .then((status) => { if (acceptInitialStatus) setLibrary(status); })
-      .catch(() => { if (acceptInitialStatus) setLibrary(null); });
+      .catch(() => { if (acceptInitialStatus) { setLibrary(null); report("status"); } });
     shortcutStatus()
       .then(setShortcut)
-      .catch(() => setShortcut(null));
+      .catch(() => { setShortcut(null); report("shortcut"); });
     copyFormat()
       .then(setFormat)
-      .catch(() => undefined);
+      .catch(() => report("format"));
     return () => {
       acceptInitialStatus = false;
-      void unlisten.then((stop) => stop());
-      void unlistenLibrary.then((stop) => stop());
+      mounted = false;
+      void unlisten.then((stop) => stop()).catch(() => console.error("Picker event cleanup failed."));
+      void unlistenLibrary.then((stop) => stop()).catch(() => console.error("Library event cleanup failed."));
     };
   }, []);
 
@@ -87,7 +105,7 @@ export function App() {
     setAnnouncement("");
     // Typing before choosing a library is normal; preserve the query and
     // chooser. Actual library/status failures still report search errors.
-    if (library !== null && !library?.name && !library?.error) {
+    if (library === undefined || library?.state === "none" || library?.state === "loading" || (library?.state === "error" && !library.has_snapshot)) {
       setResults([]);
       setResultsQuery(query);
       setActive(0);
@@ -104,16 +122,16 @@ export function App() {
           setActive(0);
           setError(null);
           announcementTimer = window.setTimeout(() => {
-            setAnnouncement(`${found.length} ${found.length === 1 ? "result" : "results"}`);
+            setAnnouncement(pickerText.resultCount(found.length));
           }, 300);
         }
       })
-      .catch((e: unknown) => {
+      .catch(() => {
         // Results of an earlier query must not sit beside this query's error.
         if (current) {
           setResults([]);
           setResultsQuery(query);
-          setError(String(e));
+          setError(pickerText.searchError);
         }
       });
     return () => {
@@ -129,10 +147,10 @@ export function App() {
 
   // Success is brief; warnings stay available until explicitly dismissed.
   useEffect(() => {
-    if (!copied || copied.warnings.length > 0) return;
+    if (preview || !copied || copied.warnings.length > 0) return;
     const timer = window.setTimeout(() => setCopied(null), 2400);
     return () => window.clearTimeout(timer);
-  }, [copied]);
+  }, [copied, preview]);
 
   const toggle = (result: SearchResult) => {
     setSelectionChanged(true);
@@ -157,15 +175,20 @@ export function App() {
         chosen.map((r) => r.id),
         format,
       );
-    } catch (e: unknown) {
-      setCopyError(String(e));
+    } catch {
+      setCopyError(pickerText.copyError);
       return;
     }
     setCopied(outcome);
     setSelected(new Map());
     // Get out of the way so the user can paste, unless there is something to read.
-    if (outcome.warnings.length === 0) void hidePicker();
+    if (outcome.warnings.length === 0) void perform("hide", hidePicker);
   };
+
+  const busy = library?.state === "loading" || library?.state === "reloading";
+  const loadingMessage = library?.state === "reloading"
+    ? libraryMessages.reloading(library.name)
+    : libraryMessages.opening(library?.name ?? null);
 
   return (
     <main
@@ -173,32 +196,30 @@ export function App() {
         if (composing(e)) return;
         if (e.key === "Escape") {
           e.preventDefault();
-          void hidePicker();
+          void perform("hide", hidePicker);
         } else if (e.key === "q" && (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey) {
           e.preventDefault();
-          void quit();
+          void perform("quit", quit);
         }
       }}
     >
       {shortcut?.error && (
         <p role="status">
-          {shortcut.registered
-            ? `Your shortcut setting was not used: ${shortcut.error}.`
-            : `The shortcut ${shortcut.shortcut} is not available: ${shortcut.error}.`}
+          {pickerText.shortcutError(shortcut.registered, shortcut.shortcut, shortcut.error)}
         </p>
       )}
-      <div className="search-bar" data-tauri-drag-region title="Drag the search bar edge to move the picker">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <div className="search-bar" data-tauri-drag-region title={pickerText.dragSearchBar}>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <circle cx="10.5" cy="10.5" r="6.5" />
           <path d="m16 16 5 5" />
         </svg>
         <label className="visually-hidden" htmlFor="search">
-          Search references
+          {pickerText.searchLabel}
         </label>
         <input
           id="search"
           type="search"
-          placeholder="Search references…"
+          placeholder={pickerText.searchPlaceholder}
           role="combobox"
           aria-expanded={results.length > 0}
           aria-controls="results"
@@ -227,19 +248,25 @@ export function App() {
         />
       </div>
       <div className="notices">
+        {library?.settings_notice && <p role="alert">{library.settings_notice}</p>}
+        {busy && <p role="status">{loadingMessage}</p>}
+        {library?.error && <p role="alert">{libraryMessages.openError(library.name, library.error, library.zotero)}</p>}
+        {(Object.keys(failures) as Operation[]).filter((operation) => failures[operation]).map((operation) => (
+          <p role="alert" key={operation}>{FAILURE_MESSAGES[operation]}</p>
+        ))}
         {error && <p role="alert">{error}</p>}
-        {copyError && <p role="alert">Nothing was copied: {copyError}</p>}
+        {copyError && <p role="alert">{copyError}</p>}
         {copied && (
           <div role="status" className="copy-notice">
             <p>
-              Copied <code>{copied.text}</code>
+              {pickerText.copied} <code>{copied.text}</code>
             </p>
             {copied.warnings.length > 0 && (
               <>
-                <button type="button" className="dismiss" aria-label="Dismiss copy warnings" onClick={() => setCopied(null)}>
-                  Dismiss
+                <button type="button" className="dismiss" aria-label={pickerText.dismissWarnings} onClick={() => setCopied(null)}>
+                  {pickerText.dismiss}
                 </button>
-                <ul aria-label="Copy warnings">
+                <ul aria-label={pickerText.copyWarnings}>
                   {copied.warnings.map((w) => (
                     <li key={w}>{w}</li>
                   ))}
@@ -249,16 +276,16 @@ export function App() {
           </div>
         )}
       </div>
-      <p className="visually-hidden" role="status" aria-label="Citation selection" aria-live="polite" aria-atomic="true">
-        {selectionChanged ? `${selected.size} ${selected.size === 1 ? "reference" : "references"} selected for citation` : ""}
+      <p className="visually-hidden" role="status" aria-label={pickerText.citationSelection} aria-live="polite" aria-atomic="true">
+        {selectionChanged ? pickerText.selectionCount(selected.size) : ""}
       </p>
       {selected.size > 0 && (
-        <ul aria-label="Selected references">
+        <ul aria-label={pickerText.selectedReferences}>
           {[...selected.entries()].map(([key, r]) => (
             <li key={key}>
               <code>{r.key}</code>{" "}
-              <button type="button" onClick={() => toggle(r)} aria-label={`Remove ${r.key} from the selection`}>
-                Remove
+              <button type="button" onClick={() => toggle(r)} aria-label={pickerText.removeReference(r.key)}>
+                {pickerText.remove}
               </button>
             </li>
           ))}
@@ -266,12 +293,12 @@ export function App() {
       )}
       <div className="results-area">
         <div className="results-heading" aria-hidden="true">
-          <span>References</span><span>{results.length > 0 ? `${results.length} ${results.length === 1 ? "result" : "results"}` : ""}</span>
+          <span>{pickerText.references}</span><span>{results.length > 0 ? pickerText.resultCount(results.length) : ""}</span>
         </div>
-        <p className="visually-hidden" role="status" aria-label="Search results" aria-live="polite" aria-atomic="true">
+        <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>
-        <ul id="results" role="listbox" aria-label="Results">
+        <ul id="results" role="listbox" aria-label={pickerText.results}>
           {results.map((r, i) => (
             <li
               key={idKey(r.id)}
@@ -288,51 +315,57 @@ export function App() {
               <span className="result-text">
                 <strong>{r.title}</strong>
                 <span className="result-meta">
-                  {r.authors} · {r.year ?? "n.d."}
+                  {r.authors} · {r.year ?? pickerText.noDate}
                 </span>
               </span>
               <code className="result-key">{r.key}</code>
-              {selected.has(idKey(r.id)) && <span className="visually-hidden">Added to citation</span>}
+              {selected.has(idKey(r.id)) && <span className="visually-hidden">{pickerText.addedToCitation}</span>}
             </li>
           ))}
         </ul>
-        {results.length === 0 && !error && (
+        {results.length === 0 && !error && library !== undefined && !busy && !library?.error && (
           <div className="empty-state">
             {library?.name ? (
-              <p>{query ? "No matching references" : "Type to find a reference"}</p>
-            ) : (
+              <p>{library.has_snapshot && library.references === 0
+                ? libraryMessages.empty(library.snapshot_name, library.zotero)
+                : query ? pickerText.noMatches : pickerText.typeToFind}</p>
+            ) : library?.state === "none" ? (
               <>
-                <p>Choose a library to get started</p>
-                <button type="button" aria-label="Choose library to get started" onClick={() => void chooseLibrary()}>
-                  Choose library…
+                <p>{pickerText.firstRun}</p>
+                <button type="button" aria-label={pickerText.firstRunChoose} onClick={() => void perform("choose", chooseLibrary)}>
+                  {pickerText.chooseLibrary}
+                </button>{" "}
+                <button type="button" title={pickerText.useZoteroTitle} onClick={() => void perform("zotero", useZotero)}>
+                  {pickerText.useZotero}
                 </button>
               </>
-            )}
+            ) : null}
           </div>
         )}
       </div>
       <footer>
-        <section aria-label="Library" className="library-bar">
-          <span className="library-name">
-            {library?.name
-              ? `${library.name}: ${library.references} references` +
-                (library.warnings > 0 ? `, ${library.warnings} could not be read fully` : "")
-              : "No library chosen"}
+        <section aria-label={pickerText.libraryRegion} className="library-bar">
+          <span className="library-name" role="status" aria-label={pickerText.libraryStatus} aria-live="polite" aria-atomic="true">
+            {libraryMessages.summary(library)}
           </span>{" "}
-          <button type="button" className="quiet-button" aria-label="Choose library…" title="Choose a library" onClick={() => void chooseLibrary()}>
-            Choose…
+          <button type="button" className="quiet-button" aria-label={pickerText.chooseLibrary} title={pickerText.chooseTitle} onClick={() => void perform("choose", chooseLibrary)}>
+            {pickerText.chooseShort}
           </button>
+          {!library?.zotero && (
+            <button type="button" className="quiet-button" title={pickerText.useZoteroTitle} onClick={() => void perform("zotero", useZotero)}>
+              {pickerText.useZotero}
+            </button>
+          )}
           {library?.name && (
-            <button type="button" className="icon-button" aria-label="Reload" title="Reload library" onClick={() => void reloadLibrary()}>
+            <button type="button" className="icon-button" aria-label={pickerText.reload} title={pickerText.reloadTitle} onClick={() => void perform("reload", reloadLibrary)}>
               ↻
             </button>
           )}
-          {library?.error && <p role="alert">The library could not be opened: {library.error}</p>}
           {library?.note && <p role="status">{library.note}</p>}
         </section>
         <div className="footer-tools">
           <label className="visually-hidden" htmlFor="format">
-            Copy as
+            {pickerText.copyAs}
           </label>
           <select id="format" value={format} onChange={(e) => setFormat(e.target.value as CopyFormat)}>
             {COPY_FORMATS.map((f) => (
@@ -342,11 +375,11 @@ export function App() {
             ))}
           </select>
           <small className="key-hints">
-            <kbd>↵</kbd> Copy · <kbd>⇧↵</kbd> Add · <kbd>Esc</kbd> Hide
+            <kbd>↵</kbd>{pickerText.keyHints.copy}<kbd>⇧↵</kbd>{pickerText.keyHints.add}<kbd>Esc</kbd>{pickerText.keyHints.hide}
           </small>
           {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
-          <button type="button" className="quiet-button" aria-label="Quit Ibis" onClick={() => void quit()}>
-            Quit
+          <button type="button" className="quiet-button" aria-label={pickerText.quitLabel} onClick={() => void perform("quit", quit)}>
+            {pickerText.quit}
           </button>
         </div>
       </footer>

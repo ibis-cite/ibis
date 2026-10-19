@@ -5,13 +5,15 @@ pub(crate) fn commands() -> tauri_specta::Builder<tauri::Wry> {
         .commands(tauri_specta::collect_commands![
             crate::library::choose_library,
             crate::library::reload_library,
+            crate::library::use_zotero,
             crate::library::library_status,
             crate::library::search,
             crate::copy::copy_citation,
             crate::copy::copy_format,
             crate::picker::hide_picker,
             crate::picker::quit,
-            crate::picker::shortcut_status
+            crate::picker::shortcut_status,
+            crate::native_feel::native_appearance
         ])
         // Match Tauri's existing Promise rejection behavior.
         .error_handling(tauri_specta::ErrorHandlingMode::Throw)

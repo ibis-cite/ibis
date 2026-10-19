@@ -4,14 +4,18 @@ use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
 use tauri::{AppHandle, Manager};
 
-use crate::library::{LibraryStatus, choose_library_file, current_status, reload_library_file};
+use crate::library::{
+    LibraryState, LibraryStatus, choose_library_file, current_status, reload_library_file, use_zotero_library,
+};
 use crate::picker::show_picker;
 
 /// One line describing the library, for the menu bar or tray menu.
 pub(crate) fn library_line(status: &LibraryStatus) -> String {
-    let line = match (&status.error, &status.name) {
-        (Some(error), _) => format!("Library could not be opened: {error}"),
-        (None, Some(name)) => {
+    let line = match (status.state, &status.error, &status.name) {
+        (LibraryState::Loading, _, Some(name)) => format!("Opening {name}…"),
+        (LibraryState::Reloading, _, Some(name)) => format!("Reloading {name}…"),
+        (_, Some(error), _) => format!("Library could not be opened: {error}"),
+        (_, None, Some(name)) => {
             let problems = match status.warnings {
                 0 => String::new(),
                 1 => ", 1 problem".to_string(),
@@ -19,7 +23,7 @@ pub(crate) fn library_line(status: &LibraryStatus) -> String {
             };
             format!("{name}: {} references{problems}", status.references)
         }
-        (None, None) => "No library chosen".to_string(),
+        (_, None, None) => "No library chosen".to_string(),
     };
     let line = match status.note {
         Some(_) => format!("{line} (not saved for next time)"),
@@ -50,6 +54,7 @@ pub(crate) fn create_tray(app: &AppHandle, shortcut: Option<&str>) -> tauri::Res
             &PredefinedMenuItem::separator(app)?,
             &line,
             &MenuItem::with_id(app, "choose", "Choose Library File…", true, None::<&str>)?,
+            &MenuItem::with_id(app, "zotero", "Use Zotero Library", true, None::<&str>)?,
             &MenuItem::with_id(app, "reload", "Reload Library", true, None::<&str>)?,
             &PredefinedMenuItem::separator(app)?,
             &MenuItem::with_id(app, "quit", "Quit Ibis", true, None::<&str>)?,
@@ -63,6 +68,7 @@ pub(crate) fn create_tray(app: &AppHandle, shortcut: Option<&str>) -> tauri::Res
         .on_menu_event(|app, event| match event.id.as_ref() {
             "open" => show_picker(app),
             "choose" => choose_library_file(app),
+            "zotero" => use_zotero_library(app),
             "reload" => reload_library_file(app),
             "quit" => app.exit(0),
             _ => {}
@@ -81,13 +87,30 @@ mod tests {
     #[test]
     fn the_library_line_explains_failures_and_stays_short() {
         let status = |name: Option<&str>, warnings, error: Option<&str>| LibraryStatus {
+            state: LibraryState::Loaded,
+            zotero: false,
+            has_snapshot: name.is_some(),
             name: name.map(String::from),
+            snapshot_name: name.map(String::from),
             references: 12,
             warnings,
             error: error.map(String::from),
             note: None,
+            settings_notice: None,
         };
         assert_eq!(library_line(&status(None, 0, None)), "No library chosen");
+        for (state, expected) in [
+            (LibraryState::Loading, "Opening refs.bib…"),
+            (LibraryState::Reloading, "Reloading refs.bib…"),
+        ] {
+            assert_eq!(
+                library_line(&LibraryStatus {
+                    state,
+                    ..status(Some("refs.bib"), 0, None)
+                }),
+                expected
+            );
+        }
         assert_eq!(
             library_line(&status(Some("refs.bib"), 0, None)),
             "refs.bib: 12 references"

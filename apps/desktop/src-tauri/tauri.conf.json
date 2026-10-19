@@ -9,6 +9,7 @@
     "beforeBuildCommand": "pnpm build"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "main",
@@ -22,7 +23,8 @@
         "alwaysOnTop": true,
         "resizable": true,
         "maximizable": false,
-        "center": true
+        "center": true,
+        "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --disable-background-networking --disable-component-update --disable-domain-reliability --no-pings --proxy-server=http://127.0.0.1:9"
       }
     ],
     "security": {
