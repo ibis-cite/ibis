@@ -120,8 +120,7 @@ def main():
             native.key("ctrl+super+r")
             smoke.wait_for(picker_ready, "panel reopens over the full-screen editor")
             assert fullscreen_ready(editor_state()), "Reopening the picker switched away from the full-screen editor"
-            native.key("Escape")
-            smoke.wait_for(lambda: not snapshot()["visible"], "Escape hides the panel")
+            smoke.escape_to_hide(native, snapshot, "Escape hides the panel")
             smoke.wait_for(lambda: native.editor_focused() and fullscreen_ready(editor_state()), "Escape returns to the visible full-screen editor")
             passed("Escape returns to the full-screen editor")
 
@@ -129,7 +128,7 @@ def main():
             smoke.wait_for(lambda: fullscreen_ready(editor_state(), False), "editor leaves full screen")
             native.key("ctrl+super+r")
             smoke.wait_for(picker_ready, "panel search focused before opening its chooser")
-            native.click("Choose library…")
+            smoke.menu_action(native, "Choose library…")
             smoke.wait_for(lambda: chooser_ready(chooser_state()), "native chooser receives focus while the picker stays visible")
             passed("library chooser is visible and focused without hiding the panel")
             native.call("cancel-chooser")
@@ -140,8 +139,8 @@ def main():
             # Native cancellation may return to the chooser trigger rather
             # than the search box; both keep keyboard access to the picker.
             smoke.wait_for(picker_has_focus, "Cancel returns keyboard focus to the picker")
-            native.key("Escape")
-            smoke.wait_for(lambda: not snapshot()["visible"] and native.editor_focused(), "dismissal after chooser returns to editor")
+            smoke.escape_to_hide(native, snapshot, "dismissal after chooser hides the panel")
+            smoke.wait_for(native.editor_focused, "dismissal after chooser returns to editor")
             passed("Cancel and dismissal restore picker and previous editor focus")
         report["status"] = "passed"
         exit_code = 0

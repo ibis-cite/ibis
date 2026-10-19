@@ -19,6 +19,7 @@ const syntheticApi: PickerApi = {
   quit: async () => undefined,
   onLibraryChanged: async () => () => undefined,
   onPickerShown: async () => () => undefined,
+  onPickerHidden: async () => () => undefined,
 };
 
 afterEach(async () => {

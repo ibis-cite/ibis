@@ -17,7 +17,7 @@ import sys
 import tempfile
 import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, call, patch
 
 
 class Unavailable(RuntimeError):
@@ -78,12 +78,56 @@ def editor_focus_facts(native, stage):
     return {"stage": stage, **{key: state[key] for key in keys}}
 
 
+# Library actions live in the picker's More menu (Ctrl/Cmd+K), not the footer.
+MENU_ACTIONS = {"Choose library…", "Use Zotero", "Reload", "Quit Ibis"}
+
+
+def menu_action(native, name):
+    """Open More, then press the named menu item, as a user would."""
+    if name not in MENU_ACTIONS:
+        raise ValueError(f"{name!r} is not a More menu action")
+    native.click("More")
+    # The accessibility tree can lag the menu opening; wait for the item.
+    def pressed():
+        try:
+            native.click(name)
+            return True
+        except (AssertionError, RuntimeError, subprocess.CalledProcessError):
+            return False
+    wait_for(pressed, f"{name} appears in the More menu", timeout=5)
+
+
 def named(snapshot, name):
     return [n for n in snapshot["nodes"] if n.get("name") == name]
 
 
 def search_focused(snapshot):
     return any(n.get("focused") for n in named(snapshot, "Search references"))
+
+
+def has_search_text(snapshot):
+    return any(n.get("value") for n in named(snapshot, "Search references"))
+
+
+def escape_to_hide(native, snapshot, description):
+    """Escape clears a search first and hides on the next press."""
+    had_text = has_search_text(snapshot())
+    native.key("Escape")
+    if had_text:
+        state = {}
+        def settled():
+            state["last"] = current = snapshot()
+            return not current["visible"] or not has_search_text(current)
+        try:
+            wait_for(settled, "Escape clears the search or hides the picker")
+        except AssertionError:
+            last = state.get("last", {})
+            print("ESCAPE STATE " + json.dumps({"visible": last.get("visible"),
+                  "search_has_text": has_search_text(last) if last else None}), flush=True)
+            raise
+        if snapshot()["visible"]:
+            native.key("Escape")
+    wait_for(lambda: not snapshot()["visible"], description)
 
 
 def prepare_initial_picker_show(native, snapshot):
@@ -94,8 +138,7 @@ def prepare_initial_picker_show(native, snapshot):
             current = snapshot()
             return current["visible"] and search_focused(current)
         wait_for(ready, "initial picker search ready")
-        native.key("Escape")
-        wait_for(lambda: not snapshot()["visible"], "initial Escape hides picker")
+        escape_to_hide(native, snapshot, "initial Escape hides picker")
 
 
 EDITABLE_ROLES = {"edit", "text", "entry", "combobox", "axcombobox", "axtextfield", "axsearchfield", "controltype.edit", "controltype.combobox"}
@@ -599,8 +642,7 @@ def main():
                 native.key(shortcut)
                 focus_state("after-first-shortcut")
                 wait_for(picker_ready, "global shortcut visible, foreground and search focus")
-                native.key("Escape")
-                wait_for(lambda: not snapshot()["visible"], "Escape hides picker")
+                escape_to_hide(native, snapshot, "Escape hides picker")
                 native.focus_editor()
                 wait_for(native.editor_focused, "previous editor focused")
                 focus_state("before-second-shortcut")
@@ -611,8 +653,7 @@ def main():
             check("global shortcut shows foreground picker with focused search", show)
 
             def second_instance():
-                native.key("Escape")
-                wait_for(lambda: not snapshot()["visible"], "picker hidden before second launch")
+                escape_to_hide(native, snapshot, "picker hidden before second launch")
                 native.focus_editor()
                 wait_for(native.editor_focused, "editor focused before second launch")
                 capture_editor_focus("before-second-launch")
@@ -688,7 +729,7 @@ def main():
 
             def missing():
                 library.unlink()
-                native.click("Reload")
+                menu_action(native, "Reload")
                 def explained():
                     report["missing_library_evidence"] = missing_library_evidence(snapshot(), library.name)
                     return all(report["missing_library_evidence"].values())
@@ -701,10 +742,10 @@ def main():
 
             def recover():
                 library.write_text("", encoding="utf-8")
-                native.click("Reload")
+                menu_action(native, "Reload")
                 wait_for(lambda: "0 references" in strings(snapshot()), "empty library count")
                 library.write_text(fixture(), encoding="utf-8")
-                native.click("Reload")
+                menu_action(native, "Reload")
                 wait_for(lambda: "3 references" in strings(snapshot()), "reload recovers after error")
             check("empty library and recovery after error", recover)
             stop()
@@ -846,6 +887,20 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(native.events, [("Escape", True), ("editor", False), ("ctrl+super+r", False)])
         self.assertTrue(native.visible)
 
+    def test_escape_clears_a_search_before_it_hides(self):
+        state = {"visible": True, "value": "query"}
+        native = Mock()
+        def key(name):
+            if state["value"]:
+                state["value"] = ""
+            else:
+                state["visible"] = False
+        native.key.side_effect = key
+        snapshot = lambda: {"visible": state["visible"], "nodes": [{"name": "Search references", "value": state["value"]}]}
+        escape_to_hide(native, snapshot, "hidden")
+        self.assertEqual(native.key.call_args_list, [call("Escape"), call("Escape")])
+        self.assertFalse(state["visible"])
+
     def test_hidden_initial_picker_does_not_send_escape_into_the_editor(self):
         native = self.InitialPickerModel(visible=False)
         prepare_initial_picker_show(native, native.snapshot)
@@ -928,6 +983,13 @@ class ContractTests(unittest.TestCase):
             state["editor_window_visible"] = "true"
             with self.assertRaisesRegex(RuntimeError, "metadata unavailable"):
                 editor_focus_facts(native, "copy-restoration-timeout")
+
+    def test_menu_actions_open_more_first(self):
+        native = Mock()
+        menu_action(native, "Reload")
+        self.assertEqual(native.click.call_args_list, [call("More"), call("Reload")])
+        with self.assertRaises(ValueError):
+            menu_action(native, "Search references")
 
     def test_global_macos_hid_event_contracts_without_native_execution(self):
         subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,

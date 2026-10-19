@@ -38,7 +38,7 @@ impl NativeIssue {
             Self::Unminimize => "the picker could not be restored",
             Self::Show => "the picker could not be shown",
             Self::Focus => "the picker could not be focused",
-            Self::PickerEvent => "the picker-shown event could not be sent",
+            Self::PickerEvent => "the picker shown or hidden event could not be sent",
             Self::Visibility => "the picker visibility could not be read",
             Self::FocusState => "the picker focus state could not be read",
             Self::Hide => "the picker could not be hidden",
