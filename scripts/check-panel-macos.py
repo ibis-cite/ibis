@@ -26,9 +26,14 @@ def flags(state, names):
     return state
 
 
-def fullscreen_ready(state):
-    state = flags(state, ("fullscreen", "visible"))
-    return state["fullscreen"] and state["visible"]
+def fullscreen_ready(state, expected=True):
+    state = flags(state, ("available", "visible"))
+    if not state["available"]:
+        if state.get("fullscreen", False) is not None:
+            raise RuntimeError("Unavailable fullscreen state must be unknown")
+        return False
+    state = flags(state, ("fullscreen",))
+    return state["fullscreen"] is expected and state["visible"]
 
 
 def chooser_ready(state):
@@ -83,7 +88,7 @@ def main():
                 return current["visible"] and current["foreground"] and smoke.search_focused(current)
 
             def editor_state():
-                return flags(native.call("editor-window-state"), ("fullscreen", "visible"))
+                return native.call("editor-window-state")
 
             def chooser_state():
                 return flags(native.call("chooser-state"), ("visible", "focused", "picker_visible"))
@@ -121,7 +126,7 @@ def main():
             passed("Escape returns to the full-screen editor")
 
             native.call("set-editor-fullscreen", "false")
-            smoke.wait_for(lambda: not editor_state()["fullscreen"] and editor_state()["visible"], "editor leaves full screen")
+            smoke.wait_for(lambda: fullscreen_ready(editor_state(), False), "editor leaves full screen")
             native.key("ctrl+super+r")
             smoke.wait_for(picker_ready, "panel search focused before opening its chooser")
             native.click("Choose library…")
@@ -174,9 +179,37 @@ def main():
 
 
 class ContractTests(unittest.TestCase):
+    def test_unavailable_fullscreen_state_never_satisfies_exit_readiness(self):
+        unavailable = {"available": False, "fullscreen": None, "visible": True}
+        self.assertTrue(not unavailable["fullscreen"] and unavailable["visible"],
+                        "Negating an unknown fullscreen state reproduces the unsafe exit predicate")
+        self.assertFalse(fullscreen_ready(unavailable, False))
+        self.assertFalse(fullscreen_ready(unavailable))
+        actual = {"available": True, "fullscreen": False, "visible": True}
+        self.assertTrue(fullscreen_ready(actual, False))
+        self.assertFalse(fullscreen_ready(actual))
+
+    def test_transition_readiness_requires_fresh_available_boolean_and_on_screen_window(self):
+        for current in (
+            {"available": False, "fullscreen": None, "visible": True},
+            {"available": True, "fullscreen": False, "visible": False},
+            {"available": True, "fullscreen": True, "visible": True},
+        ):
+            self.assertFalse(fullscreen_ready(current, False))
+        self.assertTrue(fullscreen_ready({"available": True, "fullscreen": False, "visible": True}, False))
+
+    def test_malformed_available_fullscreen_state_is_an_error(self):
+        for current in (
+            {"available": "true", "fullscreen": False, "visible": True},
+            {"available": True, "fullscreen": None, "visible": True},
+            {"available": False, "fullscreen": False, "visible": True},
+        ):
+            with self.assertRaises(RuntimeError):
+                fullscreen_ready(current, False)
+
     def test_fullscreen_flag_alone_cannot_hide_a_space_switch(self):
-        self.assertFalse(fullscreen_ready({"fullscreen": True, "visible": False}))
-        self.assertTrue(fullscreen_ready({"fullscreen": True, "visible": True}))
+        self.assertFalse(fullscreen_ready({"available": True, "fullscreen": True, "visible": False}))
+        self.assertTrue(fullscreen_ready({"available": True, "fullscreen": True, "visible": True}))
 
     def test_chooser_must_receive_focus_while_the_picker_remains_visible(self):
         self.assertFalse(chooser_ready({"visible": True, "focused": False, "picker_visible": True}))

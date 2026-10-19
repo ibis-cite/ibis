@@ -64,6 +64,16 @@ function preflightPostAccess() {
     return granted;
 }
 
+function readEditorFullscreen(read) {
+    let state;
+    // AXFullScreen can briefly be unreadable while a Space transition settles.
+    // Unknown is explicit; it must never count as the requested false state.
+    try { state = read(); }
+    catch (_) { return {available: false, fullscreen: null}; }
+    if (typeof state !== 'boolean') throw Error('Editor fullscreen accessibility state unavailable');
+    return {available: true, fullscreen: state};
+}
+
 function run(argv) {
     const action = argv[0], appId = Number(argv[1]), editorId = Number(argv[2]), text = argv[3];
     const events = Application('System Events');
@@ -287,7 +297,10 @@ function run(argv) {
     }
     case 'editor-window-state': {
         const window = editorWindow();
-        result = {fullscreen: fullscreen(window), visible: onScreen(editorId, [window])};
+        // Keep window ownership/count and CG visibility errors outside the
+        // transient AX getter boundary; malformed metadata still fails closed.
+        const state = readEditorFullscreen(() => window.attributes.byName('AXFullScreen').value());
+        result = {...state, visible: onScreen(editorId, [window])};
         break;
     }
     case 'set-editor-fullscreen': {

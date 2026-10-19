@@ -5,6 +5,23 @@ const context = {ObjC: {import() {}}};
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(`${__dirname}/smoke-macos.js`, 'utf8'), context);
 
+const fullscreenRead = () => context.readEditorFullscreen(() => { throw Error('Synthetic transition AX getter failure'); });
+assert.equal(JSON.stringify(fullscreenRead()), '{"available":false,"fullscreen":null}');
+assert.equal(JSON.stringify(context.readEditorFullscreen(() => false)), '{"available":true,"fullscreen":false}');
+assert.equal(JSON.stringify(context.readEditorFullscreen(() => true)), '{"available":true,"fullscreen":true}');
+let fullscreenReads = 0;
+const settlingFullscreen = () => {
+    fullscreenReads++;
+    if (fullscreenReads === 1) throw Error('Synthetic transition AX getter failure');
+    return false;
+};
+assert.equal(context.readEditorFullscreen(settlingFullscreen).available, false);
+assert.equal(JSON.stringify(context.readEditorFullscreen(settlingFullscreen)), '{"available":true,"fullscreen":false}');
+assert.equal(fullscreenReads, 2);
+for (const malformed of [null, undefined, 0, 'false']) {
+    assert.throws(() => context.readEditorFullscreen(() => malformed), /Editor fullscreen accessibility state unavailable/);
+}
+
 const events = [];
 context.sendPhysicalChord('ctrl+super+r', (...event) => events.push(event));
 assert.deepEqual(events, [
