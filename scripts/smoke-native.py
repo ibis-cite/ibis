@@ -87,7 +87,14 @@ def menu_action(native, name):
     if name not in MENU_ACTIONS:
         raise ValueError(f"{name!r} is not a More menu action")
     native.click("More")
-    native.click(name)
+    # The accessibility tree can lag the menu opening; wait for the item.
+    def pressed():
+        try:
+            native.click(name)
+            return True
+        except (AssertionError, RuntimeError, subprocess.CalledProcessError):
+            return False
+    wait_for(pressed, f"{name} appears in the More menu", timeout=5)
 
 
 def named(snapshot, name):
