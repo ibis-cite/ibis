@@ -16,6 +16,8 @@ Testers should get fixes without reinstalling by hand. Builds are already publis
 
 ## Consequences
 - One new dependency (`tauri-plugin-updater`, maintained by the Tauri project), a `PRIVACY.md` entry and a README note.
+- Settings gain an optional `update_checks` field (`true` or `false`; absent means not asked yet). It stays within settings format 2: older builds ignore it, as ADR 0016 allows.
+- Builds without an update key (development builds, and any build made before the key exists) have no update items and never check.
 - The maintainer creates the update key once and stores it as an environment secret, with an offline backup. Losing it means testers reinstall once by hand; rotation follows a written procedure before 1.0.
 - Testers of today's nightly (installed as "Ibis") move to "Ibis Nightly" once, by hand.
 - macOS and Windows still warn on first install until the apps are code-signed; updates after that install without a new download.
