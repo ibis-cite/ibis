@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
-use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
 
 use crate::diagnostics::{NativeIssue, checked, report};
 use crate::placement::place_on_active_display;
@@ -58,6 +58,33 @@ pub(crate) fn configured_shortcut(setting: Option<&str>) -> (Shortcut, String, O
     }
 }
 
+const SHORTCUT_BACKEND_UNAVAILABLE: &str =
+    "Global shortcuts need a working X11 connection with XKB. Open Ibis from your application launcher.";
+const SHORTCUT_REGISTRATION_FAILED: &str =
+    "The shortcut could not be registered. Another app may be using it; choose a different shortcut in settings.";
+
+/// The Linux plugin can return success after its X11 worker exits. Confirm its
+/// required backend first; session labels alone do not identify usable X11.
+pub(crate) fn register_shortcut(app: &AppHandle, shortcut: Shortcut) -> Result<(), &'static str> {
+    register_with(
+        || {
+            #[cfg(target_os = "linux")]
+            return x11_focus::shortcut_ready();
+            #[cfg(not(target_os = "linux"))]
+            Ok(())
+        },
+        || app.global_shortcut().register(shortcut),
+    )
+}
+
+fn register_with<E>(
+    backend: impl FnOnce() -> Result<(), ()>,
+    register: impl FnOnce() -> Result<(), E>,
+) -> Result<(), &'static str> {
+    backend().map_err(|()| SHORTCUT_BACKEND_UNAVAILABLE)?;
+    register().map_err(|_| SHORTCUT_REGISTRATION_FAILED)
+}
+
 /// Show the picker on the display with the pointer, focused, and tell the interface to focus the search box.
 pub(crate) fn show_picker(app: &AppHandle) {
     if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window) {
@@ -68,6 +95,32 @@ pub(crate) fn show_picker(app: &AppHandle) {
         report(window.show(), NativeIssue::Show);
         report(window.set_focus(), NativeIssue::Focus);
         report(window.emit("picker:shown", ()), NativeIssue::PickerEvent);
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum ToggleAction {
+    Hide,
+    Show,
+}
+
+fn toggle_action(visible: Option<bool>, focused: Option<bool>) -> ToggleAction {
+    if visible == Some(true) && focused == Some(true) {
+        ToggleAction::Hide
+    } else {
+        ToggleAction::Show
+    }
+}
+
+// Keep this branch trace out of release binaries. Only fixed structural facts
+// are useful for comparing the shortcut decision with native harness focus.
+#[cfg(debug_assertions)]
+fn toggle_trace(visible: Option<bool>, focused: Option<bool>) -> &'static str {
+    match (visible, focused) {
+        (Some(true), Some(true)) => "ibis-picker: toggle visible focused hide",
+        (Some(true), Some(false)) => "ibis-picker: toggle visible unfocused show",
+        (Some(true), None) => "ibis-picker: toggle visible focus-unavailable show",
+        _ => "ibis-picker: toggle not-known-visible show",
     }
 }
 
@@ -90,14 +143,22 @@ fn focused_for_shortcut(window: &tauri::WebviewWindow) -> Option<bool> {
 
 /// Toggle the picker: hide it if it is visible and focused, show it otherwise.
 pub(crate) fn toggle_picker(app: &AppHandle) {
-    match app.get_webview_window("main") {
-        Some(w)
-            if checked(w.is_visible(), NativeIssue::Visibility).unwrap_or(false)
-                && focused_for_shortcut(&w).unwrap_or(false) =>
-        {
-            dismiss_picker(app);
+    if let Some(window) = app.get_webview_window("main") {
+        let visible = checked(window.is_visible(), NativeIssue::Visibility);
+        // Preserve the short circuit: a hidden picker does not query focus.
+        let focused = if visible == Some(true) {
+            focused_for_shortcut(&window)
+        } else {
+            None
+        };
+        #[cfg(debug_assertions)]
+        eprintln!("{}", toggle_trace(visible, focused));
+        match toggle_action(visible, focused) {
+            ToggleAction::Hide => dismiss_picker(app),
+            ToggleAction::Show => show_picker(app),
         }
-        _ => show_picker(app),
+    } else {
+        show_picker(app);
     }
 }
 
@@ -175,6 +236,32 @@ pub(crate) fn hides_on_blur(release_build: bool, dialog_open: bool) -> bool {
 mod tests {
     use super::*;
 
+    #[test]
+    fn unavailable_shortcut_backend_never_calls_the_registration_plugin() {
+        assert_eq!(
+            register_with::<()>(
+                || Err(()),
+                || panic!("a disconnected plugin can falsely return success")
+            ),
+            Err(SHORTCUT_BACKEND_UNAVAILABLE)
+        );
+        assert_eq!(register_with(|| Ok(()), || Ok::<(), ()>(())), Ok(()));
+    }
+
+    #[test]
+    fn shortcut_registration_conflicts_remain_visible_without_raw_errors() {
+        struct PrivateError;
+        impl std::fmt::Display for PrivateError {
+            fn fmt(&self, _: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                panic!("never format a native error");
+            }
+        }
+        assert_eq!(
+            register_with(|| Ok(()), || Err(PrivateError)),
+            Err(SHORTCUT_REGISTRATION_FAILED)
+        );
+    }
+
     #[cfg(target_os = "linux")]
     #[test]
     fn native_editor_focus_overrides_a_stale_positive_toolkit_focus() {
@@ -189,6 +276,52 @@ mod tests {
                 "query failure must show rather than use stale focus"
             )),
             None
+        );
+    }
+
+    #[test]
+    fn shortcut_hides_only_a_known_visible_focused_picker() {
+        assert_eq!(toggle_action(Some(true), Some(true)), ToggleAction::Hide);
+        for (visible, focused) in [
+            (Some(true), Some(false)),
+            (Some(false), Some(true)), // A stale focused flag cannot hide a hidden picker.
+            (Some(false), Some(false)),
+            (Some(true), None), // An unavailable query must leave a way to summon it.
+            (None, Some(true)),
+            (None, None),
+        ] {
+            assert_eq!(toggle_action(visible, focused), ToggleAction::Show);
+        }
+    }
+
+    #[cfg(debug_assertions)]
+    #[test]
+    fn shortcut_trace_contains_only_fixed_structural_states() {
+        let mut messages = std::collections::BTreeSet::new();
+        for visible in [Some(true), Some(false), None] {
+            for focused in [Some(true), Some(false), None] {
+                let message = toggle_trace(visible, focused);
+                assert!(message.starts_with("ibis-picker: toggle "));
+                assert!(!message.contains('\n'));
+                messages.insert(message);
+            }
+        }
+        assert_eq!(messages.len(), 4);
+        assert_eq!(
+            toggle_trace(Some(true), Some(true)),
+            "ibis-picker: toggle visible focused hide"
+        );
+        assert_eq!(
+            toggle_trace(Some(true), Some(false)),
+            "ibis-picker: toggle visible unfocused show"
+        );
+        assert_eq!(
+            toggle_trace(Some(true), None),
+            "ibis-picker: toggle visible focus-unavailable show"
+        );
+        assert_eq!(
+            toggle_trace(None, Some(true)),
+            "ibis-picker: toggle not-known-visible show"
         );
     }
 
