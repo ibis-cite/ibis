@@ -8,9 +8,9 @@ const testKey = fixture("test-key.pub");
 const signature = fixture("package.bin.sig");
 
 test("nightly versions sit one patch above the release and sort by commit time", () => {
-  assert.equal(nightlyVersion("0.1.0", "202610192230"), "0.1.1-nightly.202610192230");
-  assert.equal(nightlyVersion("1.9.9", "209912312359"), "1.9.10-nightly.209912312359");
-  for (const [base, time] of [["0.1", "202610192230"], ["0.1.0-rc.1", "202610192230"], ["0.1.0", "2026-10-19"]]) {
+  assert.equal(nightlyVersion("0.1.0", "20261019223000"), "0.1.1-nightly.20261019223000");
+  assert.equal(nightlyVersion("1.9.9", "20991231235959"), "1.9.10-nightly.20991231235959");
+  for (const [base, time] of [["0.1", "20261019223000"], ["0.1.0-rc.1", "20261019223000"], ["0.1.0", "202610192230"]]) {
     assert.throws(() => nightlyVersion(base, time));
   }
 });
@@ -41,7 +41,7 @@ test("the shipped app carries the Ibis update key", () => {
 });
 
 test("Ibis Nightly is a separate app that reads only the nightly feed", () => {
-  const config = nightlyConfig("0.1.1-nightly.202610192230");
+  const config = nightlyConfig("0.1.1-nightly.20261019223000");
   assert.equal(config.identifier, "io.github.ibiscite.ibis.nightly");
   assert.equal(config.productName, "Ibis Nightly");
   assert.deepEqual(config.plugins.updater.endpoints, ["https://github.com/ibiscite/ibis/releases/download/nightly/latest.json"]);

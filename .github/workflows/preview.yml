@@ -16,7 +16,7 @@ name: Preview builds
 #
 # Builds from a v tag are the app "Ibis". Every other build is "Ibis Nightly",
 # a separate app with its own settings, a version such as
-# 0.1.1-nightly.202610192230 and its own update feed. It has no MSI (Windows
+# 0.1.1-nightly.20261019223000 and its own update feed. It has no MSI (Windows
 # Installer versions cannot carry "nightly") and no .rpm (RPM versions cannot
 # contain "-").
 
@@ -468,7 +468,7 @@ jobs:
       # Only for the locked Tauri command line tool that signs updates.
       - name: Install the signing tool
         working-directory: apps/desktop
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Download the packages
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -489,8 +489,8 @@ jobs:
           done
 
       # Signs only packages whose checksums and provenance were just verified,
-      # then lists them in the update file; a signature from any other key stops
-      # publication.
+      # then lists them in the update file; a signature with any other key ID
+      # stops publication.
       - name: Sign the update packages
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}

@@ -2,7 +2,7 @@
 //
 //   node scripts/update-feed.mjs version
 //     Prints the nightly version for HEAD: one patch above the workspace
-//     version, then `-nightly.` and the commit time (UTC, YYYYMMDDHHMM), so
+//     version, then `-nightly.` and the commit time (UTC, YYYYMMDDHHMMSS), so
 //     every build of the same commit agrees and later commits sort higher.
 //
 //   node scripts/update-feed.mjs config <version>
@@ -10,7 +10,7 @@
 //
 //   node scripts/update-feed.mjs manifest <dir> <download-base> <version> <notes>
 //     Writes <dir>/latest.json from the signed packages in <dir>, after
-//     checking that every signature was made with the key built into the app.
+//     checking that every signature names the key built into the app.
 
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -31,7 +31,7 @@ export const PACKAGES = {
 export function nightlyVersion(base, commitTime) {
   const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(base);
   if (!match) throw new Error(`workspace version is not plain X.Y.Z: ${base}`);
-  if (!/^\d{12}$/.test(commitTime)) throw new Error(`commit time is not YYYYMMDDHHMM: ${commitTime}`);
+  if (!/^\d{14}$/.test(commitTime)) throw new Error(`commit time is not YYYYMMDDHHMMSS: ${commitTime}`);
   return `${match[1]}.${match[2]}.${Number(match[3]) + 1}-nightly.${commitTime}`;
 }
 
@@ -79,7 +79,7 @@ function workspaceVersion() {
 
 function main([command, ...args]) {
   if (command === "version") {
-    const time = execFileSync("git", ["show", "-s", "--format=%cd", "--date=format-local:%Y%m%d%H%M", "HEAD"], {
+    const time = execFileSync("git", ["show", "-s", "--format=%cd", "--date=format-local:%Y%m%d%H%M%S", "HEAD"], {
       cwd: root,
       env: { ...process.env, TZ: "UTC" },
       encoding: "utf8",
