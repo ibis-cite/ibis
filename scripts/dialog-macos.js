@@ -36,6 +36,20 @@ function validateToken(token, pid, executable) {
         !exactKeys(token.sheet, ['bounds']) || !validBounds(token.sheet.bounds)) throw Error('Native dialog identity metadata unavailable');
     return token;
 }
+// Fixed failure-only discovery facts. Never serialize native labels or roles.
+function discoveryFacts(value) {
+    const limits = {windows: 20, titled_windows: 20, window_dialog_subroles: 20,
+        window_standard_subroles: 20, window_subrole_unavailable: 20,
+        direct_children: 640, direct_windows: 640, direct_sheets: 640, direct_dialog_roles: 640,
+        titled_sheets: 640, direct_static_texts: 640, direct_static_title_matches: 640,
+        title_unavailable: 660, description_unavailable: 660, title_empty: 660,
+        title_other: 660, description_empty: 660, description_other: 660};
+    if (!exactKeys(value, Object.keys(limits)) || Object.keys(limits).some(key =>
+        !Number.isInteger(value[key]) || value[key] < 0 || value[key] > limits[key])) {
+        throw Error('Native discovery facts unavailable');
+    }
+    return {...value};
+}
 function locationProgress(windows, token, foreground) {
     validateToken(token, token && token.owner && token.owner.pid, token && token.owner && token.owner.executable);
     if (!Array.isArray(windows) || windows.length > 10000 || typeof foreground !== 'boolean') {
@@ -76,7 +90,7 @@ function locationProgress(windows, token, foreground) {
 // https://developer.apple.com/documentation/applicationservices/1462085-axuielementcopyattributevalue
 // https://developer.apple.com/documentation/applicationservices/1462933-axvaluegetvalue
 // https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
-function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unready) {
+function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unready, collectDiscovery = false) {
     stage('scope');
     const bindings = {
         AXUIElementCreateSystemWide: ['id', []], AXUIElementCreateApplication: ['id', ['int']],
@@ -172,11 +186,20 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unread
         if (actual !== expected) fail('type-mismatch', 'Native AX value type unavailable', 'CFGetTypeID');
         return value;
     };
+    // AXUIElementRef is a const opaque SDK object associated with one PID.
+    // Validate each normalized object on first use in this observation only.
+    // Re-reading its immutable type/PID for every attribute wastes the bounded
+    // call budget; every live attribute/error and relationship is still checked.
+    // AXUIElement.h: AXUIElementGetPid and the const AXUIElementRef typedef.
+    const checkedElements = new WeakSet();
     const element = value => {
+        value = cfObject(value, 'CFGetTypeID');
+        if (checkedElements.has(value)) return value;
         value = typed(value, 'AXUIElementGetTypeID');
         const out = reference();
         success(call('AXUIElementGetPid', value, out));
         if (!Number.isInteger(out[0]) || out[0] !== pid) fail('owner-mismatch', 'Native AX element ownership changed');
+        checkedElements.add(value);
         return value;
     };
     // SDK Boolean is uint8, while the imported bridge may expose bool.
@@ -254,25 +277,96 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unread
     success(call('AXUIElementSetMessagingTimeout', system, 0.25));
     const app = element(call('AXUIElementCreateApplication', pid));
     const title = 'Choose a BibTeX or BibLaTeX library';
-    const titled = value => text(value, 'AXTitle', true) === title || text(value, 'AXDescription', true) === title;
+    const facts = {windows: 0, titled_windows: 0, window_dialog_subroles: 0,
+        window_standard_subroles: 0, window_subrole_unavailable: 0,
+        direct_children: 0, direct_windows: 0, direct_sheets: 0, direct_dialog_roles: 0,
+        titled_sheets: 0, direct_static_texts: 0, direct_static_title_matches: 0,
+        title_unavailable: 0, description_unavailable: 0, title_empty: 0,
+        title_other: 0, description_empty: 0, description_other: 0};
+    const label = (value, attribute, kind) => {
+        const observed = text(value, attribute, true);
+        if (collectDiscovery && observed !== title) {
+            facts[kind + (observed === null ? '_unavailable' : observed === '' ? '_empty' : '_other')]++;
+        }
+        return observed;
+    };
+    const titled = value => label(value, 'AXTitle', 'title') === title || label(value, 'AXDescription', 'description') === title;
     // AXAttributeConstants.h exposes AXChildren, not an AXSheets attribute.
     // Inspect only direct children; never enumerate the file browser subtree.
-    const sheets = value => {
+    const sheets = (value, discovering = false) => {
         stage('sheets');
-        return children(value, 'AXChildren', 32).filter(child => role(child) === 'AXSheet');
+        const direct = children(value, 'AXChildren', 32);
+        if (discovering) facts.direct_children += direct.length;
+        return direct.filter(child => {
+            const observed = role(child);
+            if (discovering) {
+                if (observed === 'AXWindow') facts.direct_windows++;
+                if (observed === 'AXSheet') facts.direct_sheets++;
+                if (observed === 'AXDialog') facts.direct_dialog_roles++;
+                if (observed === 'AXStaticText') {
+                    facts.direct_static_texts++;
+                    // Only the already-enumerated direct header can be probed;
+                    // never enter the browser tree or output its text.
+                    if (text(child, 'AXValue', true) === title) facts.direct_static_title_matches++;
+                }
+            }
+            return observed === 'AXSheet';
+        });
+    };
+    // The legacy chooser also accepts an untitled attached sheet carrying
+    // this fixed banner. Follow public AXChildren/AXParent relations only;
+    // never inspect a file browser, table, outline or a nested path sheet.
+    const banner = (sheet, window) => {
+        if (!same(element(read(sheet, 'AXParent')), window)) fail('owner-mismatch', 'Native AX sheet parent changed');
+        const visited = [sheet], headers = [];
+        const walk = (parent, depth) => {
+            const direct = children(parent, 'AXChildren', 32);
+            if (visited.length - 1 + direct.length > 16) fail('invalid-result', 'Native AX banner node bound exceeded');
+            for (const child of direct) {
+                if (visited.some(previous => same(previous, child))) fail('invalid-result', 'Native AX banner ancestry is cyclic');
+                if (visited.length - 1 >= 16) fail('invalid-result', 'Native AX banner node bound exceeded');
+                visited.push(child);
+                const observed = role(child);
+                if (!['AXStaticText', 'AXGroup'].includes(observed)) continue;
+                if (!same(element(read(child, 'AXParent')), parent)) fail('owner-mismatch', 'Native AX banner parent changed');
+                if (observed === 'AXStaticText') {
+                    if (text(child, 'AXValue', true) === title) headers.push(child);
+                } else {
+                    if (depth >= 3) fail('invalid-result', 'Native AX banner depth bound exceeded');
+                    walk(child, depth + 1);
+                }
+            }
+        };
+        walk(sheet, 0);
+        return unique(headers) !== null;
     };
     const panels = () => {
         stage('windows');
         const windows = children(app, 'AXWindows', 20);
+        if (collectDiscovery) facts.windows = windows.length;
         stage('candidates');
         const result = [];
         const add = value => {
             if (!result.some(existing => same(existing, value))) result.push(value);
         };
         for (const window of windows) {
-            if (!['AXWindow', 'AXSheet'].includes(role(window))) fail('invalid-result', 'Native AX window role unavailable');
-            if (titled(window)) add(window);
-            else for (const sheet of sheets(window)) if (titled(sheet)) add(sheet);
+            const windowRole = role(window);
+            if (!['AXWindow', 'AXSheet'].includes(windowRole)) fail('invalid-result', 'Native AX window role unavailable');
+            if (collectDiscovery) {
+                const subrole = text(window, 'AXSubrole', true);
+                if (subrole === null) facts.window_subrole_unavailable++;
+                if (subrole === 'AXDialog') facts.window_dialog_subroles++;
+                if (subrole === 'AXStandardWindow') facts.window_standard_subroles++;
+            }
+            if (titled(window)) {
+                if (collectDiscovery) facts.titled_windows++;
+                add(window);
+            } else for (const sheet of sheets(window, collectDiscovery)) {
+                if (titled(sheet)) {
+                    if (collectDiscovery) facts.titled_sheets++;
+                    add(sheet);
+                } else if (windowRole === 'AXWindow' && banner(sheet, window)) add(sheet);
+            }
         }
         return result;
     };
@@ -291,7 +385,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unread
         const value = element(read(app, 'AXFocusedUIElement'));
         return {value, chain: ancestry(value, panel)};
     };
-    return {panels, frame,
+    return {panels, frame, discovery: () => discoveryFacts(facts),
         location(panel) {
             stage('location');
             const attached = sheets(panel);
@@ -317,7 +411,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unread
         },
     };
 }
-if (typeof module !== 'undefined') module.exports = {unique, flags, locationFlags, validateToken, locationProgress};
+if (typeof module !== 'undefined') module.exports = {unique, flags, locationFlags, validateToken, locationProgress, discoveryFacts};
 
 function run(argv) {
     ObjC.import('AppKit');
@@ -393,7 +487,7 @@ function run(argv) {
     };
     const diagnostic = (api, reason) => $.NSFileHandle.fileHandleWithStandardError.writeData(
         $('NATIVE CHOOSER MACOS AX ' + JSON.stringify({api, reason}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
-    const ax = () => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage, diagnostic, unready);
+    const ax = (discovering = false) => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage, diagnostic, unready, discovering);
     const panelForAX = (observations, windows, token) => {
         const matching = [];
         for (const element of observations.panels()) {
@@ -407,9 +501,14 @@ function run(argv) {
     };
     if (action === 'location-identity') {
         const owner = {pid: appId, executable};
-        const observations = ax();
+        const observations = ax(true);
         const panel = panelForAX(observations, readWindows());
-        if (!panel) { unready('panel-not-found'); return JSON.stringify({ready: false, owned: false, token: null}); }
+        if (!panel) {
+            $.NSFileHandle.fileHandleWithStandardError.writeData(
+                $('NATIVE CHOOSER MACOS DISCOVERY ' + JSON.stringify(observations.discovery()) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
+            unready('panel-not-found');
+            return JSON.stringify({ready: false, owned: false, token: null});
+        }
         if (!appIsForeground()) { unready('not-foreground'); return JSON.stringify({ready: false, owned: true, token: null}); }
         const bounds = observations.location(panel.element);
         if (!bounds) return JSON.stringify({ready: false, owned: true, token: null});

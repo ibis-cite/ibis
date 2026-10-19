@@ -85,6 +85,51 @@ WINDOWS_LOCATION_FIELDS = (
     "focus_live", "focus_visible", "focus_enabled", "focus_same_pid", "focus_same_thread", "focus_edit", "focus_descendant",
     "ancestry_reaches_dialog", "filename_id", "uia_unique_edit", "uia_owned", "uia_visible", "uia_enabled", "uia_filename", "native_ready", "uia_ready",
 )
+WINDOWS_KEYBOARD_FIELDS = (
+    "available", "owned_picker", "native_child_focus", "unique_search", "unique_results",
+    "direct_search_focus", "controller_for_results", "controlled_results_focus", "ready",
+)
+
+
+def windows_keyboard_state(value):
+    value = flags(value, WINDOWS_KEYBOARD_FIELDS)
+    expected = (value["available"] and value["owned_picker"] and value["native_child_focus"] and value["unique_search"]
+                and (value["direct_search_focus"] or (value["unique_results"] and value["controller_for_results"]
+                                                     and value["controlled_results_focus"])))
+    if value["ready"] is not expected:
+        raise AssertionError("Native keyboard evidence is inconsistent")
+    return value
+
+
+def windows_focused_nodes(current, previous_index):
+    roles = {"edit": "edit", "combobox": "combobox", "button": "button", "listitem": "option", "option": "option",
+             "list": "list", "text": "text", "pane": "pane", "document": "document", "window": "window"}
+    def role(node):
+        value = node.get("role")
+        return roles.get(value.lower().replace("controltype.", "").replace(" ", ""), "other") if isinstance(value, str) else "other"
+    nodes = current.get("nodes", [])
+    nodes = [node for node in nodes[:4000] if isinstance(node, dict)] if isinstance(nodes, list) else []
+    focused = [node for node in nodes if node.get("focused") is True]
+    title = ["Ibis", "smoke", "reference", f"{previous_index:06d}"] if previous_index is not None else None
+    key = f"smoke{previous_index:06d}" if previous_index is not None else None
+    def known_option(node):
+        name = node.get("name")
+        if title is None or role(node) != "option" or not isinstance(name, str) or len(name) > 512:
+            return False
+        words = name.split()
+        return words[:4] == title and all(value in words for value in ("Example", "2026", key))
+    options = [node for node in nodes if known_option(node)]
+    return {"focused_roles": sorted({role(node) for node in focused}),
+            "focused_reload": any(role(node) == "button" and node.get("name") == "Reload" for node in focused),
+            "focused_other_known_control": any(role(node) == "button" and node.get("name") in ("Choose library…", "Use Zotero", "Quit") for node in focused),
+            "known_option_unique": len(options) == 1,
+            "known_option_focused": len(options) == 1 and options[0].get("focused") is True}
+
+MACOS_DISCOVERY_BOUNDS = {
+    **dict.fromkeys(("windows", "titled_windows", "window_dialog_subroles", "window_standard_subroles", "window_subrole_unavailable"), 20),
+    **dict.fromkeys(("direct_children", "direct_windows", "direct_sheets", "direct_dialog_roles", "titled_sheets", "direct_static_texts", "direct_static_title_matches"), 640),
+    **dict.fromkeys(("title_unavailable", "description_unavailable", "title_empty", "title_other", "description_empty", "description_other"), 660),
+}
 
 MACOS_AX_APIS = frozenset((
     'AXUIElementCreateSystemWide', 'AXUIElementCreateApplication', 'AXUIElementGetTypeID', 'AXValueGetTypeID',
@@ -168,12 +213,20 @@ def helper_diagnostics(stderr):
     safe = []
     ax_reported = False
     ready_reported = False
+    discovery_reported = False
     for line in stderr[:65536].splitlines():
-        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS AX ", "NATIVE CHOOSER MACOS READY ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
+        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS AX ", "NATIVE CHOOSER MACOS READY ", "NATIVE CHOOSER MACOS DISCOVERY ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
         if prefix is None:
             continue
         try:
-            value = json.loads(line[len(prefix):])
+            def unique_fields(pairs):
+                value = {}
+                for key, item in pairs:
+                    if key in value:
+                        raise ValueError("Duplicate diagnostic field")
+                    value[key] = item
+                return value
+            value = json.loads(line[len(prefix):], object_pairs_hook=unique_fields if prefix == "NATIVE CHOOSER MACOS DISCOVERY " else None)
         except ValueError:
             continue
         if not isinstance(value, dict):
@@ -187,6 +240,10 @@ def helper_diagnostics(stderr):
             valid = (not ready_reported and set(value) == {'reason'}
                      and type(value['reason']) is str and value['reason'] in MACOS_READY_REASONS)
             ready_reported = ready_reported or valid
+        elif prefix == "NATIVE CHOOSER MACOS DISCOVERY ":
+            valid = (not discovery_reported and set(value) == set(MACOS_DISCOVERY_BOUNDS)
+                     and all(type(count) is int and 0 <= count <= MACOS_DISCOVERY_BOUNDS[key] for key, count in value.items()))
+            discovery_reported = discovery_reported or valid
         elif prefix == "NATIVE CHOOSER WINDOWS LOCATION ":
             valid = set(value) == set(WINDOWS_LOCATION_FIELDS) and all(type(item) is bool for item in value.values())
         elif prefix == "NATIVE CHOOSER MACOS ":
@@ -230,18 +287,21 @@ def wait_for_chosen_query(snapshot, index, report):
         raise
 
 
-def prepare_rename_query(native, snapshot, system, previous_index=None, report=None):
+def prepare_rename_query(native, snapshot, system, previous_index=None, report=None, capture_failure=None):
     native.key("Escape")
     smoke.wait_for(lambda: not snapshot()["visible"], "rename query hides picker before restoring search focus")
     native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+y")
-    current, editable = {"nodes": []}, []
+    current, editable, keyboard = {"nodes": []}, [], None
     def ready():
-        nonlocal current, editable
+        nonlocal current, editable, keyboard
         current = snapshot()
         named = smoke.named(current, "Search references")
         editable = ([node for node in named if node.get("role", "").lower().replace(" ", "") in smoke.EDITABLE_ROLES]
                     if system == "Windows" else [])
-        focused = len(editable) == 1 and editable[0].get("focused") is True
+        if system == "Windows":
+            keyboard = None
+            keyboard = windows_keyboard_state(current.get("keyboard"))
+        focused = len(editable) == 1 and keyboard is not None and keyboard["ready"]
         return current["visible"] and current["foreground"] and bool(named) and (system != "Windows" or focused)
     try:
         smoke.wait_for(ready, "rename query shows the foreground picker before typing")
@@ -255,7 +315,15 @@ def prepare_rename_query(native, snapshot, system, previous_index=None, report=N
                      "known_result_focused": title is not None and any(node.get("focused") is True for node in smoke.named(current, title)),
                      "previous_query_unchanged": prior is not None and len(editable) == 1 and editable[0].get("value") == prior}
             report["rename_focus_failure"] = facts
+            facts.update(windows_focused_nodes(current, previous_index))
+            facts["keyboard_metadata_valid"] = keyboard is not None
+            facts["keyboard"] = dict(keyboard) if keyboard is not None else {key: False for key in WINDOWS_KEYBOARD_FIELDS}
             print("NATIVE CHOOSER RENAME FOCUS FAILURE " + json.dumps(facts), file=sys.stderr)
+        if system == "Windows" and capture_failure is not None:
+            try:
+                capture_failure()
+            except Exception:
+                pass # Preserve the original readiness error if observation fails.
         raise
 
 
@@ -418,14 +486,16 @@ class Dialog:
                 or self.child.args != [self.executable] or self.child.poll() is not None):
             raise AssertionError("Owned app exited or its identity changed")
 
-    def capture_failure(self):
+    def capture_failure(self, kind="chooser"):
+        if kind not in ("chooser", "picker") or kind == "picker" and self.system != "Windows":
+            raise AssertionError("Invalid native failure capture kind")
         if self.system not in ("Darwin", "Windows") or self.output is None or self.native.app.poll() is not None:
             return
         # Capture before the fixture context exits or owned processes stop.
         # The suite requires a disposable desktop with synthetic files.
         try:
             if self.system == "Windows":
-                image = self.output / "chooser-failure.png"
+                image = self.output / ("picker-failure.png" if kind == "picker" else "chooser-failure.png")
                 def has_png():
                     if image.is_symlink() or not image.is_file():
                         return False
@@ -434,7 +504,7 @@ class Dialog:
                 if not has_png():
                     command = ["pwsh", "-NoProfile", "-File", str(ROOT / "dialog-windows.ps1"),
                                "-Action", "capture-failure", "-AppId", str(self.native.app.pid),
-                               "-PickerHandle", str(self.native.picker_handle), "-FailureImage", str(image)]
+                               "-PickerHandle", str(self.native.picker_handle), "-FailureImage", str(image), "-CaptureKind", kind]
                     result = subprocess.run(command, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10)
                     for line in helper_diagnostics(result.stderr):
                         print(line, file=sys.stderr, flush=True)
@@ -692,7 +762,8 @@ def check(app_path, output, system):
             passed("C3 unreadable native choice retains searchable library and settings")
             report["stage"] = "rename-away"
             rename_library_roundtrip(library, settings, native.click, snapshot, query,
-                                     lambda previous: prepare_rename_query(native, snapshot, system, previous, report))
+                                     lambda previous: prepare_rename_query(native, snapshot, system, previous, report,
+                                         lambda: dialog.capture_failure("picker")))
             passed("rename-away retains searchable references and settings and recovers distinct content")
             report["stage"] = "C4"
             normal_quit(process, native.click)
@@ -775,6 +846,110 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def keyboard_evidence(self, *, virtual=False, ready=True):
+        return {"available": True, "owned_picker": True, "native_child_focus": True, "unique_search": True,
+                "unique_results": virtual, "direct_search_focus": not virtual and ready,
+                "controller_for_results": virtual, "controlled_results_focus": virtual and ready, "ready": ready}
+
+    def test_windows_rename_accepts_only_proven_controller_focus_with_native_child_focus(self):
+        actions = []
+        class Native:
+            def key(self, key): actions.append(key)
+        current = {"visible": True, "foreground": True, "keyboard": self.keyboard_evidence(virtual=True),
+                   "nodes": [{"name": "Search references", "role": "ControlType.ComboBox", "focused": False}]}
+        snapshots = iter([{"visible": False}, current])
+        with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
+            prepare_rename_query(Native(), lambda: next(snapshots), "Windows")
+            actions.append("type")
+        self.assertEqual(actions, ["Escape", "ctrl+shift+y", "type"])
+
+    def test_windows_keyboard_evidence_rejects_each_missing_virtual_or_native_proof(self):
+        for key in ("available", "owned_picker", "native_child_focus", "unique_search", "unique_results",
+                    "controller_for_results", "controlled_results_focus"):
+            value = self.keyboard_evidence(virtual=True)
+            value[key], value["ready"] = False, False
+            self.assertFalse(windows_keyboard_state(value)["ready"], key)
+        direct = self.keyboard_evidence()
+        direct["native_child_focus"], direct["ready"] = False, False
+        self.assertFalse(windows_keyboard_state(direct)["ready"])
+
+    def test_windows_keyboard_metadata_cannot_override_its_proofs_or_expose_payloads(self):
+        value = self.keyboard_evidence()
+        for invalid in ({**value, "ready": False}, {**value, "owned_picker": 1},
+                        {**value, "payload": "/private/path"}, {}, None):
+            with self.assertRaises(AssertionError):
+                windows_keyboard_state(invalid)
+
+    def test_macos_discovery_counts_are_exact_bounded_and_failure_only_metadata(self):
+        prefix = "NATIVE CHOOSER MACOS DISCOVERY "
+        bounds = {**dict.fromkeys(("windows", "titled_windows", "window_dialog_subroles", "window_standard_subroles", "window_subrole_unavailable"), 20),
+                  **dict.fromkeys(("direct_children", "direct_windows", "direct_sheets", "direct_dialog_roles", "titled_sheets", "direct_static_texts", "direct_static_title_matches"), 640),
+                  **dict.fromkeys(("title_unavailable", "description_unavailable", "title_empty", "title_other", "description_empty", "description_other"), 660)}
+        valid = {key: maximum for key, maximum in bounds.items()}
+        line = prefix + json.dumps(valid, sort_keys=True)
+        self.assertEqual(helper_diagnostics(line), [line])
+        self.assertEqual(helper_diagnostics("\n".join([line] * 30)), [line])
+        for key, maximum in bounds.items():
+            for bad in (-1, maximum + 1, True, 1.0, "private provider text", None):
+                self.assertEqual(helper_diagnostics(prefix + json.dumps({**valid, key: bad})), [], (key, bad))
+        for bad in ({**valid, "path": "/private/path"}, {}, {key: value for key, value in valid.items() if key != "windows"}):
+            self.assertEqual(helper_diagnostics(prefix + json.dumps(bad)), [])
+        duplicate = json.dumps(valid)[:-1] + ', "windows": 1}'
+        self.assertEqual(helper_diagnostics(prefix + duplicate), [])
+
+    def test_windows_focused_roles_and_options_never_expose_provider_payloads(self):
+        option = {"name": "Ibis smoke reference 000001 Example Alex 2026 smoke000001", "role": "ControlType.ListItem", "focused": True}
+        facts = windows_focused_nodes({"nodes": [option, {"name": "/private/path", "role": "secret role", "focused": True},
+                  {"name": "Reload", "role": "ControlType.Button", "focused": True}]}, 1)
+        self.assertEqual(facts, {"focused_roles": ["button", "option", "other"], "focused_reload": True,
+                         "focused_other_known_control": False, "known_option_unique": True, "known_option_focused": True})
+        for invalid in ({**option, "role": "ControlType.Text"}, {**option, "name": option["name"].replace("000001", "000002")},
+                        {**option, "name": option["name"].replace("Example", "Unknown")}, {**option, "name": option["name"] + "x" * 513}):
+            self.assertFalse(windows_focused_nodes({"nodes": [invalid]}, 1)["known_option_focused"])
+        self.assertFalse(windows_focused_nodes({"nodes": [option, dict(option)]}, 1)["known_option_unique"])
+        self.assertFalse(windows_focused_nodes({"nodes": [{}] * 4000 + [option]}, 1)["known_option_focused"])
+        encoded = json.dumps(facts)
+        for forbidden in ("private", "secret", "smoke000001", "Example"):
+            self.assertNotIn(forbidden, encoded)
+
+    def test_windows_invalid_latest_keyboard_evidence_drops_prior_metadata_and_preserves_error(self):
+        from io import StringIO
+        native, report = Mock(), {}
+        current = {"visible": True, "foreground": True, "nodes": [{"name": "Search references", "role": "ControlType.ComboBox"}],
+                   "keyboard": self.keyboard_evidence(ready=False)}
+        snapshots = iter([{"visible": False}, current, {**current, "keyboard": {}}])
+        def wait(predicate, message):
+            if "hides" in message: self.assertTrue(predicate())
+            else:
+                self.assertFalse(predicate())
+                predicate()
+        capture = Mock(side_effect=RuntimeError("secondary capture failure"))
+        with patch.object(smoke, "wait_for", side_effect=wait), patch.object(sys, "stderr", StringIO()):
+            with self.assertRaisesRegex(AssertionError, "exact boolean"):
+                prepare_rename_query(native, lambda: next(snapshots), "Windows", 1, report, capture)
+        self.assertFalse(report["rename_focus_failure"]["keyboard_metadata_valid"])
+        self.assertFalse(any(report["rename_focus_failure"]["keyboard"].values()))
+        capture.assert_called_once_with()
+        self.assertEqual([call.args[0] for call in native.key.call_args_list], ["Escape", "ctrl+shift+y"])
+
+    def test_windows_picker_capture_is_explicit_and_never_falls_back_to_chooser(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as folder:
+            native = SimpleNamespace(app=SimpleNamespace(pid=10, poll=lambda: None), picker_handle=12)
+            dialog = Dialog(native, "Windows", Path(folder))
+            result = SimpleNamespace(returncode=1, stdout="", stderr="private provider text")
+            with patch.object(subprocess, "run", return_value=result) as run:
+                dialog.capture_failure("picker")
+            command = run.call_args.args[0]
+            self.assertEqual(command[command.index("-CaptureKind") + 1], "picker")
+            self.assertEqual(Path(command[command.index("-FailureImage") + 1]).name, "picker-failure.png")
+            self.assertEqual(run.call_count, 1)
+            self.assertEqual(native.dialog_failure_capture, "unavailable")
+            with patch.object(subprocess, "run") as run:
+                for kind in ("foreign", None):
+                    with self.assertRaises(AssertionError): dialog.capture_failure(kind)
+            run.assert_not_called()
+
     def test_macos_unready_reasons_accept_only_one_fixed_reason_per_helper(self):
         prefix = 'NATIVE CHOOSER MACOS READY '
         reasons = ('registration-unavailable', 'panel-not-found', 'not-foreground', 'sheet-absent',
@@ -852,9 +1027,9 @@ class Tests(unittest.TestCase):
 
     def test_windows_rename_focus_timeout_keeps_the_same_snapshot_and_known_query_facts(self):
         from io import StringIO
-        current = {"visible": True, "foreground": True, "nodes": [
+        current = {"visible": True, "foreground": True, "keyboard": self.keyboard_evidence(ready=False), "nodes": [
             {"name": "Search references", "role": "ControlType.ComboBox", "value": "smoke000001", "focused": False},
-            {"name": "Ibis smoke reference 000001", "focused": True}, {"name": "private provider text"}]}
+            {"name": "Ibis smoke reference 000001", "role": "ControlType.Text", "focused": True}, {"name": "private provider text"}]}
         snapshot, report, stderr = Mock(side_effect=[{"visible": False}, current]), {}, StringIO()
         failure = AssertionError("original focus timeout")
         def wait(predicate, message):
@@ -868,17 +1043,22 @@ class Tests(unittest.TestCase):
                 prepare_rename_query(Mock(), snapshot, "Windows", previous_index=1, report=report)
         self.assertIs(caught.exception, failure)
         self.assertEqual(snapshot.call_count, 2)
-        self.assertEqual(report["rename_focus_failure"], {"visible": True, "foreground": True,
-            "unique_editable": True, "editable_focused": False, "known_result_focused": True, "previous_query_unchanged": True})
+        expected = {"visible": True, "foreground": True, "unique_editable": True, "editable_focused": False,
+                    "known_result_focused": True, "previous_query_unchanged": True}
+        self.assertEqual({key: report["rename_focus_failure"][key] for key in expected}, expected)
+        self.assertEqual(report["rename_focus_failure"]["focused_roles"], ["text"])
+        self.assertFalse(report["rename_focus_failure"]["known_option_focused"])
+        self.assertTrue(report["rename_focus_failure"]["keyboard_metadata_valid"])
+        self.assertEqual(report["rename_focus_failure"]["keyboard"], current["keyboard"])
         self.assertNotIn("private", stderr.getvalue())
         self.assertNotIn("smoke000001", stderr.getvalue())
 
     def test_windows_rename_never_types_until_the_unique_editable_search_is_focused(self):
         actions = []
-        unfocused = {"visible": True, "foreground": True, "nodes": [
+        unfocused = {"visible": True, "foreground": True, "keyboard": self.keyboard_evidence(ready=False), "nodes": [
             {"name": "Search references", "role": "ControlType.ComboBox", "value": "smoke000001", "focused": False},
             {"name": "Reload", "focused": True}, {"name": "1 result"}]}
-        focused = {**unfocused, "nodes": [{**unfocused["nodes"][0], "focused": True}]}
+        focused = {**unfocused, "keyboard": self.keyboard_evidence(), "nodes": [{**unfocused["nodes"][0], "focused": True}]}
         snapshots = iter([{"visible": False}, unfocused, focused])
         class Native:
             def key(self, key): actions.append(key)
@@ -897,7 +1077,7 @@ class Tests(unittest.TestCase):
     def test_windows_rename_rejects_noneditable_or_ambiguous_focused_search(self):
         for nodes in ([{"name": "Search references", "role": "ControlType.Button", "focused": True}],
                       [{"name": "Search references", "role": "ControlType.ComboBox", "focused": True}] * 2):
-            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "nodes": nodes}])
+            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "keyboard": self.keyboard_evidence(), "nodes": nodes}])
             with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
                 with self.assertRaises(AssertionError):
                     prepare_rename_query(Mock(), lambda: next(snapshots), "Windows")
@@ -1190,7 +1370,7 @@ class Tests(unittest.TestCase):
             actions = []
             class Native:
                 def key(self, key): actions.append(key)
-            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "nodes": [{"name": "Search references", "role": "ControlType.ComboBox", "focused": True}]}])
+            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "keyboard": self.keyboard_evidence(), "nodes": [{"name": "Search references", "role": "ControlType.ComboBox", "focused": True}]}])
             with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
                 prepare_rename_query(Native(), lambda: next(snapshots), system)
                 actions.append("type")

@@ -6,6 +6,7 @@ param(
   [long] $ExpectedDialogHandle,
   [string] $Text,
   [string] $FailureImage,
+  [ValidateSet('chooser','picker')] [string] $CaptureKind = 'chooser',
   [switch] $SelfTest
 )
 $ErrorActionPreference = 'Stop'
@@ -154,17 +155,34 @@ function Format-FilenameFacts([hashtable] $Facts) {
   'NATIVE CHOOSER WINDOWS LOCATION ' + (ConvertTo-Json -InputObject $safe -Compress)
 }
 
+function Test-OwnedCaptureView($View) {
+  foreach ($key in @('Owned','Foreground','SameDialog')) {
+    if ($View[$key] -isnot [bool] -or !$View[$key]) { return $false }
+  }
+  foreach ($key in @('Left','Top','Width','Height')) { if ($View[$key] -isnot [int]) { return $false } }
+  $View.Width -gt 0 -and $View.Height -gt 0 -and $View.Width -le 8192 -and $View.Height -le 8192 -and
+    [long] $View.Width * $View.Height -le 33554432
+}
+function Test-SameCaptureView($First, $Second) {
+  if (!(Test-OwnedCaptureView $First) -or !(Test-OwnedCaptureView $Second)) { return $false }
+  foreach ($key in @('Left','Top','Width','Height')) { if ($First[$key] -ne $Second[$key]) { return $false } }
+  $true
+}
+function Read-CaptureSubject([string] $Kind, [scriptblock] $Chooser, [scriptblock] $Picker) {
+  switch -CaseSensitive ($Kind) {
+    'chooser' { & $Chooser }
+    'picker' { & $Picker }
+    default { throw 'Unknown failure capture kind' }
+  }
+}
 function Save-OwnedChooserFailure([string] $Destination, [scriptblock] $Observe, [scriptblock] $Capture) {
   if ([string]::IsNullOrWhiteSpace($Destination)) { return }
   try {
     $view = & $Observe
-    foreach ($key in @('Owned','Foreground','SameDialog')) {
-      if ($view[$key] -isnot [bool] -or !$view[$key]) { return }
-    }
-    if ($view.Width -isnot [int] -or $view.Height -isnot [int] -or
-        $view.Width -le 0 -or $view.Height -le 0 -or $view.Width -gt 8192 -or $view.Height -gt 8192 -or
-        [long] $view.Width * $view.Height -gt 33554432) { return }
-    & $Capture $view $Destination | Out-Null
+    if (!(Test-OwnedCaptureView $view)) { return }
+    $fresh = & $Observe
+    if (!(Test-SameCaptureView $view $fresh)) { return }
+    & $Capture $fresh $Destination | Out-Null
   } catch {
     # Failure evidence must never replace the original helper failure.
   }
@@ -328,9 +346,25 @@ function Invoke-OwnershipTests {
   foreach ($property in $diagnostic.selector.PSObject.Properties) {
     if ($property.Value -ne 0) { throw 'Chooser private selector diagnostic regression failed' }
   }
+  $script:chooserReads=0; $script:pickerReads=0
+  $chooserCapture = { $script:chooserReads++; throw 'No chooser' }
+  $pickerCapture = { $script:pickerReads++; @{Owned=$true} }
+  if (!(Read-CaptureSubject 'picker' $chooserCapture $pickerCapture).Owned -or $script:chooserReads -ne 0 -or $script:pickerReads -ne 1) {
+    throw 'Explicit picker capture inspected the chooser'
+  }
+  try { Read-CaptureSubject 'chooser' $chooserCapture $pickerCapture | Out-Null } catch { }
+  if ($script:pickerReads -ne 1) { throw 'Chooser capture fell back to picker' }
+  $script:readNumber = 0; $script:unsafeCaptures = 0
+  $moving = { $script:readNumber++; @{Owned=$true;Foreground=$true;SameDialog=$true;Left=$script:readNumber;Top=0;Width=800;Height=600} }
+  Save-OwnedChooserFailure 'synthetic.png' $moving { $script:unsafeCaptures++ }
+  if ($script:unsafeCaptures -ne 0) { throw 'Changed failure rectangle was captured' }
+  $script:readNumber = 0
+  $lostForeground = { $script:readNumber++; @{Owned=$true;Foreground=($script:readNumber -eq 1);SameDialog=$true;Left=0;Top=0;Width=800;Height=600} }
+  Save-OwnedChooserFailure 'synthetic.png' $lostForeground { $script:unsafeCaptures++ }
+  if ($script:unsafeCaptures -ne 0) { throw 'Failure capture omitted fresh foreground guard' }
   $script:captures = 0
   $script:captureObservations = 0
-  $captureView = @{Owned=$true;Foreground=$true;SameDialog=$true;Width=800;Height=600}
+  $captureView = @{Owned=$true;Foreground=$true;SameDialog=$true;Left=0;Top=0;Width=800;Height=600}
   $readCapture = { $script:captureObservations++; $captureView }
   $capture = { param($View,$Destination) $script:captures++; if ($Destination -cne 'synthetic.png') { throw 'Wrong failure destination' } }
   Save-OwnedChooserFailure 'synthetic.png' $readCapture $capture
@@ -456,25 +490,36 @@ public static class IbisChooser {
       }
     }
   }
-  function Save-ChooserFailureImage {
-    Save-OwnedChooserFailure $FailureImage {
+  function Get-OwnedCaptureView {
+    $subject = Read-CaptureSubject $CaptureKind {
       $currentDialog = Get-Dialog
-      if (!$currentDialog -or !$dialog) { return @{} }
-      $view = @{Owned=$true;SameDialog=($currentDialog.Handle -eq $dialog.Handle);
-        Foreground=([IbisChooser]::GetForegroundWindow().ToInt64() -eq $currentDialog.Handle)}
-      if (!$view.SameDialog -or !$view.Foreground) { return $view }
-      $rectangle = [IbisChooser+Rect]::new()
-      if (![IbisChooser]::GetWindowRect([IntPtr]::new($currentDialog.Handle), [ref] $rectangle)) { return @{} }
-      $view.Left = $rectangle.Left; $view.Top = $rectangle.Top
-      $view.Width = $rectangle.Right - $rectangle.Left; $view.Height = $rectangle.Bottom - $rectangle.Top
-      $view
+      if (!$currentDialog -or !$dialog -or $currentDialog.Handle -ne $dialog.Handle) { return $null }
+      $currentDialog
     } {
+      $picker = Get-WindowInfo $PickerHandle
+      if (!$picker -or $AppId -le 0 -or $picker.ProcessId -ne $AppId -or !$picker.Visible) { return $null }
+      $picker
+    }
+    if (!$subject -or !$subject.Visible -or [IbisChooser]::GetForegroundWindow().ToInt64() -ne $subject.Handle) { return @{} }
+    $rectangle = [IbisChooser+Rect]::new()
+    if (![IbisChooser]::GetWindowRect([IntPtr]::new($subject.Handle),[ref] $rectangle)) { return @{} }
+    # Re-read the same exact live HWND and PID after the rectangle query.
+    $fresh = Get-WindowInfo $subject.Handle
+    if (!$fresh -or $fresh.ProcessId -ne $AppId -or !$fresh.Visible -or
+        [IbisChooser]::GetForegroundWindow().ToInt64() -ne $subject.Handle) { return @{} }
+    @{Owned=$true;SameDialog=$true;Foreground=$true;Left=$rectangle.Left;Top=$rectangle.Top;
+      Width=($rectangle.Right - $rectangle.Left);Height=($rectangle.Bottom - $rectangle.Top)}
+  }
+  function Save-ChooserFailureImage {
+    Save-OwnedChooserFailure $FailureImage { Get-OwnedCaptureView } {
       param($View,$Destination)
       Add-Type -AssemblyName System.Drawing
       $bitmap = $null; $graphics = $null; $stream = $null
       try {
         $bitmap = [System.Drawing.Bitmap]::new($View.Width,$View.Height)
         $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+        # Assembly/bitmap setup may take time; guard again adjacent to capture.
+        if (!(Test-SameCaptureView $View (Get-OwnedCaptureView))) { return }
         $graphics.CopyFromScreen([System.Drawing.Point]::new($View.Left,$View.Top),[System.Drawing.Point]::Empty,$bitmap.Size)
         $stream = [System.IO.File]::Open($Destination,[System.IO.FileMode]::CreateNew,[System.IO.FileAccess]::Write,[System.IO.FileShare]::None)
         $bitmap.Save($stream,[System.Drawing.Imaging.ImageFormat]::Png)
@@ -535,7 +580,7 @@ public static class IbisChooser {
     }
   }
   $script:ChooserFacts.stage = 'resolve'
-  $dialog = Get-Dialog
+  $dialog = if ($Action -ceq 'capture-failure' -and $CaptureKind -ceq 'picker') { $null } else { Get-Dialog }
   $script:ChooserFacts.owned = [bool] ($null -ne $dialog)
   $foreground = $null -ne $dialog -and [IbisChooser]::GetForegroundWindow().ToInt64() -eq $dialog.Handle
   $script:ChooserFacts.foreground = [bool] $foreground

@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const { unique, flags, locationFlags, validateToken, locationProgress } = require('./dialog-macos.js');
+const { unique, flags, locationFlags, validateToken, locationProgress, discoveryFacts } = require('./dialog-macos.js');
 const executable = '/private/tmp/ibis-native/ibis';
 
 test('native dialog actions refuse ambiguous targets', () => {
@@ -198,6 +198,7 @@ function axScenario(options = {}) {
   const panel = ax('AXWindow', {AXTitle: string('Choose a BibTeX or BibLaTeX library'), ...frames(panelBounds)});
   const sheet = ax('AXSheet', {AXParent: panel, ...frames(sheetBounds)});
   const field = ax('AXTextField', {AXParent: sheet, AXFocused: bool(true)});
+  sheet.attrs.AXChildren = array([field]);
   const button = ax('AXButton', {AXParent: panel, AXTitle: string('Open'), AXEnabled: bool(true)});
   const browser = ax('AXOutline', {AXParent: panel});
   const app = ax('AXApplication', {AXWindows: array([panel]), AXFocusedUIElement: field});
@@ -205,7 +206,7 @@ function axScenario(options = {}) {
   const unknown = ax('AXSheet', {AXParent: panel, ...frames(sheetBounds)});
   let windows = [{kCGWindowNumber: 10, kCGWindowOwnerPID: 123, kCGWindowAlpha: 1, kCGWindowBounds: panelBounds}];
   let foreground = 123, processPid = 123, processExecutable = executable, registered = true, terminated = false, elapsed = 0, failure = null;
-  const timeouts = [], posted = [], reads = [], stages = [], diagnostics = [], readiness = [];
+  const timeouts = [], posted = [], reads = [], stages = [], diagnostics = [], readiness = [], discovery = [], pidReads = [];
   const status = (name, attribute) => {
     reads.push([name, attribute]);
     if (options.onRead) options.onRead(api, name, attribute);
@@ -239,6 +240,8 @@ function axScenario(options = {}) {
       }, bindFunction() { throw Error('Missing ABI binding'); }},
     $: Object.assign(string, {
       NSFileHandle: {fileHandleWithStandardError: {writeData(value) {
+        const discoveryPrefix = 'NATIVE CHOOSER MACOS DISCOVERY ';
+        if (value.startsWith(discoveryPrefix)) { discovery.push(JSON.parse(value.slice(discoveryPrefix.length))); return; }
         const readyPrefix = 'NATIVE CHOOSER MACOS READY ';
         if (value.startsWith(readyPrefix)) {
           const payload = JSON.parse(value.slice(readyPrefix.length));
@@ -294,6 +297,7 @@ function axScenario(options = {}) {
       },
       AXUIElementGetPid: (element, output) => {
         if (options.requireNativeObjects && !element.nativeObject) return -25202;
+        pidReads.push(element.nativeRef || element);
         output[0] = element.pid; return 0;
       },
       AXUIElementCopyAttributeValue: read,
@@ -330,7 +334,7 @@ function axScenario(options = {}) {
   };
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(require.resolve('./dialog-macos.js'), 'utf8'), context);
-  const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, diagnostics, readiness, system, bool, array, string,
+  const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, diagnostics, readiness, discovery, pidReads, system, bool, array, string,
     call: (action, token, expectedExecutable = executable) => JSON.parse(context.run([action, '123', expectedExecutable, JSON.stringify(token)].slice(0, token === undefined ? 3 : 4))), setPathOpen,
     fail: (attribute, code = -25204) => { failure = {attribute, code}; },
     setWindows: value => { windows = value; }, setForeground: value => { foreground = value; },
@@ -724,4 +728,188 @@ test('successful and fatal AX paths do not manufacture an unready branch reason'
   assert.deepEqual(failed.readiness, []);
   assert.equal(failed.posted.length, 0);
   assert.equal(JSON.stringify(failed.diagnostics).includes('private'), false);
+});
+
+
+const emptyDiscovery = () => ({windows: 0, direct_children: 0, direct_windows: 0, direct_sheets: 0,
+  direct_dialog_roles: 0, titled_windows: 0, titled_sheets: 0, title_unavailable: 0, description_unavailable: 0,
+  window_dialog_subroles: 0, window_standard_subroles: 0, window_subrole_unavailable: 0,
+  direct_static_texts: 0, direct_static_title_matches: 0, title_empty: 0, title_other: 0,
+  description_empty: 0, description_other: 0});
+
+test('failure-only discovery identifies existing direct roles and missing labels without reading values', () => {
+  const native = axScenario();
+  native.panel.attrs.AXTitle = native.string('Synthetic private window title');
+  native.panel.attrs.AXDescription = native.string('Synthetic private description');
+  native.button.attrs.AXRole = native.string('AXDialog');
+  native.browser.attrs.AXRole = native.string('AXWindow');
+  assert.deepEqual(native.call('location-identity'), {ready: false, owned: false, token: null});
+  assert.deepEqual(native.discovery, [{...emptyDiscovery(), windows: 1, direct_children: 3,
+    direct_windows: 1, direct_sheets: 1, direct_dialog_roles: 1, title_unavailable: 1, description_unavailable: 1,
+    window_subrole_unavailable: 1, title_other: 1, description_other: 1}]);
+  assert.equal(native.reads.some(([, attribute]) => attribute === 'AXValue'), false);
+  assert.equal(native.reads.filter(([name, attribute]) => name === 'count' && attribute === 'AXChildren').length, 2);
+  assert.equal(native.reads.filter(([, attribute]) => attribute === 'AXRole').length, 5, 'Diagnostics add no separate role reads');
+  assert.equal(JSON.stringify(native.discovery).includes('private'), false);
+  assert.equal(native.posted.length, 0);
+});
+
+test('discovery distinguishes titled AX candidates from a failed CG match and stays absent on other outcomes', () => {
+  const mismatch = axScenario(); mismatch.setWindows([]);
+  assert.equal(mismatch.call('location-identity').ready, false);
+  assert.deepEqual(mismatch.discovery, [{...emptyDiscovery(), windows: 1, titled_windows: 1, window_subrole_unavailable: 1}]);
+  const success = axScenario(); assert.equal(success.call('location-identity').ready, true);
+  assert.deepEqual(success.discovery, []);
+  const failed = axScenario(); failed.fail('AXChildren');
+  assert.throws(() => failed.call('location-identity'), /AX/);
+  assert.deepEqual(failed.discovery, []);
+});
+
+test('discovery schema rejects payloads and every noninteger or excessive count', () => {
+  assert.deepEqual(discoveryFacts(emptyDiscovery()), emptyDiscovery());
+  assert.throws(() => discoveryFacts({...emptyDiscovery(), title: 'private'}), /discovery/);
+  for (const [key, maximum] of Object.entries({windows: 20, titled_windows: 20, direct_children: 640,
+    direct_windows: 640, direct_sheets: 640, direct_dialog_roles: 640, titled_sheets: 640,
+    title_unavailable: 660, description_unavailable: 660, title_empty: 660, title_other: 660,
+    description_empty: 660, description_other: 660, window_dialog_subroles: 20,
+    window_standard_subroles: 20, window_subrole_unavailable: 20,
+    direct_static_texts: 640, direct_static_title_matches: 640})) {
+    assert.equal(discoveryFacts({...emptyDiscovery(), [key]: maximum})[key], maximum);
+    for (const value of [-1, maximum + 1, 0.5, NaN, Infinity, true, '0', null]) {
+      assert.throws(() => discoveryFacts({...emptyDiscovery(), [key]: value}), /discovery/);
+    }
+  }
+});
+
+
+test('discovery classifies only fixed subroles and the already enumerated direct header', () => {
+  for (const [subrole, key] of [['AXDialog', 'window_dialog_subroles'], ['AXStandardWindow', 'window_standard_subroles']]) {
+    const native = axScenario();
+    native.panel.attrs.AXSubrole = native.string(subrole);
+    native.panel.attrs.AXTitle = native.string('');
+    native.panel.attrs.AXDescription = native.string('');
+    native.unknown.attrs.AXRole = native.string('AXStaticText');
+    native.unknown.attrs.AXValue = native.string('Choose a BibTeX or BibLaTeX library');
+    native.panel.attrs.AXChildren = native.array([native.unknown]);
+    assert.equal(native.call('location-identity').ready, false, 'Diagnostic header equality must not change panel matching');
+    assert.deepEqual(native.discovery, [{...emptyDiscovery(), windows: 1, [key]: 1, direct_children: 1,
+      direct_static_texts: 1, direct_static_title_matches: 1, title_empty: 1, description_empty: 1}]);
+    assert.equal(native.reads.filter(([, attribute]) => attribute === 'AXValue').length, 1);
+    assert.equal(native.posted.length, 0);
+  }
+});
+
+
+test('failure discovery does not add diagnostic attribute reads to post-path guards', () => {
+  const native = axScenario(); native.setPathOpen(false);
+  assert.equal(native.call('after-location', identity()).ready, true);
+  assert.equal(native.reads.some(([, attribute]) => ['AXSubrole', 'AXValue'].includes(attribute)), false);
+  assert.deepEqual(native.discovery, []);
+});
+
+// Model the legacy-valid surface: an untitled direct sheet whose fixed banner
+// identifies the chooser, while a separate nested sheet owns the path field.
+function untitledSheetScenario(options = {}, groups = 0) {
+  const native = axScenario(options);
+  const element = (role, parent, attrs = {}) => ({type: 'AX', pid: 123,
+    attrs: {AXRole: native.string(role), AXParent: parent, ...attrs}});
+  const root = element('AXWindow', native.app, {AXTitle: native.string('Ibis')});
+  native.panel.attrs.AXRole = native.string('AXSheet');
+  native.panel.attrs.AXTitle = native.string('Open'); // Nonmatching need not mean empty.
+  native.panel.attrs.AXParent = root;
+  root.attrs.AXChildren = native.array([native.panel]);
+  native.app.attrs.AXWindows = native.array([root]);
+  let parent = native.panel;
+  for (let index = 0; index < groups; index++) {
+    const group = element('AXGroup', parent);
+    if (parent === native.panel) parent.attrs.AXChildren.value.push(group);
+    else parent.attrs.AXChildren = native.array([group]);
+    parent = group;
+  }
+  const header = element('AXStaticText', parent, {AXValue: native.string('Choose a BibTeX or BibLaTeX library')});
+  if (parent === native.panel) parent.attrs.AXChildren.value.push(header);
+  else parent.attrs.AXChildren = native.array([header]);
+  return Object.assign(native, {root, header, headerParent: parent, element});
+}
+
+test('the legacy untitled direct sheet accepts one owned fixed banner through structural groups only', () => {
+  for (const groups of [0, 1]) {
+    const native = untitledSheetScenario({}, groups);
+    assert.deepEqual(native.call('location-identity'), {ready: true, owned: true, token: identity()});
+    native.setPathOpen(false);
+    native.panel.attrs.AXChildren.value.push(groups === 0 ? native.header : native.headerParent);
+    assert.deepEqual(native.call('after-location', identity()), {ready: true, closed: false});
+    assert.equal(native.posted.length, 0);
+  }
+});
+
+test('banner fallback refuses foreign, wrong, browser-only, duplicate and detached header proofs', () => {
+  const wrong = untitledSheetScenario(); wrong.header.attrs.AXValue = wrong.string('Other chooser');
+  assert.equal(wrong.call('location-identity').ready, false);
+  const foreign = untitledSheetScenario(); foreign.header.pid = 456;
+  assert.throws(() => foreign.call('location-identity'), /ownership/);
+  const browser = untitledSheetScenario();
+  browser.panel.attrs.AXChildren.value.pop(); browser.browser.attrs.AXChildren = browser.array([browser.header]);
+  assert.equal(browser.call('location-identity').ready, false);
+  assert.equal(browser.reads.filter(([name, attr]) => name === 'count' && attr === 'AXChildren').length, 2,
+    'Read root and sheet children, never the file browser');
+  const duplicate = untitledSheetScenario();
+  duplicate.panel.attrs.AXChildren.value.push(duplicate.element('AXStaticText', duplicate.panel,
+    {AXValue: duplicate.string('Choose a BibTeX or BibLaTeX library')}));
+  assert.throws(() => duplicate.call('location-identity'), /ambiguous/);
+  const detached = untitledSheetScenario(); detached.panel.attrs.AXParent = detached.app;
+  assert.throws(() => detached.call('location-identity'), /parent|ownership/);
+  for (const native of [wrong, foreign, browser, duplicate, detached]) assert.equal(native.posted.length, 0);
+});
+
+test('banner discovery cannot accept a partial header before a cycle, node bound or AX budget failure', () => {
+  const cycle = untitledSheetScenario({}, 1);
+  cycle.headerParent.attrs.AXChildren.value.push(cycle.headerParent);
+  assert.throws(() => cycle.call('location-identity'), /cyclic|parent|bound/);
+  const large = untitledSheetScenario();
+  large.panel.attrs.AXChildren.value.push(...Array.from({length: 17}, () => large.element('AXButton', large.panel)));
+  assert.throws(() => large.call('location-identity'), /bound/);
+  const deep = untitledSheetScenario({}, 4);
+  assert.throws(() => deep.call('location-identity'), /bound|budget/);
+  const budget = untitledSheetScenario({callMilliseconds: 250});
+  assert.throws(() => budget.call('location-identity'), /budget/);
+  for (const native of [cycle, large, deep, budget]) assert.equal(native.posted.length, 0);
+});
+
+test('banner fallback requires the owning app window relation and does not broaden root roles', () => {
+  const native = untitledSheetScenario(); native.root.attrs.AXRole = native.string('AXSheet');
+  assert.equal(native.call('location-identity').ready, false);
+  assert.equal(native.posted.length, 0);
+});
+
+
+test('the exact-object AX identity cache expires per helper and never accepts a new equal-looking foreign wrapper', () => {
+  const native = axScenario();
+  assert.equal(native.call('location-identity').ready, true);
+  assert.equal(native.pidReads.filter(value => value === native.panel).length, 1,
+    'Repeated attributes reuse only the already checked exact native object');
+  assert.equal(native.call('location-identity').ready, true);
+  assert.equal(native.pidReads.filter(value => value === native.panel).length, 2,
+    'A new observation validates again');
+  const foreign = {type: 'AX', pid: 456, nativeObject: true, isNil: () => false,
+    nativeRef: native.panel, attrs: native.field.attrs}; // CFEqual would alias the old panel.
+  native.app.attrs.AXFocusedUIElement = foreign;
+  assert.throws(() => native.call('location-identity'), /ownership/);
+  assert.equal(native.posted.length, 0);
+  const expired = axScenario(); assert.equal(expired.call('location-identity').ready, true);
+  expired.field.pid = 456;
+  assert.throws(() => expired.call('location-identity'), /ownership/);
+});
+
+test('cached AX identities cannot suppress fresh attribute errors or the 256-call observation cap', () => {
+  const stale = axScenario({onRead: (api, name, attr) => { if (attr === 'AXFocused') api.fail(attr); }});
+  assert.throws(() => stale.call('location-identity'), /AX observation failed/);
+  assert.equal(stale.posted.length, 0);
+  const large = untitledSheetScenario();
+  large.panel.attrs.AXChildren = large.array(Array.from({length: 16}, (_, index) =>
+    large.element('AXStaticText', large.panel, {AXValue: large.string(index === 0 ?
+      'Choose a BibTeX or BibLaTeX library' : 'Synthetic other header')})));
+  assert.throws(() => large.call('location-identity'), /budget/);
+  assert.equal(large.diagnostics.at(-1).reason, 'budget-exceeded');
+  assert.equal(large.posted.length, 0);
 });

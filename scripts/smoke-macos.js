@@ -311,13 +311,23 @@ function run(argv) {
             catch (_) { throw Error('Editor fullscreen accessibility control unavailable'); }
         }
         const deadline = Date.now() + 20000;
-        while ((fullscreen(editorWindow()) !== desired || !onScreen(editorId, [editorWindow()])) && Date.now() < deadline) {
+        let completed;
+        while (Date.now() < deadline) {
+            // One owned window supplies both observations for this poll. AX
+            // may be transiently unknown while a Space transition settles.
+            const window = editorWindow();
+            const state = readEditorFullscreen(() => window.attributes.byName('AXFullScreen').value());
+            const visible = onScreen(editorId, [window]);
+            if (state.available && state.fullscreen === desired && visible && Date.now() < deadline) {
+                completed = {fullscreen: state.fullscreen, visible};
+                break;
+            }
             $.NSThread.sleepForTimeInterval(0.1);
         }
-        if (fullscreen(editorWindow()) !== desired || !onScreen(editorId, [editorWindow()])) {
-            throw Error('Editor fullscreen transition did not complete on screen');
-        }
-        result = {fullscreen: desired, visible: onScreen(editorId, [editorWindow()])};
+        if (!completed) throw Error('Editor fullscreen transition did not complete on screen');
+        // Re-reading here could reject a transition without using its remaining
+        // wait budget. Return the same positively validated AX/CG sample.
+        result = completed;
         break;
     }
     case 'chooser-state': {

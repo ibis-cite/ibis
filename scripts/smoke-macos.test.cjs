@@ -22,6 +22,54 @@ for (const malformed of [null, undefined, 0, 'false']) {
     assert.throws(() => context.readEditorFullscreen(() => malformed), /Editor fullscreen accessibility state unavailable/);
 }
 
+// Execute the real setter with changing AX/CG observations, rather than
+// asserting its source spelling. All native calls below are synthetic.
+function fullscreenScenario(samples, visibility = [true]) {
+    let elapsed = 0, reads = 0, writes = 0, visibleReads = 0, windowCount = 1;
+    const attribute = {};
+    Object.defineProperty(attribute, 'value', {
+        get: () => () => {
+            const value = samples[Math.min(reads++, samples.length - 1)];
+            if (value instanceof Error) throw value;
+            return value;
+        },
+        set: () => { writes++; },
+    });
+    const window = {attributes: {byName: () => attribute}, position: () => [10, 20], size: () => [500, 400]};
+    const native = {
+        ObjC: {import() {}, deepUnwrap: value => value, castRefToObject: value => value},
+        Date: {now: () => elapsed},
+        Application: () => ({applicationProcesses: {whose: () => () => [{windows: () => Array(windowCount).fill(window)}]}}),
+        $: {
+            NSThread: {sleepForTimeInterval: seconds => { elapsed += seconds * 1000; }},
+            CGWindowListCopyWindowInfo: () => visibility[Math.min(visibleReads++, visibility.length - 1)] ?
+                [{kCGWindowOwnerPID: 456, kCGWindowAlpha: 1, kCGWindowBounds: {X: 10, Y: 20, Width: 500, Height: 400}}] : [],
+            CFArrayGetCount: value => value.length, CFArrayGetValueAtIndex: (value, index) => value[index],
+        },
+    };
+    vm.createContext(native);
+    vm.runInContext(fs.readFileSync(`${__dirname}/smoke-macos.js`, 'utf8'), native);
+    return {run: () => JSON.parse(native.run(['set-editor-fullscreen', '123', '456', 'false'])),
+        reads: () => reads, writes: () => writes, elapsed: () => elapsed,
+        duplicate: () => { windowCount = 2; }};
+}
+const changing = fullscreenScenario([true, false, true]);
+assert.deepEqual(changing.run(), {fullscreen: false, visible: true});
+assert.equal(changing.reads(), 2, 'Return the accepted AX/CG sample; a fresh final read could regress');
+assert.equal(changing.writes(), 1);
+const unknownThenReady = fullscreenScenario([true, new Error('Synthetic transition getter'), false]);
+assert.deepEqual(unknownThenReady.run(), {fullscreen: false, visible: true});
+assert.ok(unknownThenReady.elapsed() > 0);
+for (const sample of [true, new Error('Synthetic unknown transition')]) {
+    const timeout = fullscreenScenario([true, sample]);
+    assert.throws(timeout.run, /transition did not complete on screen/);
+    assert.equal(timeout.elapsed(), 20000, 'Unknown or false readiness uses the original deadline');
+}
+const hidden = fullscreenScenario([true, false], [false]);
+assert.throws(hidden.run, /transition did not complete on screen/);
+const duplicates = fullscreenScenario([true, false]); duplicates.duplicate();
+assert.throws(duplicates.run, /single synthetic editor window/);
+
 const events = [];
 context.sendPhysicalChord('ctrl+super+r', (...event) => events.push(event));
 assert.deepEqual(events, [
