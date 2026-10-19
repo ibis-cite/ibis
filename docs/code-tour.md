@@ -2,9 +2,10 @@
 
 Follow one action through the code, then use the tests beside that action.
 Paths below describe the current desktop picker and CLI. The broader design in
-[architecture.md](architecture.md) also includes planned integrations. Zotero
-import, citeproc styles and direct insertion into other applications are future
-work; today's picker searches a `.bib` library and copies citation keys.
+[architecture.md](architecture.md) also includes planned integrations. Today's
+picker searches a `.bib` file or a running Zotero personal library and copies
+citation keys. Reading Zotero's closed database, citeproc styles and direct
+insertion into other applications are future work.
 
 The accepted [picker design](design.md) guides the staged redesign in #223 after
 the preview. Its rollout describes future changes to values, layout and window
@@ -26,7 +27,9 @@ behavior; use this tour to locate the current implementation and its tests.
    loads settings and registers the global shortcut. Its pressed-event handler
    calls `toggle_picker` in [picker.rs](../apps/desktop/src-tauri/src/picker.rs).
 2. `toggle_picker` calls `show_picker` when the window needs to appear.
-   `show_picker` emits `picker:shown` after showing and focusing the window.
+   `show_picker` checks a selected Zotero library for changes and emits
+   `picker:shown` after showing and focusing the window. File libraries keep
+   their existing watcher instead.
 3. [api.ts](../apps/desktop/src/api.ts) listens through `onPickerShown`.
    [App.tsx](../apps/desktop/src/App.tsx) focuses the search input and selects its
    previous text, so typing replaces the old query.
@@ -55,8 +58,8 @@ background. A cosmetic setup failure retains a working rectangular window.
 The search effect's `current` flag ignores replies for superseded queries.
 `resultsQuery` records which query produced the visible results and also guards
 copying. Rust's `LibraryState` explicitly distinguishes `none`, `loading`,
-`loaded`, `reloading` and `error`. Its status also distinguishes the attempted
-filename from `snapshot_name`, the library still available for searching.
+`loaded`, `reloading` and `error`. Its status also distinguishes the requested
+source name from `snapshot_name`, the library still available for searching.
 `has_snapshot` remains true for a successfully loaded empty library. Initial
 status and `library:changed` events have a separate ordering problem: follow
 their state updates when debugging startup (#91).
@@ -93,15 +96,15 @@ with the explicit `bindings::tests::export_contract` test described in that file
 
 ## Opening a library: file to references
 
-At startup, `main.rs` chooses the `IBIS_LIBRARY` override or saved library path
+At startup, `main.rs` chooses the `IBIS_LIBRARY` file override or saved source
 and calls `start_open`. The Choose library button takes this path:
 `api.chooseLibrary` → Rust `choose_library` → `choose_library_file` → native
-dialog callback → `start_open(path, true)`. These Rust functions are in
+dialog callback → `start_open(Source::File(path), true)`. These Rust functions are in
 [library.rs](../apps/desktop/src-tauri/src/library.rs). `DialogOpen` prevents
 duplicate dialogs and keeps the picker open while its own dialog has focus.
 
 `start_open` numbers the request synchronously and loads in a background task.
-Choosing the already installed path is a reload; choosing a different path is
+Choosing the already installed source is a reload; choosing a different source is
 an initial load. The parsing path is:
 
 | Stage | File and function | What to inspect |
@@ -126,15 +129,23 @@ logical quotas. The current limits are documented in
 [architecture.md](architecture.md#sources). Exhaustion retains completed entries
 with a warning; a limited reload returns an error so it cannot replace the index.
 
+Use Zotero takes `api.useZotero` → Rust `use_zotero` →
+`use_zotero_library` → `start_open(Source::Zotero(...), true)`. `load_source`
+dispatches this choice to `load_zotero`, which uses
+[core Zotero API](../crates/ibis-core/src/zotero/api.rs) through the bounded,
+loopback-only [local transport](../crates/ibis-zotero-local/src/lib.rs).
+The picker offers the personal library; Zotero must be running with its local
+API enabled. A refresh reporting `Unchanged` keeps the installed index.
+
 ## Reloading: who keeps the last good library?
 
-`watch_current` in desktop `library.rs` constructs
+For a file source, `watch_current` in desktop `library.rs` constructs
 [SourceWatch](../crates/ibis-core/src/source.rs). It watches containing directories
 so editor save-by-rename works, and also manages symlink target watches.
 The bounded worker coalesces events and calls `stable_read`: two identical
 bounded reads separated by a quiet interval produce a candidate load.
 
-Desktop startup and manual opens use `load_library_snapshot`: parsing and the
+File startup and manual opens use `load_library_snapshot`: parsing and the
 watcher's baseline come from the same bounded read. `take_watch_source` hands
 that baseline to `SourceWatch::with_snapshot` only for the current request;
 it cannot consume a newer request's baseline. Only subsequent watcher reads use
@@ -142,6 +153,11 @@ it cannot consume a newer request's baseline. Only subsequent watcher reads use
 the watcher keeps watching after reporting an error. Reload parsing rejects
 demonstrably unfinished entries and work limit exhaustion. A quiet interval
 cannot prove a writer has finished at an otherwise valid prefix.
+
+Switching successfully to Zotero stops the previous file watch. Zotero is
+checked when the picker opens and through Reload, using the loaded library
+version and server snapshot to detect unchanged data. The file-based native smoke suite does not
+establish acceptance against a running Zotero installation.
 
 The **desktop** owns the last good snapshot. `install` compares the request with
 `LoadRequests`, discards outdated work, replaces the index on success, and records
@@ -159,7 +175,8 @@ status and increments `libraryVersion` to rerun the current search.
 `main.rs` obtains Tauri's `app_config_dir` and appends `settings.json`.
 [core settings.rs](../crates/ibis-core/src/settings.rs) defines `schema_version`,
 `shortcut`, `library` and `copy_format`. Format 2 stores a file choice as
-`{"bibtex": "/path/refs.bib"}`; legacy path strings migrate in memory when read.
+`{"bibtex": "/path/refs.bib"}` and a Zotero choice as `{"zotero": "user"}`;
+legacy path strings migrate in memory when read.
 [ADR 0018](adr/0018-settings-format-2.md) records the format and backup rules.
 `load` reports problems and can recover from backup or defaults. `save` uses a
 temporary file, rename and backup, and refuses to overwrite a newer schema.
@@ -167,7 +184,7 @@ temporary file, rename and backup, and refuses to overwrite a newer schema.
 [preferences.rs](../apps/desktop/src-tauri/src/preferences.rs)'s
 `SettingsFile::update` serializes the complete read-change-save operation, so
 intervening edits are preserved. A successful remembered library choice saves its
-path; a successful clipboard write saves the format. Shortcut configuration is
+tagged source; a successful clipboard write saves the format. Shortcut configuration is
 read at startup. Follow these callers before changing the settings format; its
 versioning is separate from picker UI behavior.
 
