@@ -10,7 +10,10 @@ param(
 $ErrorActionPreference = 'Stop'
 
 function Get-CreationIdentity($Process, [string] $Failure) {
-  if ($Process.CreationDate -isnot [DateTime] -or $Process.CreationDate.ToUniversalTime().Ticks -le 0) { throw $Failure }
+  # Reject the original default value before local-to-UTC conversion: west of
+  # UTC, an unspecified MinValue becomes a positive UTC tick count.
+  if ($Process.CreationDate -isnot [DateTime] -or $Process.CreationDate.Ticks -le 0 -or
+      $Process.CreationDate.ToUniversalTime().Ticks -le 0) { throw $Failure }
   $Process.CreationDate.ToUniversalTime().Ticks
 }
 

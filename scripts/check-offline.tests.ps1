@@ -50,6 +50,17 @@ foreach ($invalid in @($null, '2026-10-19', [DateTime]::MinValue)) {
   $script:processes = @((Process 10 1 $created), (Process 12 10 $invalid))
   Reject { Get-Tree 10 } 'Descendant creation identity is unavailable.'
 }
+# This fixed west-of-UTC control is independent of the runner's own timezone.
+# A normalized-ticks-only check accepts the default value demonstrated here.
+$west = [TimeZoneInfo]::CreateCustomTimeZone('synthetic-west', [TimeSpan]::FromHours(-5), 'synthetic-west', 'synthetic-west')
+$default = [DateTime]::SpecifyKind([DateTime]::MinValue, [DateTimeKind]::Unspecified)
+if ($default.Ticks -ne 0 -or [TimeZoneInfo]::ConvertTimeToUtc($default, $west).Ticks -le 0) {
+  throw 'The timezone fixture did not reproduce a positive normalized default date.'
+}
+$script:processes = @((Process 10 1 $default))
+Reject { Get-Tree 10 } 'Ibis creation identity is unavailable.'
+$script:processes = @((Process 10 1 $created), (Process 12 10 $default))
+Reject { Get-Tree 10 } 'Descendant creation identity is unavailable.'
 $script:processes = @((Process 10 1 $created.AddSeconds(1)))
 Reject { Get-Tree 10 $created.Ticks } 'Ibis process identity changed during the offline check.'
 $script:processes = @()
