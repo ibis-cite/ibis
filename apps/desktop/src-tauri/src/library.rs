@@ -498,7 +498,10 @@ pub(crate) fn refresh_zotero(app: &AppHandle) {
 fn begin_check(library: &Mutex<Library>, requests: &LoadRequests) -> Option<(u64, Source, Option<api::Snapshot>)> {
     let mut library = library.lock().ok()?;
     let source = library.source.clone()?;
-    if library.opening || library.checking || library.requested.as_ref() != Some(&source) {
+    // An installed library has no separate request; a different request is a
+    // choice in progress or a failed one that must stay visible.
+    let other_request = library.requested.as_ref().is_some_and(|requested| requested != &source);
+    if library.opening || library.checking || other_request {
         return None;
     }
     let Source::Zotero(_) = source else {
@@ -1301,15 +1304,18 @@ mod tests {
     #[test]
     fn a_zotero_change_check_is_not_shown_and_a_newer_choice_discards_it() {
         let zotero = Source::Zotero(ZoteroLibrary::User);
-        let library = Mutex::new(candidate(
+        let library = Mutex::new(Library::default());
+        let requests = LoadRequests::default();
+        // Open Zotero the ordinary way, as at start or after "Use Zotero".
+        let (opened, _, _) = begin_open(&library, &requests, zotero.clone()).unwrap_or_else(|| panic!("opens"));
+        let loaded = candidate(
             zotero.clone(),
             ibis_core::bibtex::load_str("synthetic", "@misc{kept, title={Kept}}"),
-        ));
+        );
+        install_loaded(&library, &requests, opened, Ok(Loaded::New(Box::new(loaded))));
         if let Ok(mut library) = library.lock() {
-            library.requested = Some(zotero.clone());
             library.error = Some("Zotero is not running".into());
         }
-        let requests = LoadRequests::default();
         let shown = library.lock().ok().map(|l| status(&l)).map(|s| (s.state, s.error));
         let (request, source, _) = begin_check(&library, &requests).unwrap_or_else(|| panic!("the check starts"));
         assert_eq!(source, zotero);
