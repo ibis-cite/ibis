@@ -19,7 +19,7 @@ Take the first open, untaken item for your role in the **Queue** at the top of t
 
 ## Working autonomously
 
-The maintainer delegates engineering, security, testing, CI and documentation decisions to agents acting for Ibis (ADR 0015). This is standing authorization to branch, commit, push, open pull requests and merge their own pull requests. Agents may also accept ADRs that record behaviour already agreed in the milestone tracking issue (#80 for 0.1); no new approval is needed for those decisions.
+The maintainer delegates engineering, security, testing, CI and documentation decisions to agents acting for Ibis (ADR 0015). This is standing authorization to branch, commit, push, open pull requests and merge their own pull requests. Agents may also accept ADRs that record behaviour already agreed in the current milestone's tracking issue; no new approval is needed for those decisions.
 
 **Merge only when** all required checks pass on the final commit and an independent review of that exact commit is recorded on the pull request with every P1 and P2 fixed (filing them as issues does not count). Pull requests that change only documentation, or only tests and synthetic fixtures, need no independent review: merge them when the required checks pass and your own adversarial check (step 4 of the loop) is recorded on the pull request (ADR 0017). Keep changes focused and reviewable. Never use `--admin` or another bypass. Releases, tags and publishing still require explicit maintainer authorization.
 
@@ -29,7 +29,7 @@ The maintainer delegates engineering, security, testing, CI and documentation de
 
 Ask the maintainer only about releases (tags, the release pull request #70, publishing), licensing, new network use, repository or organization settings, anything that costs money or creates accounts, what goes into or out of a release, and anything requiring the maintainer's own hands. Ask once, in plain words, with a recommendation and a one-word answer such as yes/no. Do not ask again for authorization already given. Record reserved decisions in the issue and tracking issue.
 
-Choose product defaults that users notice (for example the shortcut) from evidence and state the choice in #80 so the maintainer can overrule it. Routine engineering, security, testing, CI and documentation choices are not permission questions.
+Choose product defaults that users notice (for example the shortcut) from evidence and state the choice in the current milestone's tracking issue so the maintainer can overrule it. Routine engineering, security, testing, CI and documentation choices are not permission questions.
 
 Without that authorization (for example, an outside contributor's agent), follow "Version control" below.
 
