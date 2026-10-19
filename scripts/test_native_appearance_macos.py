@@ -1,6 +1,9 @@
 import importlib.util
+import json
 from pathlib import Path
+import subprocess
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location("appearance", Path(__file__).with_name("check-native-appearance-macos.py"))
 appearance = importlib.util.module_from_spec(spec)
@@ -8,6 +11,54 @@ spec.loader.exec_module(appearance)
 
 
 class PreferenceTransactionTests(unittest.TestCase):
+    def test_false_quit_request_can_still_have_verified_termination(self):
+        ui = appearance.NativeUI()
+        with patch.object(ui, "call", side_effect=[False, {"requested": False}, True]) as helper:
+            ui.close(True)
+        self.assertEqual(ui.cleanup_facts, {"requested": False, "terminated": True, "forced": False})
+        self.assertFalse(any(call.args[0] == "force-close" for call in helper.call_args_list))
+
+    def test_cleanup_never_forces_without_verified_original_preferences(self):
+        ui = appearance.NativeUI()
+        with patch.object(ui, "call", side_effect=[False, {"requested": False}, False]) as helper, patch.object(appearance, "wait_for", side_effect=AssertionError):
+            with self.assertRaisesRegex(RuntimeError, "requires verified preference restoration"):
+                ui.close(False)
+        self.assertFalse(any(call.args[0] == "force-close" for call in helper.call_args_list))
+
+    def test_exit_after_quit_deadline_needs_no_force_or_preference_override(self):
+        ui = appearance.NativeUI()
+        with patch.object(ui, "call", side_effect=[False, {"requested": False}, True]) as helper, patch.object(appearance, "wait_for", side_effect=AssertionError):
+            ui.close(False)
+        self.assertTrue(ui.cleanup_facts["terminated"])
+        self.assertFalse(any(call.args[0] == "force-close" for call in helper.call_args_list))
+
+    def test_native_cached_controls_revalidate_before_invoking(self):
+        subprocess.run(["node", str(Path(__file__).with_name("appearance-macos.test.cjs"))],
+                       check=True, capture_output=True, timeout=20)
+
+    def test_records_actual_final_state_but_still_fails_after_an_attempt_error(self):
+        observations, calls = [], []
+        def write(key, value):
+            calls.append(key)
+            if len(calls) == 1:
+                raise appearance.HelperTimeout("Native appearance helper timed out")
+        with self.assertRaisesRegex(RuntimeError, "Original accessibility preferences could not be restored"):
+            with appearance.saved_preferences(lambda: {"contrast": False, "transparency": True}, write,
+                                              observe=observations.append):
+                pass
+        self.assertEqual(observations[0]["final_preferences"], {"contrast": False, "transparency": True})
+        self.assertTrue(observations[0]["matches_original"])
+        self.assertEqual(observations[0]["attempts"][0]["stage"], "helper-timeout")
+        self.assertEqual(len(observations[0]["attempts"]), 3)
+
+    def test_cache_metadata_rejects_noninteger_positions_without_changing_owner(self):
+        ui = appearance.NativeUI()
+        ui.owner = json.dumps({"pid": 42, "started": 100})
+        with self.assertRaisesRegex(RuntimeError, "Native control cache metadata unavailable"):
+            ui.cache({"window_count": 1, "contrast": {"window": 0, "index": "bad", "tree_count": 3},
+                      "transparency": {"window": 0, "index": 2, "tree_count": 3}})
+        self.assertEqual(json.loads(ui.owner), {"pid": 42, "started": 100})
+
     def test_restores_original_preferences_after_failed_observation(self):
         state = {"contrast": True, "transparency": True}
         def write(key, value):

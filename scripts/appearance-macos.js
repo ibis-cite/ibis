@@ -29,15 +29,43 @@ function run(argv) {
     const controls = () => {
         const windows = owned().process.windows();
         if (windows.length > 10) throw Error('System Settings window traversal exceeded bound');
-        const nodes = windows.flatMap(window => window.entireContents());
-        if (nodes.length > 6000) throw Error('System Settings control traversal exceeded bound');
         const labels = {contrast: 'Increase contrast', transparency: 'Reduce transparency'};
-        const result = {};
-        for (const key of Object.keys(labels)) {
-            const matches = nodes.filter(node => safe(() => node.role()) === 'AXCheckBox' &&
-                [safe(() => node.title()), safe(() => node.description()), safe(() => node.name())].includes(labels[key]));
-            if (matches.length > 1) throw Error('Exact accessibility preference control is ambiguous');
-            if (matches.length === 1) result[key] = matches[0];
+        const trees = new Map();
+        const tree = index => {
+            if (!trees.has(index)) trees.set(index, windows[index].entireContents());
+            if ([...trees.values()].reduce((sum, nodes) => sum + nodes.length, 0) > 6000) {
+                throw Error('System Settings control traversal exceeded bound');
+            }
+            return trees.get(index);
+        };
+        const exact = (node, key) => node && safe(() => node.role()) === 'AXCheckBox' &&
+            [safe(() => node.title()), safe(() => node.description()), safe(() => node.name())].includes(labels[key]);
+        const cached = JSON.parse(identity).controls;
+        const result = {refs: {}, paths: {window_count: windows.length}};
+        if (cached && cached.window_count === windows.length && Object.keys(labels).every(key => {
+            const position = cached[key];
+            if (!position || !['window', 'index', 'tree_count'].every(field => Number.isInteger(position[field])) ||
+                position.window < 0 || position.window >= windows.length || position.index < 0) return false;
+            const nodes = tree(position.window);
+            if (position.tree_count !== nodes.length || position.index >= nodes.length || !exact(nodes[position.index], key)) return false;
+            result.refs[key] = nodes[position.index];
+            return true;
+        })) return {refs: result.refs, paths: cached};
+        // A cached index is only a hint into a fresh bounded AX array. Changed
+        // counts, ownership, role or fixed label invalidate it; rediscover once.
+        result.refs = {};
+        for (let window = 0; window < windows.length; window++) {
+            const nodes = tree(window);
+            nodes.forEach((node, index) => {
+                if (safe(() => node.role()) !== 'AXCheckBox') return;
+                const names = [safe(() => node.title()), safe(() => node.description()), safe(() => node.name())];
+                for (const key of Object.keys(labels)) {
+                    if (!names.includes(labels[key])) continue;
+                    if (result.refs[key]) throw Error('Exact accessibility preference control is ambiguous');
+                    result.refs[key] = node;
+                    result.paths[key] = {window, index, tree_count: nodes.length};
+                }
+            });
         }
         return result;
     };
@@ -62,22 +90,39 @@ function run(argv) {
     case 'owner': result = owner(); break;
     case 'controls-ready': {
         const found = controls();
-        result = Boolean(found.contrast && found.transparency);
+        result = {ready: Boolean(found.refs.contrast && found.refs.transparency)};
+        if (result.ready) result.controls = found.paths;
         break;
     }
-    case 'read': result = state(controls()); break;
+    case 'read': {
+        const found = controls();
+        result = {...state(found.refs), controls: found.paths};
+        break;
+    }
     case 'set': {
         const requested = JSON.parse(argument);
         if (!['contrast', 'transparency'].includes(requested.key) || typeof requested.value !== 'boolean') {
             throw Error('Unsupported accessibility preference request');
         }
         const found = controls();
-        if (state(found)[requested.key] !== requested.value) found[requested.key].actions.byName('AXPress').perform();
-        result = true;
+        const changed = state(found.refs)[requested.key] !== requested.value;
+        if (changed) found.refs[requested.key].actions.byName('AXPress').perform();
+        result = {changed, controls: found.paths};
         break;
     }
     case 'close':
-        if (!owned().app.terminate()) throw Error('Owned System Settings process could not close');
+        result = {requested: owned().app.terminate() === true};
+        break;
+    case 'closed': {
+        const token = JSON.parse(identity);
+        const app = $.NSRunningApplication.runningApplicationWithProcessIdentifier(token.pid);
+        result = !app || app.isTerminated === true || ObjC.unwrap(app.bundleIdentifier) !== bundle ||
+            Number(app.launchDate.timeIntervalSince1970) !== token.started;
+        break;
+    }
+    case 'force-close':
+        if (JSON.parse(argument).restoration_verified !== true) throw Error('Force quit requires verified preference restoration');
+        if (!owned().app.forceTerminate()) throw Error('Owned System Settings force quit failed');
         result = true;
         break;
     case 'backdrop': {

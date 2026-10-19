@@ -67,8 +67,8 @@ contains these actual native startup selections:
 | Windows Server 2025 | `opaque / unknown-preferences` | Visible opaque picker; unavailable-preferences fallback. |
 | Linux | `opaque / unsupported` | Visible opaque picker, as expected. |
 
-These are real initial fallback observations. No run selected an applied material;
-no live OS preference toggle or controlled-backdrop material session passed.
+These runs established initial fallback observations. The later focused macOS
+session below supplies actual material and live-toggle observations.
 
 New startup logs emit one fixed `ibis: native appearance mode=… reason=…` line
 for initial selection and policy changes. Modes are `opaque`, `vibrancy` or
@@ -104,7 +104,19 @@ library, for one combined native appearance/accessibility session per target OS:
    existing native shortcut/copy/chooser/fullscreen checks on this exact build.
    Reuse that evidence rather than repeating it as a separate appearance ritual.
 
-No real OS accessibility-toggle or controlled-backdrop session has passed yet.
+At `f0ec49ba14e1e1595d933d1e8338668601baf574`, the macOS
+[native artifact](https://github.com/ibiscite/ibis/actions/runs/39177725318/artifacts/12154819869)
+records all five expected mode observations: vibrancy with both accessibility
+settings off, opaque Reduce Transparency, restored vibrancy, opaque Increase
+Contrast (which also enabled Reduce Transparency), then restored vibrancy.
+The five inspected screenshots show the owned RGB backdrop blurred and tinted
+through the material, an opaque reduced-transparency surface, and black text and
+lines in high contrast. These are real rendering and live preference observations.
+The overall run failed because a final restoration action timed out and Settings
+cleanup failed. Its final actual preference values were not recorded, so verified
+restoration and a complete successful session remain required. Draft acceptance
+is unchanged by those partial successes; macOS outer corners remain square.
+
 Do not modify protected OS preference databases or infer permission denial from
 an unexplained helper error. IME/VoiceOver and display/provider cells remain in
 the shared compatibility checklist, not extra appearance-only hand checks.
@@ -115,6 +127,14 @@ settings, saves both native boolean values before changes, and restores them in
 `finally`, including after a failed observation. It never writes preference/TCC
 databases or requests permissions. Only its newly identified System Settings
 process and owned app/backdrop subprocesses can be closed.
+Cached numeric positions are hints into newly read AX arrays: process identity,
+tree counts, checkbox roles and exact fixed labels are revalidated on every
+action. A mismatch triggers one bounded rediscovery; stale indices are never
+invoked. Restoration records all attempts, the actual final booleans and whether
+they match the originals. An attempt failure still fails the run even when a
+later read matches. Cleanup observes termination after a normal quit request;
+only a still-live revalidated owned Settings process, after verified restoration,
+can be force-terminated. Its requested/terminated/forced facts are recorded.
 
 ```sh
 python3 -B scripts/test_native_appearance_macos.py

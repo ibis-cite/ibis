@@ -17,6 +17,10 @@ class Unavailable(RuntimeError):
     pass
 
 
+class HelperTimeout(RuntimeError):
+    pass
+
+
 def wait_for(read, description, seconds=20):
     deadline = time.monotonic() + seconds
     while time.monotonic() < deadline:
@@ -40,23 +44,31 @@ def checked_preferences(value, required):
 
 
 @contextmanager
-def saved_preferences(read, write, restored=lambda: None):
+def saved_preferences(read, write, restored=lambda: None, observe=lambda value: None):
     original = preferences(read())
     try:
         yield original
     finally:
-        failed = False
+        failed, attempts = False, []
         # Contrast can itself enable Reduce Transparency. Disable it first,
         # restore transparency, then restore contrast, verifying both at end.
         for key, value in (("contrast", False), ("transparency", original["transparency"]), ("contrast", original["contrast"])):
             try:
                 write(key, value)
-            except Exception:
+                stage = "verified"
+            except Exception as error:
                 failed = True
+                stage = "helper-timeout" if isinstance(error, HelperTimeout) else (
+                    "verification-deadline" if isinstance(error, AssertionError) else "action-failed")
+            attempts.append({"key": key, "value": value, "stage": stage})
+        final, matches = None, False
         try:
-            failed |= preferences(read()) != original
+            final = preferences(read())
+            matches = final == original
+            failed |= not matches
         except Exception:
             failed = True
+        observe({"attempts": attempts, "final_preferences": final, "matches_original": matches})
         if failed:
             raise RuntimeError("Original accessibility preferences could not be restored") from None
         restored()
@@ -71,6 +83,19 @@ class NativeUI:
         self.command = ["osascript", "-l", "JavaScript", str(Path(__file__).with_name("appearance-macos.js"))]
         self.owner = ""
 
+    def cache(self, value):
+        valid = isinstance(value, dict) and type(value.get("window_count")) is int and 0 < value["window_count"] <= 10
+        for key in ("contrast", "transparency"):
+            position = value.get(key) if valid else None
+            valid = valid and isinstance(position, dict) and all(type(position.get(field)) is int for field in ("window", "index", "tree_count"))
+            if valid:
+                valid = 0 <= position["window"] < value["window_count"] and 0 <= position["index"] < position["tree_count"] <= 6000
+        if not valid:
+            raise RuntimeError("Native control cache metadata unavailable")
+        token = json.loads(self.owner)
+        token["controls"] = value
+        self.owner = json.dumps(token)
+
     def call(self, action, value=""):
         if getattr(self, "last_action", None) != action:
             print("NATIVE APPEARANCE ACTION " + action, flush=True)
@@ -79,19 +104,56 @@ class NativeUI:
             result = subprocess.run(self.command + [action, self.owner, value], encoding="utf-8",
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=25)
         except subprocess.TimeoutExpired:
-            raise RuntimeError("Native appearance helper timed out") from None
+            raise HelperTimeout("Native appearance helper timed out") from None
         if result.returncode:
             if any(marker in result.stderr for marker in ("TCC Accessibility is not granted", "not allowed assistive access", "(-1743)")):
                 raise Unavailable("Native appearance Accessibility/Automation permission unavailable")
             raise RuntimeError("Native appearance helper failed")
-        return json.loads(result.stdout)
+        value = json.loads(result.stdout)
+        if isinstance(value, dict) and "controls" in value:
+            self.cache(value["controls"])
+        return value
 
     def read(self):
         return preferences(self.call("read"))
 
     def write(self, key, value):
-        self.call("set", json.dumps({"key": key, "value": value}))
-        wait_for(lambda: self.read()[key] == value, "ordinary accessibility preference change")
+        result = self.call("set", json.dumps({"key": key, "value": value}))
+        if not isinstance(result, dict) or type(result.get("changed")) is not bool:
+            raise RuntimeError("Native preference action metadata unavailable")
+        if result["changed"]:
+            wait_for(lambda: self.read()[key] == value, "ordinary accessibility preference change")
+
+    def close(self, restoration_verified):
+        self.cleanup_facts = {"requested": False, "terminated": False, "forced": False}
+        def terminated():
+            value = self.call("closed")
+            if type(value) is not bool:
+                raise RuntimeError("Owned System Settings termination metadata unavailable")
+            self.cleanup_facts["terminated"] = value
+            return value
+        if terminated():
+            return
+        try:
+            request = self.call("close")
+        except Exception:
+            if terminated():
+                return
+            raise
+        if not isinstance(request, dict) or type(request.get("requested")) is not bool:
+            raise RuntimeError("Owned System Settings termination metadata unavailable")
+        self.cleanup_facts["requested"] = request["requested"]
+        try:
+            wait_for(terminated, "owned System Settings normal quit", seconds=5)
+        except AssertionError:
+            if terminated():
+                return
+            if not restoration_verified:
+                raise RuntimeError("Owned System Settings force quit requires verified preference restoration") from None
+            if self.call("force-close", json.dumps({"restoration_verified": True})) is not True:
+                raise RuntimeError("Owned System Settings force quit metadata unavailable")
+            self.cleanup_facts["forced"] = True
+            wait_for(terminated, "owned System Settings force quit", seconds=5)
 
 
 def stop_owned(process):
@@ -121,11 +183,13 @@ def main():
                        check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, timeout=20)
         ui.owner = wait_for(lambda: ui.call("owner"), "new System Settings process")
         claimed = True
-        wait_for(lambda: ui.call("controls-ready"), "exact accessibility display controls")
+        wait_for(lambda: ui.call("controls-ready").get("ready") is True, "exact accessibility display controls")
         settings = Path.home() / "Library/Application Support/io.github.ibiscite.ibis/settings.json"
         if any(settings.with_suffix(suffix).exists() for suffix in (".json", ".json.bak", ".json.tmp")):
             raise Unavailable("Use a disposable desktop without existing Ibis settings")
-        with saved_preferences(ui.read, ui.write, lambda: report.update(restored=True)) as original:
+        def restoration(value):
+            report.update(restored=value["matches_original"], restoration=value)
+        with saved_preferences(ui.read, ui.write, observe=restoration) as original:
             report["original_preferences"] = original
             ui.write("contrast", False)
             ui.write("transparency", False)
@@ -183,7 +247,7 @@ def main():
         report.update(status="unavailable", reason=str(error))
     except Exception as error:
         # Allow only our fixed failure classes; never print subprocess commands/errors.
-        report["reason"] = str(error) if type(error) in (RuntimeError, AssertionError) else type(error).__name__
+        report["reason"] = str(error) if type(error) in (RuntimeError, AssertionError, HelperTimeout) else type(error).__name__
     finally:
         for process in (app, backdrop):
             try:
@@ -192,9 +256,11 @@ def main():
                 report.update(status="failed", cleanup="Owned appearance process cleanup failed")
         if claimed:
             try:
-                ui.call("close")  # Revalidates PID, bundle and creation time.
+                ui.close(report["restored"])  # Every action revalidates process identity.
             except Exception:
                 report.update(status="failed", cleanup="Owned System Settings cleanup failed")
+            finally:
+                report["settings_cleanup"] = dict(ui.cleanup_facts)
         (args.output / "appearance.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print("Native appearance status: " + report["status"], flush=True)
     return {"observed": 0, "unavailable": 2}.get(report["status"], 1)
