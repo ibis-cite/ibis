@@ -97,6 +97,10 @@ MACOS_AX_REASONS = frozenset((
     'bind-unavailable', 'call-exception', 'ax-error', 'missing-reference', 'invalid-type-id',
     'type-mismatch', 'owner-mismatch', 'budget-exceeded', 'invalid-result',
 ))
+MACOS_READY_REASONS = frozenset((
+    'registration-unavailable', 'panel-not-found', 'not-foreground', 'sheet-absent',
+    'focused-control-not-ready', 'focus-outside-sheet', 'final-ownership-not-ready',
+))
 
 
 def absolute_executable(value):
@@ -163,8 +167,9 @@ def helper_diagnostics(stderr):
         return []
     safe = []
     ax_reported = False
+    ready_reported = False
     for line in stderr[:65536].splitlines():
-        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS AX ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
+        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS AX ", "NATIVE CHOOSER MACOS READY ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
         if prefix is None:
             continue
         try:
@@ -178,6 +183,10 @@ def helper_diagnostics(stderr):
                      and type(value['api']) is str and value['api'] in MACOS_AX_APIS
                      and type(value['reason']) is str and value['reason'] in MACOS_AX_REASONS)
             ax_reported = ax_reported or valid
+        elif prefix == "NATIVE CHOOSER MACOS READY ":
+            valid = (not ready_reported and set(value) == {'reason'}
+                     and type(value['reason']) is str and value['reason'] in MACOS_READY_REASONS)
+            ready_reported = ready_reported or valid
         elif prefix == "NATIVE CHOOSER WINDOWS LOCATION ":
             valid = set(value) == set(WINDOWS_LOCATION_FIELDS) and all(type(item) is bool for item in value.values())
         elif prefix == "NATIVE CHOOSER MACOS ":
@@ -221,17 +230,36 @@ def wait_for_chosen_query(snapshot, index, report):
         raise
 
 
-def prepare_rename_query(native, snapshot, system):
+def prepare_rename_query(native, snapshot, system, previous_index=None, report=None):
     native.key("Escape")
     smoke.wait_for(lambda: not snapshot()["visible"], "rename query hides picker before restoring search focus")
     native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+y")
+    current, editable = {"nodes": []}, []
     def ready():
+        nonlocal current, editable
         current = snapshot()
-        return current["visible"] and current["foreground"] and bool(smoke.named(current, "Search references"))
-    smoke.wait_for(ready, "rename query shows the foreground picker before typing")
+        named = smoke.named(current, "Search references")
+        editable = ([node for node in named if node.get("role", "").lower().replace(" ", "") in smoke.EDITABLE_ROLES]
+                    if system == "Windows" else [])
+        focused = len(editable) == 1 and editable[0].get("focused") is True
+        return current["visible"] and current["foreground"] and bool(named) and (system != "Windows" or focused)
+    try:
+        smoke.wait_for(ready, "rename query shows the foreground picker before typing")
+    except AssertionError:
+        if system == "Windows" and report is not None:
+            prior = f"smoke{previous_index:06d}" if previous_index is not None else None
+            title = f"Ibis smoke reference {previous_index:06d}" if previous_index is not None else None
+            facts = {"visible": current.get("visible") is True, "foreground": current.get("foreground") is True,
+                     "unique_editable": len(editable) == 1,
+                     "editable_focused": len(editable) == 1 and editable[0].get("focused") is True,
+                     "known_result_focused": title is not None and any(node.get("focused") is True for node in smoke.named(current, title)),
+                     "previous_query_unchanged": prior is not None and len(editable) == 1 and editable[0].get("value") == prior}
+            report["rename_focus_failure"] = facts
+            print("NATIVE CHOOSER RENAME FOCUS FAILURE " + json.dumps(facts), file=sys.stderr)
+        raise
 
 
-def rename_library_roundtrip(library, settings, click, snapshot, query, prepare_query=lambda: None):
+def rename_library_roundtrip(library, settings, click, snapshot, query, prepare_query=lambda previous: None):
     original, preferences = library.read_bytes(), settings.read_bytes()
     renamed = library.with_name("renamed 引用.bib")
     assert not renamed.exists() and not renamed.is_symlink(), "Owned rename destination already exists"
@@ -272,7 +300,7 @@ def rename_library_roundtrip(library, settings, click, snapshot, query, prepare_
                     and (not require_query or state["retained_query_zero"]))
 
         smoke.wait_for(missing_explained, "renamed-away library names the missing old path and retains its snapshot")
-        prepare_query()
+        prepare_query(1)
         query(0)
         smoke.wait_for(lambda: missing_explained(True), "renamed-away retained query is searchable with unchanged settings")
 
@@ -280,14 +308,14 @@ def rename_library_roundtrip(library, settings, click, snapshot, query, prepare_
         library.write_text(smoke.fixture(5), encoding="utf-8")
         click("Reload")
         smoke.wait_for(lambda: loaded(5), "distinct recovery content replaces the retained snapshot")
-        prepare_query()
+        prepare_query(0)
         query(4)
         smoke.wait_for(lambda: loaded(5, 4), "distinct recovery query and count are visible together with unchanged settings")
 
         library.write_bytes(original)
         click("Reload")
         smoke.wait_for(lambda: loaded(3), "rename roundtrip restores the original three references")
-        prepare_query()
+        prepare_query(4)
         query(2)
         smoke.wait_for(lambda: loaded(3, 2), "restored query and baseline count are visible together with unchanged settings")
     finally:
@@ -471,6 +499,15 @@ class Dialog:
             raise AssertionError("Native chooser helper returned invalid metadata") from None
         if self.system == "Darwin" and action == "location-identity":
             location_identity(value, self.child_pid, self.executable)
+            diagnostics = tuple(helper_diagnostics(getattr(result, "stderr", "")))
+            if diagnostics != getattr(self, "last_macos_location_diagnostics", None):
+                for line in diagnostics:
+                    print(line, file=sys.stderr, flush=True)
+                self.last_macos_location_diagnostics = diagnostics
+            state = {"ready": value["ready"], "owned": value["owned"]}
+            if state != getattr(self, "last_macos_location_state", None):
+                print("NATIVE CHOOSER MACOS LOCATION " + json.dumps(state), file=sys.stderr, flush=True)
+                self.last_macos_location_state = state
         if action in ("confirm", "cancel") or guarded and action == "confirm-key":
             if self.system == "Windows":
                 key = "escape" if action == "cancel" else "return"
@@ -491,13 +528,14 @@ class Dialog:
         return flags(self.call("state"), ("visible", "foreground", "owned"))
 
     def select(self, path):
-        if self.system != "Windows":
+        if self.system not in ("Windows", "Darwin"):
             return self._select(path)
         try:
             return self._select(path)
         except Exception:
             try:
-                self.capture_failure()
+                if self.system != "Darwin" or getattr(self.native, "dialog_failure_capture", None) not in ("captured", "unavailable"):
+                    self.capture_failure()
             except Exception:
                 pass  # A secondary observation must preserve the selection failure.
             raise
@@ -654,7 +692,7 @@ def check(app_path, output, system):
             passed("C3 unreadable native choice retains searchable library and settings")
             report["stage"] = "rename-away"
             rename_library_roundtrip(library, settings, native.click, snapshot, query,
-                                     lambda: prepare_rename_query(native, snapshot, system))
+                                     lambda previous: prepare_rename_query(native, snapshot, system, previous, report))
             passed("rename-away retains searchable references and settings and recovers distinct content")
             report["stage"] = "C4"
             normal_quit(process, native.click)
@@ -737,6 +775,133 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def test_macos_unready_reasons_accept_only_one_fixed_reason_per_helper(self):
+        prefix = 'NATIVE CHOOSER MACOS READY '
+        reasons = ('registration-unavailable', 'panel-not-found', 'not-foreground', 'sheet-absent',
+                   'focused-control-not-ready', 'focus-outside-sheet', 'final-ownership-not-ready')
+        for reason in reasons:
+            valid = prefix + json.dumps({'reason': reason}, sort_keys=True)
+            self.assertEqual(helper_diagnostics(valid), [valid])
+            self.assertEqual(helper_diagnostics('\n'.join([valid] * 20)), [valid])
+        for invalid in ({'reason': 'private provider text'}, {'reason': True}, {'reason': []},
+                        {'reason': 'sheet-absent', 'token': '/private/path'}, {}):
+            self.assertEqual(helper_diagnostics(prefix + json.dumps(invalid)), [])
+        valid = prefix + '{"reason": "sheet-absent"}'
+        lines = helper_diagnostics('\n'.join(['NATIVE CHOOSER MACOS {"stage":"scope"}'] * 20 + [valid]))
+        self.assertEqual(len(lines), 16)
+        self.assertEqual(lines[-1], valid)
+
+    def test_successful_darwin_location_observations_emit_only_validated_changed_facts(self):
+        from io import StringIO
+        from types import SimpleNamespace
+        native, _ = self.darwin_owned_native()
+        dialog = Dialog(native, "Darwin")
+        token = self.macos_token()
+        responses = [{"ready": False, "owned": False, "token": None}] * 2 + [{"ready": True, "owned": True, "token": token}]
+        diagnostic = 'NATIVE CHOOSER MACOS {"stage":"scope"}\nNATIVE CHOOSER MACOS READY {"reason":"sheet-absent"}'
+        results = [SimpleNamespace(returncode=0, stdout=json.dumps(value), stderr=diagnostic + '\nprivate provider text') for value in responses]
+        stderr = StringIO()
+        with patch.object(subprocess, "run", side_effect=results), patch.object(sys, "stderr", stderr):
+            for value in responses:
+                self.assertEqual(dialog.call("location-identity"), value)
+        lines = stderr.getvalue().splitlines()
+        self.assertEqual(lines.count('NATIVE CHOOSER MACOS {"stage": "scope"}'), 1)
+        self.assertEqual(lines.count('NATIVE CHOOSER MACOS READY {"reason": "sheet-absent"}'), 1)
+        self.assertEqual([line for line in lines if line.startswith('NATIVE CHOOSER MACOS LOCATION ')], [
+            'NATIVE CHOOSER MACOS LOCATION {"ready": false, "owned": false}',
+            'NATIVE CHOOSER MACOS LOCATION {"ready": true, "owned": true}'])
+        self.assertNotIn('private', stderr.getvalue())
+        self.assertNotIn(token['owner']['executable'], stderr.getvalue())
+        self.assertNotIn('token', stderr.getvalue())
+        self.assertNotIn('pid', stderr.getvalue())
+
+    def test_invalid_darwin_location_metadata_emits_no_success_diagnostics(self):
+        from io import StringIO
+        from types import SimpleNamespace
+        native, _ = self.darwin_owned_native()
+        token = self.macos_token()
+        token['owner']['executable'] = '/foreign/app'
+        for value in ({"ready": 1, "owned": False, "token": None},
+                      {"ready": False, "owned": False, "token": None, "path": "/private/path"},
+                      {"ready": True, "owned": True, "token": token}):
+            stderr = StringIO()
+            result = SimpleNamespace(returncode=0, stdout=json.dumps(value), stderr='NATIVE CHOOSER MACOS {"stage":"scope"}\nprivate payload')
+            with patch.object(subprocess, "run", return_value=result), patch.object(sys, "stderr", stderr):
+                with self.assertRaises(AssertionError):
+                    Dialog(native, 'Darwin').call('location-identity')
+            self.assertEqual(stderr.getvalue(), '')
+
+    def test_darwin_valid_unready_timeout_captures_before_return_without_typing(self):
+        from types import SimpleNamespace
+        native, _ = self.darwin_owned_native()
+        native.key, native.set_clipboard = Mock(), Mock()
+        dialog = Dialog(native, 'Darwin')
+        failure = AssertionError('original readiness timeout')
+        def timeout(predicate, message):
+            self.assertFalse(predicate())
+            raise failure
+        result = SimpleNamespace(returncode=0, stdout='{"ready":false,"owned":false,"token":null}', stderr='')
+        with patch.object(subprocess, 'run', return_value=result), patch.object(smoke, 'wait_for', side_effect=timeout), \
+             patch.object(dialog, 'capture_failure', side_effect=RuntimeError('secondary capture failure')) as capture:
+            with self.assertRaises(AssertionError) as caught:
+                dialog.select(Path('synthetic.bib'))
+        self.assertIs(caught.exception, failure)
+        capture.assert_called_once_with()
+        native.key.assert_called_once_with('super+shift+g')
+        native.set_clipboard.assert_not_called()
+
+    def test_windows_rename_focus_timeout_keeps_the_same_snapshot_and_known_query_facts(self):
+        from io import StringIO
+        current = {"visible": True, "foreground": True, "nodes": [
+            {"name": "Search references", "role": "ControlType.ComboBox", "value": "smoke000001", "focused": False},
+            {"name": "Ibis smoke reference 000001", "focused": True}, {"name": "private provider text"}]}
+        snapshot, report, stderr = Mock(side_effect=[{"visible": False}, current]), {}, StringIO()
+        failure = AssertionError("original focus timeout")
+        def wait(predicate, message):
+            if "hides" in message:
+                self.assertTrue(predicate())
+            else:
+                self.assertFalse(predicate())
+                raise failure
+        with patch.object(smoke, "wait_for", side_effect=wait), patch.object(sys, "stderr", stderr):
+            with self.assertRaises(AssertionError) as caught:
+                prepare_rename_query(Mock(), snapshot, "Windows", previous_index=1, report=report)
+        self.assertIs(caught.exception, failure)
+        self.assertEqual(snapshot.call_count, 2)
+        self.assertEqual(report["rename_focus_failure"], {"visible": True, "foreground": True,
+            "unique_editable": True, "editable_focused": False, "known_result_focused": True, "previous_query_unchanged": True})
+        self.assertNotIn("private", stderr.getvalue())
+        self.assertNotIn("smoke000001", stderr.getvalue())
+
+    def test_windows_rename_never_types_until_the_unique_editable_search_is_focused(self):
+        actions = []
+        unfocused = {"visible": True, "foreground": True, "nodes": [
+            {"name": "Search references", "role": "ControlType.ComboBox", "value": "smoke000001", "focused": False},
+            {"name": "Reload", "focused": True}, {"name": "1 result"}]}
+        focused = {**unfocused, "nodes": [{**unfocused["nodes"][0], "focused": True}]}
+        snapshots = iter([{"visible": False}, unfocused, focused])
+        class Native:
+            def key(self, key): actions.append(key)
+        def wait(predicate, message):
+            if "hides" in message:
+                self.assertTrue(predicate())
+            else:
+                self.assertFalse(predicate())
+                self.assertNotIn("type", actions)
+                self.assertTrue(predicate())
+        with patch.object(smoke, "wait_for", side_effect=wait):
+            prepare_rename_query(Native(), lambda: next(snapshots), "Windows")
+            actions.append("type")
+        self.assertEqual(actions, ["Escape", "ctrl+shift+y", "type"])
+
+    def test_windows_rename_rejects_noneditable_or_ambiguous_focused_search(self):
+        for nodes in ([{"name": "Search references", "role": "ControlType.Button", "focused": True}],
+                      [{"name": "Search references", "role": "ControlType.ComboBox", "focused": True}] * 2):
+            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "nodes": nodes}])
+            with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
+                with self.assertRaises(AssertionError):
+                    prepare_rename_query(Mock(), lambda: next(snapshots), "Windows")
+
     def test_fresh_saved_library_requires_format_two_and_one_bibtex_path(self):
         with tempfile.TemporaryDirectory() as folder:
             library, settings = Path(folder) / "references 引用.bib", Path(folder) / "settings.json"
@@ -986,7 +1151,7 @@ class Tests(unittest.TestCase):
             with self.assertRaises(AssertionError) as caught:
                 dialog.select(Path("synthetic.bib"))
         self.assertIs(caught.exception, failure)
-        for system in ("Linux", "Darwin"):
+        for system in ("Linux",):
             dialog.system = system
             with patch.object(dialog, "_select", side_effect=failure), patch.object(dialog, "capture_failure") as capture:
                 with self.assertRaises(AssertionError):
@@ -1025,7 +1190,7 @@ class Tests(unittest.TestCase):
             actions = []
             class Native:
                 def key(self, key): actions.append(key)
-            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "nodes": [{"name": "Search references"}]}])
+            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "nodes": [{"name": "Search references", "role": "ControlType.ComboBox", "focused": True}]}])
             with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
                 prepare_rename_query(Native(), lambda: next(snapshots), system)
                 actions.append("type")
@@ -1053,8 +1218,8 @@ class Tests(unittest.TestCase):
             actions = []
             def typed(index): actions.append(index); query(index)
             with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
-                rename_library_roundtrip(library, settings, click, snapshot, typed, lambda: actions.append("prepare"))
-            self.assertEqual(actions, ["prepare", 0, "prepare", 4, "prepare", 2])
+                rename_library_roundtrip(library, settings, click, snapshot, typed, lambda previous: actions.append(("prepare", previous)))
+            self.assertEqual(actions, [("prepare", 1), 0, ("prepare", 0), 4, ("prepare", 4), 2])
 
     def rename_case(self, folder, *, stale=False, change_settings=False):
         library = Path(folder) / "example 引用.bib"

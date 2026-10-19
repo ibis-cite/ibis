@@ -76,7 +76,7 @@ function locationProgress(windows, token, foreground) {
 // https://developer.apple.com/documentation/applicationservices/1462085-axuielementcopyattributevalue
 // https://developer.apple.com/documentation/applicationservices/1462933-axvaluegetvalue
 // https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
-function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic) {
+function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic, unready) {
     stage('scope');
     const bindings = {
         AXUIElementCreateSystemWide: ['id', []], AXUIElementCreateApplication: ['id', ['int']],
@@ -296,11 +296,13 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic) {
             stage('location');
             const attached = sheets(panel);
             const sheet = unique(attached);
-            if (!sheet) return null;
+            if (!sheet) { unready('sheet-absent'); return null; }
             if (!same(element(read(sheet, 'AXParent')), panel)) fail('owner-mismatch', 'Native AX sheet parent changed');
             const current = focus(panel);
-            if (!['AXTextField', 'AXComboBox'].includes(role(current.value)) || !boolean(current.value, 'AXFocused')) return null;
-            if (!current.chain.some(value => same(value, sheet))) return null;
+            if (!['AXTextField', 'AXComboBox'].includes(role(current.value)) || !boolean(current.value, 'AXFocused')) {
+                unready('focused-control-not-ready'); return null;
+            }
+            if (!current.chain.some(value => same(value, sheet))) { unready('focus-outside-sheet'); return null; }
             return frame(sheet);
         },
         ready(panel) {
@@ -325,6 +327,14 @@ function run(argv) {
     const stage = name => $.NSFileHandle.fileHandleWithStandardError.writeData(
         $('NATIVE CHOOSER MACOS ' + JSON.stringify({stage: name}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
     stage('identity');
+    const unready = reason => {
+        if (!['registration-unavailable', 'panel-not-found', 'not-foreground', 'sheet-absent',
+            'focused-control-not-ready', 'focus-outside-sheet', 'final-ownership-not-ready'].includes(reason)) {
+            throw Error('Native chooser readiness reason unavailable');
+        }
+        $.NSFileHandle.fileHandleWithStandardError.writeData(
+            $('NATIVE CHOOSER MACOS READY ' + JSON.stringify({reason}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
+    };
     const action = argv[0], appId = Number(argv[1]), executable = argv[2];
     if (!positivePid(appId) || !validExecutable(executable)) throw Error('Native app identity unavailable');
     if (!['state', 'location-state', 'location-identity', 'after-location', 'confirm-key', 'cancel', 'confirm'].includes(action)) throw Error('Unsupported native dialog action');
@@ -355,7 +365,10 @@ function run(argv) {
         if (fileURL !== true || !validExecutable(path) || path !== executable) throw Error('Native app process identity changed');
         return true;
     };
-    if (!checkOwner(action === 'location-identity')) return JSON.stringify({ready: false, owned: false, token: null});
+    if (!checkOwner(action === 'location-identity')) {
+        unready('registration-unavailable');
+        return JSON.stringify({ready: false, owned: false, token: null});
+    }
     const readWindows = () => {
         const refs = $.CGWindowListCopyWindowInfo(
             $.kCGWindowListOptionOnScreenOnly | $.kCGWindowListExcludeDesktopElements, $.kCGNullWindowID);
@@ -380,7 +393,7 @@ function run(argv) {
     };
     const diagnostic = (api, reason) => $.NSFileHandle.fileHandleWithStandardError.writeData(
         $('NATIVE CHOOSER MACOS AX ' + JSON.stringify({api, reason}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
-    const ax = () => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage, diagnostic);
+    const ax = () => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage, diagnostic, unready);
     const panelForAX = (observations, windows, token) => {
         const matching = [];
         for (const element of observations.panels()) {
@@ -396,8 +409,8 @@ function run(argv) {
         const owner = {pid: appId, executable};
         const observations = ax();
         const panel = panelForAX(observations, readWindows());
-        if (!panel) return JSON.stringify({ready: false, owned: false, token: null});
-        if (!appIsForeground()) return JSON.stringify({ready: false, owned: true, token: null});
+        if (!panel) { unready('panel-not-found'); return JSON.stringify({ready: false, owned: false, token: null}); }
+        if (!appIsForeground()) { unready('not-foreground'); return JSON.stringify({ready: false, owned: true, token: null}); }
         const bounds = observations.location(panel.element);
         if (!bounds) return JSON.stringify({ready: false, owned: true, token: null});
         const token = validateToken({owner, panel: {window: panel.native.kCGWindowNumber, bounds: panel.native.kCGWindowBounds},
@@ -410,7 +423,10 @@ function run(argv) {
         checkOwner();
         const visible = !current.closed && windows.some(window =>
             window.kCGWindowNumber === token.panel.window && window.kCGWindowAlpha > 0);
-        if (!foreground || !visible) return JSON.stringify({ready: false, owned: visible, token: null});
+        if (!foreground || !visible) {
+            unready('final-ownership-not-ready');
+            return JSON.stringify({ready: false, owned: visible, token: null});
+        }
         return JSON.stringify({ready: true, owned: true, token});
     }
     if (action === 'after-location' || action === 'confirm-key') {

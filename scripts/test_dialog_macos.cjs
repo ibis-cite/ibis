@@ -205,7 +205,7 @@ function axScenario(options = {}) {
   const unknown = ax('AXSheet', {AXParent: panel, ...frames(sheetBounds)});
   let windows = [{kCGWindowNumber: 10, kCGWindowOwnerPID: 123, kCGWindowAlpha: 1, kCGWindowBounds: panelBounds}];
   let foreground = 123, processPid = 123, processExecutable = executable, registered = true, terminated = false, elapsed = 0, failure = null;
-  const timeouts = [], posted = [], reads = [], stages = [], diagnostics = [];
+  const timeouts = [], posted = [], reads = [], stages = [], diagnostics = [], readiness = [];
   const status = (name, attribute) => {
     reads.push([name, attribute]);
     if (options.onRead) options.onRead(api, name, attribute);
@@ -239,6 +239,11 @@ function axScenario(options = {}) {
       }, bindFunction() { throw Error('Missing ABI binding'); }},
     $: Object.assign(string, {
       NSFileHandle: {fileHandleWithStandardError: {writeData(value) {
+        const readyPrefix = 'NATIVE CHOOSER MACOS READY ';
+        if (value.startsWith(readyPrefix)) {
+          const payload = JSON.parse(value.slice(readyPrefix.length));
+          assert.deepEqual(Object.keys(payload), ['reason']); readiness.push(payload); return;
+        }
         const axPrefix = 'NATIVE CHOOSER MACOS AX ';
         if (value.startsWith(axPrefix)) {
           const payload = JSON.parse(value.slice(axPrefix.length));
@@ -325,7 +330,7 @@ function axScenario(options = {}) {
   };
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(require.resolve('./dialog-macos.js'), 'utf8'), context);
-  const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, diagnostics, system, bool, array, string,
+  const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, diagnostics, readiness, system, bool, array, string,
     call: (action, token, expectedExecutable = executable) => JSON.parse(context.run([action, '123', expectedExecutable, JSON.stringify(token)].slice(0, token === undefined ? 3 : 4))), setPathOpen,
     fail: (attribute, code = -25204) => { failure = {attribute, code}; },
     setWindows: value => { windows = value; }, setForeground: value => { foreground = value; },
@@ -674,4 +679,49 @@ test('nil or throwing native CF conversions never bypass type checks or expose b
     assert.deepEqual(native.diagnostics, [{api: 'CFGetTypeID', reason}]);
     assert.equal(native.posted.length, 0);
   }
+});
+
+
+const readinessReasons = ['registration-unavailable', 'panel-not-found', 'not-foreground', 'sheet-absent',
+  'focused-control-not-ready', 'focus-outside-sheet', 'final-ownership-not-ready'];
+
+test('every normal unready location return emits one exact fixed branch marker', () => {
+  const cases = [
+    ['registration-unavailable', false, native => native.setRegistered(false)],
+    ['panel-not-found', false, native => native.setWindows([])],
+    ['not-foreground', true, native => native.setForeground(456)],
+    ['sheet-absent', true, native => native.setPathOpen(false)],
+    ['focused-control-not-ready', true, native => { native.field.attrs.AXFocused = native.bool(false); }],
+    ['focused-control-not-ready', true, native => { native.field.attrs.AXRole = native.string('AXOutline'); }],
+    ['focus-outside-sheet', true, native => { native.field.attrs.AXParent = native.panel; }],
+  ];
+  for (const [reason, owned, prepare] of cases) {
+    const native = axScenario(); prepare(native);
+    assert.deepEqual(native.call('location-identity'), {ready: false, owned, token: null});
+    assert.deepEqual(native.readiness, [{reason}]);
+    assert.equal(readinessReasons.includes(reason), true);
+    assert.equal(native.posted.length, 0);
+  }
+});
+
+test('late foreground or panel loss emits the final guard marker without changing metadata', () => {
+  for (const [owned, mutate] of [[true, native => native.setForeground(456)], [false, native => native.setWindows([])]]) {
+    const native = axScenario({onRead: (api, name, attribute) => {
+      if (attribute === 'AXFocused') mutate(api);
+    }});
+    assert.deepEqual(native.call('location-identity'), {ready: false, owned, token: null});
+    assert.deepEqual(native.readiness, [{reason: 'final-ownership-not-ready'}]);
+    assert.equal(native.posted.length, 0);
+  }
+});
+
+test('successful and fatal AX paths do not manufacture an unready branch reason', () => {
+  const success = axScenario();
+  assert.deepEqual(success.call('location-identity'), {ready: true, owned: true, token: identity()});
+  assert.deepEqual(success.readiness, []);
+  const failed = axScenario(); failed.fail('AXChildren');
+  assert.throws(() => failed.call('location-identity'), /AX/);
+  assert.deepEqual(failed.readiness, []);
+  assert.equal(failed.posted.length, 0);
+  assert.equal(JSON.stringify(failed.diagnostics).includes('private'), false);
 });

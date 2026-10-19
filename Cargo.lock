@@ -1925,6 +1925,7 @@ name = "ibis-desktop"
 version = "0.0.0"
 dependencies = [
  "ibis-core",
+ "ibis-zotero-local",
  "objc2-app-kit",
  "raw-window-handle",
  "serde",
@@ -1952,6 +1953,13 @@ dependencies = [
  "ibis-core",
  "libfuzzer-sys",
  "serde_json",
+]
+
+[[package]]
+name = "ibis-zotero-local"
+version = "0.0.0"
+dependencies = [
+ "ibis-core",
 ]
 
 [[package]]
