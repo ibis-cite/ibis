@@ -3,7 +3,7 @@ import * as nativeApi from "./api";
 import { libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
 import { useEffect, useRef, useState } from "react";
 import { formatCitation, FORMATTED_STYLES, provisional, type FormattedCitation } from "./format/formatted";
-import type { StyleId } from "./format/engine";
+import type { StyleId } from "./format/styles";
 import { render } from "./format/markup";
 import {
   COPY_FORMATS,

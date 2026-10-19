@@ -1,7 +1,8 @@
 // Formats the chosen references as an in-text citation for the picker's
 // preview and copy, in a background worker (see client.ts).
 import { FormatClient } from "./client";
-import { STYLES, type CslItem, type StyleId } from "./engine";
+import type { CslItem } from "./engine";
+import { STYLE_TITLES, type StyleId } from "./styles";
 import { clipboardHtml, parse, plainText, type Markup } from "./markup";
 
 export interface FormattedCitation {
@@ -17,7 +18,7 @@ export function provisional(style: StyleId): boolean {
   return style === "ieee";
 }
 
-export const FORMATTED_STYLES = (Object.keys(STYLES) as StyleId[]).map((id) => ({ id, title: STYLES[id].title }));
+export const FORMATTED_STYLES = (Object.keys(STYLE_TITLES) as StyleId[]).map((id) => ({ id, title: STYLE_TITLES[id] }));
 
 let shared: FormatClient | null = null;
 
