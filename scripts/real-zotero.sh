@@ -12,7 +12,8 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d)
 zotero_pid=
 cleanup() {
-  [ -n "$zotero_pid" ] && kill "$zotero_pid" 2>/dev/null || true
+  # Zotero runs in its own process group, so this also stops its helpers.
+  [ -n "$zotero_pid" ] && kill -- "-$zotero_pid" 2>/dev/null || true
   rm -rf "$work"
 }
 trap cleanup EXIT
@@ -42,7 +43,7 @@ user_pref("app.update.auto", false);
 EOF
 
 echo "Starting Zotero"
-xvfb-run -a "$app" -profile "$work/profile" > "$work/zotero.log" 2>&1 &
+setsid xvfb-run -a "$app" -profile "$work/profile" > "$work/zotero.log" 2>&1 &
 zotero_pid=$!
 
 for _ in $(seq 120); do
