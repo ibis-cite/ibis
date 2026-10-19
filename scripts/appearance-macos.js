@@ -5,30 +5,46 @@ ObjC.import('CoreGraphics');
 ObjC.import('CoreFoundation');
 
 // Inspect only the owned picker's window metadata, never its WebView tree.
-function pickerAction(action, request) {
+function pickerAction(action, request, stage = () => {}) {
+    stage('identity');
     const token = action === 'picker-owner' ? request : request.owner;
     if (!token || !Number.isInteger(token.pid) || token.pid <= 0 ||
         typeof token.executable !== 'string' || !token.executable.startsWith('/')) {
         throw Error('Owned picker identity unavailable');
     }
-    const app = $.NSRunningApplication.runningApplicationWithProcessIdentifier(token.pid);
-    if (!app || app.isTerminated) {
+    // Objective-C nil is a truthy JXA wrapper. Only the pre-token owner
+    // registration poll may wait for absent public registration metadata.
+    const missing = value => !value || (typeof value.isNil === 'function' && value.isNil());
+    const unavailable = () => {
         if (action === 'picker-owner') return null;
         throw Error('Owned picker identity changed');
+    };
+    stage('registration');
+    const app = $.NSRunningApplication.runningApplicationWithProcessIdentifier(token.pid);
+    if (missing(app)) return unavailable();
+    if (app.isTerminated !== false || Number(app.processIdentifier) !== token.pid) {
+        throw Error('Owned picker identity changed');
     }
-    const started = Number(app.launchDate.timeIntervalSince1970);
-    if (!Number.isFinite(started) || started <= 0 || ObjC.unwrap(app.executableURL.path) !== token.executable ||
-        (action !== 'picker-owner' && started !== token.started)) throw Error('Owned picker identity changed');
-    if (action === 'picker-owner') return {pid: token.pid, started, executable: token.executable};
+    // launchDate is explicitly unavailable for direct, non-LaunchServices
+    // launches (NSRunningApplication.h). Python pins the unreaped Popen child
+    // around every call instead.
+    const executable = app.executableURL;
+    if (missing(executable)) return unavailable();
+    if (ObjC.unwrap(executable.path) !== token.executable) throw Error('Owned picker identity changed');
+    if (action === 'picker-owner') return {pid: token.pid, executable: token.executable};
+    stage('process');
     const processes = Application('System Events').applicationProcesses.whose({unixId: token.pid})();
     if (processes.length !== 1) throw Error('Owned picker identity unavailable');
+    stage('windows');
     const windows = processes[0].windows();
     if (windows.length > 10) throw Error('Picker window enumeration exceeded bound');
     const matches = windows.filter(window => window.role() === 'AXWindow' && window.name() === 'Ibis');
     if (matches.length !== 1) throw Error('Picker window identity is ambiguous');
+    stage('geometry');
     const window = matches[0], position = window.position(), size = window.size();
     const pair = value => Array.isArray(value) && value.length === 2 && value.every(Number.isFinite);
     if (!pair(position) || !pair(size) || size.some(value => value <= 0)) throw Error('Picker bounds unavailable');
+    stage('ownership');
     const refs = $.CGWindowListCopyWindowInfo(
         $.kCGWindowListOptionOnScreenOnly | $.kCGWindowListExcludeDesktopElements, $.kCGNullWindowID);
     if (!refs) throw Error('Picker on-screen ownership unavailable');
@@ -52,6 +68,7 @@ function pickerAction(action, request) {
     const screen = $.NSScreen.mainScreen.frame.size;
     const frame = {window: owned[0].kCGWindowNumber, position, size, screen: [Number(screen.width), Number(screen.height)]};
     if (action === 'picker-frame') return frame;
+    stage('resize');
     if (request.window !== frame.window) throw Error('Owned picker window identity changed');
     const target = request.size;
     if (!pair(target) || !target.every(Number.isInteger) || target[0] < 360 || target[1] < 320 ||
@@ -68,7 +85,22 @@ function pickerAction(action, request) {
 function run(argv) {
     const action = argv[0], identity = argv[1], argument = argv[2];
     if (['picker-owner', 'picker-frame', 'picker-size'].includes(action)) {
-        return JSON.stringify(pickerAction(action, JSON.parse(argument)));
+        let stage = 'identity';
+        try {
+            return JSON.stringify(pickerAction(action, JSON.parse(argument), value => { stage = value; }));
+        } catch (error) {
+            // Never serialize native exception text, paths or request payloads.
+            const reasons = {
+                'Owned picker identity unavailable': 'invalid-identity',
+                'Owned picker identity changed': 'identity-changed',
+                'Owned picker window identity changed': 'identity-changed',
+                'Picker window identity is ambiguous': 'ambiguous-window',
+                'Picker on-screen ownership is ambiguous or unavailable': 'ambiguous-window',
+                'Requested picker size is outside the capture bounds': 'invalid-size'
+            };
+            const reason = Object.prototype.hasOwnProperty.call(reasons, error.message) ? reasons[error.message] : 'native-call-failed';
+            return JSON.stringify({nativeAppearanceFailure: {action, stage, reason}});
+        }
     }
     const bundle = 'com.apple.systempreferences';
     const events = Application('System Events');

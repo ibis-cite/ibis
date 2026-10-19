@@ -10,6 +10,71 @@ spec.loader.exec_module(appearance)
 
 
 class PreferenceTransactionTests(unittest.TestCase):
+    def test_picker_child_lifetime_is_checked_before_and_after_each_helper(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+        request = {"owner": {"pid": 77, "executable": "/owned/ibis"}}
+        ui = SimpleNamespace(call=Mock(return_value={"window": 12}))
+        dead = SimpleNamespace(pid=77, poll=Mock(return_value=0))
+        with self.assertRaisesRegex(RuntimeError, "process exited"):
+            appearance.owned_picker_call(dead, ui, "picker-frame", request)
+        ui.call.assert_not_called()
+        exiting = SimpleNamespace(pid=77, poll=Mock(side_effect=[None, 0]))
+        with self.assertRaisesRegex(RuntimeError, "process exited"):
+            appearance.owned_picker_call(exiting, ui, "picker-frame", request)
+        self.assertEqual(ui.call.call_count, 1)
+        live = SimpleNamespace(pid=77, poll=Mock(return_value=None))
+        self.assertEqual(appearance.owned_picker_call(live, ui, "picker-frame", request), {"window": 12})
+        self.assertEqual(live.poll.call_count, 2)
+
+    def test_foreign_picker_pid_never_authorizes_a_helper_call(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+        ui = SimpleNamespace(call=Mock())
+        child = SimpleNamespace(pid=77, poll=Mock(return_value=None))
+        for action, request in (("picker-owner", {"pid": 88}), ("picker-size", {"owner": {"pid": 88}})):
+            with self.assertRaisesRegex(RuntimeError, "identity"):
+                appearance.owned_picker_call(child, ui, action, request)
+        ui.call.assert_not_called()
+
+    def test_registration_null_is_not_failure_and_timeout_diagnostic_is_fixed(self):
+        ui = appearance.NativeUI()
+        with patch.object(appearance.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, "null", "")):
+            self.assertIsNone(ui.call("picker-owner"))
+        self.assertFalse(hasattr(ui, "failure_facts"))
+        with patch.object(appearance.subprocess, "run", side_effect=subprocess.TimeoutExpired("private command", 25)):
+            with self.assertRaisesRegex(appearance.HelperTimeout, "picker-frame/invocation/helper-timeout"):
+                ui.call("picker-frame")
+        self.assertEqual(ui.failure_facts, {"action": "picker-frame", "stage": "invocation", "reason": "helper-timeout"})
+
+    def test_helper_failure_is_fixed_and_first_failure_survives_restoration(self):
+        import json
+        ui = appearance.NativeUI()
+        envelope = {"nativeAppearanceFailure": {"action": "picker-owner", "stage": "registration", "reason": "native-call-failed"}}
+        with patch.object(appearance.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, json.dumps(envelope), "private payload")):
+            with self.assertRaisesRegex(RuntimeError, "picker-owner/registration/native-call-failed"):
+                ui.call("picker-owner", "private request")
+        self.assertEqual(ui.failure_facts, envelope["nativeAppearanceFailure"])
+        with patch.object(appearance.subprocess, "run", return_value=subprocess.CompletedProcess([], 1, "", "private payload")):
+            with self.assertRaises(RuntimeError):
+                ui.call("set")
+        self.assertEqual(ui.failure_facts, envelope["nativeAppearanceFailure"])
+
+    def test_untrusted_helper_diagnostic_payload_is_never_echoed(self):
+        import json
+        for envelope in ({"action": "private payload", "stage": "registration", "reason": "native-call-failed"},
+                         {"action": "picker-owner", "stage": "private payload", "reason": "native-call-failed"},
+                         {"action": "picker-owner", "stage": "registration", "reason": "private payload"},
+                         {"action": "picker-size", "stage": "registration", "reason": "native-call-failed"},
+                         {"action": "picker-owner", "stage": "registration", "reason": "native-call-failed", "extra": "private payload"}):
+            ui = appearance.NativeUI()
+            result = subprocess.CompletedProcess([], 0, json.dumps({"nativeAppearanceFailure": envelope}), "private payload")
+            with patch.object(appearance.subprocess, "run", return_value=result):
+                with self.assertRaisesRegex(RuntimeError, "picker-owner/invocation/invalid-response") as error:
+                    ui.call("picker-owner", "private request")
+            self.assertNotIn("private payload", str(error.exception))
+            self.assertEqual(ui.failure_facts, {"action": "picker-owner", "stage": "invocation", "reason": "invalid-response"})
+
     def test_replaced_window_between_phases_cannot_produce_more_captures(self):
         from tempfile import TemporaryDirectory
         state = {"window": 12, "position": [20, 30], "size": [720, 480], "screen": [1600, 1000]}

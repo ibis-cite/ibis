@@ -56,6 +56,23 @@ def pin_picker_window(read):
     return current
 
 
+def owned_picker_call(process, ui, action, request):
+    if action not in {"picker-owner", "picker-frame", "picker-size"}:
+        raise RuntimeError("Unknown owned picker action")
+    token = request if action == "picker-owner" else request.get("owner")
+    if not isinstance(token, dict) or type(token.get("pid")) is not int or token["pid"] != process.pid:
+        raise RuntimeError("Owned picker process identity changed")
+    # This is our unreaped Popen child, not a PID lookup. Its PID cannot be
+    # reused while alive or a zombie. No other path waits/reaps this child;
+    # reject before invocation or after observation if it exits in between.
+    if process.poll() is not None:
+        raise RuntimeError("Owned native appearance process exited")
+    result = ui.call(action, json.dumps(request))
+    if process.poll() is not None:
+        raise RuntimeError("Owned native appearance process exited")
+    return result
+
+
 def capture_sizes(name, output, read, resize, capture):
     if name not in APPEARANCE_PHASES:
         raise RuntimeError("Unknown native appearance capture phase")
@@ -158,6 +175,18 @@ class NativeUI:
         self.owner = ""
 
     def call(self, action, value=""):
+        actions = {"probe", "owner", "controls-ready", "read", "set", "closed", "close", "force-close",
+                   "picker-owner", "picker-frame", "picker-size"}
+        stages = {"identity", "registration", "process", "windows", "geometry", "ownership", "resize"}
+        reasons = {"invalid-identity", "identity-changed", "ambiguous-window", "invalid-size", "native-call-failed"}
+        if action not in actions:
+            raise RuntimeError("Unknown native appearance action")
+        def failed(stage, reason, kind=RuntimeError):
+            facts = {"action": action, "stage": stage, "reason": reason}
+            if not hasattr(self, "failure_facts"):
+                self.failure_facts = facts
+            print(f"NATIVE APPEARANCE FAILURE action={action} stage={stage} reason={reason}", flush=True)
+            raise kind(f"Native appearance helper failed: {action}/{stage}/{reason}") from None
         if getattr(self, "last_action", None) != action:
             print("NATIVE APPEARANCE ACTION " + action, flush=True)
         self.last_action = action
@@ -165,12 +194,24 @@ class NativeUI:
             result = subprocess.run(self.command + [action, self.owner, value], encoding="utf-8",
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=25)
         except subprocess.TimeoutExpired:
-            raise HelperTimeout("Native appearance helper timed out") from None
+            failed("invocation", "helper-timeout", HelperTimeout)
         if result.returncode:
             if any(marker in result.stderr for marker in ("TCC Accessibility is not granted", "not allowed assistive access", "(-1743)")):
-                raise Unavailable("Native appearance Accessibility/Automation permission unavailable")
-            raise RuntimeError("Native appearance helper failed")
-        value = json.loads(result.stdout)
+                failed("invocation", "permission-unavailable", Unavailable)
+            failed("invocation", "helper-failed")
+        try:
+            value = json.loads(result.stdout)
+        except (ValueError, TypeError):
+            failed("invocation", "invalid-response")
+        if isinstance(value, dict) and "nativeAppearanceFailure" in value:
+            facts = value["nativeAppearanceFailure"]
+            if (set(value) != {"nativeAppearanceFailure"} or not isinstance(facts, dict)
+                    or set(facts) != {"action", "stage", "reason"} or facts["action"] != action
+                    or action not in {"picker-owner", "picker-frame", "picker-size"}
+                    or type(facts["stage"]) is not str or facts["stage"] not in stages
+                    or type(facts["reason"]) is not str or facts["reason"] not in reasons):
+                failed("invocation", "invalid-response")
+            failed(facts["stage"], facts["reason"])
         return value
 
     def read(self):
@@ -268,21 +309,17 @@ def main():
                     app = subprocess.Popen([str(args.app.resolve())], env=env, stdout=log, stderr=log)
 
                     def picker_owner():
-                        if app.poll() is not None:
-                            raise RuntimeError("Owned native appearance process exited")
-                        return ui.call("picker-owner", json.dumps({"pid": app.pid, "executable": str(args.app.resolve())}))
+                        return owned_picker_call(app, ui, "picker-owner", {"pid": app.pid, "executable": str(args.app.resolve())})
                     owner = wait_for(picker_owner, "owned picker process registration")
 
                     def raw_frame():
-                        if app.poll() is not None:
-                            raise RuntimeError("Owned native appearance process exited")
-                        return ui.call("picker-frame", json.dumps({"owner": owner}))
+                        return owned_picker_call(app, ui, "picker-frame", {"owner": owner})
                     # Pin once for the whole five-phase transaction, so a
                     # replacement window cannot reset identity between pairs.
                     frame = pin_picker_window(raw_frame)
 
                     def resize(window, size):
-                        result = ui.call("picker-size", json.dumps({"owner": owner, "window": window, "size": size}))
+                        result = owned_picker_call(app, ui, "picker-size", {"owner": owner, "window": window, "size": size})
                         if result is not True:
                             raise RuntimeError("Owned picker resize was not acknowledged")
 
@@ -328,6 +365,8 @@ def main():
         # Allow only our fixed failure classes; never print subprocess commands/errors.
         report["reason"] = str(error) if type(error) in (RuntimeError, AssertionError, HelperTimeout) else type(error).__name__
     finally:
+        if hasattr(ui, "failure_facts"):
+            report["helper_failure"] = dict(ui.failure_facts)
         for process in (app, backdrop):
             try:
                 stop_owned(process)
