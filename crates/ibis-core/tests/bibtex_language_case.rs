@@ -14,4 +14,3 @@ fn english_language_tag_case_does_not_change_title_conversion() {
     assert_eq!(loaded.references[1].title_plain().as_deref(), Some("The second title"));
     assert_eq!(loaded.references[0].title_plain().as_deref(), Some("The second title"));
 }
-
