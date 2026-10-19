@@ -48,8 +48,32 @@ pub(crate) fn configure(app: &AppHandle) -> Result<(), Box<dyn std::error::Error
     // Tauri creates the initial visible window before setup. Conversion can
     // leave its outer NSView as responder even when search reports DOM focus.
     // A future hidden startup window must remain hidden and unfocused.
+    #[cfg(debug_assertions)]
+    eprintln!(
+        "ibis: panel initial before visible={} key={} first_responder={}",
+        panel.as_panel().isVisible(),
+        panel.as_panel().isKeyWindow(),
+        panel.as_panel().firstResponder().is_some()
+    );
     if panel.as_panel().isVisible() {
+        // Assigning a WKWebView responder alone cannot reacquire native key
+        // ownership after converting the window and changing activation policy.
+        panel.as_panel().makeKeyWindow();
+        #[cfg(debug_assertions)]
+        eprintln!(
+            "ibis: panel initial after_key visible={} key={} first_responder={}",
+            panel.as_panel().isVisible(),
+            panel.as_panel().isKeyWindow(),
+            panel.as_panel().firstResponder().is_some()
+        );
         focus_webview(&window);
+        #[cfg(debug_assertions)]
+        eprintln!(
+            "ibis: panel initial after_webview visible={} key={} first_responder={}",
+            panel.as_panel().isVisible(),
+            panel.as_panel().isKeyWindow(),
+            panel.as_panel().firstResponder().is_some()
+        );
     }
     Ok(())
 }
