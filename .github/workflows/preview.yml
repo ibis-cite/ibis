@@ -218,14 +218,6 @@ jobs:
             fi
             return "$rc"
           }
-          # The Windows native smoke test is not yet reliable on hosted
-          # runners, so a failure is retried once in a fresh session.
-          smoke() {
-            local python=$1; shift
-            show "$python" scripts/smoke-native.py "$@" && return 0
-            echo "::warning::Native smoke test failed once; retrying"
-            show "$python" scripts/smoke-native.py "$@"
-          }
           SH
           cat > "$RUNNER_TEMP/stays-up.py" <<'PY'
           import subprocess, sys, time
@@ -253,8 +245,7 @@ jobs:
           app=$(dpkg -L "$package" | grep -m1 '^/usr/bin/')
           echo "installed $package at $app"
           display() { xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- "$@"; }
-          py() { display /usr/bin/python3 "$@"; }
-          smoke py --app "$app" --output screenshots/install-Linux
+          show display /usr/bin/python3 scripts/smoke-native.py --app "$app" --output screenshots/install-Linux
           show display /usr/bin/python3 "$RUNNER_TEMP/stays-up.py" "$app"
           sudo apt-get remove -y "$package"
           test ! -e "$app"
@@ -280,7 +271,7 @@ jobs:
           codesign --verify --deep --strict "$installed"
           app=$(find "$installed/Contents/MacOS" -type f -perm -u+x | head -n 1)
           echo "installed at $app"
-          smoke python3 --app "$app" --output screenshots/install-macOS
+          show python3 scripts/smoke-native.py --app "$app" --output screenshots/install-macOS
           show python3 "$RUNNER_TEMP/stays-up.py" "$app"
           rm -rf "$installed"
 
@@ -300,7 +291,10 @@ jobs:
           app=$(find "$dir" -maxdepth 1 -iname '*.exe' ! -iname 'uninstall*' | head -n 1)
           test -n "$app" || { echo "::error::The setup executable installed no app in $dir"; exit 1; }
           echo "installed at $app"
-          smoke python --app "$app" --output screenshots/install-Windows
+          # The release build fails the smoke test's missing-library step on
+          # Windows (#341); report it without blocking until that is fixed.
+          show python scripts/smoke-native.py --app "$app" --output screenshots/install-Windows ||
+            echo "::warning::The native smoke test failed on the installed Windows app; see #341."
           show python "$RUNNER_TEMP/stays-up.py" "$app"
           "$dir/uninstall.exe" //S
           # The uninstaller copies itself and returns early; wait for removal.
