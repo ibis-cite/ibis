@@ -92,6 +92,7 @@ def main():
                 report["checks"].append({"name": name, "status": "passed"})
 
             smoke.wait_for(lambda: "3 references" in smoke.strings(snapshot()), "synthetic panel library startup")
+            smoke.prepare_initial_picker_show(native, snapshot)
             native.focus_editor()
             smoke.wait_for(native.editor_focused, "synthetic editor focused")
             native.call("set-editor-fullscreen", "true")

@@ -86,6 +86,18 @@ def search_focused(snapshot):
     return any(n.get("focused") for n in named(snapshot, "Search references"))
 
 
+def prepare_initial_picker_show(native, snapshot):
+    # A nonactivating panel can remain key while the editor is already the
+    # frontmost application. Prove it is hidden before testing shortcut SHOW.
+    if snapshot()["visible"]:
+        def ready():
+            current = snapshot()
+            return current["visible"] and search_focused(current)
+        wait_for(ready, "initial picker search ready")
+        native.key("Escape")
+        wait_for(lambda: not snapshot()["visible"], "initial Escape hides picker")
+
+
 EDITABLE_ROLES = {"edit", "text", "entry", "combobox", "axcombobox", "axtextfield", "axsearchfield", "controltype.edit", "controltype.combobox"}
 
 
@@ -560,9 +572,8 @@ def main():
             check("accessibility named search/count/list", lambda: require_tree(snapshot()))
 
             def show():
-                # Editor creation can steal initial activation while the app
-                # launches. Summon through the global shortcut before sending
-                # any picker-local keys.
+                if system == "Darwin":
+                    prepare_initial_picker_show(native, snapshot)
                 native.focus_editor()
                 wait_for(native.editor_focused, "previous editor focused")
                 def focus_state(stage):
@@ -788,6 +799,62 @@ def main():
 
 
 class ContractTests(unittest.TestCase):
+    class InitialPickerModel:
+        def __init__(self, visible=True, search_ready=True, accepts_escape=True):
+            self.visible, self.key_window = visible, visible
+            self.search_ready, self.accepts_escape = search_ready, accepts_escape
+            self.events = []
+
+        def snapshot(self):
+            return {"visible": self.visible, "nodes": [{
+                "name": "Search references", "focused": self.search_ready,
+            }]}
+
+        def focus_editor(self):
+            # The editor can already be frontmost while the panel owns keys.
+            self.events.append(("editor", self.visible))
+
+        def key(self, key):
+            self.events.append((key, self.visible))
+            if key == "Escape" and self.accepts_escape:
+                self.visible = self.key_window = False
+            elif key == "ctrl+super+r":
+                self.visible = not (self.visible and self.key_window)
+                self.key_window = self.visible
+
+    def test_initial_key_panel_requires_hidden_precondition_before_shortcut_show(self):
+        old = self.InitialPickerModel()
+        old.focus_editor()
+        old.key("ctrl+super+r")
+        self.assertFalse(old.visible, "Old frontmost-only sequence must reproduce toggle-hide")
+
+        native = self.InitialPickerModel()
+        with patch(__name__ + ".wait_for", side_effect=lambda predicate, description: self.assertTrue(predicate(), description)):
+            prepare_initial_picker_show(native, native.snapshot)
+        native.focus_editor()
+        native.key("ctrl+super+r")
+        self.assertEqual(native.events, [("Escape", True), ("editor", False), ("ctrl+super+r", False)])
+        self.assertTrue(native.visible)
+
+    def test_hidden_initial_picker_does_not_send_escape_into_the_editor(self):
+        native = self.InitialPickerModel(visible=False)
+        prepare_initial_picker_show(native, native.snapshot)
+        self.assertEqual(native.events, [])
+
+    def test_visible_initial_picker_requires_named_search_before_escape(self):
+        native = self.InitialPickerModel(search_ready=False)
+        with patch(__name__ + ".wait_for", side_effect=lambda predicate, description: self.assertTrue(predicate(), description)):
+            with self.assertRaisesRegex(AssertionError, "initial picker search ready"):
+                prepare_initial_picker_show(native, native.snapshot)
+        self.assertEqual(native.events, [])
+
+    def test_initial_escape_must_actually_hide_before_editor_focus(self):
+        native = self.InitialPickerModel(accepts_escape=False)
+        with patch(__name__ + ".wait_for", side_effect=lambda predicate, description: self.assertTrue(predicate(), description)):
+            with self.assertRaisesRegex(AssertionError, "initial Escape hides picker"):
+                prepare_initial_picker_show(native, native.snapshot)
+        self.assertEqual(native.events, [("Escape", True)])
+
     def test_query_failure_facts_distinguish_empty_partial_and_exact_editable_values(self):
         for value, exact, empty in (("", False, True), ("priv", False, False), ("private query", True, False)):
             current = {"nodes": [
