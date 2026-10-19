@@ -58,6 +58,28 @@ def ready(value):
     return all(flags(value, ("visible", "foreground", "owned")).values())
 
 
+def saved_bibtex_library(settings, expected):
+    def unique_fields(pairs):
+        value = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError("Duplicate settings field")
+            value[key] = item
+        return value
+    try:
+        value = json.loads(settings.read_text(encoding="utf-8"), object_pairs_hook=unique_fields)
+        if not isinstance(value, dict) or type(value.get("schema_version")) is not int or value["schema_version"] != 2:
+            return False
+        choice = value.get("library")
+        if not isinstance(choice, dict) or set(choice) != {"bibtex"}:
+            return False
+        path = choice["bibtex"]
+        return (isinstance(path, str) and bool(path) and "\x00" not in path
+                and Path(path).is_absolute() and Path(path).samefile(expected))
+    except (OSError, ValueError, TypeError):
+        return False
+
+
 WINDOWS_LOCATION_FIELDS = (
     "owned_before", "foreground_before", "owned_after", "foreground_after", "gui_available", "gui_idle",
     "focus_live", "focus_visible", "focus_enabled", "focus_same_pid", "focus_same_thread", "focus_edit", "focus_descendant",
@@ -183,10 +205,26 @@ def query_ready(current, index):
             and f"Ibis smoke reference {index:06d}" in text and "1 result" in text)
 
 
+def wait_for_chosen_query(snapshot, index, report):
+    last = {"nodes": []}
+    def matched():
+        nonlocal last
+        last = snapshot()
+        return query_ready(last, index)
+    try:
+        smoke.wait_for(matched, "chosen library accepts a new query and is searchable")
+    except AssertionError:
+        # Classify the same observation that failed the native predicate. A
+        # further provider read could describe a different state or fail too.
+        report["query_failure"] = smoke.query_failure_facts(last, f"smoke{index:06d}", f"Ibis smoke reference {index:06d}")
+        print("NATIVE CHOOSER QUERY FAILURE " + json.dumps(report["query_failure"]), file=sys.stderr)
+        raise
+
+
 def prepare_rename_query(native, snapshot, system):
     native.key("Escape")
     smoke.wait_for(lambda: not snapshot()["visible"], "rename query hides picker before restoring search focus")
-    native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+space")
+    native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+y")
     def ready():
         current = snapshot()
         return current["visible"] and current["foreground"] and bool(smoke.named(current, "Search references"))
@@ -567,16 +605,13 @@ def check(app_path, output, system):
                 return ready(state)
 
             def saved_library(expected=None):
-                try:
-                    return Path(json.loads(settings.read_text(encoding="utf-8"))["library"]).samefile(expected or library)
-                except (OSError, ValueError, KeyError, TypeError):
-                    return False
+                return saved_bibtex_library(settings, expected or library)
 
             def query(index):
                 key = f"smoke{index:06d}"
                 native.key("ctrl+a" if system != "Darwin" else "super+a")
                 native.text(key)
-                smoke.wait_for(lambda: query_ready(snapshot(), index), "chosen library accepts a new query and is searchable")
+                wait_for_chosen_query(snapshot, index, report)
 
             report["stage"] = "C1"
             launch("first-run")
@@ -663,7 +698,7 @@ def check(app_path, output, system):
             smoke.wait_for(lambda: not snapshot()["visible"], "relaunch can hide before shortcut check")
             native.focus_editor()
             smoke.wait_for(native.editor_focused, "owned editor receives focus")
-            native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+space")
+            native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+y")
             def shortcut_ready():
                 current = snapshot()
                 state = {"visible": current["visible"], "foreground": current["foreground"],
@@ -702,6 +737,86 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def test_fresh_saved_library_requires_format_two_and_one_bibtex_path(self):
+        with tempfile.TemporaryDirectory() as folder:
+            library, settings = Path(folder) / "references 引用.bib", Path(folder) / "settings.json"
+            library.write_text(smoke.fixture(), encoding="utf-8")
+            settings.write_text(json.dumps({"schema_version": 2, "library": {"bibtex": str(library)}, "copy_format": "pandoc"}), encoding="utf-8")
+            self.assertTrue(saved_bibtex_library(settings, library))
+            other = Path(folder) / "other.bib"
+            other.write_text(smoke.fixture(), encoding="utf-8")
+            self.assertFalse(saved_bibtex_library(settings, other))
+            for version in (None, 0, 1, True, "2", 3):
+                value = {"library": {"bibtex": str(library)}}
+                if version is not None:
+                    value["schema_version"] = version
+                settings.write_text(json.dumps(value), encoding="utf-8")
+                self.assertFalse(saved_bibtex_library(settings, library), version)
+
+    def test_fresh_saved_library_rejects_legacy_zotero_mixed_and_malformed_choices(self):
+        with tempfile.TemporaryDirectory() as folder:
+            library, settings = Path(folder) / "references.bib", Path(folder) / "settings.json"
+            library.write_text(smoke.fixture(), encoding="utf-8")
+            for choice in (str(library), {"zotero": "user"}, {"zotero": {"group": 42}},
+                           {"bibtex": str(library), "zotero": "user"}, {}, None, [],
+                           {"bibtex": None}, {"bibtex": True}, {"bibtex": ""}, {"bibtex": "relative.bib"},
+                           {"bibtex": str(library) + "\x00"}, {"bibtex": str(library.with_name("missing.bib"))}):
+                settings.write_text(json.dumps({"schema_version": 2, "library": choice}), encoding="utf-8")
+                self.assertFalse(saved_bibtex_library(settings, library))
+            encoded = json.dumps(str(library))
+            for content in ("{", "[]", "null", "true", '{}',
+                            '{"schema_version":2,"library":{"bibtex":' + encoded + ',"bibtex":' + encoded + '}}',
+                            '{"schema_version":1,"schema_version":2,"library":{"bibtex":' + encoded + '}}'):
+                settings.write_text(content, encoding="utf-8")
+                self.assertFalse(saved_bibtex_library(settings, library))
+            settings.unlink()
+            self.assertFalse(saved_bibtex_library(settings, library))
+
+    def test_chosen_query_timeout_reports_only_the_final_predicate_snapshot(self):
+        from io import StringIO
+        first = {"nodes": [{"role": "ControlType.Edit", "name": "Search references", "value": "smoke000000"}]}
+        final = {"nodes": [{"role": "ControlType.Edit", "name": "Search references", "value": "private unrelated value"},
+                           {"name": "private unrelated title"}, {"name": "11 results"}]}
+        snapshot = Mock(side_effect=[first, final])
+        failure = AssertionError("original query timeout")
+        def timeout(predicate, message):
+            self.assertFalse(predicate())
+            self.assertFalse(predicate())
+            raise failure
+        report, stderr = {}, StringIO()
+        with patch.object(smoke, "wait_for", side_effect=timeout), patch.object(sys, "stderr", stderr):
+            with self.assertRaises(AssertionError) as caught:
+                wait_for_chosen_query(snapshot, 0, report)
+        self.assertIs(caught.exception, failure)
+        self.assertEqual(snapshot.call_count, 2)
+        self.assertEqual(report["query_failure"], smoke.query_failure_facts(final, "smoke000000", "Ibis smoke reference 000000"))
+        self.assertFalse(report["query_failure"]["exact_search_value"])
+        self.assertFalse(report["query_failure"]["expected_result"])
+        self.assertFalse(report["query_failure"]["one_result"])
+        self.assertTrue(all(type(value) is bool for value in report["query_failure"].values()))
+        self.assertNotIn("private", stderr.getvalue())
+        self.assertNotIn("smoke000000", stderr.getvalue())
+
+    def test_chosen_query_success_preserves_the_existing_acceptance_predicate(self):
+        # Diagnostic classification must not change the current native gate.
+        current = {"nodes": [{"name": "Search references", "value": "smoke000000"},
+                             {"name": "Ibis smoke reference 000000"}, {"name": "1 result"}]}
+        report, snapshot = {}, Mock(return_value=current)
+        with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate())):
+            wait_for_chosen_query(snapshot, 0, report)
+        self.assertEqual(snapshot.call_count, 1)
+        self.assertEqual(report, {})
+
+    def test_chosen_query_observation_error_is_preserved_without_an_extra_read(self):
+        failure, report = RuntimeError("native observation unavailable"), {}
+        snapshot = Mock(side_effect=failure)
+        with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: predicate()):
+            with self.assertRaises(RuntimeError) as caught:
+                wait_for_chosen_query(snapshot, 0, report)
+        self.assertIs(caught.exception, failure)
+        self.assertEqual(snapshot.call_count, 1)
+        self.assertEqual(report, {})
+
     def test_macos_ax_failure_facts_accept_only_fixed_api_and_reason(self):
         prefix = 'NATIVE CHOOSER MACOS AX '
         value = {'api': 'AXUIElementSetMessagingTimeout', 'reason': 'ax-error'}
@@ -906,7 +1021,7 @@ class Tests(unittest.TestCase):
             self.assertEqual(image.read_bytes(), first)
 
     def test_rename_query_requires_verified_hide_then_foreground_show_before_typing(self):
-        for system, shortcut in (("Linux", "ctrl+shift+space"), ("Windows", "ctrl+shift+space"), ("Darwin", "ctrl+super+r")):
+        for system, shortcut in (("Linux", "ctrl+shift+y"), ("Windows", "ctrl+shift+y"), ("Darwin", "ctrl+super+r")):
             actions = []
             class Native:
                 def key(self, key): actions.append(key)
@@ -918,9 +1033,9 @@ class Tests(unittest.TestCase):
 
     def test_rename_query_never_summons_after_failed_hide_or_types_without_ready_picker(self):
         for current, expected_actions in (({"visible": True}, ["Escape"]),
-            ({"visible": False, "foreground": False, "nodes": []}, ["Escape", "ctrl+shift+space"]),
-            ({"visible": True, "foreground": False, "nodes": [{"name": "Search references"}]}, ["Escape", "ctrl+shift+space"]),
-            ({"visible": True, "foreground": True, "nodes": []}, ["Escape", "ctrl+shift+space"])):
+            ({"visible": False, "foreground": False, "nodes": []}, ["Escape", "ctrl+shift+y"]),
+            ({"visible": True, "foreground": False, "nodes": [{"name": "Search references"}]}, ["Escape", "ctrl+shift+y"]),
+            ({"visible": True, "foreground": True, "nodes": []}, ["Escape", "ctrl+shift+y"])):
             actions = []
             class Native:
                 def key(self, key): actions.append(key)
@@ -946,7 +1061,7 @@ class Tests(unittest.TestCase):
         library.write_text(smoke.fixture(), encoding="utf-8")
         renamed = library.with_name("renamed 引用.bib")
         settings = Path(folder) / "settings.json"
-        settings.write_text(json.dumps({"library": str(library)}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        settings.write_text(json.dumps({"schema_version": 2, "library": {"bibtex": str(library)}}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         state = {"count": 3, "missing": False, "query": None, "queries": []}
 
         def click(name):
@@ -957,7 +1072,7 @@ class Tests(unittest.TestCase):
                 # A path-identity predicate fails while the selected file is
                 # absent. Persisted settings must instead be compared by bytes.
                 with self.assertRaises(FileNotFoundError):
-                    Path(json.loads(settings.read_text(encoding="utf-8"))["library"]).samefile(library)
+                    Path(json.loads(settings.read_text(encoding="utf-8"))["library"]["bibtex"]).samefile(library)
                 if change_settings:
                     settings.write_text(json.dumps(json.loads(settings.read_text(encoding="utf-8"))), encoding="utf-8")
             elif not stale:

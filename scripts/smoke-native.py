@@ -104,10 +104,49 @@ EDITABLE_ROLES = {"edit", "text", "entry", "combobox", "axcombobox", "axtextfiel
 def query_failure_facts(snapshot, query, expected):
     values = [n.get("value") for n in named(snapshot, "Search references")
               if n.get("role", "").lower().replace(" ", "") in EDITABLE_ROLES]
+    unique = len(values) == 1
+    available = unique and isinstance(values[0], str)
+    value = values[0] if available else None
+    partial = available and bool(value) and bool(query) and value != query
     text = strings(snapshot)
-    return {"exact_search_value": query in values,
-            "search_empty": bool(values) and all(value == "" for value in values),
-            "expected_result": expected in text, "one_result": "1 result" in text.splitlines()}
+    return {"exact_search_value": available and value == query,
+            "search_empty": available and value == "",
+            "expected_result": expected in text, "one_result": "1 result" in text.splitlines(),
+            "unique_editable": unique, "string_value": available,
+            "partial_prefix": partial and query.startswith(value),
+            "partial_suffix": partial and query.endswith(value),
+            "repeated_query": partial and value.replace(query, "") == ""}
+
+
+def editor_window_diagnostics(stderr):
+    prefixes = ("NATIVE EDITOR WINDOW BEFORE ", "NATIVE EDITOR WINDOW AFTER ")
+    keys = {"available", "owned_editor_visible", "owned_editor_minimized",
+            "foreground_editor", "foreground_picker", "foreground_other", "foreground_none"}
+    accepted = []
+    seen = set()
+    def unique_object(pairs):
+        value = dict(pairs)
+        if len(value) != len(pairs):
+            raise ValueError("Duplicate diagnostic field")
+        return value
+    for line in stderr.splitlines() if isinstance(stderr, str) else []:
+        prefix = next((value for value in prefixes if line.startswith(value)), None)
+        if prefix is None or prefix in seen or len(line) > 1024:
+            continue
+        try:
+            facts = json.loads(line[len(prefix):], object_pairs_hook=unique_object)
+        except ValueError:
+            continue
+        if not isinstance(facts, dict) or set(facts) != keys or any(type(value) is not bool for value in facts.values()):
+            continue
+        if not facts["available"]:
+            if any(facts.values()):
+                continue
+        elif sum(facts[key] for key in keys if key.startswith("foreground_")) != 1:
+            continue
+        accepted.append(line)
+        seen.add(prefix)
+    return accepted
 
 
 def wait_for_query(snapshot, query, expected, report):
@@ -387,6 +426,9 @@ class Scripted:
             # Helpers emit fixed diagnostics only, never tree or clipboard text.
             print(result.stderr, file=sys.stderr)
             raise subprocess.CalledProcessError(result.returncode, self.command, stderr=result.stderr)
+        if self.system == "Windows" and action == "focus-editor":
+            for facts in editor_window_diagnostics(result.stderr):
+                print(facts, file=sys.stderr)
         return json.loads(result.stdout)
 
     def snapshot(self):
@@ -482,7 +524,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--app", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--shortcut", help="xdotool-style chord; defaults to Ctrl+Shift+Space or Control+Command+R on macOS")
+    parser.add_argument("--shortcut", help="xdotool-style chord; defaults to Ctrl+Shift+Y or Control+Command+R on macOS")
     parser.add_argument("--budgets", type=Path, help="Measured per-platform baseline JSON, with startup_ms, first_result_ms, memory_bytes ceilings")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
@@ -576,7 +618,7 @@ def main():
                 native.text(text)
                 wait_for_query(snapshot, text, expected, report)
 
-            shortcut = args.shortcut or ("ctrl+super+r" if system == "Darwin" else "ctrl+shift+space")
+            shortcut = args.shortcut or ("ctrl+super+r" if system == "Darwin" else "ctrl+shift+y")
             launch("small")
             check("startup", lambda: wait_for(lambda: "3 references" in strings(snapshot()), "synthetic library startup"))
             check("accessibility named search/count/list", lambda: require_tree(snapshot()))
@@ -875,7 +917,37 @@ class ContractTests(unittest.TestCase):
             self.assertEqual(query_failure_facts(current, "private query", "private result"), {
                 "exact_search_value": exact, "search_empty": empty,
                 "expected_result": True, "one_result": False,
+                "unique_editable": True, "string_value": True,
+                "partial_prefix": value == "priv", "partial_suffix": False,
+                "repeated_query": False,
             })
+
+    def test_query_diagnostics_classify_only_one_available_string_without_disclosing_it(self):
+        query = "private query"
+        for value, prefix, suffix, repeated in (
+            ("private", True, False, False), ("query", False, True, False),
+            (query * 3, False, False, True), ("unrelated private text", False, False, False),
+        ):
+            facts = query_failure_facts({"nodes": [
+                {"name": "Search references", "role": "AXComboBox", "value": value},
+            ]}, query, "private expected title")
+            self.assertEqual((facts["partial_prefix"], facts["partial_suffix"], facts["repeated_query"]),
+                             (prefix, suffix, repeated))
+            self.assertEqual(len(facts), 9)
+            self.assertTrue(all(type(item) is bool for item in facts.values()))
+            self.assertNotIn("private", json.dumps(facts))
+
+    def test_missing_ambiguous_or_nonstring_editable_values_never_classify_query_content(self):
+        editable = {"name": "Search references", "role": "AXTextField", "value": "private query"}
+        cases = [([], False), ([editable, editable], False)]
+        cases += [([{**editable, "value": value}], True) for value in (None, True, 0, [], {})]
+        cases.append(([{key: value for key, value in editable.items() if key != "value"}], True))
+        for nodes, unique in cases:
+            facts = query_failure_facts({"nodes": nodes}, "private query", "private title")
+            self.assertEqual(facts["unique_editable"], unique)
+            for name in ("string_value", "exact_search_value", "search_empty", "partial_prefix", "partial_suffix", "repeated_query"):
+                self.assertFalse(facts[name], (name, nodes))
+            self.assertNotIn("private", json.dumps(facts))
 
     def test_failed_query_records_only_last_snapshot_booleans_and_static_description(self):
         states = iter([{"nodes": []}, {"nodes": [
@@ -893,6 +965,8 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(report, {"query_failure": {
             "exact_search_value": False, "search_empty": False,
             "expected_result": False, "one_result": True,
+            "unique_editable": True, "string_value": True,
+            "partial_prefix": False, "partial_suffix": False, "repeated_query": False,
         }})
         self.assertNotIn("private", json.dumps(report) + str(output.call_args))
         self.assertIs(output.call_args.kwargs["file"], stderr)
@@ -903,6 +977,94 @@ class ContractTests(unittest.TestCase):
             wait_for_query(lambda: {"nodes": [{"name": "expected private title"}]}, "private query", "expected private title", report)
         self.assertEqual(report, {})
         output.assert_not_called()
+
+    def test_editor_window_stderr_forwarding_rejects_private_malformed_or_ambiguous_metadata(self):
+        facts = {"available": True, "owned_editor_visible": True, "owned_editor_minimized": False,
+                 "foreground_editor": True, "foreground_picker": False,
+                 "foreground_other": False, "foreground_none": False}
+        valid = "NATIVE EDITOR WINDOW BEFORE " + json.dumps(facts)
+        unavailable = "NATIVE EDITOR WINDOW AFTER " + json.dumps(dict.fromkeys(facts, False))
+        lines = [valid, unavailable]
+        lines += ["NATIVE EDITOR WINDOW BEFORE " + json.dumps(item) for item in (
+            {**facts, "private": "private data"}, {**facts, "available": 1},
+            {**facts, "owned_editor_visible": "private title"},
+            {**facts, "foreground_picker": True}, {**facts, "available": False},
+            {key: value for key, value in facts.items() if key != "foreground_none"},
+        )]
+        lines += ["private path", "NATIVE EDITOR WINDOW BEFORE private data", "NATIVE EDITOR WINDOW UNKNOWN " + json.dumps(facts)]
+        lines.append("NATIVE EDITOR WINDOW BEFORE " + " " * 1025 + json.dumps(facts))
+        for line in lines[2:]:
+            self.assertEqual(editor_window_diagnostics(line), [])
+        self.assertEqual(editor_window_diagnostics("\n".join(lines)), [valid, unavailable])
+        duplicate = valid.replace('"available": true', '"available": "private", "available": true')
+        self.assertEqual(editor_window_diagnostics(duplicate), [])
+        self.assertEqual(editor_window_diagnostics("\n".join([valid] * 100 + [unavailable] * 100)), [valid, unavailable])
+        self.assertEqual(editor_window_diagnostics(None), [])
+        native = Scripted.__new__(Scripted)
+        native.system, native.command, native.editor_started = "Windows", ["synthetic helper"], 123
+        result = subprocess.CompletedProcess([], 0, stdout="true", stderr="\n".join(lines))
+        with patch("subprocess.run", return_value=result), patch("builtins.print") as output:
+            self.assertIs(native.call("focus-editor"), True)
+        emitted = [c.args[0] for c in output.call_args_list if c.args[0].startswith("NATIVE EDITOR WINDOW ")]
+        self.assertEqual(emitted, [valid, unavailable])
+        self.assertNotIn("private", str(output.call_args_list))
+
+    @unittest.skipUnless(shutil.which("pwsh"), "PowerShell is required to execute native window diagnostics")
+    def test_editor_window_diagnostics_classify_only_fixed_booleans_and_never_mask_probe_errors(self):
+        script = r'''
+param([string] $Source)
+$ErrorActionPreference='Stop'
+$tokens=$null; $errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile($Source,[ref]$tokens,[ref]$errors)
+if ($errors.Count) { throw 'Helper syntax is invalid' }
+$helper=$ast.Find({param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Write-EditorWindowFacts'},$true)
+if (!$helper) { throw 'Window diagnostics helper missing' }
+Invoke-Expression $helper.Extent.Text
+Add-Type @'
+using System;
+public static class IbisSmoke {
+ public static bool Visible=true, Minimized=false, Fail=false;
+ public static uint Foreground=12345;
+ public static bool IsWindowVisible(IntPtr window) { if(Fail) throw new Exception("private title"); return Visible; }
+ public static bool IsIconic(IntPtr window) { return Minimized; }
+ public static uint ForegroundPid() { return Foreground; }
+}
+'@
+$EditorId=12345; $AppId=54321
+foreach ($foreground in @(12345,54321,77777,0)) {
+ [IbisSmoke]::Foreground=$foreground
+ Write-EditorWindowFacts BEFORE ([IntPtr]::new(20))
+}
+$AppId=0; [IbisSmoke]::Foreground=0
+Write-EditorWindowFacts BEFORE ([IntPtr]::new(20))
+$AppId=54321
+[IbisSmoke]::Visible=$false; [IbisSmoke]::Minimized=$true
+Write-EditorWindowFacts AFTER ([IntPtr]::new(20))
+[IbisSmoke]::Fail=$true
+Write-EditorWindowFacts AFTER ([IntPtr]::new(20))
+'''
+        with tempfile.TemporaryDirectory() as temporary:
+            test = Path(temporary) / "window-facts-contract.ps1"
+            test.write_text(script, encoding="utf-8")
+            result = subprocess.run([shutil.which("pwsh"), "-NoProfile", "-File", str(test),
+                                     "-Source", str(Path(__file__).with_name("smoke-windows.ps1"))],
+                                    capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        lines = result.stderr.splitlines()
+        for line in lines:
+            self.assertEqual(editor_window_diagnostics(line), [line])
+        facts = [json.loads(line.split(" ", 4)[4]) for line in lines]
+        self.assertEqual(len(facts), 7)
+        for i, category in enumerate(("editor", "picker", "other", "none")):
+            self.assertTrue(facts[i]["available"])
+            self.assertTrue(facts[i]["foreground_" + category])
+        self.assertTrue(facts[4]["foreground_none"])
+        self.assertFalse(facts[4]["foreground_picker"])
+        self.assertFalse(facts[-2]["owned_editor_visible"])
+        self.assertTrue(facts[-2]["owned_editor_minimized"])
+        self.assertTrue(all(value is False for value in facts[-1].values()))
+        self.assertEqual(result.stdout, "")
+        self.assertNotIn("private", result.stderr)
 
     def test_helper_timeout_emits_only_allowlisted_stages_from_bytes_stderr(self):
         native = Scripted.__new__(Scripted)
@@ -1181,24 +1343,29 @@ $ErrorActionPreference = 'Stop'
 $tokens=$null; $errors=$null
 $ast=[System.Management.Automation.Language.Parser]::ParseFile($Source,[ref]$tokens,[ref]$errors)
 if ($errors.Count) { throw 'Helper syntax is invalid' }
-$getter=$ast.Find({param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Get-OwnedEditor'},$true)
-Invoke-Expression $getter.Extent.Text
+foreach ($name in @('Get-OwnedEditor','Write-EditorWindowFacts')) {
+ $getter=$ast.Find({param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq $name},$true)
+ if (!$getter) { throw 'Required focus helper missing' }
+ Invoke-Expression $getter.Extent.Text
+}
 $switch=$ast.Find({param($node) $node -is [System.Management.Automation.Language.SwitchStatementAst] -and $node.Condition.Extent.Text -eq '$Action'},$true)
 $clause=@($switch.Clauses | Where-Object {$_.Item1.Value -eq 'focus-editor'})[0].Item2.Extent.Text
 $operation=[scriptblock]::Create($clause.Substring(1,$clause.Length-2))
 Add-Type @'
 using System;
 public static class IbisSmoke {
- public static bool Live=true, Accepted=false;
+ public static bool Live=true, Accepted=false, FailFacts=false;
  public static uint Owner=12345, Foreground=0;
- public static int Requests=0;
+ public static int Requests=0, WindowReads=0;
  public static bool IsWindow(IntPtr window) { return Live; }
+ public static bool IsWindowVisible(IntPtr window) { WindowReads++; if(FailFacts) throw new Exception("private window title"); return true; }
+ public static bool IsIconic(IntPtr window) { return false; }
  public static uint OwnerPid(IntPtr window) { return Owner; }
  public static uint ForegroundPid() { return Foreground; }
  public static bool SetForegroundWindow(IntPtr window) { Requests++; return Accepted; }
 }
 '@
-$EditorId=12345; $Text='987654321'
+$EditorId=12345; $AppId=54321; $Text='987654321'
 $script:current=[pscustomobject]@{ProcessName='Notepad';StartTime=[DateTime]::new(987654321,[DateTimeKind]::Utc);MainWindowHandle=[IntPtr]::new(20)}
 function Get-Process { param($Id,$ErrorAction) $script:current }
 foreach ($accepted in @($false,$true)) {
@@ -1211,7 +1378,7 @@ foreach ($accepted in @($false,$true)) {
 $result=& $operation
 if (!$result.current_foreground -or [IbisSmoke]::Requests -ne 0) { throw 'Already focused editor was requested again' }
 foreach ($failure in @('missing','identity','zero','invalid','other-owner')) {
- [IbisSmoke]::Requests=0; [IbisSmoke]::Live=$true; [IbisSmoke]::Owner=12345
+ [IbisSmoke]::Requests=0; [IbisSmoke]::WindowReads=0; [IbisSmoke]::Live=$true; [IbisSmoke]::Owner=12345
  $script:current=[pscustomobject]@{ProcessName='Notepad';StartTime=[DateTime]::new(987654321,[DateTimeKind]::Utc);MainWindowHandle=[IntPtr]::new(20)}
  switch ($failure) {
   'missing' {$script:current=$null}
@@ -1222,8 +1389,11 @@ foreach ($failure in @('missing','identity','zero','invalid','other-owner')) {
  }
  $rejected=$false
  try { & $operation | Out-Null } catch {$rejected=$true}
- if (!$rejected -or [IbisSmoke]::Requests -ne 0) { throw 'Unowned or invalid editor reached a foreground request' }
+ if (!$rejected -or [IbisSmoke]::Requests -ne 0 -or [IbisSmoke]::WindowReads -ne 0) { throw 'Unowned or invalid editor reached native operations' }
 }
+[IbisSmoke]::Owner=12345; [IbisSmoke]::Foreground=0; [IbisSmoke]::Requests=0; [IbisSmoke]::FailFacts=$true
+$result=& $operation
+if (!$result.owned -or !$result.window_valid -or $result.current_foreground -or [IbisSmoke]::Requests -ne 1) { throw 'Diagnostics changed the focus contract' }
 '''
         with tempfile.TemporaryDirectory() as temporary:
             test = Path(temporary) / "focus-contract.ps1"
@@ -1232,7 +1402,13 @@ foreach ($failure in @('missing','identity','zero','invalid','other-owner')) {
                                      "-Source", str(Path(__file__).with_name("smoke-windows.ps1"))],
                                     capture_output=True, text=True, timeout=20)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        facts = [json.loads(line.removeprefix("NATIVE EDITOR FOCUS ")) for line in result.stderr.splitlines()]
+        self.assertNotIn("private", result.stderr)
+        window_lines = [line for line in result.stderr.splitlines() if line.startswith("NATIVE EDITOR WINDOW ")]
+        self.assertTrue(window_lines)
+        for line in window_lines:
+            self.assertEqual(editor_window_diagnostics(line), [line])
+        facts = [json.loads(line.removeprefix("NATIVE EDITOR FOCUS ")) for line in result.stderr.splitlines()
+                 if line.startswith("NATIVE EDITOR FOCUS ")]
         self.assertTrue(facts)
         for value in facts:
             self.assertEqual(set(value), {"stage", "owned", "window_valid", "request_accepted", "current_foreground"})

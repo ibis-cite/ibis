@@ -85,6 +85,7 @@ public static class IbisSmoke {
   [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr w, out uint pid);
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr w);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr w);
+  [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr w);
   [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr w);
   public static uint OwnerPid(IntPtr w) {
     uint pid; GetWindowThreadProcessId(w, out pid); return pid;
@@ -171,6 +172,26 @@ function Get-OwnedEditor {
   }
   return $editor
 }
+function Write-EditorWindowFacts([ValidateSet('BEFORE','AFTER')] [string] $Stage, [IntPtr] $Handle) {
+  $windowFacts = [ordered]@{available=$false;owned_editor_visible=$false;owned_editor_minimized=$false;
+    foreground_editor=$false;foreground_picker=$false;foreground_other=$false;foreground_none=$false}
+  try {
+    $visible = [IbisSmoke]::IsWindowVisible($Handle)
+    $minimized = [IbisSmoke]::IsIconic($Handle)
+    $foreground = [IbisSmoke]::ForegroundPid()
+    $windowFacts = [ordered]@{available=$true;owned_editor_visible=$visible;owned_editor_minimized=$minimized;
+      foreground_editor=($foreground -eq $EditorId);foreground_picker=($AppId -gt 0 -and $foreground -eq $AppId);
+      foreground_other=($foreground -gt 0 -and $foreground -ne $EditorId -and $foreground -ne $AppId);
+      foreground_none=($foreground -eq 0)}
+  } catch {
+    # Diagnostics never replace the focus request's result or original error.
+    # The unavailable record contains no partially sampled facts or raw errors.
+  }
+  try {
+    [Console]::Error.WriteLine("NATIVE EDITOR WINDOW $Stage " + (ConvertTo-Json -InputObject $windowFacts -Compress))
+  } catch { # A diagnostic sink failure must not change the focus operation.
+  }
+}
 try {
   [Console]::Error.WriteLine('NATIVE HELPER STAGE windows-dispatch')
   $result = switch ($Action) {
@@ -235,12 +256,14 @@ try {
           throw 'Synthetic editor window identity was lost'
         }
         $facts.window_valid = $true
+        Write-EditorWindowFacts BEFORE $handle
         $facts.stage = 'foreground-request'
         $facts.current_foreground = [IbisSmoke]::ForegroundPid() -eq $EditorId
         if (!$facts.current_foreground) {
           $facts.request_accepted = [IbisSmoke]::SetForegroundWindow($handle)
         }
         $facts.current_foreground = [IbisSmoke]::ForegroundPid() -eq $EditorId
+        Write-EditorWindowFacts AFTER $handle
         # A declined request is not a focus verdict. Python independently
         # waits for fresh editor-focused observations before proceeding.
         @{owned=$facts.owned;window_valid=$facts.window_valid;request_accepted=$facts.request_accepted;current_foreground=$facts.current_foreground}

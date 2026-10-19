@@ -179,6 +179,13 @@ test('a window with no native sheets needs no unrelated bounds query', () => {
 // out parameters and CGPoint/CGSize outputs model the documented SDK signatures.
 function axScenario(options = {}) {
   const types = {AX: 1, string: 2, bool: 3, array: 4, value: 5};
+  const bridged = new WeakMap();
+  const asObject = value => {
+    if (value.nativeObject) return value;
+    if (!bridged.has(value)) bridged.set(value, Object.assign(Object.create(value),
+      {nativeObject: true, nativeRef: value, isNil: () => false}));
+    return bridged.get(value);
+  };
   const string = value => ({type: 'string', value, dataUsingEncoding: () => value});
   const bool = value => ({type: 'bool', value});
   const array = value => ({type: 'array', value});
@@ -207,11 +214,12 @@ function axScenario(options = {}) {
     return failure && (!failure.attribute || failure.attribute === attribute) ? failure.code : 0;
   };
   const read = (element, attribute, output) => {
+    if (options.requireNativeObjects && !element.nativeObject) return -25202;
     const name = attribute.value;
     const error = status('read', name);
     if (error) return error;
     if (!(name in element.attrs)) return -25205;
-    output[0] = element.attrs[name]; return 0;
+    output[0] = options.sdkReturnsObjects ? asObject(element.attrs[name]) : element.attrs[name]; return 0;
   };
   panel.attrs.AXDefaultButton = button;
   const setPathOpen = value => {
@@ -224,7 +232,11 @@ function axScenario(options = {}) {
     Ref: type => Object.assign([], {refType: type}),
     Application: () => { throw Error('System Events must not be used for bounded C AX observations'); },
     ObjC: {import() {}, unwrap: value => value.value, deepUnwrap: value => value,
-      castRefToObject: value => value, bindFunction() { throw Error('Missing ABI binding'); }},
+      castRefToObject: value => {
+        if (options.throwCast || (options.forbidObjectRecast && value.nativeObject)) throw Error('private bridge cast failure');
+        if (options.nilCast) return {isNil: () => true};
+        return asObject(value);
+      }, bindFunction() { throw Error('Missing ABI binding'); }},
     $: Object.assign(string, {
       NSFileHandle: {fileHandleWithStandardError: {writeData(value) {
         const axPrefix = 'NATIVE CHOOSER MACOS AX ';
@@ -244,24 +256,44 @@ function axScenario(options = {}) {
         executableURL: processExecutable === null ? null : {isFileURL: true, path: string(processExecutable)}}) : null},
       NSWorkspace: {sharedWorkspace: {get frontmostApplication() { return {processIdentifier: foreground}; }}},
       CGWindowListCopyWindowInfo: () => windows, CFArrayGetCount: refs => {
+        if (options.requireNativeObjects && !Array.isArray(refs) && !refs.nativeObject) throw Error('Ref was boxed instead of passed to typed CF array API');
         const count = Array.isArray(refs) ? refs.length : refs.value.length;
         return options.stringLong ? String(count) : count;
       },
       CFArrayGetValueAtIndex: (refs, index) => Array.isArray(refs) ? refs[index] : refs.value[index],
       CFGetTypeID: value => {
+        // Generic CFTypeRef receives a wrapper dictionary for an unbridged
+        // opaque Ref in JXA; this is a different CF object, not a scalar issue.
+        if (options.genericCFBoxing && !value.nativeObject) return 99;
         if (Object.hasOwn(options, 'actualTypeId')) return options.actualTypeId;
         return options.actualTypeIdsAsStrings ? String(types[value.type]) : types[value.type];
       }, CFStringGetTypeID: () => types.string,
       CFBooleanGetTypeID: () => types.bool, CFArrayGetTypeID: () => types.array,
-      CFBooleanGetValue: value => options.numericBoolean ? Number(value.value) : value.value,
-      CFEqual: (left, right) => options.numericBoolean ? Number(left === right) : left === right,
+      CFBooleanGetValue: value => {
+        if (options.requireNativeObjects && !value.nativeObject) throw Error('Expected native CFBoolean');
+        return options.numericBoolean ? Number(value.value) : value.value;
+      },
+      CFEqual: (left, right) => {
+        // Raw opaque AX Refs can box into identical metadata dictionaries.
+        const equal = options.genericCFBoxing && !left.nativeObject && !right.nativeObject ? true :
+          (left.nativeRef || left) === (right.nativeRef || right);
+        return options.numericBoolean ? Number(equal) : equal;
+      },
       AXUIElementGetTypeID: () => options.expectedTypeIdsAsStrings ? String(types.AX) : types.AX,
       AXValueGetTypeID: () => options.expectedTypeIdsAsStrings ? String(types.value) : types.value,
-      AXUIElementCreateSystemWide: () => options.nilSystem ? null : system, AXUIElementCreateApplication: () => app,
-      AXUIElementSetMessagingTimeout: (element, seconds) => { timeouts.push([element, seconds]); return options.timeoutFailure ? -25201 : 0; },
-      AXUIElementGetPid: (element, output) => { output[0] = element.pid; return 0; },
+      AXUIElementCreateSystemWide: () => options.nilSystem ? null : options.sdkReturnsObjects ? asObject(system) : system,
+      AXUIElementCreateApplication: () => options.sdkReturnsObjects ? asObject(app) : app,
+      AXUIElementSetMessagingTimeout: (element, seconds) => {
+        if (options.requireNativeObjects && !element.nativeObject) return -25202;
+        timeouts.push([element.nativeRef || element, seconds]); return options.timeoutFailure ? -25201 : 0;
+      },
+      AXUIElementGetPid: (element, output) => {
+        if (options.requireNativeObjects && !element.nativeObject) return -25202;
+        output[0] = element.pid; return 0;
+      },
       AXUIElementCopyAttributeValue: read,
       AXUIElementGetAttributeValueCount: (element, attribute, output) => {
+        if (options.requireNativeObjects && !element.nativeObject) return -25202;
         const error = status('count', attribute.value);
         if (error) return error;
         const value = element.attrs[attribute.value];
@@ -269,15 +301,18 @@ function axScenario(options = {}) {
         output[0] = options.stringLong ? String(value.value.length) : value.value.length; return 0;
       },
       AXUIElementCopyAttributeValues: (element, attribute, index, maximum, output) => {
+        if (options.requireNativeObjects && !element.nativeObject) return -25202;
         const error = status('array', attribute.value);
         if (error) return error;
         const value = element.attrs[attribute.value];
         if (!value || value.type !== 'array') return -25205;
-        output[0] = array(value.value.slice(index, index + maximum)); return 0;
+        const result = array(value.value.slice(index, index + maximum));
+        output[0] = options.sdkReturnsObjects ? asObject(result) : result; return 0;
       },
       CGPointMake: (x, y) => ({x, y}), CGSizeMake: (width, height) => ({width, height}),
-      AXValueGetType: value => value.kind,
+      AXValueGetType: value => options.requireNativeObjects && !value.nativeObject ? 0 : value.kind,
       AXValueGetValue: (value, kind, output) => {
+        if (options.requireNativeObjects && !value.nativeObject) return false;
         if (kind !== value.kind || output.refType !== (kind === 1 ? 'CGPoint' : 'CGSize')) return false;
         if (options.requireStructStorage && (!output[0] || Object.values(output[0]).some(value => value !== 0))) return false;
         output[0] = value.value; return options.numericBoolean ? 1 : true;
@@ -592,4 +627,51 @@ test('a throwing missing-symbol lookup is a bounded binding failure with no raw 
   assert.throws(() => native.call('location-identity'), error => error.message === 'Native AX public API unavailable');
   assert.deepEqual(native.diagnostics, [{api: 'AXUIElementGetPid', reason: 'bind-unavailable'}]);
   assert.equal(native.posted.length, 0);
+});
+
+
+test('generic CF operations receive the underlying object rather than a Ref wrapper dictionary', () => {
+  const native = axScenario({genericCFBoxing: true, requireNativeObjects: true});
+  assert.deepEqual(native.call('location-identity'), {ready: true, owned: true, token: identity()});
+  native.setPathOpen(false);
+  assert.deepEqual(native.call('confirm-key', identity()), {invoked: true});
+  assert.equal(native.posted.length, 2);
+  assert.deepEqual(native.diagnostics, []);
+});
+
+test('bridging CF Refs preserves foreign-type, foreign-owner and distinct-element rejection', () => {
+  const type = axScenario({genericCFBoxing: true, actualTypeId: 42});
+  assert.throws(() => type.call('location-identity'), /type/);
+  const owner = axScenario({genericCFBoxing: true}); owner.field.pid = 456;
+  assert.throws(() => owner.call('location-identity'), /ownership/);
+  const duplicate = axScenario({genericCFBoxing: true});
+  duplicate.panel.attrs.AXChildren = duplicate.array([duplicate.sheet, duplicate.unknown]);
+  assert.throws(() => duplicate.call('location-identity'), /ambiguous/);
+  const outside = axScenario({genericCFBoxing: true});
+  outside.field.attrs.AXParent = outside.panel;
+  assert.deepEqual(outside.call('location-identity'), {ready: false, owned: true, token: null});
+  outside.setPathOpen(false); outside.browser.attrs.AXParent = outside.unknown;
+  outside.unknown.attrs.AXParent = outside.unknown;
+  assert.throws(() => outside.call('confirm-key', identity()), /AX/);
+  for (const native of [type, owner, duplicate, outside]) assert.equal(native.posted.length, 0);
+});
+
+
+test('already bridged SDK objects keep their identity without a second pointer conversion', () => {
+  const native = axScenario({genericCFBoxing: true, requireNativeObjects: true,
+    sdkReturnsObjects: true, forbidObjectRecast: true});
+  assert.deepEqual(native.call('location-identity'), {ready: true, owned: true, token: identity()});
+  native.setPathOpen(false);
+  assert.deepEqual(native.call('confirm-key', identity()), {invoked: true});
+  assert.deepEqual(native.diagnostics, []);
+});
+
+test('nil or throwing native CF conversions never bypass type checks or expose bridge payloads', () => {
+  for (const [options, reason] of [[{nilCast: true}, 'missing-reference'], [{throwCast: true}, 'invalid-result']]) {
+    const native = axScenario(options);
+    assert.throws(() => native.call('location-identity'), error => error.message === 'Native AX value type unavailable' ||
+      error.message === 'Native AX reference unavailable');
+    assert.deepEqual(native.diagnostics, [{api: 'CFGetTypeID', reason}]);
+    assert.equal(native.posted.length, 0);
+  }
 });

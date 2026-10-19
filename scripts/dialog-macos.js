@@ -146,21 +146,34 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic) {
         }
         return value;
     };
-    const typed = (value, name) => {
-        let present;
-        try { present = !!value && ['object', 'function'].includes(typeof value) &&
-            !(typeof value.isNil === 'function' && value.isNil()); }
-        catch (_) { fail('invalid-result', 'Native AX reference unavailable', 'CFGetTypeID'); }
-        if (!present) {
-            fail('missing-reference', 'Native AX value type unavailable', 'CFGetTypeID');
+    // Only SDK Create/Copy and CFArray outputs enter this conversion; never
+    // token fields or arbitrary JavaScript payloads. The AX SDK declares both
+    // AXUIElementRef and AXValueRef CF_BRIDGED_TYPE(id). Expose that underlying
+    // object explicitly so generic CFTypeRef/id arguments do not box a Ref
+    // into a dictionary. Keep the CF type and owner checks after conversion.
+    // Public bridge reproduction: https://stackoverflow.com/questions/33314614
+    const cfObject = (value, origin) => {
+        let object, present;
+        try {
+            if (value && ['object', 'function'].includes(typeof value)) {
+                object = typeof value.isNil === 'function' ? value : bridge.castRefToObject(value);
+            }
+            present = !!object && typeof object.isNil === 'function' && !object.isNil();
+        } catch (_) {
+            fail('invalid-result', 'Native AX reference unavailable', origin);
         }
+        if (!present) fail('missing-reference', 'Native AX value type unavailable', origin);
+        return object;
+    };
+    const typed = (value, name) => {
+        value = cfObject(value, 'CFGetTypeID');
         const actual = typeID(call('CFGetTypeID', value), 'CFGetTypeID');
         const expected = typeID(call(name), name);
         if (actual !== expected) fail('type-mismatch', 'Native AX value type unavailable', 'CFGetTypeID');
         return value;
     };
     const element = value => {
-        typed(value, 'AXUIElementGetTypeID');
+        value = typed(value, 'AXUIElementGetTypeID');
         const out = reference();
         success(call('AXUIElementGetPid', value, out));
         if (!Number.isInteger(out[0]) || out[0] !== pid) fail('owner-mismatch', 'Native AX element ownership changed');
@@ -173,9 +186,9 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic) {
         if (value === false || value === 0) return false;
         fail('invalid-result', 'Native AX boolean unavailable');
     };
-    const same = (left, right) => cBoolean(call('CFEqual', left, right));
+    const same = (left, right) => cBoolean(call('CFEqual', cfObject(left, 'CFEqual'), cfObject(right, 'CFEqual')));
     const read = (value, name, optionalLabel = false) => {
-        element(value);
+        value = element(value);
         const out = reference();
         const error = call('AXUIElementCopyAttributeValue', value, api(name), out);
         // Optional alternate labels are not proof of absence or closure.
@@ -200,7 +213,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic) {
         return value;
     };
     const children = (value, name, limit) => {
-        element(value);
+        value = element(value);
         const countRef = reference();
         success(call('AXUIElementGetAttributeValueCount', value, api(name), countRef));
         const count = index(countRef[0]);
@@ -208,12 +221,12 @@ function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic) {
         if (count === 0) return []; // Successful count, not an AX error.
         const out = reference();
         success(call('AXUIElementCopyAttributeValues', value, api(name), 0, limit + 1, out));
-        typed(out[0], 'CFArrayGetTypeID');
-        const size = index(call('CFArrayGetCount', out[0]));
+        const refs = typed(out[0], 'CFArrayGetTypeID');
+        const size = index(call('CFArrayGetCount', refs));
         if (size !== count || size > limit) fail('invalid-result', 'Native AX array bound changed');
         const result = [];
         for (let index = 0; index < size; index++) {
-            result.push(element(bridge.castRefToObject(call('CFArrayGetValueAtIndex', out[0], index))));
+            result.push(element(call('CFArrayGetValueAtIndex', refs, index)));
         }
         return result;
     };
