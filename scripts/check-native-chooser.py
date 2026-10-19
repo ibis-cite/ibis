@@ -14,7 +14,7 @@ import tempfile
 import time
 import traceback
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 
 def load_module(name, path):
@@ -65,7 +65,11 @@ WINDOWS_LOCATION_FIELDS = (
 )
 
 
-def location_token(token, process_id):
+def absolute_executable(value):
+    return isinstance(value, str) and value.startswith('/') and '\x00' not in value and len(value) <= 1024
+
+
+def location_token(token, process_id, executable=None):
     def exact(value, keys):
         return isinstance(value, dict) and set(value) == set(keys)
     def positive_integer(value, maximum=0xffffffff):
@@ -78,8 +82,9 @@ def location_token(token, process_id):
     valid = exact(token, ("owner", "panel", "sheet")) and positive_integer(process_id, 0x7fffffff)
     if valid:
         owner = token["owner"]
-        valid = (exact(owner, ("pid", "started")) and positive_integer(owner["pid"], 0x7fffffff)
-                 and owner["pid"] == process_id and finite(owner["started"]) and owner["started"] > 0)
+        valid = (exact(owner, ("pid", "executable")) and positive_integer(owner["pid"], 0x7fffffff)
+                 and owner["pid"] == process_id and absolute_executable(owner["executable"])
+                 and (executable is None or owner["executable"] == executable))
     if valid:
         for key in ("panel", "sheet"):
             window = token[key]
@@ -97,7 +102,7 @@ def location_token(token, process_id):
     return token
 
 
-def location_identity(value, process_id):
+def location_identity(value, process_id, executable=None):
     if (not isinstance(value, dict) or set(value) != {"ready", "owned", "token"}
             or type(value["ready"]) is not bool or type(value["owned"]) is not bool):
         raise AssertionError("Native chooser location metadata is invalid")
@@ -107,7 +112,7 @@ def location_identity(value, process_id):
         return None
     if not value["owned"]:
         raise AssertionError("Ready native chooser is not owned")
-    return location_token(value["token"], process_id)
+    return location_token(value["token"], process_id, executable)
 
 
 def after_location(value):
@@ -309,6 +314,25 @@ class Dialog:
     def __init__(self, native, system, output=None):
         self.native, self.system, self.output = native, system, output
         self.linux = linux.Dialog(native, smoke.run) if system == "Linux" else None
+        if system == "Darwin":
+            # This is the direct, exclusively managed Popen child. It cannot
+            # reuse its PID until this checker reaps it; never poll/reap it
+            # elsewhere while a synchronous native helper is in flight.
+            self.child = native.app
+            self.child_pid = self.child.pid
+            # launch() already resolves the executable before passing this
+            # single argument to Popen. Retain that exact launch identity.
+            arguments = self.child.args
+            if (type(self.child_pid) is not int or not 0 < self.child_pid <= 0x7fffffff
+                    or not isinstance(arguments, list) or len(arguments) != 1
+                    or not absolute_executable(arguments[0])):
+                raise AssertionError("Owned app executable identity is invalid")
+            self.executable = arguments[0]
+
+    def require_owned_child(self):
+        if (self.native.app is not self.child or self.child.pid != self.child_pid
+                or self.child.args != [self.executable] or self.child.poll() is not None):
+            raise AssertionError("Owned app exited or its identity changed")
 
     def capture_failure(self):
         if self.system not in ("Darwin", "Windows") or self.output is None or self.native.app.poll() is not None:
@@ -344,7 +368,7 @@ class Dialog:
     def call(self, action, token=None):
         guarded = self.system == "Darwin" and action in ("after-location", "confirm-key")
         if guarded:
-            location_token(token, self.native.app.pid)
+            location_token(token, self.child_pid, self.executable)
         elif token is not None:
             raise AssertionError("Unexpected native chooser identity argument")
         if self.linux:
@@ -358,12 +382,18 @@ class Dialog:
                 command += ["-FailureImage", str(self.output / "chooser-failure.png")]
         else:
             command = ["osascript", "-l", "JavaScript", str(ROOT / "dialog-macos.js"),
-                       action, str(self.native.app.pid)]
+                       action, str(self.child_pid), self.executable]
             if guarded:
                 command.append(json.dumps(token, allow_nan=False))
         try:
-            result = subprocess.run(command, encoding="utf-8", stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE, timeout=30)
+            if self.system == "Darwin":
+                self.require_owned_child()
+            try:
+                result = subprocess.run(command, encoding="utf-8", stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE, timeout=30)
+            finally:
+                if self.system == "Darwin":
+                    self.require_owned_child()
         except subprocess.TimeoutExpired as error:
             for line in helper_diagnostics(error.stderr):
                 print(line, file=sys.stderr, flush=True)
@@ -383,6 +413,8 @@ class Dialog:
             value = json.loads(result.stdout)
         except ValueError:
             raise AssertionError("Native chooser helper returned invalid metadata") from None
+        if self.system == "Darwin" and action == "location-identity":
+            location_identity(value, self.child_pid, self.executable)
         if action in ("confirm", "cancel") or guarded and action == "confirm-key":
             if self.system == "Windows":
                 key = "escape" if action == "cancel" else "return"
@@ -652,6 +684,104 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def darwin_owned_native(self, polls=None):
+        from types import SimpleNamespace
+        executable = '/Applications/Ibis.app/Contents/MacOS/ibis-desktop'
+        poll = (lambda: None) if polls is None else Mock(side_effect=polls)
+        child = SimpleNamespace(pid=10, args=[executable], poll=poll)
+        return SimpleNamespace(app=child), executable
+
+    def test_darwin_every_action_requires_the_same_live_unreaped_child(self):
+        from types import SimpleNamespace
+        for action in ('state', 'cancel', 'confirm', 'location-state', 'location-identity', 'after-location', 'confirm-key'):
+            native, executable = self.darwin_owned_native([7])
+            dialog = Dialog(native, 'Darwin')
+            token = {**self.macos_token(), 'owner': {'pid': 10, 'executable': executable}} if action in ('after-location', 'confirm-key') else None
+            with patch.object(subprocess, 'run') as run:
+                with self.assertRaisesRegex(AssertionError, 'Owned app'):
+                    dialog.call(action, token)
+                run.assert_not_called()
+            native, executable = self.darwin_owned_native([None, 7])
+            dialog = Dialog(native, 'Darwin')
+            token = {**self.macos_token(), 'owner': {'pid': 10, 'executable': executable}} if action in ('after-location', 'confirm-key') else None
+            with patch.object(subprocess, 'run', return_value=SimpleNamespace(returncode=0, stdout='{"invoked":true}')) as run:
+                with self.assertRaisesRegex(AssertionError, 'Owned app'):
+                    dialog.call(action, token)
+                self.assertEqual(run.call_count, 1)
+
+    def test_darwin_changed_child_pid_or_executable_never_starts_a_helper(self):
+        from types import SimpleNamespace
+        for changed in ('instance', 'pid', 'executable'):
+            native, executable = self.darwin_owned_native()
+            dialog = Dialog(native, 'Darwin')
+            if changed == 'instance': native.app = SimpleNamespace(pid=10, args=[executable], poll=lambda: None)
+            elif changed == 'pid': native.app.pid = 11
+            else: native.app.args = ['/foreign/app']
+            with patch.object(subprocess, 'run') as run:
+                with self.assertRaisesRegex(AssertionError, 'Owned app'):
+                    dialog.call('location-identity')
+                run.assert_not_called()
+
+    def test_darwin_request_uses_the_exact_resolved_launch_argument_on_every_host(self):
+        native, executable = self.darwin_owned_native()
+        with patch.object(Path, 'resolve', side_effect=AssertionError('No host-specific rewriting of macOS identity')):
+            dialog = Dialog(native, 'Darwin')
+        self.assertEqual(dialog.executable, executable)
+
+    def test_darwin_helper_exception_still_checks_the_child_and_never_retries(self):
+        native, _ = self.darwin_owned_native([None, 7])
+        dialog = Dialog(native, 'Darwin')
+        with patch.object(subprocess, 'run', side_effect=subprocess.TimeoutExpired('synthetic', 30)) as run:
+            with self.assertRaisesRegex(AssertionError, 'Owned app'):
+                dialog.call('location-identity')
+        self.assertEqual(run.call_count, 1)
+        self.assertEqual(native.app.poll.call_count, 2)
+
+    def test_darwin_executable_request_and_token_are_exact_before_subprocess(self):
+        from types import SimpleNamespace
+        native, executable = self.darwin_owned_native()
+        dialog = Dialog(native, 'Darwin')
+        token = {**self.macos_token(), 'owner': {'pid': 10, 'executable': '/foreign/app'}}
+        with patch.object(subprocess, 'run') as run:
+            with self.assertRaises(AssertionError): dialog.call('confirm-key', token)
+            run.assert_not_called()
+        token['owner']['executable'] = executable
+        with patch.object(subprocess, 'run', return_value=SimpleNamespace(returncode=0, stdout='{"invoked":true}')) as run:
+            self.assertEqual(dialog.call('confirm-key', token), {'invoked': True})
+        self.assertEqual(run.call_args.args[0][-4:-1], ['confirm-key', '10', executable])
+        self.assertEqual(json.loads(run.call_args.args[0][-1]), token)
+
+    def test_darwin_owned_child_is_a_real_direct_process_for_the_whole_helper_call(self):
+        from types import SimpleNamespace
+        executable = str(Path(sys.executable).resolve())
+        child = subprocess.Popen([executable], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            # Exercise the real child lifetime on every host OS. The separate
+            # Darwin request-schema tests use a synthetic absolute macOS path.
+            dialog = Dialog.__new__(Dialog)
+            dialog.native, dialog.system, dialog.linux = SimpleNamespace(app=child), 'Darwin', None
+            dialog.child, dialog.child_pid, dialog.executable = child, child.pid, executable
+            def observe(command, **_options):
+                self.assertIsNone(child.poll())
+                self.assertEqual(command[-3:], ['state', str(child.pid), executable])
+                return SimpleNamespace(returncode=0, stdout='{"visible":true,"foreground":true,"owned":true}')
+            with patch.object(subprocess, 'run', side_effect=observe):
+                self.assertEqual(dialog.state(), {'visible': True, 'foreground': True, 'owned': True})
+            self.assertIsNone(child.poll())
+        finally:
+            if child.poll() is None: child.terminate()
+            child.communicate(timeout=10)
+
+    def test_darwin_issued_identity_for_another_executable_is_rejected_before_input(self):
+        from types import SimpleNamespace
+        native, _ = self.darwin_owned_native()
+        token = self.macos_token()
+        token['owner']['executable'] = '/foreign/app'
+        response = {'ready': True, 'owned': True, 'token': token}
+        with patch.object(subprocess, 'run', return_value=SimpleNamespace(returncode=0, stdout=json.dumps(response))) as run:
+            with self.assertRaises(AssertionError): Dialog(native, 'Darwin').call('location-identity')
+        self.assertEqual(run.call_count, 1)
+
     def test_windows_location_facts_accept_only_the_exact_boolean_schema(self):
         prefix = "NATIVE CHOOSER WINDOWS LOCATION "
         facts = {key: False for key in WINDOWS_LOCATION_FIELDS}
@@ -1015,7 +1145,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(actions, ["native", "terminate-editor", "reap-editor", "settings"])
 
     def macos_token(self):
-        return {"owner": {"pid": 10, "started": 100.5},
+        return {"owner": {"pid": 10, "executable": '/Applications/Ibis.app/Contents/MacOS/ibis-desktop'},
                 "panel": {"window": 20, "bounds": {"X": -100, "Y": 20, "Width": 600, "Height": 500}},
                 "sheet": {"bounds": {"X": -90, "Y": 30, "Width": 580, "Height": 200}}}
 
@@ -1097,8 +1227,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(location_identity({"ready": True, "owned": True, "token": token}, 10), token)
         self.assertIsNone(location_identity({"ready": False, "owned": True, "token": None}, 10))
         invalid = [None, {}, {**token, "payload": "private"}]
-        for section, field, value in (("owner", "pid", True), ("owner", "pid", 11), ("owner", "started", float("nan")),
-                ("owner", "started", float("inf")), ("owner", "started", 0), ("panel", "window", True),
+        for section, field, value in (("owner", "pid", True), ("owner", "pid", 11), ("owner", "executable", "relative/app"),
+                ("owner", "executable", "/bad\x00app"), ("owner", "executable", "/" * 1025), ("panel", "window", True),
                 ("sheet", "window", 20), ("sheet", "window", -1)):
             malformed = json.loads(json.dumps(token))
             malformed[section][field] = value
@@ -1123,17 +1253,17 @@ class Tests(unittest.TestCase):
 
     def test_macos_token_is_only_forwarded_to_the_two_guarded_native_actions(self):
         from types import SimpleNamespace
-        native = SimpleNamespace(app=SimpleNamespace(pid=10))
+        native, _ = self.darwin_owned_native()
         token = self.macos_token()
         for action, response in (("after-location", '{"ready":true,"closed":true}'), ("confirm-key", '{"invoked":true}')):
             with patch.object(subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout=response)) as run:
                 Dialog(native, "Darwin").call(action, token)
-            self.assertEqual(run.call_args.args[0][-3:-1], [action, "10"])
+            self.assertEqual(run.call_args.args[0][-4:-1], [action, "10", self.macos_token()["owner"]["executable"]])
             self.assertEqual(json.loads(run.call_args.args[0][-1]), token)
 
     def test_macos_guarded_confirmation_requires_exact_success_metadata(self):
         from types import SimpleNamespace
-        native = SimpleNamespace(app=SimpleNamespace(pid=10))
+        native, _ = self.darwin_owned_native()
         for response in ('true', '{"invoked":false}', '{"invoked":1}', '{"invoked":true,"extra":1}'):
             with patch.object(subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout=response)):
                 with self.assertRaises(AssertionError):
@@ -1186,7 +1316,7 @@ class Tests(unittest.TestCase):
     def test_external_actions_require_exact_success_metadata(self):
         from types import SimpleNamespace
         inputs = []
-        native = SimpleNamespace(app=SimpleNamespace(pid=10), picker_handle=12,
+        native = SimpleNamespace(app=SimpleNamespace(pid=10, args=[self.macos_token()['owner']['executable']], poll=lambda: None), picker_handle=12,
                                  call=lambda *arguments: inputs.append(arguments) or True)
         for system, accepted, rejected in (
             ("Windows", '{"dialog_handle":20,"key":"return"}', ["false", "true", "1", "null", '{"invoked":true}',

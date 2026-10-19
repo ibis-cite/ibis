@@ -20,21 +20,24 @@ function exactKeys(value, keys) {
 }
 function positiveId(value) { return Number.isInteger(value) && value > 0 && value <= 0xffffffff; }
 function positivePid(value) { return positiveId(value) && value <= 0x7fffffff; }
+function validExecutable(value) {
+    return typeof value === 'string' && value.startsWith('/') && value.length <= 1024 && !value.includes('\0');
+}
 function validBounds(bounds) {
     return exactKeys(bounds, ['X', 'Y', 'Width', 'Height']) &&
         Object.values(bounds).every(value => typeof value === 'number' && Number.isFinite(value)) &&
         bounds.Width > 0 && bounds.Height > 0 && bounds.Width <= 8192 && bounds.Height <= 8192;
 }
-function validateToken(token, pid) {
-    if (!exactKeys(token, ['owner', 'panel', 'sheet']) || !exactKeys(token.owner, ['pid', 'started']) ||
+function validateToken(token, pid, executable) {
+    if (!exactKeys(token, ['owner', 'panel', 'sheet']) || !exactKeys(token.owner, ['pid', 'executable']) ||
         !positivePid(token.owner.pid) || token.owner.pid !== pid ||
-        typeof token.owner.started !== 'number' || !Number.isFinite(token.owner.started) || token.owner.started <= 0 ||
+        !validExecutable(token.owner.executable) || token.owner.executable !== executable ||
         !exactKeys(token.panel, ['window', 'bounds']) || !positiveId(token.panel.window) || !validBounds(token.panel.bounds) ||
         !exactKeys(token.sheet, ['bounds']) || !validBounds(token.sheet.bounds)) throw Error('Native dialog identity metadata unavailable');
     return token;
 }
 function locationProgress(windows, token, foreground) {
-    validateToken(token, token && token.owner && token.owner.pid);
+    validateToken(token, token && token.owner && token.owner.pid, token && token.owner && token.owner.executable);
     if (!Array.isArray(windows) || windows.length > 10000 || typeof foreground !== 'boolean') {
         throw Error('Native current window metadata unavailable');
     }
@@ -270,12 +273,37 @@ function run(argv) {
     const stage = name => $.NSFileHandle.fileHandleWithStandardError.writeData(
         $('NATIVE CHOOSER MACOS ' + JSON.stringify({stage: name}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
     stage('identity');
-    const action = argv[0], appId = Number(argv[1]);
-    if (!positivePid(appId)) throw Error('Native app identity unavailable');
+    const action = argv[0], appId = Number(argv[1]), executable = argv[2];
+    if (!positivePid(appId) || !validExecutable(executable)) throw Error('Native app identity unavailable');
     if (!['state', 'location-state', 'location-identity', 'after-location', 'confirm-key', 'cancel', 'confirm'].includes(action)) throw Error('Unsupported native dialog action');
     if (!$.AXIsProcessTrusted()) throw Error('Native dialog accessibility unavailable');
-    const running = $.NSRunningApplication.runningApplicationWithProcessIdentifier(appId);
-    if (!running || running.isTerminated) throw Error('Native app process unavailable');
+    // The Python owner holds the unreaped Popen child and checks poll()
+    // before and after every call. Its PID cannot be reused during that life.
+    // NSRunningApplication.launchDate is unavailable outside Launch Services.
+    const checkOwner = (allowUnavailable = false) => {
+        const unavailable = () => {
+            if (allowUnavailable) return false;
+            throw Error('Native app process metadata unavailable');
+        };
+        let current, pid, terminated, url, path, fileURL;
+        try {
+            current = $.NSRunningApplication.runningApplicationWithProcessIdentifier(appId);
+            if (!current || (typeof current.isNil === 'function' && current.isNil())) return unavailable();
+            pid = current.processIdentifier; terminated = current.isTerminated;
+        } catch (_) { return unavailable(); }
+        if (pid === undefined || pid === null || terminated === undefined || terminated === null) return unavailable();
+        if (!positivePid(pid) || typeof terminated !== 'boolean' || pid !== appId || terminated) throw Error('Native app process identity changed');
+        try {
+            url = current.executableURL;
+            if (!url || (typeof url.isNil === 'function' && url.isNil())) return unavailable();
+            fileURL = url.isFileURL;
+            path = ObjC.unwrap(url.path);
+        } catch (_) { return unavailable(); }
+        if (path === undefined || path === null || path === '' || fileURL === undefined || fileURL === null) return unavailable();
+        if (fileURL !== true || !validExecutable(path) || path !== executable) throw Error('Native app process identity changed');
+        return true;
+    };
+    if (!checkOwner(action === 'location-identity')) return JSON.stringify({ready: false, owned: false, token: null});
     const readWindows = () => {
         const refs = $.CGWindowListCopyWindowInfo(
             $.kCGWindowListOptionOnScreenOnly | $.kCGWindowListExcludeDesktopElements, $.kCGNullWindowID);
@@ -294,16 +322,9 @@ function run(argv) {
         }
         return result;
     };
-    const started = () => Number(running.launchDate.timeIntervalSince1970);
     const appIsForeground = () => {
         const front = $.NSWorkspace.sharedWorkspace.frontmostApplication;
         return !!front && Number(front.processIdentifier) === appId;
-    };
-    const checkOwner = expected => {
-        const current = $.NSRunningApplication.runningApplicationWithProcessIdentifier(appId);
-        if (!current || current.isTerminated || Number(current.launchDate.timeIntervalSince1970) !== expected) {
-            throw Error('Native app process identity changed');
-        }
     };
     const ax = () => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage);
     const panelForAX = (observations, windows, token) => {
@@ -318,8 +339,7 @@ function run(argv) {
         return unique(matching);
     };
     if (action === 'location-identity') {
-        const owner = {pid: appId, started: started()};
-        checkOwner(owner.started);
+        const owner = {pid: appId, executable};
         const observations = ax();
         const panel = panelForAX(observations, readWindows());
         if (!panel) return JSON.stringify({ready: false, owned: false, token: null});
@@ -327,23 +347,23 @@ function run(argv) {
         const bounds = observations.location(panel.element);
         if (!bounds) return JSON.stringify({ready: false, owned: true, token: null});
         const token = validateToken({owner, panel: {window: panel.native.kCGWindowNumber, bounds: panel.native.kCGWindowBounds},
-            sheet: {bounds}}, appId);
+            sheet: {bounds}}, appId, executable);
         // The nested logical sheet may share the physical panel surface or
         // have its own. Refresh panel identity without inventing a sheet ID.
         const windows = readWindows();
         const foreground = appIsForeground();
         const current = locationProgress(windows, token, foreground);
-        checkOwner(owner.started);
+        checkOwner();
         const visible = !current.closed && windows.some(window =>
             window.kCGWindowNumber === token.panel.window && window.kCGWindowAlpha > 0);
         if (!foreground || !visible) return JSON.stringify({ready: false, owned: visible, token: null});
         return JSON.stringify({ready: true, owned: true, token});
     }
     if (action === 'after-location' || action === 'confirm-key') {
-        if (typeof argv[2] !== 'string' || argv[2].length > 2048) throw Error('Native dialog identity metadata unavailable');
-        const token = validateToken(JSON.parse(argv[2]), appId);
+        if (typeof argv[3] !== 'string' || argv[3].length > 2048) throw Error('Native dialog identity metadata unavailable');
+        const token = validateToken(JSON.parse(argv[3]), appId, executable);
         const progress = () => {
-            checkOwner(token.owner.started);
+            checkOwner();
             const windows = readWindows();
             const current = locationProgress(windows, token, appIsForeground());
             if (current.closed || !current.ready) return current;
@@ -354,7 +374,7 @@ function run(argv) {
             // AX calls are bounded but may take time. Do not post using CG or
             // foreground facts captured before those messages were sent.
             const latest = locationProgress(readWindows(), token, appIsForeground());
-            checkOwner(token.owner.started);
+            checkOwner();
             return latest.closed ? latest : {ready: ready && latest.ready, closed: false};
         };
         if (action === 'after-location') return JSON.stringify(progress());
@@ -480,6 +500,8 @@ function run(argv) {
     const button = unique(dialog.nodes.filter(node => role(node) === 'AXButton' && labelled(node, label)));
     if (!button) throw Error('Native dialog control unavailable');
     // Exactly one invocation. An AX error must never trigger a second action.
+    checkOwner();
+    if (!appIsForeground()) throw Error('Owned native chooser is not foreground');
     stage('invoke');
     try { button.actions.byName('AXPress').perform(); }
     catch (_) { throw Error('Native dialog action failed'); }

@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const { unique, flags, locationFlags, validateToken, locationProgress } = require('./dialog-macos.js');
+const executable = '/private/tmp/ibis-native/ibis';
 
 test('native dialog actions refuse ambiguous targets', () => {
   assert.equal(unique([]), null);
@@ -60,7 +61,7 @@ function nativeScenario({owner = 123, foreground = 123, duplicate = false, press
     kCGWindowBounds: {X: 15, Y: 25, Width: 450, Height: 120}});
   const context = {
     module: {exports: {}},
-    ObjC: {import: () => {}, deepUnwrap: value => value, castRefToObject: value => value},
+    ObjC: {import: () => {}, unwrap: value => value.value, deepUnwrap: value => value, castRefToObject: value => value},
     Application: () => {
       if (forbidAX) throw Error('No AX traversal after Go To Folder closes');
       return {applicationProcesses: {whose: () => () => [{windows: () => duplicate ? [window, window] : [window]}]}};
@@ -68,7 +69,8 @@ function nativeScenario({owner = 123, foreground = 123, duplicate = false, press
     $: Object.assign(value => ({dataUsingEncoding: () => value}), {
       NSFileHandle: {fileHandleWithStandardError: {writeData: () => {}}},
       AXIsProcessTrusted: () => true,
-      NSRunningApplication: {runningApplicationWithProcessIdentifier: () => ({isTerminated: false, launchDate: {timeIntervalSince1970: 7}})},
+      NSRunningApplication: {runningApplicationWithProcessIdentifier: () => ({processIdentifier: 123, isTerminated: false,
+        launchDate: null, executableURL: {isFileURL: true, path: {value: executable}}})},
       NSWorkspace: {sharedWorkspace: {frontmostApplication: {processIdentifier: foreground}}},
       CGWindowListCopyWindowInfo: () => metadata, CFArrayGetCount: refs => refs.length,
       CFArrayGetValueAtIndex: (refs, index) => refs[index],
@@ -80,7 +82,7 @@ function nativeScenario({owner = 123, foreground = 123, duplicate = false, press
   };
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(require.resolve('./dialog-macos.js'), 'utf8'), context);
-  return {call: (action, token) => JSON.parse(context.run([action, '123', JSON.stringify(token)])), presses: () => presses,
+  return {call: (action, token) => JSON.parse(context.run([action, '123', executable, JSON.stringify(token)].slice(0, token === undefined ? 3 : 4))), presses: () => presses,
     windowValueReads: () => windowValueReads, posted, setWindows: value => { metadata = value; }};
 }
 
@@ -195,7 +197,7 @@ function axScenario(options = {}) {
   const system = ax('AXSystemWide');
   const unknown = ax('AXSheet', {AXParent: panel, ...frames(sheetBounds)});
   let windows = [{kCGWindowNumber: 10, kCGWindowOwnerPID: 123, kCGWindowAlpha: 1, kCGWindowBounds: panelBounds}];
-  let foreground = 123, started = 7, elapsed = 0, failure = null;
+  let foreground = 123, processPid = 123, processExecutable = executable, registered = true, terminated = false, elapsed = 0, failure = null;
   const timeouts = [], posted = [], reads = [], stages = [];
   const status = (name, attribute) => {
     reads.push([name, attribute]);
@@ -232,8 +234,9 @@ function axScenario(options = {}) {
       }}},
       NSProcessInfo: {processInfo: {get systemUptime() { return elapsed / 1000; }}},
       AXIsProcessTrusted: () => true,
-      NSRunningApplication: {runningApplicationWithProcessIdentifier: () => ({isTerminated: false,
-        launchDate: {get timeIntervalSince1970() { return started; }}})},
+      NSRunningApplication: {runningApplicationWithProcessIdentifier: () => registered ? ({isTerminated: terminated,
+        processIdentifier: processPid, get launchDate() { throw Error('Launch Services metadata is unavailable for direct children'); },
+        executableURL: processExecutable === null ? null : {isFileURL: true, path: string(processExecutable)}}) : null},
       NSWorkspace: {sharedWorkspace: {get frontmostApplication() { return {processIdentifier: foreground}; }}},
       CGWindowListCopyWindowInfo: () => windows, CFArrayGetCount: refs => {
         const count = Array.isArray(refs) ? refs.length : refs.value.length;
@@ -279,13 +282,15 @@ function axScenario(options = {}) {
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(require.resolve('./dialog-macos.js'), 'utf8'), context);
   const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, system, bool, array, string,
-    call: (action, token) => JSON.parse(context.run([action, '123', JSON.stringify(token)])), setPathOpen,
+    call: (action, token, expectedExecutable = executable) => JSON.parse(context.run([action, '123', expectedExecutable, JSON.stringify(token)].slice(0, token === undefined ? 3 : 4))), setPathOpen,
     fail: (attribute, code = -25204) => { failure = {attribute, code}; },
     setWindows: value => { windows = value; }, setForeground: value => { foreground = value; },
-    setStarted: value => { started = value; }, remove: name => { delete context.$[name]; }};
+    setExecutable: value => { processExecutable = value; }, setPid: value => { processPid = value; },
+    setRegistered: value => { registered = value; }, setTerminated: value => { terminated = value; },
+    remove: name => { delete context.$[name]; }};
   return api;
 }
-const identity = () => ({owner: {pid: 123, started: 7},
+const identity = () => ({owner: {pid: 123, executable},
   panel: {window: 10, bounds: {X: 10, Y: 20, Width: 500, Height: 400}},
   sheet: {bounds: {X: 15, Y: 25, Width: 450, Height: 120}}});
 
@@ -297,10 +302,10 @@ test('a logical direct path sheet may share its panel physical surface', () => {
 });
 
 test('logical tokens reject physical sheet IDs, foreign owners and malformed bounds', () => {
-  for (const token of [null, {}, {...identity(), owner: {pid: 456, started: 7}},
+  for (const token of [null, {}, {...identity(), owner: {pid: 456, executable}},
     {...identity(), sheet: {...identity().sheet, window: 20}},
     {...identity(), sheet: {bounds: {...identity().sheet.bounds, Width: 0}}}]) {
-    assert.throws(() => validateToken(token, 123), /metadata/);
+    assert.throws(() => validateToken(token, 123, executable), /metadata/);
   }
 });
 
@@ -370,9 +375,9 @@ test('one prepared balanced Return repeats AX and owner guards and never uses Sy
   assert.equal(changed.posted.length, 0);
 });
 
-test('process reuse, foreign frame identity and denied preflight never reach input', () => {
-  const reused = axScenario(); reused.setStarted(8);
-  assert.throws(() => reused.call('after-location', identity()), /identity changed/);
+test('executable changes and denied preflight never reach input', () => {
+  const changed = axScenario(); changed.setExecutable('/private/tmp/foreign');
+  assert.throws(() => changed.call('after-location', identity()), /identity changed/);
   const denied = axScenario(); denied.remove('CGPreflightPostEventAccess'); denied.setPathOpen(false);
   assert.throws(() => denied.call('confirm-key', identity()), /preflight/);
   assert.equal(denied.posted.length, 0);
@@ -400,14 +405,15 @@ test('SDK uint8 Boolean returns accept only exact 0/1 or bridged booleans', () =
 });
 
 test('PID token boundaries match signed pid_t rather than CGWindowID', () => {
-  const token = {...identity(), owner: {pid: 0x80000000, started: 7}};
-  assert.throws(() => validateToken(token, token.owner.pid), /metadata/);
-  const maximum = {...identity(), owner: {pid: 0x7fffffff, started: 7}};
-  assert.equal(validateToken(maximum, maximum.owner.pid), maximum);
+  const token = {...identity(), owner: {pid: 0x80000000, executable}};
+  assert.throws(() => validateToken(token, token.owner.pid, executable), /metadata/);
+  const maximum = {...identity(), owner: {pid: 0x7fffffff, executable}};
+  assert.equal(validateToken(maximum, maximum.owner.pid, executable), maximum);
 });
 
 test('final input guard refreshes CG and foreground after AX observations', () => {
-  for (const mutate of [api => api.setForeground(456), api => api.setStarted(8),
+  for (const mutate of [api => api.setForeground(456), api => api.setTerminated(true),
+    api => api.setExecutable('/private/tmp/foreign'), api => api.setPid(456),
     api => api.setWindows([]), api => api.setWindows([{kCGWindowNumber: 10, kCGWindowOwnerPID: 456}])]) {
     const native = axScenario({onRead: (api, name, attribute) => {
       if (attribute === 'AXEnabled') mutate(api);
@@ -468,4 +474,53 @@ test('JXA CFIndex strings and concrete initialized struct output storage are sup
   assert.deepEqual(native.call('location-identity'), {ready: true, owned: true, token: identity()});
   native.setPathOpen(false);
   assert.deepEqual(native.call('after-location', identity()), {ready: true, closed: false});
+});
+
+
+test('an owned direct child with unavailable Launch Services date can prove the logical sheet', () => {
+  const native = axScenario(); // launchDate getter throws if anything reads it.
+  assert.deepEqual(native.call('location-identity'), {ready: true, owned: true, token: identity()});
+  native.setPathOpen(false);
+  assert.deepEqual(native.call('confirm-key', identity()), {invoked: true});
+  assert.equal(native.posted.length, 2);
+});
+
+test('only pre-token registration metadata absence is an unready result', () => {
+  for (const unavailable of [api => api.setRegistered(false), api => api.setExecutable(null)]) {
+    const native = axScenario(); unavailable(native);
+    assert.deepEqual(native.call('location-identity'), {ready: false, owned: false, token: null});
+    for (const action of ['after-location', 'confirm-key', 'cancel', 'confirm', 'state', 'location-state']) {
+      assert.throws(() => native.call(action, ['after-location', 'confirm-key'].includes(action) ? identity() : undefined), /process|metadata/);
+    }
+    assert.equal(native.posted.length, 0);
+  }
+});
+
+test('wrong executable, foreign PID and termination are fatal even before token issuance', () => {
+  for (const mutate of [api => api.setExecutable('/private/tmp/foreign'), api => api.setExecutable('relative'), api => api.setPid(456),
+    api => api.setTerminated(true)]) {
+    const native = axScenario(); mutate(native);
+    assert.throws(() => native.call('location-identity'), /identity|process/);
+    assert.throws(() => native.call('confirm-key', identity()), /identity|process/);
+    assert.equal(native.posted.length, 0);
+  }
+});
+
+test('owner token executable is exact, bounded and has no obsolete timestamp', () => {
+  for (const owner of [{pid: 123, executable: 'relative'}, {pid: 123, executable: '/private/tmp/foreign'},
+    {pid: 123, executable: '/' + 'x'.repeat(1024)}, {pid: 123, executable: '/bad\0path'},
+    {pid: 123, started: 7}, {pid: 123, executable, started: 7}]) {
+    assert.throws(() => validateToken({...identity(), owner}, 123, executable), /metadata/);
+  }
+});
+
+
+test('every action rejects an invalid expected executable before native work', () => {
+  for (const expected of ['', 'relative', '/bad\0path', '/' + 'x'.repeat(1024)]) {
+    const native = axScenario();
+    assert.throws(() => native.call('location-identity', undefined, expected), /identity/);
+    assert.throws(() => native.call('confirm-key', identity(), expected), /identity/);
+    assert.equal(native.reads.length, 0);
+    assert.equal(native.posted.length, 0);
+  }
 });
