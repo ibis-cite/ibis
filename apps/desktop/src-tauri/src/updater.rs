@@ -12,7 +12,7 @@ use std::time::Duration;
 use tauri::menu::CheckMenuItem;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
-use tauri_plugin_updater::{Update, UpdaterExt};
+use tauri_plugin_updater::{Update, Updater, UpdaterExt};
 
 use crate::preferences::SettingsFile;
 
@@ -119,15 +119,28 @@ pub(crate) fn check_now(app: &AppHandle) {
     tauri::async_runtime::spawn(async move { check(&app, true).await });
 }
 
+/// The request names Ibis and its version, as `PRIVACY.md` says, instead of
+/// the plugin's own name.
+pub(crate) fn user_agent<R: tauri::Runtime>(app: &AppHandle<R>) -> String {
+    format!("Ibis/{}", app.package_info().version)
+}
+
+fn updater<R: tauri::Runtime>(app: &AppHandle<R>) -> tauri_plugin_updater::Result<Updater> {
+    app.updater_builder().header("User-Agent", user_agent(app))?.build()
+}
+
 async fn check(app: &AppHandle, asked: bool) {
     let updates = app.state::<Updates>();
     if updates.busy.swap(true, Ordering::SeqCst) {
         if asked {
-            tell(app, "Ibis is already checking for updates.");
+            tell(
+                app,
+                "Ibis is already checking for updates, or an update is waiting for your answer.",
+            );
         }
         return;
     }
-    let found = match app.updater() {
+    let found = match updater(app) {
         Ok(updater) => updater.check().await.map_err(|_| ()),
         Err(_) => Err(()),
     };
@@ -273,11 +286,15 @@ mod tests {
         let platform = json!({ "signature": signature.trim(), "url": format!("{base}/package.bin") });
         let tampered_platform = json!({ "signature": signature.trim(), "url": format!("{base}/tampered.bin") });
         let manifest = |entry: &serde_json::Value| {
-            let platforms: serde_json::Map<_, _> =
-                ["darwin-aarch64", "darwin-x86_64", "windows-x86_64", "linux-x86_64"]
-                    .into_iter()
-                    .map(|target| (target.to_string(), entry.clone()))
-                    .collect();
+            let platforms: serde_json::Map<_, _> = [
+                "darwin-aarch64-app",
+                "darwin-x86_64-app",
+                "windows-x86_64-nsis",
+                "linux-x86_64-appimage",
+            ]
+            .into_iter()
+            .map(|target| (target.to_string(), entry.clone()))
+            .collect();
             json!({ "version": "9.9.9-nightly.209912312359", "notes": "Synthetic notes.", "pub_date": "2099-12-31T23:59:00Z", "platforms": platforms })
                 .to_string()
                 .into_bytes()
@@ -288,6 +305,8 @@ mod tests {
             ("/package.bin", package.clone()),
             ("/tampered.bin", tampered),
         ];
+        let agents = std::sync::Arc::new(Mutex::new(Vec::new()));
+        let seen = agents.clone();
         std::thread::spawn(move || {
             use std::io::{BufRead, BufReader, Write};
             for stream in server.incoming().flatten() {
@@ -298,6 +317,11 @@ mod tests {
                 }
                 let mut header = String::new();
                 while reader.read_line(&mut header).is_ok_and(|n| n > 2) {
+                    if let Some(agent) = header.to_ascii_lowercase().strip_prefix("user-agent:")
+                        && let Ok(mut seen) = seen.lock()
+                    {
+                        seen.push(agent.trim().to_string());
+                    }
                     header.clear();
                 }
                 let path = request.split(' ').nth(1).unwrap_or_default();
@@ -337,8 +361,13 @@ mod tests {
             let url = format!("{base}/{feed}").parse().unwrap_or_else(|e| panic!("{e}"));
             let updater = app
                 .updater_builder()
+                .header("User-Agent", user_agent(app.handle()))
+                .unwrap_or_else(|e| panic!("{e}"))
                 .endpoints(vec![url])
                 .unwrap_or_else(|e| panic!("{e}"))
+                // Each published entry names its package type, so a .deb or
+                // .rpm install is never offered the AppImage.
+                .target("linux-x86_64-appimage")
                 .no_proxy()
                 .build()
                 .unwrap_or_else(|e| panic!("{e}"));
