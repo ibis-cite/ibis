@@ -28,6 +28,7 @@ export const pickerText = {
   formattedStyles: "Formatted citation",
   preview: "Preview",
   previewPending: "Formatting…",
+  previewNotReady: "Nothing was copied yet: the citation is still being formatted. Press Enter again in a moment.",
   previewError: "This citation could not be formatted. Choose another style, or copy citation keys.",
   provisional: "Provisional: the number depends on the other references cited in your document.",
   dismiss: "Dismiss",

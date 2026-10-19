@@ -33,6 +33,10 @@ describe("formatted markup", () => {
     ]);
   });
 
+  it("ignores class names that only exist on the object prototype", () => {
+    expect(parse('<div class="constructor __proto__ toString">x</div>')).toEqual(["x"]);
+  });
+
   it("shows a hostile title as text in the preview", () => {
     const html = formatter.bibliography("apa", [hostile], "html").output;
     const { container } = show(<div>{render(parse(html))}</div>);

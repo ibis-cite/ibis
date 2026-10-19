@@ -58,8 +58,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const [selectionChanged, setSelectionChanged] = useState(false);
   const [format, setFormat] = useState<Choice>("pandoc");
   const style = cslItems && copyFormatted ? styleOf(format) : null;
-  // The formatted preview of what Enter would copy; null while formatting.
-  const [formatted, setFormatted] = useState<FormattedCitation | "failed" | null>(null);
+  // The formatted preview, tagged with the style, choice and library it was
+  // made for, so Enter never copies a preview of an earlier choice.
+  const [formatted, setFormatted] = useState<{ key: string; result: FormattedCitation | "failed" } | null>(null);
   const [copied, setCopied] = useState<Copied | null>(preview?.copied ?? null);
   const [error, setError] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -181,18 +182,21 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const current = resultsQuery === query ? results : [];
   const chosen = selected.size > 0 ? [...selected.values()] : current.slice(active, active + 1);
   const chosenKey = chosen.map((r) => idKey(r.id)).join("\u0001");
+  const previewKey = `${style}\u0002${libraryVersion}\u0002${chosenKey}`;
+  // What Enter would copy now; null while it is being formatted.
+  const shown = formatted?.key === previewKey ? formatted.result : null;
 
   // Format the preview again whenever the choice or the style changes.
   useEffect(() => {
-    setFormatted(null);
     if (!style || !cslItems || chosen.length === 0) return;
     let live = true;
+    const key = previewKey;
     cslItems(chosen.map((r) => r.id))
       .then((csl) => formatCitation(csl, style))
-      .then((result) => { if (live) setFormatted(result); })
-      .catch(() => { if (live) setFormatted("failed"); });
+      .then((result) => { if (live) setFormatted({ key, result }); })
+      .catch(() => { if (live) setFormatted({ key, result: "failed" }); });
     return () => { live = false; };
-  }, [style, chosenKey, libraryVersion]);
+  }, [previewKey]);
 
   // Copy the chosen references in the chosen format.
   const copy = async () => {
@@ -203,9 +207,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     try {
       if (style && copyFormatted) {
         // Copy only what the preview shows, never a result still being made.
-        if (formatted === null || formatted === "failed") return;
-        await copyFormatted(formatted.text, formatted.html);
-        outcome = { text: formatted.text, warnings: formatted.warnings };
+        if (shown === null || shown === "failed") {
+          setCopyError(shown === null ? pickerText.previewNotReady : pickerText.previewError);
+          return;
+        }
+        await copyFormatted(shown.text, shown.html);
+        outcome = { text: shown.text, warnings: shown.warnings };
       } else {
         outcome = await copyCitation(
           chosen.map((r) => r.id),
@@ -330,15 +337,15 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       )}
       {style && chosen.length > 0 && (
         <section aria-label={pickerText.preview} className="format-preview">
-          {formatted === null && <p role="status">{pickerText.previewPending}</p>}
-          {formatted === "failed" && <p role="alert">{pickerText.previewError}</p>}
-          {formatted && formatted !== "failed" && (
+          {shown === null && <p role="status">{pickerText.previewPending}</p>}
+          {shown === "failed" && <p role="alert">{pickerText.previewError}</p>}
+          {shown && shown !== "failed" && (
             <>
-              <div className="preview-text">{render(formatted.markup)}</div>
+              <div className="preview-text">{render(shown.markup)}</div>
               {provisional(style) && <p className="provisional">{pickerText.provisional}</p>}
-              {formatted.warnings.length > 0 && (
+              {shown.warnings.length > 0 && (
                 <ul aria-label={pickerText.copyWarnings}>
-                  {formatted.warnings.map((w) => <li key={w}>{w}</li>)}
+                  {shown.warnings.map((w, i) => <li key={i}>{w}</li>)}
                 </ul>
               )}
             </>

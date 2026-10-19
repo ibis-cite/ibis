@@ -61,7 +61,7 @@ function element(node: Element): Markup[] {
   if (name === "script" || name === "style" || name === "template") return [];
   const inner = children(node);
   if (name === "div") {
-    const block = [...node.classList].map((name) => BLOCKS[name]).find(Boolean);
+    const block = [...node.classList].filter((name) => Object.hasOwn(BLOCKS, name)).map((name) => BLOCKS[name])[0];
     return block ? [{ block, children: inner }] : inner;
   }
   if (!TAGS.has(name)) return inner;
