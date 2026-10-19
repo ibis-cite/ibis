@@ -221,17 +221,36 @@ def wait_for_chosen_query(snapshot, index, report):
         raise
 
 
-def prepare_rename_query(native, snapshot, system):
+def prepare_rename_query(native, snapshot, system, previous_index=None, report=None):
     native.key("Escape")
     smoke.wait_for(lambda: not snapshot()["visible"], "rename query hides picker before restoring search focus")
     native.key("ctrl+super+r" if system == "Darwin" else "ctrl+shift+y")
+    current, editable = {"nodes": []}, []
     def ready():
+        nonlocal current, editable
         current = snapshot()
-        return current["visible"] and current["foreground"] and bool(smoke.named(current, "Search references"))
-    smoke.wait_for(ready, "rename query shows the foreground picker before typing")
+        named = smoke.named(current, "Search references")
+        editable = ([node for node in named if node.get("role", "").lower().replace(" ", "") in smoke.EDITABLE_ROLES]
+                    if system == "Windows" else [])
+        focused = len(editable) == 1 and editable[0].get("focused") is True
+        return current["visible"] and current["foreground"] and bool(named) and (system != "Windows" or focused)
+    try:
+        smoke.wait_for(ready, "rename query shows the foreground picker before typing")
+    except AssertionError:
+        if system == "Windows" and report is not None:
+            prior = f"smoke{previous_index:06d}" if previous_index is not None else None
+            title = f"Ibis smoke reference {previous_index:06d}" if previous_index is not None else None
+            facts = {"visible": current.get("visible") is True, "foreground": current.get("foreground") is True,
+                     "unique_editable": len(editable) == 1,
+                     "editable_focused": len(editable) == 1 and editable[0].get("focused") is True,
+                     "known_result_focused": title is not None and any(node.get("focused") is True for node in smoke.named(current, title)),
+                     "previous_query_unchanged": prior is not None and len(editable) == 1 and editable[0].get("value") == prior}
+            report["rename_focus_failure"] = facts
+            print("NATIVE CHOOSER RENAME FOCUS FAILURE " + json.dumps(facts), file=sys.stderr)
+        raise
 
 
-def rename_library_roundtrip(library, settings, click, snapshot, query, prepare_query=lambda: None):
+def rename_library_roundtrip(library, settings, click, snapshot, query, prepare_query=lambda previous: None):
     original, preferences = library.read_bytes(), settings.read_bytes()
     renamed = library.with_name("renamed 引用.bib")
     assert not renamed.exists() and not renamed.is_symlink(), "Owned rename destination already exists"
@@ -272,7 +291,7 @@ def rename_library_roundtrip(library, settings, click, snapshot, query, prepare_
                     and (not require_query or state["retained_query_zero"]))
 
         smoke.wait_for(missing_explained, "renamed-away library names the missing old path and retains its snapshot")
-        prepare_query()
+        prepare_query(1)
         query(0)
         smoke.wait_for(lambda: missing_explained(True), "renamed-away retained query is searchable with unchanged settings")
 
@@ -280,14 +299,14 @@ def rename_library_roundtrip(library, settings, click, snapshot, query, prepare_
         library.write_text(smoke.fixture(5), encoding="utf-8")
         click("Reload")
         smoke.wait_for(lambda: loaded(5), "distinct recovery content replaces the retained snapshot")
-        prepare_query()
+        prepare_query(0)
         query(4)
         smoke.wait_for(lambda: loaded(5, 4), "distinct recovery query and count are visible together with unchanged settings")
 
         library.write_bytes(original)
         click("Reload")
         smoke.wait_for(lambda: loaded(3), "rename roundtrip restores the original three references")
-        prepare_query()
+        prepare_query(4)
         query(2)
         smoke.wait_for(lambda: loaded(3, 2), "restored query and baseline count are visible together with unchanged settings")
     finally:
@@ -654,7 +673,7 @@ def check(app_path, output, system):
             passed("C3 unreadable native choice retains searchable library and settings")
             report["stage"] = "rename-away"
             rename_library_roundtrip(library, settings, native.click, snapshot, query,
-                                     lambda: prepare_rename_query(native, snapshot, system))
+                                     lambda previous: prepare_rename_query(native, snapshot, system, previous, report))
             passed("rename-away retains searchable references and settings and recovers distinct content")
             report["stage"] = "C4"
             normal_quit(process, native.click)
@@ -737,6 +756,58 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def test_windows_rename_focus_timeout_keeps_the_same_snapshot_and_known_query_facts(self):
+        from io import StringIO
+        current = {"visible": True, "foreground": True, "nodes": [
+            {"name": "Search references", "role": "ControlType.ComboBox", "value": "smoke000001", "focused": False},
+            {"name": "Ibis smoke reference 000001", "focused": True}, {"name": "private provider text"}]}
+        snapshot, report, stderr = Mock(side_effect=[{"visible": False}, current]), {}, StringIO()
+        failure = AssertionError("original focus timeout")
+        def wait(predicate, message):
+            if "hides" in message:
+                self.assertTrue(predicate())
+            else:
+                self.assertFalse(predicate())
+                raise failure
+        with patch.object(smoke, "wait_for", side_effect=wait), patch.object(sys, "stderr", stderr):
+            with self.assertRaises(AssertionError) as caught:
+                prepare_rename_query(Mock(), snapshot, "Windows", previous_index=1, report=report)
+        self.assertIs(caught.exception, failure)
+        self.assertEqual(snapshot.call_count, 2)
+        self.assertEqual(report["rename_focus_failure"], {"visible": True, "foreground": True,
+            "unique_editable": True, "editable_focused": False, "known_result_focused": True, "previous_query_unchanged": True})
+        self.assertNotIn("private", stderr.getvalue())
+        self.assertNotIn("smoke000001", stderr.getvalue())
+
+    def test_windows_rename_never_types_until_the_unique_editable_search_is_focused(self):
+        actions = []
+        unfocused = {"visible": True, "foreground": True, "nodes": [
+            {"name": "Search references", "role": "ControlType.ComboBox", "value": "smoke000001", "focused": False},
+            {"name": "Reload", "focused": True}, {"name": "1 result"}]}
+        focused = {**unfocused, "nodes": [{**unfocused["nodes"][0], "focused": True}]}
+        snapshots = iter([{"visible": False}, unfocused, focused])
+        class Native:
+            def key(self, key): actions.append(key)
+        def wait(predicate, message):
+            if "hides" in message:
+                self.assertTrue(predicate())
+            else:
+                self.assertFalse(predicate())
+                self.assertNotIn("type", actions)
+                self.assertTrue(predicate())
+        with patch.object(smoke, "wait_for", side_effect=wait):
+            prepare_rename_query(Native(), lambda: next(snapshots), "Windows")
+            actions.append("type")
+        self.assertEqual(actions, ["Escape", "ctrl+shift+y", "type"])
+
+    def test_windows_rename_rejects_noneditable_or_ambiguous_focused_search(self):
+        for nodes in ([{"name": "Search references", "role": "ControlType.Button", "focused": True}],
+                      [{"name": "Search references", "role": "ControlType.ComboBox", "focused": True}] * 2):
+            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "nodes": nodes}])
+            with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
+                with self.assertRaises(AssertionError):
+                    prepare_rename_query(Mock(), lambda: next(snapshots), "Windows")
+
     def test_fresh_saved_library_requires_format_two_and_one_bibtex_path(self):
         with tempfile.TemporaryDirectory() as folder:
             library, settings = Path(folder) / "references 引用.bib", Path(folder) / "settings.json"
@@ -1025,7 +1096,7 @@ class Tests(unittest.TestCase):
             actions = []
             class Native:
                 def key(self, key): actions.append(key)
-            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "nodes": [{"name": "Search references"}]}])
+            snapshots = iter([{"visible": False}, {"visible": True, "foreground": True, "nodes": [{"name": "Search references", "role": "ControlType.ComboBox", "focused": True}]}])
             with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
                 prepare_rename_query(Native(), lambda: next(snapshots), system)
                 actions.append("type")
@@ -1053,8 +1124,8 @@ class Tests(unittest.TestCase):
             actions = []
             def typed(index): actions.append(index); query(index)
             with patch.object(smoke, "wait_for", side_effect=lambda predicate, message: self.assertTrue(predicate(), message)):
-                rename_library_roundtrip(library, settings, click, snapshot, typed, lambda: actions.append("prepare"))
-            self.assertEqual(actions, ["prepare", 0, "prepare", 4, "prepare", 2])
+                rename_library_roundtrip(library, settings, click, snapshot, typed, lambda previous: actions.append(("prepare", previous)))
+            self.assertEqual(actions, [("prepare", 1), 0, ("prepare", 0), 4, ("prepare", 4), 2])
 
     def rename_case(self, folder, *, stale=False, change_settings=False):
         library = Path(folder) / "example 引用.bib"
