@@ -3,6 +3,7 @@
 import argparse
 from contextlib import contextmanager
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -19,6 +20,79 @@ class Unavailable(RuntimeError):
 
 class HelperTimeout(RuntimeError):
     pass
+
+
+APPEARANCE_PHASES = ("material", "reduce-transparency", "material-after-reduce-transparency",
+                     "increase-contrast", "material-after-increase-contrast")
+
+
+def picker_frame(value):
+    if not isinstance(value, dict) or set(value) != {"window", "position", "size", "screen"}:
+        raise RuntimeError("Native picker frame metadata unavailable")
+    if type(value["window"]) is not int or value["window"] <= 0:
+        raise RuntimeError("Native picker window identity unavailable")
+    for key in ("position", "size", "screen"):
+        pair = value[key]
+        if not isinstance(pair, list) or len(pair) != 2 or any(type(v) not in (int, float) or not math.isfinite(v) for v in pair):
+            raise RuntimeError("Native picker frame dimensions unavailable")
+    x, y = value["position"]
+    width, height = value["size"]
+    screen_width, screen_height = value["screen"]
+    if x < 0 or y < 0 or width < 360 or height < 320 or x + width > screen_width or y + height > screen_height:
+        raise RuntimeError("Native picker is outside the capture screen")
+    return {key: list(item) if isinstance(item, list) else item for key, item in value.items()}
+
+
+def pin_picker_window(read):
+    window = None
+    def current():
+        nonlocal window
+        frame = picker_frame(read())
+        if window is None:
+            window = frame["window"]
+        elif frame["window"] != window:
+            raise RuntimeError("Native picker window identity changed")
+        return frame
+    return current
+
+
+def capture_sizes(name, output, read, resize, capture):
+    if name not in APPEARANCE_PHASES:
+        raise RuntimeError("Unknown native appearance capture phase")
+    original = picker_frame(read())
+    target = [int(original["size"][0]) + 120, int(original["size"][1]) + 80]
+    picker_frame({**original, "size": target})
+    if target[0] > 1280 or target[1] > 900:
+        raise RuntimeError("Resized picker exceeds the capture bound")
+    def matches(size):
+        current = picker_frame(read())
+        if current["window"] != original["window"]:
+            raise RuntimeError("Native picker window identity changed")
+        return all(abs(actual - wanted) <= 1 for actual, wanted in zip(current["size"], size))
+    try:
+        capture(output / f"{name}.png")
+        resize(original["window"], target)
+        wait_for(lambda: matches(target), "owned picker native resize readback")
+        capture(output / f"{name}-resized.png")
+    finally:
+        resize(original["window"], original["size"])
+        wait_for(lambda: matches(original["size"]), "owned picker original size restoration")
+    return {"normal": original["size"], "resized": target, "restored": True}
+
+
+def capture_screen(path):
+    # A failed capture must not reuse an older image as fresh evidence.
+    path.unlink(missing_ok=True)
+    time.sleep(1)  # Allow the compositor to draw mode/size changes.
+    subprocess.run(["screencapture", "-x", str(path)], check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, timeout=20)
+    try:
+        with path.open("rb") as image:
+            valid = image.read(8) == b"\x89PNG\r\n\x1a\n"
+    except OSError:
+        raise RuntimeError("Native appearance capture was not written") from None
+    if not valid:
+        raise RuntimeError("Native appearance capture is not a PNG")
 
 
 def wait_for(read, description, seconds=20):
@@ -193,6 +267,25 @@ def main():
                 with log_path.open("w", encoding="utf-8") as log:
                     app = subprocess.Popen([str(args.app.resolve())], env=env, stdout=log, stderr=log)
 
+                    def picker_owner():
+                        if app.poll() is not None:
+                            raise RuntimeError("Owned native appearance process exited")
+                        return ui.call("picker-owner", json.dumps({"pid": app.pid, "executable": str(args.app.resolve())}))
+                    owner = wait_for(picker_owner, "owned picker process registration")
+
+                    def raw_frame():
+                        if app.poll() is not None:
+                            raise RuntimeError("Owned native appearance process exited")
+                        return ui.call("picker-frame", json.dumps({"owner": owner}))
+                    # Pin once for the whole five-phase transaction, so a
+                    # replacement window cannot reset identity between pairs.
+                    frame = pin_picker_window(raw_frame)
+
+                    def resize(window, size):
+                        result = ui.call("picker-size", json.dumps({"owner": owner, "window": window, "size": size}))
+                        if result is not True:
+                            raise RuntimeError("Owned picker resize was not acknowledged")
+
                     def observe(name, expected, offset, required):
                         def selected():
                             if app.poll() is not None or backdrop.poll() is not None:
@@ -203,11 +296,12 @@ def main():
                             return expected in mode_facts(data[offset:])
                         wait_for(selected, "fixed native appearance mode change")
                         actual = checked_preferences(ui.read(), required)
-                        time.sleep(1)  # Capture after the compositor has drawn the change.
-                        subprocess.run(["screencapture", "-x", str(args.output / f"{name}.png")],
-                                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, timeout=20)
+                        # Keep the existing normal-size evidence and prove a
+                        # real resize before capturing the same window again.
+                        geometry = capture_sizes(name, args.output, frame, resize, capture_screen)
                         assert preferences(ui.read()) == actual, "Native accessibility preferences changed during capture"
-                        report["checks"].append({"name": name, "mode": expected[0], "reason": expected[1], "preferences": actual})
+                        report["checks"].append({"name": name, "mode": expected[0], "reason": expected[1],
+                                                 "preferences": actual, "geometry": geometry})
                         print(f"PASS native appearance {name}", flush=True)
 
                     both_off = {"contrast": False, "transparency": False}
@@ -227,7 +321,7 @@ def main():
                         ui.write("transparency", False)
                         observe(f"material-after-{name}", ("vibrancy", "applied"), offset, both_off)
         report["status"] = "observed"
-        report["visual_review"] = "required: API modes and screenshots do not themselves prove visible material"
+        report["visual_review"] = "required: inspect all ten normal/resized images for material, outer clipping, content and native shadow; accessibility may change shadow"
     except Unavailable as error:
         report.update(status="unavailable", reason=str(error))
     except Exception as error:
