@@ -1,8 +1,9 @@
 # Owned native file-dialog actions for check-native-chooser.py. No app test API.
 param(
-  [ValidateSet('state', 'cancel', 'confirm', 'location-state')] [string] $Action = 'state',
+  [ValidateSet('state', 'cancel', 'confirm', 'location-state', 'verify-key')] [string] $Action = 'state',
   [int] $AppId,
   [long] $PickerHandle,
+  [long] $ExpectedDialogHandle,
   [string] $Text,
   [string] $FailureImage,
   [switch] $SelfTest
@@ -44,27 +45,26 @@ function Format-ChooserFailure([hashtable] $Facts, [string] $Failure) {
   'NATIVE CHOOSER WINDOWS ' + (ConvertTo-Json -InputObject $safe -Compress)
 }
 
-# Readiness never retries the action. Every observation first revalidates the
-# same owned foreground HWND, then reads the current accessibility tree.
-function Wait-ChooserTarget([scriptblock] $Observe, [scriptblock] $Clock, [scriptblock] $Pause, [int] $Budget = 8000) {
-  $deadline = (& $Clock) + $Budget
-  while ($true) {
-    $observation = & $Observe
-    if (!$observation.Owned -or !$observation.Foreground -or !$observation.SameDialog) {
-      throw 'Native chooser ownership changed before action'
-    }
-    $targets = @($observation.Targets)
-    if ($targets.Count -gt 1) { throw 'Native chooser action is ambiguous or unavailable' }
-    if ($targets.Count -eq 1 -and $targets[0].Enabled) { return $targets[0].Element }
-    if ((& $Clock) -ge $deadline) { throw 'Native chooser action is ambiguous or unavailable' }
-    & $Pause | Out-Null
+# These operations only authorize a keyboard plan. The existing native input
+# adapter rechecks the same dialog immediately before sending one key chord.
+function Get-ChooserKeyHandle($Dialog, [bool] $Foreground) {
+  if (!$Dialog -or !$Foreground) { throw 'Owned native chooser is not foreground' }
+  if (($Dialog.Handle -isnot [long] -and $Dialog.Handle -isnot [int]) -or $Dialog.Handle -le 0) {
+    throw 'Native chooser ownership changed before action'
   }
+  [long] $Dialog.Handle
 }
 
-function Invoke-ReadyChooserAction([scriptblock] $Observe, [scriptblock] $Clock, [scriptblock] $Pause, [scriptblock] $Verify, [scriptblock] $Invoke, [int] $Budget = 8000) {
-  $target = Wait-ChooserTarget $Observe $Clock $Pause $Budget
-  & $Verify | Out-Null
-  & $Invoke $target | Out-Null
+function Get-ChooserKeyPlan([string] $RequestedAction, $Dialog, [bool] $Foreground) {
+  if ($RequestedAction -cnotin @('cancel','confirm')) { throw 'Unsupported native chooser key action' }
+  $handle = Get-ChooserKeyHandle $Dialog $Foreground
+  @{dialog_handle=$handle;key=$(if ($RequestedAction -ceq 'cancel') { 'escape' } else { 'return' })}
+}
+
+function Confirm-ChooserKeyWindow($Dialog, [bool] $Foreground, [long] $ExpectedHandle) {
+  $handle = Get-ChooserKeyHandle $Dialog $Foreground
+  if ($ExpectedHandle -le 0 -or $handle -ne $ExpectedHandle) { throw 'Native chooser ownership changed before action' }
+  $true
 }
 
 function Save-OwnedChooserFailure([string] $Destination, [scriptblock] $Observe, [scriptblock] $Capture) {
@@ -81,24 +81,6 @@ function Save-OwnedChooserFailure([string] $Destination, [scriptblock] $Observe,
   } catch {
     # Failure evidence must never replace the original helper failure.
   }
-}
-
-function Select-ChooserTargets([object[]] $Candidates, [string] $Id, [string] $Name) {
-  $counts = @{buttons=0;exact_id=0;exact_name=0;offscreen=0;eligible=0}
-  $targets = [System.Collections.Generic.List[object]]::new()
-  foreach ($candidate in $Candidates) {
-    if (!$candidate.IsButton) { continue }
-    $counts.buttons++
-    $sameId = $candidate.Id -ceq $Id
-    $sameName = $candidate.Name -ceq $Name
-    if ($sameId) { $counts.exact_id++ }
-    if ($sameName) { $counts.exact_name++ }
-    if (!$sameId -and !$sameName) { continue }
-    if ($candidate.Offscreen) { $counts.offscreen++; continue }
-    if ($candidate.Enabled) { $counts.eligible++ }
-    $targets.Add(@{Element=$candidate.Element;Enabled=$candidate.Enabled})
-  }
-  @{Selector=$counts;Targets=@($targets.ToArray())}
 }
 
 function Invoke-OwnershipTests {
@@ -132,66 +114,27 @@ function Invoke-OwnershipTests {
   Reject { Resolve-OwnedDialog @($windows[20], (Window 23 42)) 41 10 $resolve } 'Native chooser is ambiguous'
   Reject { Resolve-OwnedDialog @($windows[20]) 42 10 $resolve } 'Verified picker window identity was lost'
   Reject { Resolve-OwnedDialog (@($windows[20]) * 513) 41 10 $resolve } 'Native chooser enumeration exceeded bound'
-  $target = @{Element='owned-button';Enabled=$true}
-  $script:observations = 0
-  $script:elapsed = 0
-  $script:invocations = 0
-  $script:verifications = 0
-  $observe = {
-    $script:observations++
-    if ($script:invocations -ne 0) { throw 'Chooser invoked before readiness' }
-    @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=$(if ($script:observations -eq 1) { @() } else { @($target) })}
-  }
-  $clock = { $script:elapsed }
-  $pause = { $script:elapsed += 100 }
-  $selected = Wait-ChooserTarget $observe $clock $pause 200
-  if ($selected -cne 'owned-button' -or $script:observations -ne 2) { throw 'Chooser readiness regression failed' }
-  $script:observations = 0
-  $script:elapsed = 0
-  $verify = { $script:verifications++ }
-  $invoke = { param($Element) if ($Element -cne 'owned-button') { throw 'Wrong chooser target' }; $script:invocations++ }
-  Invoke-ReadyChooserAction $observe $clock $pause $verify $invoke 200
-  if ($script:invocations -ne 1 -or $script:verifications -ne 1 -or $script:observations -ne 2) { throw 'Chooser action count regression failed' }
-  $duplicate = { @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@($target,$target)} }
-  Reject { Wait-ChooserTarget $duplicate $clock $pause 200 } 'Native chooser action is ambiguous or unavailable'
-  foreach ($property in @('Owned','Foreground','SameDialog')) {
-    $lost = @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@($target)}
-    $lost[$property] = $false
-    $readLost = { $lost }
-    Reject { Wait-ChooserTarget $readLost $clock $pause 200 } 'Native chooser ownership changed before action'
-  }
-  $script:elapsed = 0
-  $never = { @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@()} }
-  Reject { Wait-ChooserTarget $never $clock $pause 200 } 'Native chooser action is ambiguous or unavailable'
-  if ($script:elapsed -ne 200) { throw 'Chooser readiness deadline regression failed' }
-  $script:elapsed = 0
-  $disabled = { @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@(@{Element='disabled';Enabled=$false})} }
-  Reject { Wait-ChooserTarget $disabled $clock $pause 200 } 'Native chooser action is ambiguous or unavailable'
-  foreach ($failure in @('ambiguous','ownership')) {
-    $script:observations = 0
-    $script:elapsed = 0
-    $pendingThenUnsafe = {
-      $script:observations++
-      if ($script:observations -eq 1) { return @{Owned=$true;Foreground=$true;SameDialog=$true;Targets=@()} }
-      @{Owned=($failure -ne 'ownership');Foreground=$true;SameDialog=$true;Targets=@($target,$target)}
-    }
-    $expected = if ($failure -eq 'ownership') { 'Native chooser ownership changed before action' } else { 'Native chooser action is ambiguous or unavailable' }
-    Reject { Invoke-ReadyChooserAction $pendingThenUnsafe $clock $pause $verify $invoke 200 } $expected
-    if ($script:invocations -ne 1 -or $script:verifications -ne 1 -or $script:observations -ne 2) {
-      throw 'Chooser unsafe readiness invoked an action'
+  foreach ($action in @('cancel','confirm')) {
+    $plan = Get-ChooserKeyPlan $action $windows[20] $true
+    $expectedKey = if ($action -ceq 'cancel') { 'escape' } else { 'return' }
+    if ([string]::Join(',', @($plan.Keys | Sort-Object)) -cne 'dialog_handle,key' -or
+        $plan.dialog_handle -isnot [long] -or $plan.dialog_handle -ne 20 -or $plan.key -cne $expectedKey) {
+      throw 'Chooser keyboard plan regression failed'
     }
   }
-  $candidates = @(
-    @{IsButton=$true;Id='2';Name='Cancel';Offscreen=$false;Enabled=$true;Element='owned-button'},
-    @{IsButton=$true;Id='2';Name='other';Offscreen=$true;Enabled=$true;Element='hidden'},
-    @{IsButton=$true;Id='other';Name='Cancel';Offscreen=$false;Enabled=$false;Element='disabled'},
-    @{IsButton=$false;Id='2';Name='Cancel';Offscreen=$false;Enabled=$true;Element='not-button'}
-  )
-  $selection = Select-ChooserTargets $candidates '2' 'Cancel'
-  if ($selection.Targets.Count -ne 2 -or $selection.Selector.buttons -ne 3 -or
-      $selection.Selector.exact_id -ne 2 -or $selection.Selector.exact_name -ne 2 -or
-      $selection.Selector.offscreen -ne 1 -or $selection.Selector.eligible -ne 1) { throw 'Chooser selector regression failed' }
-  $facts = @{stage='target';matches=2;enumerated=12;owned=$true;foreground=$true;selector=$selection.Selector}
+  if (!(Confirm-ChooserKeyWindow $windows[20] $true 20)) { throw 'Owned chooser keyboard guard failed' }
+  Reject { Get-ChooserKeyPlan 'other' $windows[20] $true } 'Unsupported native chooser key action'
+  Reject { Get-ChooserKeyPlan 'cancel' $null $true } 'Owned native chooser is not foreground'
+  Reject { Get-ChooserKeyPlan 'cancel' $windows[20] $false } 'Owned native chooser is not foreground'
+  Reject { Confirm-ChooserKeyWindow $windows[20] $true 21 } 'Native chooser ownership changed before action'
+  Reject { Confirm-ChooserKeyWindow $windows[20] $true 0 } 'Native chooser ownership changed before action'
+  Reject { Confirm-ChooserKeyWindow $null $true 20 } 'Owned native chooser is not foreground'
+  Reject { Confirm-ChooserKeyWindow $windows[20] $false 20 } 'Owned native chooser is not foreground'
+  foreach ($badHandle in @(0,-1,'20',$true,$null)) {
+    $invalidWindow = @{Handle=$badHandle}
+    Reject { Get-ChooserKeyPlan 'cancel' $invalidWindow $true } 'Native chooser ownership changed before action'
+  }
+  $facts = @{stage='target';matches=2;enumerated=12;owned=$true;foreground=$true;selector=@{buttons=3;exact_id=2;exact_name=2;offscreen=1;eligible=1}}
   $line = Format-ChooserFailure $facts 'Native chooser action is ambiguous or unavailable'
   $prefix = 'NATIVE CHOOSER WINDOWS '
   if (!$line.StartsWith($prefix)) { throw 'Chooser safe diagnostic regression failed' }
@@ -310,57 +253,25 @@ public static class IbisChooser {
     $windows = @([IbisChooser]::Windows() | ForEach-Object { Get-WindowInfo $_ })
     Resolve-OwnedDialog $windows $AppId $PickerHandle { param($Handle) Get-WindowInfo $Handle }
   }
-  function Get-DialogElements($Dialog, [switch] $Raw, [int] $Limit = 4000) {
+  function Get-DialogElements($Dialog) {
     $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]::new($Dialog.Handle))
     if ($root.Current.ProcessId -ne $AppId) { throw 'Native chooser accessibility identity was lost' }
-    $walker = if ($Raw) { [System.Windows.Automation.TreeWalker]::RawViewWalker } else { [System.Windows.Automation.TreeWalker]::ControlViewWalker }
+    $walker = [System.Windows.Automation.TreeWalker]::ControlViewWalker
     $queue = [System.Collections.Generic.Queue[object]]::new()
     $queue.Enqueue($root)
     $count = 0
     while ($queue.Count -gt 0) {
       $element = $queue.Dequeue()
       $count++
-      $script:ChooserFacts.enumerated = [Math]::Min($count, $Limit)
-      if ($count -gt $Limit) { throw 'Native chooser accessibility tree exceeded bound' }
+      $script:ChooserFacts.enumerated = [Math]::Min($count, 4000)
+      if ($count -gt 4000) { throw 'Native chooser accessibility tree exceeded bound' }
       $element
       $child = $walker.GetFirstChild($element)
       while ($null -ne $child) {
-        if ($queue.Count + $count -ge $Limit) { throw 'Native chooser accessibility tree exceeded bound' }
+        if ($queue.Count + $count -ge 4000) { throw 'Native chooser accessibility tree exceeded bound' }
         $queue.Enqueue($child)
         $child = $walker.GetNextSibling($child)
       }
-    }
-  }
-  function Get-ChooserSelection($Elements, [string] $Id, [string] $Name) {
-    $candidates = @($Elements | ForEach-Object {
-      $current = $_.Current
-      if ($current.ControlType -eq [System.Windows.Automation.ControlType]::Button) {
-        @{IsButton=$true;Id=$current.AutomationId;Name=$current.Name;Offscreen=$current.IsOffscreen;Enabled=$current.IsEnabled;Element=$_}
-      }
-    })
-    Select-ChooserTargets $candidates $Id $Name
-  }
-  function Write-ChooserRawFailure([string] $OriginalFailure) {
-    if ($Action -cnotin @('cancel','confirm') -or !$dialog) { return }
-    $previousFacts = $script:ChooserFacts
-    try {
-      $currentDialog = Get-Dialog
-      if (!$currentDialog -or $currentDialog.Handle -ne $dialog.Handle -or
-          [IbisChooser]::GetForegroundWindow().ToInt64() -ne $currentDialog.Handle) { return }
-      $script:ChooserFacts = @{stage='tree';matches=0;enumerated=0;owned=$true;foreground=$true;selector=@{}}
-      $elements = @(Get-DialogElements $currentDialog -Raw -Limit 512)
-      $rawId = if ($Action -ceq 'cancel') { '2' } else { '1' }
-      $rawName = if ($Action -ceq 'cancel') { 'Cancel' } else { 'Open' }
-      $selection = Get-ChooserSelection $elements $rawId $rawName
-      $script:ChooserFacts.stage = 'target'
-      $script:ChooserFacts.selector = $selection.Selector
-      $script:ChooserFacts.matches = [Math]::Min($selection.Targets.Count, 4000)
-      $safe = Format-ChooserFailure $script:ChooserFacts $OriginalFailure
-      [Console]::Error.WriteLine('NATIVE CHOOSER WINDOWS RAW ' + $safe.Substring('NATIVE CHOOSER WINDOWS '.Length))
-    } catch {
-      # A secondary provider failure cannot replace the original diagnostic.
-    } finally {
-      $script:ChooserFacts = $previousFacts
     }
   }
   function Save-ChooserFailureImage {
@@ -419,46 +330,11 @@ public static class IbisChooser {
       $ready = $foreground -and (Test-FilenameFocus @(Get-DialogElements $dialog))
       @{ready=[bool] $ready;owned=($null -ne $dialog)}
     }
-    default {
-      if (!$dialog -or !$foreground) { throw 'Owned native chooser is not foreground' }
-      $name = if ($Action -eq 'cancel') { 'Cancel' } else { 'Open' }
-      $id = if ($Action -eq 'cancel') { '2' } else { '1' }
-      $observe = {
-        $script:ChooserFacts.stage = 'verify'
-        $currentDialog = Get-Dialog
-        $script:ChooserFacts.owned = [bool] ($null -ne $currentDialog)
-        $script:ChooserFacts.foreground = $null -ne $currentDialog -and [IbisChooser]::GetForegroundWindow().ToInt64() -eq $currentDialog.Handle
-        $observation = @{Owned=$script:ChooserFacts.owned;Foreground=$script:ChooserFacts.foreground;
-          SameDialog=($null -ne $currentDialog -and $currentDialog.Handle -eq $dialog.Handle);Targets=@()}
-        if (!$observation.Owned -or !$observation.Foreground -or !$observation.SameDialog) { return $observation }
-        $script:ChooserFacts.stage = 'tree'
-        $elements = @(Get-DialogElements $currentDialog)
-        $script:ChooserFacts.stage = 'target'
-        $selection = Get-ChooserSelection $elements $id $name
-        $script:ChooserFacts.selector = $selection.Selector
-        $script:ChooserFacts.matches = [Math]::Min($selection.Targets.Count, 4000)
-        $observation.Targets = $selection.Targets
-        $observation
-      }
-      # Revalidate PID/owner/foreground immediately before the only mutation.
-      $verify = {
-        $script:ChooserFacts.stage = 'verify'
-        $verified = Get-Dialog
-        $script:ChooserFacts.owned = [bool] ($null -ne $verified)
-        $script:ChooserFacts.foreground = [IbisChooser]::GetForegroundWindow().ToInt64() -eq $dialog.Handle
-        if (!$verified -or $verified.Handle -ne $dialog.Handle -or !$script:ChooserFacts.foreground) {
-          throw 'Native chooser ownership changed before action'
-        }
-      }
-      $invoke = {
-        param($Button)
-        $script:ChooserFacts.stage = 'pattern'
-        $pattern = $Button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
-        $script:ChooserFacts.stage = 'invoke'
-        $pattern.Invoke()
-      }
-      Invoke-ReadyChooserAction $observe { [Environment]::TickCount64 } { Start-Sleep -Milliseconds 100 } $verify $invoke
-      $true
+    'cancel' { Get-ChooserKeyPlan 'cancel' $dialog $foreground }
+    'confirm' { Get-ChooserKeyPlan 'confirm' $dialog $foreground }
+    'verify-key' {
+      $script:ChooserFacts.stage = 'verify'
+      Confirm-ChooserKeyWindow $dialog $foreground $ExpectedDialogHandle
     }
   }
   ConvertTo-Json -InputObject $result -Compress
@@ -467,7 +343,6 @@ public static class IbisChooser {
   $originalFailure = $_.Exception.Message
   [Console]::Error.WriteLine((Format-ChooserFailure $script:ChooserFacts $originalFailure))
   if (Get-Command Save-ChooserFailureImage -ErrorAction SilentlyContinue) { Save-ChooserFailureImage }
-  if (Get-Command Write-ChooserRawFailure -ErrorAction SilentlyContinue) { Write-ChooserRawFailure $originalFailure }
   [Console]::Error.WriteLine('Windows native chooser action failed')
   exit 1
 }

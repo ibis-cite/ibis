@@ -1,7 +1,61 @@
 # UI Automation reads/invokes controls; SendInput exercises the actual shortcut
 # and typing path. Called by smoke-native.py, not a test-mode application API.
-param([string] $Action, [int] $AppId, [int] $EditorId, [string] $Text)
+param([string] $Action, [int] $AppId, [int] $EditorId, [string] $Text, [switch] $SelfTest)
 $ErrorActionPreference = 'Stop'
+
+function Invoke-GuardedDialogKey([string] $Payload, [scriptblock] $Verify, [scriptblock] $Send) {
+  try { $plan = ConvertFrom-Json -InputObject $Payload -AsHashtable -ErrorAction Stop }
+  catch { throw 'Invalid native dialog keyboard plan' }
+  if ($plan -isnot [System.Collections.IDictionary] -or $plan.Count -ne 3 -or
+      $plan.Keys -cnotcontains 'dialog_handle' -or $plan.Keys -cnotcontains 'picker_handle' -or $plan.Keys -cnotcontains 'key') {
+    throw 'Invalid native dialog keyboard plan'
+  }
+  foreach ($field in @('dialog_handle','picker_handle')) {
+    if (($plan[$field] -isnot [int] -and $plan[$field] -isnot [long]) -or $plan[$field] -le 0) {
+      throw 'Invalid native dialog keyboard plan'
+    }
+  }
+  if ($plan.key -isnot [string] -or $plan.key -cnotin @('escape','return')) { throw 'Invalid native dialog keyboard plan' }
+  $verified = & $Verify $plan
+  if ($verified -isnot [bool] -or !$verified) { throw 'Native dialog keyboard ownership was not acknowledged' }
+  & $Send $plan.key | Out-Null
+  $true
+}
+
+function Test-GuardedDialogKey {
+  $events = [System.Collections.Generic.List[string]]::new()
+  $verify = { param($Plan) [void] $events.Add('verify'); $true }.GetNewClosure()
+  $send = { param($Key) [void] $events.Add("send:$Key") }.GetNewClosure()
+  foreach ($key in @('escape','return')) {
+    $events.Clear()
+    $plan = @{dialog_handle=20;picker_handle=10;key=$key} | ConvertTo-Json -Compress
+    if ((Invoke-GuardedDialogKey $plan $verify $send) -isnot [bool] -or
+        ($events -join ',') -cne "verify,send:$key") { throw 'Guarded native key order regression failed' }
+  }
+  foreach ($invalid in @('null','true','{}','{"dialog_handle":true,"picker_handle":10,"key":"escape"}',
+      '{"dialog_handle":20,"picker_handle":0,"key":"escape"}',
+      '{"dialog_handle":20,"picker_handle":10,"key":"alt+f4"}',
+      '{"dialog_handle":20,"picker_handle":10,"key":"return","extra":1}')) {
+    $events.Clear()
+    $rejected = $false
+    try { Invoke-GuardedDialogKey $invalid $verify $send | Out-Null } catch { $rejected = $true }
+    if (!$rejected -or $events.Count -ne 0) { throw 'Invalid dialog plan reached native input' }
+  }
+  foreach ($ack in @($false,1,'true',$null)) {
+    $events.Clear()
+    $badVerify = { param($Plan) [void] $events.Add('verify'); $ack }.GetNewClosure()
+    $rejected = $false
+    try { Invoke-GuardedDialogKey '{"dialog_handle":20,"picker_handle":10,"key":"return"}' $badVerify $send | Out-Null } catch { $rejected = $true }
+    if (!$rejected -or ($events -join ',') -cne 'verify') { throw 'Unverified dialog reached native input' }
+  }
+  $events.Clear()
+  $rejected = $false
+  $lost = { param($Plan) [void] $events.Add('verify'); throw 'Owned dialog changed' }.GetNewClosure()
+  try { Invoke-GuardedDialogKey '{"dialog_handle":20,"picker_handle":10,"key":"escape"}' $lost $send | Out-Null } catch { $rejected = $true }
+  if (!$rejected -or ($events -join ',') -cne 'verify') { throw 'Lost dialog reached native input' }
+}
+if ($SelfTest) { Test-GuardedDialogKey; return }
+
 [Console]::Error.WriteLine('NATIVE HELPER STAGE windows-encoding-start')
 # JSON crosses a pipe to Python; neither end may inherit an OEM/ANSI code page.
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
@@ -143,6 +197,16 @@ try {
     }
     'snapshot' { Get-Tree }
     'key' { Send-Chord $Text; $true }
+    'dialog-key' {
+      # Input compilation has finished. Re-read the exact owned foreground
+      # dialog in this same process immediately before one native key chord.
+      Invoke-GuardedDialogKey $Text {
+        param($Plan)
+        $acknowledgement = & "$PSScriptRoot/dialog-windows.ps1" -Action verify-key -AppId $AppId `
+          -PickerHandle $Plan.picker_handle -ExpectedDialogHandle $Plan.dialog_handle
+        ConvertFrom-Json -InputObject ($acknowledgement -join "`n") -ErrorAction Stop
+      } { param($Key) Send-Chord $Key }
+    }
     'text' {
       foreach ($character in $Text.ToCharArray()) {
         [IbisSmoke]::Key(0, [ushort] $character, 4)
