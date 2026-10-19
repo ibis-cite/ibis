@@ -371,6 +371,9 @@ dispatch alone could target that editor instead. Unicode storage is retained
 through each event post, and physical chords attempt every key release after a
 failure. Debug builds log only actual AppKit key-window and first-responder
 booleans after showing the panel; accessible focus alone is not that proof.
+The panel helper initially makes its outer NSView the first responder. Ibis then
+uses the stable Tauri Webview API to focus the actual WKWebView without activating
+the application; AppKit key/responder booleans alone do not prove HID delivery.
 The prior hosted probe showed the panel in the full-screen Space, then failed
 native search. That observation does not establish input, copy or chooser success.
 
