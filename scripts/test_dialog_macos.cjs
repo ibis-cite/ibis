@@ -25,7 +25,7 @@ test('missing and malformed native metadata cannot become a passed state', () =>
   assert.deepEqual(locationFlags(false, true), { ready: false, owned: true });
 });
 
-function nativeScenario({owner = 123, foreground = 123, duplicate = false, pressFailure = false, location = false} = {}) {
+function nativeScenario({owner = 123, foreground = 123, duplicate = false, pressFailure = false, location = false, duplicateLocation = false, forbidBrowserTraversal = false} = {}) {
   let presses = 0;
   const node = (name, role, focused = false, children = []) => ({
     name: () => name, title: () => name, description: () => '', value: () => '', role: () => role,
@@ -40,19 +40,22 @@ function nativeScenario({owner = 123, foreground = 123, duplicate = false, press
   const sheet = node('', 'AXSheet', false, [field]);
   const window = node('Choose a BibTeX or BibLaTeX library', 'AXWindow', false,
     location ? [open, cancel, focus, sheet, field] : [open, cancel, focus]);
+  window.sheets = () => location ? (duplicateLocation ? [sheet, sheet] : [sheet]) : [];
+  if (forbidBrowserTraversal) window.entireContents = () => { throw Error('Do not enumerate the file browser to poll its path sheet'); };
   const metadata = [{kCGWindowOwnerPID: owner, kCGWindowAlpha: 1,
     kCGWindowBounds: {X: 10, Y: 20, Width: 500, Height: 400}}];
   const context = {
     module: {exports: {}},
     ObjC: {import: () => {}, deepUnwrap: value => value, castRefToObject: value => value},
     Application: () => ({applicationProcesses: {whose: () => () => [{windows: () => duplicate ? [window, window] : [window]}]}}),
-    $: {
+    $: Object.assign(value => ({dataUsingEncoding: () => value}), {
+      NSFileHandle: {fileHandleWithStandardError: {writeData: () => {}}},
       AXIsProcessTrusted: () => true,
       NSRunningApplication: {runningApplicationWithProcessIdentifier: () => ({terminated: false})},
       NSWorkspace: {sharedWorkspace: {frontmostApplication: {processIdentifier: foreground}}},
       CGWindowListCopyWindowInfo: () => metadata, CFArrayGetCount: refs => refs.length,
       CFArrayGetValueAtIndex: (refs, index) => refs[index],
-    },
+    }),
   };
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(require.resolve('./dialog-macos.js'), 'utf8'), context);
@@ -91,4 +94,15 @@ test('path entry requires a focused field inside the owned nested sheet', () => 
   const native = nativeScenario();
   assert.deepEqual(native.call('confirm'), {invoked: true});
   assert.equal(native.presses(), 1);
+});
+
+test('path-sheet polling does not enumerate the native file browser before or after Return', () => {
+  assert.deepEqual(nativeScenario({forbidBrowserTraversal: true}).call('location-state'), {ready: false, owned: true});
+  assert.deepEqual(nativeScenario({location: true, forbidBrowserTraversal: true}).call('location-state'), {ready: true, owned: true});
+});
+
+test('direct path-sheet polling still rejects duplicate fields and inactive ownership', () => {
+  assert.throws(() => nativeScenario({location: true, duplicateLocation: true}).call('location-state'), /ambiguous/);
+  assert.deepEqual(nativeScenario({location: true, foreground: 456}).call('location-state'), {ready: false, owned: true});
+  assert.deepEqual(nativeScenario({location: true, owner: 456}).call('location-state'), {ready: false, owned: false});
 });

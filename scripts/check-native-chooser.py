@@ -57,6 +57,37 @@ def ready(value):
     return all(flags(value, ("visible", "foreground", "owned")).values())
 
 
+def helper_diagnostics(stderr):
+    if isinstance(stderr, bytes):
+        stderr = stderr.decode("utf-8", errors="replace")
+    if not isinstance(stderr, str):
+        return []
+    safe = []
+    for line in stderr[:65536].splitlines():
+        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
+        if prefix is None:
+            continue
+        try:
+            value = json.loads(line[len(prefix):])
+        except ValueError:
+            continue
+        if not isinstance(value, dict):
+            continue
+        if prefix == "NATIVE CHOOSER MACOS ":
+            valid = set(value) == {"stage"} and value["stage"] in ("identity", "scope", "location", "controls", "invoke")
+        else:
+            valid = (set(value) == {"stage", "reason", "matches", "enumerated", "owned", "foreground"}
+                     and value["stage"] in ("startup", "assembly", "resolve", "tree", "target", "verify", "pattern", "invoke")
+                     and value["reason"] in ("provider-unavailable", "picker-identity", "enumeration-bound", "dialog-ambiguous", "dialog-ownership", "owner-bound", "accessibility-identity", "tree-bound", "not-foreground", "target-unavailable", "ownership-changed")
+                     and all(type(value[key]) is int and 0 <= value[key] <= 4000 for key in ("matches", "enumerated"))
+                     and all(type(value[key]) is bool for key in ("owned", "foreground")))
+        if valid:
+            safe.append(prefix + json.dumps(value, sort_keys=True))
+            if len(safe) == 16:
+                break
+    return safe
+
+
 def query_ready(current, index):
     key = f"smoke{index:06d}"
     text = smoke.strings(current)
@@ -139,6 +170,7 @@ class Dialog:
     def call(self, action):
         if self.linux:
             return getattr(self.linux, action.replace("-", "_"))()
+        print(f"NATIVE CHOOSER ACTION {action}", flush=True)
         if self.system == "Windows":
             command = ["pwsh", "-NoProfile", "-File", str(ROOT / "dialog-windows.ps1"),
                        "-Action", action, "-AppId", str(self.native.app.pid),
@@ -149,9 +181,13 @@ class Dialog:
         try:
             result = subprocess.run(command, encoding="utf-8", stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE, timeout=30)
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired as error:
+            for line in helper_diagnostics(error.stderr):
+                print(line, file=sys.stderr, flush=True)
             raise AssertionError("Native chooser helper timed out") from None
         if result.returncode:
+            for line in helper_diagnostics(result.stderr):
+                print(line, file=sys.stderr, flush=True)
             raise smoke.Unavailable("Native chooser action unavailable")
         try:
             value = json.loads(result.stdout)
@@ -196,9 +232,11 @@ class Dialog:
 
 
 def check(app_path, output, system):
+    digest = hashlib.sha256()
     with app_path.open("rb") as binary:
-        digest = hashlib.file_digest(binary, "sha256").hexdigest()
-    report = {"platform": system, "checks": [], "status": "failed", "binary_sha256": digest}
+        for chunk in iter(lambda: binary.read(1024 * 1024), b""):
+            digest.update(chunk)
+    report = {"platform": system, "checks": [], "status": "failed", "binary_sha256": digest.hexdigest()}
     native, process, log, owned = None, None, None, None
     try:
         if system not in ("Linux", "Windows", "Darwin"):
@@ -380,6 +418,38 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def test_helper_diagnostics_reject_provider_text_and_untrusted_metadata(self):
+        windows = {"stage": "target", "reason": "target-unavailable", "matches": 0, "enumerated": 20, "owned": True, "foreground": True}
+        prefix = "NATIVE CHOOSER WINDOWS "
+        mac = 'NATIVE CHOOSER MACOS {"stage":"location"}'
+        allowed = prefix + json.dumps(windows)
+        self.assertEqual(len(helper_diagnostics((allowed + "\n" + mac).encode())), 2)
+        rejected = ["private provider failure", prefix + "private provider failure"]
+        for field, value in (("stage", "private path"), ("reason", "private payload"), ("matches", True), ("enumerated", 4001), ("owned", 1)):
+            rejected.append(prefix + json.dumps({**windows, field: value}))
+        rejected += [prefix + json.dumps({**windows, "payload": "private"}), 'NATIVE CHOOSER MACOS {"stage":"private"}', 'NATIVE CHOOSER MACOS {"stage":"location","payload":"private"}']
+        self.assertEqual(helper_diagnostics("\n".join(rejected)), [])
+        self.assertEqual(len(helper_diagnostics("\n".join([allowed] * 100))), 16)
+
+    def test_binary_hashing_supports_the_python_310_native_atspi_runner(self):
+        import io
+        content = b"synthetic executable" * 100000
+        class BoundedReader(io.BytesIO):
+            def read(self, size=-1):
+                self_test.assertGreater(size, 0)
+                self_test.assertLessEqual(size, 1024 * 1024)
+                return super().read(size)
+        self_test = self
+        original_open = Path.open
+        def open_owned(path, *args, **kwargs):
+            return BoundedReader(content) if path == Path("owned executable") else original_open(path, *args, **kwargs)
+        with patch.object(Path, "open", new=open_owned), patch.object(hashlib, "file_digest", create=True, side_effect=AssertionError("Not available in Python 3.10")):
+            with tempfile.TemporaryDirectory() as folder:
+                with self.assertRaises(smoke.Unavailable):
+                    check(Path("owned executable"), Path(folder), "unsupported test platform")
+                report = json.loads((Path(folder) / "chooser.json").read_text(encoding="utf-8"))
+                self.assertEqual(report["binary_sha256"], hashlib.sha256(content).hexdigest())
+
     def test_overrides_cannot_bypass_first_run(self):
         env = first_run_environment({"IBIS_LIBRARY": "private", "IBIS_GALLERY": "1", "IBIS_GALLERY_STATE": "empty", "IBIS_GALLERY_READY_FILE": "private"}, Path("synthetic"))
         self.assertFalse(any(key in env for key in ("IBIS_LIBRARY", "IBIS_GALLERY", "IBIS_GALLERY_STATE", "IBIS_GALLERY_READY_FILE")))

@@ -21,6 +21,9 @@ function run(argv) {
     ObjC.import('ApplicationServices');
     ObjC.import('CoreGraphics');
     ObjC.import('CoreFoundation');
+    const stage = name => $.NSFileHandle.fileHandleWithStandardError.writeData(
+        $('NATIVE CHOOSER MACOS ' + JSON.stringify({stage: name}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
+    stage('identity');
     const action = argv[0], appId = Number(argv[1]);
     if (!Number.isInteger(appId) || appId <= 0) throw Error('Native app identity unavailable');
     if (!['state', 'location-state', 'cancel', 'confirm'].includes(action)) throw Error('Unsupported native dialog action');
@@ -43,6 +46,7 @@ function run(argv) {
         return [node].concat(nodes);
     };
     const numeric = value => typeof value === 'number' && Number.isFinite(value);
+    stage('scope');
     const windows = app.windows();
     if (windows.length > 20) throw Error('Native app window enumeration exceeded bound');
     const refs = $.CGWindowListCopyWindowInfo(
@@ -78,7 +82,7 @@ function run(argv) {
     // A panel may be a titled top-level AXWindow or an AXSheet attached to
     // an owned window. Choose one representation, never its ancestor too.
     const direct = windows.filter(window => labelled(window, title) && onScreen(window));
-    const candidates = direct.map(window => ({element: window, nodes: contents(window)}));
+    const candidates = direct.map(window => ({element: window}));
     if (candidates.length === 0) {
         windows.filter(onScreen).forEach(window => {
             contents(window).filter(node => role(node) === 'AXSheet').forEach(sheet => {
@@ -89,25 +93,36 @@ function run(argv) {
     }
     const dialog = unique(candidates);
     const frontmost = $.NSWorkspace.sharedWorkspace.frontmostApplication;
-    const foreground = !!dialog && !!frontmost && Number(frontmost.processIdentifier) === appId && dialog.nodes.some(focused);
-    if (action === 'state') return JSON.stringify(flags(!!dialog, foreground));
+    const appForeground = !!frontmost && Number(frontmost.processIdentifier) === appId;
     if (action === 'location-state') {
+        stage('location');
         if (!dialog) return JSON.stringify(locationFlags(false, false));
         // Cmd-Shift-G opens a nested sheet. A focused text/combo field in
-        // that sheet proves keyboard input will reach the path control.
+        // that sheet proves keyboard input will reach the path control. Read
+        // the fresh sheet collection directly: enumerating every file-browser
+        // descendant after Return can exceed the helper's deadline even when
+        // the path sheet has already closed.
+        const sheets = dialog.element.sheets();
+        if (!Array.isArray(sheets) || sheets.length > 20) throw Error('Native sheet enumeration exceeded bound');
         const fields = [];
-        dialog.nodes.filter(node => node !== dialog.element && role(node) === 'AXSheet').forEach(sheet => {
+        sheets.forEach(sheet => {
+            if (role(sheet) !== 'AXSheet') throw Error('Native path sheet role unavailable');
             contents(sheet).filter(node => ['AXTextField', 'AXComboBox'].includes(role(node)) && focused(node))
                 .forEach(node => fields.push(node));
         });
         const field = unique(fields);
-        return JSON.stringify(locationFlags(!!field && foreground, true));
+        return JSON.stringify(locationFlags(!!field && appForeground, true));
     }
+    stage('controls');
+    if (dialog && !dialog.nodes) dialog.nodes = contents(dialog.element);
+    const foreground = !!dialog && appForeground && dialog.nodes.some(focused);
+    if (action === 'state') return JSON.stringify(flags(!!dialog, foreground));
     if (!dialog || !foreground) throw Error('Owned native chooser is not foreground');
     const label = action === 'cancel' ? 'Cancel' : 'Open';
     const button = unique(dialog.nodes.filter(node => role(node) === 'AXButton' && labelled(node, label)));
     if (!button) throw Error('Native dialog control unavailable');
     // Exactly one invocation. An AX error must never trigger a second action.
+    stage('invoke');
     try { button.actions.byName('AXPress').perform(); }
     catch (_) { throw Error('Native dialog action failed'); }
     return JSON.stringify({invoked: true});
