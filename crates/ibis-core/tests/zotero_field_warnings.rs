@@ -5,7 +5,11 @@ use ibis_core::zotero::{Library, load_items};
 use serde_json::{Value, json};
 
 fn item(csl: Value, local_api: bool) -> Value {
-    let csl = if local_api { json!(json!([csl]).to_string()) } else { csl };
+    let csl = if local_api {
+        json!(json!([csl]).to_string())
+    } else {
+        csl
+    };
     json!({"key": "SYN00001", "data": {"itemType": "book"}, "csljson": csl})
 }
 
