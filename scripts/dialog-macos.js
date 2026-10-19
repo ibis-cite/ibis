@@ -76,7 +76,7 @@ function locationProgress(windows, token, foreground) {
 // https://developer.apple.com/documentation/applicationservices/1462085-axuielementcopyattributevalue
 // https://developer.apple.com/documentation/applicationservices/1462933-axvaluegetvalue
 // https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
-function boundedAX(api, bridge, reference, pid, clock, stage) {
+function boundedAX(api, bridge, reference, pid, clock, stage, diagnostic) {
     stage('scope');
     const bindings = {
         AXUIElementCreateSystemWide: ['id', []], AXUIElementCreateApplication: ['id', ['int']],
@@ -88,43 +88,82 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
         AXUIElementCopyAttributeValues: ['int', ['id', 'id', 'long', 'long', 'id*']],
         AXValueGetType: ['unsigned int', ['id']], AXValueGetValue: ['unsigned char', ['id', 'unsigned int', 'void*']],
     };
-    for (const name of Object.keys(bindings)) {
-        if (typeof api[name] !== 'function') {
-            try { bridge.bindFunction(name, bindings[name]); }
-            catch (_) { throw Error('Native AX public API unavailable'); }
+    const allowedAPIs = Object.keys(bindings).concat(['CFGetTypeID', 'CFEqual', 'CFStringGetTypeID',
+        'CFBooleanGetValue', 'CFBooleanGetTypeID', 'CFArrayGetTypeID', 'CFArrayGetCount',
+        'CFArrayGetValueAtIndex', 'CGPointMake', 'CGSizeMake']);
+    let lastAPI = 'AXUIElementCreateSystemWide', reported = false;
+    const fail = (reason, message, origin = lastAPI) => {
+        if (!reported) {
+            reported = true;
+            diagnostic(allowedAPIs.includes(origin) ? origin : 'CFGetTypeID', reason);
         }
-        if (typeof api[name] !== 'function') throw Error('Native AX public API unavailable');
+        throw Error(message);
+    };
+    const available = name => {
+        try { return typeof api[name] === 'function'; }
+        catch (_) { return false; }
+    };
+    for (const name of Object.keys(bindings)) {
+        if (!available(name)) {
+            try { bridge.bindFunction(name, bindings[name]); }
+            catch (_) { fail('bind-unavailable', 'Native AX public API unavailable', name); }
+        }
+        if (!available(name)) fail('bind-unavailable', 'Native AX public API unavailable', name);
     }
-    const began = clock();
+    const now = () => {
+        let value;
+        try { value = clock(); }
+        catch (_) { fail('invalid-result', 'Native AX clock unavailable'); }
+        if (typeof value !== 'number' || !Number.isFinite(value)) fail('invalid-result', 'Native AX clock unavailable');
+        return value;
+    };
+    const began = now();
     let calls = 0;
     const budget = () => {
-        const elapsed = clock() - began;
-        if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 4000 || calls >= 256) {
-            throw Error('Native AX observation budget exceeded');
-        }
+        const elapsed = now() - began;
+        if (elapsed < 0 || elapsed > 4000 || calls >= 256) fail('budget-exceeded', 'Native AX observation budget exceeded');
     };
     const call = (name, ...args) => {
+        lastAPI = name;
         budget(); calls++;
-        if (typeof api[name] !== 'function') throw Error('Native AX public API unavailable');
+        if (!available(name)) fail('bind-unavailable', 'Native AX public API unavailable');
         let value;
         try { value = api[name](...args); }
-        catch (_) { throw Error('Native AX public call failed'); }
+        catch (_) { fail('call-exception', 'Native AX public call failed'); }
         budget(); return value;
     };
     const success = value => {
-        if (value !== 0) throw Error('Native AX observation failed');
+        if (value !== 0) fail('ax-error', 'Native AX observation failed');
+    };
+    const typeID = (value, origin) => {
+        // CFBase.h: CFTypeID is unsigned long on macOS (non-LLP64).
+        // https://github.com/apple-oss-distributions/CF/blob/main/CFBase.h
+        // Imported and explicitly bound functions
+        // may expose its exact integer as a number or a canonical JXA string.
+        if (typeof value === 'string' && /^(0|[1-9][0-9]*)$/.test(value)) value = Number(value);
+        if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) {
+            fail('invalid-type-id', 'Native AX value type unavailable', origin);
+        }
+        return value;
     };
     const typed = (value, name) => {
-        if (!value || !['object', 'function'].includes(typeof value) ||
-            (typeof value.isNil === 'function' && value.isNil()) ||
-            call('CFGetTypeID', value) !== call(name)) throw Error('Native AX value type unavailable');
+        let present;
+        try { present = !!value && ['object', 'function'].includes(typeof value) &&
+            !(typeof value.isNil === 'function' && value.isNil()); }
+        catch (_) { fail('invalid-result', 'Native AX reference unavailable', 'CFGetTypeID'); }
+        if (!present) {
+            fail('missing-reference', 'Native AX value type unavailable', 'CFGetTypeID');
+        }
+        const actual = typeID(call('CFGetTypeID', value), 'CFGetTypeID');
+        const expected = typeID(call(name), name);
+        if (actual !== expected) fail('type-mismatch', 'Native AX value type unavailable', 'CFGetTypeID');
         return value;
     };
     const element = value => {
         typed(value, 'AXUIElementGetTypeID');
         const out = reference();
         success(call('AXUIElementGetPid', value, out));
-        if (!Number.isInteger(out[0]) || out[0] !== pid) throw Error('Native AX element ownership changed');
+        if (!Number.isInteger(out[0]) || out[0] !== pid) fail('owner-mismatch', 'Native AX element ownership changed');
         return value;
     };
     // SDK Boolean is uint8, while the imported bridge may expose bool.
@@ -132,7 +171,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
     const cBoolean = value => {
         if (value === true || value === 1) return true;
         if (value === false || value === 0) return false;
-        throw Error('Native AX boolean unavailable');
+        fail('invalid-result', 'Native AX boolean unavailable');
     };
     const same = (left, right) => cBoolean(call('CFEqual', left, right));
     const read = (value, name, optionalLabel = false) => {
@@ -148,7 +187,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
         const result = read(value, name, optionalLabel);
         if (result === null) return null;
         const unwrapped = bridge.unwrap(typed(result, 'CFStringGetTypeID'));
-        if (typeof unwrapped !== 'string') throw Error('Native AX string unavailable');
+        if (typeof unwrapped !== 'string') fail('invalid-result', 'Native AX string unavailable');
         return unwrapped;
     };
     const boolean = (value, name) => {
@@ -157,7 +196,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
     const index = value => {
         // Apple's JXA Data Types notes specify long values may be strings.
         if (typeof value === 'string' && /^(0|[1-9][0-9]*)$/.test(value)) value = Number(value);
-        if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) throw Error('Native AX array count unavailable');
+        if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) fail('invalid-result', 'Native AX array count unavailable');
         return value;
     };
     const children = (value, name, limit) => {
@@ -165,13 +204,13 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
         const countRef = reference();
         success(call('AXUIElementGetAttributeValueCount', value, api(name), countRef));
         const count = index(countRef[0]);
-        if (count > limit) throw Error('Native AX array bound exceeded');
+        if (count > limit) fail('invalid-result', 'Native AX array bound exceeded');
         if (count === 0) return []; // Successful count, not an AX error.
         const out = reference();
         success(call('AXUIElementCopyAttributeValues', value, api(name), 0, limit + 1, out));
         typed(out[0], 'CFArrayGetTypeID');
         const size = index(call('CFArrayGetCount', out[0]));
-        if (size !== count || size > limit) throw Error('Native AX array bound changed');
+        if (size !== count || size > limit) fail('invalid-result', 'Native AX array bound changed');
         const result = [];
         for (let index = 0; index < size; index++) {
             result.push(element(bridge.castRefToObject(call('CFArrayGetValueAtIndex', out[0], index))));
@@ -183,17 +222,17 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
         stage('bounds');
         const decode = (name, kind, type) => {
             const encoded = typed(read(value, name), 'AXValueGetTypeID');
-            if (call('AXValueGetType', encoded) !== kind) throw Error('Native AX geometry type unavailable');
+            if (call('AXValueGetType', encoded) !== kind) fail('invalid-result', 'Native AX geometry type unavailable');
             // Ref's argument is a bridge type name, not an initial value.
             // Initialize that imported struct explicitly before its void* use.
             const out = reference(type);
             out[0] = call(kind === 1 ? 'CGPointMake' : 'CGSizeMake', 0, 0);
-            if (!cBoolean(call('AXValueGetValue', encoded, kind, out))) throw Error('Native AX geometry unavailable');
+            if (!cBoolean(call('AXValueGetValue', encoded, kind, out))) fail('invalid-result', 'Native AX geometry unavailable');
             return out[0];
         };
         const point = decode('AXPosition', 1, 'CGPoint'), size = decode('AXSize', 2, 'CGSize');
         const result = {X: point && point.x, Y: point && point.y, Width: size && size.width, Height: size && size.height};
-        if (!validBounds(result)) throw Error('Native AX frame metadata unavailable');
+        if (!validBounds(result)) fail('invalid-result', 'Native AX frame metadata unavailable');
         return result;
     };
     const system = typed(call('AXUIElementCreateSystemWide'), 'AXUIElementGetTypeID');
@@ -218,7 +257,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
             if (!result.some(existing => same(existing, value))) result.push(value);
         };
         for (const window of windows) {
-            if (!['AXWindow', 'AXSheet'].includes(role(window))) throw Error('Native AX window role unavailable');
+            if (!['AXWindow', 'AXSheet'].includes(role(window))) fail('invalid-result', 'Native AX window role unavailable');
             if (titled(window)) add(window);
             else for (const sheet of sheets(window)) if (titled(sheet)) add(sheet);
         }
@@ -228,12 +267,12 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
         const chain = [];
         for (let depth = 0; depth < 16; depth++) {
             element(value);
-            if (chain.some(previous => same(previous, value))) throw Error('Native AX ancestry is cyclic');
+            if (chain.some(previous => same(previous, value))) fail('invalid-result', 'Native AX ancestry is cyclic');
             chain.push(value);
             if (same(value, panel)) return chain;
             value = element(read(value, 'AXParent'));
         }
-        throw Error('Native AX ancestry exceeded bound');
+        fail('invalid-result', 'Native AX ancestry exceeded bound');
     };
     const focus = panel => {
         const value = element(read(app, 'AXFocusedUIElement'));
@@ -245,7 +284,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
             const attached = sheets(panel);
             const sheet = unique(attached);
             if (!sheet) return null;
-            if (!same(element(read(sheet, 'AXParent')), panel)) throw Error('Native AX sheet parent changed');
+            if (!same(element(read(sheet, 'AXParent')), panel)) fail('owner-mismatch', 'Native AX sheet parent changed');
             const current = focus(panel);
             if (!['AXTextField', 'AXComboBox'].includes(role(current.value)) || !boolean(current.value, 'AXFocused')) return null;
             if (!current.chain.some(value => same(value, sheet))) return null;
@@ -256,7 +295,7 @@ function boundedAX(api, bridge, reference, pid, clock, stage) {
             focus(panel); // Positive successful ancestry, never unsupported-as-empty.
             stage('controls');
             const button = element(read(panel, 'AXDefaultButton'));
-            if (role(button) !== 'AXButton' || text(button, 'AXTitle') !== 'Open') throw Error('Native AX default Open unavailable');
+            if (role(button) !== 'AXButton' || text(button, 'AXTitle') !== 'Open') fail('invalid-result', 'Native AX default Open unavailable');
             ancestry(button, panel);
             const enabled = boolean(button, 'AXEnabled');
             return enabled && sheets(panel).length === 0;
@@ -326,7 +365,9 @@ function run(argv) {
         const front = $.NSWorkspace.sharedWorkspace.frontmostApplication;
         return !!front && Number(front.processIdentifier) === appId;
     };
-    const ax = () => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage);
+    const diagnostic = (api, reason) => $.NSFileHandle.fileHandleWithStandardError.writeData(
+        $('NATIVE CHOOSER MACOS AX ' + JSON.stringify({api, reason}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
+    const ax = () => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage, diagnostic);
     const panelForAX = (observations, windows, token) => {
         const matching = [];
         for (const element of observations.panels()) {

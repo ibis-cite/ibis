@@ -64,6 +64,18 @@ WINDOWS_LOCATION_FIELDS = (
     "ancestry_reaches_dialog", "filename_id", "uia_unique_edit", "uia_owned", "uia_visible", "uia_enabled", "uia_filename", "native_ready", "uia_ready",
 )
 
+MACOS_AX_APIS = frozenset((
+    'AXUIElementCreateSystemWide', 'AXUIElementCreateApplication', 'AXUIElementGetTypeID', 'AXValueGetTypeID',
+    'AXUIElementSetMessagingTimeout', 'AXUIElementGetPid', 'AXUIElementCopyAttributeValue',
+    'AXUIElementGetAttributeValueCount', 'AXUIElementCopyAttributeValues', 'AXValueGetType', 'AXValueGetValue',
+    'CFGetTypeID', 'CFEqual', 'CFStringGetTypeID', 'CFBooleanGetValue', 'CFBooleanGetTypeID', 'CFArrayGetTypeID',
+    'CFArrayGetCount', 'CFArrayGetValueAtIndex', 'CGPointMake', 'CGSizeMake',
+))
+MACOS_AX_REASONS = frozenset((
+    'bind-unavailable', 'call-exception', 'ax-error', 'missing-reference', 'invalid-type-id',
+    'type-mismatch', 'owner-mismatch', 'budget-exceeded', 'invalid-result',
+))
+
 
 def absolute_executable(value):
     return isinstance(value, str) and value.startswith('/') and '\x00' not in value and len(value) <= 1024
@@ -128,8 +140,9 @@ def helper_diagnostics(stderr):
     if not isinstance(stderr, str):
         return []
     safe = []
+    ax_reported = False
     for line in stderr[:65536].splitlines():
-        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
+        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS AX ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
         if prefix is None:
             continue
         try:
@@ -138,7 +151,12 @@ def helper_diagnostics(stderr):
             continue
         if not isinstance(value, dict):
             continue
-        if prefix == "NATIVE CHOOSER WINDOWS LOCATION ":
+        if prefix == "NATIVE CHOOSER MACOS AX ":
+            valid = (not ax_reported and set(value) == {'api', 'reason'}
+                     and type(value['api']) is str and value['api'] in MACOS_AX_APIS
+                     and type(value['reason']) is str and value['reason'] in MACOS_AX_REASONS)
+            ax_reported = ax_reported or valid
+        elif prefix == "NATIVE CHOOSER WINDOWS LOCATION ":
             valid = set(value) == set(WINDOWS_LOCATION_FIELDS) and all(type(item) is bool for item in value.values())
         elif prefix == "NATIVE CHOOSER MACOS ":
             valid = set(value) == {"stage"} and value["stage"] in ("identity", "scope", "windows", "metadata", "bounds", "candidates", "sheets", "location", "controls", "invoke")
@@ -684,6 +702,18 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def test_macos_ax_failure_facts_accept_only_fixed_api_and_reason(self):
+        prefix = 'NATIVE CHOOSER MACOS AX '
+        value = {'api': 'AXUIElementSetMessagingTimeout', 'reason': 'ax-error'}
+        self.assertEqual(helper_diagnostics(prefix + json.dumps(value)), [prefix + json.dumps(value, sort_keys=True)])
+        for invalid in ({**value, 'api': 'private provider text'}, {**value, 'reason': 'private error'},
+                        {**value, 'payload': '/private/path'}, {**value, 'api': True}, {'api': value['api']}):
+            self.assertEqual(helper_diagnostics(prefix + json.dumps(invalid)), [])
+        self.assertEqual(helper_diagnostics('\n'.join([prefix + json.dumps(value)] * 20)),
+                         [prefix + json.dumps(value, sort_keys=True)])
+        self.assertEqual(helper_diagnostics('NATIVE CHOOSER MACOS {"stage":"scope"}\n' + prefix + json.dumps(value)),
+                         ['NATIVE CHOOSER MACOS {"stage": "scope"}', prefix + json.dumps(value, sort_keys=True)])
+
     def darwin_owned_native(self, polls=None):
         from types import SimpleNamespace
         executable = '/Applications/Ibis.app/Contents/MacOS/ibis-desktop'

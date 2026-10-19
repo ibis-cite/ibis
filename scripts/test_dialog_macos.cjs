@@ -198,7 +198,7 @@ function axScenario(options = {}) {
   const unknown = ax('AXSheet', {AXParent: panel, ...frames(sheetBounds)});
   let windows = [{kCGWindowNumber: 10, kCGWindowOwnerPID: 123, kCGWindowAlpha: 1, kCGWindowBounds: panelBounds}];
   let foreground = 123, processPid = 123, processExecutable = executable, registered = true, terminated = false, elapsed = 0, failure = null;
-  const timeouts = [], posted = [], reads = [], stages = [];
+  const timeouts = [], posted = [], reads = [], stages = [], diagnostics = [];
   const status = (name, attribute) => {
     reads.push([name, attribute]);
     if (options.onRead) options.onRead(api, name, attribute);
@@ -227,6 +227,11 @@ function axScenario(options = {}) {
       castRefToObject: value => value, bindFunction() { throw Error('Missing ABI binding'); }},
     $: Object.assign(string, {
       NSFileHandle: {fileHandleWithStandardError: {writeData(value) {
+        const axPrefix = 'NATIVE CHOOSER MACOS AX ';
+        if (value.startsWith(axPrefix)) {
+          const payload = JSON.parse(value.slice(axPrefix.length));
+          assert.deepEqual(Object.keys(payload).sort(), ['api', 'reason']); diagnostics.push(payload); return;
+        }
         const prefix = 'NATIVE CHOOSER MACOS ';
         assert.equal(value.startsWith(prefix), true);
         const payload = JSON.parse(value.slice(prefix.length));
@@ -243,12 +248,16 @@ function axScenario(options = {}) {
         return options.stringLong ? String(count) : count;
       },
       CFArrayGetValueAtIndex: (refs, index) => Array.isArray(refs) ? refs[index] : refs.value[index],
-      CFGetTypeID: value => types[value.type], CFStringGetTypeID: () => types.string,
+      CFGetTypeID: value => {
+        if (Object.hasOwn(options, 'actualTypeId')) return options.actualTypeId;
+        return options.actualTypeIdsAsStrings ? String(types[value.type]) : types[value.type];
+      }, CFStringGetTypeID: () => types.string,
       CFBooleanGetTypeID: () => types.bool, CFArrayGetTypeID: () => types.array,
       CFBooleanGetValue: value => options.numericBoolean ? Number(value.value) : value.value,
       CFEqual: (left, right) => options.numericBoolean ? Number(left === right) : left === right,
-      AXUIElementGetTypeID: () => types.AX, AXValueGetTypeID: () => types.value,
-      AXUIElementCreateSystemWide: () => system, AXUIElementCreateApplication: () => app,
+      AXUIElementGetTypeID: () => options.expectedTypeIdsAsStrings ? String(types.AX) : types.AX,
+      AXValueGetTypeID: () => options.expectedTypeIdsAsStrings ? String(types.value) : types.value,
+      AXUIElementCreateSystemWide: () => options.nilSystem ? null : system, AXUIElementCreateApplication: () => app,
       AXUIElementSetMessagingTimeout: (element, seconds) => { timeouts.push([element, seconds]); return options.timeoutFailure ? -25201 : 0; },
       AXUIElementGetPid: (element, output) => { output[0] = element.pid; return 0; },
       AXUIElementCopyAttributeValue: read,
@@ -281,13 +290,16 @@ function axScenario(options = {}) {
   };
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(require.resolve('./dialog-macos.js'), 'utf8'), context);
-  const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, system, bool, array, string,
+  const api = {panel, sheet, field, button, browser, app, unknown, posted, timeouts, reads, stages, diagnostics, system, bool, array, string,
     call: (action, token, expectedExecutable = executable) => JSON.parse(context.run([action, '123', expectedExecutable, JSON.stringify(token)].slice(0, token === undefined ? 3 : 4))), setPathOpen,
     fail: (attribute, code = -25204) => { failure = {attribute, code}; },
     setWindows: value => { windows = value; }, setForeground: value => { foreground = value; },
     setExecutable: value => { processExecutable = value; }, setPid: value => { processPid = value; },
     setRegistered: value => { registered = value; }, setTerminated: value => { terminated = value; },
-    remove: name => { delete context.$[name]; }};
+    remove: (name, throwingGetter = false) => {
+      delete context.$[name];
+      if (throwingGetter) Object.defineProperty(context.$, name, {get() { throw Error('private bridge lookup'); }});
+    }};
   return api;
 }
 const identity = () => ({owner: {pid: 123, executable},
@@ -523,4 +535,61 @@ test('every action rejects an invalid expected executable before native work', (
     assert.equal(native.reads.length, 0);
     assert.equal(native.posted.length, 0);
   }
+});
+
+
+test('unsigned long CF type IDs normalize exact canonical number and string representations', () => {
+  for (const options of [{expectedTypeIdsAsStrings: true}, {actualTypeIdsAsStrings: true},
+    {expectedTypeIdsAsStrings: true, actualTypeIdsAsStrings: true}]) {
+    const native = axScenario(options);
+    assert.deepEqual(native.call('location-identity'), {ready: true, owned: true, token: identity()});
+    native.setPathOpen(false);
+    assert.deepEqual(native.call('confirm-key', identity()), {invoked: true});
+    assert.deepEqual(native.diagnostics, []);
+  }
+});
+
+const diagnosticAPIs = ['AXUIElementCreateSystemWide', 'AXUIElementCreateApplication', 'AXUIElementGetTypeID',
+  'AXValueGetTypeID', 'AXUIElementSetMessagingTimeout', 'AXUIElementGetPid', 'AXUIElementCopyAttributeValue',
+  'AXUIElementGetAttributeValueCount', 'AXUIElementCopyAttributeValues', 'AXValueGetType', 'AXValueGetValue',
+  'CFGetTypeID', 'CFEqual', 'CFStringGetTypeID', 'CFBooleanGetValue', 'CFBooleanGetTypeID', 'CFArrayGetTypeID',
+  'CFArrayGetCount', 'CFArrayGetValueAtIndex', 'CGPointMake', 'CGSizeMake'];
+const diagnosticReasons = ['bind-unavailable', 'call-exception', 'ax-error', 'missing-reference', 'invalid-type-id',
+  'type-mismatch', 'owner-mismatch', 'budget-exceeded', 'invalid-result'];
+
+test('malformed or unequal type IDs cannot become compatible refs or produce input', () => {
+  for (const actualTypeId of [0, -1, '', ' 1', '1 ', '+1', '01', '1.0', '1e0', 'Infinity', Infinity,
+    NaN, true, null, undefined, {}, Number.MAX_SAFE_INTEGER + 1, String(Number.MAX_SAFE_INTEGER + 1), 42]) {
+    const native = axScenario({actualTypeId});
+    assert.throws(() => native.call('location-identity'), /type/);
+    assert.equal(native.posted.length, 0);
+    assert.deepEqual(native.diagnostics, [{api: 'CFGetTypeID', reason: actualTypeId === 42 ? 'type-mismatch' : 'invalid-type-id'}]);
+  }
+});
+
+test('AX initialization failures identify only a fixed API and reason once per helper', () => {
+  const missing = axScenario(); missing.remove('AXUIElementGetPid');
+  const timeout = axScenario({timeoutFailure: true});
+  const nil = axScenario({nilSystem: true});
+  const thrown = axScenario({nativeThrow: true});
+  const budget = axScenario({callMilliseconds: 1000});
+  const foreign = axScenario(); foreign.app.pid = 456;
+  for (const [native, api, reason] of [[missing, 'AXUIElementGetPid', 'bind-unavailable'],
+    [timeout, 'AXUIElementSetMessagingTimeout', 'ax-error'], [nil, 'CFGetTypeID', 'missing-reference'],
+    [thrown, 'AXUIElementGetAttributeValueCount', 'call-exception'],
+    [budget, 'AXUIElementCopyAttributeValue', 'budget-exceeded'], [foreign, 'AXUIElementGetPid', 'owner-mismatch']]) {
+    assert.throws(() => native.call('location-identity'), /AX/);
+    assert.deepEqual(native.diagnostics, [{api, reason}]);
+    assert.equal(native.diagnostics.every(row => diagnosticAPIs.includes(row.api) && diagnosticReasons.includes(row.reason)), true);
+    assert.equal(JSON.stringify(native.diagnostics).includes('private'), false);
+    assert.equal(native.posted.length, 0);
+  }
+});
+
+
+test('a throwing missing-symbol lookup is a bounded binding failure with no raw diagnostic', () => {
+  const native = axScenario(); native.remove('AXUIElementGetPid', true);
+  assert.throws(() => native.call('location-identity'), error => error.message === 'Native AX public API unavailable');
+  assert.deepEqual(native.diagnostics, [{api: 'AXUIElementGetPid', reason: 'bind-unavailable'}]);
+  assert.equal(native.posted.length, 0);
 });
