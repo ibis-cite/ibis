@@ -26,7 +26,10 @@ function idKey(id: RecordId): string {
 type Operation = keyof typeof FAILURE_MESSAGES;
 
 // Shortcut labels follow the platform: ⌘ on macOS, Ctrl elsewhere.
-const modifier = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl+";
+const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
+const modifier = isMac ? "⌘" : "Ctrl+";
+// Ctrl+K is "delete to end of line" in macOS text fields, so there only ⌘K opens More.
+const commandKey = (e: React.KeyboardEvent) => (isMac ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey);
 
 // Fields a row already shows; a match anywhere else is named under the row.
 const VISIBLE_FIELDS = new Set(["title", "author", "citekey", "year"]);
@@ -73,7 +76,10 @@ function MoreMenu({ children, onClose }: { children: React.ReactNode; onClose: (
           e.preventDefault();
           items[e.key === "Home" ? 0 : items.length - 1]?.focus();
         } else if (e.key === "Tab") {
+          // Leaving the menu returns to the search box, so keys keep working.
+          e.preventDefault();
           onClose(false);
+          document.getElementById("search")?.focus();
         }
       }}
     >
@@ -260,7 +266,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
 
   // The search box is the place to type; the shortcut works from anywhere in the picker.
   const isMenuShortcut = (e: React.KeyboardEvent) =>
-    e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey;
+    e.key.toLowerCase() === "k" && commandKey(e) && !e.altKey && !e.shiftKey;
   const closeMenu = (refocus: boolean) => {
     setMenuOpen(false);
     if (refocus) moreButton.current?.focus();
@@ -470,12 +476,13 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               ref={moreButton}
               className="quiet-button"
               aria-haspopup="menu"
+              aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
               aria-expanded={menuOpen}
               aria-controls={menuOpen ? "more-menu" : undefined}
               title={pickerText.moreTitle(modifier)}
               onClick={() => (menuOpen ? closeMenu(true) : setMenuOpen(true))}
             >
-              {pickerText.more} <kbd>{modifier}K</kbd>
+              {pickerText.more} <kbd aria-hidden="true">{modifier}K</kbd>
             </button>
             {menuOpen && (
               <MoreMenu onClose={closeMenu}>

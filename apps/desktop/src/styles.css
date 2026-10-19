@@ -77,7 +77,8 @@ footer { border-top: var(--border-width) solid var(--line); padding: var(--foote
 .format-picker:focus-within { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
 .format-picker select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: default; }
 
-.more { position: relative; }
+/* More stays at the far end even when the footer wraps, so its menu opens inward. */
+.more { position: relative; margin-inline-start: auto; }
 .more > button { min-height: var(--control-min-size); }
 [role="menu"] { position: absolute; bottom: calc(100% + var(--space-1)); inset-inline-end: 0; z-index: 1; min-width: var(--menu-min-width); display: flex; flex-direction: column; padding: var(--space-1); background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }
 [role="menuitem"] { display: flex; justify-content: space-between; gap: var(--space-4); min-height: var(--control-min-size); align-items: center; text-align: start; border: 0; background: var(--clear); }
