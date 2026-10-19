@@ -207,7 +207,7 @@ A run without `--budgets` explicitly records `measured-without-budget`.
 
 | Hosted runner cell | Observed maximum startup / first result / current tree memory | Initial ceilings |
 | --- | --- | --- |
-| Ubuntu 24.04 x86_64, Xvfb/Openbox | 13,302.48 ms / 1,791.29 ms / 818.20 MiB | 20,000 ms / 3,000 ms / 1,280 MiB |
+| Ubuntu 24.04 x86_64, Xvfb/Openbox | 21,280.26 ms / 1,945.87 ms / 818.20 MiB | 32,000 ms / 3,000 ms / 1,280 MiB |
 | Windows Server 2025 x86_64 | 25,438 ms / 8,657 ms / 482.96 MiB | 40,000 ms / 13,000 ms / 768 MiB |
 | macOS 15 arm64 | 20,323.48 ms / 7,871.04 ms / 351.25 MiB | 32,000 ms / 12,000 ms / 576 MiB |
 
@@ -225,6 +225,19 @@ passed. These ceilings include UIA/accessibility/native-control probing and
 input overhead; they do not describe app search latency alone. They qualify
 those debug runner cells only. Release packages, other images/architectures,
 peak memory and local container/proot observations need separate evidence.
+
+The first enforced Linux run at `8b4f4da` failed its original 20-second startup
+ceiling: all three samples were 20,359–21,280 ms, compared with earlier 10,665–13,302 ms.
+All 13 interaction checks passed. The apps tree and native harness were identical
+to the preceding `8d64d85`; both jobs used Ubuntu 24.04.5 image 20261012.334.1,
+the same Rust toolchain and an unoptimized debug build. Runner regions differed,
+but no CPU model/core count or load facts were recorded, so a hardware or region
+cause is unproven. The initial calibration now includes that observed range:
+the same 1.5-times rounding policy yields 32 seconds. This changes the initial
+qualification baseline; it is not a runtime optimization or a diagnosed app fix.
+An exceeded budget records `performance.status: failed`, the metric and numeric
+ceilings, retaining and printing all three samples instead of calling the
+attempted gate `measured-without-budget`.
 
 ### Remaining hand checks (after all three cloud runs pass)
 

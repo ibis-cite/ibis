@@ -136,8 +136,12 @@ def summarize_performance(samples):
 
 
 def enforce_performance_budgets(performance, budgets):
-    for metric in ("startup_ms", "first_result_ms", "memory_bytes"):
-        assert 0 < performance[metric] <= budgets[metric], f"100k {metric} exceeded measured baseline budget"
+    ceilings = {metric: budgets[metric] for metric in ("startup_ms", "first_result_ms", "memory_bytes")}
+    performance.update(status="failed", ceilings=ceilings)
+    for metric, ceiling in ceilings.items():
+        if not 0 < performance[metric] <= ceiling:
+            performance["failed_metric"] = metric
+            raise AssertionError(f"100k {metric} exceeded measured baseline budget")
     performance["status"] = "passed"
 
 
@@ -705,8 +709,12 @@ def main():
             report["performance"] = summarize_performance(samples)
             if args.budgets:
                 budgets = json.loads(args.budgets.read_text(encoding="utf-8"))[system]
-                enforce_performance_budgets(report["performance"], budgets)
-            print(json.dumps(report["performance"]), flush=True)
+                try:
+                    enforce_performance_budgets(report["performance"], budgets)
+                finally:
+                    print(json.dumps(report["performance"]), flush=True)
+            else:
+                print(json.dumps(report["performance"]), flush=True)
         report["status"] = "passed"
         exit_code = 0
     except Unavailable as error:
@@ -816,7 +824,10 @@ class ContractTests(unittest.TestCase):
         ])
         with self.assertRaisesRegex(AssertionError, "startup_ms"):
             enforce_performance_budgets(performance, {"startup_ms": 150, "first_result_ms": 15, "memory_bytes": 2000})
-        self.assertEqual(performance["status"], "measured-without-budget")
+        self.assertEqual(performance["status"], "failed")
+        self.assertEqual(performance["failed_metric"], "startup_ms")
+        self.assertEqual(performance["ceilings"], {"startup_ms": 150, "first_result_ms": 15, "memory_bytes": 2000})
+        self.assertEqual([sample["startup_ms"] for sample in performance["samples"]], [100, 200, 50])
 
     def test_macos_waits_for_new_editor_process_registration(self):
         registrations = iter((0, 12345))
