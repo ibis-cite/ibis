@@ -302,20 +302,30 @@ jobs:
           test ! -e "$app" || { echo "::error::The uninstaller left $app behind"; exit 1; }
           # Builds without an MSI skip the rest.
           [ -e dist/Ibis-Windows.msi ] || exit 0
-          # The MSI installs for all users into a folder with the same name;
-          # the runner has administrator rights.
-          msi=$(cygpath -w "$PWD/dist/Ibis-Windows.msi")
-          log=$(cygpath -w "$RUNNER_TEMP/msi.log")
-          if ! MSYS2_ARG_CONV_EXCL='*' msiexec /i "$msi" /qn /norestart '/l*v' "$log"; then
-            iconv -f UTF-16LE -t UTF-8 "$RUNNER_TEMP/msi.log" > "$RUNNER_TEMP/msi.txt" || true
-            show sh -c 'tail -n 40 "$1"; exit 1' msiexec "$RUNNER_TEMP/msi.txt"
+          # The MSI installs for all users; the runner has administrator rights.
+          # The install folder is read from the installer's own log.
+          msiexec() {
+            MSI="$(cygpath -w "$PWD/dist/Ibis-Windows.msi")" LOG="$(cygpath -w "$RUNNER_TEMP/msi-$1.log")" MODE="$1" pwsh -NoProfile -Command '
+              $p = Start-Process msiexec.exe -Wait -PassThru -ArgumentList "/$env:MODE", "`"$env:MSI`"", "/qn", "/norestart", "/l*v", "`"$env:LOG`""
+              exit $p.ExitCode'
+          }
+          msi_log() { tr -d '\000\r' < "$RUNNER_TEMP/msi-$1.log"; }
+          if ! msiexec i; then
+            show sh -c 'tail -n 40; exit 1' msiexec < <(msi_log i)
           fi
-          dir="$(cygpath -u -F 38)/$(basename "$dir")"
+          installdir=$(msi_log i | sed -n 's/^.*Property(S): INSTALLDIR = //p')
+          installdir=${installdir%%$'\n'*}
+          if [ -z "$installdir" ]; then
+            show sh -c 'grep -a "Property(S): .*\(DIR\|FOLDER\) = " | tail -n 40; exit 1' msiexec < <(msi_log i)
+          fi
+          dir=$(cygpath -u "$installdir")
           app=$(find "$dir" -maxdepth 1 -iname '*.exe' ! -iname 'uninstall*' | head -n 1)
           test -n "$app" || { echo "::error::The MSI installed no app in $dir"; exit 1; }
           echo "installed at $app"
           show python "$RUNNER_TEMP/stays-up.py" "$app"
-          MSYS2_ARG_CONV_EXCL='*' msiexec /x "$msi" /qn /norestart
+          if ! msiexec x; then
+            show sh -c 'tail -n 40; exit 1' msiexec < <(msi_log x)
+          fi
           test ! -e "$app"
 
       - name: Keep install screenshots and logs
