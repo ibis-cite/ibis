@@ -60,4 +60,27 @@ describe("formatting client", () => {
     worker.onerror?.(new Event("error"));
     await expect(result).rejects.toThrow("the citation engine stopped unexpectedly");
   });
+
+  it("fails only the request that could not be sent", async () => {
+    const worker = new FakeWorker();
+    const client = new FormatClient(() => worker, 1000);
+    const waiting = client.format(request);
+    const post = worker.postMessage.bind(worker);
+    worker.postMessage = () => {
+      throw new Error("DataCloneError");
+    };
+    await expect(client.format(request)).rejects.toThrow("the references could not be sent to the formatter");
+    worker.postMessage = post;
+    vi.advanceTimersByTime(999);
+    worker.reply({ id: worker.requests[0]?.id ?? 0, result: { output: "ok", problems: [] } });
+    await expect(waiting).resolves.toEqual({ output: "ok", problems: [] });
+    expect(worker.terminated).toBe(false);
+  });
+
+  it("reports a worker that cannot start", async () => {
+    const client = new FormatClient(() => {
+      throw new Error("no workers here");
+    }, 1000);
+    await expect(client.format(request)).rejects.toThrow("the citation engine stopped unexpectedly");
+  });
 });

@@ -64,11 +64,15 @@ export class Formatter {
     return engine;
   }
 
+  /** Run with exactly `items` loaded; `items` carry engine keys as ids. */
   private attempt<T>(style: StyleId, items: CslItem[], format: OutputFormat, run: (engine: Engine) => T): T {
     this.items = new Map(items.map((item) => [item.id, item]));
     const engine = this.engine(style);
     try {
       engine.setOutputFormat(format);
+      // Forget items from earlier requests: the engine keeps what it fetched
+      // by id, and an edited reference must not show its old fields.
+      engine.updateItems([]);
       engine.updateItems(items.map((item) => item.id));
       return run(engine);
     } catch (error) {
@@ -80,59 +84,121 @@ export class Formatter {
 
   /** The in-text citation for `cites`, such as "(Garcia, 2021, p. 13)". */
   citation(style: StyleId, items: CslItem[], cites: CiteItem[], format: OutputFormat): Formatted {
-    try {
-      const output = this.attempt(style, items, format, (engine) => engine.makeCitationCluster(cites));
-      return { output: wrap(output, format, "citation"), problems: [] };
-    } catch {
-      return this.separately(cites.map((cite) => cite.id), items, format, "citation", (item) =>
-        this.attempt(style, [item], format, (engine) =>
-          engine.makeCitationCluster(cites.filter((cite) => cite.id === item.id)),
-        ),
-      );
+    const { keyed, keyOf } = engineKeys(items);
+    const problems: Formatted["problems"] = [];
+    if (cites.length === 0) problems.push({ id: "", reason: "no reference was chosen" });
+    const found: CiteItem[] = [];
+    const missing: string[] = [];
+    for (const cite of cites) {
+      const key = keyOf.get(cite.id);
+      if (key === undefined) {
+        problems.push({ id: cite.id, reason: MISSING_REASON });
+        missing.push(escape(cite.id, format));
+      } else {
+        found.push({ ...cite, id: key });
+      }
     }
+    const cluster = (chosen: CiteItem[]) =>
+      chosen.length === 0
+        ? ""
+        : this.attempt(style, keyed.filter((item) => chosen.some((cite) => cite.id === item.id)), format, (engine) =>
+          engine.makeCitationCluster(chosen),
+        );
+    let output: string;
+    try {
+      output = cluster(found);
+    } catch {
+      // Find the references this style cannot format; cite the rest together.
+      const failing = found.filter((cite) => !succeeds(() => cluster([cite])));
+      const good = found.filter((cite) => !failing.includes(cite));
+      for (const cite of failing) {
+        const item = keyed.find((candidate) => candidate.id === cite.id);
+        problems.push({ id: callerId(items, cite.id), reason: FALLBACK_REASON });
+        missing.push(escape(item?.title || callerId(items, cite.id), format));
+      }
+      try {
+        output = cluster(good);
+      } catch {
+        output = "";
+        for (const cite of good) {
+          problems.push({ id: callerId(items, cite.id), reason: FALLBACK_REASON });
+          const item = keyed.find((candidate) => candidate.id === cite.id);
+          missing.push(escape(item?.title || callerId(items, cite.id), format));
+        }
+      }
+    }
+    const text = [output, ...missing].filter(Boolean).join("; ");
+    return { output: wrap(text, format, "citation"), problems };
   }
 
   /** Bibliography entries for `items`, in the order the style sorts them. */
   bibliography(style: StyleId, items: CslItem[], format: OutputFormat): Formatted {
+    const { keyed } = engineKeys(items);
+    const run = (chosen: CslItem[]) =>
+      chosen.length === 0 ? [] : this.attempt(style, chosen, format, (engine) => entries(engine));
     try {
-      const output = this.attempt(style, items, format, (engine) => entries(engine));
-      return { output: wrap(output, format, "bibliography"), problems: [] };
+      return { output: wrap(run(keyed).join("\n"), format, "bibliography"), problems: [] };
     } catch {
-      return this.separately(items.map((item) => item.id), items, format, "bibliography", (item) =>
-        this.attempt(style, [item], format, (engine) => entries(engine)),
-      );
-    }
-  }
-
-  /** Format each item on its own so one bad item does not lose the rest. */
-  private separately(
-    ids: string[],
-    items: CslItem[],
-    format: OutputFormat,
-    kind: "citation" | "bibliography",
-    run: (item: CslItem) => string,
-  ): Formatted {
-    const byId = new Map(items.map((item) => [item.id, item]));
-    const problems: Formatted["problems"] = [];
-    const parts = [...new Set(ids)].map((id) => {
-      const item = byId.get(id);
+      // Format the references that work together, so numbering, sorting and
+      // disambiguation stay right, and show the others by title.
+      const failing = keyed.filter((item) => !succeeds(() => run([item])));
+      let good = keyed.filter((item) => !failing.includes(item));
+      let formatted: string[] = [];
       try {
-        if (!item) throw new Error("missing item");
-        return run(item);
+        formatted = run(good);
       } catch {
-        problems.push({ id, reason: item ? FALLBACK_REASON : "the reference is missing" });
-        return escape(item?.title || id, format);
+        // Even the rest together fails: show every reference by title.
+        good = [];
       }
-    });
-    const joined = parts.join(kind === "citation" ? "; " : "\n");
-    return { output: wrap(joined, format, kind), problems };
+      const shown = keyed.filter((item) => !good.includes(item));
+      const problems = shown.map((item) => ({ id: callerId(items, item.id), reason: FALLBACK_REASON }));
+      const fallback = shown.map((item) => entry(escape(item.title || callerId(items, item.id), format), format));
+      const output = [...formatted, ...fallback].join("\n");
+      return { output: wrap(output, format, "bibliography"), problems };
+    }
   }
 }
 
-function entries(engine: Engine): string {
+const MISSING_REASON = "the reference is missing";
+
+function succeeds(run: () => unknown): boolean {
+  try {
+    run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The engine identifies items by id, but ids from a library are citation
+ * keys and can repeat across sources. Give each item its own key for the
+ * engine; a citation names the first item with its id.
+ */
+function engineKeys(items: CslItem[]): { keyed: CslItem[]; keyOf: Map<string, string> } {
+  const keyOf = new Map<string, string>();
+  const keyed = items.map((item, index) => {
+    const key = `ibis-${index}`;
+    if (typeof item.id === "string" && !keyOf.has(item.id)) keyOf.set(item.id, key);
+    return { ...item, id: key };
+  });
+  return { keyed, keyOf };
+}
+
+function callerId(items: CslItem[], key: string): string {
+  const id = items[Number(key.slice("ibis-".length))]?.id;
+  return typeof id === "string" ? id : "";
+}
+
+function entries(engine: Engine): string[] {
   const bibliography = engine.makeBibliography();
   if (!bibliography) throw new Error("the style has no bibliography");
-  return bibliography[1].map((entry) => entry.trim()).join("\n");
+  // One line per entry: a line break inside a field must not split it.
+  return bibliography[1].map((text) => text.replace(/\s*\n\s*/g, " ").trim());
+}
+
+function entry(text: string, format: OutputFormat): string {
+  return format === "html" ? `<div class="csl-entry">${text}</div>` : text;
 }
 
 /** RTF output from the engine is a fragment; wrap it as a complete document. */
@@ -151,6 +217,7 @@ export function escape(text: string, format: OutputFormat): string {
         .map((ch) => {
           const code = ch.codePointAt(0) ?? 0;
           if (ch === "\\" || ch === "{" || ch === "}") return `\\${ch}`;
+          if (code < 0x20 || code === 0x7f) return " ";
           if (code < 0x80) return ch;
           // RTF \u takes a signed 16-bit value; astral characters become surrogate pairs.
           return ch.split("").map((unit) => {

@@ -38,12 +38,25 @@ export class FormatClient {
   constructor(private start: () => WorkerLike = startWorker, private limitMs = 5000) {}
 
   format(request: Request): Promise<Formatted> {
-    const id = ++this.next;
-    const worker = this.current();
     return new Promise((resolve, reject) => {
+      const id = ++this.next;
+      let worker: WorkerLike;
+      try {
+        worker = this.current();
+      } catch {
+        reject(new Error(STOPPED));
+        return;
+      }
       const timer = setTimeout(() => this.stop(TIMED_OUT), this.limitMs);
       this.pending.set(id, { resolve, reject, timer });
-      worker.postMessage({ ...request, id });
+      try {
+        worker.postMessage({ ...request, id });
+      } catch {
+        // Only this request failed; the worker and other requests carry on.
+        clearTimeout(timer);
+        this.pending.delete(id);
+        reject(new Error("the references could not be sent to the formatter"));
+      }
     });
   }
 

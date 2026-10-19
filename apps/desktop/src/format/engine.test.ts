@@ -65,13 +65,59 @@ describe("formatted citations", () => {
       { id: "broken", reason: "this style could not format the reference, so its title is shown instead" },
     ]);
     expect(result.output).toContain("Synthetic sleep study");
-    expect(result.output).toContain("Broken &lt;one&gt;");
+    expect(result.output).toContain('<div class="csl-entry">Broken &lt;one&gt;</div>');
     // The next request still works.
     expect(formatter.citation("apa", [garcia], [{ id: "garcia2021" }], "text").output).toBe("(Garcia, 2021)");
   });
 
+  it("shows a reference's current fields, not ones cached from an earlier request", () => {
+    const fresh = new Formatter();
+    expect(fresh.bibliography("apa", [garcia], "text").output).toContain("(2021)");
+    const edited = { ...garcia, title: "Edited study", issued: { "date-parts": [[1999]] } };
+    expect(fresh.bibliography("apa", [edited], "text").output)
+      .toBe("Garcia, A. (1999). Edited study. Journal of Tests, 3, 12–14.");
+  });
+
+  it("keeps references that share a citation key", () => {
+    const other = { ...garcia, title: "Another study" };
+    const result = formatter.bibliography("apa", [garcia, other], "text");
+    expect(result.problems).toEqual([]);
+    expect(result.output).toContain("Synthetic sleep study");
+    expect(result.output).toContain("Another study");
+    expect(formatter.citation("apa", [garcia], [{ id: "unknown" }], "text")).toEqual({
+      output: "unknown",
+      problems: [{ id: "unknown", reason: "the reference is missing" }],
+    });
+  });
+
+  it("keeps numbering and one citation when a reference in the middle fails", () => {
+    const broken: CslItem = { id: "broken", type: "book", title: "Broken", author: [{ family: 5 }] };
+    const third: CslItem = { ...garcia, id: "zed2021", title: "Third study", author: [{ family: "Zed", given: "Bo" }] };
+    const bibliography = formatter.bibliography("ieee", [garcia, broken, third], "text");
+    expect(bibliography.output.split("\n")).toEqual([
+      "[1] A. Garcia, “Synthetic sleep study,” Journal of Tests, vol. 3, pp. 12–14, 2021.",
+      "[2] B. Zed, “Third study,” Journal of Tests, vol. 3, pp. 12–14, 2021.",
+      "Broken",
+    ]);
+    expect(bibliography.problems.map((problem) => problem.id)).toEqual(["broken"]);
+    const citation = formatter.citation("apa", [garcia, broken, third], [
+      { id: "garcia2021" },
+      { id: "broken" },
+      { id: "zed2021" },
+    ], "text");
+    expect(citation.output).toBe("(Garcia, 2021; Zed, 2021); Broken");
+    expect(citation.problems.map((problem) => problem.id)).toEqual(["broken"]);
+  });
+
+  it("keeps each entry on one line", () => {
+    const multiline = { ...garcia, title: "First line\nsecond line" };
+    const rtf = formatter.bibliography("apa", [multiline, mueller], "rtf").output;
+    expect(rtf.match(/\\par/g)).toHaveLength(1);
+  });
+
   it("escapes fallback text for each output", () => {
     expect(escape("a & {b} 😀", "rtf")).toBe("a & \\{b\\} \\uc0\\u-10179{}\\uc0\\u-8704{}");
+    expect(escape("a\u0000b\tc", "rtf")).toBe("a b c");
     expect(escape("<a>", "html")).toBe("&lt;a&gt;");
     expect(escape("<a>", "text")).toBe("<a>");
   });
