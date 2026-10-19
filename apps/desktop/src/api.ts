@@ -16,6 +16,8 @@ export const {
   shortcutStatus,
   copyCitation,
   copyFormat,
+  cslItems,
+  copyFormatted,
 } = commands;
 
 // This UI default is not part of the Rust command signature.

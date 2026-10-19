@@ -150,10 +150,7 @@ mod tests {
 
     #[test]
     fn csl_items_follow_the_chosen_records_in_order() {
-        let loaded = bibtex::load_str(
-            "a.bib",
-            "@article{same, title={First}}\n@book{other, title={Other}}\n",
-        );
+        let loaded = bibtex::load_str("a.bib", "@article{same, title={First}}\n@book{other, title={Other}}\n");
         let ids: Vec<RecordId> = loaded.references.iter().rev().map(|r| r.id.clone()).collect();
         let json = csl_json(&loaded.references, &ids).unwrap_or_else(|e| panic!("{e}"));
         let items: Vec<serde_json::Value> = serde_json::from_str(&json).unwrap_or_else(|e| panic!("{e}"));

@@ -120,3 +120,16 @@ function htmlOf(node: Markup): string {
 function escapeHtml(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
+
+/** The markup as plain text: one line per entry, a margin followed by a space. */
+export function plainText(markup: Markup[]): string {
+  return markup.map(textOf).join("").replace(/\n+$/, "");
+}
+
+function textOf(node: Markup): string {
+  if (typeof node === "string") return node;
+  const inner = node.children.map(textOf).join("");
+  if ("block" in node && node.block === "entry") return `${inner.trim()}\n`;
+  if ("block" in node && node.block === "margin") return `${inner.trim()} `;
+  return inner;
+}
