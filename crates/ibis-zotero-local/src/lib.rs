@@ -6,10 +6,14 @@
 //! use. Requests carry no browser `Origin` and no browser User-Agent (Zotero
 //! refuses browser-like requests), follow no redirects and give up quickly.
 //! The rules of the conversation are in [`ibis_core::zotero::api`].
+//!
+//! Whatever listens on the port is believed to be Zotero, as with any client
+//! of Zotero's local API; requests carry nothing secret, and answers are
+//! checked for `Zotero-API-Version: 3` and bounded in size and time.
 
 use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{Ipv4Addr, SocketAddr, TcpStream};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use ibis_core::zotero::api::{Response, Transport, TransportError};
 
@@ -20,6 +24,8 @@ pub const MAX_RESPONSE_BYTES: u64 = 64 * 1024 * 1024;
 const MAX_HEADER_BYTES: usize = 64 * 1024;
 const CONNECT_TIMEOUT: Duration = Duration::from_millis(500);
 const IO_TIMEOUT: Duration = Duration::from_secs(15);
+/// The whole answer must arrive within this time, however it trickles in.
+const DEADLINE: Duration = Duration::from_secs(60);
 
 /// Zotero's local API on this computer.
 #[derive(Debug, Clone, Copy)]
@@ -47,10 +53,10 @@ impl Transport for LocalZotero {
             return Err(TransportError::Malformed);
         }
         let address = SocketAddr::from((Ipv4Addr::LOCALHOST, self.port));
-        let mut stream = TcpStream::connect_timeout(&address, CONNECT_TIMEOUT).map_err(|e| match e.kind() {
-            std::io::ErrorKind::TimedOut => TransportError::TimedOut,
-            _ => TransportError::Unreachable,
-        })?;
+        // A refused connection can also time out (Windows retries it), so
+        // both mean Zotero is not there.
+        let mut stream =
+            TcpStream::connect_timeout(&address, CONNECT_TIMEOUT).map_err(|_| TransportError::Unreachable)?;
         stream
             .set_read_timeout(Some(IO_TIMEOUT))
             .map_err(|_| TransportError::Unreachable)?;
@@ -65,13 +71,35 @@ impl Transport for LocalZotero {
             env!("CARGO_PKG_VERSION")
         );
         stream.write_all(request.as_bytes()).map_err(io_error)?;
-        read_response(stream)
+        read_response(Deadline {
+            stream,
+            until: Instant::now() + DEADLINE,
+        })
+    }
+}
+
+/// A stream whose reads give up once the overall deadline has passed, so a
+/// peer sending a byte now and then cannot keep a request open.
+struct Deadline {
+    stream: TcpStream,
+    until: Instant,
+}
+
+impl Read for Deadline {
+    fn read(&mut self, buffer: &mut [u8]) -> std::io::Result<usize> {
+        let left = self.until.saturating_duration_since(Instant::now());
+        if left.is_zero() {
+            return Err(std::io::ErrorKind::TimedOut.into());
+        }
+        self.stream.set_read_timeout(Some(left.min(IO_TIMEOUT)))?;
+        self.stream.read(buffer)
     }
 }
 
 fn io_error(error: std::io::Error) -> TransportError {
     match error.kind() {
         std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock => TransportError::TimedOut,
+        std::io::ErrorKind::InvalidData | std::io::ErrorKind::UnexpectedEof => TransportError::Malformed,
         _ => TransportError::Unreachable,
     }
 }
@@ -106,7 +134,9 @@ fn read_response(stream: impl Read) -> Result<Response, TransportError> {
     if !version.starts_with("HTTP/1.") || code.len() != 3 {
         return Err(TransportError::Malformed);
     }
-    let status: u16 = code.parse().map_err(|_| TransportError::Malformed)?;
+    let status = digits(code)
+        .and_then(|code| u16::try_from(code).ok())
+        .ok_or(TransportError::Malformed)?;
     let mut headers = Vec::new();
     loop {
         let header = line()?;
@@ -122,11 +152,21 @@ fn read_response(stream: impl Read) -> Result<Response, TransportError> {
             .find(|(n, _)| n.eq_ignore_ascii_case(name))
             .map(|(_, v)| v.as_str())
     };
-    let chunked = find("Transfer-Encoding").is_some_and(|v| v.eq_ignore_ascii_case("chunked"));
-    let length = find("Content-Length")
-        .map(str::parse::<u64>)
-        .transpose()
-        .map_err(|_| TransportError::Malformed)?;
+    // Only plain chunked framing is understood; anything else could be
+    // misread as the body.
+    let chunked = match find("Transfer-Encoding") {
+        None => false,
+        Some(v) if v.eq_ignore_ascii_case("chunked") => true,
+        Some(_) => return Err(TransportError::Malformed),
+    };
+    let mut lengths = headers
+        .iter()
+        .filter(|(n, _)| n.eq_ignore_ascii_case("Content-Length"))
+        .map(|(_, v)| digits(v).ok_or(TransportError::Malformed));
+    let length = lengths.next().transpose()?;
+    if lengths.any(|other| other != length.ok_or(TransportError::Malformed)) {
+        return Err(TransportError::Malformed);
+    }
     let mut reader = reader.take(MAX_RESPONSE_BYTES + 1);
     let body = if chunked {
         read_chunked(&mut reader)?
@@ -151,17 +191,27 @@ fn read_response(stream: impl Read) -> Result<Response, TransportError> {
     Ok(Response { status, headers, body })
 }
 
+/// A decimal number written with digits only (no sign or spaces).
+fn digits(text: &str) -> Option<u64> {
+    (!text.is_empty() && text.bytes().all(|b| b.is_ascii_digit()))
+        .then(|| text.parse().ok())
+        .flatten()
+}
+
 fn read_chunked(reader: &mut impl BufRead) -> Result<Vec<u8>, TransportError> {
     let mut body = Vec::new();
     loop {
         let mut size_line = String::new();
         reader.by_ref().take(1024).read_line(&mut size_line).map_err(io_error)?;
-        let size_text = size_line.trim().split(';').next().unwrap_or_default();
-        let size = u64::from_str_radix(size_text, 16).map_err(|_| TransportError::Malformed)?;
+        let size_text = size_line.split(';').next().unwrap_or_default().trim();
+        if size_text.is_empty() || !size_text.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(TransportError::Malformed);
+        }
+        let size = u64::from_str_radix(size_text, 16).map_err(|_| TransportError::TooLarge)?;
         if size == 0 {
             return Ok(body);
         }
-        if body.len() as u64 + size > MAX_RESPONSE_BYTES {
+        if size > MAX_RESPONSE_BYTES - body.len() as u64 {
             return Err(TransportError::TooLarge);
         }
         let before = body.len();
@@ -170,7 +220,7 @@ fn read_chunked(reader: &mut impl BufRead) -> Result<Vec<u8>, TransportError> {
             return Err(TransportError::Malformed);
         }
         let mut end = [0u8; 2];
-        reader.read_exact(&mut end).map_err(|_| TransportError::Malformed)?;
+        reader.read_exact(&mut end).map_err(io_error)?;
         if &end != b"\r\n" {
             return Err(TransportError::Malformed);
         }
@@ -292,5 +342,52 @@ mod tests {
         let (mut zotero, server) = serve(answer);
         assert_eq!(zotero.get("users/0/items").err(), Some(TransportError::TooLarge));
         request_of(server);
+    }
+
+    #[test]
+    fn huge_chunk_sizes_and_unknown_framing_are_errors_not_crashes() {
+        for answer in [
+            &b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n2\r\n[]\r\nffffffffffffffff\r\n"[..],
+            b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n1ffffffffffffffff\r\n",
+        ] {
+            assert_eq!(read_response(answer).err(), Some(TransportError::TooLarge));
+        }
+        for answer in [
+            &b"HTTP/1.1 200 OK\r\nTransfer-Encoding: gzip, chunked\r\n\r\n2\r\n[]\r\n0\r\n\r\n"[..],
+            b"HTTP/1.1 200 OK\r\nContent-Length: 2\r\nContent-Length: 3\r\n\r\n[]",
+            b"HTTP/1.1 200 OK\r\nContent-Length: +2\r\n\r\n[]",
+            b"HTTP/1.1 +20 OK\r\n\r\n",
+            b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\xff\r\n",
+        ] {
+            assert_eq!(read_response(answer).err(), Some(TransportError::Malformed));
+        }
+        let extension =
+            read_response(&b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n2 ;x=y\r\n[]\r\n0\r\n\r\n"[..]);
+        assert_eq!(extension.map(|r| r.body).ok(), Some(b"[]".to_vec()));
+    }
+
+    #[test]
+    fn a_trickling_answer_stops_at_the_overall_deadline() {
+        let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).unwrap_or_else(|e| panic!("{e}"));
+        let address = listener.local_addr().unwrap_or_else(|e| panic!("{e}"));
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap_or_else(|e| panic!("{e}"));
+            let _ = stream.write_all(b"HTTP/1.1 200 OK\r\n");
+            for _ in 0..40 {
+                thread::sleep(Duration::from_millis(50));
+                if stream.write_all(b"X").is_err() {
+                    break;
+                }
+            }
+        });
+        let stream = TcpStream::connect(address).unwrap_or_else(|e| panic!("{e}"));
+        let started = Instant::now();
+        let outcome = read_response(Deadline {
+            stream,
+            until: Instant::now() + Duration::from_millis(300),
+        });
+        assert_eq!(outcome.err(), Some(TransportError::TimedOut));
+        assert!(started.elapsed() < Duration::from_secs(2));
+        let _ = server.join();
     }
 }
