@@ -98,10 +98,16 @@ export class Formatter {
         found.push({ ...cite, id: key });
       }
     }
-    // Load every reference, not only the cited ones, so numbers and year
-    // suffixes match the bibliography for the same items.
+    // Load every reference, not only the cited ones, and build the
+    // bibliography too, so a reference the bibliography leaves out is left out
+    // here as well and numbers and year suffixes match it.
     const cluster = (chosen: CiteItem[], loaded: CslItem[]) =>
-      chosen.length === 0 ? "" : this.attempt(style, loaded, format, (engine) => engine.makeCitationCluster(chosen));
+      chosen.length === 0
+        ? ""
+        : this.attempt(style, loaded, format, (engine) => {
+          engine.makeBibliography();
+          return engine.makeCitationCluster(chosen);
+        });
     let output: string;
     try {
       output = cluster(found, keyed);

@@ -112,6 +112,13 @@ describe("formatted citations", () => {
   it("numbers and disambiguates a citation as the bibliography does", () => {
     const zed: CslItem = { ...garcia, id: "zed2021", title: "Third study", author: [{ family: "Zed", given: "Bo" }] };
     expect(formatter.citation("ieee", [garcia, zed], [{ id: "zed2021" }], "text").output).toBe("[2]");
+    // IEEE cites only "[n]", so this reference fails in the bibliography alone.
+    const broken: CslItem = { id: "broken", type: "book", title: "Broken", author: [{ family: 5 }] };
+    expect(formatter.citation("ieee", [broken], [{ id: "broken" }], "text").problems).toHaveLength(1);
+    expect(formatter.citation("ieee", [garcia, broken, zed], [{ id: "zed2021" }, { id: "broken" }], "text")).toEqual({
+      output: "[2]; Broken",
+      problems: [{ id: "broken", reason: "this style could not format the reference, so its title is shown instead" }],
+    });
     const second = { ...garcia, id: "garcia2021b", title: "Another study" };
     const bibliography = formatter.bibliography("apa", [garcia, second], "text").output;
     expect(bibliography).toContain("(2021a)");
