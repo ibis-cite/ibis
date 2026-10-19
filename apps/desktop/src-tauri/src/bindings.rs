@@ -13,6 +13,7 @@ pub(crate) fn commands() -> tauri_specta::Builder<tauri::Wry> {
             crate::copy::csl_items,
             crate::copy::copy_formatted,
             crate::picker::hide_picker,
+            crate::picker::set_pinned,
             crate::picker::quit,
             crate::picker::shortcut_status,
             crate::native_feel::native_appearance

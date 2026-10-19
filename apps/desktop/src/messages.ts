@@ -12,6 +12,7 @@ export const operationFailures = {
   zotero: "Ibis could not start reading Zotero. Try again.",
   reload: "Ibis could not reload your library. Choose the file again.",
   hide: "Ibis could not hide this window. Try again.",
+  pin: "Ibis could not change the pin. Try again.",
   quit: "Ibis could not quit. Try again.",
   pickerEvents: "Ibis could not focus the search box. Restart Ibis to try again.",
   libraryEvents: "Your library may not update automatically. Use Reload, or restart Ibis.",
@@ -42,8 +43,17 @@ export const pickerText = {
   results: "Results",
   noDate: "No date",
   addedToCitation: "Added to citation",
+  bestMatches: "Best matches",
   noMatches: "No matching references",
+  noMatchesHint: "Try fewer words, an author's surname or a year.",
   typeToFind: "Type to find a reference",
+  typeToFindHint: "Search by title, author, year, citation key or DOI.",
+  matchedIn: (field: string) => `Matched in ${matchFieldNames[field] ?? field}`,
+  more: "More",
+  pin: "Pin Ibis",
+  pinTitle: "Pin: keep Ibis open beside your document",
+  unpinTitle: "Unpin: hide Ibis after copying or clicking elsewhere",
+  moreTitle: (modifier: string) => `More actions (${modifier}K)`,
   firstRun: "Choose a library to get started",
   firstRunChoose: "Choose library to get started",
   chooseLibrary: "Choose library…",
@@ -85,6 +95,24 @@ export const libraryMessages = {
     return `${status.snapshot_name ?? "Library"}: ${status.references} ${status.references === 1 ? "reference" : "references"}` +
       (status.warnings > 0 ? `, ${status.warnings} reading ${status.warnings === 1 ? "notice" : "notices"}` : "");
   },
+};
+
+const matchFieldNames: Record<string, string> = {
+  doi: "the DOI",
+  keyword: "the keywords",
+  container: "the journal or book",
+  abstract: "the abstract",
+};
+
+// One word for the closed format control; the list shows the full label.
+export const copyFormatNames: Record<KeyFormat, string> = {
+  pandoc: "Pandoc",
+  autocite: "\\autocite",
+  parencite: "\\parencite",
+  textcite: "\\textcite",
+  cite: "\\cite",
+  typst: "Typst",
+  keys: "Keys",
 };
 
 // Record requires a label for every Rust citation syntax.

@@ -9,3 +9,12 @@ export const STYLE_TITLES = {
 } as const;
 
 export type StyleId = keyof typeof STYLE_TITLES;
+
+// One word for the closed format control in the picker header.
+export const STYLE_NAMES: Record<StyleId, string> = {
+  apa: "APA",
+  "chicago-author-date": "Chicago",
+  "harvard-cite-them-right": "Harvard",
+  ieee: "IEEE",
+  "modern-language-association": "MLA",
+};
