@@ -77,6 +77,12 @@ footer { border-top: var(--border-width) solid var(--line); padding: var(--foote
 .format-picker:focus-within { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
 .format-picker select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: default; }
 
+/* The pin appears with the pointer or while on, without moving anything. */
+.pin-button { display: inline-grid; place-items: center; min-width: var(--control-min-size); min-height: var(--control-min-size); padding: 0; background: var(--clear); border-color: var(--clear); color: var(--muted); opacity: 0; transition: opacity var(--motion-feedback) var(--motion-ease); }
+.pin-button svg { width: var(--icon-glyph-size); stroke-width: var(--icon-stroke); }
+main:hover .pin-button, .pin-button:focus-visible { opacity: 1; }
+.pin-button[aria-pressed="true"] { opacity: 1; color: var(--accent); }
+
 .more { position: relative; }
 .more > button { min-height: var(--control-min-size); }
 [role="menu"] { position: absolute; bottom: calc(100% + var(--space-1)); inset-inline-end: 0; z-index: 1; min-width: var(--menu-min-width); display: flex; flex-direction: column; padding: var(--space-1); background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }

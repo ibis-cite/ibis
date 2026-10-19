@@ -12,6 +12,7 @@ export const {
   reloadLibrary,
   libraryStatus,
   hidePicker,
+  setPinned,
   quit,
   shortcutStatus,
   copyCitation,

@@ -25,6 +25,9 @@ function idKey(id: RecordId): string {
 
 type Operation = keyof typeof FAILURE_MESSAGES;
 
+// A search comes back if the picker returns within a minute, as in Raycast.
+const KEEP_SEARCH_MS = 60_000;
+
 // Shortcut labels follow the platform: ⌘ on macOS, Ctrl elsewhere.
 const modifier = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl+";
 
@@ -94,14 +97,14 @@ function MenuItem({ label, title, keys, onSelect }: { label: string; title?: str
 // A stable provider lets the development gallery use synthetic data without IPC.
 export type PickerApi = Pick<typeof nativeApi,
   "chooseLibrary" | "useZotero" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" |
-  "hidePicker" | "onLibraryChanged" | "onPickerShown" | "quit" | "search" | "shortcutStatus">;
+  "hidePicker" | "setPinned" | "onLibraryChanged" | "onPickerShown" | "quit" | "search" | "shortcutStatus">;
 
 export type PickerPreview = { query?: string; copied?: Copied };
 
 // The picker: search, choose one or more references, copy them as a citation.
 export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: PickerPreview } = {}) {
   const { chooseLibrary, useZotero, libraryStatus, reloadLibrary, copyCitation, copyFormat,
-    hidePicker, onLibraryChanged, onPickerShown, quit, search, shortcutStatus } = api;
+    hidePicker, setPinned, onLibraryChanged, onPickerShown, quit, search, shortcutStatus } = api;
   const [query, setQuery] = useState(preview?.query ?? "");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [announcement, setAnnouncement] = useState("");
@@ -122,6 +125,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const input = useRef<HTMLInputElement>(null);
   const moreButton = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pinned, setPinnedState] = useState(false);
+  // When the picker last went away; the search waits a minute, in memory only.
+  const hiddenAt = useRef<number | null>(null);
   const [failures, setFailures] = useState<Partial<Record<Operation, boolean>>>({});
   const report = (operation: Operation, failed = true) => {
     setFailures((previous) => ({ ...previous, [operation]: failed }));
@@ -129,6 +135,20 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const perform = async (operation: Operation, action: () => Promise<unknown>) => {
     try { await action(); report(operation, false); }
     catch { report(operation); }
+  };
+  const hide = () => {
+    hiddenAt.current = Date.now();
+    void perform("hide", hidePicker);
+  };
+  const clearSearch = () => {
+    setQuery("");
+    setSelected(new Map());
+    setActive(0);
+  };
+  const togglePin = () => {
+    const on = !pinned;
+    setPinnedState(on);
+    void perform("pin", () => setPinned(on));
   };
 
   // When the picker is shown, put the cursor in the search box with the
@@ -142,9 +162,14 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       return () => undefined;
     };
     const focusSearch = () => {
+      if (hiddenAt.current !== null && Date.now() - hiddenAt.current > KEEP_SEARCH_MS) clearSearch();
+      hiddenAt.current = null;
       input.current?.focus();
       input.current?.select();
     };
+    // Focus moving to another app hides an unpinned picker natively.
+    const noteBlur = () => { hiddenAt.current ??= Date.now(); };
+    window.addEventListener("blur", noteBlur);
     const unlisten = onPickerShown(focusSearch).catch(() => subscriptionFailure("pickerEvents"));
     const unlistenLibrary = onLibraryChanged((status) => {
       acceptInitialStatus = false;
@@ -164,6 +189,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     return () => {
       acceptInitialStatus = false;
       mounted = false;
+      window.removeEventListener("blur", noteBlur);
       void unlisten.then((stop) => stop()).catch(() => console.error("Picker event cleanup failed."));
       void unlistenLibrary.then((stop) => stop()).catch(() => console.error("Library event cleanup failed."));
     };
@@ -249,8 +275,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     }
     setCopied(outcome);
     setSelected(new Map());
-    // Get out of the way so the user can paste, unless there is something to read.
-    if (outcome.warnings.length === 0) void perform("hide", hidePicker);
+    // Get out of the way so the user can paste, unless there is something to
+    // read or the picker is pinned beside the document.
+    if (outcome.warnings.length === 0 && !pinned) hide();
   };
 
   const busy = library?.state === "loading" || library?.state === "reloading";
@@ -278,9 +305,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         if (composing(e)) return;
         if (e.key === "Escape") {
           e.preventDefault();
-          // Escape steps back one layer: the menu first, then the picker.
+          // Escape steps back one layer: the menu, then the search, then the picker.
           if (menuOpen) closeMenu(true);
-          else void perform("hide", hidePicker);
+          else if (query || selected.size > 0) {
+            clearSearch();
+            input.current?.focus();
+          } else hide();
         } else if (isMenuShortcut(e)) {
           e.preventDefault();
           if (menuOpen) closeMenu(true);
@@ -348,6 +378,19 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             ))}
           </select>
         </span>
+        <button
+          type="button"
+          className="pin-button"
+          aria-pressed={pinned}
+          aria-label={pickerText.pin}
+          title={pinned ? pickerText.unpinTitle : pickerText.pinTitle}
+          onClick={togglePin}
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill={pinned ? "currentColor" : "none"} stroke="currentColor">
+            <path d="M9 4h6l-1 5 4 4H6l4-4z" />
+            <path d="M12 13v7" />
+          </svg>
+        </button>
       </header>
       <div className="notices">
         {library?.settings_notice && <p role="alert">{library.settings_notice}</p>}

@@ -16,6 +16,8 @@ pub(crate) enum NativeIssue {
     FocusState,
     Hide,
     HideApplication,
+    #[cfg(not(target_os = "macos"))]
+    AlwaysOnTop,
     Monitor,
     Size,
     Position,
@@ -41,6 +43,8 @@ impl NativeIssue {
             Self::FocusState => "the picker focus state could not be read",
             Self::Hide => "the picker could not be hidden",
             Self::HideApplication => "the application could not release focus",
+            #[cfg(not(target_os = "macos"))]
+            Self::AlwaysOnTop => "the picker could not change whether it stays on top",
             Self::Monitor => "the picker monitor could not be read",
             Self::Size => "the picker size could not be read",
             Self::Position => "the picker could not be positioned",
@@ -135,6 +139,8 @@ mod tests {
             NativeIssue::FocusState,
             NativeIssue::Hide,
             NativeIssue::HideApplication,
+            #[cfg(not(target_os = "macos"))]
+            NativeIssue::AlwaysOnTop,
             NativeIssue::Monitor,
             NativeIssue::Size,
             NativeIssue::Position,
