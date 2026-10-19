@@ -19,6 +19,7 @@ function exactKeys(value, keys) {
         Object.keys(value).sort().join(',') === keys.slice().sort().join(',');
 }
 function positiveId(value) { return Number.isInteger(value) && value > 0 && value <= 0xffffffff; }
+function positivePid(value) { return positiveId(value) && value <= 0x7fffffff; }
 function validBounds(bounds) {
     return exactKeys(bounds, ['X', 'Y', 'Width', 'Height']) &&
         Object.values(bounds).every(value => typeof value === 'number' && Number.isFinite(value)) &&
@@ -26,10 +27,10 @@ function validBounds(bounds) {
 }
 function validateToken(token, pid) {
     if (!exactKeys(token, ['owner', 'panel', 'sheet']) || !exactKeys(token.owner, ['pid', 'started']) ||
-        !positiveId(token.owner.pid) || token.owner.pid !== pid ||
+        !positivePid(token.owner.pid) || token.owner.pid !== pid ||
         typeof token.owner.started !== 'number' || !Number.isFinite(token.owner.started) || token.owner.started <= 0 ||
-        ![token.panel, token.sheet].every(part => exactKeys(part, ['window', 'bounds']) && positiveId(part.window) && validBounds(part.bounds)) ||
-        token.panel.window === token.sheet.window) throw Error('Native dialog identity metadata unavailable');
+        !exactKeys(token.panel, ['window', 'bounds']) || !positiveId(token.panel.window) || !validBounds(token.panel.bounds) ||
+        !exactKeys(token.sheet, ['bounds']) || !validBounds(token.sheet.bounds)) throw Error('Native dialog identity metadata unavailable');
     return token;
 }
 function locationProgress(windows, token, foreground) {
@@ -48,15 +49,14 @@ function locationProgress(windows, token, foreground) {
         }
     }
     const byId = id => unique(windows.filter(window => window.kCGWindowNumber === id));
-    const panel = byId(token.panel.window), sheet = byId(token.sheet.window);
-    for (const window of [panel, sheet].filter(Boolean)) {
+    const panel = byId(token.panel.window);
+    for (const window of [panel].filter(Boolean)) {
         if (window.kCGWindowOwnerPID !== token.owner.pid) throw Error('Native dialog window ownership changed');
     }
     if (panel && (!validBounds(panel.kCGWindowBounds) ||
         Object.keys(token.panel.bounds).some(key => Math.abs(panel.kCGWindowBounds[key] - token.panel.bounds[key]) > 2))) {
         throw Error('Native dialog window frame changed');
     }
-    if (sheet) return {ready: false, closed: false};
     if (!panel) return {ready: true, closed: true};
     const surfaces = windows.filter(window => window.kCGWindowOwnerPID === token.owner.pid &&
         typeof window.kCGWindowAlpha === 'number' && window.kCGWindowAlpha > 0 &&
@@ -65,6 +65,200 @@ function locationProgress(windows, token, foreground) {
     // above the dialog rather than posting Return to an unknown modal.
     return {ready: foreground && surfaces.length > 0 && surfaces[0].kCGWindowNumber === token.panel.window,
         closed: false};
+}
+
+// SDK: AXUIElement.h / AXValue.h and Apple's JXA explicit Ref bridge.
+// AX CF types are CF_BRIDGED_TYPE(id); CFIndex is signed long on supported
+// 64-bit macOS. CGPoint/CGSize Ref outputs use imported CoreGraphics layouts.
+// https://developer.apple.com/documentation/applicationservices/1462085-axuielementcopyattributevalue
+// https://developer.apple.com/documentation/applicationservices/1462933-axvaluegetvalue
+// https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
+function boundedAX(api, bridge, reference, pid, clock, stage) {
+    stage('scope');
+    const bindings = {
+        AXUIElementCreateSystemWide: ['id', []], AXUIElementCreateApplication: ['id', ['int']],
+        AXUIElementGetTypeID: ['unsigned long', []], AXValueGetTypeID: ['unsigned long', []],
+        AXUIElementSetMessagingTimeout: ['int', ['id', 'float']],
+        AXUIElementGetPid: ['int', ['id', 'int*']],
+        AXUIElementCopyAttributeValue: ['int', ['id', 'id', 'id*']],
+        AXUIElementGetAttributeValueCount: ['int', ['id', 'id', 'long*']],
+        AXUIElementCopyAttributeValues: ['int', ['id', 'id', 'long', 'long', 'id*']],
+        AXValueGetType: ['unsigned int', ['id']], AXValueGetValue: ['unsigned char', ['id', 'unsigned int', 'void*']],
+    };
+    for (const name of Object.keys(bindings)) {
+        if (typeof api[name] !== 'function') {
+            try { bridge.bindFunction(name, bindings[name]); }
+            catch (_) { throw Error('Native AX public API unavailable'); }
+        }
+        if (typeof api[name] !== 'function') throw Error('Native AX public API unavailable');
+    }
+    const began = clock();
+    let calls = 0;
+    const budget = () => {
+        const elapsed = clock() - began;
+        if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 4000 || calls >= 256) {
+            throw Error('Native AX observation budget exceeded');
+        }
+    };
+    const call = (name, ...args) => {
+        budget(); calls++;
+        if (typeof api[name] !== 'function') throw Error('Native AX public API unavailable');
+        let value;
+        try { value = api[name](...args); }
+        catch (_) { throw Error('Native AX public call failed'); }
+        budget(); return value;
+    };
+    const success = value => {
+        if (value !== 0) throw Error('Native AX observation failed');
+    };
+    const typed = (value, name) => {
+        if (!value || !['object', 'function'].includes(typeof value) ||
+            (typeof value.isNil === 'function' && value.isNil()) ||
+            call('CFGetTypeID', value) !== call(name)) throw Error('Native AX value type unavailable');
+        return value;
+    };
+    const element = value => {
+        typed(value, 'AXUIElementGetTypeID');
+        const out = reference();
+        success(call('AXUIElementGetPid', value, out));
+        if (!Number.isInteger(out[0]) || out[0] !== pid) throw Error('Native AX element ownership changed');
+        return value;
+    };
+    // SDK Boolean is uint8, while the imported bridge may expose bool.
+    // Accept precisely either representation, never arbitrary truthy values.
+    const cBoolean = value => {
+        if (value === true || value === 1) return true;
+        if (value === false || value === 0) return false;
+        throw Error('Native AX boolean unavailable');
+    };
+    const same = (left, right) => cBoolean(call('CFEqual', left, right));
+    const read = (value, name, optionalLabel = false) => {
+        element(value);
+        const out = reference();
+        const error = call('AXUIElementCopyAttributeValue', value, api(name), out);
+        // Optional alternate labels are not proof of absence or closure.
+        if (optionalLabel && (error === -25205 || error === -25212)) return null;
+        success(error);
+        return out[0];
+    };
+    const text = (value, name, optionalLabel = false) => {
+        const result = read(value, name, optionalLabel);
+        if (result === null) return null;
+        const unwrapped = bridge.unwrap(typed(result, 'CFStringGetTypeID'));
+        if (typeof unwrapped !== 'string') throw Error('Native AX string unavailable');
+        return unwrapped;
+    };
+    const boolean = (value, name) => {
+        return cBoolean(call('CFBooleanGetValue', typed(read(value, name), 'CFBooleanGetTypeID')));
+    };
+    const index = value => {
+        // Apple's JXA Data Types notes specify long values may be strings.
+        if (typeof value === 'string' && /^(0|[1-9][0-9]*)$/.test(value)) value = Number(value);
+        if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) throw Error('Native AX array count unavailable');
+        return value;
+    };
+    const children = (value, name, limit) => {
+        element(value);
+        const countRef = reference();
+        success(call('AXUIElementGetAttributeValueCount', value, api(name), countRef));
+        const count = index(countRef[0]);
+        if (count > limit) throw Error('Native AX array bound exceeded');
+        if (count === 0) return []; // Successful count, not an AX error.
+        const out = reference();
+        success(call('AXUIElementCopyAttributeValues', value, api(name), 0, limit + 1, out));
+        typed(out[0], 'CFArrayGetTypeID');
+        const size = index(call('CFArrayGetCount', out[0]));
+        if (size !== count || size > limit) throw Error('Native AX array bound changed');
+        const result = [];
+        for (let index = 0; index < size; index++) {
+            result.push(element(bridge.castRefToObject(call('CFArrayGetValueAtIndex', out[0], index))));
+        }
+        return result;
+    };
+    const role = value => text(value, 'AXRole');
+    const frame = value => {
+        stage('bounds');
+        const decode = (name, kind, type) => {
+            const encoded = typed(read(value, name), 'AXValueGetTypeID');
+            if (call('AXValueGetType', encoded) !== kind) throw Error('Native AX geometry type unavailable');
+            // Ref's argument is a bridge type name, not an initial value.
+            // Initialize that imported struct explicitly before its void* use.
+            const out = reference(type);
+            out[0] = call(kind === 1 ? 'CGPointMake' : 'CGSizeMake', 0, 0);
+            if (!cBoolean(call('AXValueGetValue', encoded, kind, out))) throw Error('Native AX geometry unavailable');
+            return out[0];
+        };
+        const point = decode('AXPosition', 1, 'CGPoint'), size = decode('AXSize', 2, 'CGSize');
+        const result = {X: point && point.x, Y: point && point.y, Width: size && size.width, Height: size && size.height};
+        if (!validBounds(result)) throw Error('Native AX frame metadata unavailable');
+        return result;
+    };
+    const system = typed(call('AXUIElementCreateSystemWide'), 'AXUIElementGetTypeID');
+    // AXUIElement.h: only the system-wide object changes this process's default
+    // for newly obtained refs. Setting app alone does not cover derived refs.
+    success(call('AXUIElementSetMessagingTimeout', system, 0.25));
+    const app = element(call('AXUIElementCreateApplication', pid));
+    const title = 'Choose a BibTeX or BibLaTeX library';
+    const titled = value => text(value, 'AXTitle', true) === title || text(value, 'AXDescription', true) === title;
+    // AXAttributeConstants.h exposes AXChildren, not an AXSheets attribute.
+    // Inspect only direct children; never enumerate the file browser subtree.
+    const sheets = value => {
+        stage('sheets');
+        return children(value, 'AXChildren', 32).filter(child => role(child) === 'AXSheet');
+    };
+    const panels = () => {
+        stage('windows');
+        const windows = children(app, 'AXWindows', 20);
+        stage('candidates');
+        const result = [];
+        const add = value => {
+            if (!result.some(existing => same(existing, value))) result.push(value);
+        };
+        for (const window of windows) {
+            if (!['AXWindow', 'AXSheet'].includes(role(window))) throw Error('Native AX window role unavailable');
+            if (titled(window)) add(window);
+            else for (const sheet of sheets(window)) if (titled(sheet)) add(sheet);
+        }
+        return result;
+    };
+    const ancestry = (value, panel) => {
+        const chain = [];
+        for (let depth = 0; depth < 16; depth++) {
+            element(value);
+            if (chain.some(previous => same(previous, value))) throw Error('Native AX ancestry is cyclic');
+            chain.push(value);
+            if (same(value, panel)) return chain;
+            value = element(read(value, 'AXParent'));
+        }
+        throw Error('Native AX ancestry exceeded bound');
+    };
+    const focus = panel => {
+        const value = element(read(app, 'AXFocusedUIElement'));
+        return {value, chain: ancestry(value, panel)};
+    };
+    return {panels, frame,
+        location(panel) {
+            stage('location');
+            const attached = sheets(panel);
+            const sheet = unique(attached);
+            if (!sheet) return null;
+            if (!same(element(read(sheet, 'AXParent')), panel)) throw Error('Native AX sheet parent changed');
+            const current = focus(panel);
+            if (!['AXTextField', 'AXComboBox'].includes(role(current.value)) || !boolean(current.value, 'AXFocused')) return null;
+            if (!current.chain.some(value => same(value, sheet))) return null;
+            return frame(sheet);
+        },
+        ready(panel) {
+            if (sheets(panel).length !== 0) return false;
+            focus(panel); // Positive successful ancestry, never unsupported-as-empty.
+            stage('controls');
+            const button = element(read(panel, 'AXDefaultButton'));
+            if (role(button) !== 'AXButton' || text(button, 'AXTitle') !== 'Open') throw Error('Native AX default Open unavailable');
+            ancestry(button, panel);
+            const enabled = boolean(button, 'AXEnabled');
+            return enabled && sheets(panel).length === 0;
+        },
+    };
 }
 if (typeof module !== 'undefined') module.exports = {unique, flags, locationFlags, validateToken, locationProgress};
 
@@ -77,7 +271,7 @@ function run(argv) {
         $('NATIVE CHOOSER MACOS ' + JSON.stringify({stage: name}) + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
     stage('identity');
     const action = argv[0], appId = Number(argv[1]);
-    if (!Number.isInteger(appId) || appId <= 0) throw Error('Native app identity unavailable');
+    if (!positivePid(appId)) throw Error('Native app identity unavailable');
     if (!['state', 'location-state', 'location-identity', 'after-location', 'confirm-key', 'cancel', 'confirm'].includes(action)) throw Error('Unsupported native dialog action');
     if (!$.AXIsProcessTrusted()) throw Error('Native dialog accessibility unavailable');
     const running = $.NSRunningApplication.runningApplicationWithProcessIdentifier(appId);
@@ -105,16 +299,67 @@ function run(argv) {
         const front = $.NSWorkspace.sharedWorkspace.frontmostApplication;
         return !!front && Number(front.processIdentifier) === appId;
     };
+    const checkOwner = expected => {
+        const current = $.NSRunningApplication.runningApplicationWithProcessIdentifier(appId);
+        if (!current || current.isTerminated || Number(current.launchDate.timeIntervalSince1970) !== expected) {
+            throw Error('Native app process identity changed');
+        }
+    };
+    const ax = () => boundedAX($, ObjC, Ref, appId, () => Number($.NSProcessInfo.processInfo.systemUptime) * 1000, stage);
+    const panelForAX = (observations, windows, token) => {
+        const matching = [];
+        for (const element of observations.panels()) {
+            const bounds = observations.frame(element);
+            const native = unique(windows.filter(window => window.kCGWindowOwnerPID === appId &&
+                window.kCGWindowAlpha > 0 && validBounds(window.kCGWindowBounds) &&
+                Object.keys(bounds).every(key => Math.abs(bounds[key] - window.kCGWindowBounds[key]) <= 2)));
+            if (native && (!token || native.kCGWindowNumber === token.panel.window)) matching.push({element, native});
+        }
+        return unique(matching);
+    };
+    if (action === 'location-identity') {
+        const owner = {pid: appId, started: started()};
+        checkOwner(owner.started);
+        const observations = ax();
+        const panel = panelForAX(observations, readWindows());
+        if (!panel) return JSON.stringify({ready: false, owned: false, token: null});
+        if (!appIsForeground()) return JSON.stringify({ready: false, owned: true, token: null});
+        const bounds = observations.location(panel.element);
+        if (!bounds) return JSON.stringify({ready: false, owned: true, token: null});
+        const token = validateToken({owner, panel: {window: panel.native.kCGWindowNumber, bounds: panel.native.kCGWindowBounds},
+            sheet: {bounds}}, appId);
+        // The nested logical sheet may share the physical panel surface or
+        // have its own. Refresh panel identity without inventing a sheet ID.
+        const windows = readWindows();
+        const foreground = appIsForeground();
+        const current = locationProgress(windows, token, foreground);
+        checkOwner(owner.started);
+        const visible = !current.closed && windows.some(window =>
+            window.kCGWindowNumber === token.panel.window && window.kCGWindowAlpha > 0);
+        if (!foreground || !visible) return JSON.stringify({ready: false, owned: visible, token: null});
+        return JSON.stringify({ready: true, owned: true, token});
+    }
     if (action === 'after-location' || action === 'confirm-key') {
         if (typeof argv[2] !== 'string' || argv[2].length > 2048) throw Error('Native dialog identity metadata unavailable');
         const token = validateToken(JSON.parse(argv[2]), appId);
         const progress = () => {
-            if (running.isTerminated || started() !== token.owner.started) throw Error('Native app process identity changed');
-            return locationProgress(readWindows(), token, appIsForeground());
+            checkOwner(token.owner.started);
+            const windows = readWindows();
+            const current = locationProgress(windows, token, appIsForeground());
+            if (current.closed || !current.ready) return current;
+            const observations = ax();
+            const panel = panelForAX(observations, windows, token);
+            if (!panel) throw Error('Native AX owned panel unavailable');
+            const ready = observations.ready(panel.element);
+            // AX calls are bounded but may take time. Do not post using CG or
+            // foreground facts captured before those messages were sent.
+            const latest = locationProgress(readWindows(), token, appIsForeground());
+            checkOwner(token.owner.started);
+            return latest.closed ? latest : {ready: ready && latest.ready, closed: false};
         };
         if (action === 'after-location') return JSON.stringify(progress());
-        // Public HID events, with all preparation before the final ownership
-        // check. No AX traversal after the nested path sheet closes.
+        // Public HID events are prepared before the final bounded C AX/CG proof.
+        // System Events is never used on this post-path observation/action route.
         if (typeof $.CGPreflightPostEventAccess !== 'function') {
             try { ObjC.bindFunction('CGPreflightPostEventAccess', ['bool', []]); }
             catch (_) { throw Error('Native event-posting preflight unavailable'); }
@@ -209,9 +454,9 @@ function run(argv) {
     }
     const dialog = unique(candidates);
     const appForeground = appIsForeground();
-    if (action === 'location-state' || action === 'location-identity') {
+    if (action === 'location-state') {
         stage('location');
-        if (!dialog) return JSON.stringify(action === 'location-state' ? locationFlags(false, false) : {ready: false, owned: false, token: null});
+        if (!dialog) return JSON.stringify(locationFlags(false, false));
         // Cmd-Shift-G opens a nested sheet. A focused text/combo field in
         // that sheet proves keyboard input will reach the path control. Read
         // the fresh sheet collection directly: enumerating every file-browser
@@ -224,16 +469,7 @@ function run(argv) {
         });
         const field = unique(fields);
         const ready = !!field && appForeground;
-        if (action === 'location-state') return JSON.stringify(locationFlags(ready, true));
-        if (!ready) return JSON.stringify({ready: false, owned: true, token: null});
-        const part = element => {
-            const row = nativeFrame(element);
-            if (!row) throw Error('Native dialog physical window identity unavailable');
-            return {window: row.kCGWindowNumber, bounds: row.kCGWindowBounds};
-        };
-        const token = validateToken({owner: {pid: appId, started: started()},
-            panel: part(dialog.element), sheet: part(field.sheet)}, appId);
-        return JSON.stringify({ready: true, owned: true, token});
+        return JSON.stringify(locationFlags(ready, true));
     }
     stage('controls');
     if (dialog && !dialog.nodes) dialog.nodes = contents(dialog.element);

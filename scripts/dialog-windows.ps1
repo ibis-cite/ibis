@@ -1,6 +1,6 @@
 # Owned native file-dialog actions for check-native-chooser.py. No app test API.
 param(
-  [ValidateSet('state', 'cancel', 'confirm', 'location-state', 'verify-key')] [string] $Action = 'state',
+  [ValidateSet('state', 'cancel', 'confirm', 'location-state', 'verify-key', 'capture-failure')] [string] $Action = 'state',
   [int] $AppId,
   [long] $PickerHandle,
   [long] $ExpectedDialogHandle,
@@ -65,6 +65,93 @@ function Confirm-ChooserKeyWindow($Dialog, [bool] $Foreground, [long] $ExpectedH
   $handle = Get-ChooserKeyHandle $Dialog $Foreground
   if ($ExpectedHandle -le 0 -or $handle -ne $ExpectedHandle) { throw 'Native chooser ownership changed before action' }
   $true
+}
+
+function Get-CommonDialogFocusFacts([long] $Dialog, [int] $Process, [uint32] $Thread, [bool] $Available,
+    [uint32] $Flags, [long] $Focus, [bool] $IsChild, [scriptblock] $Resolve) {
+  $facts = @{gui_available=($Available -and $Thread -gt 0 -and $Process -gt 0);gui_idle=$false;
+    focus_live=$false;focus_visible=$false;focus_enabled=$false;focus_same_pid=$false;focus_same_thread=$false;
+    focus_edit=$false;focus_descendant=$false;ancestry_reaches_dialog=$false;filename_id=$false}
+  if (!$facts.gui_available) { return $facts }
+  $facts.gui_idle = ($Flags -band 30) -eq 0 # move/size and all three menu modes
+  $facts.focus_descendant = $IsChild
+  if ($Focus -le 0) { return $facts }
+  $current = & $Resolve $Focus
+  if (!$current) { return $facts }
+  $facts.focus_live = $true
+  $facts.focus_visible = $current.Visible -is [bool] -and $current.Visible
+  $facts.focus_enabled = $current.Enabled -is [bool] -and $current.Enabled
+  $facts.focus_same_pid = $current.ProcessId -eq $Process
+  $facts.focus_same_thread = $current.Thread -eq $Thread
+  $facts.focus_edit = $current.ClassName -ceq 'Edit'
+  $seen = [System.Collections.Generic.HashSet[long]]::new()
+  for ($depth = 0; $depth -lt 32 -and $current; $depth++) {
+    if ($current.Handle -le 0 -or !$seen.Add([long] $current.Handle) -or $current.ProcessId -ne $Process) { break }
+    if ($current.Handle -eq $Dialog) { $facts.ancestry_reaches_dialog = $true; break }
+    # SDK dlg.h: edt1=1152, cmb13=1148. Modern dialogs are not assumed to
+    # expose these legacy IDs: an unknown observed identity stays false.
+    if (($current.ControlId -eq 1152 -and $current.ClassName -ceq 'Edit') -or
+        ($current.ControlId -eq 1148 -and $current.ClassName -cin @('ComboBox','ComboBoxEx32'))) { $facts.filename_id = $true }
+    if ($current.Parent -le 0 -or $depth -eq 31) { break }
+    $current = & $Resolve ([long] $current.Parent)
+  }
+  $facts
+}
+
+function Complete-FilenameFocusFacts([hashtable] $Facts) {
+  function All([string[]] $Keys) {
+    foreach ($key in $Keys) { if ($Facts[$key] -isnot [bool] -or !$Facts[$key]) { return $false } }
+    $true
+  }
+  $guard = All @('owned_before','foreground_before','owned_after','foreground_after')
+  $physical = @('gui_idle','focus_live','focus_visible','focus_enabled','focus_same_pid','focus_same_thread','focus_descendant','ancestry_reaches_dialog')
+  $Facts.native_ready = $guard -and (All (@('gui_available','focus_edit','filename_id') + $physical))
+  # A fresh native query that proves a foreign or invalid recipient must not
+  # be overruled by retained accessibility focus. Unknown native IDs alone do
+  # not invalidate an independently identified, focused filename UIA edit.
+  $conflict = $Facts.gui_available -is [bool] -and $Facts.gui_available -and !(All $physical)
+  $Facts.uia_ready = $guard -and !$conflict -and (All @('uia_unique_edit','uia_owned','uia_visible','uia_enabled','uia_filename'))
+  $Facts
+}
+
+function Observe-FilenameFocus($ExpectedDialog, [scriptblock] $ReadDialog, [scriptblock] $IsForeground,
+    [scriptblock] $ReadUia, [scriptblock] $ReadNative) {
+  $facts = @{}
+  foreach ($key in Filename-FactKeys) { $facts[$key] = $false }
+  $before = & $ReadDialog
+  $facts.owned_before = $null -ne $before -and $null -ne $ExpectedDialog -and $before.Handle -eq $ExpectedDialog.Handle
+  if ($facts.owned_before) {
+    $foreground = & $IsForeground $before
+    $facts.foreground_before = $foreground -is [bool] -and $foreground
+  }
+  if ($facts.foreground_before) {
+    try {
+      $uia = & $ReadUia $before
+      foreach ($key in $uia.Keys) { $facts[$key] = $uia[$key] }
+    } catch { # The native alternative still needs its complete independent proof.
+    }
+    $native = & $ReadNative $before
+    foreach ($key in $native.Keys) { $facts[$key] = $native[$key] }
+  }
+  $after = & $ReadDialog
+  $facts.owned_after = $null -ne $after -and $null -ne $ExpectedDialog -and $after.Handle -eq $ExpectedDialog.Handle
+  if ($facts.owned_after) {
+    $foreground = & $IsForeground $after
+    $facts.foreground_after = $foreground -is [bool] -and $foreground
+  }
+  Complete-FilenameFocusFacts $facts
+}
+
+function Filename-FactKeys {
+  @('owned_before','foreground_before','owned_after','foreground_after','gui_available','gui_idle',
+    'focus_live','focus_visible','focus_enabled','focus_same_pid','focus_same_thread','focus_edit','focus_descendant',
+    'ancestry_reaches_dialog','filename_id','uia_unique_edit','uia_owned','uia_visible','uia_enabled','uia_filename','native_ready','uia_ready')
+}
+
+function Format-FilenameFacts([hashtable] $Facts) {
+  $safe = @{}
+  foreach ($key in Filename-FactKeys) { $safe[$key] = $Facts[$key] -is [bool] -and $Facts[$key] }
+  'NATIVE CHOOSER WINDOWS LOCATION ' + (ConvertTo-Json -InputObject $safe -Compress)
 }
 
 function Save-OwnedChooserFailure([string] $Destination, [scriptblock] $Observe, [scriptblock] $Capture) {
@@ -133,6 +220,90 @@ function Invoke-OwnershipTests {
   foreach ($badHandle in @(0,-1,'20',$true,$null)) {
     $invalidWindow = @{Handle=$badHandle}
     Reject { Get-ChooserKeyPlan 'cancel' $invalidWindow $true } 'Native chooser ownership changed before action'
+  }
+  $focusWindows = @{
+    20=@{Handle=20;ProcessId=41;Thread=7;ClassName='#32770';ControlId=0;Parent=0;Visible=$true;Enabled=$true}
+    90=@{Handle=90;ProcessId=41;Thread=7;ClassName='ComboBox';ControlId=1148;Parent=20;Visible=$true;Enabled=$true}
+    100=@{Handle=100;ProcessId=41;Thread=7;ClassName='Edit';ControlId=1001;Parent=90;Visible=$true;Enabled=$true}
+  }
+  $resolveFocus = { param($Handle) $focusWindows[[int] $Handle] }.GetNewClosure()
+  function Readiness($Native, [bool] $Uia = $false) {
+    $facts = $Native.Clone()
+    foreach ($key in @('owned_before','foreground_before','owned_after','foreground_after')) { $facts[$key] = $true }
+    foreach ($key in @('uia_unique_edit','uia_owned','uia_visible','uia_enabled','uia_filename')) { $facts[$key] = $Uia }
+    Complete-FilenameFocusFacts $facts
+  }
+  $native = Get-CommonDialogFocusFacts 20 41 7 $true 0 100 $true $resolveFocus
+  if (!(Readiness $native).native_ready) { throw 'Common dialog filename combo focus was rejected' }
+  $focusWindows[100].ControlId = 1152; $focusWindows[100].Parent = 20
+  if (!(Readiness (Get-CommonDialogFocusFacts 20 41 7 $true 0 100 $true $resolveFocus)).native_ready) {
+    throw 'Common dialog filename edit focus was rejected'
+  }
+  $focusWindows[100].ControlId = 1001; $focusWindows[100].Parent = 90
+  $focusWindows[90].ControlId = 42
+  if ((Readiness (Get-CommonDialogFocusFacts 20 41 7 $true 0 100 $true $resolveFocus)).native_ready) { throw 'Unknown filename identity was accepted' }
+  $focusWindows[90].ControlId = 1148
+  foreach ($property in @('ProcessId','Thread','Visible','Enabled','ClassName')) {
+    $original = $focusWindows[100][$property]
+    $focusWindows[100][$property] = switch ($property) { 'ProcessId' {42} 'Thread' {8} 'ClassName' {'Button'} default {$false} }
+    if ((Readiness (Get-CommonDialogFocusFacts 20 41 7 $true 0 100 $true $resolveFocus)).native_ready) { throw 'Foreign or invalid focused edit was accepted' }
+    $focusWindows[100][$property] = $original
+  }
+  foreach ($flags in @(2,4,8,16)) {
+    $facts = Readiness (Get-CommonDialogFocusFacts 20 41 7 $true $flags 100 $true $resolveFocus) $true
+    if ($facts.native_ready -or $facts.uia_ready) { throw 'Menu or move mode was accepted as filename focus' }
+  }
+  $outside = Readiness (Get-CommonDialogFocusFacts 20 41 7 $true 0 100 $false $resolveFocus) $true
+  if ($outside.native_ready -or $outside.uia_ready) { throw 'A focused edit outside the exact dialog was accepted' }
+  $focusWindows[90].Parent = 90
+  if ((Readiness (Get-CommonDialogFocusFacts 20 41 7 $true 0 100 $true $resolveFocus)).native_ready) { throw 'Cyclic filename ancestry was accepted' }
+  $focusWindows[90].Parent = 20
+  $focusWindows[90].ProcessId = 42
+  if ((Readiness (Get-CommonDialogFocusFacts 20 41 7 $true 0 100 $true $resolveFocus) $true).uia_ready) { throw 'Foreign filename ancestry was accepted through stale UIA focus' }
+  $focusWindows[90].ProcessId = 41
+  $fresh = Readiness $native
+  foreach ($key in @('owned_before','foreground_before','owned_after','foreground_after')) {
+    $changed = $fresh.Clone(); $changed[$key] = $false
+    $changed = Complete-FilenameFocusFacts $changed
+    if ($changed.native_ready -or $changed.uia_ready) { throw 'Lost dialog identity or foreground after focus query was accepted' }
+  }
+  $unavailable = Get-CommonDialogFocusFacts 20 41 7 $false 0 0 $false $resolveFocus
+  if (!(Readiness $unavailable $true).uia_ready) { throw 'Strict UIA filename focus was rejected' }
+  $ambiguous = Readiness $unavailable $true; $ambiguous.uia_unique_edit = $false
+  if ((Complete-FilenameFocusFacts $ambiguous).uia_ready) { throw 'Ambiguous UIA filename focus was accepted' }
+  $observations = [System.Collections.Generic.List[string]]::new()
+  $readChangingDialog = {
+    [void] $observations.Add('dialog')
+    @{Handle=$(if ($observations.Count -eq 1) { 20 } else { 21 })}
+  }
+  $readUia = { param($Window) [void] $observations.Add('uia'); @{} }
+  $readNative = { param($Window) [void] $observations.Add('native'); $native }
+  $observed = Observe-FilenameFocus @{Handle=20} $readChangingDialog { param($Window) $true } $readUia $readNative
+  if ($observed.native_ready -or $observed.uia_ready -or ($observations -join ',') -cne 'dialog,uia,native,dialog') {
+    throw 'Filename focus omitted the fresh dialog guard after its queries'
+  }
+  $observations.Clear()
+  $readStableDialog = { [void] $observations.Add('dialog'); @{Handle=20} }
+  $changedForeground = { param($Window) $observations.Count -eq 1 }
+  $observed = Observe-FilenameFocus @{Handle=20} $readStableDialog $changedForeground $readUia $readNative
+  if ($observed.native_ready -or $observed.uia_ready) { throw 'Filename focus accepted lost foreground after its queries' }
+  $deep = @{}
+  foreach ($handle in 100..134) {
+    $deep[$handle] = @{Handle=$handle;ProcessId=41;Thread=7;ClassName='Edit';ControlId=1152;Parent=($handle+1);Visible=$true;Enabled=$true}
+  }
+  $deep[134].Parent = 20
+  $script:focusReads = 0
+  $resolveDeep = { param($Handle) $script:focusReads++; $deep[[int] $Handle] }
+  if ((Readiness (Get-CommonDialogFocusFacts 20 41 7 $true 0 100 $true $resolveDeep)).native_ready -or $script:focusReads -gt 32) {
+    throw 'Filename focus accepted an unbounded ancestor chain'
+  }
+  $safeFacts = Format-FilenameFacts @{focus_edit='private provider text';payload='private'}
+  if ($safeFacts.Contains('private')) { throw 'Filename focus diagnostic exposed provider text' }
+  $safeFields = $safeFacts.Substring('NATIVE CHOOSER WINDOWS LOCATION '.Length) | ConvertFrom-Json
+  if ([string]::Join(',', @($safeFields.PSObject.Properties.Name | Sort-Object)) -cne
+      [string]::Join(',', @(Filename-FactKeys | Sort-Object))) { throw 'Filename focus diagnostic schema changed' }
+  foreach ($property in $safeFields.PSObject.Properties) {
+    if ($property.Value -isnot [bool] -or $property.Value) { throw 'Filename focus diagnostic coerced provider text' }
   }
   $facts = @{stage='target';matches=2;enumerated=12;owned=$true;foreground=$true;selector=@{buttons=3;exact_id=2;exact_name=2;offscreen=1;eligible=1}}
   $line = Format-ChooserFailure $facts 'Native chooser action is ambiguous or unavailable'
@@ -222,10 +393,20 @@ using System.Runtime.InteropServices;
 using System.Text;
 public static class IbisChooser {
   [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
+  [StructLayout(LayoutKind.Sequential)] public struct GuiThreadInfo {
+    public uint Size, Flags;
+    public IntPtr Active, Focus, Capture, MenuOwner, MoveSize, Caret;
+    public Rect CaretRect;
+  }
   public delegate bool EnumProc(IntPtr window, IntPtr data);
   [DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc callback, IntPtr data);
   [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr window);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr window);
+  [DllImport("user32.dll")] public static extern bool IsWindowEnabled(IntPtr window);
+  [DllImport("user32.dll")] public static extern bool IsChild(IntPtr parent, IntPtr child);
+  [DllImport("user32.dll")] public static extern IntPtr GetAncestor(IntPtr window, uint flags);
+  [DllImport("user32.dll")] public static extern int GetDlgCtrlID(IntPtr window);
+  [DllImport("user32.dll")] public static extern bool GetGUIThreadInfo(uint thread, ref GuiThreadInfo info);
   [DllImport("user32.dll")] public static extern IntPtr GetWindow(IntPtr window, uint command);
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr window, out Rect rectangle);
@@ -239,6 +420,7 @@ public static class IbisChooser {
     return handles.ToArray();
   }
   public static uint ProcessId(IntPtr window) { uint process; GetWindowThreadProcessId(window, out process); return process; }
+  public static uint ThreadId(IntPtr window) { uint process; return GetWindowThreadProcessId(window, out process); }
   public static string Title(IntPtr window) { var text = new StringBuilder(256); GetWindowText(window, text, text.Capacity); return text.ToString(); }
   public static string ClassName(IntPtr window) { var text = new StringBuilder(256); GetClassName(window, text, text.Capacity); return text.ToString(); }
 }
@@ -296,6 +478,7 @@ public static class IbisChooser {
         $graphics.CopyFromScreen([System.Drawing.Point]::new($View.Left,$View.Top),[System.Drawing.Point]::Empty,$bitmap.Size)
         $stream = [System.IO.File]::Open($Destination,[System.IO.FileMode]::CreateNew,[System.IO.FileAccess]::Write,[System.IO.FileShare]::None)
         $bitmap.Save($stream,[System.Drawing.Imaging.ImageFormat]::Png)
+        $script:CaptureSucceeded = $true
       } finally {
         if ($stream) { $stream.Dispose() }
         if ($graphics) { $graphics.Dispose() }
@@ -303,20 +486,53 @@ public static class IbisChooser {
       }
     }
   }
-  function Test-FilenameFocus($Elements) {
+  function Get-UiaFilenameFocusFacts($Elements) {
+    $facts = @{uia_unique_edit=$false;uia_owned=$false;uia_visible=$false;uia_enabled=$false;uia_filename=$false}
     $focused = @($Elements | Where-Object {
       $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Edit -and $_.Current.HasKeyboardFocus
     })
-    if ($focused.Count -ne 1) { return $false }
+    $facts.uia_unique_edit = $focused.Count -eq 1
+    if (!$facts.uia_unique_edit) { return $facts }
+    $info = $focused[0].Current
+    $facts.uia_owned = $info.ProcessId -eq $AppId
+    $facts.uia_visible = !$info.IsOffscreen
+    $facts.uia_enabled = $info.IsEnabled
+    $filename = $info.Name -ceq 'File name:' -or $info.Name -ceq 'File name'
+    $withinRoot = $false
     $element = $focused[0]
     for ($depth = 0; $depth -lt 32 -and $null -ne $element; $depth++) {
-      if ($element.Equals($Elements[0])) { break }
+      if ($element.Equals($Elements[0])) { $withinRoot = $true; break }
       $current = $element.Current
-      if ($current.AutomationId -ceq '1148' -or $current.AutomationId -ceq 'FileNameControlHost') { return $true }
+      if ($current.AutomationId -ceq '1148' -or $current.AutomationId -ceq 'FileNameControlHost') { $filename = $true }
       $element = [System.Windows.Automation.TreeWalker]::ControlViewWalker.GetParent($element)
     }
-    # The filename edit also has a fixed label in the English cloud image.
-    $focused[0].Current.Name -ceq 'File name:' -or $focused[0].Current.Name -ceq 'File name'
+    $facts.uia_filename = $withinRoot -and $filename
+    $facts
+  }
+  function Get-FocusWindowInfo([long] $Handle) {
+    $window = [IntPtr]::new($Handle)
+    if (![IbisChooser]::IsWindow($window)) { return $null }
+    @{Handle=$Handle;ProcessId=[IbisChooser]::ProcessId($window);Thread=[IbisChooser]::ThreadId($window);
+      ClassName=[IbisChooser]::ClassName($window);ControlId=[IbisChooser]::GetDlgCtrlID($window);
+      Parent=[IbisChooser]::GetAncestor($window,1).ToInt64();
+      Visible=[IbisChooser]::IsWindowVisible($window);Enabled=[IbisChooser]::IsWindowEnabled($window)}
+  }
+  function Get-FilenameFocusFacts($ExpectedDialog) {
+    Observe-FilenameFocus $ExpectedDialog { Get-Dialog } {
+      param($Window) [IbisChooser]::GetForegroundWindow().ToInt64() -eq $Window.Handle
+    } {
+      param($Window) Get-UiaFilenameFocusFacts @(Get-DialogElements $Window)
+    } {
+      param($Window)
+      $thread = [IbisChooser]::ThreadId([IntPtr]::new($Window.Handle))
+      $info = [IbisChooser+GuiThreadInfo]::new()
+      $info.Size = [System.Runtime.InteropServices.Marshal]::SizeOf($info)
+      $available = $thread -gt 0 -and [IbisChooser]::GetGUIThreadInfo($thread,[ref] $info)
+      $isChild = $available -and [IbisChooser]::IsChild([IntPtr]::new($Window.Handle),$info.Focus)
+      Get-CommonDialogFocusFacts $Window.Handle $AppId $thread $available $info.Flags $info.Focus.ToInt64() $isChild {
+        param($Handle) Get-FocusWindowInfo $Handle
+      }
+    }
   }
   $script:ChooserFacts.stage = 'resolve'
   $dialog = Get-Dialog
@@ -327,8 +543,14 @@ public static class IbisChooser {
     'state' { @{visible=($null -ne $dialog);foreground=[bool] $foreground;owned=($null -ne $dialog)} }
     'location-state' {
       $script:ChooserFacts.stage = 'tree'
-      $ready = $foreground -and (Test-FilenameFocus @(Get-DialogElements $dialog))
-      @{ready=[bool] $ready;owned=($null -ne $dialog)}
+      $facts = Get-FilenameFocusFacts $dialog
+      [Console]::Error.WriteLine((Format-FilenameFacts $facts))
+      @{ready=($facts.native_ready -or $facts.uia_ready);owned=$facts.owned_after}
+    }
+    'capture-failure' {
+      $script:CaptureSucceeded = $false
+      Save-ChooserFailureImage
+      @{captured=$script:CaptureSucceeded}
     }
     'cancel' { Get-ChooserKeyPlan 'cancel' $dialog $foreground }
     'confirm' { Get-ChooserKeyPlan 'confirm' $dialog $foreground }

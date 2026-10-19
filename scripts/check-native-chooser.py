@@ -58,25 +58,33 @@ def ready(value):
     return all(flags(value, ("visible", "foreground", "owned")).values())
 
 
+WINDOWS_LOCATION_FIELDS = (
+    "owned_before", "foreground_before", "owned_after", "foreground_after", "gui_available", "gui_idle",
+    "focus_live", "focus_visible", "focus_enabled", "focus_same_pid", "focus_same_thread", "focus_edit", "focus_descendant",
+    "ancestry_reaches_dialog", "filename_id", "uia_unique_edit", "uia_owned", "uia_visible", "uia_enabled", "uia_filename", "native_ready", "uia_ready",
+)
+
+
 def location_token(token, process_id):
     def exact(value, keys):
         return isinstance(value, dict) and set(value) == set(keys)
-    def positive_integer(value):
-        return type(value) is int and value > 0
+    def positive_integer(value, maximum=0xffffffff):
+        return type(value) is int and 0 < value <= maximum
     def finite(value):
         try:
             return type(value) in (int, float) and math.isfinite(value)
         except OverflowError:
             return False
-    valid = exact(token, ("owner", "panel", "sheet"))
+    valid = exact(token, ("owner", "panel", "sheet")) and positive_integer(process_id, 0x7fffffff)
     if valid:
         owner = token["owner"]
-        valid = (exact(owner, ("pid", "started")) and positive_integer(owner["pid"])
+        valid = (exact(owner, ("pid", "started")) and positive_integer(owner["pid"], 0x7fffffff)
                  and owner["pid"] == process_id and finite(owner["started"]) and owner["started"] > 0)
     if valid:
         for key in ("panel", "sheet"):
             window = token[key]
-            if not exact(window, ("window", "bounds")) or not positive_integer(window["window"]):
+            keys = ("window", "bounds") if key == "panel" else ("bounds",)
+            if not exact(window, keys) or key == "panel" and not positive_integer(window["window"]):
                 valid = False
                 break
             bounds = window["bounds"]
@@ -84,7 +92,7 @@ def location_token(token, process_id):
                     or not 0 < bounds["Width"] <= 8192 or not 0 < bounds["Height"] <= 8192):
                 valid = False
                 break
-    if not valid or token["panel"]["window"] == token["sheet"]["window"]:
+    if not valid:
         raise AssertionError("Native chooser location identity is invalid")
     return token
 
@@ -116,7 +124,7 @@ def helper_diagnostics(stderr):
         return []
     safe = []
     for line in stderr[:65536].splitlines():
-        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
+        prefix = next((value for value in ("NATIVE CHOOSER WINDOWS LOCATION ", "NATIVE CHOOSER WINDOWS RAW ", "NATIVE CHOOSER WINDOWS ", "NATIVE CHOOSER MACOS ") if line.startswith(value)), None)
         if prefix is None:
             continue
         try:
@@ -125,7 +133,9 @@ def helper_diagnostics(stderr):
             continue
         if not isinstance(value, dict):
             continue
-        if prefix == "NATIVE CHOOSER MACOS ":
+        if prefix == "NATIVE CHOOSER WINDOWS LOCATION ":
+            valid = set(value) == set(WINDOWS_LOCATION_FIELDS) and all(type(item) is bool for item in value.values())
+        elif prefix == "NATIVE CHOOSER MACOS ":
             valid = set(value) == {"stage"} and value["stage"] in ("identity", "scope", "windows", "metadata", "bounds", "candidates", "sheets", "location", "controls", "invoke")
         else:
             valid = (set(value) == {"stage", "reason", "matches", "enumerated", "owned", "foreground", "selector"}
@@ -301,11 +311,30 @@ class Dialog:
         self.linux = linux.Dialog(native, smoke.run) if system == "Linux" else None
 
     def capture_failure(self):
-        if self.system != "Darwin" or self.output is None or self.native.app.poll() is not None:
+        if self.system not in ("Darwin", "Windows") or self.output is None or self.native.app.poll() is not None:
             return
         # Capture before the fixture context exits or owned processes stop.
         # The suite requires a disposable desktop with synthetic files.
         try:
+            if self.system == "Windows":
+                image = self.output / "chooser-failure.png"
+                def has_png():
+                    if image.is_symlink() or not image.is_file():
+                        return False
+                    with image.open("rb") as source:
+                        return source.read(8) == b"\x89PNG\r\n\x1a\n"
+                if not has_png():
+                    command = ["pwsh", "-NoProfile", "-File", str(ROOT / "dialog-windows.ps1"),
+                               "-Action", "capture-failure", "-AppId", str(self.native.app.pid),
+                               "-PickerHandle", str(self.native.picker_handle), "-FailureImage", str(image)]
+                    result = subprocess.run(command, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10)
+                    for line in helper_diagnostics(result.stderr):
+                        print(line, file=sys.stderr, flush=True)
+                    if result.returncode:
+                        self.native.dialog_failure_capture = "unavailable"
+                        return
+                self.native.dialog_failure_capture = "captured" if has_png() else "unavailable"
+                return
             subprocess.run(["screencapture", "-x", str(self.output / "chooser-failure.png")],
                            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
             self.native.dialog_failure_capture = "captured"
@@ -345,6 +374,11 @@ class Dialog:
                 print(line, file=sys.stderr, flush=True)
             self.capture_failure()
             raise smoke.Unavailable("Native chooser action unavailable")
+        if self.system == "Windows" and action == "location-state":
+            for line in helper_diagnostics(getattr(result, "stderr", "")):
+                if line.startswith("NATIVE CHOOSER WINDOWS LOCATION ") and line != getattr(self, "last_location_facts", None):
+                    print(line, file=sys.stderr, flush=True)
+                    self.last_location_facts = line
         try:
             value = json.loads(result.stdout)
         except ValueError:
@@ -369,6 +403,18 @@ class Dialog:
         return flags(self.call("state"), ("visible", "foreground", "owned"))
 
     def select(self, path):
+        if self.system != "Windows":
+            return self._select(path)
+        try:
+            return self._select(path)
+        except Exception:
+            try:
+                self.capture_failure()
+            except Exception:
+                pass  # A secondary observation must preserve the selection failure.
+            raise
+
+    def _select(self, path):
         if self.linux:
             smoke.wait_for(self.linux.location_controls_ready, "native chooser controls finish initialization")
             self.linux.select_path(path)
@@ -606,6 +652,99 @@ def check(app_path, output, system):
 
 
 class Tests(unittest.TestCase):
+    def test_windows_location_facts_accept_only_the_exact_boolean_schema(self):
+        prefix = "NATIVE CHOOSER WINDOWS LOCATION "
+        facts = {key: False for key in WINDOWS_LOCATION_FIELDS}
+        self.assertEqual(helper_diagnostics(prefix + json.dumps(facts)), [prefix + json.dumps(facts, sort_keys=True)])
+        for invalid in ({**facts, "focus_edit": 1}, {**facts, "filename_id": "private"},
+                        {**facts, "payload": "private"}, {key: value for key, value in facts.items() if key != "owned_after"}):
+            self.assertEqual(helper_diagnostics(prefix + json.dumps(invalid)), [])
+
+    def test_windows_false_location_wait_reports_only_changed_allowlisted_facts(self):
+        from types import SimpleNamespace
+        prefix = "NATIVE CHOOSER WINDOWS LOCATION "
+        first = {key: False for key in WINDOWS_LOCATION_FIELDS}
+        second = {**first, "gui_available": True}
+        native = SimpleNamespace(app=SimpleNamespace(pid=10), picker_handle=12)
+        dialog = Dialog(native, "Windows")
+        with patch("builtins.print") as printed:
+            for facts in (first, first, second):
+                result = SimpleNamespace(returncode=0, stdout='{"ready":false,"owned":true}',
+                                         stderr=prefix + json.dumps(facts) + "\nprivate provider payload")
+                with patch.object(subprocess, "run", return_value=result):
+                    self.assertEqual(dialog.call("location-state"), {"ready": False, "owned": True})
+        lines = [call.args[0] for call in printed.call_args_list if call.args and call.args[0].startswith(prefix)]
+        self.assertEqual(lines, [prefix + json.dumps(facts, sort_keys=True) for facts in (first, second)])
+        self.assertFalse(any("private" in str(call) for call in printed.call_args_list))
+
+    def test_windows_select_timeout_captures_before_fixture_cleanup_and_never_inputs(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder)
+            fixture = output / "synthetic.bib"
+            fixture.write_text(smoke.fixture(3))
+            inputs = []
+            native = SimpleNamespace(app=SimpleNamespace(pid=10, poll=lambda: None), picker_handle=12,
+                                     key=lambda *_: inputs.append("key"), call=lambda *_: inputs.append("call"))
+            dialog = Dialog(native, "Windows", output)
+            failure = AssertionError("synthetic filename focus timeout")
+            def capture(command, **options):
+                self.assertTrue(fixture.exists())
+                self.assertEqual(command[command.index("-Action") + 1], "capture-failure")
+                self.assertEqual(command[command.index("-PickerHandle") + 1], "12")
+                self.assertEqual(options["timeout"], 10)
+                image = Path(command[command.index("-FailureImage") + 1])
+                image.write_bytes(b"\x89PNG\r\n\x1a\nsynthetic")
+                return SimpleNamespace(returncode=0, stdout='{"captured":true}', stderr="")
+            with patch.object(dialog, "_select", side_effect=failure), patch.object(subprocess, "run", side_effect=capture):
+                with self.assertRaises(AssertionError) as caught:
+                    dialog.select(fixture)
+            self.assertIs(caught.exception, failure)
+            self.assertEqual(native.dialog_failure_capture, "captured")
+            self.assertEqual(inputs, [])
+
+    def test_windows_capture_failure_preserves_the_original_selection_error(self):
+        from types import SimpleNamespace
+        failure = AssertionError("synthetic selection failure")
+        dialog = Dialog(SimpleNamespace(), "Windows")
+        with patch.object(dialog, "_select", side_effect=failure), patch.object(dialog, "capture_failure", side_effect=RuntimeError("secondary capture failure")):
+            with self.assertRaises(AssertionError) as caught:
+                dialog.select(Path("synthetic.bib"))
+        self.assertIs(caught.exception, failure)
+        for system in ("Linux", "Darwin"):
+            dialog.system = system
+            with patch.object(dialog, "_select", side_effect=failure), patch.object(dialog, "capture_failure") as capture:
+                with self.assertRaises(AssertionError):
+                    dialog.select(Path("synthetic.bib"))
+            capture.assert_not_called()
+
+    def test_windows_failure_capture_requires_a_png_and_never_sends_input(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as folder:
+            inputs = []
+            native = SimpleNamespace(app=SimpleNamespace(pid=10, poll=lambda: None), picker_handle=12,
+                                     key=lambda *_: inputs.append("key"), call=lambda *_: inputs.append("call"))
+            dialog = Dialog(native, "Windows", Path(folder))
+            with patch.object(subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout='{"captured":true}', stderr="")):
+                dialog.capture_failure()
+            self.assertEqual(native.dialog_failure_capture, "unavailable")
+            with patch.object(subprocess, "run", side_effect=subprocess.TimeoutExpired("synthetic capture", 10)):
+                dialog.capture_failure()
+            self.assertEqual(native.dialog_failure_capture, "unavailable")
+            self.assertEqual(inputs, [])
+
+    def test_windows_failure_capture_preserves_the_first_owned_png(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as folder:
+            image = Path(folder) / "chooser-failure.png"
+            first = b"\x89PNG\r\n\x1a\nsynthetic first failure"
+            image.write_bytes(first)
+            native = SimpleNamespace(app=SimpleNamespace(pid=10, poll=lambda: None), picker_handle=12)
+            with patch.object(subprocess, "run") as capture:
+                Dialog(native, "Windows", Path(folder)).capture_failure()
+            capture.assert_not_called()
+            self.assertEqual(image.read_bytes(), first)
+
     def test_rename_query_requires_verified_hide_then_foreground_show_before_typing(self):
         for system, shortcut in (("Linux", "ctrl+shift+space"), ("Windows", "ctrl+shift+space"), ("Darwin", "ctrl+super+r")):
             actions = []
@@ -878,7 +1017,17 @@ class Tests(unittest.TestCase):
     def macos_token(self):
         return {"owner": {"pid": 10, "started": 100.5},
                 "panel": {"window": 20, "bounds": {"X": -100, "Y": 20, "Width": 600, "Height": 500}},
-                "sheet": {"window": 21, "bounds": {"X": -90, "Y": 30, "Width": 580, "Height": 200}}}
+                "sheet": {"bounds": {"X": -90, "Y": 30, "Width": 580, "Height": 200}}}
+
+    def test_macos_logical_path_sheet_needs_no_separate_physical_window(self):
+        token = self.macos_token()
+        token["sheet"].pop("window", None)
+        self.assertEqual(location_identity({"ready": True, "owned": True, "token": token}, 10), token)
+        for section, field, value in (("owner", "pid", 2**31), ("panel", "window", 2**32), ("sheet", "window", 21)):
+            invalid = json.loads(json.dumps(token))
+            invalid[section][field] = value
+            with self.assertRaises(AssertionError):
+                location_token(invalid, 10)
 
     def macos_case(self, after, *, identity=None, confirm=None):
         actions = []
