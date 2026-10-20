@@ -157,9 +157,9 @@ refuses to overwrite a newer schema.
 [preferences.rs](../apps/desktop/src-tauri/src/preferences.rs)'s
 `SettingsFile::update` serializes the complete read-change-save operation, so
 intervening edits are preserved. A successful remembered library choice saves its
-path; a successful clipboard write saves the format. Shortcut configuration is
-read at startup. Follow these callers before changing the settings format; its
-versioning is separate from picker UI behavior.
+path; choosing a copy format saves it together with the citation style. Shortcut
+configuration is read at startup. Follow these callers before changing the
+settings format; its versioning is separate from picker UI behavior.
 
 ## Debugging: choose the smallest relevant test
 
