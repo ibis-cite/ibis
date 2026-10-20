@@ -82,6 +82,7 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
     copy_format: () => "pandoc",
     picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: false }),
     set_picker_preferences: () => null,
+    find_sources: () => ({ zotero: "absent", list: 1, files: [], cut_short: false }),
     library_status: () => ({ state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
   };
   mockIPC(
@@ -1024,4 +1025,56 @@ test("unreadable saved choices are reported and never overwritten with defaults"
   await chooseFromMore("Larger text", "menuitemcheckbox");
   expect(document.documentElement.dataset.textSize).toBe("larger");
   expect(calls).not.toContain("set_picker_preferences");
+});
+
+const NO_LIBRARY = { state: "none", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: null, note: null };
+
+test("first-run setup lists found .bib files by name and folder, and opens one by its list number", async () => {
+  const opened: unknown[] = [];
+  backend({
+    library_status: () => NO_LIBRARY,
+    find_sources: () => ({
+      zotero: "access_off",
+      list: 7,
+      files: [{ name: "thesis.bib", folder: "PhD" }, { name: "refs.bib", folder: "Downloads" }],
+      cut_short: true,
+    }),
+    open_found_library: (args) => { opened.push(args); return null; },
+  });
+  render(<App />);
+  const found = await screen.findByRole("region", { name: "Found on this computer" });
+  expect(within(found).getAllByRole("button").map((b) => b.textContent)).toEqual(["thesis.bib in PhD", "refs.bib in Downloads"]);
+  expect(screen.getByText(/turn on “Allow other applications on this computer to communicate with Zotero”/)).toBeTruthy();
+  expect(screen.getByText(/Some folders were too large/)).toBeTruthy();
+  fireEvent.click(within(found).getByRole("button", { name: "refs.bib in Downloads" }));
+  await waitFor(() => expect(opened).toEqual([{ list: 7, index: 1 }]));
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
+test("a refused choice from an older list looks again and shows the new list", async () => {
+  let searches = 0;
+  backend({
+    library_status: () => NO_LIBRARY,
+    find_sources: () => {
+      searches += 1;
+      return { zotero: "absent", list: searches, files: [{ name: `v${searches}.bib`, folder: "Documents" }], cut_short: false };
+    },
+    open_found_library: () => { throw new Error("That file is no longer offered"); },
+  });
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: "v1.bib in Documents" }));
+  expect(await screen.findByRole("button", { name: "v2.bib in Documents" })).toBeTruthy();
+  expect(screen.getByText("That file could not be opened from the list. Pick it again from the new list.")).toBeTruthy();
+});
+
+test("when looking for libraries fails, setup still offers the file chooser and Zotero and says why", async () => {
+  backend({
+    library_status: () => NO_LIBRARY,
+    find_sources: () => { throw new Error("synthetic failure"); },
+  });
+  render(<App />);
+  expect(await screen.findByText("Ibis could not look for libraries on this computer. Choose a file instead.")).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Choose library to get started" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Use Zotero" })).toBeTruthy();
+  expect(screen.queryByRole("region", { name: "Found on this computer" })).toBeNull();
 });

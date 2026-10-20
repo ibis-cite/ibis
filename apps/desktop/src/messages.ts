@@ -17,6 +17,21 @@ export const operationFailures = {
   quit: "Ibis could not quit. Try again.",
   pickerEvents: "Ibis could not focus the search box. Restart Ibis to try again.",
   libraryEvents: "Your library may not update automatically. Use Reload, or restart Ibis.",
+  findSources: "Ibis could not look for libraries on this computer. Choose a file instead.",
+  openFound: "That file could not be opened from the list. Pick it again from the new list.",
+} as const;
+
+export const setupText = {
+  looking: "Looking for Zotero and .bib files…",
+  zoteroOpen: "Zotero is open, so Ibis can read your library from it.",
+  zoteroAccessOff:
+    "Zotero is open, but it does not let other apps read it yet. In Zotero, open Settings, then Advanced, and turn on " +
+    "“Allow other applications on this computer to communicate with Zotero”.",
+  foundFiles: "Found on this computer",
+  inFolder: (folder: string) => `in ${folder}`,
+  openFound: (name: string, folder: string) => (folder ? `Use ${name} in ${folder}` : `Use ${name}`),
+  cutShort: "Some folders were too large to search fully. Use Choose library… if your file is not listed.",
+  lookAgain: "Look again",
 } as const;
 
 export const densityNames = {

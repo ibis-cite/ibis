@@ -20,6 +20,8 @@ Ibis is free, open source and private by design: everything works offline, nothi
 
 The newest development build for Windows, macOS and Linux is always at **[Releases → Ibis nightly](https://github.com/ibiscite/ibis/releases/tag/nightly)**. It is rebuilt whenever the app changes, so it can be unfinished; numbered preview releases are steadier. Direct downloads: [Mac with Apple silicon (M1 and later)](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-macOS-Apple-silicon.dmg), [Mac with Intel](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-macOS-Intel.dmg), [Windows](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-Windows-setup.exe), [Linux AppImage](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-Linux.AppImage). It installs as **Ibis Nightly**, separate from the stable Ibis, and can update itself if you allow update checks when it first starts. Builds are not signed yet, so your system may warn before opening them (the release page says what to click). Tell us what works and what you miss through [a problem report or an idea](https://github.com/ibiscite/ibis/issues/new/choose).
 
+The first time the picker opens, it offers Zotero if Zotero is open and lists `.bib` files it finds in your Documents, Desktop and Downloads folders, by name only, so you can pick one; **Choose library…** opens any other file.
+
 ## Use with Zotero
 
 With Zotero open, choose **Use Zotero** in the picker (or **Use Zotero Library** in the menu bar or tray menu). Ibis reads your personal library through Zotero's local API, on your computer only, and checks it for changes each time the picker opens. It never changes anything in Zotero.
