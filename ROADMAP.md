@@ -22,6 +22,7 @@ Each release is usable on its own. Dates are not promised; scope is. Work is tra
 - A citation language server (`ibis lsp`) for code editors.
 - `CITATION.cff` and Hayagriva sources; Kindle highlights and browser bookmarks as sources.
 - An experiment with Zotero-compatible citations in Word documents.
+- An optional read-only source for Zotero web libraries (needs a network ADR).
 - Additional reference managers (JabRef, Paperpile exports, Calibre, Bookends and others).
 - A web version built from the same core.
 
