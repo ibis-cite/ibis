@@ -14,7 +14,7 @@ comes from [ROADMAP.md](../ROADMAP.md); the rollout below separates remaining
 work from behavior already implemented. Native acceptance is recorded separately
 in [testing.md](testing.md), not established by this specification.
 
-## Seven rules
+## Eight rules
 
 1. **One anatomy everywhere.** Search, list, detail, citation tray and footer, in
    that order, in every form from a one-line bar to the large settings window.
@@ -29,6 +29,9 @@ in [testing.md](testing.md), not established by this specification.
    inserted, or why not. Colour is never the only signal.
 7. **Calm motion.** Movement only explains where something came from, and it
    switches off when the system asks for reduced motion.
+8. **No glow, no edge rings.** Selection is a fill, never an outline. No
+   coloured borders, outer glows or bright rims. A focus ring appears only when
+   the keyboard moved focus.
 
 ## Design language
 
@@ -67,13 +70,32 @@ platform, so a source or a reference type always looks the same.
 |---|---|---|---|
 | Material | Translucent glass | Mica, content on a lighter layer | Flat |
 | Window radius | 12 pt, the native panel corner (#236) | 8 px (4 px controls) | 14 px |
-| Selected row | Filled accent, white text | Soft grey with an accent pill on the left | Accent tint |
+| Selected row | Filled accent, white text | Soft grey with an accent pill on the left | GTK's selection colour (filled accent) with its paired text |
+| Keyboard focus ring | 2 px accent, 1 px gap | 2 px in the text colour around a 1 px surface-coloured stroke (Fluent's focus visual) | 2 px, the accent mixed half toward the text colour, 1 px gap |
 | Search box | Frameless, large | Text box with an underline that turns accent on focus | Framed entry |
 | Shortcut labels | ⌘ ⌥ ⇧ | Ctrl Alt Shift | Ctrl Super Shift |
 | Copied | Pill near the top of the screen | Notice bottom-right | Toast at the bottom |
 
+The Linux selected row uses the full selection colour rather than a tint: focus
+stays in the search box while ↑ ↓ move the selection, so the fill is the only
+cue, and libadwaita's list tint (25 % accent, `$view_selected_color`) or a
+plain neutral fill reaches only about 1.1–1.3:1 against the rows beside it.
+The full accent reaches about 3.7:1 (light) and 4:1 (dark) with Adwaita blue.
+Adwaita's half-accent focus ring is mixed toward the text colour instead of
+made transparent for the same reason.
+
 High contrast and reduced transparency replace every material with the opaque
 system surface, as [native appearance groundwork](https://github.com/ibiscite/ibis/pull/232#issuecomment-6282577029) already does.
+
+On macOS the glass is AppKit's popover material (`NSVisualEffectView`) behind
+the page, under a light veil of the surface colour at 55%: web text cannot use
+AppKit's vibrant blending, and without the veil secondary text drops below
+4.5:1 over a bright or colourful wallpaper. Over the veil, the citation and
+status colours are one step deeper (scarlet `#982d16` light, `#ff9d87` dark) so
+they keep 4.5:1; the opaque surface keeps the usual scarlet. Fills, hairlines
+and key caps are translucent so the material shows through, and the window edge
+is a 1 px hairline (black 10% in light, white 10% in dark), never a white rim. The newer Liquid Glass material
+(`NSGlassEffectView`, macOS 26) is a later step (Rollout 9).
 
 ## What shows, and when
 
@@ -87,7 +109,7 @@ system surface, as [native appearance groundwork](https://github.com/ibiscite/ib
 | Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab cycles them. |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter or Tab picks the first. |
 | Row: title and year | Always | Year at the right edge, in the same place on every row. |
-| Row: authors and journal | Comfortable and Spacious | Compact shows the first author ("García et al.") after the title. |
+| Row: authors and journal | Comfortable and Spacious | Tells apart references with the same first author and year. The journal is the container title (journal, book or proceedings), else the publisher. Spacious adds the item type as one word ("Article", "Book"). One line: authors are shortened as in a citation ("García", "García, Okafor", or "García et al." for three or more; screen readers hear every name), then the journal, each with an ellipsis (the key and library label shorten first, never below a few letters, and the type word stays whole; only when enlarged text leaves no room do they move under them); a match in the journal is always named, since it may be shortened. Compact shows the first author ("García et al.") after the title. |
 | Row: why it matched | Only when hidden | "In the abstract: …sleep…" or "Tagged: …" when the match is not in the title or authors. |
 | PDF or Web label | When a file is attached | Says what is attached ("PDF · 12 pp") and opens the preview. No empty column otherwise. |
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
@@ -199,11 +221,15 @@ is pressed again.
   directly, as on Windows.
 
 **Accessibility.** Reduced motion uses fades only. Screen readers hear the
-result count and, per row, title, first author, year and why it matched;
-"Copied" is announced politely. Every action has a key; focus rings are always
-visible (2 px, accent), except on the frameless macOS search field, where the
-caret and the active row are the cue, as in Spotlight. With increased contrast
-or forced colours, that field shows the ring too. Right-to-left titles align right within their row.
+result count and, per row, title, first author, year, journal or container
+(Comfortable and Spacious) and why it matched;
+"Copied" is announced politely. Every action has a key. Focus rings appear only for keyboard
+focus (`:focus-visible`), never after a click, in the platform's style (see the
+table above), and reach 3:1 against the surface with the platform's default
+accent. The search box never shows one: it always has focus, the caret is
+the cue, and on Windows its accent underline. Rows moved with ↑ ↓ show their
+fill, not a ring. With increased contrast or forced colours, every control and
+the search box show a solid 2 px ring and the active row a 3 px edge. Right-to-left titles align right within their row.
 
 ## Settings
 
