@@ -413,7 +413,7 @@ mod tests {
         let refs = crate::bibtex::load_str(
             "t",
             "@misc{a, title={A}, eprint={hep-th/9711200}, archivePrefix={arXiv}}
-             @article{b, title={B}, journal={J}, eprint={1706.03762v5}, eprinttype={arxiv}, pmid={12345678}}
+             @article{b, title={B}, journal={J}, eprint={1706.03762v5}, eprinttype={arxiv}, pmid={12345678}, pmcid={PMC7654321}}
              @book{c, title={C}, isbn={978 0 306 40615 7}}
              @article{d, title={D}, journal={J}, eprint={987}, eprinttype={pubmed}}
              @misc{e, title={E}, eprint={arXiv:1706.03763}, archivePrefix={arXiv}}",
@@ -424,6 +424,10 @@ mod tests {
         assert!(ids[1].contains(&Identifier::Arxiv("1706.03762".into())));
         assert!(ids[1].contains(&Identifier::Doi("10.48550/arxiv.1706.03762".into())));
         assert!(ids[1].contains(&Identifier::Pmid("12345678".into())));
+        // BibTeX `pmid` and `pmcid` become the CSL variables Zotero uses.
+        assert_eq!(refs[1].variables["PMID"], "12345678");
+        assert_eq!(refs[1].variables["PMCID"], "PMC7654321");
+        assert_eq!(refs[3].variables["PMID"], "987");
         assert_eq!(ids[2], [Identifier::Isbn("9780306406157".into())]);
         assert_eq!(ids[3], [Identifier::Pmid("987".into())]);
         assert_eq!(refs[4].eprints, ["arXiv:1706.03763"]);
