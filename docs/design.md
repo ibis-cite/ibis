@@ -75,6 +75,13 @@ platform, so a source or a reference type always looks the same.
 High contrast and reduced transparency replace every material with the opaque
 system surface, as [native appearance groundwork](https://github.com/ibiscite/ibis/pull/232#issuecomment-6282577029) already does.
 
+On macOS the glass is AppKit's popover material (`NSVisualEffectView`) behind
+the page, under a light veil of the surface colour at 55%: web text cannot use
+AppKit's vibrant blending, and without the veil secondary text drops below
+4.5:1 over a bright or colourful wallpaper. Fills, hairlines and key caps are
+translucent so the material shows through. The newer Liquid Glass material
+(`NSGlassEffectView`, macOS 26) is a later step (Rollout 9).
+
 ## What shows, and when
 
 | Element | Visible | Why |

@@ -1,7 +1,34 @@
-/* The existing opaque surface remains the default. Native success alone opts in. */
-:root[data-native-appearance="mica"], :root[data-native-appearance="vibrancy"] { background: transparent; }
+/* The existing opaque surface remains the default. Native success alone opts in.
+   On macOS a light veil (--vibrancy-tint, tokens.css) keeps text legible over the
+   material; Windows Mica already supplies its own tint. */
+:root[data-native-appearance="mica"] { background: transparent; }
+:root[data-native-appearance="vibrancy"] { background: var(--vibrancy-tint, transparent); }
 
 /* Defensive overrides also cover preferences changed before native refresh. */
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
   :root[data-native-appearance] { background: var(--surface); }
+}
+
+/* macOS skin (docs/design.md, the prototype's macOS look): frameless buttons
+   and key caps on soft fills, rounder menus. Increase contrast, forced colours
+   and the contrast preview keep their framed, opaque controls. */
+@media (prefers-contrast: no-preference) and (forced-colors: none) {
+  :root[data-platform="macos"]:not([data-gallery-theme="contrast"]) :is(button, select) { border-color: var(--clear); }
+  :root[data-platform="macos"]:not([data-gallery-theme="contrast"]) kbd {
+    min-width: 1.25rem; border-color: var(--clear); background: var(--button-background);
+    font-weight: var(--type-strong-weight); text-align: center;
+  }
+  :root[data-platform="macos"]:not([data-gallery-theme="contrast"]) :is([role="menu"], .keys-dialog) { border-radius: var(--menu-radius); }
+
+  /* With the native material: a hairline edge and top highlight as on a macOS
+     panel, and menus of the same glass that blur the list beneath them. */
+  :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]) body::after {
+    content: ""; position: fixed; inset: 0; z-index: 3; pointer-events: none;
+    border-radius: var(--window-radius);
+    box-shadow: inset 0 0 0 var(--border-width) var(--glass-edge), inset 0 var(--border-width) 0 var(--glass-highlight);
+  }
+  :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]) :is([role="menu"], .keys-dialog) {
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+  }
 }
