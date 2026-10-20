@@ -18,6 +18,11 @@ When source reading, search or output changes, also test against a **controlled*
 
 Versioning, commit conventions and milestone releases are described in `docs/development.md`.
 
+The [code signing policy](docs/code-signing.md) records the current unsigned
+status and the planned SignPath Foundation process. Link it from release notes;
+once accepted and integrated, include the SignPath credit described there.
+Updater signatures and operating-system code signing are separate.
+
 Release Please updates the shared workspace version and the `ibis`, `ibis-core`, `ibis-desktop` and `ibis-zotero-local` entries in the root lockfile together. Its TOML updater tags scalar values with position metadata, so lockfile name filters use `@.name.value` while the replacement selects `.version` ([upstream explanation](https://github.com/googleapis/release-please/issues/2455)). The separate `ibis-fuzz` tooling version stays unchanged. When changing this configuration, rehearse the pinned upstream updater on a temporary checkout with a proposed version, then run `cargo metadata --locked --offline --format-version 1` and the same command with `--manifest-path fuzz/Cargo.toml`. Both must pass; inspect the diff to ensure only the workspace and four release package versions changed. Also run locked metadata on the generated release PR before considering a release.
 
 ### Enabling release automation (one time)
