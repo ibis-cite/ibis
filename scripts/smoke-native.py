@@ -108,6 +108,15 @@ def search_focused(snapshot):
     return any(n.get("focused") for n in named(snapshot, "Search references"))
 
 
+def control_activation_facts(state):
+    keys = {"pressed", "button_role", "menu_item_role", "toggle_role",
+            "invoke_pattern", "expand_collapse_pattern", "toggle_pattern"}
+    if (not isinstance(state, dict) or type(state.get("pressed")) is not bool or
+            any(type(state[key]) is not bool for key in keys & state.keys())):
+        raise RuntimeError("Native button action metadata unavailable")
+    return {key: state[key] for key in sorted(keys & state.keys())}
+
+
 def has_search_text(snapshot):
     return any(n.get("value") for n in named(snapshot, "Search references"))
 
@@ -186,11 +195,14 @@ def type_query(native, snapshot, text, select_all):
     raise AssertionError(f"Search field did not hold the typed query after {TYPE_ATTEMPTS} attempts")
 
 
-def wait_for_query(snapshot, query, expected, report):
+def wait_for_query(snapshot, query, expected, report, *, settled=False):
     last = {"nodes": []}
     def matched():
         nonlocal last
         last = snapshot()
+        if settled:
+            facts = query_failure_facts(last, query, expected)
+            return facts["exact_search_value"] and facts["expected_result"] and facts["one_result"]
         return expected in strings(last)
     try:
         wait_for(matched, "native typed query")
@@ -579,20 +591,21 @@ class Scripted:
 
     def click(self, name):
         if self.system != "Darwin":
-            self.call("click", name)
+            facts = control_activation_facts(self.call("click", name))
+            print("NATIVE CONTROL STATE " + json.dumps(facts), flush=True)
+            assert facts["pressed"], "Native button was not activated"
             return
         state = {}
         def pressed():
             nonlocal state
             state = self.call("click", name)
-            if not isinstance(state, dict) or type(state.get("pressed")) is not bool:
-                raise RuntimeError("Native button action metadata unavailable")
-            return state["pressed"]
+            return control_activation_facts(state)["pressed"]
         try:
             wait_for(pressed, "exact named native button becomes available")
         except AssertionError:
             print("NATIVE CONTROL STATE " + json.dumps(state), flush=True)
             raise
+        print("NATIVE CONTROL STATE " + json.dumps(control_activation_facts(state)), flush=True)
 
     def focus_editor(self):
         state = self.call("focus-editor")
@@ -681,9 +694,9 @@ def quit_normally(native, app):
     def activate(name):
         if isinstance(native, Scripted):
             result = native.call("click", name, timeout=remaining())
-            activated = (isinstance(result, dict) and result.get("pressed") is True
-                         if native.system == "Darwin" else result is True)
-            assert activated, "Native Quit control was not activated"
+            facts = control_activation_facts(result)
+            print("NATIVE CONTROL STATE " + json.dumps(facts), flush=True)
+            assert facts["pressed"], "Native Quit control was not activated"
         else:
             native.click(name)
         remaining()
@@ -734,15 +747,25 @@ def first_run_preferences_main(args):
 
         def snapshot():
             assert app.poll() is None, "Native app exited unexpectedly"
-            return native.snapshot()
+            current = native.snapshot()
+            report["last_native_state"] = {
+                "visible": bool(current["visible"]), "foreground": bool(current["foreground"]),
+                "named_search": bool(named(current, "Search references")),
+                "search_focused": search_focused(current),
+                "result_focused": any(bool(node.get("focused")) and
+                    node.get("role", "").lower().replace(" ", "") in
+                    {"option", "listitem", "axrow", "controltype.listitem"} for node in current["nodes"]),
+            }
+            return current
 
         def visible_text(text):
             current = snapshot()
             return current["visible"] and text in strings(current)
 
-        def picker_ready():
+        def picker_ready(*, typing=False):
             current = snapshot()
-            return current["visible"] and current["foreground"] and search_focused(current)
+            return (current["visible"] and current["foreground"] and bool(named(current, "Search references"))
+                    and (not typing or search_focused(current)))
 
         def passed(name):
             report["checks"].append({"name": name, "status": "passed"})
@@ -758,9 +781,9 @@ def first_run_preferences_main(args):
         assert saved_typst(settings), "Normal Quit lost the saved Typst choice"
         launch("relaunch", with_library=True)
         wait_for(lambda: visible_text("3 references"), "synthetic references after relaunch")
-        wait_for(picker_ready, "restarted native search focus")
+        wait_for(lambda: picker_ready(typing=True), "restarted native search focus")
         type_query(native, snapshot, "smoke000001", "super+a" if system == "Darwin" else "ctrl+a")
-        wait_for_query(snapshot, "smoke000001", "Ibis smoke reference 000001", report)
+        wait_for_query(snapshot, "smoke000001", "Ibis smoke reference 000001", report, settled=True)
         prime_clipboard(native)
         native.key("Return")
         copy_deadline = time.monotonic() + 20
@@ -774,6 +797,8 @@ def first_run_preferences_main(args):
         passed("relaunch uses saved Typst without choosing a format again")
         wait_for(lambda: not snapshot()["visible"], "Typst copy hides picker")
         native.key(shortcut)
+        # AT-SPI can focus the active result while the combobox retains input.
+        # More/Quit needs the same foreground/named-search state as reopen().
         wait_for(picker_ready, "picker available for normal Quit")
         report["second_quit_seconds"] = quit_normally(native, app)
         passed("restarted More/Quit exits zero within ten seconds")
@@ -1146,8 +1171,10 @@ class ContractTests(unittest.TestCase):
         clock, launches, actions = [0.0], [], []
         native = Mock()
         native.query = ""
+        native.query_ready_at = 0
         native.value = ""
         native.visible = True
+        native.reopened = False
 
         def launch(_command, *, env, **_options):
             app = Mock()
@@ -1198,26 +1225,37 @@ class ContractTests(unittest.TestCase):
             actions.append((chord, len(launches)))
             if chord == "Return":
                 self.assertEqual(len(launches), 2, "Copy happened before relaunch")
+                if clock[0] < native.query_ready_at:
+                    return  # The app rejects Enter while results belong to the old query.
                 native.value = "[@smoke000001]" if failure == "wrong-copy" else "@smoke000001"
                 if failure == "whitespace-copy":
                     native.value += "\n"
                 native.visible = False
             elif chord == "ctrl+shift+y":
-                native.visible = True
+                native.visible = failure != "hidden-reopen"
+                native.reopened = True
 
         def snapshot():
             names = ["More", "Quit Ibis"]
             if len(launches) == 1:
                 names += ["Choose library to get started", "Typst"]
             else:
-                names += ["3 references", "1 result", "Ibis smoke reference 000001"]
+                names += ["3 references", "1 result" if clock[0] >= native.query_ready_at else "3 results",
+                          "Ibis smoke reference 000001"]
+            result_focus = failure == "active-result-reopen" and native.reopened
             return {"visible": native.visible, "foreground": native.visible, "nodes": [
                 {"name": name, "role": "button"} for name in names] + [
-                {"name": "Search references", "role": "entry", "value": native.query, "focused": True}]}
+                {"name": "Search references", "role": "entry", "value": native.query, "focused": not result_focus},
+                {"name": "private result payload", "role": "list item", "focused": result_focus}]}
+
+        def text(value):
+            native.query = value
+            if failure == "delayed-query":
+                native.query_ready_at = clock[0] + 0.2
 
         native.click.side_effect = click
         native.key.side_effect = key
-        native.text.side_effect = lambda text: setattr(native, "query", text)
+        native.text.side_effect = text
         native.snapshot.side_effect = snapshot
         native.set_clipboard.side_effect = lambda value: setattr(native, "value", value)
         original_clipboard = Linux.clipboard
@@ -1286,6 +1324,32 @@ class ContractTests(unittest.TestCase):
                 result, report, _launches, actions = self.preference_probe(failure)
                 self.assertEqual((result, report["status"]), (1, "failed"))
                 self.assertEqual([action for action in actions if action[0] == "Return"], [("Return", 2)])
+
+    def test_first_run_preferences_wait_for_results_before_one_return(self):
+        result, report, _launches, actions = self.preference_probe("delayed-query")
+        self.assertEqual((result, report["status"]), (0, "passed"))
+        self.assertEqual([action for action in actions if action[0] == "Return"], [("Return", 2)])
+
+    def test_first_run_preferences_reopen_accepts_focused_active_result(self):
+        result, report, _launches, actions = self.preference_probe("active-result-reopen")
+        self.assertEqual((result, report["status"]), (0, "passed"))
+        self.assertEqual(report["last_native_state"], {
+            "visible": True, "foreground": True, "named_search": True,
+            "search_focused": False, "result_focused": True,
+        })
+        self.assertEqual([action for action in actions if action[0] == "Return"], [("Return", 2)])
+        self.assertEqual([action for action in actions if action[0] == "Quit Ibis"], [("Quit Ibis", 1), ("Quit Ibis", 2)])
+
+    def test_first_run_preferences_failure_retains_only_observed_boolean_state(self):
+        result, report, _launches, actions = self.preference_probe("hidden-reopen")
+        self.assertEqual((result, report["status"]), (1, "failed"))
+        self.assertEqual(report["last_native_state"], {
+            "visible": False, "foreground": False, "named_search": True,
+            "search_focused": True, "result_focused": False,
+        })
+        self.assertTrue(all(type(value) is bool for value in report["last_native_state"].values()))
+        self.assertNotIn("private", json.dumps(report))
+        self.assertEqual([action for action in actions if action[0] == "Quit Ibis"], [("Quit Ibis", 1)])
 
     def test_scripted_calls_accept_a_remaining_budget_without_resetting_it(self):
         native = Scripted.__new__(Scripted)
@@ -1609,6 +1673,28 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(report, {})
         output.assert_not_called()
 
+    def test_settled_query_requires_all_facts_in_one_observation(self):
+        def state(value, title, count):
+            return {"nodes": [
+                {"name": "Search references", "role": "entry", "value": value},
+                {"name": title}, {"name": count},
+            ]}
+        states = [state("private query", "private title", "3 results"),
+                  state("old query", "private title", "1 result"),
+                  state("private query", "old title", "1 result"),
+                  state("private query", "private title", "1 result")]
+        source = Mock(side_effect=states)
+        def observe(predicate, _description):
+            self.assertFalse(predicate())
+            self.assertFalse(predicate())
+            self.assertFalse(predicate())
+            self.assertTrue(predicate())
+        report = {}
+        with patch(__name__ + ".wait_for", side_effect=observe):
+            wait_for_query(source, "private query", "private title", report, settled=True)
+        self.assertEqual(source.call_count, 4)
+        self.assertEqual(report, {})
+
     def test_helper_timeout_emits_only_allowlisted_stages_from_bytes_stderr(self):
         native = Scripted.__new__(Scripted)
         native.system, native.command = "Windows", ["synthetic-helper", "private argument"]
@@ -1651,6 +1737,23 @@ class ContractTests(unittest.TestCase):
         with patch.object(native, "call", side_effect=[{"pressed": False}, {"pressed": True}]) as helper, patch("time.sleep"):
             native.click("Reload")
         self.assertEqual(helper.call_args_list, [(('click', 'Reload'),), (('click', 'Reload'),)])
+
+    def test_windows_click_requires_one_confirmed_activation_and_logs_only_fixed_booleans(self):
+        native = Scripted.__new__(Scripted)
+        native.system = "Windows"
+        state = {"pressed": True, "button_role": True, "toggle_pattern": True, "private": "document payload"}
+        with patch.object(native, "call", return_value=state) as helper, patch("builtins.print") as output:
+            native.click("Typst")
+        helper.assert_called_once_with("click", "Typst")
+        self.assertNotIn("private", str(output.call_args))
+        self.assertNotIn("payload", str(output.call_args))
+        self.assertEqual(json.loads(output.call_args.args[0].removeprefix("NATIVE CONTROL STATE ")),
+                         {"pressed": True, "button_role": True, "toggle_pattern": True})
+        for invalid in (True, None, {"pressed": "true"}, {"pressed": True, "toggle_pattern": "true"}, {"pressed": False}):
+            with self.subTest(invalid=invalid), patch.object(native, "call", return_value=invalid) as helper, \
+                    patch("builtins.print"), self.assertRaises((AssertionError, RuntimeError)):
+                native.click("Typst")
+            helper.assert_called_once_with("click", "Typst")
 
     def windows_native(self):
         native = Scripted.__new__(Scripted)
@@ -1982,6 +2085,82 @@ foreach ($failure in @('missing','identity','zero','invalid','other-owner')) {
             self.assertEqual(set(value), {"stage", "owned", "window_valid", "request_accepted", "current_foreground"})
             self.assertIn(value.pop("stage"), ("identity", "window", "foreground-request"))
             self.assertTrue(all(type(item) is bool for item in value.values()))
+
+    @unittest.skipUnless(shutil.which("pwsh"), "PowerShell is required to execute the Windows click helper contract")
+    def test_windows_click_activates_one_exact_owned_button_with_its_native_pattern(self):
+        script = r'''
+param([string] $Source)
+$ErrorActionPreference='Stop'
+$tokens=$null; $errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile($Source,[ref]$tokens,[ref]$errors)
+if ($errors.Count) { throw 'Helper syntax is invalid' }
+$switch=$ast.Find({param($node) $node -is [System.Management.Automation.Language.SwitchStatementAst] -and $node.Condition.Extent.Text -eq '$Action'},$true)
+$clause=@($switch.Clauses | Where-Object {$_.Item1.Value -eq 'click'})[0].Item2.Extent.Text
+$operation=[scriptblock]::Create($clause.Substring(1,$clause.Length-2))
+Add-Type @'
+using System;
+namespace System.Windows.Automation {
+ public enum TreeScope { Descendants }
+ public class AutomationElement { public static string NameProperty="name"; }
+ public class PropertyCondition { public string Value; public PropertyCondition(string property,string value) { Value=value; } }
+ public class ControlType { public static string Button="button", MenuItem="menu", Text="text"; }
+ public class InvokePattern { public static int Pattern=1; }
+ public class ExpandCollapsePattern { public static int Pattern=2; }
+ public class TogglePattern { public static int Pattern=3; }
+}
+public class ClickPattern {
+ public int Activations; public bool Fail;
+ public void Invoke() { Activate(); } public void Expand() { Activate(); } public void Toggle() { Activate(); }
+ private void Activate() { Activations++; if(Fail) throw new Exception("uncertain activation"); }
+}
+public class ClickElement {
+ public string Name="Typst"; public ClickElement Current { get { return this; } }
+ public string ControlType="button"; public int Supported=3; public ClickPattern Action=new ClickPattern();
+ public bool TryGetCurrentPattern(int pattern,ref object value) { value=pattern==Supported ? Action : null; return value!=null; }
+}
+public class ClickWindow {
+ public ClickElement[] Elements=new ClickElement[0];
+ public ClickElement[] FindAll(System.Windows.Automation.TreeScope scope,System.Windows.Automation.PropertyCondition condition) {
+  return Array.FindAll(Elements,element=>element.Name==condition.Value);
+ }
+}
+'@
+$AppId=42; $Text='Typst'; $script:window=[ClickWindow]::new()
+function Get-AppWindow { param($Id) if($Id -ne 42) {throw 'Unexpected owner'}; $script:window }
+foreach ($pattern in @(1,2,3)) {
+ $element=[ClickElement]::new(); $element.Supported=$pattern; $script:window.Elements=@($element)
+ $result=& $operation
+ if(!$result.pressed -or !$result.button_role -or $element.Action.Activations -ne 1 -or
+    $result.invoke_pattern -ne ($pattern -eq 1) -or $result.expand_collapse_pattern -ne ($pattern -eq 2) -or
+    $result.toggle_pattern -ne ($pattern -eq 3)) {throw 'Native pattern did not activate once'}
+}
+foreach ($failure in @('missing','wrong-label','text-toggle','menu-toggle','duplicate','unsupported','uncertain','bound')) {
+ $element=[ClickElement]::new(); $script:window.Elements=@($element)
+ switch($failure) {
+  'missing' {$script:window.Elements=@()}
+  'wrong-label' {$element.Name='private Typst suffix'}
+  'text-toggle' {$element.ControlType='text'}
+  'menu-toggle' {$element.ControlType='menu'}
+  'duplicate' {$script:window.Elements=@($element,[ClickElement]::new())}
+  'unsupported' {$element.Supported=0}
+  'uncertain' {$element.Action.Fail=$true}
+  'bound' {$script:window.Elements=@($element)*4001}
+ }
+ $rejected=$false; try {& $operation | Out-Null} catch {$rejected=$true}
+ $expected=if($failure -eq 'uncertain') {1} else {0}
+ if(!$rejected -or $element.Action.Activations -ne $expected) {throw 'Unsafe or repeated activation'}
+}
+$script:window=$null
+$rejected=$false; try {& $operation | Out-Null} catch {$rejected=$true}
+if(!$rejected) {throw 'Missing owned window accepted'}
+'''
+        with tempfile.TemporaryDirectory() as temporary:
+            test = Path(temporary) / "click-contract.ps1"
+            test.write_text(script, encoding="utf-8")
+            result = subprocess.run([shutil.which("pwsh"), "-NoProfile", "-File", str(test),
+                                     "-Source", str(Path(__file__).with_name("smoke-windows.ps1"))],
+                                    capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_windows_editor_preflight_rejects_a_pid_without_creation_identity(self):
         with patch.object(Scripted, "call", side_effect=[True, 12345]):
