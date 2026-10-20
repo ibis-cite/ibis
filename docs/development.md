@@ -5,7 +5,7 @@ This project favours small, verified, reversible steps.
 ## Flow of work
 
 1. **Issue.** Every change starts from an issue that states the user-visible outcome and acceptance criteria. Its labels, title and milestone follow [Issues, labels and milestones](#issues-labels-and-milestones).
-2. **Branch.** One short-lived branch per issue, named `<type>/<issue>-<short-description>`, e.g. `feat/12-zotero-snapshot-reader`.
+2. **Branch.** One short-lived branch per issue, named `<type>/<issue>-<short-description>`, e.g. `feat/12-zotero-snapshot-reader`, created from `main`; the type matches the pull request title's type. Besides `main` and the bots' `release-please--*` and `dependabot/*` branches, the only long-lived branch is `evidence`, a data branch where CI publishes synthetic native screenshots (`scripts/publish-evidence.mjs`); never open pull requests from it or delete it.
 3. **Test first.** Add a failing test or fixture that captures the acceptance criteria, then implement.
 4. **Check.** `node scripts/check.mjs` must pass locally. It checks GitHub Actions expressions with actionlint before the Rust and desktop checks, and runs every desktop crate test (`cargo test -p ibis-desktop`), which plain `cargo test` skips because the desktop crate is not a default workspace member. A failing check exits 1; a missing tool reports incomplete (exit 2) on every platform. It does not run the web builds that CI's Web interface job checks (`pnpm build`, and `pnpm exec vite build --mode evidence` for the screenshot gallery); run those in `apps/desktop` when you change the build setup.
 5. **Pull request.** Title in Conventional Commits form (`feat: read Zotero libraries while Zotero is closed`), linked to its issue (`Closes #12`). CI runs on Windows, macOS and Linux; when only documentation changed, the Desktop jobs report success without building the native app. A newer push to a pull request or to `main` cancels the older run, so on `main` the newest commit (which contains every earlier merge) is the one tested; merges that change only documentation start no run on `main`. Only `main` saves Rust build caches. The description says what users can now do, how it was verified, and what was not verified.
@@ -50,7 +50,7 @@ One standard for every issue and pull request, open or closed:
 - **Platform** and **source**, only when it applies to some of them: `platform:linux`, `platform:macos`, `platform:windows`, `platform:web`; `source:zotero`, `source:bibtex`.
 - **Status**: `status:ready` (can be picked up), `status:blocked`, `status:needs-design` (a short plan is reviewed before code).
 - **Needs**: `needs:triage` (new finding, not yet placed), `needs:review`, `needs:maintainer` (a reserved decision only).
-- **Specials**: `tracking`, `good first issue`, `help wanted`, `upstream`. Release Please and Dependabot add their own labels (`autorelease: pending`, `dependencies`, `rust`, `github_actions`); leave them alone.
+- **Specials**: `tracking`, `good first issue`, `help wanted`, `upstream`. Release Please and Dependabot add their own labels (`autorelease: pending`, `autorelease: tagged`, `dependencies`); leave them alone. Dependabot pull requests also get `type:chore`.
 
 No other labels. Each family has one colour.
 
@@ -210,11 +210,11 @@ existing licence and advisory policy.
 
 ## Commit messages
 
-[Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `perf:`, `docs:`, `test:`, `refactor:`, `ci:`, `chore:`. Breaking changes use `!` (`feat!:`) or a `BREAKING CHANGE:` footer. Commits are signed off (`git commit -s`).
+[Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `perf:`, `docs:`, `test:`, `ci:`, `build:`, `refactor:`, `chore:`, `revert:`, with no scope (bots may keep theirs, such as `chore(deps):`). Breaking changes use `!` (`feat!:`) or a `BREAKING CHANGE:` footer. Commits are signed off (`git commit -s`).
 
 ## Versions and releases
 
-- [Semantic Versioning](https://semver.org/). While the version is `0.x`, features and fixes raise the patch version (`0.1.3`), and completing a roadmap milestone raises the minor version (`0.2.0`), so version numbers match `ROADMAP.md`. A milestone release is requested by adding `Release-As: 0.N.0` to the body of a commit on `main`.
+- [Semantic Versioning](https://semver.org/). While the version is `0.x`, `0.N.1`, `0.N.2`, … add fixes and small features, and completing a roadmap milestone raises the minor version (`0.2.0`), so version numbers match `ROADMAP.md`. A milestone release is requested by adding `Release-As: 0.N.0` to the body of a commit on `main`.
 - [release-please](https://github.com/googleapis/release-please) keeps a release pull request open on GitHub. Merging it updates `CHANGELOG.md` and the version in `Cargo.toml`, creates the tag and the GitHub release. Versions are never edited by hand.
 - Release builds are produced only by CI from a tag. Preview builds may be published as GitHub pre-releases.
 - Every push to `main` also replaces the rolling `nightly` pre-release, so the newest merged state can always be downloaded and tried.
