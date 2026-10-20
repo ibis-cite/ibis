@@ -143,6 +143,8 @@ function KeysDialog({ bindings, onClose }: { bindings: readonly KeyBinding[]; on
         ref={dialog}
         role="dialog"
         aria-modal="true"
+        // Clicking plain text inside keeps focus here, so Escape still closes it.
+        tabIndex={-1}
         aria-labelledby="keys-title"
         className="keys-dialog"
         onKeyDown={(e) => {
@@ -164,7 +166,7 @@ function KeysDialog({ bindings, onClose }: { bindings: readonly KeyBinding[]; on
           <button type="button" className="quiet-button" onClick={onClose}>{keyText.close}</button>
         </div>
         <div className="keys-scroll" tabIndex={0} role="group" aria-labelledby="keys-title">
-          <table aria-labelledby="keys-title">
+          <table>
             <thead>
               <tr><th scope="col">{keyText.keyColumn}</th><th scope="col">{keyText.actionColumn}</th><th scope="col">{keyText.regionColumn}</th></tr>
             </thead>
@@ -249,6 +251,10 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const keysReturn = useRef<HTMLElement | null>(null);
   // While Alt (⌥) is held, the footer shows the other keys instead of Enter.
   const [altHeld, setAltHeld] = useState(false);
+  // Enter copies only from the search box; elsewhere it presses the focused control.
+  const [searchFocused, setSearchFocused] = useState(false);
+  // autoFocus can happen before React listens for focus events.
+  useEffect(() => setSearchFocused(document.activeElement === input.current), []);
   const [pinned, setPinnedState] = useState(false);
   // When the picker last went away; the search waits a minute, in memory only.
   const hiddenAt = useRef<number | null>(null);
@@ -626,15 +632,18 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     ? [...KEY_TABLE, { region: "system", action: "open", keys: [shortcut.shortcut] }]
     : KEY_TABLE;
   // What Enter does now, from the same state the copy uses; null when it does nothing.
-  const enterAction = chosen.length === 0 ? null
+  // A formatted citation still being made, or one that failed, is not copied.
+  const enterAction = !searchFocused || chosen.length === 0 || (style && (shown === null || shown === "failed")) ? null
     : chosen.length > 1 ? keyText.copySeveralAs(chosen.length, choiceName(format)) : keyText.copyAs(choiceName(format));
   const highlighted = results[active];
-  const shiftEnterAction = highlighted
+  const shiftEnterAction = searchFocused && highlighted
     ? (selected.has(idKey(highlighted.id)) ? keyText.removeFromCitation : keyText.addToCitation) : null;
   const escapeAction = menuOpen ? keyText.closeMenu : query ? keyText.clearSearch : keyText.hide;
 
   return (
     <main
+      onFocus={(e) => setSearchFocused(e.target === input.current)}
+      onBlur={() => setSearchFocused(false)}
       onKeyDown={(e) => {
         if (composing(e)) return;
         if (isKeysShortcut(e)) {

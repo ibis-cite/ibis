@@ -105,7 +105,6 @@ main:hover .pin-button, .pin-button:focus-visible { opacity: 1; }
 [role="menuitem"] kbd { color: var(--muted); }
 .quiet-button, .icon-button { background: var(--clear); border-color: var(--clear); color: var(--muted); }
 .icon-button { font-size: var(--icon-size); padding: var(--icon-padding); }
-.key-hints { color: var(--muted); font-size: var(--hint-size); }
 kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding: var(--hint-padding); border: var(--border-width) solid var(--line); border-radius: var(--hint-radius); margin-inline-start: var(--hint-margin); }
 
 @media (prefers-contrast: more) {
@@ -128,7 +127,6 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
   #search { flex-basis: calc(100% - var(--search-icon-width) - var(--search-gap)); }
   .result-meta { flex-wrap: wrap; }
   .result-authors { white-space: normal; }
-  .key-hints { display: none; }
 }
 /* No animation: reduced-motion users get the same immediate feedback. */
 
@@ -153,7 +151,7 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 /* The keys overlay: one table of every key, above a dimmed picker. */
 .keys-backdrop { position: fixed; inset: 0; z-index: 2; display: grid; place-items: center; padding: var(--space-4); background: color-mix(in srgb, var(--text) 30%, transparent); }
 .keys-dialog { display: flex; flex-direction: column; width: min(36rem, 100%); max-height: 100%; min-height: 0; background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }
-.keys-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4); border-bottom: var(--border-width) solid var(--line); }
+.keys-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); padding-block: var(--space-2); padding-inline: var(--space-4) var(--space-2); border-bottom: var(--border-width) solid var(--line); }
 .keys-heading h2 { margin: 0; font-size: inherit; font-weight: var(--type-strong-weight); }
 .keys-heading button { min-height: var(--control-min-size); }
 .keys-scroll { overflow: auto; min-height: 0; padding: var(--space-2) var(--space-4) var(--space-4); }

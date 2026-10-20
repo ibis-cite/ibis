@@ -1471,7 +1471,11 @@ test("? lists every key in a modal dialog, but a ? typed in the search is text",
   } finally {
     canvas.mockRestore();
   }
-  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  // Clicking plain text focuses the dialog itself, so Escape still reaches it.
+  expect(dialog.getAttribute("tabindex")).toBe("-1");
+  expect(within(dialog).getByRole("table").getAttribute("aria-labelledby")).toBeNull();
+  dialog.focus();
+  fireEvent.keyDown(dialog, { key: "Escape" });
   expect(screen.queryByRole("dialog")).toBeNull();
   expect(document.activeElement).toBe(box);
   expect(box.value).toBe("?");
@@ -1515,4 +1519,48 @@ test("when nothing matches in some Zotero libraries, the picker offers to search
   fireEvent.click(await screen.findByRole("button", { name: "Search all Zotero libraries" }));
   await waitFor(() => expect(chosen).toEqual([["user", { group: 42 }]]));
   expect(screen.queryByRole("button", { name: "Search all Zotero libraries" })).toBeNull();
+});
+
+test("the footer offers Enter only when Enter in the search box would copy", async () => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
+  let release: () => void = () => undefined;
+  let fail = false;
+  backend({
+    search: () => [result("a", "First"), result("b", "Second")],
+    csl_items: async (args) => {
+      await new Promise<void>((resolve) => { release = resolve; });
+      if (fail) throw new Error("synthetic: formatting failed");
+      return JSON.stringify((args.ids as { native_key: string }[]).map((id) =>
+        ({ id: id.native_key, type: "book", title: id.native_key, author: [{ family: "Alpha" }], issued: { "date-parts": [[2021]] } })));
+    },
+    copy_formatted: () => null,
+  });
+  try {
+    render(<App />);
+    await screen.findByText("First");
+    const box = screen.getByLabelText("Search references");
+    expect(footerKeys()).toContain("Enter Copy as Pandoc");
+    // Another control has focus, so Enter would press it instead.
+    const more = screen.getByRole("button", { name: /^More/ });
+    act(() => more.focus());
+    expect(footerKeys()).not.toContain("Enter");
+    act(() => box.focus());
+    expect(footerKeys()).toContain("Enter Copy as Pandoc");
+    // A formatted citation still being made is not offered.
+    fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
+    await screen.findByText("Formatting…");
+    expect(footerKeys()).not.toContain("Enter");
+    await act(async () => release());
+    await waitFor(() => expect(footerKeys()).toContain("Enter Copy as APA"));
+    // Nor is one that failed.
+    fail = true;
+    fireEvent.keyDown(box, { key: "ArrowDown" });
+    await waitFor(() => expect(screen.getByText("Formatting…")).toBeTruthy());
+    await act(async () => release());
+    expect(await screen.findByText(/could not be formatted/)).toBeTruthy();
+    expect(footerKeys()).not.toContain("Enter");
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });
