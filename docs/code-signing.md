@@ -15,6 +15,11 @@ a Windows publisher or remove the first-install warning.
 
 ## Roles and review
 
+The current single maintainer is [Diyanko](https://github.com/diyanko), responsible
+for the committer and reviewer roles and the planned signing approver role.
+Contributors and delegated agents work under the rules below; a delegated merge
+does not authorize signing or publication.
+
 - **Contributors** propose changes through public pull requests and disclose
   AI assistance in commits and pull requests under
   [ADR 0011](adr/0011-ai-contributions.md), as amended by
@@ -28,6 +33,11 @@ a Windows publisher or remove the first-install warning.
   authorizes releases, tags and publication. The maintainer will also approve
   each stable Windows signing request if SignPath Foundation accepts Ibis.
   Agents cannot grant themselves those release or signing approvals.
+
+## Privacy
+
+[PRIVACY.md](../PRIVACY.md) describes local library access, optional update checks
+and installer network use. Ibis does not track users or upload their libraries.
 
 ## Planned Windows signing
 
@@ -44,5 +54,7 @@ Signing will use installers built by the public GitHub Actions release workflow,
 after the checks and release approval described in
 [RELEASING.md](../RELEASING.md). The Windows code signature must be applied
 before creating the Ibis updater signature, so the updater verifies the exact
-installer that will run. The Foundation application, account requirements and
-signing integration remain unfinished until recorded in #299.
+installer that will run. The [Foundation's conditions](https://signpath.org/terms)
+also require multi-factor authentication for team access and enforced product
+name/version metadata. Confirming those requirements, applying and integrating
+signing remain unfinished work in #299; this page does not assert compliance.
