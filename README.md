@@ -4,7 +4,7 @@
 
 Ibis is free, open source and private by design: everything works offline, nothing is tracked, and your libraries are never changed.
 
-> **Status: early development, working towards the first preview (0.1).** The core engine and the `ibis` command line tool read BibTeX/BibLaTeX files. The desktop picker runs from source: a global shortcut (Ctrl+Shift+Y, or Control+Command+R on macOS) opens it, you search a `.bib` library or, while Zotero is open, your Zotero library, automatically pick up changes and copy a citation in Pandoc, BibLaTeX, LaTeX or Typst syntax. Installable preview builds, Zotero group libraries, reading Zotero while it is closed, formatted styles and direct insertion follow. See the [roadmap](ROADMAP.md).
+> **Status: early preview (0.1).** A global shortcut (Ctrl+Shift+Y, or Control+Command+R on macOS) opens the picker. Search a `.bib` library or, while Zotero is open, your Zotero library and any group libraries you choose (More menu), and copy a citation key (Pandoc, BibLaTeX, LaTeX, Typst) or a formatted citation in APA, Chicago, Harvard, IEEE or MLA. Builds are unsigned. First-run setup, more styles, reading Zotero while it is closed and direct insertion follow. See the [roadmap](ROADMAP.md).
 
 ## Planned for 1.0
 
@@ -18,7 +18,16 @@ Ibis is free, open source and private by design: everything works offline, nothi
 
 ## Try the latest build
 
-The newest development build for Windows, macOS and Linux is always at **[Releases → Ibis nightly](https://github.com/ibiscite/ibis/releases/tag/nightly)**. It is rebuilt whenever the app changes, so it can be unfinished; numbered preview releases are steadier. Direct downloads: [Mac with Apple silicon (M1 and later)](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-macOS-Apple-silicon.dmg), [Mac with Intel](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-macOS-Intel.dmg), [Windows](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-Windows-setup.exe), [Linux AppImage](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-Linux.AppImage). It installs as **Ibis Nightly**, separate from the stable Ibis, and can update itself if you allow update checks when it first starts. Builds are not signed yet, so your system may warn before opening them (the release page says what to click). Tell us what works and what you miss through [a problem report or an idea](https://github.com/ibiscite/ibis/issues/new/choose).
+The newest development build for Windows, macOS and Linux is always at **[Releases → nightly](https://github.com/ibiscite/ibis/releases/tag/nightly)**. It is rebuilt whenever the app changes, so it can be unfinished; numbered preview releases are steadier. Direct downloads: [Mac with Apple silicon (M1 and later)](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-macOS-Apple-silicon.dmg), [Mac with Intel](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-macOS-Intel.dmg), [Windows](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-Windows-setup.exe), [Linux AppImage](https://github.com/ibiscite/ibis/releases/download/nightly/Ibis-Linux.AppImage). It installs as **Ibis Nightly**, separate from the stable Ibis, and can update itself if you allow update checks when it first starts. Builds are not signed yet, so your system may warn before opening them (the release page says what to click). Tell us what works and what you miss through [a problem report or an idea](https://github.com/ibiscite/ibis/issues/new/choose).
+
+## Which build to use
+
+- **Releases** (`vX.Y.Z`): the [newest numbered release](https://github.com/ibiscite/ibis/releases) is the steadier choice. Releases before 1.0 are marked as previews.
+- **Nightly**: the [rolling nightly](https://github.com/ibiscite/ibis/releases/tag/nightly) is built from the latest `main`. It installs separately as **Ibis Nightly** and may break.
+
+The menu bar or tray menu shows which build and version you are running. Send questions and feedback to [GitHub Discussions](https://github.com/ibiscite/ibis/discussions), and problems to [the issues](https://github.com/ibiscite/ibis/issues/new/choose).
+
+The first time the picker opens, it offers Zotero if Zotero is open and lists `.bib` files it finds in your Documents, Desktop and Downloads folders, by name only, so you can pick one; **Choose library…** opens any other file.
 
 ## Use with Zotero
 

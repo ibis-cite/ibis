@@ -1,15 +1,16 @@
 //! The open library: loading off the main thread, the search command and
 //! choosing or reloading a library file or the Zotero library.
 
+use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Mutex;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use std::sync::{Arc, Mutex};
 
 use ibis_core::model::{LoadWarning, RecordId, Reference};
 use ibis_core::search::OwnedIndex;
-use ibis_core::settings::{LibrarySetting, ZoteroLibrary};
+use ibis_core::settings::{LibrarySetting, ZoteroLibraries, ZoteroLibrary};
 use ibis_core::source::{SourceError, SourceSnapshot, SourceWatch, load_library_snapshot};
-use ibis_core::zotero::{self, api};
+use ibis_core::zotero::{self, libraries};
 use ibis_zotero_local::LocalZotero;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -20,12 +21,12 @@ use crate::picker::{DialogOpen, show_picker};
 use crate::preferences::SettingsFile;
 use crate::tray::{LibraryMenuItem, library_line};
 
-/// Where references come from: a BibTeX or BibLaTeX file, or a Zotero
-/// library read through Zotero's local API while Zotero runs.
+/// Where references come from: a BibTeX or BibLaTeX file, or Zotero
+/// libraries read through Zotero's local API while Zotero runs.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) enum Source {
     File(PathBuf),
-    Zotero(ZoteroLibrary),
+    Zotero(ZoteroLibraries),
 }
 
 impl From<PathBuf> for Source {
@@ -47,7 +48,7 @@ impl Source {
     fn setting(&self) -> LibrarySetting {
         match self {
             Source::File(path) => LibrarySetting::Bibtex(path.clone()),
-            Source::Zotero(library) => LibrarySetting::Zotero(*library),
+            Source::Zotero(libraries) => LibrarySetting::Zotero(libraries.clone()),
         }
     }
 
@@ -55,8 +56,11 @@ impl Source {
     fn name(&self) -> Option<String> {
         match self {
             Source::File(path) => path.file_name().map(|n| n.to_string_lossy().into_owned()),
-            Source::Zotero(ZoteroLibrary::User) => Some("Zotero library".to_string()),
-            Source::Zotero(ZoteroLibrary::Group(id)) => Some(format!("Zotero group {id}")),
+            Source::Zotero(libraries) => Some(match libraries.libraries() {
+                [ZoteroLibrary::User] => "Zotero library".to_string(),
+                [ZoteroLibrary::Group(id)] => format!("Zotero group {id}"),
+                several => format!("{} Zotero libraries", several.len()),
+            }),
         }
     }
 }
@@ -77,12 +81,13 @@ pub(crate) struct Library {
     pub(crate) opening: bool,
     /// A Zotero change check is running; unlike `opening`, it is not shown.
     checking: bool,
-    pub(crate) index: OwnedIndex,
+    /// Shared so a search can run without holding the library lock.
+    pub(crate) index: Arc<OwnedIndex>,
     pub(crate) warnings: Vec<LoadWarning>,
     /// Exact initial load observation, reused when attaching the watcher.
     snapshot: Option<SourceSnapshot>,
-    /// The Zotero library version loaded, so a refresh rereads only on change.
-    zotero: Option<api::Snapshot>,
+    /// The Zotero library versions loaded, so a refresh rereads only on change.
+    zotero: Option<libraries::Snapshots>,
     /// Neutral failure reason; status derives retention context from the current index.
     /// Automatic refreshes preserve a different rejected choice until the next request.
     pub(crate) error: Option<String>,
@@ -99,6 +104,21 @@ pub(crate) struct Library {
 #[derive(Default)]
 pub(crate) struct LoadRequests(pub(crate) AtomicU64);
 
+/// The newest search each interface page has sent, so a search for a query
+/// the person has already typed past stops early instead of delaying the
+/// newer one. The interface numbers its searches, because commands can start
+/// in a different order than they were sent, and names its page, because a
+/// reloaded page counts from the start again.
+#[derive(Default)]
+pub(crate) struct SearchRequests(Mutex<HashMap<u32, Arc<AtomicU32>>>);
+
+impl SearchRequests {
+    fn newest(&self, page: u32) -> Arc<AtomicU32> {
+        let mut pages = self.0.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+        Arc::clone(pages.entry(page).or_default())
+    }
+}
+
 /// The platform watcher and its worker stop when replaced or the app exits.
 #[derive(Default)]
 pub(crate) struct LibraryWatch(pub(crate) Mutex<Option<SourceWatch>>);
@@ -109,6 +129,8 @@ pub(crate) struct LibraryStatus {
     pub(crate) state: LibraryState,
     /// Whether the requested library is Zotero rather than a file.
     pub(crate) zotero: bool,
+    /// The Zotero libraries requested, in order; empty for a file.
+    pub(crate) zotero_libraries: Vec<ZoteroLibrary>,
     /// A successfully opened snapshot, including a valid empty library.
     pub(crate) has_snapshot: bool,
     /// Requested file name only, including during opening and after failure.
@@ -191,6 +213,10 @@ pub(crate) fn status(library: &Library) -> LibraryStatus {
             library.requested.as_ref().or(library.source.as_ref()),
             Some(Source::Zotero(_))
         ),
+        zotero_libraries: match library.requested.as_ref().or(library.source.as_ref()) {
+            Some(Source::Zotero(chosen)) => chosen.libraries().to_vec(),
+            _ => Vec::new(),
+        },
         has_snapshot: library.source.is_some(),
         name: library
             .requested
@@ -235,31 +261,32 @@ pub(crate) enum Loaded {
     Unchanged,
 }
 
-/// Read the Zotero library, or only check for changes when `previous` is
-/// the version already loaded.
-fn load_zotero(library: ZoteroLibrary, previous: Option<&api::Snapshot>) -> Result<Loaded, String> {
+/// Read the Zotero libraries, or only check for changes when `previous`
+/// holds the versions already loaded.
+fn load_zotero(chosen: ZoteroLibraries, previous: Option<&libraries::Snapshots>) -> Result<Loaded, String> {
     let mut zotero = LocalZotero::default();
-    match api::refresh(&mut zotero, zotero_library(library), previous).map_err(|e| e.to_string())? {
-        api::Refresh::Unchanged => Ok(Loaded::Unchanged),
-        api::Refresh::Loaded { result, snapshot } => {
-            let mut new = candidate(Source::Zotero(library), result);
-            new.zotero = Some(snapshot);
+    let wanted: Vec<zotero::Library> = chosen.libraries().iter().copied().map(zotero_library).collect();
+    match libraries::refresh(&mut zotero, &wanted, previous).map_err(|e| e.to_string())? {
+        libraries::Refresh::Unchanged => Ok(Loaded::Unchanged),
+        libraries::Refresh::Loaded { result, snapshots } => {
+            let mut new = candidate(Source::Zotero(chosen), result);
+            new.zotero = Some(snapshots);
             Ok(Loaded::New(Box::new(new)))
         }
     }
 }
 
-fn load_source(source: Source, reload: bool, previous: Option<api::Snapshot>) -> Result<Loaded, String> {
+fn load_source(source: Source, reload: bool, previous: Option<libraries::Snapshots>) -> Result<Loaded, String> {
     match source {
         Source::File(path) => load_library(path, reload).map(|library| Loaded::New(Box::new(library))),
-        Source::Zotero(library) => load_zotero(library, previous.as_ref().filter(|_| reload)),
+        Source::Zotero(chosen) => load_zotero(chosen, previous.as_ref().filter(|_| reload)),
     }
 }
 
 fn candidate(source: impl Into<Source>, loaded: ibis_core::model::LoadResult) -> Library {
     Library {
         source: Some(source.into()),
-        index: OwnedIndex::new(loaded.references),
+        index: Arc::new(OwnedIndex::new(loaded.references)),
         warnings: loaded.warnings,
         snapshot: None,
         error: None,
@@ -457,11 +484,26 @@ pub(crate) fn choose_library_file(app: &AppHandle) {
     });
 }
 
-/// Read the personal Zotero library from now on.
+/// Read Zotero from now on: the libraries already chosen if Zotero is in
+/// use, otherwise the personal library.
 pub(crate) fn use_zotero_library(app: &AppHandle) {
+    let chosen = app
+        .state::<Mutex<Library>>()
+        .lock()
+        .ok()
+        .and_then(|library| match library.requested.as_ref().or(library.source.as_ref()) {
+            Some(Source::Zotero(chosen)) => Some(chosen.clone()),
+            _ => None,
+        })
+        .unwrap_or_else(|| ZoteroLibrary::User.into());
+    open_zotero(app, chosen);
+}
+
+/// Read these Zotero libraries from now on.
+fn open_zotero(app: &AppHandle, chosen: ZoteroLibraries) {
     // Start first: the picker then sees a request in progress and does not
     // start a second check of Zotero.
-    start_open(app, Source::Zotero(ZoteroLibrary::User), true);
+    start_open(app, Source::Zotero(chosen), true);
     show_picker(app);
 }
 
@@ -495,7 +537,10 @@ pub(crate) fn refresh_zotero(app: &AppHandle) {
 /// Start checking the open Zotero library for changes without showing it:
 /// the picker keeps its state until Zotero has changed or cannot be reached.
 /// The check is numbered like any request, so a newer choice discards it.
-fn begin_check(library: &Mutex<Library>, requests: &LoadRequests) -> Option<(u64, Source, Option<api::Snapshot>)> {
+fn begin_check(
+    library: &Mutex<Library>,
+    requests: &LoadRequests,
+) -> Option<(u64, Source, Option<libraries::Snapshots>)> {
     let mut library = library.lock().ok()?;
     let source = library.source.clone()?;
     // An installed library has no separate request; a different request is a
@@ -536,6 +581,7 @@ pub(crate) fn current_status(app: &AppHandle) -> LibraryStatus {
         .unwrap_or_else(|_| LibraryStatus {
             state: LibraryState::Error,
             zotero: false,
+            zotero_libraries: Vec::new(),
             has_snapshot: false,
             name: None,
             snapshot_name: None,
@@ -707,6 +753,42 @@ pub(crate) fn use_zotero(app: AppHandle) {
     use_zotero_library(&app);
 }
 
+/// Read these Zotero libraries together from now on, in this order; the
+/// result arrives as `library:changed`. An empty list or a repeated library
+/// is refused.
+#[tauri::command]
+#[specta::specta]
+pub(crate) fn use_zotero_libraries(app: AppHandle, libraries: Vec<ZoteroLibrary>) -> Result<(), String> {
+    let chosen = ZoteroLibraries::new(libraries).ok_or("Choose at least one Zotero library, each once")?;
+    // Chosen from the open picker: showing it again would move focus out of
+    // the menu.
+    start_open(&app, Source::Zotero(chosen), true);
+    Ok(())
+}
+
+/// A Zotero group library the user can choose.
+#[derive(Clone, Serialize, specta::Type)]
+pub(crate) struct ZoteroGroup {
+    pub(crate) id: u64,
+    pub(crate) name: String,
+}
+
+/// The group libraries Zotero knows, while Zotero runs.
+#[tauri::command]
+#[specta::specta]
+pub(crate) async fn zotero_groups() -> Result<Vec<ZoteroGroup>, String> {
+    tauri::async_runtime::spawn_blocking(|| libraries::groups(&mut LocalZotero::default()))
+        .await
+        .map_err(|_| "listing Zotero groups stopped unexpectedly".to_string())?
+        .map(|groups| {
+            groups
+                .into_iter()
+                .map(|g| ZoteroGroup { id: g.id, name: g.name })
+                .collect()
+        })
+        .map_err(|e| e.to_string())
+}
+
 /// Open the current library again; the result arrives as `library:changed`.
 #[tauri::command]
 #[specta::specta]
@@ -722,34 +804,72 @@ pub(crate) fn library_status(app: AppHandle) -> LibraryStatus {
 }
 
 /// Search the open library. An empty query returns no results. Async so it
-/// runs off the main thread.
+/// runs off the main thread. `page` identifies the interface page and
+/// `request` increases with every search it sends; a search older than that
+/// page's newest one returns no results, which the interface ignores because
+/// it belongs to an outdated query.
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn search(
     query: String,
     limit: usize,
+    page: u32,
+    request: u32,
     library: State<'_, Mutex<Library>>,
+    requests: State<'_, SearchRequests>,
 ) -> Result<Vec<SearchResult>, String> {
-    let library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
-    if library.source.is_none() {
-        return Err(match &library.error {
-            Some(error) => format!("the library could not be opened: {error}"),
-            None => "no library is open".to_string(),
-        });
-    }
-    Ok(library
-        .index
-        .search(&query, limit.min(200))
+    // The library lock is held only to take the index.
+    let index = {
+        let library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
+        if library.source.is_none() {
+            return Err(match &library.error {
+                Some(error) => format!("the library could not be opened: {error}"),
+                None => "no library is open".to_string(),
+            });
+        }
+        Arc::clone(&library.index)
+    };
+    Ok(search_newest(&index, &query, limit, request, &requests.newest(page)))
+}
+
+/// Run a search unless a newer request has started, stopping if one does.
+fn search_newest(index: &OwnedIndex, query: &str, limit: usize, request: u32, newest: &AtomicU32) -> Vec<SearchResult> {
+    newest.fetch_max(request, Ordering::SeqCst);
+    let outdated = || newest.load(Ordering::SeqCst) > request;
+    index
+        .search_until(query, limit.min(200), &outdated)
+        .unwrap_or_default()
         .into_iter()
         .map(|hit| {
             let matched = hit.matched.iter().map(|m| format!("{m:?}").to_lowercase()).collect();
             SearchResult::from(hit.reference, matched)
         })
-        .collect())
+        .collect()
 }
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn an_older_search_stops_even_if_it_starts_after_a_newer_one() {
+        let refs = ibis_core::bibtex::load_str("t", "@article{a,title={Sleep},year={2020}}").references;
+        let index = OwnedIndex::new(refs);
+        let newest = AtomicU32::new(0);
+        assert_eq!(search_newest(&index, "sleep", 20, 2, &newest).len(), 1);
+        assert!(search_newest(&index, "sleep", 20, 1, &newest).is_empty());
+        assert_eq!(search_newest(&index, "sleep", 20, 2, &newest).len(), 1);
+        assert_eq!(search_newest(&index, "sleep", 20, 3, &newest).len(), 1);
+    }
+
+    #[test]
+    fn a_reloaded_page_counts_its_searches_afresh() {
+        let refs = ibis_core::bibtex::load_str("t", "@article{a,title={Sleep},year={2020}}").references;
+        let index = OwnedIndex::new(refs);
+        let requests = SearchRequests::default();
+        assert_eq!(search_newest(&index, "sleep", 20, 500, &requests.newest(1)).len(), 1);
+        assert_eq!(search_newest(&index, "sleep", 20, 1, &requests.newest(2)).len(), 1);
+        assert!(search_newest(&index, "sleep", 20, 499, &requests.newest(1)).is_empty());
+    }
+
     use super::*;
 
     #[test]
@@ -1250,14 +1370,34 @@ mod tests {
     }
 
     #[test]
+    fn several_zotero_libraries_are_named_listed_and_saved_in_order() {
+        let chosen = ZoteroLibraries::new(vec![ZoteroLibrary::Group(7), ZoteroLibrary::User])
+            .unwrap_or_else(|| panic!("valid choice"));
+        let source = Source::Zotero(chosen.clone());
+        assert_eq!(source.name().as_deref(), Some("2 Zotero libraries"));
+        assert_eq!(source.setting(), LibrarySetting::Zotero(chosen.clone()));
+        assert_eq!(Source::from(source.setting()), source);
+
+        let library = Mutex::new(Library::default());
+        let requests = LoadRequests::default();
+        let (_, _, opening) =
+            begin_open(&library, &requests, source).unwrap_or_else(|| panic!("the choice should start"));
+        assert!(opening.zotero);
+        assert_eq!(opening.zotero_libraries, [ZoteroLibrary::Group(7), ZoteroLibrary::User]);
+        let file = candidate(PathBuf::from("refs.bib"), ibis_core::bibtex::load_str("synthetic", ""));
+        assert!(status(&file).zotero_libraries.is_empty());
+    }
+
+    #[test]
     fn a_zotero_library_is_named_without_paths_and_keeps_its_references_when_unchanged_or_unreachable() {
         let library = Mutex::new(candidate(
-            Source::Zotero(ZoteroLibrary::Group(7)),
+            Source::Zotero(ZoteroLibrary::Group(7).into()),
             ibis_core::bibtex::load_str("synthetic", "@misc{kept, title={Kept}}"),
         ));
         let requests = LoadRequests::default();
-        let (request, reload, refreshing) = begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7)))
-            .unwrap_or_else(|| panic!("the refresh should start"));
+        let (request, reload, refreshing) =
+            begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7).into()))
+                .unwrap_or_else(|| panic!("the refresh should start"));
         assert!(reload);
         assert!(refreshing.zotero);
         assert_eq!(refreshing.state, LibraryState::Reloading);
@@ -1271,7 +1411,7 @@ mod tests {
         if let Ok(mut library) = library.lock() {
             library.note = Some(saved.to_string());
         }
-        let (request, _, _) = begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7)))
+        let (request, _, _) = begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7).into()))
             .unwrap_or_else(|| panic!("the refresh should start"));
         let kept = install_loaded(&library, &requests, request, Ok(Loaded::Unchanged))
             .unwrap_or_else(|| panic!("the refresh is current"));
@@ -1281,7 +1421,7 @@ mod tests {
             "an unchanged check keeps the warning"
         );
 
-        let (request, _, _) = begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7)))
+        let (request, _, _) = begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7).into()))
             .unwrap_or_else(|| panic!("the refresh should start"));
         let offline = install_loaded(
             &library,
@@ -1296,14 +1436,14 @@ mod tests {
             Some("Zotero is not running, or it is not accepting connections; keeping the last loaded references")
         );
         assert_eq!(
-            Source::Zotero(ZoteroLibrary::User).name().as_deref(),
+            Source::Zotero(ZoteroLibrary::User.into()).name().as_deref(),
             Some("Zotero library")
         );
     }
 
     #[test]
     fn a_zotero_change_check_is_not_shown_and_a_newer_choice_discards_it() {
-        let zotero = Source::Zotero(ZoteroLibrary::User);
+        let zotero = Source::Zotero(ZoteroLibrary::User.into());
         let library = Mutex::new(Library::default());
         let requests = LoadRequests::default();
         // Open Zotero the ordinary way, as at start or after "Use Zotero".
@@ -1350,7 +1490,7 @@ mod tests {
 
     #[test]
     fn a_zotero_choice_that_has_not_opened_yet_is_what_reload_and_the_picker_retry() {
-        let zotero = Source::Zotero(ZoteroLibrary::User);
+        let zotero = Source::Zotero(ZoteroLibrary::User.into());
         let file = Source::File(PathBuf::from("synthetic.bib"));
         // Zotero was closed when Ibis started: nothing opened yet.
         let library = Mutex::new(Library::default());
@@ -1376,7 +1516,7 @@ mod tests {
         assert_eq!(zotero_to_check(&over_zotero), None);
 
         assert!(
-            !retry(&over_zotero, Source::Zotero(ZoteroLibrary::User)).1,
+            !retry(&over_zotero, Source::Zotero(ZoteroLibrary::User.into())).1,
             "rereading saves nothing"
         );
         let loaded_file = candidate(file, ibis_core::bibtex::load_str("synthetic", ""));

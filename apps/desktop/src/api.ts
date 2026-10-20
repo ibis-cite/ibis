@@ -3,12 +3,17 @@ import { copyFormatLabels } from "./messages";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { commands, type KeyFormat, type LibraryStatus } from "./bindings";
 
-export type { Copied, Density, LibraryStatus, PickerPreferences, RecordId, SearchResult, ShortcutStatus } from "./bindings";
+export type { Sources } from "./bindings";
+export type {
+  Copied, Density, LibraryStatus, PickerPreferences, RecordId, SearchResult, ShortcutStatus, ZoteroGroup, ZoteroLibrary,
+} from "./bindings";
 export type CopyFormat = KeyFormat;
 
 export const {
   chooseLibrary,
   useZotero,
+  useZoteroLibraries,
+  zoteroGroups,
   reloadLibrary,
   libraryStatus,
   hidePicker,
@@ -21,11 +26,19 @@ export const {
   copyFormatted,
   pickerPreferences,
   setPickerPreferences,
+  findSources,
+  openFoundLibrary,
 } = commands;
 
-// This UI default is not part of the Rust command signature.
+// The limit default, page and request number are not part of the UI's API:
+// each search is numbered so the app can stop searches for outdated queries,
+// and the page is named because a reloaded page counts from the start again.
+const searchPage = crypto.getRandomValues(new Uint32Array(1))[0] ?? 0;
+let searchRequest = 0;
+
 export function search(query: string, limit = 20) {
-  return commands.search(query, limit);
+  searchRequest += 1;
+  return commands.search(query, limit, searchPage, searchRequest);
 }
 
 /** Called whenever the picker is shown by the global shortcut or a second launch. */

@@ -10,6 +10,7 @@ export const operationFailures = {
   shortcut: "Ibis could not check the shortcut. Open Ibis from the menu bar or tray.",
   choose: "The file chooser did not open. Try again.",
   zotero: "Ibis could not start reading Zotero. Try again.",
+  zoteroGroups: "Ibis could not list your Zotero groups. Check that Zotero is open, then try again.",
   reload: "Ibis could not reload your library. Choose the file again.",
   hide: "Ibis could not hide this window. Try again.",
   pin: "Ibis could not change the pin. Try again.",
@@ -17,6 +18,24 @@ export const operationFailures = {
   quit: "Ibis could not quit. Try again.",
   pickerEvents: "Ibis could not focus the search box. Restart Ibis to try again.",
   libraryEvents: "Your library may not update automatically. Use Reload, or restart Ibis.",
+  findSources: "Ibis could not look for libraries on this computer. Choose a file instead.",
+  openFound: "That file could not be opened from the list. Pick it again from the new list.",
+} as const;
+
+export const setupText = {
+  looking: "Looking for Zotero and .bib files…",
+  zoteroAccessOff:
+    "Zotero is open, but it does not let other apps read it yet. In Zotero, open Settings, then Advanced, and turn on " +
+    "“Allow other applications on this computer to communicate with Zotero”.",
+  foundFiles: "Found on this computer",
+  inFolder: "in",
+  openFound: (name: string, folder: string) => (folder ? `Use ${name} in ${folder}` : `Use ${name}`),
+  cutShort: "Some folders were too large to search fully. Use Choose library… if your file is not listed.",
+  lookAgain: "Look again",
+  nothingFound: "No Zotero or .bib files found nearby. Use Choose library… to pick a file.",
+  found: (files: number, zotero: boolean) =>
+    [zotero ? "Zotero is open, so Use Zotero can read your library." : "",
+      files ? `${files} .bib ${files === 1 ? "file" : "files"} found.` : ""].filter(Boolean).join(" "),
 } as const;
 
 export const densityNames = {
@@ -78,6 +97,10 @@ export const pickerText = {
   density: (name: string) => `Rows: ${name}`,
   densityTitle: "Show less or more of each reference",
   largerText: "Larger text",
+  zoteroLibraries: "Zotero libraries",
+  myLibrary: "My Library",
+  groupLibrary: (id: number) => `Group ${id}`,
+  keepOneLibrary: "Keep at least one Zotero library on.",
   keyHints: { copy: " Copy · ", add: " Add · ", hide: " Hide" },
   resultCount: (count: number) => `${count} ${count === 1 ? "result" : "results"}`,
   selectionCount: (count: number) => `${count} ${count === 1 ? "reference" : "references"} selected for citation`,
