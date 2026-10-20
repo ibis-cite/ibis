@@ -29,11 +29,13 @@ main {
 #search::placeholder { color: var(--muted); }
 /* Windows and Linux search in a framed 16 px text box with the icon inside it.
    The icon overlaps the box's start padding, so the flex row never changes. */
-:root[data-platform="windows"] .search-bar svg, :root[data-platform="linux"] .search-bar svg { position: relative; z-index: 1; margin-inline: var(--space-3) calc(-1 * (var(--search-icon-width) + var(--space-3) + var(--search-gap))); }
+/* Only the search glyph (the header's direct child), never the pin icon inside its button. */
+:root[data-platform="windows"] .search-bar > svg, :root[data-platform="linux"] .search-bar > svg { position: relative; z-index: 1; margin-inline: var(--space-3) calc(-1 * (var(--search-icon-width) + var(--space-3) + var(--search-gap))); }
 :root[data-platform="windows"] #search, :root[data-platform="linux"] #search { padding: var(--field-padding); padding-inline-start: calc(var(--search-icon-width) + 2 * var(--space-3)); border-radius: var(--field-radius); background: var(--field-background); }
-/* Windows: an underline that turns accent on focus is the focus indicator. */
+/* Windows: an underline that turns accent on focus. The --focus ring stays as
+   well, because a bright system accent alone can fall far below 3:1. */
 :root[data-platform="windows"] #search { border: var(--border-width) solid var(--field-edge); border-bottom-color: var(--line); }
-:root[data-platform="windows"] #search:focus { outline: none; border-bottom-color: var(--accent); box-shadow: inset 0 calc(-1 * var(--border-width)) var(--accent); }
+:root[data-platform="windows"] #search:focus { outline-offset: var(--focus-offset); border-bottom-color: var(--accent); box-shadow: inset 0 calc(-1 * var(--border-width)) var(--accent); }
 /* Linux: a framed entry with the focus ring drawn on its edge. */
 :root[data-platform="linux"] #search { border: var(--border-width) solid var(--clear); outline-offset: 0; }
 .visually-hidden { position: absolute; width: var(--hidden-size); height: var(--hidden-size); padding: 0; margin: var(--hidden-margin); overflow: hidden; clip-path: var(--hidden-clip); white-space: nowrap; }
@@ -57,12 +59,13 @@ main {
 /* The selected (active) row follows the platform: filled accent on macOS,
    soft grey with an accent pill on Windows, accent tint on Linux. A row added
    to the citation keeps a scarlet frame and key, so the two never look alike. */
-[role="option"][data-active] { background: var(--row-active-background); color: var(--row-active-text); }
+[role="option"][data-active] { background: var(--row-active-background); color: var(--row-active-text); border-color: var(--row-active-edge); }
 [data-active] .result-meta, [data-active] .result-year, [data-active] .result-why { color: var(--row-active-muted); }
 :root[data-platform="windows"] [role="option"][data-active]::before { content: ""; position: absolute; inset-inline-start: 0; top: 50%; width: var(--pill-width); height: var(--pill-height); margin-top: calc(var(--pill-height) / -2); border-radius: var(--pill-width); background: var(--accent); }
-[role="option"][data-citation-selected] { border-color: var(--citation); }
+/* An inset ring marks an added row whatever its fill, active or not, in every theme. */
+[role="option"][data-citation-selected] { border-color: var(--citation); box-shadow: inset 0 0 0 var(--focus-width) var(--citation); }
 [data-citation-selected]:not([data-active]) .result-key { color: var(--citation); }
-:root:not([data-platform="windows"]):not([data-platform="linux"]) [role="option"][data-active][data-citation-selected] { border-color: var(--row-active-text); }
+[role="option"][data-active][data-citation-selected] { box-shadow: inset 0 0 0 var(--focus-width) var(--row-active-text); }
 .empty-state { color: var(--muted); text-align: center; padding: var(--empty-padding); }
 .empty-state p:first-child { color: var(--text); font-weight: var(--type-strong-weight); }
 .empty-hint { font-size: var(--metadata-size); }
@@ -128,7 +131,6 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 
   [role="option"][data-active] { border-color: var(--active-edge); border-width: var(--contrast-border-width); }
   :root[data-platform] #search { border-color: var(--line); }
-  :root[data-platform="windows"] #search:focus { outline: var(--focus-width) solid var(--focus); }
 }
 @media (forced-colors: active) {
 

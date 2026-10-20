@@ -1,4 +1,8 @@
 import { afterEach, expect, test, vi } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
+import { App } from "./App";
+import { galleryProvider, galleryStates } from "./gallery-fixtures";
 import { platformOf, setPlatform } from "./nativeAppearance";
 
 // Vitest can load these existing runtime builtins without a Node-types dependency.
@@ -9,7 +13,7 @@ const tokens = readFileSync(new FileURL("./tokens.css", import.meta.url), "utf8"
 const styles = readFileSync(new FileURL("./styles.css", import.meta.url), "utf8");
 const corners = readFileSync(new FileURL("../src-tauri/src/native_corners.rs", import.meta.url), "utf8");
 
-afterEach(() => { delete document.documentElement.dataset.platform; });
+afterEach(() => { cleanup(); clearMocks(); delete document.documentElement.dataset.platform; });
 
 /** Every declaration block whose selector list is, or includes, `selector`, joined. */
 function rules(css: string, selector: string): string {
@@ -102,4 +106,69 @@ test("meta text on the Windows grey row stays at 4.5:1 in both themes", () => {
     const [lighter, darker] = [luminance(muted[mode]!), luminance(row)].sort((a, b) => b - a);
     expect((lighter! + .05) / (darker! + .05)).toBeGreaterThanOrEqual(4.5);
   }
+});
+
+test("an added row keeps a ring that does not depend on the fill, active or not, in every theme", () => {
+  const ring = /box-shadow:\s*inset 0 0 0 var\(--focus-width\) var\((--[\w-]+)\)/;
+  expect(rules(styles, '[role="option"][data-citation-selected]').match(ring)?.[1]).toBe("--citation");
+  // On the active row the ring takes the row's own text colour, so it shows on any fill.
+  const activeAdded = rules(styles, '[role="option"][data-active][data-citation-selected]');
+  expect(activeAdded.match(ring)?.[1]).toBe("--row-active-text");
+  expect(rules(styles, '[role="option"][data-active]')).not.toMatch(/box-shadow/);
+  // The ring applies on every platform, and high contrast never removes it.
+  expect(styles).not.toMatch(/data-platform[^{]*\[data-active\]\[data-citation-selected\]/);
+  for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
+    const block = styles.slice(styles.indexOf(media), styles.indexOf("}\n}", styles.indexOf(media)));
+    expect(block, media).not.toMatch(/box-shadow:\s*none/);
+  }
+  // Under contrast the active fill is the Highlight pair, so the ring is HighlightText.
+  const contrast = tokens.slice(tokens.indexOf("@media (prefers-contrast: more)"));
+  expect(contrast).toMatch(/--row-active-text:\s*HighlightText/);
+});
+
+test("the Linux active row has a system fallback without color-mix and a 1 px accent edge", () => {
+  const linux = rules(tokens, ':root[data-platform="linux"]');
+  // Outside @supports: the plain system pair, never color-mix.
+  const plain = tokens.slice(0, tokens.indexOf("@supports (background: color-mix"));
+  const linuxPlain = rules(plain, ':root[data-platform="linux"]');
+  expect(linuxPlain).toMatch(/--row-active-background:\s*Highlight;/);
+  expect(linuxPlain).toMatch(/--row-active-text:\s*HighlightText;/);
+  expect(linuxPlain).not.toMatch(/:\s*color-mix/);
+  expect(linux).toMatch(/--row-active-edge:\s*var\(--accent\)/);
+  // The tint sits inside the color-mix @supports block.
+  const supports = tokens.slice(tokens.indexOf("@supports (background: color-mix"));
+  const tinted = rules(supports.slice(0, supports.indexOf("}\n}") + 3), ':root[data-platform="linux"]');
+  expect(tinted).toMatch(/--row-active-background:\s*color-mix\(in srgb, var\(--accent\) 15%/);
+  expect(rules(styles, '[role="option"][data-active]')).toMatch(/border-color:\s*var\(--row-active-edge\)/);
+  expect(rules(tokens, ":root")).toMatch(/--row-active-edge:\s*var\(--clear\)/);
+});
+
+test("the framed-box icon overlap moves only the search glyph, never the pin icon", async () => {
+  mockIPC(() => { throw new Error("Native commands must not run here"); }, { shouldMockEvents: true });
+  const state = galleryStates.find((candidate) => candidate.id === "many-results")!;
+  render(<App {...galleryProvider(state)} />);
+  await screen.findAllByRole("option");
+  const searchIcon = document.querySelector(".search-bar")!.firstElementChild;
+  const pinIcon = document.querySelector(".pin-button svg");
+  expect(searchIcon?.tagName.toLowerCase()).toBe("svg");
+  expect(pinIcon).toBeTruthy();
+  const overlap = [...styles.matchAll(/([^{}]+)\{[^{}]*margin-inline:[^{}]*search-icon-width[^{}]*\}/g)];
+  expect(overlap).toHaveLength(1);
+  const selector = overlap[0]![1]!.replace(/\/\*[^]*?\*\//g, "").trim();
+  for (const platform of ["windows", "linux"]) {
+    setPlatform(platform === "windows" ? "Win32" : "Linux x86_64");
+    expect([...document.querySelectorAll(selector)], platform).toEqual([searchIcon]);
+    expect(pinIcon!.matches(selector), platform).toBe(false);
+  }
+});
+
+test("the Windows search keeps the contrast-safe focus ring beside the accent underline", () => {
+  const focus = rules(styles, ':root[data-platform="windows"] #search:focus');
+  expect(focus).toMatch(/var\(--accent\)/);
+  expect(focus).not.toMatch(/outline(-style|-width)?:\s*(none|0)/);
+  // No platform rule anywhere removes the focus outline from the search box.
+  for (const [, head, body] of styles.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (head!.includes("#search")) expect(body, head).not.toMatch(/outline(-style|-width)?:\s*(none|0)\b/);
+  }
+  expect(rules(styles, ":focus-visible")).toMatch(/outline:\s*var\(--focus-width\) solid var\(--focus\)/);
 });

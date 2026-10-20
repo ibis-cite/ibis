@@ -147,6 +147,7 @@
   --row-active-background: var(--selected-background);
   --row-active-text: var(--selected-text);
   --row-active-muted: currentColor;
+  --row-active-edge: var(--clear);
   --gallery-padding: 1rem;
   --gallery-gap: 1.5rem;
   --gallery-heading-size: 1.5rem;
@@ -180,12 +181,14 @@
 }
 :root[data-platform="linux"] {
   --window-radius: 14px; --field-radius: 9px;
-  --row-active-background: color-mix(in srgb, var(--accent) 15%, var(--surface)); --row-active-text: var(--text); --row-active-muted: var(--text);
+  /* Without color-mix (older WebKitGTK) the system pair keeps the row visible. */
+  --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; --row-active-edge: var(--accent);
 }
 
 
 @supports (background: color-mix(in srgb, white 50%, black)) {
   :root { --search-active-border: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+  :root[data-platform="linux"] { --row-active-background: color-mix(in srgb, var(--accent) 15%, var(--surface)); --row-active-text: var(--text); --row-active-muted: var(--text); }
 }
 
 @media (prefers-contrast: more) {
