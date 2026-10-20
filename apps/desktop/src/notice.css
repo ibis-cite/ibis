@@ -135,3 +135,12 @@
 .gallery-notice[data-platform="macos"] { top: 0; }
 .gallery-notice[data-platform="windows"] { bottom: 0; inset-inline-start: auto; width: 26.25rem; height: 7rem; }
 .gallery-notice[data-platform="linux"] { bottom: 1.75rem; margin-inline: auto; width: 22.5rem; height: 2.75rem; }
+
+/* Linux without a compositor: an opaque window, so the toast fills it with square corners. */
+:root.notice-window[data-surface="opaque"],
+:root.notice-window[data-surface="opaque"] body { background: #3a3a3e; }
+:root.notice-window[data-surface="opaque"] .copied-notice { border-radius: 0; }
+@media (prefers-contrast: more), (forced-colors: active), (prefers-reduced-transparency: reduce) {
+  :root.notice-window[data-surface="opaque"],
+  :root.notice-window[data-surface="opaque"] body { background: Canvas; }
+}

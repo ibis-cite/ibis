@@ -19,8 +19,12 @@ use crate::placement::{Area, display};
 pub(crate) const LABEL: &str = "notice";
 /// The window title, which screen readers may read; never the citation.
 const TITLE: &str = "Ibis notice";
-/// As long as the prototype shows it, ending with a 200 ms fade drawn by the page.
-const SHOWN_FOR: Duration = Duration::from_millis(2_800);
+/// As long as the prototype shows it, ending with a 200 ms fade drawn by the
+/// page, plus a little time for the page to receive its text.
+const SHOWN_FOR: Duration = Duration::from_millis(2_900);
+/// A new window's timer starts when its page has loaded; this one takes it
+/// away if the page never loads.
+const LOAD_LIMIT: Duration = Duration::from_millis(8_000);
 /// The notice names what was copied on one line; longer text is cut short.
 const TEXT_LIMIT: usize = 200;
 
@@ -131,7 +135,7 @@ fn show(app: &AppHandle, text: String) {
         *current = Some(text.clone());
     }
     let showing = notice.showing.fetch_add(1, Ordering::SeqCst).wrapping_add(1);
-    let shown = {
+    let timer = {
         let Ok(_creating) = notice.window.lock() else {
             return;
         };
@@ -144,17 +148,21 @@ fn show(app: &AppHandle, text: String) {
                 }
                 report(window.emit_to(LABEL, "notice:show", &text), NativeIssue::Notice);
                 present(app);
-                true
+                SHOWN_FOR
             }
-            None => create(app).is_some(),
+            // Its page starts the usual timer once it has loaded.
+            None if create(app).is_some() => LOAD_LIMIT,
+            None => return,
         }
     };
-    if !shown {
-        return;
-    }
+    dismiss_after(app, showing, timer);
+}
+
+/// Take the notice away after `delay`, unless a later notice replaced it.
+fn dismiss_after(app: &AppHandle, showing: u64, delay: Duration) {
     let handle = app.clone();
     let timer = std::thread::Builder::new().name("ibis-notice".into()).spawn(move || {
-        std::thread::sleep(SHOWN_FOR);
+        std::thread::sleep(delay);
         if handle.state::<Notice>().showing.load(Ordering::SeqCst) == showing {
             dismiss(&handle);
         }
@@ -221,7 +229,14 @@ fn create(app: &AppHandle) -> Option<()> {
         .iter()
         .find(|window| window.label == "main")
         .and_then(|window| window.additional_browser_args.clone());
-    let mut builder = WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App("notice.html".into()))
+    let rounded = rounded_surface();
+    // The page squares its corners and fills the window when it cannot be transparent.
+    let page = if rounded {
+        "notice.html"
+    } else {
+        "notice.html?surface=opaque"
+    };
+    let mut builder = WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App(page.into()))
         .title(TITLE)
         .inner_size(width, height)
         .min_inner_size(width, height)
@@ -245,22 +260,98 @@ fn create(app: &AppHandle) -> Option<()> {
     if let Some(args) = browser_args.as_deref() {
         builder = builder.additional_browser_args(args);
     }
-    // Transparent everywhere, so each notice keeps its rounded shape; the
-    // page draws an opaque surface. Without a compositor (some X11 window
-    // managers) Linux shows dark corners instead.
-    builder = builder.transparent(true);
-    // Windows and Linux show it as it is created: tao shows a window built
-    // unfocused without activating it, which a later show would not do.
-    // macOS shows it once it is a non-activating panel.
-    builder = builder.visible(!cfg!(target_os = "macos"));
+    // Transparent where something composites it, so the notice keeps its
+    // rounded shape over an opaque surface the page draws. Without a
+    // compositor (plain X11) a transparent window maps black, so it is an
+    // opaque square toast in the toast's colour from the first frame.
+    builder = if rounded {
+        builder.transparent(true)
+    } else {
+        builder.background_color(tauri::webview::Color(0x3a, 0x3a, 0x3e, 0xff))
+    };
+    // Windows shows it as it is created: tao shows a window built unfocused
+    // without activating it, which a later show would not do. macOS shows it
+    // once it is a non-activating panel.
+    // Linux maps it once its page has drawn, so no empty (black) frame shows
+    // first; GTK never focuses it, since it does not accept focus.
+    builder = builder.visible(cfg!(target_os = "windows"));
+    // The page fades in once loaded, so the visible time counts from then.
+    builder = builder.on_page_load(|window, payload| {
+        if payload.event() != tauri::webview::PageLoadEvent::Finished {
+            return;
+        }
+        #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+        {
+            report(window.show(), NativeIssue::Notice);
+            report(window.set_ignore_cursor_events(true), NativeIssue::Notice);
+        }
+        let app = window.app_handle();
+        let showing = app.state::<Notice>().showing.load(Ordering::SeqCst);
+        dismiss_after(app, showing, SHOWN_FOR);
+    });
     let window = checked(builder.build(), NativeIssue::Notice)?;
     #[cfg(target_os = "macos")]
     macos::configure(app, &window);
     // Clicks pass through, including its transparent margins, so it never
     // blocks what is under it (macOS does this in `configure`).
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "windows")]
     report(window.set_ignore_cursor_events(true), NativeIssue::Notice);
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    let _ = window;
     Some(())
+}
+
+/// Whether the window can be transparent with rounded corners: always on
+/// macOS and Windows, which composite every window; on Linux only under
+/// Wayland or an X11 compositing manager.
+fn rounded_surface() -> bool {
+    #[cfg(any(target_os = "macos", target_os = "windows"))]
+    return true;
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        let wayland = std::env::var("WAYLAND_DISPLAY").ok();
+        let backend = std::env::var("GDK_BACKEND").ok();
+        let on_wayland = uses_wayland(wayland.as_deref(), backend.as_deref());
+        linux_rounded(on_wayland, x11_composited)
+    }
+}
+
+/// GTK uses Wayland when a Wayland display is present, unless GDK_BACKEND
+/// asks for X11 first.
+#[cfg(any(not(any(target_os = "macos", target_os = "windows")), test))]
+fn uses_wayland(wayland_display: Option<&str>, gdk_backend: Option<&str>) -> bool {
+    wayland_display.is_some_and(|display| !display.is_empty())
+        && !gdk_backend.is_some_and(|backend| backend.trim_start().starts_with("x11"))
+}
+
+/// Every Wayland compositor composites. On X11 only a running compositing
+/// manager does; an unknown answer keeps the opaque window, which is always
+/// drawn correctly.
+#[cfg(any(not(any(target_os = "macos", target_os = "windows")), test))]
+fn linux_rounded(wayland: bool, x11_composited: impl FnOnce() -> Result<bool, ()>) -> bool {
+    wayland || x11_composited() == Ok(true)
+}
+
+/// A compositing manager owns the `_NET_WM_CM_S<screen>` selection (EWMH),
+/// which is what GDK's own `is_composited` checks on X11.
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+fn x11_composited() -> Result<bool, ()> {
+    use x11rb::protocol::xproto::ConnectionExt;
+    let (connection, screen) = x11rb::connect(None).map_err(|_| ())?;
+    let name = format!("_NET_WM_CM_S{screen}");
+    let atom = connection
+        .intern_atom(false, name.as_bytes())
+        .map_err(|_| ())?
+        .reply()
+        .map_err(|_| ())?
+        .atom;
+    let owner = connection
+        .get_selection_owner(atom)
+        .map_err(|_| ())?
+        .reply()
+        .map_err(|_| ())?
+        .owner;
+    Ok(owner != x11rb::NONE)
 }
 
 /// Bring a kept notice back to the front without activating Ibis.
@@ -430,6 +521,20 @@ mod tests {
         // The toast's 28-point margin is 42 pixels at 150%.
         let linux = notice_corner(Platform::Linux, hidpi, 1.5);
         assert_eq!(linux, (1920.0 + (3840.0 - 540.0) / 2.0, 2112.0 - 66.0 - 42.0));
+    }
+
+    #[test]
+    fn linux_rounds_the_toast_only_where_it_is_composited() {
+        assert!(linux_rounded(true, || panic!("Wayland always composites")));
+        assert!(linux_rounded(false, || Ok(true)));
+        assert!(!linux_rounded(false, || Ok(false)), "plain X11 maps transparency black");
+        assert!(!linux_rounded(false, || Err(())), "unknown keeps the opaque toast");
+        assert!(uses_wayland(Some("wayland-0"), None));
+        assert!(uses_wayland(Some("wayland-0"), Some("wayland,x11")));
+        assert!(!uses_wayland(Some("wayland-0"), Some("x11")));
+        assert!(!uses_wayland(Some("wayland-0"), Some("x11,wayland")));
+        assert!(!uses_wayland(Some(""), None));
+        assert!(!uses_wayland(None, None));
     }
 
     #[test]
