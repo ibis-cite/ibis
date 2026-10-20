@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "notice",
+  "description": "The Copied notice only listens for the text it shows. It has no window, file system, shell, network, menu or tray access.",
+  "windows": [
+    "notice"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten"
+  ]
+}

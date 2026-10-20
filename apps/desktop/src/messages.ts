@@ -162,3 +162,11 @@ export const copyFormatLabels: Record<KeyFormat, string> = {
   typst: "Typst  @key",
   keys: "Keys only",
 };
+
+// The notice shown after a clean copy hides the picker (#496).
+export const copiedNoticeText = {
+  title: "Copied",
+  windowsTitle: "Citation copied",
+  source: "Ibis",
+  noticeFailed: "The Copied notice could not be shown.",
+};

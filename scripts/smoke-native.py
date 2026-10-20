@@ -26,6 +26,11 @@ class Unavailable(RuntimeError):
     pass
 
 
+# The short Copied notice is a second visible window of the app (#496); it is
+# never the picker, so picker visibility checks skip it.
+NOTICE_TITLE = "Ibis notice"
+
+
 def run(*args):
     return subprocess.check_output(args, text=True, stderr=subprocess.PIPE, timeout=20).strip()
 
@@ -345,9 +350,17 @@ class Linux:
 
     def window(self, pid):
         try:
-            return run("xdotool", "search", "--onlyvisible", "--pid", str(pid)).splitlines()[0]
-        except (subprocess.CalledProcessError, IndexError):
+            windows = run("xdotool", "search", "--onlyvisible", "--pid", str(pid)).splitlines()
+        except subprocess.CalledProcessError:
             return None
+        for window in windows:
+            try:
+                if run("xdotool", "getwindowname", window) == NOTICE_TITLE:
+                    continue
+            except subprocess.CalledProcessError:
+                continue  # A window closed while being listed is not the picker.
+            return window
+        return None
 
     def snapshot(self):
         nodes = []
@@ -1109,6 +1122,19 @@ class ContractTests(unittest.TestCase):
             elif key == "ctrl+super+r":
                 self.visible = not (self.visible and self.key_window)
                 self.key_window = self.visible
+
+    def test_linux_picker_visibility_skips_the_copied_notice_window(self):
+        linux = Linux.__new__(Linux)
+        names = {"1": NOTICE_TITLE, "2": "Ibis"}
+        def fake(*args):
+            if args[1] == "search":
+                return "1\n2"
+            return names[args[2]]
+        with patch(f"{__name__}.run", side_effect=fake):
+            self.assertEqual(linux.window(42), "2")
+        names["2"] = NOTICE_TITLE
+        with patch(f"{__name__}.run", side_effect=fake):
+            self.assertIsNone(linux.window(42))
 
     def test_initial_key_panel_requires_hidden_precondition_before_shortcut_show(self):
         old = self.InitialPickerModel()

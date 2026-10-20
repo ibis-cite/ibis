@@ -6,6 +6,8 @@ import { galleryProvider, galleryStates, type GalleryState } from "./gallery-fix
 import { libraryMessages } from "./messages";
 import "./styles.css";
 import "./gallery.css";
+import "./notice.css";
+import { noticePlatform, renderNotice } from "./copyFeedback";
 
 function rendered(root: HTMLElement, state: GalleryState): boolean {
   // Real webviews measure layout here; jsdom's zero dimensions do not prove it.
@@ -34,7 +36,8 @@ function rendered(root: HTMLElement, state: GalleryState): boolean {
     && (root.querySelector('.notices > p[role="status"]')?.textContent ?? null) === busy
     && (root.querySelector('[aria-label="Choose library to get started"]') !== null) === (library.state === "none")
     && (root.querySelector(".copy-notice code")?.textContent ?? null) === (state.copied?.text ?? null)
-    && (root.querySelector('.library-bar p[role="status"]')?.textContent ?? null) === library.note;
+    && (root.querySelector('.library-bar p[role="status"]')?.textContent ?? null) === library.note
+    && (document.querySelector(".gallery-notice .copied-notice code")?.textContent ?? null) === (state.notice ?? null);
 }
 
 type GalleryDiagnosticStage = "frontend-mounted" | "effects-settled" | "rendered";
@@ -84,6 +87,15 @@ export function renderGalleryState(
   document.title = `${state.label} — Ibis picker states`;
   const app = createRoot(root);
   app.render(<App api={api} preview={provider.preview} />);
+  // The notice is its own window in the app; here it is drawn where it appears.
+  let notice: HTMLElement | null = null;
+  if (state.notice !== undefined) {
+    notice = document.createElement("div");
+    notice.className = "gallery-notice";
+    notice.dataset.platform = noticePlatform(navigator.platform);
+    document.body.append(notice);
+    renderNotice(notice, noticePlatform(navigator.platform))(state.notice);
+  }
   void (document.fonts?.ready ?? Promise.resolve()).then(() => { fontsReady = true; }, () => { failed = true; });
   const check = () => {
     if (stopped || !root.isConnected) return;
@@ -105,7 +117,7 @@ export function renderGalleryState(
     frame = requestAnimationFrame(check);
   };
   frame = requestAnimationFrame(check);
-  return () => { stopped = true; cancelAnimationFrame(frame); app.unmount(); };
+  return () => { stopped = true; cancelAnimationFrame(frame); app.unmount(); notice?.remove(); };
 }
 
 /** Separate evidence/dev entry: the normal production build omits this page. */
