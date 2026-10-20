@@ -100,18 +100,32 @@
   border-radius: 1.375rem;
 }
 
-/* 2.8 s in view, as in the prototype: a 120 ms fade in, then a 200 ms fade out. */
-.copied-notice.showing { animation: copied-notice 2800ms var(--motion-ease) both; }
-@keyframes copied-notice {
-  0% { opacity: 0; transform: translateY(var(--notice-from, 0)); }
-  4.3% { opacity: 1; transform: none; }
-  92.9% { opacity: 1; transform: none; }
-  100% { opacity: 0; transform: none; }
+/* 2.8 s in view, as in the prototype: a 120 ms fade in when shown, then a
+   200 ms fade out when the app's timer marks it as leaving (notice.rs). */
+:root { --notice-rise: var(--motion-feedback); }
+.copied-notice.showing {
+  animation:
+    copied-notice-in 120ms var(--motion-ease) both,
+    copied-notice-rise var(--notice-rise) var(--motion-ease) both;
+}
+.copied-notice.showing.leaving { animation: copied-notice-out 200ms var(--motion-ease) both; }
+@keyframes copied-notice-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes copied-notice-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes copied-notice-rise {
+  from { transform: translateY(var(--notice-from, 0)); }
+  to { transform: none; }
 }
 .copied-notice[data-platform="macos"] { --notice-from: -.5rem; }
 .copied-notice[data-platform="linux"] { --notice-from: 0; }
 /* Reduced motion: fades only, nothing moves. */
 @media (prefers-reduced-motion: reduce) {
+  :root { --notice-rise: 1ms; }
   .copied-notice { --notice-from: 0 !important; }
 }
 

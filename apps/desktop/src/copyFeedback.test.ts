@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { afterCopy, DRAG_DISTANCE, noticePlatform, renderNotice, rowClickAction, type RowClick } from "./copyFeedback";
+import { afterCopy, DRAG_DISTANCE, leaveNotice, noticePlatform, renderNotice, rowClickAction, type RowClick } from "./copyFeedback";
 import noticeCapability from "../src-tauri/capabilities/notice.json";
 
 test("only a clean copy from an unpinned picker hides it and says Copied", () => {
@@ -53,6 +53,18 @@ test("the notice is a polite status that shows text as text and replays when sho
   const windows = document.createElement("div");
   renderNotice(windows, "windows")("[@a]");
   expect(windows.textContent).toContain("Citation copied. Press Ctrl+V to paste.");
+});
+
+test("the app's timer fades the notice out, and showing it again brings it back", () => {
+  const root = document.createElement("div");
+  const show = renderNotice(root, "linux");
+  const notice = root.querySelector(".copied-notice")!;
+  show("[@a]");
+  leaveNotice(root);
+  expect(notice.classList.contains("leaving")).toBe(true);
+  show("[@b]");
+  expect(notice.classList.contains("leaving")).toBe(false);
+  expect(notice.classList.contains("showing")).toBe(true);
 });
 
 test("the notice window is granted no core permission beyond event listening", () => {

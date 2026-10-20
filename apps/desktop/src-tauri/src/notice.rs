@@ -19,9 +19,13 @@ use crate::placement::{Area, display};
 pub(crate) const LABEL: &str = "notice";
 /// The window title, which screen readers may read; never the citation.
 const TITLE: &str = "Ibis notice";
-/// As long as the prototype shows it, ending with a 200 ms fade drawn by the
-/// page, plus a little time for the page to receive its text.
-const SHOWN_FOR: Duration = Duration::from_millis(2_900);
+/// As long as the prototype shows it: a 120 ms fade in, then the page's
+/// 200 ms fade out, which this timer starts with `notice:leave`.
+const SHOWN_FOR: Duration = Duration::from_millis(2_800);
+/// The page's fade out (`notice.css`).
+const FADE_OUT: Duration = Duration::from_millis(200);
+/// Time for the `notice:leave` event to reach the page before the window goes.
+const GRACE: Duration = Duration::from_millis(100);
 /// A new window's timer starts when its page has loaded; this one takes it
 /// away if the page never loads.
 const LOAD_LIMIT: Duration = Duration::from_millis(8_000);
@@ -158,12 +162,28 @@ fn show(app: &AppHandle, text: String) {
     dismiss_after(app, showing, timer);
 }
 
-/// Take the notice away after `delay`, unless a later notice replaced it.
+/// When a notice in view for `shown` starts fading out, and how long after
+/// that its window goes: the fade ends as the visible time does.
+fn leave_schedule(shown: Duration) -> (Duration, Duration) {
+    (shown.saturating_sub(FADE_OUT), FADE_OUT + GRACE)
+}
+
+/// Fade the notice out and take it away after `delay`, unless a later notice
+/// replaced it.
 fn dismiss_after(app: &AppHandle, showing: u64, delay: Duration) {
     let handle = app.clone();
+    let (leave_at, close_after) = leave_schedule(delay);
     let timer = std::thread::Builder::new().name("ibis-notice".into()).spawn(move || {
-        std::thread::sleep(delay);
-        if handle.state::<Notice>().showing.load(Ordering::SeqCst) == showing {
+        let current = || handle.state::<Notice>().showing.load(Ordering::SeqCst) == showing;
+        std::thread::sleep(leave_at);
+        if !current() {
+            return;
+        }
+        if let Some(window) = handle.get_webview_window(LABEL) {
+            report(window.emit_to(LABEL, "notice:leave", ()), NativeIssue::Notice);
+        }
+        std::thread::sleep(close_after);
+        if current() {
             dismiss(&handle);
         }
     });
@@ -470,6 +490,16 @@ mod tests {
     /// negative coordinates.
     const USABLE: Area = rect(0.0, 38.0, 1728.0, 1079.0);
     const LEFT: Area = rect(-2560.0, 0.0, 2560.0, 1392.0);
+
+    #[test]
+    fn the_fade_out_ends_when_the_visible_time_does() {
+        let (leave_at, close_after) = leave_schedule(SHOWN_FOR);
+        assert_eq!(leave_at, Duration::from_millis(2_600));
+        assert_eq!(leave_at + FADE_OUT, SHOWN_FOR);
+        assert!(close_after > FADE_OUT);
+        // A delay shorter than the fade starts it at once.
+        assert_eq!(leave_schedule(Duration::from_millis(50)).0, Duration::ZERO);
+    }
 
     #[test]
     fn macos_shows_a_pill_near_the_top_centre() {

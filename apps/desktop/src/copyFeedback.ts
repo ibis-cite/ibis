@@ -81,8 +81,13 @@ export function renderNotice(root: HTMLElement, platform: NoticePlatform): (text
     code.textContent = text;
     notice.replaceChildren(source, mark, title, code);
     // Restart the fade for a notice shown again while still visible.
-    notice.classList.remove("showing");
+    notice.classList.remove("showing", "leaving");
     void notice.offsetWidth;
     notice.classList.add("showing");
   };
+}
+
+/** Start the notice's fade out; the app takes the window away once it ends. */
+export function leaveNotice(root: HTMLElement): void {
+  root.querySelector(".copied-notice")?.classList.add("leaving");
 }
