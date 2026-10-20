@@ -286,13 +286,20 @@ mod tests {
             std::fs::write(&file.path, text).unwrap_or_else(|e| panic!("{e}"));
             let failed = file.save_preferences(chosen, Some(KeyFormat::Cite));
             assert!(failed.is_err());
-            assert!(!failed.unwrap_err().contains("synthetic-private-value"));
+            assert!(
+                !failed
+                    .err()
+                    .unwrap_or_else(|| panic!("expected a failed settings save"))
+                    .contains("synthetic-private-value")
+            );
             assert_eq!(std::fs::read_to_string(&file.path).unwrap_or_default(), text);
         }
         std::fs::remove_file(&file.path).unwrap_or_else(|e| panic!("{e}"));
         std::fs::create_dir(&file.path).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(
-            file.save_preferences(chosen, Some(KeyFormat::Cite)).unwrap_err(),
+            file.save_preferences(chosen, Some(KeyFormat::Cite))
+                .err()
+                .unwrap_or_else(|| panic!("expected an unreadable settings save to fail")),
             "settings.json could not be read"
         );
         assert!(file.path.is_dir());
