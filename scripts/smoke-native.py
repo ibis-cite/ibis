@@ -463,7 +463,8 @@ class Scripted:
         current = None
         def settled():
             # While the interface renders, a control can disappear between
-            # listing the tree and reading it (#361). The helper reports only
+            # listing the tree and reading it, and right after launch the
+            # window can still be half created (#361). The helper reports only
             # that fact; any other helper failure still fails at once.
             nonlocal current
             current = self.call("snapshot", str(self.picker_handle))

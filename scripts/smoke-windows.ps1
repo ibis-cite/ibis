@@ -74,7 +74,11 @@ function Get-Tree {
   }
   if (!$window) { return @{nodes=@();visible=$false;foreground=$false} }
   $handle = [IntPtr] $window.Current.NativeWindowHandle
-  if ($handle -eq [IntPtr]::Zero) { throw 'Native picker window handle unavailable' }
+  if ($handle -eq [IntPtr]::Zero) {
+    # Right after launch the window can be listed before it has a handle.
+    if (!$Text -or $Text -eq '0') { return @{tree_changed=$true} }
+    throw 'Native picker window handle unavailable'
+  }
   # Retained UIA state and unrelated same-PID tray windows cannot establish
   # visibility. Keep querying the verified picker HWND's actual OS bit.
   $visible = [IbisSmoke]::IsWindowVisible($handle)
@@ -159,8 +163,12 @@ try {
     'snapshot' {
       try { Get-Tree } catch {
         # A control can vanish between listing the tree and reading it while
-        # the interface renders (#361). Report only that; Python re-reads.
-        if ((Get-ErrorKind $_) -ne 'ElementNotAvailableException') { throw }
+        # the interface renders (#361). Until the picker window is first
+        # verified, UI Automation can also fail with a COM error while the
+        # window is being created. Report only that; Python re-reads.
+        $kind = Get-ErrorKind $_
+        $discovering = !$Text -or $Text -eq '0'
+        if ($kind -ne 'ElementNotAvailableException' -and !($discovering -and $kind -eq 'COMException')) { throw }
         @{tree_changed=$true}
       }
     }
