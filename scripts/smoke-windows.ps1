@@ -97,6 +97,21 @@ function Get-Tree {
   }
   @{nodes=$nodes;visible=$visible;foreground=([IbisSmoke]::ForegroundPid() -eq $AppId);picker_handle=$handle.ToInt64()}
 }
+# Only exception type names from this list are reported, never their text.
+function Get-ErrorKind($Failure) {
+  $known = 'ElementNotAvailableException', 'COMException', 'InvalidOperationException', 'TimeoutException',
+    'UnauthorizedAccessException', 'ArgumentException', 'RuntimeException'
+  $exception = $Failure.Exception
+  for ($cause = $exception; $cause; $cause = $cause.InnerException) {
+    # UIA_E_ELEMENTNOTAVAILABLE can also arrive as a bare COM error.
+    if ($cause -is [System.Windows.Automation.ElementNotAvailableException] -or
+        ($cause -is [System.Runtime.InteropServices.COMException] -and $cause.HResult -eq -2147220991)) {
+      return 'ElementNotAvailableException'
+    }
+    $exception = $cause
+  }
+  if ($known -contains $exception.GetType().Name) { $exception.GetType().Name } else { 'other' }
+}
 function Send-Chord([string] $Chord) {
   $map = @{ctrl=0x11;shift=0x10;alt=0x12;super=0x5b;space=0x20;escape=0x1b;return=0x0d}
   $keys = @($Chord.ToLowerInvariant().Split('+') | ForEach-Object {
@@ -141,7 +156,14 @@ try {
       if ($baseline.Contains([int] $actual.Id)) { throw 'Editor activation selected a preexisting process' }
       @{pid=[int] $actual.Id;started=[long] $actual.StartTime.ToUniversalTime().Ticks}
     }
-    'snapshot' { Get-Tree }
+    'snapshot' {
+      try { Get-Tree } catch {
+        # A control can vanish between listing the tree and reading it while
+        # the interface renders (#361). Report only that; Python re-reads.
+        if ((Get-ErrorKind $_) -ne 'ElementNotAvailableException') { throw }
+        @{tree_changed=$true}
+      }
+    }
     'key' { Send-Chord $Text; $true }
     'text' {
       foreach ($character in $Text.ToCharArray()) {
@@ -216,5 +238,6 @@ try {
 } catch {
   # Never serialize exception text: UIA exceptions can contain accessible text.
   [Console]::Error.WriteLine("Windows native smoke action unavailable: $Action")
+  [Console]::Error.WriteLine('NATIVE HELPER ERROR ' + (Get-ErrorKind $_))
   exit 1
 }
