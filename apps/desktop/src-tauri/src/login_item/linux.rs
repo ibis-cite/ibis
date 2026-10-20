@@ -16,13 +16,24 @@ pub(crate) fn launch_program(
     appimage: Option<PathBuf>,
     appdir: Option<PathBuf>,
 ) -> Option<PathBuf> {
-    match (current_exe, appimage, appdir) {
+    match (current_exe.map(live_path), appimage, appdir) {
         (Some(exe), Some(image), Some(dir))
             if image.is_absolute() && dir.is_absolute() && dir.parent().is_some() && exe.starts_with(&dir) =>
         {
             Some(image)
         }
         (exe, _, _) => exe,
+    }
+}
+
+/// After a package upgrade replaces the running program, Linux reports it as
+/// "/usr/bin/ibis-desktop (deleted)". The new program at the same path is
+/// the one to start; when there is none, the dead path is kept and `enable`
+/// refuses it, so the person sees why.
+fn live_path(exe: PathBuf) -> PathBuf {
+    match exe.to_str().and_then(|path| path.strip_suffix(" (deleted)")) {
+        Some(path) if Path::new(path).is_file() => PathBuf::from(path),
+        _ => exe,
     }
 }
 
@@ -43,6 +54,10 @@ impl Entry for DesktopFile {
     }
 
     fn enable(&self) -> Result<(), Failed> {
+        // An entry for a missing program would show as on and never start.
+        if !self.program.is_file() {
+            return Err(Failed);
+        }
         let contents = desktop_entry(&self.name, &self.program).ok_or(Failed)?;
         self.write(&contents)
     }
@@ -99,9 +114,9 @@ fn repointed(text: &str, program: &Path) -> Option<String> {
     for line in text.lines().map(str::trim) {
         if line.starts_with('[') {
             in_entry = line == "[Desktop Entry]";
-        } else if in_entry && line == MARK {
+        } else if in_entry && (line == MARK || key_value(line) == Some(("X-Ibis-Autostart", "true"))) {
             ours = true;
-        } else if in_entry && let Some(value) = line.strip_prefix("TryExec=") {
+        } else if in_entry && let Some(("TryExec", value)) = key_value(line) {
             old_program = Some(unescape_string(value));
         }
     }
@@ -116,15 +131,21 @@ fn repointed(text: &str, program: &Path) -> Option<String> {
         if trimmed.starts_with('[') {
             in_entry = trimmed == "[Desktop Entry]";
         }
-        let replaced = match () {
-            () if in_entry && trimmed.starts_with("TryExec=") => &try_exec,
-            () if in_entry && trimmed.starts_with("Exec=") => &exec,
-            () => line,
+        let replaced = match key_value(trimmed) {
+            Some(("TryExec", _)) if in_entry => &try_exec,
+            Some(("Exec", _)) if in_entry => &exec,
+            _ => line,
         };
         updated.push_str(replaced);
         updated.push('\n');
     }
     Some(updated)
+}
+
+/// A `Key=value` line's key and value, with spaces around `=` allowed.
+fn key_value(line: &str) -> Option<(&str, &str)> {
+    line.split_once('=')
+        .map(|(key, value)| (key.trim(), value.trim_start()))
 }
 
 /// Desktops switch an entry off by hiding it rather than deleting it.
@@ -333,14 +354,20 @@ mod tests {
             .path()
             .join("config dir/autostart/io.github.ibiscite.ibis.nightly.desktop");
         let stable = home.path().join("config dir/autostart/io.github.ibiscite.ibis.desktop");
+        let program = home.path().join("Ibis Nightly/ibis");
+        std::fs::create_dir_all(home.path().join("Ibis Nightly")).unwrap_or_default();
+        std::fs::write(&program, "").unwrap_or_default();
         let items = LoginItems::new(
             "Ibis Nightly",
-            Some(Box::new(file(path.clone(), "Ibis Nightly", "/opt/Ibis Nightly/ibis"))),
+            Some(Box::new(file(path.clone(), "Ibis Nightly", &program.to_string_lossy()))),
         );
         assert_eq!(items.reading(), item(false, None));
         assert!(items.change(true).enabled);
         let written = std::fs::read_to_string(&path).unwrap_or_default();
-        assert!(written.contains("Exec=\"/opt/Ibis Nightly/ibis\" --at-login\n"));
+        assert!(
+            written.contains(&format!("Exec=\"{}\" --at-login\n", program.display())),
+            "{written}"
+        );
         assert!(!stable.exists(), "Nightly must not write the stable entry");
         assert!(!path.with_extension("desktop.partial").exists());
 
@@ -385,6 +412,14 @@ mod tests {
         assert!(now.contains("X-GNOME-Autostart-Delay=5\n"), "the person's keys stay");
         assert!(!now.contains("gone/"));
 
+        // Keys written with spaces around `=` are recognised too.
+        let spaced = old.replace("TryExec=", "TryExec = ").replace("\nExec=", "\nExec = ");
+        std::fs::write(&path, &spaced).unwrap_or_default();
+        assert_eq!(entry.refresh(), Ok(()));
+        let now = std::fs::read_to_string(&path).unwrap_or_default();
+        assert!(now.contains(&format!("TryExec={}\n", here.display())), "{now}");
+        assert!(!now.contains("gone/"), "{now}");
+
         // A program that still exists is someone's choice: left alone.
         let other = home.path().join("other-ibis");
         std::fs::write(&other, "").unwrap_or_default();
@@ -410,6 +445,32 @@ mod tests {
         assert_eq!(std::fs::read_to_string(&target).unwrap_or_default(), old);
     }
 
+    /// A package upgrade replaces the running program: Linux then names it
+    /// "... (deleted)". The new program at that path is used; with none, the
+    /// switch is refused rather than writing a path that never starts.
+    #[test]
+    fn a_replaced_program_is_found_again_or_refused() {
+        let home = tempfile::tempdir().unwrap_or_else(|e| panic!("temporary folder: {e}"));
+        let upgraded = home.path().join("ibis-desktop");
+        std::fs::write(&upgraded, "").unwrap_or_default();
+        let deleted = |path: &Path| PathBuf::from(format!("{} (deleted)", path.display()));
+        assert_eq!(
+            launch_program(Some(deleted(&upgraded)), None, None),
+            Some(upgraded.clone())
+        );
+
+        let removed = home.path().join("removed-ibis");
+        let dead = deleted(&removed);
+        assert_eq!(launch_program(Some(dead.clone()), None, None), Some(dead.clone()));
+        let path = home.path().join("autostart/ibis.desktop");
+        let entry = file(path.clone(), "Ibis", &dead.to_string_lossy());
+        assert_eq!(
+            change(Some(&entry), true, false),
+            item(false, Some(LoginItemProblem::Refused))
+        );
+        assert!(!path.exists(), "no entry for a program that is gone");
+    }
+
     #[test]
     fn an_unwritable_folder_is_a_visible_refusal() {
         use std::os::unix::fs::PermissionsExt;
@@ -423,7 +484,9 @@ mod tests {
             let _ = std::fs::remove_file(probe);
             return;
         }
-        let entry = file(folder.join("ibis.desktop"), "Ibis", "/usr/bin/ibis");
+        let program = home.path().join("ibis");
+        std::fs::write(&program, "").unwrap_or_default();
+        let entry = file(folder.join("ibis.desktop"), "Ibis", &program.to_string_lossy());
         assert_eq!(
             change(Some(&entry), true, false),
             item(false, Some(LoginItemProblem::Refused))

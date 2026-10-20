@@ -136,7 +136,10 @@ pub(crate) fn create_tray(app: &AppHandle, shortcut: Option<&str>) -> tauri::Res
         // Someone may have changed it in the system's settings since.
         .on_tray_icon_event(|tray, event| {
             if matches!(event, TrayIconEvent::Click { .. } | TrayIconEvent::Enter { .. }) {
-                login_item::current(tray.app_handle());
+                // Registry, file and ServiceManagement reads block: keep them
+                // off the main thread that draws the menu.
+                let app = tray.app_handle().clone();
+                tauri::async_runtime::spawn_blocking(move || login_item::current(&app));
             }
         });
     if let Some(icon) = app.default_window_icon() {

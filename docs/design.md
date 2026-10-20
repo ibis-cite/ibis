@@ -243,10 +243,12 @@ off until the person ticks it: Apple's App Review Guideline 2.4.5(iii) asks
 Mac apps for consent first, and Raycast, Alfred, PowerToys and 1Password offer
 it as a setting. A login start
 leaves the picker hidden until the shortcut is pressed. The tick is read from
-the system each time the picker or the menu opens, never from `settings.json`,
-so turning Ibis off in System Settings > General > Login Items (macOS), Task
-Manager's Startup apps (Windows) or the desktop's startup settings (Linux)
-shows at once. If the system refuses, the tick shows the real state and a
+the system, never from `settings.json`, each time the picker or More opens and,
+on macOS and Windows, each time the menu bar or tray icon is clicked. So
+turning Ibis off in System Settings > General > Login Items (macOS) or Task
+Manager's Startup apps (Windows) shows at once. Most Linux tray hosts do not
+report clicks, so there the tray tick catches up with the desktop's startup
+settings the next time the picker or More opens. If the system refuses, the tick shows the real state and a
 sentence says where to change it; while macOS waits for the person to approve
 the login item there, the picker says so each time it opens. Ibis Nightly and development builds register under their own
 names and never replace stable Ibis's entry.

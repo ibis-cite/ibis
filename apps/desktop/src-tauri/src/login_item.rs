@@ -154,12 +154,29 @@ impl LoginItems {
     }
 
     pub(crate) fn read(&self) -> LoginItem {
-        self.named(self.reading())
+        self.read_then(|_| {})
     }
 
+    #[cfg(test)]
     pub(crate) fn change(&self, on: bool) -> LoginItem {
+        self.change_then(on, |_| {})
+    }
+
+    /// Read the state and pass it to `show` before another change can start,
+    /// so the menu never ends on an older answer than the last change.
+    pub(crate) fn read_then(&self, show: impl FnOnce(&LoginItem)) -> LoginItem {
         let _changing = self.changing.lock();
-        self.named(change(self.entry.as_deref(), on, cfg!(target_os = "macos")))
+        let item = self.named(self.reading());
+        show(&item);
+        item
+    }
+
+    /// Change the state and pass the outcome to `show` under the same lock.
+    pub(crate) fn change_then(&self, on: bool, show: impl FnOnce(&LoginItem)) -> LoginItem {
+        let _changing = self.changing.lock();
+        let item = self.named(change(self.entry.as_deref(), on, cfg!(target_os = "macos")));
+        show(&item);
+        item
     }
 
     /// An entry left by an earlier copy of Ibis (a moved AppImage, say) is
@@ -314,11 +331,10 @@ pub(crate) struct LoginMenuItem(pub(crate) CheckMenuItem<tauri::Wry>);
 
 /// Read the system state and show it in the menu.
 pub(crate) fn current(app: &AppHandle) -> LoginItem {
-    let item = app
-        .try_state::<LoginItems>()
-        .map_or_else(|| unsupported(app), |items| items.read());
-    show_in_menu(app, &item);
-    item
+    match app.try_state::<LoginItems>() {
+        Some(items) => items.read_then(|item| show_in_menu(app, item)),
+        None => unsupported(app),
+    }
 }
 
 fn unsupported(app: &AppHandle) -> LoginItem {
@@ -333,11 +349,10 @@ fn show_in_menu(app: &AppHandle, item: &LoginItem) {
 
 /// Change the choice and show the outcome in the menu.
 pub(crate) fn set(app: &AppHandle, on: bool) -> LoginItem {
-    let item = app
-        .try_state::<LoginItems>()
-        .map_or_else(|| unsupported(app), |items| items.change(on));
-    show_in_menu(app, &item);
-    item
+    match app.try_state::<LoginItems>() {
+        Some(items) => items.change_then(on, |item| show_in_menu(app, item)),
+        None => unsupported(app),
+    }
 }
 
 /// Whether Ibis starts when the person logs in, read from the system now.
@@ -367,10 +382,15 @@ pub(crate) async fn set_login_item(app: AppHandle, enabled: bool) -> LoginItem {
 pub(crate) fn toggle_from_menu(app: &AppHandle) {
     let app = app.clone();
     tauri::async_runtime::spawn_blocking(move || {
-        let wanted = app
+        // Without the tick there is no request to act on: show the system
+        // state again and change nothing.
+        let Some(wanted) = app
             .try_state::<LoginMenuItem>()
             .and_then(|menu| menu.0.is_checked().ok())
-            .unwrap_or(true);
+        else {
+            current(&app);
+            return;
+        };
         let item = set(&app, wanted);
         if let Some(problem) = item.problem {
             use tauri_plugin_dialog::DialogExt;
