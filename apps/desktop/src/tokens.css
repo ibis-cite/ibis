@@ -191,10 +191,11 @@
    on a bright or colourful backdrop. The web cannot use AppKit's vibrant text
    blending, so --vibrancy-tint lays a light veil over the native material that
    keeps text legible over any wallpaper. Increase contrast, forced colours and
-   older webviews keep the system colours above. */
+   older webviews keep the system colours above. The Copied notice window keeps
+   its own look (notice.css). */
 @supports (color: light-dark(white, black)) {
   @media (prefers-contrast: no-preference) and (forced-colors: none) {
-    :root[data-platform="macos"] {
+    :root[data-platform="macos"]:not(.notice-window):not([data-gallery-theme="contrast"]) {
       --text: light-dark(#16181d, #f5f5f7);
       --muted: light-dark(#4c5260, #c0c3cc);
       --line: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 10%));
@@ -205,8 +206,16 @@
       --button-radius: 8px; --result-radius: 10px; --hint-radius: 5px; --key-radius: 5px; --menu-radius: 12px;
       --menu-shadow: 0 1rem 2.5rem rgb(0 0 0 / 22%);
       --vibrancy-tint: light-dark(rgb(250 250 252 / 55%), rgb(30 30 34 / 55%));
-      --glass-edge: light-dark(rgb(255 255 255 / 75%), rgb(255 255 255 / 14%));
-      --glass-highlight: light-dark(rgb(255 255 255 / 85%), rgb(255 255 255 / 12%));
+      /* A hairline, as on a native panel: no white rim or glow (prototype round six). */
+      --glass-edge: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 10%));
+    }
+    /* Over the veiled material, colour roles one step deeper (lighter in dark
+       mode) keep 4.5:1; the opaque surface keeps Ibis scarlet as it is. */
+    :root[data-platform="macos"][data-native-appearance="vibrancy"]:not(.notice-window):not([data-gallery-theme="contrast"]) {
+      --citation: light-dark(#982d16, #ff9d87);
+      --status-done: light-dark(#135f29, #6fca81);
+      --status-look: light-dark(#734b00, #e3b341);
+      --status-stop: light-dark(#9b273b, #ff9c9c);
     }
   }
 }
