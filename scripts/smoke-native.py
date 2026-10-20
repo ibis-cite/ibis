@@ -705,7 +705,11 @@ def quit_normally(native, app):
         remaining()
         return current["visible"] and bool(named(current, "Quit Ibis"))
     activate("More")
-    wait_for(ready, "Quit appears in More", timeout=remaining())
+    # The macOS click guard already acquires one exact named native control
+    # and fails on absence or ambiguity before AXPress. A second full-tree
+    # read can exhaust the Quit budget before that single guarded activation.
+    if not (isinstance(native, Scripted) and native.system == "Darwin"):
+        wait_for(ready, "Quit appears in More", timeout=remaining())
     activate("Quit Ibis")  # One activation; never retry an uncertain native action.
     assert app.wait(timeout=remaining()) == 0, "Normal Quit did not exit zero"
     # Use the same final sample for acceptance and elapsed-time evidence.
@@ -1167,14 +1171,19 @@ def main():
 
 
 class ContractTests(unittest.TestCase):
-    def preference_probe(self, failure=None):
+    def preference_probe(self, failure=None, *, scripted_system=None):
         clock, launches, actions = [0.0], [], []
-        native = Mock()
+        # Exercise the Scripted Quit protocol while keeping settings in the
+        # existing owned Linux fixture; this is a control-flow contract only.
+        native = Mock(spec=Scripted) if scripted_system else Mock()
+        if scripted_system:
+            native.system = scripted_system
         native.query = ""
         native.query_ready_at = 0
         native.value = ""
         native.visible = True
         native.reopened = False
+        native.more_open = False
 
         def launch(_command, *, env, **_options):
             app = Mock()
@@ -1214,12 +1223,15 @@ class ContractTests(unittest.TestCase):
                     value = json.dumps({"schema_version": 2, "copy_format": "typst", "padding": "x" * 65536})
                 settings.write_text(value, encoding="utf-8")
             elif name == "Quit Ibis":
+                native.more_open = False
                 if failure == "late-driver":
                     clock[0] += 11
                 if failure != "stuck-quit":
                     native.app.returncode = 7 if failure == "nonzero-quit" else 0
                 if failure == "uncertain-quit":
                     raise RuntimeError("Synthetic uncertain activation")
+            elif name == "More":
+                native.more_open = True
 
         def key(chord):
             actions.append((chord, len(launches)))
@@ -1235,7 +1247,9 @@ class ContractTests(unittest.TestCase):
                 native.visible = failure != "hidden-reopen"
                 native.reopened = True
 
-        def snapshot():
+        def snapshot(**_options):
+            if failure == "slow-menu-snapshot" and native.more_open:
+                clock[0] += 8
             names = ["More", "Quit Ibis"]
             if len(launches) == 1:
                 names += ["Choose library to get started", "Typst"]
@@ -1258,6 +1272,17 @@ class ContractTests(unittest.TestCase):
         native.text.side_effect = text
         native.snapshot.side_effect = snapshot
         native.set_clipboard.side_effect = lambda value: setattr(native, "value", value)
+        if scripted_system:
+            def helper(action, name, *, timeout):
+                self.assertEqual(action, "click")
+                self.assertGreater(timeout, 0)
+                clock[0] += 2
+                if name == "Quit Ibis" and failure == "absent-quit":
+                    actions.append((name, len(launches)))
+                    return {"pressed": False}
+                click(name)
+                return {"pressed": True}
+            native.call.side_effect = helper
         original_clipboard = Linux.clipboard
         native.clipboard.side_effect = lambda **kwargs: original_clipboard(native, **kwargs)
         def clipboard_read(*_args, **_kwargs):
@@ -1340,6 +1365,26 @@ class ContractTests(unittest.TestCase):
         self.assertEqual([action for action in actions if action[0] == "Return"], [("Return", 2)])
         self.assertEqual([action for action in actions if action[0] == "Quit Ibis"], [("Quit Ibis", 1), ("Quit Ibis", 2)])
 
+    def test_first_run_preferences_darwin_quit_uses_one_guarded_activation_without_slow_full_tree_read(self):
+        result, report, _launches, actions = self.preference_probe("slow-menu-snapshot", scripted_system="Darwin")
+        self.assertEqual((result, report["status"]), (0, "passed"))
+        self.assertEqual((report["first_quit_seconds"], report["second_quit_seconds"]), (4, 4))
+        self.assertEqual([action for action in actions if action[0] == "Return"], [("Return", 2)])
+        self.assertEqual([action for action in actions if action[0] == "Quit Ibis"], [("Quit Ibis", 1), ("Quit Ibis", 2)])
+
+    def test_first_run_preferences_darwin_quit_still_rejects_absent_uncertain_or_late_actions(self):
+        for failure in ("absent-quit", "uncertain-quit", "late-driver", "late-wait", "nonzero-quit", "stuck-quit"):
+            with self.subTest(failure=failure):
+                result, report, _launches, actions = self.preference_probe(failure, scripted_system="Darwin")
+                self.assertEqual((result, report["status"]), (1, "failed"))
+                self.assertEqual([action for action in actions if action[0] == "Quit Ibis"], [("Quit Ibis", 1)])
+
+    def test_first_run_preferences_windows_keeps_its_menu_readiness_observation_in_the_shared_budget(self):
+        result, report, _launches, actions = self.preference_probe("slow-menu-snapshot", scripted_system="Windows")
+        self.assertEqual((result, report["status"]), (1, "failed"))
+        self.assertIn("shared 10-second budget", report["reason"])
+        self.assertEqual([action for action in actions if action[0] == "Quit Ibis"], [])
+
     def test_first_run_preferences_failure_retains_only_observed_boolean_state(self):
         result, report, _launches, actions = self.preference_probe("hidden-reopen")
         self.assertEqual((result, report["status"]), (1, "failed"))
@@ -1381,10 +1426,10 @@ class ContractTests(unittest.TestCase):
             return 0
         app.wait.side_effect = exited
         with patch("time.monotonic", side_effect=lambda: clock[0]):
-            self.assertEqual(quit_normally(native, app), 7)
-        self.assertEqual([entry.kwargs["timeout"] for entry in native.call.call_args_list], [10, 8, 6])
-        app.wait.assert_called_once_with(timeout=4)
-        self.assertEqual([entry.args for entry in native.call.call_args_list], [("click", "More"), ("snapshot",), ("click", "Quit Ibis")])
+            self.assertEqual(quit_normally(native, app), 5)
+        self.assertEqual([entry.kwargs["timeout"] for entry in native.call.call_args_list], [10, 8])
+        app.wait.assert_called_once_with(timeout=6)
+        self.assertEqual([entry.args for entry in native.call.call_args_list], [("click", "More"), ("click", "Quit Ibis")])
         clock[0] = 0
         app.wait.side_effect = lambda timeout: (clock.__setitem__(0, 11), 0)[1]
         with patch("time.monotonic", side_effect=lambda: clock[0]):
