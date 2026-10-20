@@ -21,7 +21,12 @@ pub enum Identifier {
 /// numbers are not taken for PubMed IDs, because they are usually years or
 /// pages; `pmid:` or a PubMed link is needed.
 pub fn parse_query(query: &str) -> Option<Identifier> {
-    let q = trim_wrapping(query.trim());
+    let q = query.trim();
+    // Identifiers are short; this also bounds the work done per keystroke.
+    if q.len() > MAX_QUERY_LEN {
+        return None;
+    }
+    let q = trim_wrapping(q);
     if q.is_empty() {
         return None;
     }
@@ -31,6 +36,9 @@ pub fn parse_query(query: &str) -> Option<Identifier> {
         .or_else(|| pmid(q).map(Identifier::Pmid))
         .or_else(|| isbn(q).map(Identifier::Isbn))
 }
+
+/// Longer pasted text is searched as words, never as an identifier.
+const MAX_QUERY_LEN: usize = 512;
 
 /// Drop sentence punctuation and unbalanced brackets around a pasted
 /// identifier, keeping brackets that belong to it, as in `10.1000/abc(1)`.
@@ -280,6 +288,18 @@ mod tests {
     use super::*;
 
     #[test]
+    fn long_bracket_runs_are_rejected_quickly() {
+        let started = std::time::Instant::now();
+        assert_eq!(parse_query(&"(".repeat(100_000)), None);
+        assert_eq!(parse_query(&format!("{}10.1000/x", "(".repeat(600))), None);
+        assert!(started.elapsed() < std::time::Duration::from_secs(1));
+        assert_eq!(
+            parse_query(&format!("{}10.1000/x", "(".repeat(100))),
+            Some(Identifier::Doi("10.1000/x".into()))
+        );
+    }
+
+    #[test]
     fn queries_in_common_written_forms_are_recognized() {
         let doi = Some(Identifier::Doi("10.1000/xyz.123".into()));
         for q in [
@@ -389,7 +409,8 @@ mod tests {
             "@misc{a, title={A}, eprint={hep-th/9711200}, archivePrefix={arXiv}}
              @article{b, title={B}, journal={J}, eprint={1706.03762v5}, eprinttype={arxiv}, pmid={12345678}}
              @book{c, title={C}, isbn={978 0 306 40615 7}}
-             @article{d, title={D}, journal={J}, eprint={987}, eprinttype={pubmed}}",
+             @article{d, title={D}, journal={J}, eprint={987}, eprinttype={pubmed}}
+             @misc{e, title={E}, eprint={arXiv:1706.03763}, archivePrefix={arXiv}}",
         )
         .references;
         let ids: Vec<_> = refs.iter().map(of_reference).collect();
@@ -399,6 +420,8 @@ mod tests {
         assert!(ids[1].contains(&Identifier::Pmid("12345678".into())));
         assert_eq!(ids[2], [Identifier::Isbn("9780306406157".into())]);
         assert_eq!(ids[3], [Identifier::Pmid("987".into())]);
+        assert_eq!(refs[4].variables["number"], "arXiv:1706.03763");
+        assert!(ids[4].contains(&Identifier::Arxiv("1706.03763".into())));
     }
 
     #[test]

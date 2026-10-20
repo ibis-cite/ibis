@@ -230,7 +230,13 @@ pub(crate) fn convert(
         .map(|t| t.to_lowercase());
     if let (Some(eprint_type), Some(eprint)) = (eprint_type, text("eprint")) {
         let target = match eprint_type.as_str() {
-            "arxiv" => Some(("number", format!("arXiv:{eprint}"))),
+            "arxiv" => {
+                let id = match eprint.get(..6) {
+                    Some(prefix) if prefix.eq_ignore_ascii_case("arxiv:") => eprint[6..].trim(),
+                    _ => eprint.as_str(),
+                };
+                Some(("number", format!("arXiv:{id}")))
+            }
             "pubmed" => Some(("PMID", eprint)),
             _ => None,
         };
