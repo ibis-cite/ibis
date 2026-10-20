@@ -165,6 +165,11 @@ pub enum SettingsError {
     Unreadable(#[from] io::Error),
     #[error("the settings file is not valid: {0}")]
     Invalid(String),
+    /// An invalid Zotero list member, counted from one; no member value is kept.
+    #[error(
+        "the settings file is not valid: Zotero library entry {position} must be \"user\" or {{\"group\": <non-negative integer ID>}}"
+    )]
+    InvalidZoteroLibraryEntry { position: usize },
     #[error("the settings file was written by a newer version of Ibis (format {0}); it was left unchanged")]
     NewerVersion(u32),
 }
@@ -205,10 +210,7 @@ fn parse(text: &str) -> Result<Settings, SettingsError> {
         if let Some(libraries) = value.pointer("/library/zotero").and_then(Value::as_array) {
             for (index, library) in libraries.iter().enumerate() {
                 if ZoteroLibrary::deserialize(library).is_err() {
-                    return SettingsError::Invalid(format!(
-                        "Zotero library entry {} must be \"user\" or {{\"group\": <non-negative integer ID>}}",
-                        index + 1
-                    ));
+                    return SettingsError::InvalidZoteroLibraryEntry { position: index + 1 };
                 }
             }
         }
@@ -547,7 +549,13 @@ mod tests {
             r#""/a/bare/path.bib""#,
         ] {
             let text = format!(r#"{{"schema_version": 2, "library": {bad}}}"#);
-            assert!(matches!(parse(&text), Err(SettingsError::Invalid(_))), "{bad}");
+            assert!(
+                matches!(
+                    parse(&text),
+                    Err(SettingsError::Invalid(_) | SettingsError::InvalidZoteroLibraryEntry { .. })
+                ),
+                "{bad}"
+            );
         }
     }
 
@@ -578,6 +586,9 @@ mod tests {
                     format!(
                         "the settings file is not valid: Zotero library entry {position} must be \"user\" or {{\"group\": <non-negative integer ID>}}"
                     )
+                );
+                assert!(
+                    matches!(error, SettingsError::InvalidZoteroLibraryEntry { position: actual } if actual == position)
                 );
                 settings["schema_version"] = serde_json::json!(99);
                 assert!(matches!(
