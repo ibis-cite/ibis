@@ -13,6 +13,7 @@
 //! Ibis and Ibis Nightly have different names and identifiers, so each has
 //! its own entry; debug builds use another one again.
 
+#[cfg(any(target_os = "linux", test))]
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
@@ -228,6 +229,7 @@ impl Entry for SystemEntry {
     }
 }
 
+#[cfg(any(target_os = "linux", test))]
 /// An XDG autostart entry: on while the file exists and is not hidden.
 pub(crate) struct DesktopFile {
     pub(crate) path: PathBuf,
@@ -235,6 +237,7 @@ pub(crate) struct DesktopFile {
     pub(crate) contents: Option<String>,
 }
 
+#[cfg(any(target_os = "linux", test))]
 impl Entry for DesktopFile {
     fn is_enabled(&self) -> Result<bool, Failed> {
         match std::fs::read_to_string(&self.path) {
@@ -267,6 +270,7 @@ impl Entry for DesktopFile {
     }
 }
 
+#[cfg(any(target_os = "linux", test))]
 /// Desktops switch an entry off by hiding it rather than deleting it.
 fn switched_off(text: &str) -> bool {
     let mut in_entry = false;
@@ -283,6 +287,7 @@ fn switched_off(text: &str) -> bool {
     })
 }
 
+#[cfg(any(target_os = "linux", test))]
 /// The autostart entry that starts `program` hidden, or `None` when its path
 /// cannot be represented (not Unicode, or with control characters).
 pub(crate) fn desktop_entry(name: &str, program: &Path) -> Option<String> {
@@ -307,6 +312,7 @@ pub(crate) fn desktop_entry(name: &str, program: &Path) -> Option<String> {
     ))
 }
 
+#[cfg(any(target_os = "linux", test))]
 /// An `Exec` argument, quoted as the Desktop Entry specification says.
 fn quote_argument(argument: &str) -> String {
     let mut quoted = String::from("\"");
@@ -325,6 +331,7 @@ fn quote_argument(argument: &str) -> String {
     quoted
 }
 
+#[cfg(any(target_os = "linux", test))]
 /// A desktop entry string value: backslashes are escaped once more.
 fn escape_string(value: &str) -> String {
     value.replace('\\', "\\\\")
