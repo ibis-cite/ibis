@@ -3,7 +3,6 @@
 use ibis_core::cite::{CiteItem, KeyFormat, render};
 
 #[test]
-#[ignore = "#332: Pandoc output truncates citation keys at alphabetic combining marks"]
 fn pandoc_quotes_alphabetic_combining_marks_in_keys() {
     // Rust's Unicode Alphabetic property includes these combining marks, but
     // Pandoc's bare citation-key parser stops before them. With `[@key]`, the
