@@ -907,6 +907,15 @@ test("rows with the same first author and year are told apart by their container
   expect(rows[0]?.querySelector(".result-container bdi")?.textContent).toBe("Journal of Sleep \u202eResearch");
   expect(rows[0]?.textContent).toContain("García, Okafor");
   expect(rows[0]?.querySelector(".result-type, .result-first-author")).toBeNull();
+  // Authors and container are one text run with one evenly spaced separator,
+  // not two flex items whose gap widens the space before the "·".
+  const byline = rows[0]?.querySelector(".result-byline");
+  expect(byline?.querySelector(".result-authors + .result-container")).toBeTruthy();
+  expect(byline?.textContent).toBe("García, Okafor · Journal of Sleep \u202eResearch");
+  expect(byline?.querySelectorAll("[aria-hidden]").length).toBe(1);
+  const authorAndContainerRules = [...styles.matchAll(/([^{}]*\.result-(?:authors|container)[^{}]*)\{([^}]*)\}/g)];
+  expect(authorAndContainerRules.length).toBeGreaterThan(0);
+  for (const [, , body] of authorAndContainerRules) expect(body).not.toMatch(/width|margin|padding|gap|flex/);
   // A match in the container that the row shows needs no explanation.
   expect(rows[1]?.textContent).not.toContain("Matched in");
   expect(rows[2]?.querySelector(".result-container")).toBeNull();
@@ -935,6 +944,29 @@ test("rows with the same first author and year are told apart by their container
   expect(rows[0]?.querySelector(".result-container, .result-type")).toBeNull();
   // The container is out of sight in Compact, so a match there is named.
   expect(rows[1]?.textContent).toContain("Matched in");
+});
+
+test("a match in a container that the row cuts off is still explained", async () => {
+  // Layout stand-in: the line is 200px wide and every container runs past it.
+  const rect = (left: number, right: number) => ({ left, right, top: 0, bottom: 10, width: right - left, height: 10, x: left, y: 0, toJSON: () => ({}) });
+  const measured = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    if (this.classList.contains("result-byline")) return rect(0, 200) as DOMRect;
+    if (this.classList.contains("result-container")) return rect(120, 480) as DOMRect;
+    return rect(0, 0) as DOMRect;
+  });
+  backend({ search: () => [
+    { ...result("a", "Clipped journal"), authors: "García, Okafor, Lima, Chen, Novak, Haddad", container: "Journal of Synthetic Studies", matched: ["container"] },
+    { ...result("b", "No journal"), matched: ["title"] },
+  ] });
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "synthetic" } });
+  await screen.findByText("No journal");
+  const rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
+  await waitFor(() => expect(rows[0]?.textContent).toContain("Matched in"));
+  // The authors and container keep a real width; the key and badges wrap first.
+  expect(styles).toMatch(/\.result-byline \{ flex: 1 1 min\(16em, 100%\);[^}]*line-clamp: 2;/);
+  expect(styles).toMatch(/\.result-meta \{ flex-wrap: wrap; \}/);
+  measured.mockRestore();
 });
 
 test("Escape clears the search before it hides the picker, keeping chosen references", async () => {

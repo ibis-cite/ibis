@@ -204,6 +204,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // file to defaults.
   const [density, setDensity] = useState<Density>("comfortable");
   const [largerText, setLargerText] = useState(false);
+  const resultList = useRef<HTMLUListElement>(null);
+  /** Rows whose container is cut off, so a match in it must still be explained. */
+  const [clippedContainers, setClippedContainers] = useState<ReadonlySet<string>>(() => new Set());
   const savedPreferences = useRef<PickerPreferences | null>(null);
   const pending = useRef<Partial<PickerPreferences>>({});
   const pendingKeyFormat = useRef<{ format: CopyFormat; saved: boolean } | null>(null);
@@ -261,6 +264,31 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       delete document.documentElement.dataset.textSize;
     };
   }, [density, largerText]);
+  // The container follows the authors in one text run and is cut off first
+  // when two lines are not enough, so measure which rows cut it off. This runs
+  // after the effect above applies the density and text size.
+  useEffect(() => {
+    const list = resultList.current;
+    if (!list) return;
+    const measure = () => {
+      const clipped = new Set<string>();
+      for (const line of list.querySelectorAll<HTMLElement>(".result-byline")) {
+        const container = line.querySelector(".result-container");
+        if (!container || !line.dataset.row) continue;
+        const shown = line.getBoundingClientRect();
+        const full = container.getBoundingClientRect();
+        const outside = full.left < shown.left - 0.5 || full.right > shown.right + 0.5 || full.bottom > shown.bottom + 0.5;
+        if (outside) clipped.add(line.dataset.row);
+      }
+      setClippedContainers((before) => before.size === clipped.size && [...clipped].every((row) => before.has(row)) ? before : clipped);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    // Each line too: a library badge or key can narrow it while the list keeps its size.
+    for (const element of [list, ...list.querySelectorAll(".result-byline")]) observer.observe(element);
+    return () => observer.disconnect();
+  }, [results, density, largerText]);
 
   const togglePin = () => {
     const on = !pinned;
@@ -681,11 +709,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>
-        <ul id="results" role="listbox" aria-label={pickerText.results}>
+        <ul id="results" ref={resultList} role="listbox" aria-label={pickerText.results}>
           {results.map((r, i) => {
             const compact = density === "compact";
-            // Comfortable and Spacious rows show the container, so a match there is visible.
-            const why = hiddenMatch(r.matched, !compact && Boolean(r.container));
+            // A match in the container needs no explanation while the row shows all of it.
+            const why = hiddenMatch(r.matched, !compact && Boolean(r.container) && !clippedContainers.has(idKey(r.id)));
             const itemType = density === "spacious" ? rowText.itemType(r.item_type) : null;
             return (
               <li
@@ -706,8 +734,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                   <span className="result-year">{r.year ?? pickerText.noDate}</span>
                 </span>
                 <span className="result-meta">
-                  <span className="result-authors">{r.authors}</span>
-                  {!compact && r.container && <span className="result-container"><span aria-hidden="true">· </span><bdi>{r.container}</bdi></span>}
+                  {/* One text run, so the separator is spaced like the words around it and the container is shortened first. */}
+                  <span className="result-byline" data-row={idKey(r.id)}>
+                    <span className="result-authors">{r.authors}</span>
+                    {!compact && r.container && <span className="result-container"><span aria-hidden="true">{" · "}</span><bdi>{r.container}</bdi></span>}
+                  </span>
                   {itemType && <span className="result-type">{itemType}</span>}
                   <code className="result-key">{r.key}</code>
                   {severalLibraries && libraryOf(r.id.source) && <span className="result-library">{libraryOf(r.id.source)}</span>}

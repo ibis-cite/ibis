@@ -39,7 +39,13 @@ main {
 .result-year, .result-meta, .result-why { color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 .result-year { flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .result-meta { margin-top: var(--metadata-gap); }
-.result-authors { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Authors and container are one text run that keeps a real width: when the
+   key, type and library badge leave less than 16em, they move to the next
+   line instead. A container that still does not fit moves to a second line
+   of its own before it is shortened. */
+.result-meta { flex-wrap: wrap; }
+.result-byline { flex: 1 1 min(16em, 100%); min-width: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+.result-authors, .result-container { unicode-bidi: isolate; }
 .result-key { flex-shrink: 1; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
 .result-why { font-style: italic; }
 .result-library { flex-shrink: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -127,7 +133,7 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
   /* Keep an editable search row when enlarged text leaves no room for controls. */
   #search { flex-basis: calc(100% - var(--search-icon-width) - var(--search-gap)); }
   .result-meta { flex-wrap: wrap; }
-  .result-authors { white-space: normal; }
+  .result-byline { display: block; }
   .key-hints { display: none; }
 }
 /* No animation: reduced-motion users get the same immediate feedback. */
@@ -145,16 +151,11 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 [role="menuitemcheckbox"][aria-disabled="true"] { color: var(--muted); }
 
 /* Rows that tell similar references apart (#492). Comfortable and Spacious
-   rows show the container after the authors, each shortened with an ellipsis;
-   Spacious adds the item type; Compact puts the first author after the title. */
-.result-container { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.result-meta:has(.result-container) .result-authors { flex: 0 1 auto; max-width: 50%; }
+   rows show the container after the authors in the same text run, so it is
+   shortened first; Spacious adds the item type; Compact puts the first author
+   after the title. */
 .result-type { flex-shrink: 0; }
 .result-first-author { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 [data-citation-selected] .result-first-author { color: inherit; }
 :root[data-density="compact"] .result-title { flex: 0 1 auto; }
 :root[data-density="compact"] .result-year { margin-inline-start: auto; }
-@media (max-width: 460px) {
-  .result-container { white-space: normal; overflow-wrap: anywhere; }
-  .result-meta:has(.result-container) .result-authors { max-width: none; }
-}
