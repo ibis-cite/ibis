@@ -129,7 +129,7 @@ def claim_settings(config):
     """Windows and macOS have no settings-folder override, so the test uses the
     account's own folder and must never overwrite someone's real settings."""
     folder = config / IDENTIFIER
-    if any((folder / name).exists() for name in ("settings.json", "settings.json.bak", "settings.json.tmp")):
+    if any(os.path.lexists(folder / name) for name in ("settings.json", "settings.json.bak", "settings.json.tmp")):
         raise SystemExit(f"Ibis Nightly settings already exist in {folder}; use a disposable account")
     return seed_settings(config)
 
@@ -308,8 +308,9 @@ class MacOS:
             return None, None  # Mid-replacement.
 
     def updated(self):
-        executable, _ = self.installed()
-        return executable is not None and executable.exists() and digest(executable) == self.expected
+        executable, version = self.installed()
+        return (executable is not None and version == self.expected_version and executable.exists()
+                and digest(executable) == self.expected)
 
     def facts(self):
         return {"previous_version": self.previous_version, "expected_version": self.expected_version,
@@ -520,6 +521,32 @@ class Tests(unittest.TestCase):
                 claim_settings(root)
             clean_settings(settings)
             self.assertEqual([entry.name for entry in settings.parent.iterdir()], ["other.json"])
+
+    @unittest.skipIf(os.name == "nt", "creating symlinks needs extra rights on Windows")
+    def test_claim_refuses_a_dangling_link_and_leaves_it_and_its_target_alone(self):
+        for name in ("settings.json", "settings.json.bak", "settings.json.tmp"):
+            with tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                folder = root / "config" / IDENTIFIER
+                folder.mkdir(parents=True)
+                target = root / "elsewhere.json"
+                (folder / name).symlink_to(target)
+                with self.assertRaises(SystemExit):
+                    claim_settings(root / "config")
+                self.assertTrue((folder / name).is_symlink())
+                self.assertFalse(target.exists())
+
+    def test_macos_update_needs_the_new_version_as_well_as_the_new_executable(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            bundle = Path(temporary) / "Ibis Nightly.app"
+            (bundle / "Contents/MacOS").mkdir(parents=True)
+            (bundle / "Contents/MacOS/ibis-desktop").write_bytes(b"new")
+            mac = MacOS.__new__(MacOS)
+            mac.bundle, mac.expected, mac.expected_version = bundle, digest(bundle / "Contents/MacOS/ibis-desktop"), "new-version"
+            for version, updated in (("old-version", False), ("new-version", True)):
+                with open(bundle / "Contents/Info.plist", "wb") as file:
+                    plistlib.dump({"CFBundleExecutable": "ibis-desktop", "CFBundleShortVersionString": version}, file)
+                self.assertEqual(mac.updated(), updated)
 
     def test_environment_drops_an_outer_appimage(self):
         env = environment({"APPIMAGE": "/outer", "PATH": "/bin"}, Path("/c"), Path("/l.bib"))
