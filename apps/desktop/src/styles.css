@@ -41,8 +41,8 @@ main {
 .result-meta { margin-top: var(--metadata-gap); }
 /* Shortened authors and the container keep 60% of the line (or 12em); the
    key and library badge shorten first. Within it the authors shorten faster
-   and the container keeps most of the room, each with an ellipsis. The separator is text
-   inside the container, so the byline has no gap of its own. */
+   and the container keeps most of the room, each with an ellipsis. The
+   separator is text inside the container, so the byline has no gap. */
 .result-byline { display: flex; align-items: baseline; flex: 1 1 0; min-width: min(12em, 60%); overflow: hidden; }
 .result-authors { flex: 0 3 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-container { flex: 1 1 8em; min-width: min(8em, 70%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -154,9 +154,8 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 [role="menuitemcheckbox"][aria-disabled="true"] { color: var(--muted); }
 
 /* Rows that tell similar references apart (#492). Comfortable and Spacious
-   rows show the container after the authors in the same text run, so it is
-   shortened first; Spacious adds the item type; Compact puts the first author
-   after the title. */
+   rows show shortened authors and the container on one line; Spacious adds
+   the item type; Compact puts the first author after the title. */
 .result-type { flex: none; }
 .result-first-author { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 [data-citation-selected] .result-first-author { color: inherit; }
