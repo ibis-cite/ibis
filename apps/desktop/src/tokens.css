@@ -186,19 +186,23 @@
   --row-active-background: color-mix(in srgb, var(--text) 6%, var(--surface)); --row-active-text: var(--text); --row-active-muted: var(--muted);
   /* Fluent's focus visual: an outer stroke in the text colour (black in light
      mode, white in dark) around an inner stroke in the surface colour. */
-  --focus-ring-color: var(--text); --focus-ring-offset: 2px; --focus-ring-shadow: 0 0 0 1px var(--surface);
+  --focus-ring-color: var(--text); --focus-ring-shadow: 0 0 0 1px var(--surface);
 }
 :root[data-platform="linux"] {
   --window-radius: 14px; --field-radius: 9px;
-  /* Without color-mix (older WebKitGTK) the system pair keeps the row visible. */
+  /* The selected row is GTK's selection colour with its paired text: the
+     system Highlight pair, which WebKitGTK takes from the GTK theme. A tint
+     like libadwaita's 25% accent ($view_selected_color) reaches only about
+     1.3:1, and focus stays in the search box, so the fill is the only cue. */
   --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor;
 }
 
 
 @supports (background: color-mix(in srgb, white 50%, black)) {
   :root { --search-active-border: color-mix(in srgb, var(--accent) 50%, var(--line)); }
-  /* Linux: a plain neutral fill, as in Adwaita lists, and Adwaita's half-accent focus ring. */
-  :root[data-platform="linux"] { --row-active-background: color-mix(in srgb, var(--text) 6%, var(--surface)); --row-active-text: var(--text); --row-active-muted: var(--muted); --focus-ring-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+  /* Linux: Adwaita's half-accent focus ring, mixed toward the text colour
+     rather than transparency so it reaches 3:1 on the surface in both themes. */
+  :root[data-platform="linux"] { --focus-ring-color: color-mix(in srgb, var(--accent) 50%, var(--text)); }
 }
 
 @media (prefers-contrast: more) {
