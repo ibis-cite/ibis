@@ -374,10 +374,35 @@ jobs:
     needs: [build, install]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    # Holds the update signing key; only main and v tags may use it.
+    environment: updates
     permissions:
       contents: write
       attestations: read
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: apps/desktop/package.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/desktop/pnpm-lock.yaml
+
+      # Only for the locked Tauri command line tool that signs updates.
+      - name: Install the signing tool
+        working-directory: apps/desktop
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
       - name: Download the packages
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -396,6 +421,32 @@ jobs:
           for file in dist/*; do
             gh attestation verify "$file" --repo "$REPO" --source-ref "$SOURCE_REF" --source-digest "$SOURCE_SHA" --signer-workflow "$REPO/.github/workflows/preview.yml"
           done
+
+      # As in the nightly job: sign only verified packages, and stop if a
+      # signature names any key other than the one built into the app.
+      - name: Sign the update packages
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.UPDATE_SIGNING_KEY_PASSWORD }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # The feed's version must be the one the app reports, or it would
+          # offer the same release again and again.
+          if [ "${TAG#v}" != "$(node scripts/update-feed.mjs release)" ]; then
+            echo "::error::$TAG does not match the workspace version $(node scripts/update-feed.mjs release)."
+            exit 1
+          fi
+          for file in Ibis-macOS-Apple-silicon.app.tar.gz Ibis-macOS-Intel.app.tar.gz Ibis-Windows-setup.exe Ibis-Linux.AppImage; do
+            apps/desktop/node_modules/.bin/tauri signer sign "dist/$file" > /dev/null
+          done
+          mkdir feed
+          cp dist/*.sig feed/
+          node scripts/update-feed.mjs manifest feed "https://github.com/$REPO/releases/download/$TAG" \
+            "${TAG#v}" "Ibis $TAG. Release notes: https://github.com/$REPO/releases/tag/$TAG"
+          rm feed/*.sig
+          cat feed/latest.json
 
       - name: Publish the verified pre-release
         env:
@@ -436,6 +487,38 @@ jobs:
             gh release create "$TAG" dist/* --repo "$REPO" --prerelease --draft --title "Ibis $TAG (preview)" --notes-file combined-notes.md --verify-tag
             gh release edit "$TAG" --repo "$REPO" --draft=false
           fi
+
+      # The rolling "stable" pre-release mirrors the newest release, and the
+      # stable app reads its latest.json (ADR 0019); the feed itself points at
+      # the numbered release. It moves only after the release is public, so it never names
+      # packages that cannot be downloaded yet. A public release is never
+      # republished (above), so an older tag cannot move the feed back.
+      - name: Move the stable update feed to this release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          TAG: ${{ github.ref_name }}
+          FEED: stable
+        run: |
+          set -euo pipefail
+          cat > feed-notes.md <<EOF
+          **The newest Ibis release, [Ibis $TAG](https://github.com/$REPO/releases/tag/$TAG), at links that stay the same,** for example \`https://github.com/$REPO/releases/download/stable/Ibis-Windows-setup.exe\`. See that release for its notes and how to verify a download. \`latest.json\` is the update feed the stable app reads.
+          EOF
+          if ! gh release view "$FEED" --repo "$REPO" > /dev/null 2>&1; then
+            gh release create "$FEED" --repo "$REPO" --draft --prerelease --target "$SHA" --title "Ibis update feed" --notes-file feed-notes.md
+          fi
+          # Packages first, the feed last; then remove files from older releases.
+          gh release upload "$FEED" dist/* --repo "$REPO" --clobber
+          gh release upload "$FEED" feed/latest.json --repo "$REPO" --clobber
+          names=$(gh release view "$FEED" --repo "$REPO" --json assets --jq '.assets[].name')
+          while IFS= read -r name; do
+            if [ -n "$name" ] && [ ! -e "dist/$name" ] && [ ! -e "feed/$name" ]; then gh release delete-asset "$FEED" "$name" --repo "$REPO" --yes; fi
+          done <<< "$names"
+          if ! gh api --method PATCH "repos/$REPO/git/refs/tags/$FEED" -f sha="$SHA" -F force=true > /dev/null; then
+            gh api --method POST "repos/$REPO/git/refs" -f ref="refs/tags/$FEED" -f sha="$SHA" > /dev/null
+          fi
+          gh release edit "$FEED" --repo "$REPO" --prerelease --draft=false --title "Ibis update feed" --notes-file feed-notes.md
 
   nightly:
     name: Publish nightly pre-release

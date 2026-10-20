@@ -5,6 +5,9 @@
 //     version, then `-nightly.` and the commit time (UTC, YYYYMMDDHHMMSS), so
 //     every build of the same commit agrees and later commits sort higher.
 //
+//   node scripts/update-feed.mjs release
+//     Prints the workspace version, which a v tag must name.
+//
 //   node scripts/update-feed.mjs config <version>
 //     Prints the Tauri configuration that turns a build into Ibis Nightly.
 //
@@ -85,6 +88,8 @@ function main([command, ...args]) {
       encoding: "utf8",
     }).trim();
     console.log(nightlyVersion(workspaceVersion(), time));
+  } else if (command === "release") {
+    console.log(workspaceVersion());
   } else if (command === "config" && args.length === 1) {
     console.log(JSON.stringify(nightlyConfig(args[0])));
   } else if (command === "manifest" && args.length === 4) {
@@ -103,7 +108,7 @@ function main([command, ...args]) {
     });
     writeFileSync(join(dir, "latest.json"), `${JSON.stringify(feed, null, 2)}\n`);
   } else {
-    throw new Error("usage: update-feed.mjs version | config <version> | manifest <dir> <download-base> <version> <notes>");
+    throw new Error("usage: update-feed.mjs version | release | config <version> | manifest <dir> <download-base> <version> <notes>");
   }
 }
 
