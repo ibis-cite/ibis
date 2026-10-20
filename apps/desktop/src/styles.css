@@ -99,7 +99,11 @@ main {
 
 footer { border-top: var(--border-width) solid var(--line); padding: var(--footer-padding); font-size: var(--footer-size); min-height: var(--footer-height); }
 .library-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--footer-gap); }
-.library-name { flex: 1; min-width: var(--library-min-width); overflow-wrap: anywhere; color: var(--muted); }
+/* One line that never pushes the keys aside: the age after the source and count
+   is cut first, and the tooltip and More keep the whole detail. */
+.library-status { flex: 1; min-width: var(--library-min-width); display: flex; align-items: center; gap: var(--footer-gap); color: var(--muted); }
+.library-words { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.library-status[data-health="stop"] .library-name, .library-status[data-health="look"] .library-name { color: var(--text); }
 .library-bar p { width: 100%; margin: var(--library-notice-margin); }
 /* The dot repeats what the words say, so colour is never the only signal. */
 .status-dot { width: var(--status-dot-size); height: var(--status-dot-size); border-radius: 50%; flex-shrink: 0; background: var(--muted); }
@@ -177,6 +181,9 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 [role="menuitemcheckbox"]:hover, [role="menuitemcheckbox"]:focus-visible { background: var(--hover-background); }
 [role="menuitemcheckbox"][aria-checked="true"]::after { content: "✓"; }
 [role="menu"] [role="group"] { border-block: var(--border-width) solid var(--line); }
+/* The library line opens More: it never widens the menu and is read as the group's name. */
+[role="menu"] > .menu-library { border-block-start: 0; }
+.menu-detail { width: 0; min-width: 100%; margin: 0; padding: var(--space-1) var(--space-2) var(--space-2); color: var(--muted); font-size: var(--hint-size); overflow-wrap: break-word; }
 [role="menuitemcheckbox"][aria-disabled="true"] { color: var(--muted); }
 
 /* Footer key hints (#491): what Enter does now, or with Alt held the other

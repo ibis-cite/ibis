@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use ibis_core::model::{LoadWarning, RecordId, Reference};
 use ibis_core::search::OwnedIndex;
@@ -97,6 +98,11 @@ pub(crate) struct Library {
     pub(crate) note: Option<String>,
     /// Persistent startup recovery notice; includes a path for the interface only.
     pub(crate) settings_notice: Option<String>,
+    /// When the references in `index` were read from their source.
+    read_at: Option<SystemTime>,
+    /// When the source was last found to match `index`: a read, or a Zotero
+    /// check that found nothing changed. Kept when a later attempt fails.
+    checked_at: Option<SystemTime>,
 }
 
 /// Counts requests to open a library, so a load that finishes after a newer
@@ -144,6 +150,12 @@ pub(crate) struct LibraryStatus {
     pub(crate) note: Option<String>,
     /// Startup settings recovery, separate from transient library status.
     pub(crate) settings_notice: Option<String>,
+    /// When the searchable references were read, in milliseconds since
+    /// 1970 (UTC); `null` without a snapshot.
+    pub(crate) updated_at: Option<f64>,
+    /// When the source was last found unchanged or read, in the same unit;
+    /// after a failed update, the time of the copy still being searched.
+    pub(crate) checked_at: Option<f64>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, specta::Type)]
@@ -242,7 +254,16 @@ pub(crate) fn status(library: &Library) -> LibraryStatus {
             None => library.note.clone(),
         },
         settings_notice: library.settings_notice.clone(),
+        updated_at: library.read_at.and_then(epoch_millis),
+        checked_at: library.checked_at.and_then(epoch_millis),
     }
+}
+
+/// A time for the interface, which shows it relative to its own clock.
+fn epoch_millis(time: SystemTime) -> Option<f64> {
+    time.duration_since(UNIX_EPOCH)
+        .ok()
+        .map(|since| since.as_secs_f64() * 1000.0)
 }
 
 /// Read, parse and index off the main thread. Initial loads tolerate damaged
@@ -284,7 +305,10 @@ fn load_source(source: Source, reload: bool, previous: Option<libraries::Snapsho
 }
 
 fn candidate(source: impl Into<Source>, loaded: ibis_core::model::LoadResult) -> Library {
+    let now = SystemTime::now();
     Library {
+        read_at: Some(now),
+        checked_at: Some(now),
         source: Some(source.into()),
         index: Arc::new(OwnedIndex::new(loaded.references)),
         warnings: loaded.warnings,
@@ -599,6 +623,8 @@ pub(crate) fn current_status(app: &AppHandle) -> LibraryStatus {
             error: Some("library state is unavailable".to_string()),
             note: None,
             settings_notice: None,
+            updated_at: None,
+            checked_at: None,
         })
 }
 
@@ -618,6 +644,9 @@ pub(crate) fn reload_library_file(app: &AppHandle) {
     }
 }
 
+/// Added to a failure while the last good references stay searchable.
+pub(crate) const KEPT: &str = "; keeping the last loaded references";
+
 /// Retention belongs to the installed desktop snapshot, not the source error.
 /// Any failure to refresh Zotero keeps the references already read.
 fn error_with_snapshot_context(error: String, has_references: bool, zotero: bool) -> String {
@@ -633,7 +662,7 @@ fn error_with_snapshot_context(error: String, has_references: bool, zotero: bool
             .iter()
             .any(|source| source.to_string() == error))
     {
-        format!("{error}; keeping the last loaded references")
+        format!("{error}{KEPT}")
     } else {
         error
     }
@@ -720,6 +749,7 @@ fn install_loaded(
             library.opening = false;
             library.checking = false;
             library.error = None;
+            library.checked_at = Some(SystemTime::now());
             // Keep the note: a "not saved for next time" warning must outlive
             // the check that showing the picker starts right after it.
             library.requested = library.source.clone();
@@ -1417,6 +1447,7 @@ mod tests {
             ibis_core::bibtex::load_str("synthetic", "@misc{kept, title={Kept}}"),
         ));
         let requests = LoadRequests::default();
+        assert_eq!(status(&Library::default()).updated_at, None, "nothing read, no time");
         let (request, reload, refreshing) =
             begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::Group(7).into()))
                 .unwrap_or_else(|| panic!("the refresh should start"));
@@ -1428,6 +1459,16 @@ mod tests {
             .unwrap_or_else(|| panic!("the refresh is current"));
         assert_eq!(unchanged.state, LibraryState::Loaded);
         assert_eq!(unchanged.references, 1);
+        let read = unchanged
+            .updated_at
+            .unwrap_or_else(|| panic!("a snapshot has a read time"));
+        let checked = unchanged
+            .checked_at
+            .unwrap_or_else(|| panic!("a snapshot has a check time"));
+        assert!(
+            checked >= read,
+            "an unchanged check confirms the copy without rereading it"
+        );
 
         let saved = "the library opened but could not be saved for next time: synthetic";
         if let Ok(mut library) = library.lock() {
@@ -1453,6 +1494,11 @@ mod tests {
         )
         .unwrap_or_else(|| panic!("the refresh is current"));
         assert_eq!(offline.references, 1);
+        assert_eq!(
+            (offline.updated_at, offline.checked_at),
+            (unchanged.updated_at, kept.checked_at),
+            "a failed update keeps the time of the copy still searched"
+        );
         assert_eq!(
             offline.error.as_deref(),
             Some("Zotero is not running, or it is not accepting connections; keeping the last loaded references")

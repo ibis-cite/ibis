@@ -165,14 +165,95 @@ export const libraryMessages = {
   empty: (name: string | null, zotero = false) => zotero
     ? `No references found in ${name ?? "your Zotero library"}. Add items in Zotero, then reload.`
     : `No references found in ${name ?? "this library"}. Choose a BibTeX or BibLaTeX export with references, then try again.`,
+  /** The footer words: where the references come from and how many. A ticking
+   * age is kept out of this text, so the live region never repeats a clock. */
   summary: (status: LibraryStatus | null | undefined) => {
     if (status === undefined) return "Checking library…";
     if (status === null) return "Library details unavailable";
-    if (!status.has_snapshot) return status.name ?? "No library chosen";
-    return `${status.snapshot_name ?? "Library"}: ${status.references} ${status.references === 1 ? "reference" : "references"}` +
-      (status.warnings > 0 ? `, ${status.warnings} reading ${status.warnings === 1 ? "notice" : "notices"}` : "");
+    if (status.state === "loading") return sourceLabel(status, status.name);
+    if (status.state === "none" || (!status.has_snapshot && !status.name)) return "No library chosen";
+    if (!status.has_snapshot) return `${sourceLabel(status, status.name)} · not opened`;
+    // After a failed switch the previous library is still current: describe it.
+    const source = sourceLabel(status, status.snapshot_name);
+    if (kept(status)) return `${source} · last good copy`;
+    if (status.references === 0) return `${source} · no references`;
+    return `${source} · ${count(status.references, "reference")}` +
+      (status.warnings > 0 ? ` · ${count(status.warnings, "reading notice")}` : "");
+  },
+  /** The quiet age after the summary, or null when the age does not matter. */
+  age: (status: LibraryStatus | null | undefined, now: number) => {
+    if (status?.state === "loading") return "opening…";
+    if (!status?.has_snapshot) return null;
+    if (status.state === "reloading") return "reloading…";
+    const { updated, checked } = times(status);
+    if (kept(status)) return checked === null ? null : `read ${ago(checked, now)}`;
+    if (status.error || updated === null || now - updated > recentUpdate) return null;
+    return `updated ${ago(updated, now)}`;
+  },
+  /** Everything known, for the tooltip and the top of More. */
+  detail: (status: LibraryStatus | null | undefined, now: number, libraryNames: (status: LibraryStatus) => string) => {
+    const summary = libraryMessages.summary(status);
+    if (!status?.has_snapshot) return summary;
+    const { updated, checked } = times(status);
+    const from = status.zotero ? `Zotero: ${libraryNames(status)}` : status.snapshot_name ?? "Library";
+    const read = updated === null ? "" : `, read ${ago(updated, now)} (${clock(updated, now)})`;
+    const what = `${from}. ${count(status.references, "reference")}${read}.`;
+    if (kept(status)) {
+      const at = checked === null ? "" : ` from ${clock(checked, now)}`;
+      return `${what} ${status.zotero ? "Zotero could not be reached" : "The file could not be read"}, so Ibis is searching the copy${at}.`;
+    }
+    if (status.error) return `${status.name ?? "The chosen library"} could not be opened. Still searching ${what}`;
+    const confirmed = status.zotero && checked !== null && updated !== null && checked - updated > minute
+      ? ` Checked ${ago(checked, now)}.` : "";
+    const how = status.zotero ? " Checked for changes each time Ibis opens." : " Reread whenever the file changes.";
+    const notices = status.warnings > 0 ? ` ${count(status.warnings, "reading notice")}.` : "";
+    return what + confirmed + notices + how;
   },
 };
+
+/** Text is English, so numbers and times are too; one place to change with translations. */
+export const appLocale = "en";
+const minute = 60_000;
+/** How long "updated …" stays after the references change. */
+export const recentUpdate = 10 * minute;
+const numbers = new Intl.NumberFormat(appLocale);
+const relative = new Intl.RelativeTimeFormat(appLocale, { numeric: "auto" });
+
+function count(n: number, noun: string) {
+  return `${numbers.format(n)} ${n === 1 ? noun : `${noun}s`}`;
+}
+
+function sourceLabel(status: LibraryStatus, name: string | null) {
+  return status.zotero ? "Zotero" : name ?? "Library";
+}
+
+/** Times from an older backend or fixture may be missing. */
+function times(status: LibraryStatus) {
+  return { updated: status.updated_at ?? null, checked: status.checked_at ?? null };
+}
+
+/** An update of the open library failed, so an older copy of it is searched.
+ * A failed switch to another library keeps the previous one, which is current. */
+function kept(status: LibraryStatus) {
+  return Boolean(status.error && status.has_snapshot && status.name === status.snapshot_name
+    && status.error.replace(/\.$/, "").endsWith("keeping the last loaded references"));
+}
+
+/** "just now", "5 minutes ago", "yesterday"; a date after a week. Never in the future. */
+export function ago(at: number, now: number) {
+  const seconds = Math.max(0, (now - at) / 1000);
+  if (seconds < 45) return "just now";
+  if (seconds < 90 * 60) return relative.format(-Math.max(1, Math.round(seconds / 60)), "minute");
+  if (seconds < 36 * 3600) return relative.format(-Math.round(seconds / 3600), "hour");
+  if (seconds < 7 * 86400) return relative.format(-Math.round(seconds / 86400), "day");
+  return `on ${new Intl.DateTimeFormat(appLocale, { month: "short", day: "numeric" }).format(at)}`;
+}
+
+/** Clock time today, otherwise date and time. */
+function clock(at: number, now: number) {
+  const sameDay = new Date(at).toDateString() === new Date(now).toDateString();
+  return new Intl.DateTimeFormat(appLocale, sameDay ? { timeStyle: "short" } : { dateStyle: "medium", timeStyle: "short" }).format(at);
+}
 
 const matchFieldNames: Record<string, string> = {
   doi: "the DOI",

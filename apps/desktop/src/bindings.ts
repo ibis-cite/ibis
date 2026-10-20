@@ -170,6 +170,16 @@ export type LibraryStatus = {
 	note: string | null,
 	/**  Startup settings recovery, separate from transient library status. */
 	settings_notice: string | null,
+	/**
+	 *  When the searchable references were read, in milliseconds since
+	 *  1970 (UTC); `null` without a snapshot.
+	 */
+	updated_at: number | null,
+	/**
+	 *  When the source was last found unchanged or read, in the same unit;
+	 *  after a failed update, the time of the copy still being searched.
+	 */
+	checked_at: number | null,
 };
 
 /**

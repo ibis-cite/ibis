@@ -94,7 +94,32 @@ system surface, as [native appearance groundwork](https://github.com/ibiscite/ib
 | Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows. |
 | Citation tray | Once a source is added | Page number per source and the exact text to be copied, in scarlet. |
 | Footer tip | One at a time | Tied to what the user is doing, retired once they have done it. Otherwise the footer shows library status. |
-| Library status | Words only on trouble | A dot normally, details on hover; a sentence only when something needs the user. |
+| Library status | Always, quietly | A dot, the source and the count; the age only when it is news or a warning (see below). A sentence above the list only when something needs the user. |
+
+**Library status.** One footer line, as Mail's "Updated just now" and VS Code's
+status bar do it: short words, colour only alongside them, detail on demand.
+
+| Case | Footer | Dot |
+|---|---|---|
+| Starting, first run | "Checking library…", "No library chosen" | Grey |
+| Opening | "Zotero · opening…" | Grey |
+| Loaded | "Zotero · 1,204 references" or "thesis.bib · 1,204 references" | Done |
+| Just changed (ten minutes) | "… · updated 2 minutes ago" | Done |
+| Reloading | "… · reloading…", count kept | Unchanged |
+| Reading notices, empty | "… · 2 reading notices", "Zotero · no references" | Look |
+| Update failed, old copy kept | "Zotero · last good copy · read 2 hours ago" | Stop |
+| Never opened | "thesis.bib · not opened" | Stop |
+
+Several Zotero libraries still read "Zotero"; rows name their library. The
+tooltip, and the name of the library group at the top of More (so keyboard and
+screen-reader users reach it), say which libraries, when they were read (relative
+and clock time), when Zotero was last checked, and how Ibis keeps them current:
+Zotero is checked each time Ibis opens; a file is reread whenever it changes. Times
+use `Intl.RelativeTimeFormat` in the app's language ("just now" under 45 seconds,
+a date after a week) and tick every 30 seconds without redrawing the picker. The
+live region holds only the words before the age, so a ticking clock is never
+announced. The tray line has no time, because a native menu is not redrawn while
+open; after a failed update it says "not updated" and why.
 
 ## Learning without a tutorial
 
