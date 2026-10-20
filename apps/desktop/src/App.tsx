@@ -1,7 +1,8 @@
 import type React from "react";
 import * as nativeApi from "./api";
 import { copyFormatNames, densityNames, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { LibrarySetup, shortcutLabel } from "./LibrarySetup";
 import { formatCitation, FORMATTED_STYLES, provisional, type FormattedCitation } from "./format/formatted";
 import { STYLE_NAMES, type StyleId } from "./format/styles";
 import { render } from "./format/markup";
@@ -121,10 +122,10 @@ function MenuItem({ label, title, keys, checked, disabled, onSelect }: {
 export type PickerApi = Pick<typeof nativeApi,
   "chooseLibrary" | "useZotero" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" | "pickerPreferences" | "setPickerPreferences" |
   "hidePicker" | "setPinned" | "onLibraryChanged" | "onPickerShown" | "onPickerHidden" | "quit" | "search" | "shortcutStatus"> &
-  Partial<Pick<typeof nativeApi, "cslItems" | "copyFormatted" | "useZoteroLibraries" | "zoteroGroups">>;
+  Partial<Pick<typeof nativeApi, "cslItems" | "copyFormatted" | "setCopyFormat" | "useZoteroLibraries" | "zoteroGroups" | "findSources" | "openFoundLibrary">>;
 
 /** A citation-key syntax, or a citation style written as `style:<id>`. */
-type Choice = CopyFormat | `style:${StyleId}`;
+export type Choice = CopyFormat | `style:${StyleId}`;
 
 /** The one word the closed format control shows. */
 function choiceName(choice: Choice): string {
@@ -147,6 +148,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const { chooseLibrary, useZotero, libraryStatus, reloadLibrary, copyCitation, copyFormat,
     hidePicker, setPinned, onLibraryChanged, onPickerShown, onPickerHidden, quit, search, shortcutStatus, cslItems, copyFormatted,
     pickerPreferences, setPickerPreferences, useZoteroLibraries, zoteroGroups } = api;
+  const { findSources, openFoundLibrary, setCopyFormat } = api;
+  const setupApi = useMemo(() => ({ chooseLibrary, useZotero, findSources, openFoundLibrary }),
+    [chooseLibrary, useZotero, findSources, openFoundLibrary]);
   const [query, setQuery] = useState(preview?.query ?? "");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [announcement, setAnnouncement] = useState("");
@@ -178,6 +182,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const report = (operation: Operation, failed = true) => {
     setFailures((previous) => ({ ...previous, [operation]: failed }));
   };
+  // Setup failures belong to the setup screen; they go when a library is chosen.
+  const setupDone = library !== undefined && library?.state !== "none";
+  useEffect(() => {
+    if (setupDone) setFailures(({ findSources: _found, openFound: _opened, ...rest }) => rest);
+  }, [setupDone]);
   const perform = async (operation: Operation, action: () => Promise<unknown>) => {
     try { await action(); report(operation, false); }
     catch { report(operation); }
@@ -206,6 +215,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const chooseFormat = (choice: Choice) => {
     setFormat(choice);
     savePreferences({ citation_style: styleOf(choice) });
+    // A key format is otherwise saved only when something is copied.
+    if (!styleOf(choice) && setCopyFormat) void perform("preferences", () => setCopyFormat(choice as CopyFormat));
   };
   const changeDensity = () => {
     const next = DENSITIES[(DENSITIES.indexOf(density) + 1) % DENSITIES.length] ?? "comfortable";
@@ -687,15 +698,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                   ? <><p>{pickerText.noMatches}</p><p className="empty-hint">{pickerText.noMatchesHint}</p></>
                   : <><p>{pickerText.typeToFind}</p><p className="empty-hint">{pickerText.typeToFindHint}</p></>
             ) : library?.state === "none" ? (
-              <>
-                <p>{pickerText.firstRun}</p>
-                <button type="button" aria-label={pickerText.firstRunChoose} onClick={() => void perform("choose", chooseLibrary)}>
-                  {pickerText.chooseLibrary}
-                </button>{" "}
-                <button type="button" title={pickerText.useZoteroTitle} onClick={() => void perform("zotero", useZotero)}>
-                  {pickerText.useZotero}
-                </button>
-              </>
+              <LibrarySetup api={setupApi} perform={perform}
+                writing={{ format, formatted: Boolean(cslItems && copyFormatted), choose: chooseFormat }}
+                shortcut={shortcut?.registered ? shortcutLabel(shortcut.shortcut, isMac) : null} />
             ) : null}
           </div>
         )}
