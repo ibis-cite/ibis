@@ -180,6 +180,8 @@ pub(crate) fn dismiss_picker(app: &AppHandle) {
     #[cfg(target_os = "macos")]
     crate::panel::cancel_initial_presentation(app);
     if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window) {
+        // The interface keeps its search for a minute after a real hide.
+        report(window.emit("picker:hidden", ()), NativeIssue::PickerEvent);
         dismiss_with(
             || window.hide(),
             || {
@@ -232,11 +234,31 @@ impl DialogOpen {
     }
 }
 
+/// Set while the user has pinned the picker: it then stays open beside the
+/// document and floats above it. Unpinned, it hides when focus moves away.
+#[derive(Default)]
+pub(crate) struct Pinned(pub(crate) AtomicBool);
+
+/// Pin or unpin the picker. Staying on top is best effort: Wayland does not
+/// allow it, and there pinned means only that the picker stays open.
+#[tauri::command]
+#[specta::specta]
+pub(crate) fn set_pinned(app: AppHandle, pinned: State<'_, Pinned>, on: bool) {
+    pinned.0.store(on, Ordering::SeqCst);
+    // The macOS panel is already a floating panel; it only needs to stay open.
+    #[cfg(not(target_os = "macos"))]
+    if let Some(window) = checked(app.get_webview_window("main").ok_or(()), NativeIssue::Window) {
+        report(window.set_always_on_top(on), NativeIssue::AlwaysOnTop);
+    }
+    #[cfg(target_os = "macos")]
+    let _ = app;
+}
+
 /// Whether the picker hides when it loses focus. Release builds hide it, like
-/// other launchers, except while one of its own dialogs has the focus;
-/// development builds never do, so the developer tools stay usable.
-pub(crate) fn hides_on_blur(release_build: bool, dialog_open: bool) -> bool {
-    release_build && !dialog_open
+/// other launchers, except while one of its own dialogs has the focus or it is
+/// pinned; development builds never do, so the developer tools stay usable.
+pub(crate) fn hides_on_blur(release_build: bool, dialog_open: bool, pinned: bool) -> bool {
+    release_build && !dialog_open && !pinned
 }
 
 /// When Narrator or another UI Automation client presses a control, WebView2
@@ -266,14 +288,16 @@ impl FocusChanges {
 }
 
 /// Hide the picker after the grace period unless focus came back or one of
-/// its own dialogs opened. Without a timer thread, hide at once as before.
+/// its own dialogs opened or the user pinned it. Without a timer thread,
+/// hide at once as before.
 #[cfg(target_os = "windows")]
 pub(crate) fn dismiss_unless_refocused(app: &AppHandle, blur: u64) {
     let delayed = app.clone();
     let spawned = std::thread::Builder::new().name("ibis-blur".into()).spawn(move || {
         std::thread::sleep(REFOCUS_GRACE);
         let dialog_open = delayed.state::<DialogOpen>().0.load(Ordering::SeqCst);
-        if hides_on_blur(true, dialog_open) && delayed.state::<FocusChanges>().is_latest(blur) {
+        let pinned = delayed.state::<Pinned>().0.load(Ordering::SeqCst);
+        if hides_on_blur(true, dialog_open, pinned) && delayed.state::<FocusChanges>().is_latest(blur) {
             dismiss_picker(&delayed);
         }
     });
@@ -422,9 +446,14 @@ mod tests {
     /// made the dialog disappear before it could be used.
     #[test]
     fn the_picker_stays_open_while_its_own_dialog_has_the_focus() {
-        assert!(hides_on_blur(true, false));
-        assert!(!hides_on_blur(true, true));
-        assert!(!hides_on_blur(false, false));
+        assert!(hides_on_blur(true, false, false));
+        assert!(!hides_on_blur(true, true, false));
+        assert!(!hides_on_blur(false, false, false));
+    }
+
+    #[test]
+    fn a_pinned_picker_stays_open_when_focus_moves_to_the_document() {
+        assert!(!hides_on_blur(true, false, true));
     }
 
     /// #341: pressing More through UI Automation on Windows blurs the picker
