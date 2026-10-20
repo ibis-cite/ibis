@@ -614,6 +614,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const libraryOf = (source: string) =>
     source === "zotero:user" ? pickerText.myLibrary
       : source.startsWith("zotero:group:") ? groupName(Number(source.slice("zotero:group:".length))) : null;
+  /** Names the library too when another chosen reference has the same key. */
+  const removeLabel = (r: SearchResult) => {
+    const library = libraryOf(r.id.source);
+    const shared = [...selected.values()].some((other) => other.key === r.key && other.id.source !== r.id.source);
+    return shared && library ? pickerText.removeReferenceIn(r.key, library) : pickerText.removeReference(r.key);
+  };
   const closeMenu = (refocus: boolean) => {
     setMenuOpen(false);
     if (refocus) moreButton.current?.focus();
@@ -797,7 +803,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           {[...selected.entries()].map(([key, r]) => (
             <li key={key}>
               <code>{r.key}</code>{" "}
-              <button type="button" onClick={() => toggle(r)} aria-label={pickerText.removeReference(r.key)}>
+              <button type="button" onClick={() => toggle(r)} aria-label={removeLabel(r)}>
                 {pickerText.remove}
               </button>
             </li>
@@ -850,19 +856,21 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               >
                 <span className="result-line">
                   <strong className="result-title">{r.title}</strong>
-                  {compact && r.first_author && <span className="result-first-author"><bdi>{r.first_author}</bdi>{r.author_count > 1 && ` ${rowText.etAl}`}</span>}
+                  {compact && r.first_author && <span className="result-first-author" dir="auto">{r.first_author}{r.author_count > 1 && ` ${rowText.etAl}`}</span>}
                   <span className="result-year">{r.year ?? pickerText.noDate}</span>
                 </span>
                 <span className="result-meta">
-                  {/* The separator sits inside the container; a no-break space keeps the space before it. */}
+                  {/* Each clipping part takes its own text direction, so Latin text in a
+                      right-to-left row is cut at its end. The separator is its own part. */}
                   <span className="result-byline">
-                    <span className="result-authors">
+                    <span className="result-authors" dir="auto">
                       {authors === r.authors ? authors : <><span aria-hidden="true">{authors}</span><span className="visually-hidden">{r.authors}</span></>}
                     </span>
-                    {!compact && r.container && <span className="result-container">{r.authors && <span aria-hidden="true">{"\u00a0· "}</span>}<bdi>{r.container}</bdi></span>}
+                    {!compact && r.container && r.authors && <span className="result-separator" aria-hidden="true">{"\u00a0·\u00a0"}</span>}
+                    {!compact && r.container && <span className="result-container" dir="auto">{r.container}</span>}
                   </span>
                   {itemType && <span className="result-type">{itemType}</span>}
-                  <code className="result-key">{r.key}</code>
+                  <code className="result-key" dir="auto">{r.key}</code>
                   {severalLibraries && libraryOf(r.id.source) && <span className="result-library">{libraryOf(r.id.source)}</span>}
                 </span>
                 {why && <span className="result-why">{pickerText.matchedIn(why)}</span>}

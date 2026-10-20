@@ -904,17 +904,21 @@ test("rows with the same first author and year are told apart by their container
   await screen.findByText("Untyped");
   let rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
   // Comfortable: authors and container, no type word and no first-author repeat.
-  expect(rows[0]?.querySelector(".result-container bdi")?.textContent).toBe("Journal of Sleep \u202eResearch");
+  expect(rows[0]?.querySelector(".result-container")?.textContent).toBe("Journal of Sleep \u202eResearch");
   expect(rows[0]?.textContent).toContain("García, Okafor");
   expect(rows[0]?.querySelector(".result-type, .result-first-author")).toBeNull();
-  // One separator, spaced like the words around it: a no-break space before
-  // it (a plain one would collapse at the start of the flex item) and a space
-  // after, with no gap, margin or padding of its own.
+  // One separator part between authors and container, spaced like the words
+  // around it with no-break spaces (plain ones would collapse at the edges of
+  // a flex item), and no gap, margin or padding of its own.
   const byline = rows[0]?.querySelector(".result-byline");
-  expect(byline?.querySelector(".result-authors + .result-container")).toBeTruthy();
-  expect(byline?.textContent).toBe("García, Okafor\u00a0· Journal of Sleep \u202eResearch");
-  expect([...(byline?.querySelectorAll(".result-container [aria-hidden]") ?? [])].map((e) => e.textContent)).toEqual(["\u00a0· "]);
-  const bylineRules = [...styles.matchAll(/([^{}]*\.result-(?:byline|authors|container)\b[^{}]*)\{([^}]*)\}/g)];
+  expect(byline?.querySelector(".result-authors + .result-separator[aria-hidden] + .result-container")).toBeTruthy();
+  expect(byline?.textContent).toBe("García, Okafor\u00a0·\u00a0Journal of Sleep \u202eResearch");
+  expect(byline?.querySelector(".result-separator")?.textContent).toBe("\u00a0·\u00a0");
+  // Each clipping part takes its own direction, so a right-to-left row cuts
+  // Latin text at its end rather than its start.
+  for (const part of [".result-authors", ".result-container", ".result-key"]) expect(rows[0]?.querySelector(part)?.getAttribute("dir")).toBe("auto");
+  expect(styles).toMatch(/\.result-separator \{ flex: none;/);
+  const bylineRules = [...styles.matchAll(/([^{}]*\.result-(?:byline|authors|separator|container)\b[^{}]*)\{([^}]*)\}/g)];
   expect(bylineRules.length).toBeGreaterThan(0);
   for (const [, , body] of bylineRules) expect(body).not.toMatch(/margin|padding|gap|(^|[^-])width:/);
   // The row may shorten the container, so a match there is always named.
@@ -939,7 +943,11 @@ test("rows with the same first author and year are told apart by their container
   rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
   // Compact: the first author follows the title on the one line, before the year.
   const line = rows[0]?.querySelector(".result-line");
-  expect(line?.querySelector(".result-first-author bdi")?.textContent).toBe("García");
+  expect(line?.querySelector(".result-first-author")?.getAttribute("dir")).toBe("auto");
+  // It keeps its own width beside a long title, as in the prototype, capped and ellipsized.
+  expect(styles).toMatch(/\.result-first-author \{ flex: none; max-width: var\(--key-max-width\);[^}]*text-overflow: ellipsis/);
+  // A very narrow Compact row gives the title its own line instead.
+  expect(styles).toMatch(/@container \(max-width: 16em\) \{\s*:root\[data-density="compact"\] \.result-line \{ flex-wrap: wrap; row-gap: 0; \}\s*:root\[data-density="compact"\] \.result-title \{ flex-basis: 100%; \}/);
   expect(line?.textContent).toBe("Sleep spindlesGarcía et al.2021");
   expect(rows[2]?.querySelector(".result-first-author")?.textContent).toBe("Smith");
   expect(rows[0]?.querySelector(".result-container, .result-type")).toBeNull();
@@ -970,6 +978,9 @@ test("rows shorten the authors and keep the journal, key and library label visib
   // for the crowded cases are in PR #502.
   expect(styles).not.toMatch(/line-clamp/);
   expect(styles).toMatch(/\.result-meta \{[^}]*flex-wrap: wrap; row-gap: 0;/);
+  // Rows at least 25em wide (461px or more at normal text) never wrap.
+  expect(styles).toMatch(/\[role="option"\] \{ container-type: inline-size; \}/);
+  expect(styles).toMatch(/@container \(min-width: 25em\) \{ \.result-meta \{ flex-wrap: nowrap; \} \}/);
   expect(styles).toMatch(/\.result-byline \{[^}]*flex: 1 1 0; min-width: min\(12em, 60%\)/);
   expect(styles).toMatch(/\.result-authors \{ flex: 0 3 auto; min-width: 0;[^}]*text-overflow: ellipsis/);
   expect(styles).toMatch(/\.result-container \{ flex: 1 1 8em; min-width: min\(8em, 70%\);[^}]*text-overflow: ellipsis/);
@@ -1392,6 +1403,26 @@ test("with several Zotero libraries each result names its library, and a left gr
   expect(within(screen.getByText("Mine").closest("li")!).getByText("My Library")).toBeTruthy();
   await chooseFromMore("Group 9", "menuitemcheckbox");
   await waitFor(() => expect(chosen).toEqual([["user", { group: 42 }]]));
+});
+
+test("removing one of two chosen references with the same key names its library", async () => {
+  backend({
+    library_status: () => zoteroStatus(["user", { group: 42 }]),
+    zotero_groups: () => [{ id: 42, name: "Synthetic lab" }],
+    search: ({ query }) => (query ? [result("garcia2021", "Mine", "zotero:user"), result("garcia2021", "Shared", "zotero:group:42"), result("other", "Other", "zotero:user")] : []),
+  });
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "x" } });
+  await within((await screen.findByText("Shared")).closest("li")!).findByText("Synthetic lab");
+  fireEvent.click(screen.getByText("Other"));
+  fireEvent.click(screen.getByText("Mine"));
+  // Only one garcia2021 chosen so far: its key is enough.
+  expect(screen.getByRole("button", { name: "Remove garcia2021 from the selection" })).toBeTruthy();
+  fireEvent.click(screen.getByText("Shared"));
+  const chosen = within(screen.getByRole("list", { name: "Selected references" }));
+  expect(chosen.getByRole("button", { name: "Remove garcia2021 (My Library) from the selection" })).toBeTruthy();
+  expect(chosen.getByRole("button", { name: "Remove garcia2021 (Synthetic lab) from the selection" })).toBeTruthy();
+  expect(chosen.getByRole("button", { name: "Remove other from the selection" })).toBeTruthy();
 });
 
 test("a failed group list is reported and My Library stays available", async () => {

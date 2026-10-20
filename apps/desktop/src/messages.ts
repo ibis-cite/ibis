@@ -110,6 +110,8 @@ export const pickerText = {
   resultCount: (count: number) => `${count} ${count === 1 ? "result" : "results"}`,
   selectionCount: (count: number) => `${count} ${count === 1 ? "reference" : "references"} selected for citation`,
   removeReference: (key: string) => `Remove ${key} from the selection`,
+  /** When two chosen references from different libraries share a key. */
+  removeReferenceIn: (key: string, library: string) => `Remove ${key} (${library}) from the selection`,
   shortcutError: (registered: boolean, shortcut: string, reason: string) => registered
     ? `Your shortcut setting was not used: ${reason}.`
     : `The shortcut ${shortcut} is not available: ${reason}.`,

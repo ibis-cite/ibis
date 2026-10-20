@@ -58,16 +58,20 @@ main {
 .result-year, .result-meta, .result-why { color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 .result-year { flex-shrink: 0; font-variant-numeric: tabular-nums; }
 /* The meta line wraps only when the byline, type, key and badge cannot all
-   fit at their sizes (enlarged text in a narrow window); then they move under
-   the byline. Normal sizes keep one line. */
+   fit at their sizes; then they move under the byline. A row at least 25em
+   wide (any window of 461px or more at normal text) keeps one line, and its
+   key and badge shorten to their minimums instead. */
 .result-meta { margin-top: var(--metadata-gap); flex-wrap: wrap; row-gap: 0; }
+[role="option"] { container-type: inline-size; }
+@container (min-width: 25em) { .result-meta { flex-wrap: nowrap; } }
 /* Shortened authors and the container keep 60% of the line (or 12em); the
    key and library badge shorten first. Within it the authors shorten faster
    and the container keeps most of the room, each with an ellipsis. The
-   separator is text inside the container, so the byline has no gap. */
+   separator is its own part, so the byline has no gap. */
 .result-byline { display: flex; align-items: baseline; flex: 1 1 0; min-width: min(12em, 60%); overflow: hidden; }
 .result-authors { flex: 0 3 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-container { flex: 1 1 8em; min-width: min(8em, 70%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-separator { flex: none; white-space: nowrap; }
 .result-authors, .result-container { unicode-bidi: isolate; }
 .result-key { flex: 0 1 auto; min-width: min(6ch, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
 .result-why { font-style: italic; }
@@ -195,10 +199,17 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
    rows show shortened authors and the container on one line; Spacious adds
    the item type; Compact puts the first author after the title. */
 .result-type { flex: 0 1 auto; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.result-first-author { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
+.result-first-author { flex: none; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 [data-active] .result-first-author { color: var(--row-active-muted); }
 :root[data-density="compact"] .result-title { flex: 0 1 auto; }
 :root[data-density="compact"] .result-year { margin-inline-start: auto; }
+/* In a very narrow Compact row (large text in a small window) the title takes
+   its own line, with the first author and year below it, rather than being
+   squeezed beside them. */
+@container (max-width: 16em) {
+  :root[data-density="compact"] .result-line { flex-wrap: wrap; row-gap: 0; }
+  :root[data-density="compact"] .result-title { flex-basis: 100%; }
+}
 
 /* Footer key hints (#491): what Enter does now, or with Alt held the other
    keys. They stay in narrow windows and wrap instead of overlapping. */
