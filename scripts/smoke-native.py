@@ -109,25 +109,38 @@ def has_search_text(snapshot):
     return any(n.get("value") for n in named(snapshot, "Search references"))
 
 
+ESCAPE_STEP_TIMEOUT = 5
+
+
 def escape_to_hide(native, snapshot, description):
-    """Escape clears a search first and hides on the next press."""
-    had_text = has_search_text(snapshot())
-    native.key("Escape")
-    if had_text:
-        state = {}
-        def settled():
-            state["last"] = current = snapshot()
-            return not current["visible"] or not has_search_text(current)
-        try:
-            wait_for(settled, "Escape clears the search or hides the picker")
-        except AssertionError:
-            last = state.get("last", {})
-            print("ESCAPE STATE " + json.dumps({"visible": last.get("visible"),
-                  "search_has_text": has_search_text(last) if last else None}), flush=True)
-            raise
-        if snapshot()["visible"]:
+    """Escape clears a search first and hides on the next press.
+
+    macOS can report a cleared search value late, so with a search each press
+    waits only briefly and a picker that is still visible gets one spare press.
+    """
+    last = {}
+    if has_search_text(snapshot()):
+        for press in range(3):
+            if not snapshot()["visible"]:
+                return
             native.key("Escape")
-    wait_for(lambda: not snapshot()["visible"], description)
+            deadline = time.monotonic() + ESCAPE_STEP_TIMEOUT
+            while time.monotonic() < deadline:
+                last.update(snapshot())
+                if not last["visible"] or (press == 0 and not has_search_text(last)):
+                    break
+                time.sleep(0.1)
+    else:
+        native.key("Escape")
+    def hidden():
+        last.update(snapshot())
+        return not last["visible"]
+    try:
+        wait_for(hidden, description)
+    except AssertionError:
+        print("ESCAPE STATE " + json.dumps({"visible": bool(last.get("visible")),
+              "search_has_text": has_search_text(last) if last else None}), flush=True)
+        raise
 
 
 def prepare_initial_picker_show(native, snapshot):
@@ -900,6 +913,28 @@ class ContractTests(unittest.TestCase):
         escape_to_hide(native, snapshot, "hidden")
         self.assertEqual(native.key.call_args_list, [call("Escape"), call("Escape")])
         self.assertFalse(state["visible"])
+
+    def test_escape_presses_again_when_a_cleared_search_is_reported_late(self):
+        state = {"visible": True, "presses": 0}
+        native = Mock()
+        def key(name):
+            state["presses"] += 1
+            state["visible"] = state["presses"] < 2
+        native.key.side_effect = key
+        snapshot = lambda: {"visible": state["visible"], "nodes": [{"name": "Search references", "value": "stale"}]}
+        with patch(__name__ + ".ESCAPE_STEP_TIMEOUT", 0.05):
+            escape_to_hide(native, snapshot, "hidden")
+        self.assertEqual(native.key.call_args_list, [call("Escape"), call("Escape")])
+
+    def test_escape_that_never_hides_fails_after_one_spare_press(self):
+        native = Mock()
+        snapshot = lambda: {"visible": True, "nodes": [{"name": "Search references", "value": "private query"}]}
+        with patch(__name__ + ".ESCAPE_STEP_TIMEOUT", 0.05), \
+             patch(__name__ + ".wait_for", side_effect=lambda predicate, description: self.assertTrue(predicate(), description)), \
+             patch("builtins.print") as printed, self.assertRaises(AssertionError):
+            escape_to_hide(native, snapshot, "hidden")
+        self.assertEqual(native.key.call_count, 3)
+        self.assertNotIn("private query", printed.call_args.args[0])
 
     def test_hidden_initial_picker_does_not_send_escape_into_the_editor(self):
         native = self.InitialPickerModel(visible=False)
