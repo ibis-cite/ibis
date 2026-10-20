@@ -570,7 +570,9 @@ mod tests {
                 let mut libraries = vec![serde_json::json!("user"), serde_json::json!({ "group": 42 })];
                 libraries.insert(position - 1, bad.clone());
                 let mut settings = serde_json::json!({ "schema_version": 2, "library": { "zotero": libraries } });
-                let error = parse(&settings.to_string()).unwrap_err();
+                let Err(error) = parse(&settings.to_string()) else {
+                    panic!("expected the invalid-member error");
+                };
                 assert_eq!(
                     error.to_string(),
                     format!(
@@ -610,10 +612,10 @@ mod tests {
             "the settings file is not valid: Zotero library entry 2 must be \"user\" or {\"group\": <non-negative integer ID>}"
         );
         let mut changed = false;
-        assert_eq!(
-            update(&path, |_| changed = true).unwrap_err().to_string(),
-            error.to_string()
-        );
+        let Err(update_error) = update(&path, |_| changed = true) else {
+            panic!("expected the invalid-member error");
+        };
+        assert_eq!(update_error.to_string(), error.to_string());
         assert!(!changed);
         assert_eq!(fs::read_to_string(&path).unwrap_or_default(), bad);
         assert_eq!(fs::read(backup_path(&path)).unwrap_or_default(), backup);
