@@ -477,10 +477,7 @@ class Scripted:
 
     def click(self, name):
         if self.system != "Darwin":
-            state = self.call("click", name)
-            if self.system == "Windows" and isinstance(state, dict):
-                # Diagnostic for #341: window classes and process names only.
-                print(f"::notice title=click {name}::NATIVE CLICK FOCUS " + json.dumps(state.get("focus")), flush=True)
+            self.call("click", name)
             return
         state = {}
         def pressed():
@@ -871,9 +868,6 @@ def main():
                 report.update(status="failed", reason="Disposable settings cleanup failed")
                 exit_code = 1
         report["elapsed_seconds"] = round(time.monotonic() - started, 2)
-        if os.environ.get("GITHUB_ACTIONS"):  # TEMPORARY #341 diagnostics
-            print("::notice title=smoke summary::" + json.dumps({key: report.get(key) for key in (
-                "status", "reason", "last_native_state", "elapsed_seconds")} | {"passed": len(report["checks"])}), flush=True)
         (args.output / "smoke.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return exit_code
 
