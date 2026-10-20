@@ -97,7 +97,7 @@ The native smoke uses UI Automation/SendInput (Windows), System Events/CoreGraph
 
 ## Picker screenshots
 
-CI launches embedded native debug apps with the synthetic `real-world.bib` and captures every gallery state; no development server is needed. Download `picker-<commit SHA>` from the run's artifacts (retained 14 days), inspect all three platform PNGs and startup logs, and check the manifest/source SHA. Failed jobs may leave partial evidence; screenshots have no automated visual verdict and do not prove typing, focus, copying, speech or unsupported platforms. Gallery capture uses `scripts/capture-gallery.py`; Linux's Xvfb images do not establish a real desktop compositor's appearance.
+CI launches embedded native debug apps with the synthetic `real-world.bib` and captures every gallery state; no development server is needed. Download `picker-combined-<commit SHA>-attempt-<run attempt>` from the run's artifacts (retained 14 days), inspect all three platform PNGs and startup logs, and check the manifest/source SHA. Before combination, or if it fails, individual `picker-<commit SHA>-<runner OS>` artifacts may remain; successful combination deletes those shards. Failed jobs may leave partial evidence; screenshots have no automated visual verdict and do not prove typing, focus, copying, speech or unsupported platforms. Gallery capture uses `scripts/capture-gallery.py`; Linux's Xvfb images do not establish a real desktop compositor's appearance.
 
 ## Manual-only checks
 
