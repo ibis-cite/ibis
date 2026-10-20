@@ -12,7 +12,9 @@
 //! scan must agree on both; a disagreement means the library changed and
 //! the scan starts over. More items than the declared total, or a page with
 //! items when the total is zero, are an inconsistent answer and fail closed,
-//! so a partial or mismatched library is never published as complete.
+//! so a partial or mismatched library is never published as complete. A
+//! short page inside a split export also fails closed if later ranges would
+//! leave unread items between the pages.
 
 use serde_json::Value;
 use thiserror::Error;
@@ -254,6 +256,11 @@ fn scan_once(transport: &mut impl Transport, library: Library) -> Result<Option<
             return Err(ZoteroError::Incomplete);
         }
         if !ranges.is_empty() {
+            // A queued sibling starts after the whole requested range, not
+            // after a short answer. Never step over an unread gap.
+            if got < limit && items.len() + skipped.len() < count {
+                return Err(ZoteroError::Incomplete);
+            }
             continue;
         }
         if items.len() + skipped.len() == count {
@@ -606,6 +613,37 @@ mod tests {
     fn a_short_page_never_yields_a_partial_library() {
         let mut fake = Fake::default().answer(page(3, 5, &["A"])).answer(page(3, 5, &[]));
         assert_eq!(scan(&mut fake, Library::User), Err(ZoteroError::Incomplete));
+    }
+
+    #[test]
+    fn short_sequential_pages_still_read_every_item() {
+        let mut fake = Fake::default()
+            .answer(page(3, 3, &["A"]))
+            .answer(page(3, 3, &["B", "C"]));
+        let (result, _) = scan(&mut fake, Library::User).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(keys(&result), ["A", "B", "C"]);
+        assert!(result.warnings.is_empty());
+        assert_eq!(fake.asked.len(), 2);
+        assert!(fake.asked[1].ends_with("start=1"));
+    }
+
+    #[test]
+    fn a_short_split_page_at_the_total_still_reads_the_complete_library() {
+        let all = many("A", 20);
+        let all: Vec<&str> = all.iter().map(String::as_str).collect();
+        let mut fake = Fake::default()
+            .answer(Response {
+                status: 500,
+                ..Response::default()
+            })
+            .answer(page(3, 20, &all))
+            .answer(page(3, 20, &[]));
+        let (result, _) = scan(&mut fake, Library::User).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(keys(&result), all);
+        assert!(result.warnings.is_empty());
+        assert_eq!(fake.asked.len(), 3);
+        assert!(fake.asked[1].ends_with("limit=50&start=0"));
+        assert!(fake.asked[2].ends_with("limit=50&start=50"));
     }
 
     #[test]
