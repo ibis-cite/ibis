@@ -16,6 +16,16 @@ export const commands = {
 	 *  `library:changed`.
 	 */
 	useZotero: () => __TAURI_INVOKE<void>("use_zotero"),
+	/**
+	 *  Find what setup can offer: whether Zotero is open, and `.bib` files in
+	 *  the documents, desktop and downloads folders.
+	 */
+	findSources: () => __TAURI_INVOKE<Sources>("find_sources"),
+	/**
+	 *  Open the file at `index` in the list [`find_sources`] last returned and
+	 *  remember it; the result arrives as `library:changed`.
+	 */
+	openFoundLibrary: (index: number) => __TAURI_INVOKE<null>("open_found_library", { index }),
 	/**  The library as it is now, for the interface when it starts. */
 	libraryStatus: () => __TAURI_INVOKE<LibraryStatus>("library_status"),
 	/**
@@ -74,6 +84,14 @@ export type Copied = {
 
 /**  How much each result row shows (ADR 0020). */
 export type Density = "compact" | "comfortable" | "spacious";
+
+/**  A `.bib` file found on this computer. */
+export type FoundFile = {
+	/**  The file name, such as `refs.bib`. */
+	name: string,
+	/**  The name of the folder holding it, without the rest of its path. */
+	folder: string,
+};
 
 /**  Key-based output syntax. */
 export type KeyFormat =
@@ -149,3 +167,11 @@ export type ShortcutStatus = {
 	registered: boolean,
 	error: string | null,
 };
+
+/**  What first-run setup can offer. */
+export type Sources = {
+	zotero: ZoteroPresence,
+	files: FoundFile[],
+};
+
+export type ZoteroPresence = "available" | "access_off" | "absent";
