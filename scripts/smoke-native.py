@@ -62,8 +62,9 @@ def missing_library_evidence(snapshot, name):
         "failed_source_named": f"The library could not be opened: {name}",
         "retention_explained": "the library file is unavailable; keeping the last loaded references",
         "recovery_action": "Choose it again or reconnect the drive.",
-        # The footer names the searched library apart from its state words.
-        "retained_snapshot": name in text and " · not updated" in text,
+        # The footer says the library was not updated; its detail, read by
+        # screen readers, keeps the retained count. Names are isolated (U+2068/9).
+        "retained_snapshot": " · not updated" in text and " · 4 references" in text,
     }.items()}
 
 
@@ -1525,7 +1526,8 @@ class ContractTests(unittest.TestCase):
         message = (f"The library could not be opened: {name}. "
                    "the library file is unavailable; keeping the last loaded references. "
                    "Choose it again or reconnect the drive.")
-        current = {"nodes": [{"name": message}, {"value": name}, {"value": " · not updated"}]}
+        current = {"nodes": [{"name": message}, {"value": name}, {"value": " · not updated"},
+                             {"value": f"\u2068{name}\u2069 · 4 references. checked just now, 12:00 PM · the file could not be read"}]}
         self.assertTrue(all(missing_library_evidence(current, name).values()))
         current["nodes"].pop()
         evidence = missing_library_evidence(current, name)

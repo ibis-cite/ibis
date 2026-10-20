@@ -49,18 +49,23 @@ export function LibraryStatusLine({ library, groupName }: {
   const health = libraryHealth(library);
   const [source, state] = libraryMessages.summaryParts(library);
   const age = libraryMessages.age(library, now);
-  const detail = libraryMessages.detail(library, now, (status) => zoteroLibraryNames(status, groupName)).filter(Boolean).join("\n");
+  const lines = libraryMessages.detail(library, now, (status) => zoteroLibraryNames(status, groupName));
+  const detail = lines.filter(Boolean).join("\n");
   return (
-    <span className="library-status" data-health={health} title={detail}>
-      <span className="status-dot" data-health={health} aria-hidden="true" />
-      <span className="library-words">
-        <span className="library-name" role="status" aria-label={pickerText.libraryStatus} aria-live="polite" aria-atomic="true">
-          {source !== null && <bdi className="library-source">{source}</bdi>}
-          {state && <span className="library-state">{state}</span>}
+    <>
+      <span className="library-status" data-health={health} title={detail}>
+        <span className="status-dot" data-health={health} aria-hidden="true" />
+        <span className="library-words">
+          <span className="library-name" role="status" aria-label={pickerText.libraryStatus} aria-live="polite" aria-atomic="true">
+            {source !== null && <bdi className="library-source">{source}</bdi>}
+            {state && <span className="library-state">{state}</span>}
+          </span>
+          {age && <span className="library-age"> · {age}</span>}
         </span>
-        {age && <span className="library-age"> · {age}</span>}
       </span>
-    </span>
+      {/* The hover detail, for screen readers reading the footer; not live. */}
+      {lines[1] && <span className="visually-hidden library-detail">{`${lines[0]}. ${lines[1]}`}</span>}
+    </>
   );
 }
 

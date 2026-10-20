@@ -748,6 +748,18 @@ fn install_result(
     loaded: Result<Library, String>,
     automatic: bool,
 ) -> Option<LibraryStatus> {
+    // Compare references outside the lock, so searches and status reads do
+    // not wait on a large library; the installed index is checked again below.
+    let compared = match &loaded {
+        Ok(new) if new.source.is_some() => {
+            let (source, index) = library
+                .lock()
+                .ok()
+                .map(|current| (current.source.clone(), Arc::clone(&current.index)))?;
+            (new.source == source).then(|| (index.references() == new.index.references(), index))
+        }
+        _ => None,
+    };
     let mut library = library.lock().ok()?;
     if requests.0.load(Ordering::SeqCst) != request {
         return None;
@@ -764,8 +776,11 @@ fn install_result(
             new.settings_notice = library.settings_notice.take();
             // Only a reread of the same library that brought different
             // references is an update worth telling.
-            if new.source.is_some() && new.source == library.source {
-                new.changed_at = if new.index.references() == library.index.references() {
+            if let Some((same, index)) = compared
+                && new.source == library.source
+            {
+                // Unchanged only if the compared index is still the installed one.
+                new.changed_at = if same && Arc::ptr_eq(&index, &library.index) {
                     library.changed_at
                 } else {
                     new.checked_at

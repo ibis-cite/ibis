@@ -82,6 +82,16 @@ test("names are isolated so right-to-left names keep their place", () => {
   expect(status.textContent).toBe("مراجع.bib · 1,204 references");
 });
 
+test("screen readers can read the detail, including the count kept after a failed update", () => {
+  const { container } = render(createElement(LibraryStatusLine, {
+    library: file({ state: "error", stale: true, error: "The library file is unavailable; keeping the last loaded references", references: 4 }),
+    groupName: String,
+  }));
+  expect(container.querySelector(".library-status")?.textContent).toMatch(/^thesis\.bib · not updated · checked /);
+  expect(strip(container.querySelector(".library-detail")?.textContent ?? null)).toMatch(
+    /^thesis\.bib · 4 references\. checked .+ ago, .+ · the file could not be read$/);
+});
+
 test("missing fields from an older backend show no age instead of a wrong one", () => {
   const old = { ...file(), updated_at: undefined, checked_at: undefined, stale: undefined, snapshot_zotero: undefined } as unknown as LibraryStatus;
   expect(line(old)).toBe("thesis.bib · 1,204 references");

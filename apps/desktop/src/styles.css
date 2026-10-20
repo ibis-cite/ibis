@@ -122,7 +122,8 @@ footer { border-top: var(--border-width) solid var(--line); padding: var(--foote
 .library-words, .library-name { display: flex; min-width: 0; overflow: hidden; white-space: pre; }
 /* A long name is shortened before the state words; the age goes first of all. */
 .library-source { min-width: 3ch; flex-shrink: 100; overflow: hidden; text-overflow: ellipsis; }
-.library-state { flex: none; }
+/* Shrinks only once the name is as short as it gets, then ends with an ellipsis. */
+.library-state { flex: 0 0.00001 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .library-age { min-width: 0; flex-shrink: 1000; overflow: hidden; text-overflow: ellipsis; }
 .library-status[data-health="stop"] .library-name, .library-status[data-health="look"] .library-name { color: var(--text); }
 .library-bar p { width: 100%; margin: var(--library-notice-margin); }
