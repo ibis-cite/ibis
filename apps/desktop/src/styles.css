@@ -83,7 +83,9 @@ footer { border-top: var(--border-width) solid var(--line); padding: var(--foote
 .format-picker::after { content: "▾"; }
 .format-picker:hover { background: var(--hover-background); color: var(--text); }
 .format-picker:focus-within { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
-.format-picker select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: default; }
+/* Older WebKit lets long option labels extend a flex item's scrollable area
+   even though the closed select fits. Contain that native control, not the page. */
+.format-picker select { position: absolute; inset: 0; width: 100%; overflow: hidden; opacity: 0; cursor: default; }
 
 /* The pin appears with the pointer or while on, without moving anything. */
 .pin-button { display: inline-grid; place-items: center; min-width: var(--control-min-size); min-height: var(--control-min-size); padding: 0; background: var(--clear); border-color: var(--clear); color: var(--muted); opacity: 0; transition: opacity var(--motion-feedback) var(--motion-ease); }
@@ -94,7 +96,7 @@ main:hover .pin-button, .pin-button:focus-visible { opacity: 1; }
 /* More stays at the far end even when the footer wraps, so its menu opens inward. */
 .more { position: relative; margin-inline-start: auto; }
 .more > button { min-height: var(--control-min-size); }
-[role="menu"] { position: absolute; bottom: calc(100% + var(--space-1)); inset-inline-end: 0; z-index: 1; min-width: var(--menu-min-width); display: flex; flex-direction: column; padding: var(--space-1); background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }
+[role="menu"] { position: absolute; bottom: calc(100% + var(--space-1)); inset-inline-end: 0; z-index: 1; min-width: min(var(--menu-min-width), calc(100vw - 2 * var(--space-4))); display: flex; flex-direction: column; padding: var(--space-1); background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }
 [role="menuitem"] { display: flex; justify-content: space-between; gap: var(--space-4); min-height: var(--control-min-size); align-items: center; text-align: start; border: 0; background: var(--clear); }
 [role="menuitem"]:hover, [role="menuitem"]:focus-visible { background: var(--hover-background); }
 [role="menuitem"] kbd { color: var(--muted); }
@@ -118,7 +120,9 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
      a tall footer and a tiny nested results viewport. */
   main { height: auto; min-height: var(--picker-height); overflow: visible; }
   .results-area { flex: none; overflow: visible; }
-  .search-bar { padding: var(--compact-search-padding); }
+  .search-bar { padding: var(--compact-search-padding); flex-wrap: wrap; }
+  /* Keep an editable search row when enlarged text leaves no room for controls. */
+  #search { flex: 1 1 calc(100% - var(--search-icon-width) - var(--search-gap)); width: auto; }
   .result-meta { flex-wrap: wrap; }
   .result-authors { white-space: normal; }
   .key-hints { display: none; }

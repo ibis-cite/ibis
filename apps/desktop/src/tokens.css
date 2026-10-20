@@ -145,7 +145,7 @@
   --gallery-title-gap: .5rem;
   --gallery-frame-min-width: 36rem;
   --gallery-frame-height: 30rem;
-  --gallery-large-text-size: 150%;
+  --gallery-large-text-size: 200%;
 }
 
 /* Older system webviews retain usable system colours. */
