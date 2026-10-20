@@ -39,16 +39,17 @@ main {
 .result-year, .result-meta, .result-why { color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 .result-year { flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .result-meta { margin-top: var(--metadata-gap); }
-/* Authors and container are one text run that keeps a real width: when the
-   key, type and library badge leave less than 16em, they move to the next
-   line instead. A container that still does not fit moves to a second line
-   of its own before it is shortened. */
-.result-meta { flex-wrap: wrap; }
-.result-byline { flex: 1 1 min(16em, 100%); min-width: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+/* Shortened authors and the container keep 60% of the line (or 12em); the
+   key and library badge shorten first. Within it the authors shorten faster
+   and the container keeps most of the room, each with an ellipsis. The separator is text
+   inside the container, so the byline has no gap of its own. */
+.result-byline { display: flex; align-items: baseline; flex: 1 1 0; min-width: min(12em, 60%); overflow: hidden; }
+.result-authors { flex: 0 3 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-container { flex: 1 1 8em; min-width: min(8em, 70%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-authors, .result-container { unicode-bidi: isolate; }
-.result-key { flex-shrink: 1; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
+.result-key { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
 .result-why { font-style: italic; }
-.result-library { flex-shrink: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-library { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 [role="option"]:hover:not([data-active]):not([data-citation-selected]) { background: var(--hover-background); }
 /* Active and selected remain distinguishable even without colour. */
 [role="option"][data-active] { background: var(--active-background); border-color: var(--active-edge); box-shadow: inset var(--active-edge-width) 0 var(--accent); }
@@ -133,7 +134,9 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
   /* Keep an editable search row when enlarged text leaves no room for controls. */
   #search { flex-basis: calc(100% - var(--search-icon-width) - var(--search-gap)); }
   .result-meta { flex-wrap: wrap; }
+  /* Authors and container flow as one wrapping run of text. */
   .result-byline { display: block; }
+  .result-authors, .result-container { white-space: normal; overflow-wrap: anywhere; }
   .key-hints { display: none; }
 }
 /* No animation: reduced-motion users get the same immediate feedback. */
@@ -154,7 +157,7 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
    rows show the container after the authors in the same text run, so it is
    shortened first; Spacious adds the item type; Compact puts the first author
    after the title. */
-.result-type { flex-shrink: 0; }
+.result-type { flex: none; }
 .result-first-author { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 [data-citation-selected] .result-first-author { color: inherit; }
 :root[data-density="compact"] .result-title { flex: 0 1 auto; }

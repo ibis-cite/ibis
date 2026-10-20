@@ -907,17 +907,18 @@ test("rows with the same first author and year are told apart by their container
   expect(rows[0]?.querySelector(".result-container bdi")?.textContent).toBe("Journal of Sleep \u202eResearch");
   expect(rows[0]?.textContent).toContain("García, Okafor");
   expect(rows[0]?.querySelector(".result-type, .result-first-author")).toBeNull();
-  // Authors and container are one text run with one evenly spaced separator,
-  // not two flex items whose gap widens the space before the "·".
+  // One separator, spaced like the words around it: a no-break space before
+  // it (a plain one would collapse at the start of the flex item) and a space
+  // after, with no gap, margin or padding of its own.
   const byline = rows[0]?.querySelector(".result-byline");
   expect(byline?.querySelector(".result-authors + .result-container")).toBeTruthy();
-  expect(byline?.textContent).toBe("García, Okafor · Journal of Sleep \u202eResearch");
-  expect(byline?.querySelectorAll("[aria-hidden]").length).toBe(1);
-  const authorAndContainerRules = [...styles.matchAll(/([^{}]*\.result-(?:authors|container)[^{}]*)\{([^}]*)\}/g)];
-  expect(authorAndContainerRules.length).toBeGreaterThan(0);
-  for (const [, , body] of authorAndContainerRules) expect(body).not.toMatch(/width|margin|padding|gap|flex/);
-  // A match in the container that the row shows needs no explanation.
-  expect(rows[1]?.textContent).not.toContain("Matched in");
+  expect(byline?.textContent).toBe("García, Okafor\u00a0· Journal of Sleep \u202eResearch");
+  expect([...(byline?.querySelectorAll("[aria-hidden]") ?? [])].map((e) => e.textContent)).toEqual(["\u00a0· "]);
+  const bylineRules = [...styles.matchAll(/([^{}]*\.result-(?:byline|authors|container)\b[^{}]*)\{([^}]*)\}/g)];
+  expect(bylineRules.length).toBeGreaterThan(0);
+  for (const [, , body] of bylineRules) expect(body).not.toMatch(/margin|padding|gap|(^|[^-])width:/);
+  // The row may shorten the container, so a match there is always named.
+  expect(rows[1]?.textContent).toContain("Matched in");
   expect(rows[2]?.querySelector(".result-container")).toBeNull();
   unmount();
 
@@ -946,27 +947,34 @@ test("rows with the same first author and year are told apart by their container
   expect(rows[1]?.textContent).toContain("Matched in");
 });
 
-test("a match in a container that the row cuts off is still explained", async () => {
-  // Layout stand-in: the line is 200px wide and every container runs past it.
-  const rect = (left: number, right: number) => ({ left, right, top: 0, bottom: 10, width: right - left, height: 10, x: left, y: 0, toJSON: () => ({}) });
-  const measured = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
-    if (this.classList.contains("result-byline")) return rect(0, 200) as DOMRect;
-    if (this.classList.contains("result-container")) return rect(120, 480) as DOMRect;
-    return rect(0, 0) as DOMRect;
-  });
+test("rows shorten the authors and keep the meta line to one line with room for the journal", async () => {
   backend({ search: () => [
-    { ...result("a", "Clipped journal"), authors: "García, Okafor, Lima, Chen, Novak, Haddad", container: "Journal of Synthetic Studies", matched: ["container"] },
-    { ...result("b", "No journal"), matched: ["title"] },
+    { ...result("a", "Six authors"), authors: "García, Okafor, Lima, Chen, Novak, Haddad", first_author: "García", more_authors: true, container: "Journal of Sleep Research" },
+    { ...result("b", "Two authors"), authors: "García, Okafor", first_author: "García", more_authors: true, container: "Sleep" },
+    { ...result("c", "One author"), container: "Sleep" },
   ] });
   render(<App />);
-  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "synthetic" } });
-  await screen.findByText("No journal");
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
+  await screen.findByText("One author");
   const rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
-  await waitFor(() => expect(rows[0]?.textContent).toContain("Matched in"));
-  // The authors and container keep a real width; the key and badges wrap first.
-  expect(styles).toMatch(/\.result-byline \{ flex: 1 1 min\(16em, 100%\);[^}]*line-clamp: 2;/);
-  expect(styles).toMatch(/\.result-meta \{ flex-wrap: wrap; \}/);
-  measured.mockRestore();
+  const authors = (row?: HTMLElement) => row?.querySelector(".result-authors");
+  // Three or more: "García et al." on screen; screen readers still hear every name.
+  expect(authors(rows[0])?.querySelector("[aria-hidden]")?.textContent).toBe("García et al.");
+  expect(authors(rows[0])?.querySelector(".visually-hidden")?.textContent).toBe("García, Okafor, Lima, Chen, Novak, Haddad");
+  expect(authors(rows[1])?.textContent).toBe("García, Okafor");
+  expect(authors(rows[2])?.textContent).toBe("Smith");
+  // One line (wrapping only in the narrow layout), with a real share for the
+  // journal; the key and library badge shorten first. Chromium probe numbers
+  // for the crowded cases are in PR #502.
+  const narrow = styles.indexOf("@media (max-width: 460px)");
+  const wide = styles.slice(0, narrow) + styles.slice(styles.indexOf("}\n/* No animation", narrow));
+  expect(wide).not.toMatch(/\.result-(?:meta|byline)[^{]*\{[^}]*flex-wrap/);
+  expect(styles).not.toMatch(/line-clamp/);
+  expect(styles).toMatch(/\.result-byline \{[^}]*flex: 1 1 0; min-width: min\(12em, 60%\)/);
+  expect(styles).toMatch(/\.result-authors \{ flex: 0 3 auto; min-width: 0;[^}]*text-overflow: ellipsis/);
+  expect(styles).toMatch(/\.result-container \{ flex: 1 1 8em; min-width: min\(8em, 70%\);[^}]*text-overflow: ellipsis/);
+  expect(styles).toMatch(/\.result-key \{ flex: 0 1 auto; min-width: 0;/);
+  expect(styles).toMatch(/\.result-library \{ flex: 0 1 auto; min-width: 0;/);
 });
 
 test("Escape clears the search before it hides the picker, keeping chosen references", async () => {

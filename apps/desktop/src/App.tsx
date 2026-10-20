@@ -49,10 +49,16 @@ const commandKey = (e: React.KeyboardEvent) => (isMac ? e.metaKey && !e.ctrlKey 
 const VISIBLE_FIELDS = new Set(["title", "author", "citekey", "year"]);
 
 /** The strongest match the row does not show, if every match is hidden. */
-function hiddenMatch(matched: string[], containerShown = false): string | null {
-  const shown = (field: string) => VISIBLE_FIELDS.has(field) || (containerShown && field === "container");
-  if (matched.length === 0 || matched.some(shown)) return null;
+function hiddenMatch(matched: string[]): string | null {
+  if (matched.length === 0 || matched.some((field) => VISIBLE_FIELDS.has(field))) return null;
   return matched[0] ?? null;
+}
+
+/** Authors as a row shows them: "García", "García, Okafor" or "García et al.". */
+function shortAuthors(r: SearchResult): string {
+  if (!r.first_author || !r.more_authors) return r.authors;
+  const rest = r.authors.startsWith(`${r.first_author}, `) ? r.authors.slice(r.first_author.length + 2) : null;
+  return rest !== null && !rest.includes(", ") ? r.authors : `${r.first_author} ${rowText.etAl}`;
 }
 
 /** Done, Look or Stop for the footer dot; words carry the same meaning. */
@@ -204,9 +210,6 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // file to defaults.
   const [density, setDensity] = useState<Density>("comfortable");
   const [largerText, setLargerText] = useState(false);
-  const resultList = useRef<HTMLUListElement>(null);
-  /** Rows whose container is cut off, so a match in it must still be explained. */
-  const [clippedContainers, setClippedContainers] = useState<ReadonlySet<string>>(() => new Set());
   const savedPreferences = useRef<PickerPreferences | null>(null);
   const pending = useRef<Partial<PickerPreferences>>({});
   const pendingKeyFormat = useRef<{ format: CopyFormat; saved: boolean } | null>(null);
@@ -264,31 +267,6 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       delete document.documentElement.dataset.textSize;
     };
   }, [density, largerText]);
-  // The container follows the authors in one text run and is cut off first
-  // when two lines are not enough, so measure which rows cut it off. This runs
-  // after the effect above applies the density and text size.
-  useEffect(() => {
-    const list = resultList.current;
-    if (!list) return;
-    const measure = () => {
-      const clipped = new Set<string>();
-      for (const line of list.querySelectorAll<HTMLElement>(".result-byline")) {
-        const container = line.querySelector(".result-container");
-        if (!container || !line.dataset.row) continue;
-        const shown = line.getBoundingClientRect();
-        const full = container.getBoundingClientRect();
-        const outside = full.left < shown.left - 0.5 || full.right > shown.right + 0.5 || full.bottom > shown.bottom + 0.5;
-        if (outside) clipped.add(line.dataset.row);
-      }
-      setClippedContainers((before) => before.size === clipped.size && [...clipped].every((row) => before.has(row)) ? before : clipped);
-    };
-    measure();
-    if (typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(measure);
-    // Each line too: a library badge or key can narrow it while the list keeps its size.
-    for (const element of [list, ...list.querySelectorAll(".result-byline")]) observer.observe(element);
-    return () => observer.disconnect();
-  }, [results, density, largerText]);
 
   const togglePin = () => {
     const on = !pinned;
@@ -709,11 +687,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>
-        <ul id="results" ref={resultList} role="listbox" aria-label={pickerText.results}>
+        <ul id="results" role="listbox" aria-label={pickerText.results}>
           {results.map((r, i) => {
             const compact = density === "compact";
-            // A match in the container needs no explanation while the row shows all of it.
-            const why = hiddenMatch(r.matched, !compact && Boolean(r.container) && !clippedContainers.has(idKey(r.id)));
+            // A match in the container is always named: the row may shorten the container.
+            const why = hiddenMatch(r.matched);
+            const authors = shortAuthors(r);
             const itemType = density === "spacious" ? rowText.itemType(r.item_type) : null;
             return (
               <li
@@ -734,10 +713,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                   <span className="result-year">{r.year ?? pickerText.noDate}</span>
                 </span>
                 <span className="result-meta">
-                  {/* One text run, so the separator is spaced like the words around it and the container is shortened first. */}
-                  <span className="result-byline" data-row={idKey(r.id)}>
-                    <span className="result-authors">{r.authors}</span>
-                    {!compact && r.container && <span className="result-container"><span aria-hidden="true">{" · "}</span><bdi>{r.container}</bdi></span>}
+                  {/* The separator sits inside the container; a no-break space keeps the space before it. */}
+                  <span className="result-byline">
+                    <span className="result-authors">
+                      {authors === r.authors ? authors : <><span aria-hidden="true">{authors}</span><span className="visually-hidden">{r.authors}</span></>}
+                    </span>
+                    {!compact && r.container && <span className="result-container">{r.authors && <span aria-hidden="true">{"\u00a0· "}</span>}<bdi>{r.container}</bdi></span>}
                   </span>
                   {itemType && <span className="result-type">{itemType}</span>}
                   <code className="result-key">{r.key}</code>
