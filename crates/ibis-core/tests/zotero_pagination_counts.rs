@@ -36,7 +36,6 @@ fn page(total: usize, items: &[Value]) -> Response {
 }
 
 #[test]
-#[ignore = "#263: an unchanged-version count drop silently publishes a partial library"]
 fn a_changed_total_at_one_version_cannot_publish_a_partial_snapshot() {
     let first: Vec<_> = (0..PAGE_SIZE).map(item).collect();
     let mut fake = Fake([page(200, &first), page(101, &[item(100)])].into());
@@ -49,8 +48,20 @@ fn a_changed_total_at_one_version_cannot_publish_a_partial_snapshot() {
 }
 
 #[test]
-#[ignore = "#263: a nonempty page with zero total is accepted as a complete snapshot"]
 fn a_page_exceeding_its_declared_total_is_incomplete() {
     let mut fake = Fake([page(0, &[item(0)])].into());
+    assert_eq!(scan(&mut fake, Library::User), Err(ZoteroError::Incomplete));
+}
+
+#[test]
+fn a_last_page_with_more_items_than_the_declared_total_is_incomplete() {
+    let first: Vec<_> = (0..PAGE_SIZE).map(item).collect();
+    let mut fake = Fake(
+        [
+            page(PAGE_SIZE + 1, &first),
+            page(PAGE_SIZE + 1, &[item(100), item(101)]),
+        ]
+        .into(),
+    );
     assert_eq!(scan(&mut fake, Library::User), Err(ZoteroError::Incomplete));
 }
