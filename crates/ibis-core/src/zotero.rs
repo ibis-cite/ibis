@@ -392,8 +392,9 @@ fn partial_date(parts: &Value, name: &str, problems: &mut Vec<String>) -> Option
 /// tags CSL understands, written in their canonical lower-case form, and
 /// escape everything else, so a title such as "p < 0.05" is never mistaken
 /// for markup. Tag names and attributes match ASCII case-insensitively and
-/// may have spaces inside the angle brackets (`<I>`, `<i >`, `</ i>`), as
-/// Zotero's editor and imports produce them.
+/// may have trailing spaces or space after a closing slash (`<I>`, `<i >`,
+/// `</ i>`), as Zotero's editor and imports produce them. A space immediately
+/// after `<` stays literal text.
 fn rich_text(title: &str) -> String {
     let mut out = String::with_capacity(title.len());
     let mut rest = title;
@@ -420,6 +421,11 @@ fn rich_text(title: &str) -> String {
 /// the `<` beginning `rest`, if it is one CSL understands. Only a bounded
 /// prefix is examined, so a long run of `<` or spaces stays linear.
 fn rich_text_tag(rest: &str) -> Option<(&'static str, usize)> {
+    // Otherwise a comparison such as `a < b > c` becomes a bold tag and
+    // loses its variable when converted to plain display/search text.
+    if rest.as_bytes().get(1).is_some_and(u8::is_ascii_whitespace) {
+        return None;
+    }
     /// Longest accepted tag plus room for whitespace.
     const MAX_TAG_LEN: usize = 64;
     const ATTRIBUTES: [(&str, &str, &str); 2] = [
@@ -800,6 +806,30 @@ mod tests {
         )
         .references[0];
         assert_eq!(r.title_plain().as_deref(), Some("a < b"));
+    }
+
+    #[test]
+    fn spaced_comparisons_stay_literal_in_titles_and_search() {
+        for (title, escaped, query) in [
+            ("a < b > c", "a &lt; b &gt; c", "b"),
+            ("日本 < i > 한국어", "日本 &lt; i &gt; 한국어", "i"),
+            ("a < /b > c", "a &lt; /b &gt; c", "b"),
+            ("a <\tb > c", "a &lt;\tb &gt; c", "b"),
+        ] {
+            let result = load_items(
+                Library::User,
+                &[item("K", json!({}), json!({ "type": "book", "title": title }))],
+            );
+            assert!(result.warnings.is_empty());
+            let reference = &result.references[0];
+            assert_eq!(reference.title.as_deref(), Some(escaped), "{title}");
+            assert_eq!(reference.title_plain().as_deref(), Some(title), "{title}");
+            assert_eq!(
+                crate::search::Index::new(&result.references).search(query, 10).len(),
+                1,
+                "{title}"
+            );
+        }
     }
 
     #[test]
