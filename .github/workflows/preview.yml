@@ -511,6 +511,26 @@ jobs:
           rm feed/*.sig
           cat feed/latest.json
 
+      # The update test (update-e2e job) starts the nightly being replaced and
+      # lets it update itself to this one. Only the file is kept; nothing from
+      # it runs in this job.
+      - name: Keep the previous nightly for the update test
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir previous
+          gh release download nightly --repo "$REPO" --pattern Ibis-Linux.AppImage --pattern latest.json --dir previous ||
+            echo "No previous nightly with an update feed; the update test will be skipped."
+
+      - name: Upload the previous nightly
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: previous-nightly
+          path: previous/*
+          if-no-files-found: ignore
+          retention-days: 3
+
       # The nightly tag moves to each new main commit. It never matches v*, so
       # it starts no release build, and Release Please ignores it.
       - name: Replace the nightly pre-release
@@ -556,3 +576,71 @@ jobs:
             gh api --method POST "repos/$REPO/git/refs" -f ref="refs/tags/$TAG" -f sha="$SHA" > /dev/null
           fi
           gh release edit "$TAG" --repo "$REPO" --prerelease --draft=false --title "Ibis nightly" --notes-file notes.md
+
+  update-e2e:
+    name: Update the previous nightly to this one (Linux)
+    needs: nightly
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Download the previous nightly
+        id: previous
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        continue-on-error: true
+        with:
+          name: previous-nightly
+          path: previous
+
+      - name: Download this build
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ibis-x86_64-unknown-linux-gnu
+          path: dist
+
+      # Runs only when the previous nightly can update (it has a feed) and the
+      # published feed now names this build, which the nightly job skips when
+      # main has already moved on.
+      - name: Decide whether to run
+        id: decide
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          version=$(node scripts/update-feed.mjs version)
+          published=$(curl -fsSL "https://github.com/$REPO/releases/download/nightly/latest.json" | jq -r .version)
+          if [ ! -f previous/latest.json ] || [ ! -f previous/Ibis-Linux.AppImage ]; then
+            echo "::notice::Update test skipped: the previous nightly had no update feed."
+          elif [ "$published" != "$version" ]; then
+            echo "::notice::Update test skipped: the published nightly is $published, not this build ($version)."
+          elif [ "$(jq -r .version previous/latest.json)" = "$version" ]; then
+            echo "::notice::Update test skipped: the previous nightly is this same build."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Updating $(jq -r .version previous/latest.json) to $version"
+          fi
+
+      - name: Update the previous nightly
+        if: steps.decide.outputs.run == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb xauth python3-pyatspi at-spi2-core libfuse2t64 fonts-noto-core
+          /usr/bin/python3 scripts/update-e2e.py --self-test
+          xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- /usr/bin/python3 scripts/update-e2e.py \
+            --previous previous/Ibis-Linux.AppImage --expected dist/Ibis-Linux.AppImage --output update-e2e
+
+      - name: Upload the update test logs
+        if: always() && steps.decide.outputs.run == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: update-e2e
+          path: update-e2e/*
+          if-no-files-found: warn
+          retention-days: 14
