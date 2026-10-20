@@ -451,6 +451,9 @@ class Scripted:
         if result.returncode:
             # Helpers emit fixed diagnostics only, never tree or clipboard text.
             print(result.stderr, file=sys.stderr)
+            if os.environ.get("GITHUB_ACTIONS"):  # TEMPORARY #361 diagnostics: fixed helper lines only
+                fixed = [line for line in result.stderr.splitlines() if line.startswith(("NATIVE HELPER ERROR ", "NATIVE HELPER STAGE "))]
+                print(f"::notice title=helper {action}::" + " | ".join(fixed[-3:]), flush=True)
             raise subprocess.CalledProcessError(result.returncode, self.command, stderr=result.stderr)
         return json.loads(result.stdout)
 
@@ -882,6 +885,9 @@ def main():
                 report.update(status="failed", reason="Disposable settings cleanup failed")
                 exit_code = 1
         report["elapsed_seconds"] = round(time.monotonic() - started, 2)
+        if os.environ.get("GITHUB_ACTIONS"):  # TEMPORARY #361 diagnostics
+            print("::notice title=smoke summary::" + json.dumps({key: report.get(key) for key in (
+                "status", "reason", "elapsed_seconds")} | {"passed": len(report["checks"])}), flush=True)
         (args.output / "smoke.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return exit_code
 
