@@ -66,11 +66,11 @@ platform, so a source or a reference type always looks the same.
 | | macOS | Windows 11 | Linux (GNOME) |
 |---|---|---|---|
 | Material | Translucent glass | Mica, content on a lighter layer | Flat |
-| Window radius | 20 px | 8 px (4 px controls) | 14 px |
+| Window radius | 12 pt, the native panel corner (#236) | 8 px (4 px controls) | 14 px |
 | Selected row | Filled accent, white text | Soft grey with an accent pill on the left | Accent tint |
 | Search box | Frameless, large | Text box with an underline that turns accent on focus | Framed entry |
 | Shortcut labels | ⌘ ⌥ ⇧ | Ctrl Alt Shift | Ctrl Super Shift |
-| Copied | Pill near the top of the screen | Notification bottom-right | Toast at the bottom |
+| Copied | Pill near the top of the screen | Notice bottom-right | Toast at the bottom |
 
 High contrast and reduced transparency replace every material with the opaque
 system surface, as [native appearance groundwork](https://github.com/ibiscite/ibis/pull/232#issuecomment-6282577029) already does.
@@ -87,7 +87,7 @@ system surface, as [native appearance groundwork](https://github.com/ibiscite/ib
 | Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab cycles them. |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter or Tab picks the first. |
 | Row: title and year | Always | Year at the right edge, in the same place on every row. |
-| Row: authors and journal | Comfortable and Spacious | Compact shows the first author ("García et al.") after the title. |
+| Row: authors and journal | Comfortable and Spacious | Tells apart references with the same first author and year. The journal is the container title (journal, book or proceedings), else the publisher. Spacious adds the item type as one word ("Article", "Book"). One line: authors are shortened as in a citation ("García", "García, Okafor", or "García et al." for three or more; screen readers hear every name), then the journal, each with an ellipsis (the key and library label shorten first, never below a few letters, and the type word stays whole; only when enlarged text leaves no room do they move under them); a match in the journal is always named, since it may be shortened. Compact shows the first author ("García et al.") after the title. |
 | Row: why it matched | Only when hidden | "In the abstract: …sleep…" or "Tagged: …" when the match is not in the title or authors. |
 | PDF or Web label | When a file is attached | Says what is attached ("PDF · 12 pp") and opens the preview. No empty column otherwise. |
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
@@ -111,6 +111,8 @@ Pandoc, `\autocite`, `\parencite`, `\textcite`, `\cite`, Typst and bare keys.
 The five bundled citation styles are separate choices ([ADR 0020](adr/0020-picker-preferences.md)).
 Number-key bindings are not implemented or assigned here; the shared key table
 for #223 must name each binding before any are advertised.
+That table is `apps/desktop/src/keys.ts`; the `?` overlay (Ctrl/⌘ / inside the
+search box), the footer hints and the More menu all read their labels from it.
 
 No pop-up tour and no "advanced mode". Tooltips appear after 600 ms and name the
 action and its key. Empty and no-result states say what to try next. Footer tips
@@ -155,13 +157,16 @@ per display. On small screens, the preview replaces the list instead of sitting
 beside it.
 
 **Giving focus back.** After Enter, Ibis hides and focus returns to the window it
-came from. If inserting fails, the citation is on the clipboard and a notice says
-why. Shift+Enter adds to the tray and keeps Ibis open. When pinned, Enter inserts
+came from, and a short "Copied" (or "Inserted") notice appears where the
+table above says, drawn by Ibis in a small window that never takes focus;
+native system notifications may replace it later. If inserting fails, the
+citation is on the clipboard and a notice says why. Shift+Enter adds to the tray and keeps Ibis open. When pinned, Enter inserts
 and Ibis stays open.
 
 **Escape** steps back one layer: close a menu or dialog, close the preview,
-clear the search and filters, then hide. With sources in the tray, the last step
-asks once before discarding them. Escape never unpins.
+clear the search and filters, then hide. Nothing asks for confirmation. After
+hiding, the search is kept in memory for a minute (#314); bringing back a search
+that Escape cleared is still to do (rollout step 3). Escape never unpins.
 
 **Pinned** Ibis floats above the document, keeps its place, and does not take
 focus until clicked or summoned. It is the only time Ibis stays on top.
@@ -194,9 +199,12 @@ is pressed again.
   directly, as on Windows.
 
 **Accessibility.** Reduced motion uses fades only. Screen readers hear the
-result count and, per row, title, first author, year and why it matched;
+result count and, per row, title, first author, year, journal or container
+(Comfortable and Spacious) and why it matched;
 "Copied" is announced politely. Every action has a key; focus rings are always
-visible (2 px, accent). Right-to-left titles align right within their row.
+visible (2 px, accent), except on the frameless macOS search field, where the
+caret and the active row are the cue, as in Spotlight. With increased contrast
+or forced colours, that field shows the ring too. Right-to-left titles align right within their row.
 
 ## Rollout
 
@@ -212,16 +220,30 @@ which tips were seen) need an ADR before new `settings.json` fields are added.
 1. **Done (#307).** Design values in `tokens.css`: type scale, densities, radii,
    motion and colour roles, without changing layout. Remaining motion work:
    enforce the 280 ms cap and reduced-motion behavior for every transition.
-2. Picker layout: header (search, format, pin), rows, footer with library status
-   and More, empty and no-result text.
-3. Window behaviour that needs no settings: outside-click hiding, keeping the
-   search in memory for a minute, the Escape ladder, and staying on top only
+2. **Done in structure (#313); proportions and details in progress.** Picker
+   layout: header (search, format, pin), rows, footer with library status and
+   More, empty and no-result text. Remaining: header height, the per-platform
+   search box, selected row and the citation colour (#490); the footer's Enter
+   hint, the `?` key list and no-result actions (#491); rows that tell similar
+   references apart (#492).
+3. **Partly done (#314).** Window behaviour that needs no settings:
+   outside-click hiding, keeping the search in memory for a minute, the Escape ladder, and staying on top only
    when pinned. Hide the quick picker from the taskbar, Dock and Alt+Tab; verify
    each platform separately (macOS already uses an accessory panel). Add the
    full-screen/presentation shortcut guard and its second-press override.
    Separately verify the macOS panel opens over full-screen apps in the current
    Space; the panel already has this configuration, which is not evidence that
    every native scenario passes.
+   Status (#495): the quick picker asks to stay out of the taskbar on Windows
+   and Linux, and the Linux native smoke checks the X11 hints. The full-screen
+   guard (a second press within 2 seconds opens Ibis anyway) works where the
+   window manager reports full-screen windows (X11). Windows and macOS have no
+   detection yet: it needs native calls the safe dependencies do not offer, so
+   there the shortcut always opens Ibis. Hiding the picker from Windows Alt+Tab
+   needs a tool-window style for the same reason. (#509, #510)
+   Also still to do in this step: undoing an Escape that cleared the search
+   (reopening within a minute brings it back), the "Copied" notice after hiding, and a click on a row copies it
+   (Shift+click adds it to the tray).
 4. Density and Larger text are settings under ADR 0020 (#407, #408). Remaining
    work: an ADR for display choice and remembered per-display position, then
    change the opening default from the pointer's display to the focused window's
@@ -233,5 +255,6 @@ which tips were seen) need an ADR before new `settings.json` fields are added.
 8. Attachments: the PDF or Web label and the preview pane (needs attachment
    data from Zotero).
 9. Later: one-line and at-cursor forms, the settings window, and alternative
-   looks users can choose; native Wayland GlobalShortcuts portal integration
+   looks users can choose, including macOS Liquid Glass (which needs the newest
+   macOS material API); native Wayland GlobalShortcuts portal integration
    and its system shortcut dialog need their own implementation and evidence.

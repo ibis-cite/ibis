@@ -55,7 +55,10 @@ async function chooseFromMore(name: string, role: "menuitem" | "menuitemcheckbox
 }
 
 function result(key: string, title: string, source = "refs.bib") {
-  return { id: { source, native_key: key }, key, title, authors: "Smith", year: 2020, matched: ["title"] };
+  return {
+    id: { source, native_key: key }, key, title, authors: "Smith", year: 2020, matched: ["title"],
+    first_author: "Smith", author_count: 1, container: null as string | null, item_type: "article-journal",
+  };
 }
 
 type Handler = (args: Record<string, unknown>) => unknown;
@@ -78,6 +81,7 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
     shortcut_status: () => ({ shortcut: "Control+Command+R", registered: true, error: null }),
     search: () => [],
     hide_picker: () => null,
+    show_copied_notice: () => null,
     set_pinned: () => null,
     copy_format: () => "pandoc",
     picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: false }),
@@ -347,7 +351,7 @@ test("the selection is kept by record identity across queries and copied in orde
   await screen.findByText("One");
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
   fireEvent.change(box, { target: { value: "two" } });
-  fireEvent.click(await screen.findByText("Two"));
+  fireEvent.click(await screen.findByText("Two"), { shiftKey: true });
   expect(screen.getAllByRole("button", { name: /Remove same/ })).toHaveLength(2);
   fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(copies).toHaveLength(1));
@@ -411,6 +415,55 @@ test("Enter never copies a result left over from the previous query", async () =
   expect(calls).not.toContain("copy_citation");
   release([result("new", "New result")]);
   await screen.findByText("New result");
+});
+
+test("while a newer search is pending, no key, click or hint acts on the previous query's results", async () => {
+  const pending: Record<string, { resolve: (value: unknown) => void; reject: (error: Error) => void }> = {};
+  const copied: unknown[] = [];
+  backend({
+    search: ({ query }) => query === "kept" ? [result("kept", "Kept result")]
+      : query === "old" ? [result("old", "Old result")]
+      : query ? new Promise((resolve, reject) => { pending[query as string] = { resolve, reject }; }) : [],
+    copy_citation: (args) => { copied.push(args); return { text: "x", warnings: [] }; },
+  });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  const chosenKeys = () => screen.queryByRole("list", { name: "Selected references" })?.textContent ?? "";
+  // A deliberate choice from an earlier search stays chosen across searches.
+  fireEvent.change(box, { target: { value: "kept" } });
+  await screen.findByText("Kept result");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  fireEvent.change(box, { target: { value: "old" } });
+  await screen.findByText("Old result");
+
+  // Delayed success: the old rows still show, but nothing acts on or offers them.
+  fireEvent.change(box, { target: { value: "pending" } });
+  await waitFor(() => expect(pending.pending).toBeDefined());
+  fireEvent.keyDown(box, { key: "Alt", altKey: true });
+  expect(footerKeys()).toBe("Esc Clear search");
+  fireEvent.keyUp(box, { key: "Alt" });
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  // Neither Shift+click (add) nor a plain click (copy) acts on a stale row.
+  fireEvent.click(screen.getByText("Old result"), { shiftKey: true });
+  fireEvent.click(screen.getByText("Old result"));
+  fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(copied).toHaveLength(1));
+  expect(chosenKeys()).not.toContain("old");
+  expect(copied).toEqual([{ ids: [{ source: "refs.bib", native_key: "kept" }], format: "pandoc" }]);
+  await act(async () => { pending.pending!.resolve([result("new", "New result")]); });
+  await screen.findByText("New result");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  expect(chosenKeys()).toContain("new");
+
+  // Stale failure: a failed newer search leaves nothing to add.
+  fireEvent.change(box, { target: { value: "old" } });
+  await screen.findByText("Old result");
+  fireEvent.change(box, { target: { value: "failing" } });
+  await waitFor(() => expect(pending.failing).toBeDefined());
+  await act(async () => { pending.failing!.reject(new Error("search failed")); });
+  await screen.findByText("Ibis could not search your library. Use Reload, then try again.");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  expect(chosenKeys()).not.toContain("old");
 });
 
 test("the library is shown, can be chosen and reloaded, and failures are explained", async () => {
@@ -513,6 +566,8 @@ test("combobox focus is separate from citation selection and only additions/remo
   await screen.findByText("First");
   const box = screen.getByRole("combobox", { name: "Search references" });
   const list = screen.getByRole("listbox", { name: "Results" });
+  expect(box.getAttribute("aria-autocomplete")).toBe("list");
+  expect(box.getAttribute("aria-controls")).toBe(list.id);
   expect(list.hasAttribute("aria-multiselectable")).toBe(false);
   expect(within(list).getAllByRole("option", { selected: true })).toHaveLength(1);
   const notice = screen.getByRole("status", { name: "Citation selection" });
@@ -533,15 +588,16 @@ test("combobox focus is separate from citation selection and only additions/remo
   expect(notice.textContent).toBe("1 reference selected for citation");
   fireEvent.change(box, { target: { value: "reorder" } });
   await waitFor(() => expect(within(list).getAllByRole("option")[0]?.textContent).toContain("Second"));
+  expect((box as HTMLInputElement).value).toBe("reorder");
   expect(screen.getByText("First").closest('[role="option"]')?.hasAttribute("data-citation-selected")).toBe(true);
   expect(within(list).getAllByRole("option", { selected: true })).toHaveLength(1);
   expect(document.getElementById(box.getAttribute("aria-activedescendant")!)?.textContent).toContain("Second");
-  fireEvent.click(screen.getByText("Second"));
+  fireEvent.click(screen.getByText("Second"), { shiftKey: true });
   expect(notice.textContent).toBe("2 references selected for citation");
   fireEvent.click(screen.getAllByRole("button", { name: "Remove same from the selection" })[0]!);
   expect(notice.textContent).toBe("1 reference selected for citation");
   expect(screen.getByText("First").closest('[role="option"]')?.hasAttribute("data-citation-selected")).toBe(false);
-  fireEvent.click(screen.getByText("Second"));
+  fireEvent.click(screen.getByText("Second"), { shiftKey: true });
   expect(notice.textContent).toBe("0 references selected for citation");
 });
 
@@ -842,7 +898,7 @@ test("Ctrl+K opens More with every action, Escape closes it before hiding the pi
   fireEvent.keyDown(box, { key: "k", ctrlKey: true });
   const menu = await screen.findByRole("menu");
   const items = within(menu).getAllByRole("menuitem").map((item) => item.textContent);
-  expect(items).toEqual(["Choose library…", "Use Zotero", "Reload", "Rows: Comfortable", "Quit IbisCtrl+Q"]);
+  expect(items).toEqual(["Choose library…", "Use Zotero", "Reload", "Rows: Comfortable", "Keyboard shortcutsCtrl+/", "Quit IbisCtrl+Q"]);
   expect(within(menu).getByRole("menuitemcheckbox", { name: "Larger text" }).getAttribute("aria-checked")).toBe("false");
   expect(document.activeElement).toBe(within(menu).getAllByRole("menuitem")[0]);
   fireEvent.keyDown(document.activeElement!, { key: "ArrowUp" });
@@ -883,6 +939,116 @@ test("a row says why it matched only when the match is not visible", async () =>
   expect(rows[0]?.textContent).not.toContain("Matched in");
   expect(rows[1]?.textContent).toContain("Matched in the abstract");
   expect(screen.getByText("Best matches")).toBeTruthy();
+});
+
+test("rows with the same first author and year are told apart by their container and type", async () => {
+  const garcia = { authors: "García, Okafor", first_author: "García", author_count: 2, year: 2021 };
+  let density = "comfortable";
+  backend({
+    picker_preferences: () => ({ citation_style: null, density, larger_text: false }),
+    search: () => [
+      { ...result("a", "Sleep spindles"), ...garcia, container: "Journal of Sleep \u202eResearch", matched: ["title"] },
+      { ...result("b", "Sleep spindles: a replication"), ...garcia, container: "Sleep", item_type: "book", matched: ["container", "abstract"] },
+      { ...result("c", "Untyped"), item_type: "constructor", matched: ["title"] },
+    ],
+  });
+  const { unmount } = render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "spindles" } });
+  await screen.findByText("Untyped");
+  let rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
+  // Comfortable: authors and container, no type word and no first-author repeat.
+  expect(rows[0]?.querySelector(".result-container")?.textContent).toBe("Journal of Sleep \u202eResearch");
+  expect(rows[0]?.textContent).toContain("García, Okafor");
+  expect(rows[0]?.querySelector(".result-type, .result-first-author")).toBeNull();
+  // One separator part between authors and container, spaced like the words
+  // around it: a no-break space before the dot and a preserved space after it
+  // (white-space: pre), and no gap, margin or padding of its own.
+  const byline = rows[0]?.querySelector(".result-byline");
+  expect(byline?.querySelector(".result-authors + .result-separator[aria-hidden] + .result-container")).toBeTruthy();
+  expect(byline?.textContent).toBe("García, Okafor\u00a0· Journal of Sleep \u202eResearch");
+  expect(byline?.querySelector(".result-separator")?.textContent).toBe("\u00a0· ");
+  // In the narrow layout the line may break after the separator, not inside a word.
+  expect(styles).toMatch(/\.result-separator \{ white-space: pre-wrap; \}/);
+  // Each clipping part takes its own direction, so a right-to-left row cuts
+  // Latin text at its end rather than its start.
+  for (const part of [".result-authors", ".result-container", ".result-key"]) expect(rows[0]?.querySelector(part)?.getAttribute("dir")).toBe("auto");
+  expect(styles).toMatch(/\.result-separator \{ flex: none; white-space: pre; \}/);
+  const bylineRules = [...styles.matchAll(/([^{}]*\.result-(?:byline|authors|separator|container)\b[^{}]*)\{([^}]*)\}/g)];
+  expect(bylineRules.length).toBeGreaterThan(0);
+  for (const [, , body] of bylineRules) expect(body).not.toMatch(/margin|padding|gap|(^|[^-])width:/);
+  // The row may shorten the container, so a match there is always named.
+  expect(rows[1]?.textContent).toContain("Matched in");
+  expect(rows[2]?.querySelector(".result-container")).toBeNull();
+  unmount();
+
+  density = "spacious";
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "spindles" } });
+  await screen.findByText("Untyped");
+  rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
+  expect(rows[0]?.querySelector(".result-type")?.textContent).toBe("Article");
+  expect(rows[1]?.querySelector(".result-type")?.textContent).toBe("Book");
+  expect(rows[2]?.querySelector(".result-type")).toBeNull();
+  cleanup();
+
+  density = "compact";
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "spindles" } });
+  await screen.findByText("Untyped");
+  rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
+  // Compact: the first author follows the title on the one line, before the year.
+  const line = rows[0]?.querySelector(".result-line");
+  expect(line?.querySelector(".result-first-author")?.getAttribute("dir")).toBe("auto");
+  // "et al." is isolated, so it keeps its order beside a right-to-left name.
+  expect(line?.querySelector(".result-first-author bdi")?.textContent).toBe("et al.");
+  // No reliance on text-align: match-parent, which Chromium ignores here: the
+  // container is only as wide as its text, so it sits beside its separator.
+  expect(styles).not.toMatch(/match-parent/);
+  // It keeps its own width beside a long title, as in the prototype, capped and ellipsized.
+  expect(styles).toMatch(/\.result-first-author \{ flex: none; max-width: var\(--key-max-width\);[^}]*text-overflow: ellipsis/);
+  // A very narrow Compact row gives the title its own line instead.
+  expect(styles).toMatch(/@container \(max-width: 16em\) \{\s*:root\[data-density="compact"\] \.result-line \{ flex-wrap: wrap; row-gap: 0; \}\s*:root\[data-density="compact"\] \.result-title \{ flex-basis: 100%; \}/);
+  expect(line?.textContent).toBe("Sleep spindlesGarcía et al.2021");
+  expect(rows[2]?.querySelector(".result-first-author")?.textContent).toBe("Smith");
+  expect(rows[0]?.querySelector(".result-container, .result-type")).toBeNull();
+  // The container is out of sight in Compact, so a match there is named.
+  expect(rows[1]?.textContent).toContain("Matched in");
+});
+
+test("rows shorten the authors and keep the journal, key and library label visible", async () => {
+  backend({ search: () => [
+    { ...result("a", "Six authors"), authors: "García, Okafor, Lima, Chen, Novak, Haddad", first_author: "García", author_count: 6, container: "Journal of Sleep Research" },
+    // Two creators are both named; the core counts an organisation with a comma as one.
+    { ...result("b", "Organisation"), authors: "Smith, Institute, Research", first_author: "Smith", author_count: 2, container: "Sleep" },
+    { ...result("c", "One author"), container: "Sleep" },
+  ] });
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
+  await screen.findByText("One author");
+  const rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
+  const authors = (row?: HTMLElement) => row?.querySelector(".result-authors");
+  // Three or more: "García et al." on screen; screen readers still hear every name.
+  expect(authors(rows[0])?.querySelector("[aria-hidden]")?.textContent).toBe("García et al.");
+  expect(authors(rows[0])?.querySelector("[aria-hidden] bdi")?.textContent).toBe("et al.");
+  expect(authors(rows[0])?.querySelector(".visually-hidden")?.textContent).toBe("García, Okafor, Lima, Chen, Novak, Haddad");
+  expect(authors(rows[1])?.textContent).toBe("Smith, Institute, Research");
+  expect(authors(rows[2])?.textContent).toBe("Smith");
+  // The key and library label give way first, down to a few letters; the type
+  // word and the authors (up to 60% of the byline) keep their width, and the
+  // container shortens first. Below 25em the meta line may wrap instead (no
+  // row gap). Chromium probe numbers for the crowded cases are in PR #502.
+  expect(styles).not.toMatch(/line-clamp/);
+  expect(styles).toMatch(/\.result-meta \{[^}]*flex-wrap: wrap; row-gap: 0;/);
+  // Rows at least 25em wide (461px or more at normal text) never wrap.
+  expect(styles).toMatch(/\[role="option"\] \{ container-type: inline-size; \}/);
+  expect(styles).toMatch(/@container \(min-width: 25em\) \{ \.result-meta \{ flex-wrap: nowrap; \} \}/);
+  expect(styles).toMatch(/\.result-byline \{[^}]*flex: 1 1 auto; min-width: min\(12em, 60%\)/);
+  expect(styles).toMatch(/\.result-authors \{ flex: none; max-width: 60%;[^}]*text-overflow: ellipsis/);
+  expect(styles).toMatch(/\.result-container \{ flex: 0 1 auto; min-width: 0;[^}]*text-overflow: ellipsis/);
+  expect(styles).toMatch(/\.result-key \{ flex: 0 1000 auto; min-width: min\(6ch, 100%\);[^}]*text-overflow: ellipsis/);
+  expect(styles).toMatch(/\.result-library \{ flex: 0 1000 auto; min-width: min\(5em, 100%\);[^}]*text-overflow: ellipsis/);
+  expect(styles).toMatch(/\.result-type \{ flex: none; max-width: 100%;[^}]*text-overflow: ellipsis/);
+  for (const name of ["key", "library"]) expect(styles).not.toMatch(new RegExp(`\\.result-${name} \\{[^}]*min-width: 0`));
 });
 
 test("Escape clears the search before it hides the picker, keeping chosen references", async () => {
@@ -968,8 +1134,14 @@ test("a saved citation style, density and text size come back at start", async (
   });
   render(<App />);
   await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
-  expect(document.documentElement.dataset.density).toBe("compact");
-  expect(document.documentElement.dataset.textSize).toBe("larger");
+  // The select changes when React commits the loaded choices, but density and
+  // text size reach <html> in an effect that runs after that commit. The load
+  // resolves outside act(), so waitFor can see the select before the effect
+  // has run; wait for the attributes themselves.
+  await waitFor(() => {
+    expect(document.documentElement.dataset.density).toBe("compact");
+    expect(document.documentElement.dataset.textSize).toBe("larger");
+  });
 });
 
 test.each(["pandoc", "autocite", "parencite", "textcite", "cite", "typst", "keys"])("choosing %s survives a restart without copying", async (choice) => {
@@ -1300,6 +1472,27 @@ test("with several Zotero libraries each result names its library, and a left gr
   await waitFor(() => expect(chosen).toEqual([["user", { group: 42 }]]));
 });
 
+test("removing one of two chosen references with the same key names its library", async () => {
+  backend({
+    library_status: () => zoteroStatus(["user", { group: 42 }]),
+    zotero_groups: () => [{ id: 42, name: "Synthetic lab" }],
+    search: ({ query }) => (query ? [result("garcia2021", "Mine", "zotero:user"), result("garcia2021", "Shared", "zotero:group:42"), result("other", "Other", "zotero:user")] : []),
+  });
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "x" } });
+  await within((await screen.findByText("Shared")).closest("li")!).findByText("Synthetic lab");
+  // Shift+click adds a row to the citation (a plain click copies it).
+  fireEvent.click(screen.getByText("Other"), { shiftKey: true });
+  fireEvent.click(screen.getByText("Mine"), { shiftKey: true });
+  // Only one garcia2021 chosen so far: its key is enough.
+  expect(screen.getByRole("button", { name: "Remove garcia2021 from the selection" })).toBeTruthy();
+  fireEvent.click(screen.getByText("Shared"), { shiftKey: true });
+  const chosen = within(screen.getByRole("list", { name: "Selected references" }));
+  expect(chosen.getByRole("button", { name: "Remove garcia2021 (My Library) from the selection" })).toBeTruthy();
+  expect(chosen.getByRole("button", { name: "Remove garcia2021 (Synthetic lab) from the selection" })).toBeTruthy();
+  expect(chosen.getByRole("button", { name: "Remove other from the selection" })).toBeTruthy();
+});
+
 test("a failed group list is reported and My Library stays available", async () => {
   backend({
     library_status: () => zoteroStatus(["user"]),
@@ -1492,4 +1685,384 @@ test("first-run writing choices save the key and style together before copying",
   await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
   await waitFor(() => expect(saved).toEqual([{ style: null, key: "typst" }, { style: "apa", key: null }]));
   expect(calls).not.toContain("copy_citation");
+});
+
+test("a clean copy hides the picker, then says Copied with the copied text", async () => {
+  const notices: unknown[] = [];
+  const calls = backend({
+    search: () => [result("a", "First")],
+    copy_citation: () => ({ text: "[@a]", warnings: [] }),
+    show_copied_notice: (args) => { notices.push(args); return null; },
+  });
+  render(<App />);
+  await screen.findByText("First");
+  fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
+  await waitFor(() => expect(notices).toEqual([{ text: "[@a]" }]));
+  expect(calls.indexOf("hide_picker")).toBeLessThan(calls.indexOf("show_copied_notice"));
+});
+
+test("copies with warnings, pinned copies and failed hides show no Copied notice window", async () => {
+  let warnings = ["bare keys cannot carry page numbers"];
+  let hideFails = false;
+  const calls = backend({
+    search: () => [result("a", "First")],
+    copy_citation: () => ({ text: "a", warnings }),
+    hide_picker: () => { if (hideFails) throw new Error("SYNTHETIC"); return null; },
+  });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  await screen.findByText("First");
+  fireEvent.keyDown(box, { key: "Enter" });
+  await screen.findByLabelText("Copy warnings");
+  fireEvent.click(screen.getByRole("button", { name: "Pin Ibis" }));
+  warnings = [];
+  fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(calls.filter((c) => c === "copy_citation")).toHaveLength(2));
+  fireEvent.click(screen.getByRole("button", { name: "Pin Ibis" }));
+  hideFails = true;
+  fireEvent.keyDown(box, { key: "Enter" });
+  await screen.findByText("Ibis could not hide this window. Try again.");
+  expect(calls).not.toContain("show_copied_notice");
+});
+
+test("a failed Copied notice never undoes the copy or the hide", async () => {
+  const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+  try {
+    backend({
+      search: () => [result("a", "First")],
+      copy_citation: () => ({ text: "@a", warnings: [] }),
+      show_copied_notice: () => { throw new Error("SYNTHETIC_PRIVATE_PAYLOAD"); },
+    });
+    render(<App />);
+    await screen.findByText("First");
+    fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
+    await waitFor(() => expect(log).toHaveBeenCalledWith("The Copied notice could not be shown."));
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByText("@a")).toBeTruthy();
+    expect(log.mock.calls.flat().join(" ")).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
+  } finally { log.mockRestore(); }
+});
+
+test("clicking a row copies it like Enter, and Shift+click adds it like Shift+Enter", async () => {
+  const copies: unknown[] = [];
+  const calls = backend({
+    search: () => [result("a", "First"), result("b", "Second")],
+    copy_citation: (args) => { copies.push(args); return { text: "@b", warnings: [] }; },
+  });
+  render(<App />);
+  const second = (await screen.findByText("Second")).closest('[role="option"]')!;
+  fireEvent.click(second, { shiftKey: true });
+  expect(second.hasAttribute("data-citation-selected")).toBe(true);
+  expect(document.activeElement).toBe(screen.getByLabelText("Search references"));
+  fireEvent.click(second, { shiftKey: true });
+  expect(second.hasAttribute("data-citation-selected")).toBe(false);
+  expect(copies).toEqual([]);
+  fireEvent.click(second);
+  await waitFor(() => expect(calls).toContain("hide_picker"));
+  expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "b" }], format: "pandoc" }]);
+  expect(second.getAttribute("aria-selected")).toBe("true");
+});
+
+test("with sources in the citation, a click copies the citation like Enter", async () => {
+  const copies: unknown[] = [];
+  backend({
+    search: () => [result("a", "First"), result("b", "Second")],
+    copy_citation: (args) => { copies.push(args); return { text: "@a", warnings: [] }; },
+  });
+  render(<App />);
+  fireEvent.click(await screen.findByText("First"), { shiftKey: true });
+  fireEvent.click(screen.getByText("Second"));
+  await waitFor(() => expect(copies).toHaveLength(1));
+  expect(copies[0]).toEqual({ ids: [{ source: "refs.bib", native_key: "a" }], format: "pandoc" });
+});
+
+test("a drag, a double click's second click or a modified click on a row copies nothing", async () => {
+  const calls = backend({
+    search: () => [result("a", "First")],
+    copy_citation: () => ({ text: "@a", warnings: [] }),
+  });
+  render(<App />);
+  const row = (await screen.findByText("First")).closest('[role="option"]')!;
+  fireEvent.pointerDown(row, { clientX: 10, clientY: 10 });
+  fireEvent.click(row, { clientX: 60, clientY: 12 });
+  fireEvent.click(row, { detail: 2 });
+  fireEvent.click(row, { ctrlKey: true });
+  fireEvent.click(row, { altKey: true });
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  expect(calls).not.toContain("copy_citation");
+  expect(row.hasAttribute("data-citation-selected")).toBe(false);
+  fireEvent.pointerDown(row, { clientX: 10, clientY: 10 });
+  fireEvent.click(row, { clientX: 12, clientY: 11 });
+  await waitFor(() => expect(calls).toContain("copy_citation"));
+});
+
+test("a click on a row waits for its formatted preview before copying it", async () => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
+  const copies: unknown[] = [];
+  backend({
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+    search: () => [result("a", "First"), result("b", "Second")],
+    csl_items: ({ ids }) => JSON.stringify((ids as { native_key: string }[]).map((id) => ({
+      id: id.native_key, type: "article-journal", title: id.native_key === "a" ? "First" : "Second",
+      author: [{ family: "Smith", given: "A" }], issued: { "date-parts": [[2020]] },
+    }))),
+    copy_formatted: (args) => { copies.push(args); return null; },
+  });
+  render(<App />);
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
+  fireEvent.click(await screen.findByText("Second"));
+  await waitFor(() => expect(copies).toHaveLength(1));
+  expect(String((copies[0] as { text: string }).text)).toContain("Smith");
+  expect(screen.queryByText("The preview is still being made. Try again in a moment.")).toBeNull();
+});
+
+test.each([[30_000, "first"], [61_000, ""]])(
+  "a search cleared by Escape comes back selected when reopened soon after (%i ms)", async (away, kept) => {
+    const calls = backend({ search: () => [result("a", "First")] });
+    const now = vi.spyOn(performance, "now").mockReturnValue(1_000_000);
+    try {
+      render(<App />);
+      const box = screen.getByLabelText("Search references") as HTMLInputElement;
+      fireEvent.change(box, { target: { value: "first" } });
+      await screen.findByText("First");
+      fireEvent.keyDown(box, { key: "Escape" });
+      expect(box.value).toBe("");
+      fireEvent.keyDown(box, { key: "Escape" });
+      await waitFor(() => expect(calls).toContain("hide_picker"));
+      await act(async () => { await emit("picker:hidden"); });
+      now.mockReturnValue(1_000_000 + away);
+      await act(async () => { await emit("picker:shown"); });
+      await waitFor(() => expect(box.value).toBe(kept));
+      expect(document.activeElement).toBe(box);
+      expect([box.selectionStart, box.selectionEnd]).toEqual([0, kept.length]);
+    } finally {
+      now.mockRestore();
+    }
+  });
+
+test("a search cleared by Escape stays cleared once something else is typed or copied", async () => {
+  backend({ search: () => [result("a", "First")], copy_citation: () => ({ text: "@a", warnings: [] }) });
+  render(<App />);
+  const box = screen.getByLabelText("Search references") as HTMLInputElement;
+  fireEvent.change(box, { target: { value: "first" } });
+  await screen.findByText("First");
+  fireEvent.keyDown(box, { key: "Escape" });
+  fireEvent.change(box, { target: { value: "f" } });
+  fireEvent.change(box, { target: { value: "" } });
+  await act(async () => { await emit("picker:hidden"); });
+  await act(async () => { await emit("picker:shown"); });
+  expect(box.value).toBe("");
+  fireEvent.change(box, { target: { value: "first" } });
+  await screen.findByText("First");
+  fireEvent.keyDown(box, { key: "Escape" });
+  // Browsing the empty search after Escape, then copying from it.
+  await waitFor(() => expect(screen.getByText("References")).toBeTruthy());
+  await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+  fireEvent.keyDown(box, { key: "Enter" });
+  await screen.findByText("@a");
+  await act(async () => { await emit("picker:hidden"); });
+  await act(async () => { await emit("picker:shown"); });
+  expect(box.value).toBe("");
+});
+
+test.each(["Escape", "hidden"])("a click waiting for its preview never copies after the picker is left (%s)", async (leave) => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
+  let release: () => void = () => undefined;
+  const ready = new Promise<void>((resolve) => { release = resolve; });
+  const calls = backend({
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+    search: () => [result("a", "First"), result("b", "Second")],
+    csl_items: ({ ids }) => ready.then(() => JSON.stringify((ids as { native_key: string }[]).map((id) => ({
+        id: id.native_key, type: "article-journal", title: id.native_key,
+        author: [{ family: "Smith", given: "A" }], issued: { "date-parts": [[2020]] },
+      })))),
+    copy_formatted: () => null,
+  });
+  render(<App />);
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
+  fireEvent.click(await screen.findByText("Second"));
+  if (leave === "Escape") {
+    fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Escape" });
+    await waitFor(() => expect(calls).toContain("hide_picker"));
+  }
+  await act(async () => { await emit("picker:hidden"); });
+  const hides = calls.filter((c) => c === "hide_picker").length;
+  await act(async () => { release(); await new Promise((resolve) => setTimeout(resolve, 50)); });
+  await waitFor(() => expect(document.querySelector(".format-preview")?.textContent).toContain("Smith"));
+  expect(calls).not.toContain("copy_formatted");
+  expect(calls.filter((c) => c === "hide_picker")).toHaveLength(hides);
+  expect(calls).not.toContain("show_copied_notice");
+});
+
+const footerKeys = () => screen.getByRole("group", { name: "Keys" }).textContent;
+
+test("the footer says what Enter will copy, and holding Alt shows the other keys", async () => {
+  backend({ search: ({ query }) => (query ? [result("a", "First"), result("b", "Second")] : []) });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  // Nothing to copy yet, so Enter is not advertised.
+  await waitFor(() => expect(footerKeys()).toBe("Ctrl+/ All keys"));
+  fireEvent.change(box, { target: { value: "x" } });
+  await screen.findByText("First");
+  expect(footerKeys()).toBe("Enter Copy as PandocCtrl+/ All keys");
+  fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "typst" } });
+  expect(footerKeys()).toContain("Enter Copy as Typst");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  fireEvent.keyDown(box, { key: "ArrowDown" });
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  expect(footerKeys()).toContain("Enter Copy 2 as Typst");
+  fireEvent.keyDown(box, { key: "Alt", altKey: true });
+  expect(footerKeys()).toBe("Shift+Enter Remove from citationEsc Clear search");
+  fireEvent.keyUp(box, { key: "Alt" });
+  expect(footerKeys()).toContain("Copy 2 as Typst");
+  fireEvent.keyDown(box, { key: "Alt", altKey: true });
+  fireEvent.blur(window);
+  expect(footerKeys()).not.toContain("Esc");
+});
+
+test("library status is a dot when all is well and words when something needs the user", async () => {
+  let warnings = 0;
+  backend({ library_status: () => ({ state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 3, warnings, error: null, note: null }) });
+  render(<App />);
+  const status = await screen.findByRole("status", { name: "Library status" });
+  await waitFor(() => expect(status.textContent).toBe("refs.bib: 3 references"));
+  expect(status.className).toContain("visually-hidden");
+  expect(document.querySelector(".status-dot")?.getAttribute("title")).toBe("refs.bib: 3 references");
+  cleanup();
+  warnings = 1;
+  render(<App />);
+  const trouble = await screen.findByRole("status", { name: "Library status" });
+  await waitFor(() => expect(trouble.textContent).toContain("1 reading notice"));
+  expect(trouble.className).not.toContain("visually-hidden");
+});
+
+test("? lists every key in a modal dialog, but a ? typed in the search is text", async () => {
+  const calls = backend({ search: () => [result("a", "First")] });
+  render(<App />);
+  const box = screen.getByLabelText("Search references") as HTMLInputElement;
+  fireEvent.keyDown(box, { key: "?" });
+  fireEvent.change(box, { target: { value: "?" } });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(box.value).toBe("?");
+  fireEvent.keyDown(box, { key: "/", ctrlKey: true });
+  const dialog = await screen.findByRole("dialog", { name: "Keyboard shortcuts" });
+  expect(dialog.getAttribute("aria-modal")).toBe("true");
+  const close = within(dialog).getByRole("button", { name: "Close" });
+  expect(document.activeElement).toBe(close);
+  const rows = within(dialog).getAllByRole("row").slice(1).map((row) => within(row).getAllByRole("cell").map((cell) => cell.textContent));
+  expect(rows).toContainEqual(["Enter", "Copy the highlighted reference, or the ones added to the citation, in the Copy as format", "Search box"]);
+  expect(rows).toContainEqual(["Shift+Enter", "Add the highlighted reference to the citation, or remove it", "Search box"]);
+  expect(rows).toContainEqual(["Ctrl+K", "Open or close More", "Anywhere in Ibis"]);
+  expect(rows).toContainEqual(["Ctrl+/ or ?", "Show this list (? works outside the search box)", "Anywhere in Ibis"]);
+  expect(rows).toContainEqual(["Home or End", "Go to the first or last item", "More menu"]);
+  // The global shortcut, labelled for this platform, is listed once it works.
+  await waitFor(() => expect(within(dialog).getAllByRole("row").at(-1)?.textContent).toBe("Ctrl+Super+ROpen IbisAny app"));
+  // Focus stays in the dialog, and the picker's keys wait until it closes.
+  fireEvent.keyDown(close, { key: "Tab" });
+  expect(dialog.contains(document.activeElement)).toBe(true);
+  fireEvent.keyDown(document.activeElement!, { key: "Tab", shiftKey: true });
+  expect(dialog.contains(document.activeElement)).toBe(true);
+  fireEvent.keyDown(document.activeElement!, { key: "k", ctrlKey: true });
+  expect(screen.queryByRole("menu")).toBeNull();
+  const canvas = vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+  try {
+    const found = await axe.run(document.body, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] }, rules: { "color-contrast": { enabled: false } } });
+    expect(found.violations.map((v) => v.id)).toEqual([]);
+  } finally {
+    canvas.mockRestore();
+  }
+  // Clicking plain text focuses the dialog itself, so Escape still reaches it.
+  expect(dialog.getAttribute("tabindex")).toBe("-1");
+  expect(within(dialog).getByRole("table").getAttribute("aria-labelledby")).toBeNull();
+  dialog.focus();
+  fireEvent.keyDown(dialog, { key: "Escape" });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.activeElement).toBe(box);
+  expect(box.value).toBe("?");
+  expect(calls).not.toContain("hide_picker");
+  // Outside a text field, a bare ? opens it, and focus returns there.
+  const more = screen.getByRole("button", { name: /^More/ });
+  more.focus();
+  fireEvent.keyDown(more, { key: "?" });
+  fireEvent.click(within(await screen.findByRole("dialog")).getByRole("button", { name: "Close" }));
+  expect(document.activeElement).toBe(more);
+  // More lists it with its key; closing returns to the search box.
+  await chooseFromMore("Keyboard shortcuts");
+  expect(await screen.findByRole("dialog")).toBeTruthy();
+  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  expect(document.activeElement).toBe(box);
+});
+
+test("when nothing matches, the picker offers to clear the search", async () => {
+  backend({ search: () => [] });
+  render(<App />);
+  const box = screen.getByLabelText("Search references") as HTMLInputElement;
+  fireEvent.change(box, { target: { value: "nothing here" } });
+  expect(await screen.findByText("No matching references")).toBeTruthy();
+  expect(screen.getByText("Check the spelling, or try fewer words, an author's surname or a year.")).toBeTruthy();
+  expect(screen.queryByRole("button", { name: "Search all Zotero libraries" })).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+  expect(box.value).toBe("");
+  expect(document.activeElement).toBe(box);
+  expect(await screen.findByText("Type to find a reference")).toBeTruthy();
+});
+
+test("when nothing matches in some Zotero libraries, the picker offers to search them all", async () => {
+  const chosen: unknown[][] = [];
+  backend({
+    library_status: () => zoteroStatus(["user"]),
+    zotero_groups: () => [{ id: 42, name: "Synthetic lab" }],
+    use_zotero_libraries: ({ libraries }) => { chosen.push(libraries as unknown[]); return null; },
+  });
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "elsewhere" } });
+  fireEvent.click(await screen.findByRole("button", { name: "Search all Zotero libraries" }));
+  await waitFor(() => expect(chosen).toEqual([["user", { group: 42 }]]));
+  expect(screen.queryByRole("button", { name: "Search all Zotero libraries" })).toBeNull();
+});
+
+test("the footer offers Enter only when Enter in the search box would copy", async () => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
+  let release: () => void = () => undefined;
+  let fail = false;
+  backend({
+    search: () => [result("a", "First"), result("b", "Second")],
+    csl_items: async (args) => {
+      await new Promise<void>((resolve) => { release = resolve; });
+      if (fail) throw new Error("synthetic: formatting failed");
+      return JSON.stringify((args.ids as { native_key: string }[]).map((id) =>
+        ({ id: id.native_key, type: "book", title: id.native_key, author: [{ family: "Alpha" }], issued: { "date-parts": [[2021]] } })));
+    },
+    copy_formatted: () => null,
+  });
+  try {
+    render(<App />);
+    await screen.findByText("First");
+    const box = screen.getByLabelText("Search references");
+    expect(footerKeys()).toContain("Enter Copy as Pandoc");
+    // Another control has focus, so Enter would press it instead.
+    const more = screen.getByRole("button", { name: /^More/ });
+    act(() => more.focus());
+    expect(footerKeys()).not.toContain("Enter");
+    act(() => box.focus());
+    expect(footerKeys()).toContain("Enter Copy as Pandoc");
+    // A formatted citation still being made is not offered.
+    fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
+    await screen.findByText("Formatting…");
+    expect(footerKeys()).not.toContain("Enter");
+    await act(async () => release());
+    await waitFor(() => expect(footerKeys()).toContain("Enter Copy as APA"));
+    // Nor is one that failed.
+    fail = true;
+    fireEvent.keyDown(box, { key: "ArrowDown" });
+    await waitFor(() => expect(screen.getByText("Formatting…")).toBeTruthy());
+    await act(async () => release());
+    expect(await screen.findByText(/could not be formatted/)).toBeTruthy();
+    expect(footerKeys()).not.toContain("Enter");
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });

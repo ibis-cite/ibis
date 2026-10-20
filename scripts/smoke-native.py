@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import signal
 import subprocess
@@ -24,6 +25,11 @@ from unittest.mock import Mock, call, patch
 
 class Unavailable(RuntimeError):
     pass
+
+
+# The short Copied notice is a second visible window of the app (#496); it is
+# never the picker, so picker visibility checks skip it.
+NOTICE_TITLE = "Ibis notice"
 
 
 def run(*args):
@@ -285,9 +291,33 @@ def copy_picker_observation(native):
         return {"available": False}
 
 
-def copy_with_diagnostics(native, report):
+def quiet_key_window(key_window):
+    """One optional key-window probe for failure facts; never a readiness wait."""
+    try:
+        with open(os.devnull, "w") as quiet, redirect_stdout(quiet), redirect_stderr(quiet):
+            state = key_window()
+        return state if type(state) is bool else None
+    except Exception:
+        return None
+
+
+def copy_with_diagnostics(native, report, key_window=None):
+    """Press Return once in the picker and require the exact citation.
+
+    On macOS the search field's accessible focus is only the WebView's DOM
+    focus; it stays set when the panel is no longer the key window, and a
+    Return posted then goes to another app (#454). Where the platform can
+    observe it, wait for the picker to own the keyboard before pressing.
+    """
     prime_clipboard(native)
     before = copy_picker_observation(native)
+    if key_window is not None:
+        try:
+            wait_for(key_window, "picker is the key window before Return")
+        except AssertionError:
+            report["copy_failure"] = {"before_return": before, "key_window": False}
+            print("NATIVE COPY FAILURE " + json.dumps(report["copy_failure"]), file=sys.stderr)
+            raise
     native.key("Return")
     started = time.monotonic()
     clipboard = {"polls": 0, "expected": False, "sentinel": False, "empty": False}
@@ -306,6 +336,8 @@ def copy_with_diagnostics(native, report):
         clipboard["elapsed_seconds"] = round(time.monotonic() - started, 3)
         report["copy_failure"] = {"before_return": before, "clipboard": clipboard,
                                   "after_timeout": copy_picker_observation(native)}
+        if key_window is not None:
+            report["copy_failure"]["key_window_after_timeout"] = quiet_key_window(key_window)
         print("NATIVE COPY FAILURE " + json.dumps(report["copy_failure"]), file=sys.stderr)
         raise
 
@@ -338,9 +370,22 @@ def require_tree(snapshot):
     assert any("list" in n["role"].lower() and "item" not in n["role"].lower() for n in results), "Named Results is not a list"
 
 
+def window_state_skips_taskbar(xprop_line):
+    """Whether an `xprop _NET_WM_STATE` line asks to stay out of the taskbar and pager."""
+    _, separator, atoms = xprop_line.partition("=")
+    names = {atom.strip() for atom in atoms.split(",")} if separator else set()
+    return {"_NET_WM_STATE_SKIP_TASKBAR", "_NET_WM_STATE_SKIP_PAGER"} <= names
+
+
+def supporting_wm_window(xprop_line):
+    """The window an `xprop _NET_SUPPORTING_WM_CHECK` line names, or None."""
+    match = re.fullmatch(r"_NET_SUPPORTING_WM_CHECK\(WINDOW\): window id # (0x[0-9a-fA-F]+)", xprop_line.strip())
+    return match.group(1) if match else None
+
+
 class Linux:
     def __init__(self):
-        for program in ("xdotool", "xclip", "xterm", "openbox"):
+        for program in ("xdotool", "xclip", "xterm", "openbox", "xprop"):
             if not shutil.which(program):
                 raise Unavailable(f"Linux native smoke needs {program}")
         if not os.environ.get("DISPLAY") or not os.environ.get("DBUS_SESSION_BUS_ADDRESS"):
@@ -353,14 +398,27 @@ class Linux:
         except (ImportError, ValueError) as error:
             raise Unavailable("Use /usr/bin/python3 with distro python3-pyatspi installed") from error
         self.wm = subprocess.Popen(["openbox"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # A window mapped before the window manager runs keeps no EWMH state:
+        # GTK sends later hint changes such as skip-taskbar to the manager
+        # instead of writing them. Desktops start their manager first; so must we.
+        wait_for(self.window_manager_ready, "openbox manages the display")
         self.editor = subprocess.Popen(["xterm", "-title", "Ibis synthetic editor", "-e", "/bin/cat"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.app = None
+        self.last_window_state = "not read"
 
     def window(self, pid):
         try:
-            return run("xdotool", "search", "--onlyvisible", "--pid", str(pid)).splitlines()[0]
-        except (subprocess.CalledProcessError, IndexError):
+            windows = run("xdotool", "search", "--onlyvisible", "--pid", str(pid)).splitlines()
+        except subprocess.CalledProcessError:
             return None
+        for window in windows:
+            try:
+                if run("xdotool", "getwindowname", window) == NOTICE_TITLE:
+                    continue
+            except subprocess.CalledProcessError:
+                continue  # A window closed while being listed is not the picker.
+            return window
+        return None
 
     def snapshot(self):
         nodes = []
@@ -411,6 +469,12 @@ class Linux:
             stack.extend(c for c in item if c)
         raise AssertionError(f"No invokable accessibility control {name!r}")
 
+    def notice_visible(self):
+        try:
+            return bool(run("xdotool", "search", "--onlyvisible", "--pid", str(self.app.pid), "--name", f"^{NOTICE_TITLE}$"))
+        except subprocess.CalledProcessError:
+            return False
+
     def focus_editor(self):
         window = self.window(self.editor.pid)
         if not window:
@@ -428,6 +492,23 @@ class Linux:
         # terminal child without _NET_WM_PID does not hide the actual owner.
         focused = run("xdotool", "getwindowfocus")
         return run("xdotool", "getwindowpid", focused) == str(self.editor.pid)
+
+    def window_manager_ready(self):
+        """Whether an EWMH window manager owns the display (the spec's two-way check)."""
+        if self.wm.poll() is not None:
+            raise RuntimeError("openbox exited during startup")
+        try:
+            window = supporting_wm_window(run("xprop", "-root", "_NET_SUPPORTING_WM_CHECK"))
+            return window is not None and supporting_wm_window(
+                run("xprop", "-id", window, "_NET_SUPPORTING_WM_CHECK")) == window
+        except subprocess.CalledProcessError:
+            return False
+
+    def skips_taskbar(self):
+        window = self.window(self.app.pid)
+        # Window state atoms only, kept to explain a failure.
+        self.last_window_state = f"{window}: {run('xprop', '-id', window, '_NET_WM_STATE')}" if window else "no visible window"
+        return bool(window) and window_state_skips_taskbar(self.last_window_state.partition(": ")[2])
 
     def clipboard(self, *, timeout=20):
         # Clipboard equality includes whitespace; command-output normalization
@@ -622,6 +703,12 @@ class Scripted:
 
     def editor_focused(self):
         return self.call("editor-focused")
+
+    def picker_key(self):
+        state = self.call("picker-key")
+        if type(state) is not bool:
+            raise RuntimeError("Native picker key-window state unavailable")
+        return state
 
     def clipboard(self, *, timeout=None):
         return self.call("clipboard", **({} if timeout is None else {"timeout": timeout}))
@@ -946,6 +1033,15 @@ def main():
             check("startup", lambda: wait_for(lambda: "3 references" in strings(snapshot()), "synthetic library startup"))
             check("accessibility named search/count/list", lambda: require_tree(snapshot()))
 
+            def skips_taskbar():
+                # Window managers build the taskbar and Alt+Tab from these hints.
+                try:
+                    wait_for(native.skips_taskbar, "picker window skips the taskbar and pager")
+                except AssertionError as error:
+                    raise AssertionError(f"{error}; last {native.last_window_state}") from None
+            if system == "Linux":
+                check("first picker stays out of the taskbar and window switcher", skips_taskbar)
+
             def show():
                 if system == "Darwin":
                     prepare_initial_picker_show(native, snapshot)
@@ -973,6 +1069,8 @@ def main():
                 focus_state("after-second-shortcut")
                 wait_for(picker_ready, "global shortcut visible, foreground and search focus")
             check("global shortcut shows foreground picker with focused search", show)
+            if system == "Linux":
+                check("shown picker stays out of the taskbar and window switcher", skips_taskbar)
 
             def second_instance():
                 escape_to_hide(native, snapshot, "picker hidden before second launch")
@@ -994,7 +1092,7 @@ def main():
             assert "Ibis smoke reference 000001" in strings(snapshot()), "Expected native result missing"
 
             def copy():
-                copy_with_diagnostics(native, report)
+                copy_with_diagnostics(native, report, native.picker_key if system == "Darwin" else None)
                 wait_for(lambda: not snapshot()["visible"], "copy hides picker")
                 capture_editor_focus("after-copy-hides-picker")
                 try:
@@ -1002,6 +1100,11 @@ def main():
                 except AssertionError:
                     capture_editor_focus("copy-restoration-timeout")
                     raise
+                # The Copied notice (#496) is up while the editor keeps focus.
+                # Only the Linux adapter can see it; others skip this check.
+                if hasattr(native, "notice_visible"):
+                    wait_for(lambda: native.notice_visible() and native.editor_focused(),
+                             "Copied notice shows while the editor keeps focus", timeout=5)
 
             def live_settings_copy():
                 paths = [settings.with_suffix(suffix) for suffix in (".json", ".json.bak", ".json.tmp")]
@@ -1435,6 +1538,40 @@ class ContractTests(unittest.TestCase):
         with patch("time.monotonic", side_effect=lambda: clock[0]):
             with self.assertRaisesRegex(AssertionError, "shared 10-second budget"):
                 quit_normally(native, app)
+    def test_taskbar_hints_are_read_from_the_window_manager_state(self):
+        self.assertTrue(window_state_skips_taskbar(
+            "_NET_WM_STATE(ATOM) = _NET_WM_STATE_FOCUSED, _NET_WM_STATE_SKIP_TASKBAR, _NET_WM_STATE_SKIP_PAGER"))
+        for line in ("_NET_WM_STATE(ATOM) = _NET_WM_STATE_SKIP_PAGER", "_NET_WM_STATE:  not found.",
+                     "_NET_WM_STATE(ATOM) = ", "_NET_WM_STATE(ATOM) = _NET_WM_STATE_SKIP_TASKBAR_X, _NET_WM_STATE_SKIP_PAGER"):
+            self.assertFalse(window_state_skips_taskbar(line), line)
+
+    def test_linux_starts_the_editor_only_once_the_window_manager_is_ready(self):
+        events = []
+        ready = iter([False, False, True])
+        def launch(command, **kwargs):
+            events.append(command[0])
+            return Mock(poll=Mock(return_value=None))
+        def check(native):
+            events.append("ready?")
+            return next(ready)
+        modules = {"pyatspi": Mock(), "gi": Mock(), "gi.repository": Mock()}
+        with patch("shutil.which", return_value="/usr/bin/tool"), patch.dict(os.environ, {"DISPLAY": ":99", "DBUS_SESSION_BUS_ADDRESS": "unix:x"}), \
+                patch.dict(sys.modules, modules), patch("subprocess.Popen", side_effect=launch), \
+                patch.object(Linux, "window_manager_ready", check), patch("time.sleep"):
+            Linux()
+        self.assertEqual(events, ["openbox", "ready?", "ready?", "ready?", "xterm"])
+
+    def test_a_window_manager_that_exits_is_reported_not_waited_for(self):
+        native = Linux.__new__(Linux)
+        native.wm = Mock(poll=Mock(return_value=1))
+        with self.assertRaisesRegex(RuntimeError, "openbox exited"):
+            native.window_manager_ready()
+
+    def test_window_manager_readiness_reads_the_supporting_window(self):
+        self.assertEqual(supporting_wm_window("_NET_SUPPORTING_WM_CHECK(WINDOW): window id # 0x20011f"), "0x20011f")
+        for line in ("_NET_SUPPORTING_WM_CHECK:  not found.", "_NET_SUPPORTING_WM_CHECK(WINDOW): window id # ",
+                     "_NET_SUPPORTING_WM_CHECK(WINDOW): window id # 0x20011f, 0x1"):
+            self.assertIsNone(supporting_wm_window(line), line)
 
     class CopyClock:
         def __init__(self, step=10):
@@ -1468,6 +1605,47 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(native.snapshot.call_count, 1)
         self.assertNotIn("copy_failure", report)
         self.assertEqual(native.mock_calls[:4], [call.set_clipboard(sentinel), call.clipboard(), call.snapshot(), call.key("Return")])
+
+    def test_return_waits_until_the_picker_owns_the_keyboard(self):
+        native, report, clock = Mock(), {}, self.CopyClock(1)
+        sentinel = "Ibis native smoke clipboard sentinel"
+        native.clipboard.side_effect = [sentinel, "[@smoke000001]"]
+        native.snapshot.return_value = self.copy_snapshot()
+        native.picker_key.side_effect = [False, False, True]
+        with patch(__name__ + ".time.monotonic", clock.monotonic), patch(__name__ + ".time.sleep", clock.sleep):
+            copy_with_diagnostics(native, report, native.picker_key)
+        self.assertEqual(native.mock_calls[:7], [call.set_clipboard(sentinel), call.clipboard(), call.snapshot(),
+                                                 call.picker_key(), call.picker_key(), call.picker_key(), call.key("Return")])
+        self.assertNotIn("copy_failure", report)
+
+    def test_return_is_never_sent_while_another_window_owns_the_keyboard(self):
+        native, report, clock = Mock(), {}, self.CopyClock()
+        native.clipboard.return_value = "Ibis native smoke clipboard sentinel"
+        native.snapshot.return_value = self.copy_snapshot()
+        native.picker_key.return_value = False
+        with patch(__name__ + ".time.monotonic", clock.monotonic), patch(__name__ + ".time.sleep", clock.sleep), \
+             patch("sys.stderr", new_callable=io.StringIO), \
+             self.assertRaisesRegex(AssertionError, "Timed out: picker is the key window before Return"):
+            copy_with_diagnostics(native, report, native.picker_key)
+        native.key.assert_not_called()
+        self.assertFalse(report["copy_failure"]["key_window"])
+        self.assertTrue(report["copy_failure"]["before_return"]["search_focused"])
+
+    def test_clipboard_timeout_records_key_window_once_and_quietly(self):
+        for probe, expected in ((Mock(side_effect=[True, False]), False),
+                                (Mock(side_effect=[True, RuntimeError("private helper payload")]), None)):
+            with self.subTest(expected=expected):
+                native, report, clock = Mock(), {}, self.CopyClock()
+                native.clipboard.return_value = "Ibis native smoke clipboard sentinel"
+                native.snapshot.return_value = self.copy_snapshot()
+                errors = io.StringIO()
+                with patch(__name__ + ".time.monotonic", clock.monotonic), patch(__name__ + ".time.sleep", clock.sleep), \
+                     patch("sys.stderr", errors), self.assertRaisesRegex(AssertionError, "expected citation on OS clipboard"):
+                    copy_with_diagnostics(native, report, probe)
+                self.assertIs(report["copy_failure"]["key_window_after_timeout"], expected)
+                self.assertEqual(probe.call_count, 2)
+                self.assertEqual(native.key.call_args_list, [call("Return")])
+                self.assertNotIn("private", errors.getvalue() + json.dumps(report))
 
     def test_native_copy_timeout_records_fresh_state_without_reading_clipboard_again(self):
         native, report, clock = Mock(), {"last_native_state": {"visible": True}}, self.CopyClock()
@@ -1578,6 +1756,19 @@ class ContractTests(unittest.TestCase):
             elif key == "ctrl+super+r":
                 self.visible = not (self.visible and self.key_window)
                 self.key_window = self.visible
+
+    def test_linux_picker_visibility_skips_the_copied_notice_window(self):
+        linux = Linux.__new__(Linux)
+        names = {"1": NOTICE_TITLE, "2": "Ibis"}
+        def fake(*args):
+            if args[1] == "search":
+                return "1\n2"
+            return names[args[2]]
+        with patch(f"{__name__}.run", side_effect=fake):
+            self.assertEqual(linux.window(42), "2")
+        names["2"] = NOTICE_TITLE
+        with patch(f"{__name__}.run", side_effect=fake):
+            self.assertIsNone(linux.window(42))
 
     def test_initial_key_panel_requires_hidden_precondition_before_shortcut_show(self):
         old = self.InitialPickerModel()

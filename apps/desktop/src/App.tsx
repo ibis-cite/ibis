@@ -1,11 +1,14 @@
 import type React from "react";
 import * as nativeApi from "./api";
-import { copyFormatNames, densityNames, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
+import { copiedNoticeText, copyFormatNames, densityNames, keyText, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText, rowText } from "./messages";
+import { ariaKeys, KEY_TABLE, keyLabel, keysFor, type KeyBinding } from "./keys";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LibrarySetup, shortcutLabel } from "./LibrarySetup";
+import { usePointerSelection } from "./pointerSelection";
 import { formatCitation, FORMATTED_STYLES, provisional, type FormattedCitation } from "./format/formatted";
 import { STYLE_NAMES, type StyleId } from "./format/styles";
 import { render } from "./format/markup";
+import { afterCopy, rowClickAction } from "./copyFeedback";
 import {
   COPY_FORMATS,
   type Copied,
@@ -41,9 +44,23 @@ const SAVE_BEFORE_QUIT_MS = 2_000;
 
 // Shortcut labels follow the platform: ⌘ on macOS, Ctrl elsewhere.
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
-const modifier = isMac ? "⌘" : "Ctrl+";
+const label = (accelerator: string) => keyLabel(accelerator, isMac);
 // Ctrl+K is "delete to end of line" in macOS text fields, so there only ⌘K opens More.
 const commandKey = (e: React.KeyboardEvent) => (isMac ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey);
+
+/** Typing a character there enters text, so a bare `?` is not a command. */
+function typesText(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable || target instanceof HTMLTextAreaElement) return true;
+  return target instanceof HTMLInputElement && !["button", "checkbox", "radio", "range", "color", "file", "submit", "reset"].includes(target.type);
+}
+
+/** `?` outside a text field, or Ctrl/⌘ with / (or ?) anywhere. */
+function isKeysShortcut(e: React.KeyboardEvent): boolean {
+  if (e.altKey) return false;
+  if ((e.key === "/" || e.key === "?") && commandKey(e)) return true;
+  return e.key === "?" && !e.ctrlKey && !e.metaKey && !typesText(e.target);
+}
 
 // Fields a row already shows; a match anywhere else is named under the row.
 const VISIBLE_FIELDS = new Set(["title", "author", "citekey", "year"]);
@@ -53,6 +70,16 @@ function hiddenMatch(matched: string[]): string | null {
   if (matched.length === 0 || matched.some((field) => VISIBLE_FIELDS.has(field))) return null;
   return matched[0] ?? null;
 }
+
+/** Rows name one or two authors in full and shorten three or more to
+ * "García et al.". The count comes from the record's creators, so a name with
+ * a comma is one; with one or two creators the joined surnames are the short form. */
+function abbreviatedAuthors(r: SearchResult): boolean {
+  return Boolean(r.first_author) && r.author_count > 2;
+}
+
+/** "et al." in its own isolate, so it keeps its reading order beside a right-to-left name. */
+const etAl = <bdi>{rowText.etAl}</bdi>;
 
 /** Done, Look or Stop for the footer dot; words carry the same meaning. */
 function libraryHealth(library: LibraryStatus | null | undefined): "done" | "look" | "stop" | "idle" {
@@ -118,12 +145,67 @@ function MenuItem({ label, title, keys, checked, disabled, onSelect }: {
   );
 }
 
+/** Every key in one table, as a modal dialog: Escape or Close returns focus. */
+function KeysDialog({ bindings, onClose }: { bindings: readonly KeyBinding[]; onClose: () => void }) {
+  const dialog = useRef<HTMLDivElement>(null);
+  useEffect(() => { dialog.current?.querySelector<HTMLElement>("button")?.focus(); }, []);
+  return (
+    <div className="keys-backdrop" onPointerDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div
+        ref={dialog}
+        role="dialog"
+        aria-modal="true"
+        // Clicking plain text inside keeps focus here, so Escape still closes it.
+        tabIndex={-1}
+        aria-labelledby="keys-title"
+        className="keys-dialog"
+        onKeyDown={(e) => {
+          // The picker's own keys wait until the dialog is closed.
+          e.stopPropagation();
+          if (e.key === "Escape") {
+            e.preventDefault();
+            onClose();
+          } else if (e.key === "Tab") {
+            const focusable = [...(dialog.current?.querySelectorAll<HTMLElement>("button, [tabindex='0']") ?? [])];
+            const at = focusable.indexOf(document.activeElement as HTMLElement);
+            e.preventDefault();
+            focusable[(at + (e.shiftKey ? -1 : 1) + focusable.length) % focusable.length]?.focus();
+          }
+        }}
+      >
+        <div className="keys-heading">
+          <h2 id="keys-title">{keyText.title}</h2>
+          <button type="button" className="quiet-button" onClick={onClose}>{keyText.close}</button>
+        </div>
+        <div className="keys-scroll" tabIndex={0} role="group" aria-labelledby="keys-title">
+          <table>
+            <thead>
+              <tr><th scope="col">{keyText.keyColumn}</th><th scope="col">{keyText.actionColumn}</th><th scope="col">{keyText.regionColumn}</th></tr>
+            </thead>
+            <tbody>
+              {bindings.map((binding) => (
+                <tr key={`${binding.region}:${binding.action}`}>
+                  <td>{binding.keys.map((keys, i) => (
+                    <span key={keys}>{i > 0 && ` ${keyText.or} `}<kbd aria-keyshortcuts={ariaKeys(keys, isMac)}>{binding.action === "open" ? shortcutLabel(keys, isMac) : label(keys)}</kbd></span>
+                  ))}</td>
+                  <td>{keyText.actions[binding.action]}</td>
+                  <td>{keyText.regions[binding.region]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // A stable provider lets the development gallery use synthetic data without IPC.
 // Formatted citations are offered only when the provider can supply them.
 export type PickerApi = Pick<typeof nativeApi,
   "chooseLibrary" | "useZotero" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" | "pickerPreferences" | "setPickerPreferences" |
   "hidePicker" | "setPinned" | "onLibraryChanged" | "onPickerShown" | "onPickerHidden" | "quit" | "search" | "shortcutStatus"> &
-  Partial<Pick<typeof nativeApi, "cslItems" | "copyFormatted" | "useZoteroLibraries" | "zoteroGroups" | "findSources" | "openFoundLibrary">>;
+  Partial<Pick<typeof nativeApi, "cslItems" | "copyFormatted" | "useZoteroLibraries" | "zoteroGroups" | "findSources" | "openFoundLibrary" | "showCopiedNotice">>;
 
 /** A citation-key syntax, or a citation style written as `style:<id>`. */
 export type Choice = CopyFormat | `style:${StyleId}`;
@@ -149,7 +231,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const { chooseLibrary, useZotero, libraryStatus, reloadLibrary, copyCitation, copyFormat,
     hidePicker, setPinned, onLibraryChanged, onPickerShown, onPickerHidden, quit, search, shortcutStatus, cslItems, copyFormatted,
     pickerPreferences, setPickerPreferences, useZoteroLibraries, zoteroGroups } = api;
-  const { findSources, openFoundLibrary } = api;
+  const { findSources, openFoundLibrary, showCopiedNotice } = api;
   const setupApi = useMemo(() => ({ chooseLibrary, useZotero, findSources, openFoundLibrary }),
     [chooseLibrary, useZotero, findSources, openFoundLibrary]);
   const [query, setQuery] = useState(preview?.query ?? "");
@@ -158,6 +240,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // The query the shown results belong to; differs while a search is pending.
   const [resultsQuery, setResultsQuery] = useState<string | null>(null);
   const [active, setActive] = useState(0);
+  const pointer = usePointerSelection(active, setActive);
   const [selected, setSelected] = useState<Map<string, SearchResult>>(new Map());
   const [selectionChanged, setSelectionChanged] = useState(false);
   const [format, setFormat] = useState<Choice>("pandoc");
@@ -176,9 +259,21 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const input = useRef<HTMLInputElement>(null);
   const moreButton = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [keysOpen, setKeysOpen] = useState(false);
+  // Where focus goes back to when the keys overlay closes.
+  const keysReturn = useRef<HTMLElement | null>(null);
+  // While Alt (⌥) is held, the footer shows the other keys instead of Enter.
+  const [altHeld, setAltHeld] = useState(false);
+  // Enter copies only from the search box; elsewhere it presses the focused control.
+  const [searchFocused, setSearchFocused] = useState(false);
+  // autoFocus can happen before React listens for focus events.
+  useEffect(() => setSearchFocused(document.activeElement === input.current), []);
   const [pinned, setPinnedState] = useState(false);
   // When the picker last went away; the search waits a minute, in memory only.
   const hiddenAt = useRef<number | null>(null);
+  // A search Escape cleared comes back on reopening within the same minute.
+  const escapedQuery = useRef<string | null>(null);
+  const [restored, setRestored] = useState(0);
   const [failures, setFailures] = useState<Partial<Record<Operation, boolean>>>({});
   const report = (operation: Operation, failed = true) => {
     setFailures((previous) => ({ ...previous, [operation]: failed }));
@@ -192,8 +287,14 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     try { await action(); report(operation, false); }
     catch { report(operation); }
   };
-  const hide = () => void perform("hide", hidePicker);
+  // A click still waiting for its preview must never copy once the user has left.
+  const [clickCopy, setClickCopy] = useState<string | null>(null);
+  const hide = () => {
+    setClickCopy(null);
+    void perform("hide", hidePicker);
+  };
   const clearSearch = () => {
+    escapedQuery.current = null;
     setQuery("");
     setSelected(new Map());
     setActive(0);
@@ -261,6 +362,21 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     };
   }, [density, largerText]);
 
+  useEffect(() => {
+    // Only Alt on its own, or Alt still down from that, counts; any other key ends it.
+    const down = (e: KeyboardEvent) => setAltHeld((held) => e.key === "Alt" || (e.altKey && held));
+    const up = (e: KeyboardEvent) => { if (e.key === "Alt" || !e.altKey) setAltHeld(false); };
+    const reset = () => setAltHeld(false);
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    window.addEventListener("blur", reset);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+      window.removeEventListener("blur", reset);
+    };
+  }, []);
+
   const togglePin = () => {
     const on = !pinned;
     setPinnedState(on);
@@ -280,13 +396,24 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     };
     const focusSearch = () => {
       if (hiddenAt.current !== null && performance.now() - hiddenAt.current > KEEP_SEARCH_MS) clearSearch();
+      else if (hiddenAt.current !== null && escapedQuery.current !== null) {
+        const escaped = escapedQuery.current;
+        escapedQuery.current = null;
+        setQuery((now) => (now === "" ? escaped : now));
+        setRestored((n) => n + 1);
+      }
       hiddenAt.current = null;
       input.current?.focus();
       input.current?.select();
     };
     // Every hide is reported, including the native one when focus moves away;
     // a monotonic clock keeps clock changes from clearing or keeping a search.
-    const unlistenHidden = onPickerHidden(() => { hiddenAt.current = performance.now(); })
+    const unlistenHidden = onPickerHidden(() => {
+      hiddenAt.current = performance.now();
+      setKeysOpen(false);
+      setAltHeld(false);
+      setClickCopy(null);
+    })
       .catch(() => subscriptionFailure("pickerEvents"));
     const unlisten = onPickerShown(focusSearch).catch(() => subscriptionFailure("pickerEvents"));
     const unlistenLibrary = onLibraryChanged((status) => {
@@ -371,10 +498,20 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     };
   }, [query, library, libraryVersion]);
 
-  // Keep the highlighted result visible while moving with the arrow keys.
+  // A restored search is selected once it is back in the box, so typing replaces it.
   useEffect(() => {
+    if (restored > 0) input.current?.select();
+  }, [restored]);
+
+  // Keep the highlighted result visible while moving with the arrow keys.
+  // A row chosen by the pointer is already under it; scrolling would move it away.
+  useEffect(() => {
+    if (pointer.fromPointer.current) {
+      pointer.fromPointer.current = false;
+      return;
+    }
     document.getElementById(`result-${active}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [active]);
+  }, [active, pointer.fromPointer]);
 
   // Success is brief; warnings stay available until explicitly dismissed.
   useEffect(() => {
@@ -392,9 +529,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     });
   };
 
-  // The selection, or the highlighted result when nothing is selected.
-  // Never a highlighted result that belongs to an earlier query.
+  // Results belong to the query that produced them. While a newer search is
+  // pending, the rows still on screen are not acted on or offered by any key,
+  // click or footer hint; only these current results are.
   const current = resultsQuery === query ? results : [];
+  // The selection, or the highlighted result when nothing is selected.
   const chosen = selected.size > 0 ? [...selected.values()] : current.slice(active, active + 1);
   const chosenKey = chosen.map((r) => idKey(r.id)).join("\u0001");
   const previewKey = `${style}\u0002${libraryVersion}\u0002${chosenKey}`;
@@ -440,10 +579,31 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     }
     setCopied(outcome);
     setSelected(new Map());
+    // After a copy, reopening keeps the current search, not one cleared before it.
+    escapedQuery.current = null;
     // Get out of the way so the user can paste, unless there is something to
     // read or the picker is pinned beside the document.
-    if (outcome.warnings.length === 0 && !pinned) hide();
+    if (afterCopy(outcome, pinned) === "hide-and-notify") {
+      void perform("hide", async () => {
+        await hidePicker();
+        // The notice is extra; a failure to show it never undoes the copy.
+        await showCopiedNotice?.(outcome.text).catch(() => console.error(copiedNoticeText.noticeFailed));
+      });
+    }
   };
+  // A click on a row copies what Enter would copy then (the row, or the
+  // citation being built), once that is ready; anything changing first cancels it.
+  useEffect(() => {
+    if (clickCopy === null) return;
+    if (chosenKey !== clickCopy) {
+      setClickCopy(null);
+      return;
+    }
+    if (style && shown === null) return;
+    setClickCopy(null);
+    void copy();
+  }, [clickCopy, chosenKey, shown]);
+  const pressedAt = useRef<{ x: number; y: number } | null>(null);
 
   const busy = library?.state === "loading" || library?.state === "reloading";
   const loadingMessage = library?.state === "reloading"
@@ -466,7 +626,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   }, [library]);
   const chosenLibraries = pendingLibraries ?? reportedLibraries;
   const severalLibraries = chosenLibraries.length > 1;
-  const wantGroups = Boolean(zoteroGroups && library?.zotero && (menuOpen || severalLibraries));
+  // Nothing matched this search, so the empty state offers what to try next.
+  const nothingMatched = Boolean(query) && resultsQuery === query && results.length === 0 && !error;
+  const wantGroups = Boolean(zoteroGroups && library?.zotero && (menuOpen || severalLibraries || nothingMatched));
   useEffect(() => {
     // Group names can refresh in the background, but a failure belongs only
     // to this menu opening. Closing it also invalidates its pending request.
@@ -491,6 +653,18 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       throw error;
     }));
   };
+  // Every Zotero library on offer, once the group list is known.
+  const allLibraries = (): ZoteroLibrary[] => ["user", ...offeredGroups.map((group) => ({ group }))];
+  const searchAllLibraries = () => {
+    if (!useZoteroLibraries) return;
+    const all = allLibraries();
+    setPendingLibraries(all);
+    input.current?.focus();
+    void perform("zotero", () => useZoteroLibraries(all).catch((error: unknown) => {
+      setPendingLibraries(null);
+      throw error;
+    }));
+  };
   const groupName = (id: number) => groups?.find((group) => group.id === id)?.name ?? pickerText.groupLibrary(id);
   // Every group Zotero lists, plus chosen groups it no longer lists, so they can be turned off.
   const offeredGroups = [...(groups?.map((group) => group.id) ?? []),
@@ -499,6 +673,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const libraryOf = (source: string) =>
     source === "zotero:user" ? pickerText.myLibrary
       : source.startsWith("zotero:group:") ? groupName(Number(source.slice("zotero:group:".length))) : null;
+  /** Names the library too when another chosen reference has the same key. */
+  const removeLabel = (r: SearchResult) => {
+    const library = libraryOf(r.id.source);
+    const shared = [...selected.values()].some((other) => other.key === r.key && other.id.source !== r.id.source);
+    return shared && library ? pickerText.removeReferenceIn(r.key, library) : pickerText.removeReference(r.key);
+  };
   const closeMenu = (refocus: boolean) => {
     setMenuOpen(false);
     if (refocus) moreButton.current?.focus();
@@ -509,17 +689,49 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     void perform(operation, action);
   };
   const health = libraryHealth(library);
+  const narrowed = Boolean(library?.zotero && useZoteroLibraries && groups) && allLibraries().some((choice) => !isChosen(choice));
+  const openKeys = () => {
+    closeMenu(false);
+    const focused = document.activeElement;
+    // A menu item is gone once the menu closes; the search box takes its place.
+    keysReturn.current = focused instanceof HTMLElement && !focused.closest("[role='menu']") ? focused : input.current;
+    setKeysOpen(true);
+  };
+  const closeKeys = () => {
+    setKeysOpen(false);
+    const back = keysReturn.current;
+    (back?.isConnected ? back : input.current)?.focus();
+  };
+  // The keys overlay lists the global shortcut too, when it works.
+  const bindings: readonly KeyBinding[] = shortcut?.registered
+    ? [...KEY_TABLE, { region: "system", action: "open", keys: [shortcut.shortcut] }]
+    : KEY_TABLE;
+  // What Enter does now, from the same state the copy uses; null when it does nothing.
+  // A formatted citation still being made, or one that failed, is not copied.
+  const enterAction = !searchFocused || chosen.length === 0 || (style && (shown === null || shown === "failed")) ? null
+    : chosen.length > 1 ? keyText.copySeveralAs(chosen.length, choiceName(format)) : keyText.copyAs(choiceName(format));
+  const highlighted = current[active];
+  const shiftEnterAction = searchFocused && highlighted
+    ? (selected.has(idKey(highlighted.id)) ? keyText.removeFromCitation : keyText.addToCitation) : null;
+  const escapeAction = menuOpen ? keyText.closeMenu : query ? keyText.clearSearch : keyText.hide;
 
   return (
     <main
+      onFocus={(e) => setSearchFocused(e.target === input.current)}
+      onBlur={() => setSearchFocused(false)}
       onKeyDown={(e) => {
         if (composing(e)) return;
-        if (e.key === "Escape") {
+        if (isKeysShortcut(e)) {
           e.preventDefault();
+          openKeys();
+        } else if (e.key === "Escape") {
+          e.preventDefault();
+          setClickCopy(null);
           // Escape steps back one layer: the menu, then the search, then the
           // picker. Chosen references stay; hiding keeps them for a minute.
           if (menuOpen) closeMenu(true);
           else if (query) {
+            escapedQuery.current = query;
             setQuery("");
             input.current?.focus();
           } else hide();
@@ -551,6 +763,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           type="search"
           placeholder={pickerText.searchPlaceholder}
           role="combobox"
+          aria-autocomplete="list"
           aria-expanded={results.length > 0}
           aria-controls="results"
           aria-activedescendant={results[active] ? `result-${active}` : undefined}
@@ -558,6 +771,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           autoFocus
           value={query}
           onChange={(e) => {
+            escapedQuery.current = null;
             setQuery(e.target.value);
           }}
           onKeyDown={(e) => {
@@ -568,7 +782,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               setActive((i) => Math.min(Math.max(i + step, 0), Math.max(results.length - 1, 0)));
             } else if (e.key === "Enter" && e.shiftKey) {
               e.preventDefault();
-              const result = results[active];
+              const result = current[active];
               if (result) toggle(result);
             } else if (e.key === "Enter") {
               e.preventDefault();
@@ -652,7 +866,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           {[...selected.entries()].map(([key, r]) => (
             <li key={key}>
               <code>{r.key}</code>{" "}
-              <button type="button" onClick={() => toggle(r)} aria-label={pickerText.removeReference(r.key)}>
+              <button type="button" onClick={() => toggle(r)} aria-label={removeLabel(r)}>
                 {pickerText.remove}
               </button>
             </li>
@@ -683,9 +897,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>
-        <ul id="results" role="listbox" aria-label={pickerText.results}>
+        <ul id="results" role="listbox" aria-label={pickerText.results} onMouseMove={pointer.onMouseMove}>
           {results.map((r, i) => {
+            const compact = density === "compact";
+            // A match in the container is always named: the row may shorten the container.
             const why = hiddenMatch(r.matched);
+            const itemType = density === "spacious" ? rowText.itemType(r.item_type) : null;
             return (
               <li
                 key={idKey(r.id)}
@@ -694,18 +911,43 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                 aria-selected={i === active}
                 data-citation-selected={selected.has(idKey(r.id)) || undefined}
                 data-active={i === active || undefined}
-                onClick={() => {
+                onPointerDown={(e) => { pressedAt.current = { x: e.clientX, y: e.clientY }; }}
+                onClick={(e) => {
+                  const start = pressedAt.current;
+                  pressedAt.current = null;
+                  // Rows of an earlier query, still shown while a newer search
+                  // is pending, are not acted on by a click or Shift+click (#507).
+                  if (current !== results) return;
+                  const action = rowClickAction({
+                    shiftKey: e.shiftKey, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, detail: e.detail,
+                    moved: start ? Math.hypot(e.clientX - start.x, e.clientY - start.y) : 0,
+                    onControl: (e.target as Element).closest("button, a, input, select, textarea, [role=button]") !== null,
+                    selectedText: !(window.getSelection()?.isCollapsed ?? true),
+                  });
+                  if (action === "none") return;
                   setActive(i);
-                  toggle(r);
+                  if (action === "toggle") toggle(r);
+                  else setClickCopy(selected.size > 0 ? chosenKey : idKey(r.id));
+                  input.current?.focus();
                 }}
               >
                 <span className="result-line">
                   <strong className="result-title">{r.title}</strong>
+                  {compact && r.first_author && <span className="result-first-author" dir="auto">{r.first_author}{r.author_count > 1 && <> {etAl}</>}</span>}
                   <span className="result-year">{r.year ?? pickerText.noDate}</span>
                 </span>
                 <span className="result-meta">
-                  <span className="result-authors">{r.authors}</span>
-                  <code className="result-key">{r.key}</code>
+                  {/* Each clipping part takes its own text direction, so Latin text in a
+                      right-to-left row is cut at its end. The separator is its own part. */}
+                  <span className="result-byline">
+                    <span className="result-authors" dir="auto">
+                      {abbreviatedAuthors(r) ? <><span aria-hidden="true">{r.first_author} {etAl}</span><span className="visually-hidden">{r.authors}</span></> : r.authors}
+                    </span>
+                    {!compact && r.container && r.authors && <span className="result-separator" aria-hidden="true">{"\u00a0· "}</span>}
+                    {!compact && r.container && <span className="result-container" dir="auto">{r.container}</span>}
+                  </span>
+                  {itemType && <span className="result-type">{itemType}</span>}
+                  <code className="result-key" dir="auto">{r.key}</code>
                   {severalLibraries && libraryOf(r.id.source) && <span className="result-library">{libraryOf(r.id.source)}</span>}
                 </span>
                 {why && <span className="result-why">{pickerText.matchedIn(why)}</span>}
@@ -723,7 +965,14 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                   <button type="button" onClick={() => void perform("choose", chooseLibrary)}>{pickerText.chooseLibrary}</button>
                 </>
                 : query
-                  ? <><p>{pickerText.noMatches}</p><p className="empty-hint">{pickerText.noMatchesHint}</p></>
+                  ? <>
+                    <p>{pickerText.noMatches}</p>
+                    <p className="empty-hint">{pickerText.noMatchesHint}</p>
+                    <div className="empty-actions">
+                      <button type="button" onClick={() => { setQuery(""); input.current?.focus(); }}>{pickerText.clearSearch}</button>
+                      {narrowed && <button type="button" onClick={searchAllLibraries}>{pickerText.searchAllLibraries}</button>}
+                    </div>
+                  </>
                   : <><p>{pickerText.typeToFind}</p><p className="empty-hint">{pickerText.typeToFindHint}</p></>
             ) : library?.state === "none" ? (
               <LibrarySetup api={setupApi} perform={perform}
@@ -735,12 +984,20 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       </div>
       <footer>
         <section aria-label={pickerText.libraryRegion} className="library-bar">
-          <span className="status-dot" data-health={health} aria-hidden="true" />
-          <span className="library-name" role="status" aria-label={pickerText.libraryStatus} aria-live="polite" aria-atomic="true">
+          <span className="status-dot" data-health={health} aria-hidden="true" title={libraryMessages.summary(library)} />
+          {/* Words only when something needs the user; otherwise the dot, with details on hover. */}
+          <span className={health === "done" ? "library-name visually-hidden" : "library-name"} role="status"
+            aria-label={pickerText.libraryStatus} aria-live="polite" aria-atomic="true">
             {libraryMessages.summary(library)}
           </span>
-          <small className="key-hints">
-            <kbd>↵</kbd>{pickerText.keyHints.copy}<kbd>⇧↵</kbd>{pickerText.keyHints.add}<kbd>Esc</kbd>{pickerText.keyHints.hide}
+          <small className="enter-hints" aria-label={keyText.footer} role="group">
+            {altHeld ? <>
+              {shiftEnterAction && <span><kbd>{label(keysFor("add"))}</kbd> {shiftEnterAction}</span>}
+              <span><kbd>{label(keysFor("escape"))}</kbd> {escapeAction}</span>
+            </> : <>
+              {enterAction && <span><kbd>{label(keysFor("copy"))}</kbd> {enterAction}</span>}
+              <span><kbd>{label(keysFor("keys"))}</kbd> {keyText.allKeys}</span>
+            </>}
           </small>
           <span className="more">
             <button
@@ -748,13 +1005,13 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               ref={moreButton}
               className="quiet-button"
               aria-haspopup="menu"
-              aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
+              aria-keyshortcuts={ariaKeys(keysFor("more"), isMac)}
               aria-expanded={menuOpen}
               aria-controls={menuOpen ? "more-menu" : undefined}
-              title={pickerText.moreTitle(modifier)}
+              title={pickerText.moreTitle(label(keysFor("more")))}
               onClick={() => (menuOpen ? closeMenu(true) : setMenuOpen(true))}
             >
-              {pickerText.more} <kbd aria-hidden="true">{modifier}K</kbd>
+              {pickerText.more} <kbd aria-hidden="true">{label(keysFor("more"))}</kbd>
             </button>
             {menuOpen && (
               <MoreMenu onClose={closeMenu}>
@@ -782,13 +1039,15 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                 <MenuItem label={pickerText.density(densityNames[density])} title={pickerText.densityTitle} onSelect={changeDensity} />
                 <MenuItem label={pickerText.largerText} checked={largerText} onSelect={toggleLargerText} />
                 {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
-                <MenuItem label={pickerText.quitLabel} keys={`${modifier}Q`} onSelect={() => runFromMenu("quit", quitAfterSaving)} />
+                <MenuItem label={keyText.title} keys={label(keysFor("keys"))} onSelect={openKeys} />
+                <MenuItem label={pickerText.quitLabel} keys={label(keysFor("quit"))} onSelect={() => runFromMenu("quit", quitAfterSaving)} />
               </MoreMenu>
             )}
           </span>
           {library?.note && <p role="status">{library.note}</p>}
         </section>
       </footer>
+      {keysOpen && <KeysDialog bindings={bindings} onClose={closeKeys} />}
     </main>
   );
 }
