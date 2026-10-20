@@ -574,6 +574,26 @@ mod tests {
     }
 
     #[test]
+    fn an_inactive_registration_without_pending_approval_is_refused() {
+        struct InactiveEntry;
+        impl Entry for InactiveEntry {
+            fn is_enabled(&self) -> Result<bool, Failed> {
+                Ok(false)
+            }
+            fn enable(&self) -> Result<(), Failed> {
+                Ok(())
+            }
+            fn disable(&self) -> Result<(), Failed> {
+                Ok(())
+            }
+        }
+        assert_eq!(
+            change(Some(&InactiveEntry), true, true),
+            item(false, Some(LoginItemProblem::Refused))
+        );
+    }
+
+    #[test]
     fn an_unreadable_outcome_is_not_shown_as_on() {
         let entry = FakeEntry {
             unreadable: true,
