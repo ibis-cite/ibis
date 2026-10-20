@@ -88,6 +88,7 @@
   --search-gap: .9rem;
   --search-padding: 1.4rem 1.5rem;
   --search-icon-width: 1.35rem;
+  --search-min-width: 12rem;
   --search-icon-stroke: var(--icon-stroke);
   --search-size: var(--type-search-size);
   --search-tracking: -.025em;
