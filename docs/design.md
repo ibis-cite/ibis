@@ -162,9 +162,9 @@ citation is on the clipboard and a notice says why. Shift+Enter adds to the tray
 and Ibis stays open.
 
 **Escape** steps back one layer: close a menu or dialog, close the preview,
-clear the search and filters, then hide. Nothing asks for confirmation: the
-search is kept in memory for a minute (#314), so opening Ibis again undoes an
-Escape. Escape never unpins.
+clear the search and filters, then hide. Nothing asks for confirmation. After
+hiding, the search is kept in memory for a minute (#314); bringing back a search
+that Escape cleared is still to do (rollout step 3). Escape never unpins.
 
 **Pinned** Ibis floats above the document, keeps its place, and does not take
 focus until clicked or summoned. It is the only time Ibis stays on top.
@@ -228,7 +228,8 @@ which tips were seen) need an ADR before new `settings.json` fields are added.
    full-screen/presentation shortcut guard and its second-press override.
    Separately verify the macOS panel opens over full-screen apps in the current
    Space; the panel already has this configuration, which is not evidence that
-   every native scenario passes. Also still to do in this step: the "Copied" notice after hiding, and a click on a row copies it
+   every native scenario passes. Also still to do in this step: undoing an Escape that cleared the search
+   (reopening within a minute brings it back), the "Copied" notice after hiding, and a click on a row copies it
    (Shift+click adds it to the tray).
 4. Density and Larger text are settings under ADR 0020 (#407, #408). Remaining
    work: an ADR for display choice and remembered per-display position, then
