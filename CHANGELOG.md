@@ -2,6 +2,8 @@
 
 ## [0.1.1](https://github.com/ibiscite/ibis/compare/v0.1.0...v0.1.1) (2026-10-20)
 
+First-run setup finds Zotero and nearby `.bib` files and shows the shortcut, searches stay responsive on large libraries, copy format choices are kept, and the picker no longer overflows at large text sizes.
+
 
 ### Features
 
