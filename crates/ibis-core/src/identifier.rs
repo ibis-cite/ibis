@@ -70,6 +70,12 @@ pub fn of_reference(r: &Reference) -> Vec<Identifier> {
         ids.extend(arxiv(url).map(Identifier::Arxiv));
         ids.extend(pmid(url).map(Identifier::Pmid));
     }
+    ids.extend(
+        r.eprints
+            .iter()
+            .filter_map(|e| arxiv_prefixed(e))
+            .map(Identifier::Arxiv),
+    );
     for (name, value) in &r.variables {
         match name.as_str() {
             "ISBN" => {
@@ -420,8 +426,26 @@ mod tests {
         assert!(ids[1].contains(&Identifier::Pmid("12345678".into())));
         assert_eq!(ids[2], [Identifier::Isbn("9780306406157".into())]);
         assert_eq!(ids[3], [Identifier::Pmid("987".into())]);
-        assert_eq!(refs[4].variables["number"], "arXiv:1706.03763");
+        assert_eq!(refs[4].eprints, ["arXiv:1706.03763"]);
         assert!(ids[4].contains(&Identifier::Arxiv("1706.03763".into())));
+    }
+
+    #[test]
+    fn an_arxiv_eprint_is_searchable_but_never_printed() {
+        let refs = crate::bibtex::load_str(
+            "t",
+            "@article{a, title={A}, journal={J}, number={4}, eprint={2101.00001}, eprinttype={arxiv}}
+             @techreport{b, title={B}, institution={I}, number={TR-7}, eprint={2101.00002}, archivePrefix={arXiv}}",
+        )
+        .references;
+        assert!(of_reference(&refs[0]).contains(&Identifier::Arxiv("2101.00001".into())));
+        assert!(of_reference(&refs[1]).contains(&Identifier::Arxiv("2101.00002".into())));
+        // Citation processors see the same item as without the eprint.
+        let csl = refs[0].to_csl_json();
+        assert_eq!(csl.get("number"), None);
+        assert_eq!(csl["issue"], "4");
+        assert_eq!(refs[1].to_csl_json()["number"], "TR-7");
+        assert!(!csl.to_string().contains("2101.00001"));
     }
 
     #[test]

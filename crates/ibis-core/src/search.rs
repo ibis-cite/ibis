@@ -402,6 +402,7 @@ mod tests {
             abstract_text: None,
             keywords: vec![],
             language: None,
+            eprints: vec![],
             variables: Default::default(),
             raw: None,
         }

@@ -223,25 +223,25 @@ pub(crate) fn convert(
     set("genre", &["type"]);
     set("note", &["note"]);
     set("event-title", &["eventtitle"]);
-    // BibLaTeX keeps arXiv and PubMed IDs in `eprint`. An arXiv ID goes where
-    // Zotero puts it, "arXiv:ID" in the number, so styles and search see it.
+    // BibLaTeX keeps arXiv and PubMed IDs in `eprint`. A PubMed ID is the CSL
+    // `PMID`; an arXiv ID has no CSL variable and is kept for search only.
+    let mut eprints = Vec::new();
     let eprint_type = text("eprinttype")
         .or_else(|| text("archiveprefix"))
         .map(|t| t.to_lowercase());
     if let (Some(eprint_type), Some(eprint)) = (eprint_type, text("eprint")) {
-        let target = match eprint_type.as_str() {
+        match eprint_type.as_str() {
             "arxiv" => {
                 let id = match eprint.get(..6) {
                     Some(prefix) if prefix.eq_ignore_ascii_case("arxiv:") => eprint[6..].trim(),
                     _ => eprint.as_str(),
                 };
-                Some(("number", format!("arXiv:{id}")))
+                eprints.push(format!("arXiv:{id}"));
             }
-            "pubmed" => Some(("PMID", eprint)),
-            _ => None,
-        };
-        if let Some((csl, value)) = target {
-            variables.entry(csl.to_string()).or_insert(value);
+            "pubmed" => {
+                variables.entry("PMID".to_string()).or_insert(eprint);
+            }
+            _ => {}
         }
     }
     if let Some(short_title) = short_title {
@@ -305,6 +305,7 @@ pub(crate) fn convert(
         abstract_text,
         keywords,
         language,
+        eprints,
         variables,
         raw: Some(raw.to_string()),
     }
