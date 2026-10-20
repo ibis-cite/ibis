@@ -20,7 +20,7 @@
 - **Read-only sources.** Never write to Zotero, `.bib` files or any library. Original records are preserved verbatim next to normalized data.
 - **Stable identity.** A record is identified by its source plus native key, never a citation key alone.
 - **Never fail silently or guess data.** Skipped data becomes a `LoadWarning`; a failed insertion leaves the citation copied with a reason. Reject invalid input with a clear error and warn about missing metadata rather than inventing it.
-- **Offline by default.** No telemetry or network access without an accepted ADR. Every network feature is opt-in and listed in [PRIVACY.md](../PRIVACY.md).
+- **Offline by default.** No telemetry. Network access requires an accepted ADR; every network feature is opt-in and listed in [PRIVACY.md](../PRIVACY.md).
 - **Behaviour as data.** Destination profiles, output templates and styles are validated data and never execute code.
 - **Escape output.** Escape every output for its target syntax, including LaTeX, Pandoc, Typst, HTML and RTF.
 - **Keep private data private.** Never put real reference data, document text, clipboard contents, credentials, personal paths or usernames in tests, logs, diagnostics, issues or commits. Never commit or print these. Fixtures are synthetic; diagnostics use an allowlist rather than raw errors or payloads.
