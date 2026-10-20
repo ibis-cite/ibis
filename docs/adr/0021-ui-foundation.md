@@ -1,6 +1,6 @@
 # 0021. Build the desktop interface on React Aria Components and layered CSS tokens
 
-Status: proposed (2026-10-20)
+Status: accepted (2026-10-20, maintainer decision)
 
 ## Context
 
@@ -16,7 +16,7 @@ For tokens, the W3C Design Tokens Community Group format reached a stable versio
 2. **Shared components live in `src/ui/`.** They know nothing about references or libraries. Screens and their state live in `src/features/<feature>/`. Each `ui/` component has its own CSS file and a vitest test (roles, names, keyboard path, Escape and focus return, axe-core) for each platform look, and a state in the gallery.
 3. **Tokens stay hand-written CSS in three layers.** The base layer holds sizes, type, motion and raw brand colours. The role layer holds surface, text, accent, selection, status and citation. The look layer holds overrides under `:root[data-platform="macos|windows|linux"]`, then increased contrast and forced colours. Components read role tokens only. A test checks that every custom property used is defined and that sizes sit on the 4 px grid. A DTCG file and a generator are added only when a second consumer needs the same values, such as native Rust windows or a design tool. Even then, they cover only the non-colour tokens unless DTCG gains system colours.
 4. **Platform behaviour stays in Ibis's own tables.** Shortcut labels come from `keys.ts`. The pointer-selection rule (`pointerSelection.ts`) and the native Copied notice window (`notice.ts`) stay. React Aria's input-modality tracking replaces hand-written modality code.
-5. **Migration is incremental.** First `App.tsx` is split without any visible change. The token layers are named next, and then the dependency is added together with its first component. After that, one component moves per pull request, each under about 300 changed lines. The pull request that adds the dependency records the production bundle change; the expected change is about 70 KB gzip.
+5. **Migration is incremental.** First `App.tsx` is split without any visible change. The token layers are named next, and then the dependency is added together with its first component. After that, one component moves per pull request, each under about 300 changed lines. The pull request that adds the dependency records the production bundle change; the expected change is about 70 KB gzip. The same pull request checks that the components work in the oldest WebKitGTK that Ibis supports on Linux.
 
 ## Consequences
 
@@ -24,5 +24,5 @@ For tokens, the W3C Design Tokens Community Group format reached a stable versio
 - Ibis depends on Adobe continuing to maintain React Aria. A replacement would touch only `src/ui/`, because screens use Ibis's own components, not the library directly. Base UI is the closest alternative.
 - React Aria's Toast is still marked unstable. In-window notices use `role="status"` until it is stable.
 - Popovers cannot extend beyond the webview window, so menus must fit inside the picker. Native popup windows, as Raycast uses, are a separate decision if ever needed.
-- The result list keeps its current combobox semantics (#485) until moving it is shown to be worth the risk.
+- The result list keeps its current combobox semantics (#485) and moves last, only once moving it is shown to be worth the risk.
 - No network use, data format, settings field or security boundary changes.
