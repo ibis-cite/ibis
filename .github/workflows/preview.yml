@@ -38,11 +38,9 @@ permissions:
 
 # Runs are never cancelled, so publication is never cut off halfway. While one
 # runs, only the newest waiting push to main is kept.
-# On main only the newest commit's nightly matters, so a newer merge replaces
-# an older build. Tag builds are releases and always finish.
 concurrency:
   group: preview-${{ github.ref_name }}
-  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+  cancel-in-progress: false
 
 jobs:
   build:
