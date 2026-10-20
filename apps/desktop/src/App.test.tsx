@@ -1078,3 +1078,32 @@ test("when looking for libraries fails, setup still offers the file chooser and 
   expect(screen.getByRole("button", { name: "Use Zotero" })).toBeTruthy();
   expect(screen.queryByRole("region", { name: "Found on this computer" })).toBeNull();
 });
+
+test("setup failures go away once a library is chosen", async () => {
+  let status = NO_LIBRARY as Record<string, unknown>;
+  backend({
+    library_status: () => status,
+    find_sources: () => { throw new Error("synthetic failure"); },
+  });
+  render(<App />);
+  const failure = "Ibis could not look for libraries on this computer. Choose a file instead.";
+  await screen.findByText(failure);
+  status = { ...NO_LIBRARY, state: "loaded", has_snapshot: true, name: "refs.bib", snapshot_name: "refs.bib", references: 1 };
+  await act(async () => { await emit("library:changed", status); });
+  await waitFor(() => expect(screen.queryByText(failure)).toBeNull());
+});
+
+test("setup says what it found, says when it found nothing, and Look again keeps focus", async () => {
+  let answer: unknown = { zotero: "available", list: 1, files: [{ name: "refs.bib", folder: "" }], cut_short: false };
+  backend({ library_status: () => NO_LIBRARY, find_sources: () => answer });
+  render(<App />);
+  expect((await screen.findByText(/Zotero is open/)).textContent).toBe("Zotero is open, so Use Zotero can read your library. 1 .bib file found.");
+  expect(screen.getByRole("button", { name: "refs.bib" })).toBeTruthy();
+  answer = { zotero: "absent", list: 2, files: [], cut_short: false };
+  const again = screen.getByRole("button", { name: "Look again" });
+  again.focus();
+  fireEvent.click(again);
+  expect(await screen.findByText("No Zotero or .bib files found nearby. Use Choose library… to pick a file.")).toBeTruthy();
+  expect(document.activeElement).toBe(again);
+  expect(screen.queryByRole("region", { name: "Found on this computer" })).toBeNull();
+});

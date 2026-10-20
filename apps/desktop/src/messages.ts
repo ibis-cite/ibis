@@ -23,15 +23,18 @@ export const operationFailures = {
 
 export const setupText = {
   looking: "Looking for Zotero and .bib files…",
-  zoteroOpen: "Zotero is open, so Ibis can read your library from it.",
   zoteroAccessOff:
     "Zotero is open, but it does not let other apps read it yet. In Zotero, open Settings, then Advanced, and turn on " +
     "“Allow other applications on this computer to communicate with Zotero”.",
   foundFiles: "Found on this computer",
-  inFolder: (folder: string) => `in ${folder}`,
+  inFolder: "in",
   openFound: (name: string, folder: string) => (folder ? `Use ${name} in ${folder}` : `Use ${name}`),
   cutShort: "Some folders were too large to search fully. Use Choose library… if your file is not listed.",
   lookAgain: "Look again",
+  nothingFound: "No Zotero or .bib files found nearby. Use Choose library… to pick a file.",
+  found: (files: number, zotero: boolean) =>
+    [zotero ? "Zotero is open, so Use Zotero can read your library." : "",
+      files ? `${files} .bib ${files === 1 ? "file" : "files"} found.` : ""].filter(Boolean).join(" "),
 } as const;
 
 export const densityNames = {

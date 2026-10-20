@@ -174,6 +174,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const report = (operation: Operation, failed = true) => {
     setFailures((previous) => ({ ...previous, [operation]: failed }));
   };
+  // Setup failures belong to the setup screen; they go when a library is chosen.
+  const setupDone = library != null && library.state !== "none";
+  useEffect(() => {
+    if (setupDone) setFailures(({ findSources: _found, openFound: _opened, ...rest }) => rest);
+  }, [setupDone]);
   const perform = async (operation: Operation, action: () => Promise<unknown>) => {
     try { await action(); report(operation, false); }
     catch { report(operation); }

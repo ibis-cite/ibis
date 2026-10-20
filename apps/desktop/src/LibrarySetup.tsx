@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import type { Sources } from "./bindings";
 import { pickerText, setupText } from "./messages";
 
@@ -22,6 +22,7 @@ export function LibrarySetup({ api, perform }: {
   // Undefined while looking; null when looking failed or is not offered.
   const [sources, setSources] = useState<Sources | null>();
   const [search, setSearch] = useState(0);
+  const heading = useId();
 
   useEffect(() => {
     if (!findSources) { setSources(null); return; }
@@ -29,14 +30,19 @@ export function LibrarySetup({ api, perform }: {
     setSources(undefined);
     void perform("findSources", () => findSources().then(
       (found) => { if (current) setSources(found); },
-      (error: unknown) => { if (current) setSources(null); throw error; },
+      // A search replaced or left behind is nobody's failure.
+      (error: unknown) => { if (current) { setSources(null); throw error; } },
     ));
     return () => { current = false; };
   }, [findSources, search]);
 
+  const looking = sources === undefined;
   const zotero = sources?.zotero;
   const files = openFoundLibrary ? sources?.files ?? [] : [];
   const lookAgain = () => setSearch((n) => n + 1);
+  const outcome = looking ? setupText.looking
+    : sources && files.length === 0 && zotero !== "available" ? setupText.nothingFound
+    : sources ? setupText.found(files.length, zotero === "available") : "";
 
   return (
     <div className="library-setup">
@@ -50,12 +56,11 @@ export function LibrarySetup({ api, perform }: {
           {pickerText.useZotero}
         </button>
       </div>
-      {sources === undefined && <p className="empty-hint" role="status">{setupText.looking}</p>}
-      {zotero === "available" && <p className="empty-hint">{setupText.zoteroOpen}</p>}
+      {findSources && <p className="empty-hint" role="status">{outcome}</p>}
       {zotero === "access_off" && <p className="empty-hint">{setupText.zoteroAccessOff}</p>}
       {files.length > 0 && sources && (
-        <section aria-label={setupText.foundFiles} className="found-files">
-          <p className="empty-hint">{setupText.foundFiles}</p>
+        <section aria-labelledby={heading} className="found-files">
+          <p className="empty-hint" id={heading}>{setupText.foundFiles}</p>
           <ul>
             {files.map((file, index) => (
               <li key={`${sources.list}-${index}`}>
@@ -65,8 +70,8 @@ export function LibrarySetup({ api, perform }: {
                     lookAgain();
                     throw error;
                   }))}>
-                  <span className="found-name">{file.name}</span>
-                  {file.folder && <>{" "}<span className="found-folder">{setupText.inFolder(file.folder)}</span></>}
+                  <bdi className="found-name">{file.name}</bdi>
+                  {file.folder && <>{" "}<span className="found-folder">{setupText.inFolder}{" "}<bdi>{file.folder}</bdi></span></>}
                 </button>
               </li>
             ))}
@@ -74,8 +79,11 @@ export function LibrarySetup({ api, perform }: {
         </section>
       )}
       {sources?.cut_short && <p className="empty-hint">{setupText.cutShort}</p>}
-      {sources !== undefined && findSources && (
-        <button type="button" onClick={lookAgain}>{setupText.lookAgain}</button>
+      {findSources && (
+        // Stays in place while looking, so focus is not lost.
+        <button type="button" aria-disabled={looking || undefined} onClick={() => { if (!looking) lookAgain(); }}>
+          {setupText.lookAgain}
+        </button>
       )}
     </div>
   );
