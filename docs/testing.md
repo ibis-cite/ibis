@@ -98,6 +98,12 @@ Windows opens Notepad, macOS opens TextEdit, and Linux opens an xterm running
 contract by checking the OS clipboard and that the destination receives focus.
 It does not inject a citation into the editor.
 
+In CI the Linux smoke blocks every pull request. The macOS and Windows UI steps
+(native picker and full-screen panel) depend on hosted-runner desktop sessions
+and are sometimes flaky, so on pull requests they only add a warning. On `main`
+they block, and a failure opens or updates a "Native UI smoke failing on main"
+issue for that system.
+
 ```sh
 # Ubuntu/Debian runner dependencies (test tools, not app dependencies):
 sudo apt-get install xvfb xauth xdotool xclip xterm openbox python3-pyatspi
@@ -387,7 +393,8 @@ nightly with `rustup toolchain install nightly --profile minimal`, then run:
 cargo +nightly fuzz run load_str -- -max_total_time=60 -timeout=5 -rss_limit_mb=1024 -max_len=16384
 ```
 
-Targets are `split_parse`, `load_str` and `csl_export`. The nightly workflow gives
+Targets are `split_parse`, `load_str`, `csl_export` and `cite_render` (escaping
+of every key syntax in `cite::render`). The nightly workflow gives
 each 300 seconds with a persistent corpus seeded from synthetic fixtures, and
 minimizes and reports crashes, timeouts and OOMs as deduplicated `area:testing`
 issues. Fixed inputs become fixtures with regression coverage. Fuzz targets share
