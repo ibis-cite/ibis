@@ -1054,6 +1054,51 @@ test.each(["menu", "shortcut"])("%s Quit drains ordered format choices before ex
   await waitFor(() => expect(calls).toContain("quit"));
 });
 
+test.each(["menu", "shortcut"])("%s Quit waits for the initial read, then saves a key and clears the old style together", async (route) => {
+  let finishReading = () => undefined as void;
+  const reading = new Promise<void>((resolve) => { finishReading = resolve; });
+  let rememberedKey = "typst";
+  let rememberedStyle: unknown = "apa";
+  let atQuit: unknown = null;
+  const calls = backend({
+    copy_format: async () => { await reading; return "typst"; },
+    picker_preferences: async () => { await reading; return { citation_style: "apa", density: "comfortable", larger_text: false }; },
+    set_picker_preferences: ({ preferences, copyFormat }) => {
+      rememberedStyle = (preferences as { citation_style: unknown }).citation_style;
+      if (copyFormat) rememberedKey = copyFormat as string;
+      return null;
+    },
+    quit: () => { atQuit = { copy_format: rememberedKey, citation_style: rememberedStyle }; return null; },
+  });
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "cite" } });
+  try {
+    if (route === "menu") await chooseFromMore("Quit Ibis");
+    else await act(async () => { fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "q", ctrlKey: true }); });
+    expect(calls).not.toContain("quit");
+    expect(atQuit).toBeNull();
+    await act(async () => { finishReading(); await reading; });
+    await waitFor(() => expect(atQuit).toEqual({ copy_format: "cite", citation_style: null }));
+    expect(calls.filter((call) => call === "set_picker_preferences")).toHaveLength(1);
+  } finally {
+    await act(async () => { finishReading(); await reading; });
+  }
+});
+
+test("a refused preference save reports failure and still allows Quit", async () => {
+  const calls = backend({
+    copy_format: () => "typst",
+    set_picker_preferences: () => { throw new Error("SYNTHETIC_PRIVATE_SAVE_ERROR"); },
+  });
+  render(<App />);
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst"));
+  fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "cite" } });
+  await screen.findByText(/could not read or save your picker choices/);
+  await chooseFromMore("Quit Ibis");
+  await waitFor(() => expect(calls).toContain("quit"));
+  expect(screen.queryByText(/SYNTHETIC_PRIVATE_SAVE_ERROR/)).toBeNull();
+});
+
 test("a stuck settings request cannot keep Quit waiting indefinitely", async () => {
   const calls = backend({
     copy_format: () => "typst",
@@ -1328,4 +1373,23 @@ test("shortcuts read as people type them on each system", async () => {
   expect(shortcutLabel("cmdorctrl + shift + keyr", false)).toBe("Ctrl+Shift+R");
   expect(shortcutLabel("control+command+r", true)).toBe("⌃⌘R");
   expect(shortcutLabel("Alt+Space", false)).toBe("Alt+Space");
+});
+
+test("first-run writing choices save the key and style together before copying", async () => {
+  const saved: unknown[] = [];
+  const calls = backend({
+    library_status: () => NO_LIBRARY,
+    set_picker_preferences: ({ preferences, copyFormat }) => {
+      saved.push({ style: (preferences as { citation_style: unknown }).citation_style, key: copyFormat });
+      return null;
+    },
+  });
+  render(<App />);
+  const places = await screen.findByRole("region", { name: "Where do you write?" });
+  fireEvent.click(within(places).getByRole("button", { name: "Typst" }));
+  await waitFor(() => expect(saved).toEqual([{ style: null, key: "typst" }]));
+  fireEvent.click(within(places).getByRole("button", { name: "Word or Google Docs" }));
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
+  await waitFor(() => expect(saved).toEqual([{ style: null, key: "typst" }, { style: "apa", key: null }]));
+  expect(calls).not.toContain("copy_citation");
 });
