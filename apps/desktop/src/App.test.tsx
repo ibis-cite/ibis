@@ -49,9 +49,9 @@ test("copy confirmation expires, but copy warnings remain until dismissed", asyn
 });
 
 /** Opens the More menu and picks an action from it, as a user would. */
-async function chooseFromMore(name: string) {
+async function chooseFromMore(name: string, role: "menuitem" | "menuitemcheckbox" = "menuitem") {
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  fireEvent.click(await screen.findByRole("menuitem", { name }));
+  fireEvent.click(await screen.findByRole(role, { name }));
 }
 
 function result(key: string, title: string, source = "refs.bib") {
@@ -80,6 +80,8 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
     hide_picker: () => null,
     set_pinned: () => null,
     copy_format: () => "pandoc",
+    picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: false }),
+    set_picker_preferences: () => null,
     library_status: () => ({ state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
   };
   mockIPC(
@@ -744,6 +746,72 @@ test.each([false, true])("a failed library open is not described as an empty exp
   expect(document.body.textContent).not.toContain("Choose a BibTeX or BibLaTeX export");
 });
 
+test("a citation style shows a safe preview and copies rich text with its warnings", async () => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
+  const copies: Record<string, unknown>[] = [];
+  backend({
+    search: () => [result("a", "First"), result("b", "Second")],
+    csl_items: (args) => JSON.stringify((args.ids as { native_key: string }[]).map((id) => id.native_key === "a"
+      ? { id: "a", type: "book", title: "First <img src=x onerror=alert(1)>", author: [{ family: "Garcia", given: "Ana" }], issued: { "date-parts": [[2021]] } }
+      : { id: "b", type: "book", title: "Second", author: [{ family: 5 }] })),
+    copy_formatted: (args) => { copies.push(args); return null; },
+  });
+  try {
+    render(<App />);
+    await screen.findByText("First");
+    fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:ieee" } });
+    const preview = await screen.findByRole("region", { name: "Preview" });
+    await within(preview).findByText("[1]");
+    expect(within(preview).getByText(/Provisional/)).toBeTruthy();
+    const box = screen.getByLabelText("Search references");
+    fireEvent.keyDown(box, { key: "ArrowDown" });
+    fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+    fireEvent.keyDown(box, { key: "ArrowUp" });
+    fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+    fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
+    await within(preview).findByText("(Garcia, 2021); Second");
+    fireEvent.keyDown(box, { key: "Enter" });
+    await waitFor(() => expect(copies).toHaveLength(1));
+    expect(copies[0]).toEqual({ text: "(Garcia, 2021); Second", html: "(Garcia, 2021); Second" });
+    await screen.findByText("Copied");
+    expect(screen.getAllByText(/“Second”: this style could not format the reference/).length).toBeGreaterThan(0);
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
+
+test("Enter never copies a formatted preview of an earlier choice", async () => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
+  const copies: Record<string, unknown>[] = [];
+  const book = (key: string, family: string) => ({ id: key, type: "book", title: key, author: [{ family }], issued: { "date-parts": [[2021]] } });
+  backend({
+    search: () => [result("a", "First"), result("b", "Second")],
+    csl_items: (args) => JSON.stringify((args.ids as { native_key: string }[]).map((id) =>
+      id.native_key === "a" ? book("a", "Alpha") : book("b", "Beta"))),
+    copy_formatted: (args) => { copies.push(args); return null; },
+  });
+  try {
+    render(<App />);
+    await screen.findByText("First");
+    fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
+    const preview = await screen.findByRole("region", { name: "Preview" });
+    await within(preview).findByText("(Alpha, 2021)");
+    const box = screen.getByLabelText("Search references");
+    // Enter after the choice changed but before its preview is ready.
+    act(() => { fireEvent.keyDown(box, { key: "ArrowDown" }); });
+    act(() => { fireEvent.keyDown(box, { key: "Enter" }); });
+    expect(await screen.findByText(/still being formatted/)).toBeTruthy();
+    await within(preview).findByText("(Beta, 2021)");
+    expect(copies).toEqual([]);
+    fireEvent.keyDown(box, { key: "Enter" });
+    await waitFor(() => expect(copies.map((copy) => copy.text)).toEqual(["(Beta, 2021)"]));
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
+
 test("the design scale keeps text readable and every colour role legible in both themes", () => {
   for (const [, token, size] of tokens.matchAll(/(--type-[\w-]+-size):\s*([\d.]+)rem/g)) {
     expect(Number(size), `${token} is at least 12 px`).toBeGreaterThanOrEqual(.75);
@@ -773,7 +841,8 @@ test("Ctrl+K opens More with every action, Escape closes it before hiding the pi
   fireEvent.keyDown(box, { key: "k", ctrlKey: true });
   const menu = await screen.findByRole("menu");
   const items = within(menu).getAllByRole("menuitem").map((item) => item.textContent);
-  expect(items).toEqual(["Choose library…", "Use Zotero", "Reload", "Quit IbisCtrl+Q"]);
+  expect(items).toEqual(["Choose library…", "Use Zotero", "Reload", "Rows: Comfortable", "Quit IbisCtrl+Q"]);
+  expect(within(menu).getByRole("menuitemcheckbox", { name: "Larger text" }).getAttribute("aria-checked")).toBe("false");
   expect(document.activeElement).toBe(within(menu).getAllByRole("menuitem")[0]);
   fireEvent.keyDown(document.activeElement!, { key: "ArrowUp" });
   expect(document.activeElement?.textContent).toContain("Quit Ibis");
@@ -890,3 +959,69 @@ test.each([[30_000, true, "first"], [61_000, true, ""], [61_000, false, "first"]
       now.mockRestore();
     }
   });
+
+test("a saved citation style, density and text size come back at start", async () => {
+  backend({
+    copy_format: () => "typst",
+    picker_preferences: () => ({ citation_style: "apa", density: "compact", larger_text: true }),
+  });
+  render(<App />);
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
+  expect(document.documentElement.dataset.density).toBe("compact");
+  expect(document.documentElement.dataset.textSize).toBe("larger");
+});
+
+test("format, density and text size choices are saved without losing each other", async () => {
+  const saved: unknown[] = [];
+  backend({
+    copy_format: () => "typst",
+    set_picker_preferences: ({ preferences }) => { saved.push(preferences); return null; },
+  });
+  render(<App />);
+  const select = screen.getByLabelText("Copy as") as HTMLSelectElement;
+  await waitFor(() => expect(select.value).toBe("typst"));
+  fireEvent.change(select, { target: { value: "style:ieee" } });
+  await chooseFromMore("Rows: Comfortable");
+  await chooseFromMore("Larger text", "menuitemcheckbox");
+  fireEvent.change(select, { target: { value: "pandoc" } });
+  await waitFor(() => expect(saved).toHaveLength(4));
+  expect(saved).toEqual([
+    { citation_style: "ieee", density: "comfortable", larger_text: false },
+    { citation_style: "ieee", density: "spacious", larger_text: false },
+    { citation_style: "ieee", density: "spacious", larger_text: true },
+    { citation_style: null, density: "spacious", larger_text: true },
+  ]);
+  expect(document.documentElement.dataset.density).toBe("spacious");
+});
+
+test("a choice made while saved choices load is kept and saved, not replaced", async () => {
+  let finish = () => undefined as void;
+  const loaded = new Promise<void>((resolve) => { finish = resolve; });
+  const saved: unknown[] = [];
+  backend({
+    copy_format: async () => { await loaded; return "typst"; },
+    picker_preferences: async () => { await loaded; return { citation_style: "apa", density: "compact", larger_text: false }; },
+    set_picker_preferences: ({ preferences }) => { saved.push(preferences); return null; },
+  });
+  render(<App />);
+  const select = screen.getByLabelText("Copy as") as HTMLSelectElement;
+  fireEvent.change(select, { target: { value: "cite" } });
+  await act(async () => { finish(); await loaded; });
+  await waitFor(() => expect(saved).toEqual([{ citation_style: null, density: "compact", larger_text: false }]));
+  expect(select.value).toBe("cite");
+});
+
+test("unreadable saved choices are reported and never overwritten with defaults", async () => {
+  const calls = backend({
+    copy_format: () => "typst",
+    picker_preferences: () => { throw new Error("synthetic settings failure"); },
+  });
+  render(<App />);
+  await screen.findByText(/could not read or save your picker choices/);
+  // The saved key format still applies, so the next copy does not replace it.
+  expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst");
+  fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
+  await chooseFromMore("Larger text", "menuitemcheckbox");
+  expect(document.documentElement.dataset.textSize).toBe("larger");
+  expect(calls).not.toContain("set_picker_preferences");
+});

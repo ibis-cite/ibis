@@ -166,6 +166,23 @@ def query_failure_facts(snapshot, query, expected):
             "expected_result": expected in text, "one_result": "1 result" in text.splitlines()}
 
 
+TYPE_ATTEMPTS = 3
+TYPE_SETTLE_TIMEOUT = 5
+
+
+def type_query(native, snapshot, text, select_all):
+    """Type into the search field until it reads back exactly, bounded."""
+    for _attempt in range(TYPE_ATTEMPTS):
+        native.key(select_all)
+        native.text(text)
+        deadline = time.monotonic() + TYPE_SETTLE_TIMEOUT
+        while time.monotonic() < deadline:
+            if query_failure_facts(snapshot(), text, "")["exact_search_value"]:
+                return
+            time.sleep(0.1)
+    raise AssertionError(f"Search field did not hold the typed query after {TYPE_ATTEMPTS} attempts")
+
+
 def wait_for_query(snapshot, query, expected, report):
     last = {"nodes": []}
     def matched():
@@ -391,7 +408,10 @@ class Scripted:
                 self.editor_folder = tempfile.TemporaryDirectory(prefix="ibis synthetic editor ")
                 self.editor_path = Path(self.editor_folder.name).resolve() / "Ibis synthetic editor.txt"
                 self.editor_path.write_text("", encoding="utf-8")
-                subprocess.run(["open", "-n", "-a", "TextEdit", str(self.editor_path)], check=True,
+                # Ignore saved state so a fresh instance never restores a
+                # window left behind by an earlier synthetic editor.
+                subprocess.run(["open", "-n", "-a", "TextEdit", str(self.editor_path),
+                                "--args", "-ApplePersistenceIgnoreState", "YES"], check=True,
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=20)
                 def registered():
                     self.editor_pid = self.call("editor")
@@ -474,6 +494,15 @@ class Scripted:
 
     def text(self, text):
         self.call("text", text)
+
+    def settle_editor_windows(self):
+        """Close leftover windows of the owned editor, then require exactly one."""
+        self.call("close-extra-editor-windows", str(self.editor_path))
+        try:
+            wait_for(lambda: self.call("editor-owned", str(self.editor_path)), "single owned synthetic editor window", timeout=10)
+        except AssertionError:
+            state = self.call("editor-state", str(self.editor_path))
+            raise AssertionError(f"A single synthetic editor window is required; found {state['window_count']}") from None
 
     def click(self, name):
         if self.system != "Darwin":
@@ -638,8 +667,11 @@ def main():
                         # Summon deliberately before delivering real keystrokes.
                         native.key(shortcut)
                         wait_for(picker_ready, "Windows picker activated before typing")
-                native.key("ctrl+a" if system != "Darwin" else "super+a")
-                native.text(text)
+                if system == "Darwin":
+                    type_query(native, snapshot, text, "super+a")
+                else:
+                    native.key("ctrl+a")
+                    native.text(text)
                 wait_for_query(snapshot, text, expected, report)
 
             shortcut = args.shortcut or ("ctrl+super+r" if system == "Darwin" else "ctrl+shift+y")
@@ -965,6 +997,37 @@ class ContractTests(unittest.TestCase):
                 prepare_initial_picker_show(native, native.snapshot)
         self.assertEqual(native.events, [("Escape", True)])
 
+    def test_typed_query_is_retyped_until_the_search_field_reads_back_exactly(self):
+        values = iter(["smoke00001", "smoke000001"])
+        native = Mock()
+        snapshot = lambda: {"nodes": [{"name": "Search references", "role": "AXTextField", "value": next(values)}]}
+        with patch(__name__ + ".time") as clock:
+            clock.monotonic.side_effect = [0, 0, 10, 0, 0]
+            type_query(native, snapshot, "smoke000001", "super+a")
+        self.assertEqual(native.mock_calls, [call.key("super+a"), call.text("smoke000001")] * 2)
+
+    def test_typed_query_fails_clearly_after_bounded_attempts(self):
+        native = Mock()
+        snapshot = lambda: {"nodes": [{"name": "Search references", "role": "AXTextField", "value": "smoke"}]}
+        with patch(__name__ + ".time") as clock:
+            clock.monotonic.side_effect = [0, 0, 10] * TYPE_ATTEMPTS
+            with self.assertRaisesRegex(AssertionError, "did not hold the typed query after 3 attempts"):
+                type_query(native, snapshot, "smoke000001", "super+a")
+        self.assertEqual(native.text.call_count, TYPE_ATTEMPTS)
+
+    def test_macos_editor_settle_closes_leftovers_and_reports_window_count(self):
+        native = Scripted.__new__(Scripted)
+        native.editor_path = Path("synthetic.txt")
+        actions = []
+        def helper(action, text=""):
+            actions.append(action)
+            return {"close-extra-editor-windows": 1, "editor-owned": False, "editor-state": {"window_count": 2}}[action]
+        native.call = helper
+        with patch(__name__ + ".wait_for", side_effect=AssertionError("Timed out")):
+            with self.assertRaisesRegex(AssertionError, "single synthetic editor window is required; found 2"):
+                native.settle_editor_windows()
+        self.assertEqual(actions, ["close-extra-editor-windows", "editor-state"])
+
     def test_query_failure_facts_distinguish_empty_partial_and_exact_editable_values(self):
         for value, exact, empty in (("", False, True), ("priv", False, False), ("private query", True, False)):
             current = {"nodes": [
@@ -1153,6 +1216,7 @@ class ContractTests(unittest.TestCase):
 
         def launch(command, **kwargs):
             self.assertEqual(command[:4], ["open", "-n", "-a", "TextEdit"])
+            self.assertEqual(command[5:], ["--args", "-ApplePersistenceIgnoreState", "YES"])
             self.assertEqual(Path(command[4]).name, "Ibis synthetic editor.txt")
             self.assertTrue(Path(command[4]).is_file())
 
@@ -1281,7 +1345,7 @@ class ContractTests(unittest.TestCase):
             wait.assert_not_called()
 
     @unittest.skipUnless(shutil.which("pwsh"), "PowerShell is required to execute the Windows focus helper contract")
-    def test_windows_helper_validates_owned_window_before_at_most_one_foreground_request(self):
+    def test_windows_helper_validates_owned_window_before_a_foreground_request_and_one_unlocked_retry(self):
         script = r'''
 param([string] $Source)
 $ErrorActionPreference = 'Stop'
@@ -1298,7 +1362,8 @@ using System;
 public static class IbisSmoke {
  public static bool Live=true, Accepted=false;
  public static uint Owner=12345, Foreground=0;
- public static int Requests=0;
+ public static int Requests=0, Keys=0;
+ public static void Key(ushort vk, ushort scan, uint flags) { if (vk != 0x12) throw new Exception("unexpected key"); Keys++; }
  public static bool IsWindow(IntPtr window) { return Live; }
  public static uint OwnerPid(IntPtr window) { return Owner; }
  public static uint ForegroundPid() { return Foreground; }
@@ -1309,14 +1374,17 @@ $EditorId=12345; $Text='987654321'
 $script:current=[pscustomobject]@{ProcessName='Notepad';StartTime=[DateTime]::new(987654321,[DateTimeKind]::Utc);MainWindowHandle=[IntPtr]::new(20)}
 function Get-Process { param($Id,$ErrorAction) $script:current }
 foreach ($accepted in @($false,$true)) {
- [IbisSmoke]::Requests=0; [IbisSmoke]::Accepted=$accepted
+ [IbisSmoke]::Requests=0; [IbisSmoke]::Keys=0; [IbisSmoke]::Accepted=$accepted
  $result=& $operation
+ # A refused request gets one retry after an Alt press and an Alt release.
+ $requests=if ($accepted) {1} else {2}; $keys=if ($accepted) {0} else {2}
  if ($result.Count -ne 4 -or !$result.owned -or !$result.window_valid -or
-     $result.request_accepted -ne $accepted -or $result.current_foreground -or [IbisSmoke]::Requests -ne 1) { throw 'Request metadata regression' }
+     $result.request_accepted -ne $accepted -or $result.current_foreground -or
+     [IbisSmoke]::Requests -ne $requests -or [IbisSmoke]::Keys -ne $keys) { throw 'Request metadata regression' }
 }
-[IbisSmoke]::Foreground=12345; [IbisSmoke]::Requests=0
+[IbisSmoke]::Foreground=12345; [IbisSmoke]::Requests=0; [IbisSmoke]::Keys=0
 $result=& $operation
-if (!$result.current_foreground -or [IbisSmoke]::Requests -ne 0) { throw 'Already focused editor was requested again' }
+if (!$result.current_foreground -or [IbisSmoke]::Requests -ne 0 -or [IbisSmoke]::Keys -ne 0) { throw 'Already focused editor was requested again' }
 foreach ($failure in @('missing','identity','zero','invalid','other-owner')) {
  [IbisSmoke]::Requests=0; [IbisSmoke]::Live=$true; [IbisSmoke]::Owner=12345
  $script:current=[pscustomobject]@{ProcessName='Notepad';StartTime=[DateTime]::new(987654321,[DateTimeKind]::Utc);MainWindowHandle=[IntPtr]::new(20)}
@@ -1329,7 +1397,7 @@ foreach ($failure in @('missing','identity','zero','invalid','other-owner')) {
  }
  $rejected=$false
  try { & $operation | Out-Null } catch {$rejected=$true}
- if (!$rejected -or [IbisSmoke]::Requests -ne 0) { throw 'Unowned or invalid editor reached a foreground request' }
+ if (!$rejected -or [IbisSmoke]::Requests -ne 0 -or [IbisSmoke]::Keys -ne 0) { throw 'Unowned or invalid editor reached a foreground request' }
 }
 '''
         with tempfile.TemporaryDirectory() as temporary:

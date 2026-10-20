@@ -13,9 +13,16 @@ export const operationFailures = {
   reload: "Ibis could not reload your library. Choose the file again.",
   hide: "Ibis could not hide this window. Try again.",
   pin: "Ibis could not change the pin. Try again.",
+  preferences: "Ibis could not read or save your picker choices. They apply until Ibis restarts.",
   quit: "Ibis could not quit. Try again.",
   pickerEvents: "Ibis could not focus the search box. Restart Ibis to try again.",
   libraryEvents: "Your library may not update automatically. Use Reload, or restart Ibis.",
+} as const;
+
+export const densityNames = {
+  compact: "Compact",
+  comfortable: "Comfortable",
+  spacious: "Spacious",
 } as const;
 
 export const pickerText = {
@@ -25,6 +32,13 @@ export const pickerText = {
   searchError: "Ibis could not search your library. Use Reload, then try again.",
   copyError: "Nothing was copied. Try again, or use Reload.",
   copied: "Copied",
+  keyFormats: "Citation keys",
+  formattedStyles: "Formatted citation",
+  preview: "Preview",
+  previewPending: "Formatting…",
+  previewNotReady: "Nothing was copied yet: the citation is still being formatted. Press Enter again in a moment.",
+  previewError: "This citation could not be formatted. Choose another style, or copy citation keys.",
+  provisional: "Provisional: the number depends on the other references cited in your document.",
   dismiss: "Dismiss",
   dismissWarnings: "Dismiss copy warnings",
   copyWarnings: "Copy warnings",
@@ -61,6 +75,9 @@ export const pickerText = {
   copyAs: "Copy as",
   quit: "Quit",
   quitLabel: "Quit Ibis",
+  density: (name: string) => `Rows: ${name}`,
+  densityTitle: "Show less or more of each reference",
+  largerText: "Larger text",
   keyHints: { copy: " Copy · ", add: " Add · ", hide: " Hide" },
   resultCount: (count: number) => `${count} ${count === 1 ? "result" : "results"}`,
   selectionCount: (count: number) => `${count} ${count === 1 ? "reference" : "references"} selected for citation`,

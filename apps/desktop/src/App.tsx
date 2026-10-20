@@ -1,12 +1,17 @@
 import type React from "react";
 import * as nativeApi from "./api";
-import { copyFormatNames, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
+import { copyFormatNames, densityNames, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
 import { useEffect, useRef, useState } from "react";
+import { formatCitation, FORMATTED_STYLES, provisional, type FormattedCitation } from "./format/formatted";
+import { STYLE_NAMES, type StyleId } from "./format/styles";
+import { render } from "./format/markup";
 import {
   COPY_FORMATS,
   type Copied,
   type CopyFormat,
+  type Density,
   type LibraryStatus,
+  type PickerPreferences,
   type RecordId,
   type SearchResult,
   type ShortcutStatus,
@@ -24,6 +29,8 @@ function idKey(id: RecordId): string {
 }
 
 type Operation = keyof typeof FAILURE_MESSAGES;
+
+const DENSITIES: Density[] = ["compact", "comfortable", "spacious"];
 
 // A search comes back if the picker returns within a minute, as in Raycast.
 const KEEP_SEARCH_MS = 60_000;
@@ -54,7 +61,7 @@ function libraryHealth(library: LibraryStatus | null | undefined): "done" | "loo
 function MoreMenu({ children, onClose }: { children: React.ReactNode; onClose: (refocus: boolean) => void }) {
   const menu = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    menu.current?.querySelector<HTMLElement>("[role=menuitem]")?.focus();
+    menu.current?.querySelector<HTMLElement>("[data-menu-item]")?.focus();
     const outside = (e: PointerEvent) => {
       const target = e.target as Node;
       if (!menu.current?.contains(target) && !menu.current?.parentElement?.contains(target)) onClose(false);
@@ -69,7 +76,7 @@ function MoreMenu({ children, onClose }: { children: React.ReactNode; onClose: (
       aria-label={pickerText.more}
       ref={menu}
       onKeyDown={(e) => {
-        const items = [...(menu.current?.querySelectorAll<HTMLElement>("[role=menuitem]") ?? [])];
+        const items = [...(menu.current?.querySelectorAll<HTMLElement>("[data-menu-item]") ?? [])];
         const at = items.indexOf(document.activeElement as HTMLElement);
         const move = { ArrowDown: 1, ArrowUp: -1 }[e.key];
         if (move !== undefined) {
@@ -91,9 +98,14 @@ function MoreMenu({ children, onClose }: { children: React.ReactNode; onClose: (
   );
 }
 
-function MenuItem({ label, title, keys, onSelect }: { label: string; title?: string; keys?: string; onSelect: () => void }) {
+function MenuItem({ label, title, keys, checked, onSelect }: {
+  label: string; title?: string; keys?: string; checked?: boolean; onSelect: () => void;
+}) {
+  // A checkable item keeps the menuitem role for focus handling; aria-checked
+  // is announced on menuitemcheckbox only, so the role changes with it.
   return (
-    <button type="button" role="menuitem" tabIndex={-1} title={title} onClick={onSelect}>
+    <button type="button" role={checked === undefined ? "menuitem" : "menuitemcheckbox"} aria-checked={checked}
+      data-menu-item tabIndex={-1} title={title} onClick={onSelect}>
       <span>{label}</span>
       {keys && <kbd aria-hidden="true">{keys}</kbd>}
     </button>
@@ -101,16 +113,32 @@ function MenuItem({ label, title, keys, onSelect }: { label: string; title?: str
 }
 
 // A stable provider lets the development gallery use synthetic data without IPC.
+// Formatted citations are offered only when the provider can supply them.
 export type PickerApi = Pick<typeof nativeApi,
-  "chooseLibrary" | "useZotero" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" |
-  "hidePicker" | "setPinned" | "onLibraryChanged" | "onPickerShown" | "onPickerHidden" | "quit" | "search" | "shortcutStatus">;
+  "chooseLibrary" | "useZotero" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" | "pickerPreferences" | "setPickerPreferences" |
+  "hidePicker" | "setPinned" | "onLibraryChanged" | "onPickerShown" | "onPickerHidden" | "quit" | "search" | "shortcutStatus"> &
+  Partial<Pick<typeof nativeApi, "cslItems" | "copyFormatted">>;
+
+/** A citation-key syntax, or a citation style written as `style:<id>`. */
+type Choice = CopyFormat | `style:${StyleId}`;
+
+/** The one word the closed format control shows. */
+function choiceName(choice: Choice): string {
+  const style = styleOf(choice);
+  return style ? STYLE_NAMES[style] : copyFormatNames[choice as CopyFormat];
+}
+
+function styleOf(choice: Choice): StyleId | null {
+  return choice.startsWith("style:") ? (choice.slice("style:".length) as StyleId) : null;
+}
 
 export type PickerPreview = { query?: string; copied?: Copied };
 
 // The picker: search, choose one or more references, copy them as a citation.
 export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: PickerPreview } = {}) {
   const { chooseLibrary, useZotero, libraryStatus, reloadLibrary, copyCitation, copyFormat,
-    hidePicker, setPinned, onLibraryChanged, onPickerShown, onPickerHidden, quit, search, shortcutStatus } = api;
+    hidePicker, setPinned, onLibraryChanged, onPickerShown, onPickerHidden, quit, search, shortcutStatus, cslItems, copyFormatted,
+    pickerPreferences, setPickerPreferences } = api;
   const [query, setQuery] = useState(preview?.query ?? "");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [announcement, setAnnouncement] = useState("");
@@ -119,7 +147,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Map<string, SearchResult>>(new Map());
   const [selectionChanged, setSelectionChanged] = useState(false);
-  const [format, setFormat] = useState<CopyFormat>("pandoc");
+  const [format, setFormat] = useState<Choice>("pandoc");
+  const style = cslItems && copyFormatted ? styleOf(format) : null;
+  // The formatted preview, tagged with the style, choice and library it was
+  // made for, so Enter never copies a preview of an earlier choice.
+  const [formatted, setFormatted] = useState<{ key: string; result: FormattedCitation | "failed" } | null>(null);
   const [copied, setCopied] = useState<Copied | null>(preview?.copied ?? null);
   const [error, setError] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -148,6 +180,43 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     setSelected(new Map());
     setActive(0);
   };
+  // Saved preferences, once read; choices made before that wait in `pending`
+  // so a slow read never overwrites them and a failed read never resets the
+  // file to defaults.
+  const [density, setDensity] = useState<Density>("comfortable");
+  const [largerText, setLargerText] = useState(false);
+  const savedPreferences = useRef<PickerPreferences | null>(null);
+  const pending = useRef<Partial<PickerPreferences>>({});
+  const savePreferences = (change: Partial<PickerPreferences>) => {
+    pending.current = { ...pending.current, ...change };
+    if (!savedPreferences.current) return;
+    const next = { ...savedPreferences.current, ...pending.current } as PickerPreferences;
+    pending.current = {};
+    savedPreferences.current = next;
+    void perform("preferences", () => setPickerPreferences(next));
+  };
+  const chooseFormat = (choice: Choice) => {
+    setFormat(choice);
+    savePreferences({ citation_style: styleOf(choice) });
+  };
+  const changeDensity = () => {
+    const next = DENSITIES[(DENSITIES.indexOf(density) + 1) % DENSITIES.length] ?? "comfortable";
+    setDensity(next);
+    savePreferences({ density: next });
+  };
+  const toggleLargerText = () => {
+    setLargerText(!largerText);
+    savePreferences({ larger_text: !largerText });
+  };
+  useEffect(() => {
+    document.documentElement.dataset.density = density;
+    document.documentElement.dataset.textSize = largerText ? "larger" : "normal";
+    return () => {
+      delete document.documentElement.dataset.density;
+      delete document.documentElement.dataset.textSize;
+    };
+  }, [density, largerText]);
+
   const togglePin = () => {
     const on = !pinned;
     setPinnedState(on);
@@ -188,9 +257,28 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     shortcutStatus()
       .then(setShortcut)
       .catch(() => { setShortcut(null); report("shortcut"); });
-    copyFormat()
-      .then(setFormat)
-      .catch(() => report("format"));
+    // The saved style wins over the saved key format; a choice made while
+    // these load wins over both.
+    void Promise.allSettled([copyFormat(), pickerPreferences()]).then(([key, saved]) => {
+      if (!mounted) return;
+      if (key.status === "rejected") report("format");
+      if (saved.status === "rejected") {
+        // Without saved preferences the saved key format still applies.
+        report("preferences");
+        if (pending.current.citation_style === undefined && key.status === "fulfilled") setFormat(key.value);
+        return;
+      }
+      const loaded = { ...saved.value, ...pending.current } as PickerPreferences;
+      savedPreferences.current = saved.value;
+      setDensity(loaded.density);
+      setLargerText(loaded.larger_text);
+      const chosen = pending.current.citation_style !== undefined;
+      if (Object.keys(pending.current).length > 0) savePreferences({});
+      if (chosen) return;
+      const style = saved.value.citation_style;
+      if (style && cslItems && copyFormatted) setFormat(`style:${style}`);
+      else if (key.status === "fulfilled") setFormat(key.value);
+    });
     return () => {
       acceptInitialStatus = false;
       mounted = false;
@@ -260,20 +348,48 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     });
   };
 
-  // Copy the selection, or the highlighted result when nothing is selected.
+  // The selection, or the highlighted result when nothing is selected.
+  // Never a highlighted result that belongs to an earlier query.
+  const current = resultsQuery === query ? results : [];
+  const chosen = selected.size > 0 ? [...selected.values()] : current.slice(active, active + 1);
+  const chosenKey = chosen.map((r) => idKey(r.id)).join("\u0001");
+  const previewKey = `${style}\u0002${libraryVersion}\u0002${chosenKey}`;
+  // What Enter would copy now; null while it is being formatted.
+  const shown = formatted?.key === previewKey ? formatted.result : null;
+
+  // Format the preview again whenever the choice or the style changes.
+  useEffect(() => {
+    if (!style || !cslItems || chosen.length === 0) return;
+    let live = true;
+    const key = previewKey;
+    cslItems(chosen.map((r) => r.id))
+      .then((csl) => formatCitation(csl, style))
+      .then((result) => { if (live) setFormatted({ key, result }); })
+      .catch(() => { if (live) setFormatted({ key, result: "failed" }); });
+    return () => { live = false; };
+  }, [previewKey]);
+
+  // Copy the chosen references in the chosen format.
   const copy = async () => {
-    // Never copy a highlighted result that belongs to an earlier query.
-    const current = resultsQuery === query ? results : [];
-    const chosen = selected.size > 0 ? [...selected.values()] : current.slice(active, active + 1);
     if (chosen.length === 0) return;
     setCopied(null);
     setCopyError(null);
     let outcome: Copied;
     try {
-      outcome = await copyCitation(
-        chosen.map((r) => r.id),
-        format,
-      );
+      if (style && copyFormatted) {
+        // Copy only what the preview shows, never a result still being made.
+        if (shown === null || shown === "failed") {
+          setCopyError(shown === null ? pickerText.previewNotReady : pickerText.previewError);
+          return;
+        }
+        await copyFormatted(shown.text, shown.html);
+        outcome = { text: shown.text, warnings: shown.warnings };
+      } else {
+        outcome = await copyCitation(
+          chosen.map((r) => r.id),
+          format as CopyFormat,
+        );
+      }
     } catch {
       setCopyError(pickerText.copyError);
       return;
@@ -372,16 +488,27 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         />
         {/* The closed control shows one word; the list and screen readers get the full name. */}
         <span className="format-picker" title={pickerText.copyAs}>
-          <span aria-hidden="true" className="format-name">{copyFormatNames[format]}</span>
+          <span aria-hidden="true" className="format-name">{choiceName(format)}</span>
           <label className="visually-hidden" htmlFor="format">
             {pickerText.copyAs}
           </label>
-          <select id="format" value={format} onChange={(e) => setFormat(e.target.value as CopyFormat)}>
-            {COPY_FORMATS.map((f) => (
-              <option key={f.value} value={f.value}>
-                {f.label}
-              </option>
-            ))}
+          <select id="format" value={format} onChange={(e) => chooseFormat(e.target.value as Choice)}>
+            <optgroup label={pickerText.keyFormats}>
+              {COPY_FORMATS.map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
+              ))}
+            </optgroup>
+            {cslItems && copyFormatted && (
+              <optgroup label={pickerText.formattedStyles}>
+                {FORMATTED_STYLES.map((s) => (
+                  <option key={s.id} value={`style:${s.id}`}>
+                    {s.title}
+                  </option>
+                ))}
+              </optgroup>
+            )}
           </select>
         </span>
         <button
@@ -441,6 +568,23 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             </li>
           ))}
         </ul>
+      )}
+      {style && chosen.length > 0 && (
+        <section aria-label={pickerText.preview} className="format-preview">
+          {shown === null && <p role="status">{pickerText.previewPending}</p>}
+          {shown === "failed" && <p role="alert">{pickerText.previewError}</p>}
+          {shown && shown !== "failed" && (
+            <>
+              <div className="preview-text">{render(shown.markup)}</div>
+              {provisional(style) && <p className="provisional">{pickerText.provisional}</p>}
+              {shown.warnings.length > 0 && (
+                <ul aria-label={pickerText.copyWarnings}>
+                  {shown.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                </ul>
+              )}
+            </>
+          )}
+        </section>
       )}
       <div className="results-area">
         <div className="results-heading" aria-hidden="true">
@@ -536,6 +680,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                 {library?.name && (
                   <MenuItem label={pickerText.reload} title={pickerText.reloadTitle} onSelect={() => runFromMenu("reload", reloadLibrary)} />
                 )}
+                <MenuItem label={pickerText.density(densityNames[density])} title={pickerText.densityTitle} onSelect={changeDensity} />
+                <MenuItem label={pickerText.largerText} checked={largerText} onSelect={toggleLargerText} />
                 {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
                 <MenuItem label={pickerText.quitLabel} keys={`${modifier}Q`} onSelect={() => runFromMenu("quit", quit)} />
               </MoreMenu>

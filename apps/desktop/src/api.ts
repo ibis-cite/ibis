@@ -3,7 +3,7 @@ import { copyFormatLabels } from "./messages";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { commands, type KeyFormat, type LibraryStatus } from "./bindings";
 
-export type { Copied, LibraryStatus, RecordId, SearchResult, ShortcutStatus } from "./bindings";
+export type { Copied, Density, LibraryStatus, PickerPreferences, RecordId, SearchResult, ShortcutStatus } from "./bindings";
 export type CopyFormat = KeyFormat;
 
 export const {
@@ -17,6 +17,10 @@ export const {
   shortcutStatus,
   copyCitation,
   copyFormat,
+  cslItems,
+  copyFormatted,
+  pickerPreferences,
+  setPickerPreferences,
 } = commands;
 
 // The limit default, page and request number are not part of the UI's API:
