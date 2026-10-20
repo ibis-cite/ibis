@@ -218,9 +218,25 @@ pub fn normalize(text: &str) -> String {
             _ => [' ', '\0'],
         })
         .filter(|c| *c != '\0')
-        .nfc()
         .collect();
-    folded.split_whitespace().collect::<Vec<_>>().join(" ")
+    // Recompose kept marks and Hangul syllables; most text has neither, so it
+    // skips this second pass.
+    let folded: String = if folded
+        .chars()
+        .any(|c| is_combining_mark(c) || ('\u{1100}'..='\u{11FF}').contains(&c))
+    {
+        folded.nfc().collect()
+    } else {
+        folded
+    };
+    // A kept mark left at the start of a word (after punctuation or a spacing
+    // mark such as ゛) has no letter to belong to.
+    folded
+        .split_whitespace()
+        .map(|word| word.trim_start_matches(is_combining_mark))
+        .filter(|word| !word.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// Combining marks that readers treat as optional, so searches ignore them.
@@ -232,11 +248,20 @@ fn is_optional_mark(c: char) -> bool {
         | '\u{20D0}'..='\u{20FF}'
         | '\u{FE20}'..='\u{FE2F}'
         | '\u{0483}'..='\u{0489}'
-        | '\u{0591}'..='\u{05C7}'
+        | '\u{0591}'..='\u{05BD}'
+        | '\u{05BF}'
+        | '\u{05C1}'..='\u{05C2}'
+        | '\u{05C4}'..='\u{05C5}'
+        | '\u{05C7}'
         | '\u{0610}'..='\u{061A}'
         | '\u{064B}'..='\u{065F}'
         | '\u{0670}'
-        | '\u{06D6}'..='\u{06ED}')
+        | '\u{06D6}'..='\u{06ED}'
+        // Variation selectors pick a glyph, not a different letter.
+        | '\u{180B}'..='\u{180D}'
+        | '\u{180F}'
+        | '\u{FE00}'..='\u{FE0F}'
+        | '\u{E0100}'..='\u{E01EF}')
 }
 
 fn starts_word(text: &str, term: &str) -> bool {
@@ -469,6 +494,17 @@ mod tests {
         assert_eq!(keys("かっこう"), ["ka"]);
         assert_eq!(keys("किताब"), ["hi"]);
         assert!(keys("कताब").is_empty());
+
+        let refs = [
+            reference("vs", "葛\u{E0100}城の研究", "例", 2020),
+            reference("he", "בית־ספר", "דוגמה", 2021),
+        ];
+        let index = Index::new(&refs);
+        assert_eq!(index.search("葛城", 10)[0].reference.id.native_key, "vs");
+        assert_eq!(index.search("ספר", 10)[0].reference.id.native_key, "he");
+        assert_eq!(normalize("❤\u{FE0F}x"), "x");
+        assert_eq!(normalize("か゛ き"), "か き");
+        assert_eq!(normalize("בית־ספר"), "בית ספר");
 
         let refs = [reference("ko", "한국어 연구", "김", 2020)];
         let index = Index::new(&refs);
