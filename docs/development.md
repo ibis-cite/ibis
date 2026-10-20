@@ -55,6 +55,8 @@ No other labels. Each family has one colour.
 
 **Milestones.** Every open issue has one milestone: `0.N Name` for a planned release (matching `ROADMAP.md`), `1.0`, or `Later` for anything not scheduled. Each open milestone's description is one line saying what users can do when it ships, and names its tracking issue. A milestone closes when its release ships.
 
+**Versions and releases.** Version numbers, release and nightly titles, tags and download links follow [RELEASING.md](../RELEASING.md#releases).
+
 **Tracking issues.** Each active milestone has one, labelled `tracking` and titled `<milestone>: plan, queue and decisions`. Its body holds the current plan: what done means, **Now** (work in progress and where it is), the ordered **Queue**, what waits on the maintainer, what is deferred, and decisions taken. History goes in comments. After each merge, add one line saying what users can now do and what is next.
 
 ## Setting up a computer

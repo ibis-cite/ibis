@@ -8,17 +8,23 @@ When source reading, search or output changes, also test against a **controlled*
 
 ## Releases
 
-Versions follow [Semantic Versioning](https://semver.org/). While `0.x`, features
-and fixes raise the patch version; completing a roadmap milestone raises the
-minor version. Release notes come from Conventional Commits; commit conventions
-are in [AGENTS.md](AGENTS.md#version-control). To request a milestone version,
-use `Release-As: 0.N.0` in a commit body on `main`.
+Versions follow [Semantic Versioning](https://semver.org/). Before 1.0,
+`0.N.0` ships milestone `0.N`; `0.N.1`, `0.N.2`, ... fix it. Release notes
+come from Conventional Commits; commit conventions are in
+[AGENTS.md](AGENTS.md#version-control). To request a milestone version, use
+`Release-As: 0.N.0` in a commit body on `main`.
 
-Release Please keeps the release PR open; merging it updates `CHANGELOG.md` and
-the workspace version and creates the tag and release. Never edit versions by
-hand. Numbered release builds are produced only by CI from a tag; previews may
-be GitHub pre-releases. Data formats have their own schema versions and tested
-migrations.
+Release Please keeps a pull request titled `chore: release X.Y.Z`; merging it
+only on the maintainer's word updates `CHANGELOG.md` and the workspace version,
+tags `vX.Y.Z` and publishes **Ibis X.Y.Z** with a download table and changes
+grouped by type. Never edit versions by hand. Numbered release builds are
+produced only by CI from a tag; previews may be GitHub pre-releases. Data formats
+have their own schema versions and tested migrations.
+
+Non-documentation changes on `main` publish
+**Ibis Nightly X.Y.Z-nightly.YYYYMMDDHHMMSS** on the rolling `nightly` tag.
+The rolling `stable` tag mirrors the newest release so download links never
+change. Tags are `vX.Y.Z`, `nightly` and `stable`; no other tags.
 
 Release Please updates the workspace version and the four release package entries
 in `Cargo.lock`; `ibis-fuzz` stays unchanged. When changing its updater config,
@@ -51,7 +57,7 @@ Release Please then keeps a release pull request open. Bot-created proposals can
 - **Nightly:** every push to `main` that changes more than documentation builds the same packages and replaces the `nightly` pre-release ([Releases → nightly](https://github.com/ibiscite/ibis/releases/tag/nightly), titled `Ibis Nightly <version>` with the version and commit at the top of its notes). The `nightly` tag moves to that commit; it never matches `v*`, so it starts no release build and Release Please ignores it. Runs are never cancelled; while one runs, only the newest waiting push is kept, and a run whose commit is no longer the head of `main` does not publish. Publication first checks every checksum and verifies each package's provenance against `refs/heads/main` and that commit; a failed build or check leaves the previous nightly in place. Packages are uploaded before the tag moves and the notes change, so the notes always name the commit that was fully published. To refresh it by hand, run Preview builds on `main` with publication checked. Builds from `main` are the separate app **Ibis Nightly** (identifier `io.github.ibiscite.ibis.nightly`, version `X.Y.Z-nightly.YYYYMMDDHHMMSS` from `scripts/update-feed.mjs`), without the MSI and `.rpm`, whose version formats cannot carry it.
 - **Updates (ADR 0019):** the nightly job and the tag release job, in the `updates` environment that only `main` and `v*` tags can use, sign the macOS app archives, the Windows setup executable and the AppImage with the Ibis update key, check that each signature names the key built into the app (the app itself verifies the signature before installing), and upload `latest.json` after the packages. A tag release must name the workspace version; once the release is public, the `stable-feed` job copies its packages and `latest.json` to the rolling `stable` pre-release, which the stable app reads and which gives fixed download links to the newest release. That job can be re-run on its own, and leaves the feed in place for a tag older than the one it names (a backport). Signatures live only in `latest.json`. After each nightly, the `update-e2e` job starts the nightly that was just replaced (Linux AppImage, under a virtual display) with update checks on, accepts the offered update and checks that the file was replaced by the new package and the new version started; it is skipped, with a notice, when the previous nightly had no feed or a newer commit took over publication. Losing the key or its password means testers reinstall once by hand; the maintainer keeps an offline backup.
 
-All four package jobs must succeed. Then an install job installs the packages the way a user would and starts the installed app: the Linux `.deb` with `apt-get` (and the AppImage), the Windows setup executable and MSI silently, and the Apple silicon disk image copied to an Applications folder. It runs `scripts/smoke-native.py` against the installed app with a synthetic library, checks the app stays up, and uninstalls it. The Intel disk image is built but not installed. The nightly and pre-release are published only if every install succeeds; screenshots and logs are kept as `install-*` workflow artifacts. Publication checks every downloaded checksum and verifies each package and checksum attestation against the exact tag ref, source commit and preview workflow. Packages upload to a draft; only then is the draft published. A build, verification or upload failure leaves the draft unpublished. An already public release is not overwritten. The generated changelog is preserved and the unsigned preview warning and checksum/provenance instructions are added once.
+All four package jobs must succeed. Then an install job installs the packages the way a user would and starts the installed app: the Linux `.deb` with `apt-get` (and the AppImage), the Windows setup executable and MSI silently, and the Apple silicon disk image copied to an Applications folder. It runs `scripts/smoke-native.py` against the installed app with a synthetic library, checks the app stays up, and uninstalls it. The Intel disk image is built but not installed. The nightly and pre-release are published only if every install succeeds; screenshots and logs are kept as `install-*` workflow artifacts. Publication checks every downloaded checksum and verifies each package and checksum attestation against the exact tag ref, source commit and preview workflow. Packages upload to a draft; only then is the draft published. A build, verification or upload failure leaves the draft unpublished. An already public release is not overwritten. The release is titled `Ibis X.Y.Z`; `scripts/release-notes.mjs` turns Release Please's generated change list into the notes (download table, unsigned-install note, changes without commit hashes, verification instructions) and leaves notes that already have a download table alone.
 
 ### Recovering a package build
 
