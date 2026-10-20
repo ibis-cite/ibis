@@ -49,8 +49,10 @@ REPLACE_TIMEOUT = 300
 RESTART_TIMEOUT = 60
 UNINSTALL = r"Software\Microsoft\Windows\CurrentVersion\Uninstall"
 
-# Lists the named processes' windows, buttons and texts, or presses the named
-# button. Prints {"pressed": bool, "seen": [...]}.
+# Lists the named processes' windows and named elements, or presses the named
+# button. Prints {"pressed": bool, "seen": [...], "probe": {...}}, where the
+# probe holds only counts, error numbers or exception type names, and how a
+# press was made.
 WINDOWS_LOOK = r"""
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
 $A = [System.Windows.Automation.AutomationElement]
@@ -61,9 +63,7 @@ $probe = @{ pids = 0; windows = 0; elements = 0; errors = [System.Collections.Ge
 # Only the exception's type name is kept: its message can name paths or windows.
 function Note($id, $error) { if ($probe.errors.Count -lt 50) { $probe.errors.Add("[$id] " + $error.Exception.GetType().Name) } }
 function Press($item) {
-  try { $item.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke(); return 'invoke' } catch {}
-  try { $item.GetCurrentPattern([System.Windows.Automation.LegacyIAccessiblePattern]::Pattern).DoDefaultAction(); return 'default-action' } catch {}
-  return $null
+  try { $item.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke(); return 'invoke' } catch { return $null }
 }
 function Answer($pressed, $how) {
   @{ pressed = $pressed; seen = @($seen); probe = @{ pids = $probe.pids; windows = $probe.windows; elements = $probe.elements; errors = @($probe.errors); pressed_by = $how } } | ConvertTo-Json -Compress -Depth 4
@@ -524,7 +524,7 @@ def run(args):
                 if seen["helper"]:
                     report["last_helper_problem"] = seen["helper"]
                 if seen["probe"] is not None:
-                    report["last_probe"] = seen["probe"]
+                    report["last_probe"] = seen["probe"]  # From the last look that answered.
                 if install:
                     report.update(install.facts())
                     try:
