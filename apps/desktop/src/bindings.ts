@@ -30,6 +30,10 @@ export const commands = {
 	copyCitation: (ids: RecordId[], format: KeyFormat) => __TAURI_INVOKE<Copied>("copy_citation", { ids, format }),
 	/**  The format the picker starts with: the last one used, or Pandoc. */
 	copyFormat: () => __TAURI_INVOKE<KeyFormat>("copy_format"),
+	/**  The preferences the picker starts with. */
+	pickerPreferences: () => __TAURI_INVOKE<PickerPreferences>("picker_preferences"),
+	/**  Remember the picker preferences; other settings in the file are kept. */
+	setPickerPreferences: (preferences: PickerPreferences) => __TAURI_INVOKE<null>("set_picker_preferences", { preferences }),
 	/**  Hide the picker (Escape in the interface). */
 	hidePicker: () => __TAURI_INVOKE<void>("hide_picker"),
 	/**
@@ -49,11 +53,17 @@ export const commands = {
 };
 
 /* Types */
+/**  A bundled citation style the picker can format with (ADR 0020). */
+export type CitationStyle = "apa" | "chicago-author-date" | "harvard-cite-them-right" | "ieee" | "modern-language-association";
+
 export type Copied = {
 	text: string,
 	/**  What the chosen syntax could not express, and other problems the user should see. */
 	warnings: string[],
 };
+
+/**  How much each result row shows (ADR 0020). */
+export type Density = "compact" | "comfortable" | "spacious";
 
 /**  Key-based output syntax. */
 export type KeyFormat =
@@ -92,6 +102,17 @@ export type LibraryStatus = {
 	note: string | null,
 	/**  Startup settings recovery, separate from transient library status. */
 	settings_notice: string | null,
+};
+
+/**
+ *  How the picker looks and what it formats with, remembered across restarts
+ *  (ADR 0020). The key format is remembered separately, on each copy.
+ */
+export type PickerPreferences = {
+	/**  A style chosen in the format menu, or `null` to copy citation keys. */
+	citation_style: CitationStyle | null,
+	density: Density,
+	larger_text: boolean,
 };
 
 /**  Stable identity of a record: which source it came from and its key there. */

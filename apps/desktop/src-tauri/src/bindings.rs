@@ -10,6 +10,8 @@ pub(crate) fn commands() -> tauri_specta::Builder<tauri::Wry> {
             crate::library::search,
             crate::copy::copy_citation,
             crate::copy::copy_format,
+            crate::preferences::picker_preferences,
+            crate::preferences::set_picker_preferences,
             crate::picker::hide_picker,
             crate::picker::set_pinned,
             crate::picker::quit,
