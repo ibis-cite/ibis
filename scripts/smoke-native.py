@@ -2141,10 +2141,13 @@ $ast=[System.Management.Automation.Language.Parser]::ParseFile($Source,[ref]$tok
 if ($errors.Count) { throw 'Helper syntax is invalid' }
 $switch=$ast.Find({param($node) $node -is [System.Management.Automation.Language.SwitchStatementAst] -and $node.Condition.Extent.Text -eq '$Action'},$true)
 $clause=@($switch.Clauses | Where-Object {$_.Item1.Value -eq 'click'})[0].Item2.Extent.Text
+# Real Windows UIA types may already be loaded. Every extracted type and all
+# fake provider types must share this isolated namespace, including enums.
+$clause=$clause.Replace('[System.Windows.Automation.', '[IbisClickContract.')
 $operation=[scriptblock]::Create($clause.Substring(1,$clause.Length-2))
 Add-Type @'
 using System;
-namespace System.Windows.Automation {
+namespace IbisClickContract {
  public enum TreeScope { Descendants }
  public class AutomationElement { public static string NameProperty="name"; }
  public class PropertyCondition { public string Value; public PropertyCondition(string property,string value) { Value=value; } }
@@ -2152,7 +2155,6 @@ namespace System.Windows.Automation {
  public class InvokePattern { public static int Pattern=1; }
  public class ExpandCollapsePattern { public static int Pattern=2; }
  public class TogglePattern { public static int Pattern=3; }
-}
 public class ClickPattern {
  public int Activations; public bool Fail;
  public void Invoke() { Activate(); } public void Expand() { Activate(); } public void Toggle() { Activate(); }
@@ -2165,28 +2167,29 @@ public class ClickElement {
 }
 public class ClickWindow {
  public ClickElement[] Elements=new ClickElement[0];
- public ClickElement[] FindAll(System.Windows.Automation.TreeScope scope,System.Windows.Automation.PropertyCondition condition) {
+ public ClickElement[] FindAll(TreeScope scope,PropertyCondition condition) {
   return Array.FindAll(Elements,element=>element.Name==condition.Value);
  }
 }
+}
 '@
-$AppId=42; $Text='Typst'; $script:window=[ClickWindow]::new()
+$AppId=42; $Text='Typst'; $script:window=[IbisClickContract.ClickWindow]::new()
 function Get-AppWindow { param($Id) if($Id -ne 42) {throw 'Unexpected owner'}; $script:window }
 foreach ($pattern in @(1,2,3)) {
- $element=[ClickElement]::new(); $element.Supported=$pattern; $script:window.Elements=@($element)
+ $element=[IbisClickContract.ClickElement]::new(); $element.Supported=$pattern; $script:window.Elements=@($element)
  $result=& $operation
  if(!$result.pressed -or !$result.button_role -or $element.Action.Activations -ne 1 -or
     $result.invoke_pattern -ne ($pattern -eq 1) -or $result.expand_collapse_pattern -ne ($pattern -eq 2) -or
     $result.toggle_pattern -ne ($pattern -eq 3)) {throw 'Native pattern did not activate once'}
 }
 foreach ($failure in @('missing','wrong-label','text-toggle','menu-toggle','duplicate','unsupported','uncertain','bound')) {
- $element=[ClickElement]::new(); $script:window.Elements=@($element)
+ $element=[IbisClickContract.ClickElement]::new(); $script:window.Elements=@($element)
  switch($failure) {
   'missing' {$script:window.Elements=@()}
   'wrong-label' {$element.Name='private Typst suffix'}
   'text-toggle' {$element.ControlType='text'}
   'menu-toggle' {$element.ControlType='menu'}
-  'duplicate' {$script:window.Elements=@($element,[ClickElement]::new())}
+  'duplicate' {$script:window.Elements=@($element,[IbisClickContract.ClickElement]::new())}
   'unsupported' {$element.Supported=0}
   'uncertain' {$element.Action.Fail=$true}
   'bound' {$script:window.Elements=@($element)*4001}
