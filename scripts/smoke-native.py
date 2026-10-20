@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import signal
 import subprocess
@@ -332,6 +333,12 @@ def window_state_skips_taskbar(xprop_line):
     return {"_NET_WM_STATE_SKIP_TASKBAR", "_NET_WM_STATE_SKIP_PAGER"} <= names
 
 
+def supporting_wm_window(xprop_line):
+    """The window an `xprop _NET_SUPPORTING_WM_CHECK` line names, or None."""
+    match = re.fullmatch(r"_NET_SUPPORTING_WM_CHECK\(WINDOW\): window id # (0x[0-9a-fA-F]+)", xprop_line.strip())
+    return match.group(1) if match else None
+
+
 class Linux:
     def __init__(self):
         for program in ("xdotool", "xclip", "xterm", "openbox", "xprop"):
@@ -347,8 +354,13 @@ class Linux:
         except (ImportError, ValueError) as error:
             raise Unavailable("Use /usr/bin/python3 with distro python3-pyatspi installed") from error
         self.wm = subprocess.Popen(["openbox"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # A window mapped before the window manager runs keeps no EWMH state:
+        # GTK sends later hint changes such as skip-taskbar to the manager
+        # instead of writing them. Desktops start their manager first; so must we.
+        wait_for(self.window_manager_ready, "openbox manages the display")
         self.editor = subprocess.Popen(["xterm", "-title", "Ibis synthetic editor", "-e", "/bin/cat"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.app = None
+        self.last_window_state = "not read"
 
     def window(self, pid):
         try:
@@ -423,9 +435,22 @@ class Linux:
         focused = run("xdotool", "getwindowfocus")
         return run("xdotool", "getwindowpid", focused) == str(self.editor.pid)
 
+    def window_manager_ready(self):
+        """Whether an EWMH window manager owns the display (the spec's two-way check)."""
+        if self.wm.poll() is not None:
+            raise RuntimeError("openbox exited during startup")
+        try:
+            window = supporting_wm_window(run("xprop", "-root", "_NET_SUPPORTING_WM_CHECK"))
+            return window is not None and supporting_wm_window(
+                run("xprop", "-id", window, "_NET_SUPPORTING_WM_CHECK")) == window
+        except subprocess.CalledProcessError:
+            return False
+
     def skips_taskbar(self):
         window = self.window(self.app.pid)
-        return bool(window) and window_state_skips_taskbar(run("xprop", "-id", window, "_NET_WM_STATE"))
+        # Window state atoms only, kept to explain a failure.
+        self.last_window_state = f"{window}: {run('xprop', '-id', window, '_NET_WM_STATE')}" if window else "no visible window"
+        return bool(window) and window_state_skips_taskbar(self.last_window_state.partition(": ")[2])
 
     def clipboard(self):
         return run("xclip", "-selection", "clipboard", "-out")
@@ -755,7 +780,10 @@ def main():
 
             def skips_taskbar():
                 # Window managers build the taskbar and Alt+Tab from these hints.
-                wait_for(native.skips_taskbar, "picker window skips the taskbar and pager")
+                try:
+                    wait_for(native.skips_taskbar, "picker window skips the taskbar and pager")
+                except AssertionError as error:
+                    raise AssertionError(f"{error}; last {native.last_window_state}") from None
             if system == "Linux":
                 check("first picker stays out of the taskbar and window switcher", skips_taskbar)
 
@@ -992,6 +1020,34 @@ class ContractTests(unittest.TestCase):
         for line in ("_NET_WM_STATE(ATOM) = _NET_WM_STATE_SKIP_PAGER", "_NET_WM_STATE:  not found.",
                      "_NET_WM_STATE(ATOM) = ", "_NET_WM_STATE(ATOM) = _NET_WM_STATE_SKIP_TASKBAR_X, _NET_WM_STATE_SKIP_PAGER"):
             self.assertFalse(window_state_skips_taskbar(line), line)
+
+    def test_linux_starts_the_editor_only_once_the_window_manager_is_ready(self):
+        events = []
+        ready = iter([False, False, True])
+        def launch(command, **kwargs):
+            events.append(command[0])
+            return Mock(poll=Mock(return_value=None))
+        def check(native):
+            events.append("ready?")
+            return next(ready)
+        modules = {"pyatspi": Mock(), "gi": Mock(), "gi.repository": Mock()}
+        with patch("shutil.which", return_value="/usr/bin/tool"), patch.dict(os.environ, {"DISPLAY": ":99", "DBUS_SESSION_BUS_ADDRESS": "unix:x"}), \
+                patch.dict(sys.modules, modules), patch("subprocess.Popen", side_effect=launch), \
+                patch.object(Linux, "window_manager_ready", check), patch("time.sleep"):
+            Linux()
+        self.assertEqual(events, ["openbox", "ready?", "ready?", "ready?", "xterm"])
+
+    def test_a_window_manager_that_exits_is_reported_not_waited_for(self):
+        native = Linux.__new__(Linux)
+        native.wm = Mock(poll=Mock(return_value=1))
+        with self.assertRaisesRegex(RuntimeError, "openbox exited"):
+            native.window_manager_ready()
+
+    def test_window_manager_readiness_reads_the_supporting_window(self):
+        self.assertEqual(supporting_wm_window("_NET_SUPPORTING_WM_CHECK(WINDOW): window id # 0x20011f"), "0x20011f")
+        for line in ("_NET_SUPPORTING_WM_CHECK:  not found.", "_NET_SUPPORTING_WM_CHECK(WINDOW): window id # ",
+                     "_NET_SUPPORTING_WM_CHECK(WINDOW): window id # 0x20011f, 0x1"):
+            self.assertIsNone(supporting_wm_window(line), line)
 
     class CopyClock:
         def __init__(self, step=10):
