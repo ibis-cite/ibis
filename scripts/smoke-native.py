@@ -105,6 +105,44 @@ def search_focused(snapshot):
     return any(n.get("focused") for n in named(snapshot, "Search references"))
 
 
+def has_search_text(snapshot):
+    return any(n.get("value") for n in named(snapshot, "Search references"))
+
+
+ESCAPE_STEP_TIMEOUT = 5
+
+
+def escape_to_hide(native, snapshot, description):
+    """Escape clears a search first and hides on the next press.
+
+    macOS can report a cleared search value late, so with a search each press
+    waits only briefly and a picker that is still visible gets one spare press.
+    """
+    last = {}
+    if has_search_text(snapshot()):
+        for press in range(3):
+            if not snapshot()["visible"]:
+                return
+            native.key("Escape")
+            deadline = time.monotonic() + ESCAPE_STEP_TIMEOUT
+            while time.monotonic() < deadline:
+                last.update(snapshot())
+                if not last["visible"] or (press == 0 and not has_search_text(last)):
+                    break
+                time.sleep(0.1)
+    else:
+        native.key("Escape")
+    def hidden():
+        last.update(snapshot())
+        return not last["visible"]
+    try:
+        wait_for(hidden, description)
+    except AssertionError:
+        print("ESCAPE STATE " + json.dumps({"visible": bool(last.get("visible")),
+              "search_has_text": has_search_text(last) if last else None}), flush=True)
+        raise
+
+
 def prepare_initial_picker_show(native, snapshot):
     # A nonactivating panel can remain key while the editor is already the
     # frontmost application. Prove it is hidden before testing shortcut SHOW.
@@ -113,8 +151,7 @@ def prepare_initial_picker_show(native, snapshot):
             current = snapshot()
             return current["visible"] and search_focused(current)
         wait_for(ready, "initial picker search ready")
-        native.key("Escape")
-        wait_for(lambda: not snapshot()["visible"], "initial Escape hides picker")
+        escape_to_hide(native, snapshot, "initial Escape hides picker")
 
 
 EDITABLE_ROLES = {"edit", "text", "entry", "combobox", "axcombobox", "axtextfield", "axsearchfield", "controltype.edit", "controltype.combobox"}
@@ -156,16 +193,24 @@ def fixed_toggle_diagnostics(paths):
             if line in allowed]
 
 
-def settings_path(system, temporary, native=None):
+def settings_path(system, temporary, native=None, identifier="io.github.ibiscite.ibis"):
     if system == "Windows":
         # dirs7 uses SHGetKnownFolderPath, not the APPDATA environment variable.
         roaming = Path(native.call("config-dir"))
         if not roaming.is_absolute():
             raise Unavailable("Windows native configuration directory unavailable")
-        return roaming / "io.github.ibiscite.ibis/settings.json"
+        return roaming / identifier / "settings.json"
     if system == "Darwin":
-        return Path.home() / "Library/Application Support/io.github.ibiscite.ibis/settings.json"
-    return temporary / "config/io.github.ibiscite.ibis/settings.json"
+        return Path.home() / "Library/Application Support" / identifier / "settings.json"
+    return temporary / "config" / identifier / "settings.json"
+
+
+def answer_update_question(settings):
+    """Release builds ask about update checks at first launch; answer "Not Now"
+    in advance so the question never takes focus from the picker."""
+    if not settings.exists():
+        settings.parent.mkdir(parents=True, exist_ok=True)
+        settings.write_text(json.dumps({"schema_version": 2, "update_checks": False}), encoding="utf-8")
 
 
 def claim_settings(candidate):
@@ -501,6 +546,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--app", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--identifier", default="io.github.ibiscite.ibis", help="Bundle identifier, which names the settings folder")
     parser.add_argument("--shortcut", help="xdotool-style chord; defaults to Ctrl+Shift+Y or Control+Command+R on macOS")
     parser.add_argument("--budgets", type=Path, help="Measured per-platform baseline JSON, with startup_ms, first_result_ms, memory_bytes ceilings")
     args = parser.parse_args()
@@ -520,7 +566,7 @@ def main():
         if system not in ("Linux", "Darwin", "Windows"):
             raise Unavailable("Unsupported native smoke platform")
         if system == "Darwin":
-            owned_settings = claim_settings(settings_path(system, Path(".")))
+            owned_settings = claim_settings(settings_path(system, Path("."), identifier=args.identifier))
         native = Linux() if system == "Linux" else Scripted(system)
         with tempfile.TemporaryDirectory(prefix="ibis native smoke ") as temporary:
             folder = Path(temporary)
@@ -531,7 +577,7 @@ def main():
             # config locations; preflight refuses all existing preferences.
             # Copying saves the format even with IBIS_LIBRARY, so clean only
             # preference files this disposable run can create.
-            settings = settings_path(system, folder, native)
+            settings = settings_path(system, folder, native, args.identifier)
             if system == "Windows":
                 owned_settings = claim_settings(settings)
 
@@ -540,6 +586,7 @@ def main():
                 log_path = args.output / f"startup-{label}.log"
                 log = log_path.open("w", encoding="utf-8")
                 diagnostic_logs.append(log_path)
+                answer_update_question(settings)
                 app = subprocess.Popen([str(args.app.resolve())], env=env, stdout=log, stderr=log)
                 native.app = app
 
@@ -618,8 +665,7 @@ def main():
                 native.key(shortcut)
                 focus_state("after-first-shortcut")
                 wait_for(picker_ready, "global shortcut visible, foreground and search focus")
-                native.key("Escape")
-                wait_for(lambda: not snapshot()["visible"], "Escape hides picker")
+                escape_to_hide(native, snapshot, "Escape hides picker")
                 native.focus_editor()
                 wait_for(native.editor_focused, "previous editor focused")
                 focus_state("before-second-shortcut")
@@ -630,8 +676,7 @@ def main():
             check("global shortcut shows foreground picker with focused search", show)
 
             def second_instance():
-                native.key("Escape")
-                wait_for(lambda: not snapshot()["visible"], "picker hidden before second launch")
+                escape_to_hide(native, snapshot, "picker hidden before second launch")
                 native.focus_editor()
                 wait_for(native.editor_focused, "editor focused before second launch")
                 capture_editor_focus("before-second-launch")
@@ -864,6 +909,42 @@ class ContractTests(unittest.TestCase):
         native.key("ctrl+super+r")
         self.assertEqual(native.events, [("Escape", True), ("editor", False), ("ctrl+super+r", False)])
         self.assertTrue(native.visible)
+
+    def test_escape_clears_a_search_before_it_hides(self):
+        state = {"visible": True, "value": "query"}
+        native = Mock()
+        def key(name):
+            if state["value"]:
+                state["value"] = ""
+            else:
+                state["visible"] = False
+        native.key.side_effect = key
+        snapshot = lambda: {"visible": state["visible"], "nodes": [{"name": "Search references", "value": state["value"]}]}
+        escape_to_hide(native, snapshot, "hidden")
+        self.assertEqual(native.key.call_args_list, [call("Escape"), call("Escape")])
+        self.assertFalse(state["visible"])
+
+    def test_escape_presses_again_when_a_cleared_search_is_reported_late(self):
+        state = {"visible": True, "presses": 0}
+        native = Mock()
+        def key(name):
+            state["presses"] += 1
+            state["visible"] = state["presses"] < 2
+        native.key.side_effect = key
+        snapshot = lambda: {"visible": state["visible"], "nodes": [{"name": "Search references", "value": "stale"}]}
+        with patch(__name__ + ".ESCAPE_STEP_TIMEOUT", 0.05):
+            escape_to_hide(native, snapshot, "hidden")
+        self.assertEqual(native.key.call_args_list, [call("Escape"), call("Escape")])
+
+    def test_escape_that_never_hides_fails_after_one_spare_press(self):
+        native = Mock()
+        snapshot = lambda: {"visible": True, "nodes": [{"name": "Search references", "value": "private query"}]}
+        with patch(__name__ + ".ESCAPE_STEP_TIMEOUT", 0.05), \
+             patch(__name__ + ".wait_for", side_effect=lambda predicate, description: self.assertTrue(predicate(), description)), \
+             patch("builtins.print") as printed, self.assertRaises(AssertionError):
+            escape_to_hide(native, snapshot, "hidden")
+        self.assertEqual(native.key.call_count, 3)
+        self.assertNotIn("private query", printed.call_args.args[0])
 
     def test_hidden_initial_picker_does_not_send_escape_into_the_editor(self):
         native = self.InitialPickerModel(visible=False)
@@ -1332,6 +1413,16 @@ foreach ($failure in @('missing','identity','zero','invalid','other-owner')) {
                 claim_settings(actual)
             self.assertEqual(backup.read_text(encoding="utf-8"), "existing synthetic preferences")
             self.assertFalse(actual.exists())
+
+    def test_nightly_settings_and_the_update_question_answered_in_advance(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            settings = settings_path("Linux", Path(temporary), identifier="io.github.ibiscite.ibis.nightly")
+            self.assertEqual(settings, Path(temporary) / "config/io.github.ibiscite.ibis.nightly/settings.json")
+            answer_update_question(settings)
+            self.assertEqual(json.loads(settings.read_text(encoding="utf-8")), {"schema_version": 2, "update_checks": False})
+            settings.write_text("{invalid synthetic settings", encoding="utf-8")
+            answer_update_question(settings)
+            self.assertEqual(settings.read_text(encoding="utf-8"), "{invalid synthetic settings")
 
     def test_settings_cleanup_removes_only_files_claimed_in_a_fresh_account(self):
         with tempfile.TemporaryDirectory() as temporary:
