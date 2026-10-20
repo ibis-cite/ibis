@@ -51,7 +51,8 @@ impl MatchField {
             MatchField::Keyword => 5,
             MatchField::Container => 3,
             MatchField::Abstract => 1,
-            MatchField::Identifier => 12,
+            // Identifier hits are scored apart, in `by_identifier`.
+            MatchField::Identifier => 0,
         }
     }
 }

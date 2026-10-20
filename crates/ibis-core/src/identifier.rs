@@ -21,7 +21,7 @@ pub enum Identifier {
 /// numbers are not taken for PubMed IDs, because they are usually years or
 /// pages; `pmid:` or a PubMed link is needed.
 pub fn parse_query(query: &str) -> Option<Identifier> {
-    let q = query.trim().trim_end_matches(['.', ',', ';', ')', ']', '>']);
+    let q = trim_wrapping(query.trim());
     if q.is_empty() {
         return None;
     }
@@ -32,16 +32,31 @@ pub fn parse_query(query: &str) -> Option<Identifier> {
         .or_else(|| isbn(q).map(Identifier::Isbn))
 }
 
+/// Drop sentence punctuation and unbalanced brackets around a pasted
+/// identifier, keeping brackets that belong to it, as in `10.1000/abc(1)`.
+fn trim_wrapping(mut q: &str) -> &str {
+    loop {
+        let before = q;
+        q = q.trim_end_matches(['.', ',', ';', ':']).trim();
+        for (open, close) in [('(', ')'), ('[', ']'), ('<', '>'), ('{', '}')] {
+            let unbalanced = q.matches(open).count() != q.matches(close).count();
+            if unbalanced && q.ends_with(close) {
+                q = &q[..q.len() - close.len_utf8()];
+            } else if unbalanced && q.starts_with(open) {
+                q = &q[open.len_utf8()..];
+            }
+        }
+        if q == before {
+            return q;
+        }
+    }
+}
+
 /// Every identifier a record carries, from its DOI, link and identifier
 /// fields, without duplicates.
 pub fn of_reference(r: &Reference) -> Vec<Identifier> {
     let mut ids = Vec::new();
-    if let Some(d) = r.doi.as_deref().and_then(doi) {
-        if let Some(a) = d.strip_prefix("10.48550/arxiv.") {
-            ids.extend(arxiv(a).map(Identifier::Arxiv));
-        }
-        ids.push(Identifier::Doi(d));
-    }
+    ids.extend(r.doi.as_deref().and_then(doi).map(Identifier::Doi));
     if let Some(url) = r.url.as_deref() {
         ids.extend(doi(url).map(Identifier::Doi));
         ids.extend(arxiv(url).map(Identifier::Arxiv));
@@ -49,12 +64,40 @@ pub fn of_reference(r: &Reference) -> Vec<Identifier> {
     }
     for (name, value) in &r.variables {
         match name.as_str() {
-            "ISBN" => ids.extend(value.split([',', ';', ' ']).filter_map(isbn).map(Identifier::Isbn)),
+            "ISBN" => {
+                for part in value.split([',', ';']) {
+                    match isbn(part) {
+                        Some(found) => ids.push(Identifier::Isbn(found)),
+                        None => ids.extend(part.split_whitespace().filter_map(isbn).map(Identifier::Isbn)),
+                    }
+                }
+            }
             "PMID" => ids.extend(digits(value.trim()).map(Identifier::Pmid)),
-            "number" | "archive_location" => ids.extend(arxiv_prefixed(value.trim()).map(Identifier::Arxiv)),
+            // Zotero keeps an arXiv ID as "arXiv:…" in a preprint's number or
+            // on its own line in Extra, which becomes the CSL note.
+            "number" | "archive_location" | "note" => ids.extend(
+                value
+                    .lines()
+                    .filter_map(|line| arxiv_prefixed(line.trim()))
+                    .map(Identifier::Arxiv),
+            ),
             _ => {}
         }
     }
+    // An arXiv ID and its arXiv DOI name the same work.
+    let mut equivalents = Vec::new();
+    for id in &ids {
+        match id {
+            Identifier::Arxiv(a) => equivalents.push(Identifier::Doi(format!("10.48550/arxiv.{a}"))),
+            Identifier::Doi(d) => equivalents.extend(
+                d.strip_prefix("10.48550/arxiv.")
+                    .and_then(arxiv_id)
+                    .map(Identifier::Arxiv),
+            ),
+            _ => {}
+        }
+    }
+    ids.extend(equivalents);
     ids.sort();
     ids.dedup();
     ids
@@ -73,12 +116,49 @@ fn strip_link<'a>(text: &'a str, hosts: &[&str]) -> Option<&'a str> {
     hosts.iter().find_map(|h| strip_prefix_ci(rest, h))
 }
 
+/// The path of a link, without a query string or fragment.
+fn link_path(path: &str) -> &str {
+    path.split(['?', '#']).next().unwrap_or(path).trim_end_matches('/')
+}
+
+/// Decode `%XX` escapes that a copied link may contain.
+fn percent_decode(text: &str) -> String {
+    let bytes = text.as_bytes();
+    let mut out = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        let hex = |b: u8| (b as char).to_digit(16);
+        match (
+            bytes[i],
+            bytes.get(i + 1).copied().and_then(hex),
+            bytes.get(i + 2).copied().and_then(hex),
+        ) {
+            (b'%', Some(high), Some(low)) => {
+                out.push((high * 16 + low) as u8);
+                i += 3;
+            }
+            (byte, _, _) => {
+                out.push(byte);
+                i += 1;
+            }
+        }
+    }
+    String::from_utf8(out).unwrap_or_else(|_| text.to_string())
+}
+
 fn doi(text: &str) -> Option<String> {
     let text = text.trim();
-    let body = strip_link(text, &["doi.org/", "dx.doi.org/"])
-        .or_else(|| strip_prefix_ci(text, "doi:"))
-        .unwrap_or(text)
-        .trim();
+    let decoded;
+    let body = match strip_link(text, &["doi.org/", "dx.doi.org/"]) {
+        Some(path) => {
+            decoded = percent_decode(path.split('#').next().unwrap_or(path));
+            decoded.as_str()
+        }
+        None => strip_prefix_ci(text, "doi:")
+            .or_else(|| strip_prefix_ci(text, "doi "))
+            .unwrap_or(text),
+    }
+    .trim();
     let (prefix, suffix) = body.split_once('/')?;
     let registrant = prefix.strip_prefix("10.")?;
     let valid = registrant.len() >= 4
@@ -90,8 +170,8 @@ fn doi(text: &str) -> Option<String> {
 
 fn arxiv(text: &str) -> Option<String> {
     let text = text.trim();
-    if let Some(path) = strip_link(text, &["arxiv.org/abs/", "arxiv.org/pdf/"]) {
-        return arxiv_id(path.trim_end_matches(".pdf"));
+    if let Some(path) = strip_link(text, &["arxiv.org/abs/", "arxiv.org/pdf/", "arxiv.org/html/"]) {
+        return arxiv_id(link_path(path).trim_end_matches(".pdf"));
     }
     arxiv_prefixed(text).or_else(|| arxiv_id(text).filter(|_| text.contains('.') && !text.contains('/')))
 }
@@ -113,19 +193,24 @@ fn arxiv_id(text: &str) -> Option<String> {
             && (4..=5).contains(&number.len())
             && number.chars().all(|c| c.is_ascii_digit())
     });
-    let old_style = id.split_once('/').is_some_and(|(archive, number)| {
-        !archive.is_empty()
-            && archive.chars().all(|c| c.is_ascii_lowercase() || c == '-' || c == '.')
-            && number.len() == 7
-            && number.chars().all(|c| c.is_ascii_digit())
-    });
-    (new_style || old_style).then_some(id)
+    if new_style {
+        return Some(id);
+    }
+    // Old style: `archive/YYMMNNN`; a subject class such as `math.AG/…` is
+    // not part of the identifier.
+    let (archive, number) = id.split_once('/')?;
+    let archive = archive.split('.').next().unwrap_or(archive);
+    let valid = !archive.is_empty()
+        && archive.chars().all(|c| c.is_ascii_lowercase() || c == '-')
+        && number.len() == 7
+        && number.chars().all(|c| c.is_ascii_digit());
+    valid.then(|| format!("{archive}/{number}"))
 }
 
 fn pmid(text: &str) -> Option<String> {
     let text = text.trim();
     let body = strip_link(text, &["pubmed.ncbi.nlm.nih.gov/", "ncbi.nlm.nih.gov/pubmed/"])
-        .map(|p| p.trim_end_matches('/'))
+        .map(link_path)
         .or_else(|| strip_prefix_ci(text, "pmid:").map(str::trim))
         .or_else(|| strip_prefix_ci(text, "pmid ").map(str::trim))?;
     digits(body)
@@ -141,11 +226,11 @@ fn digits(text: &str) -> Option<String> {
 /// An ISBN-10 or ISBN-13 with a valid check digit, as 13 digits.
 fn isbn(text: &str) -> Option<String> {
     let text = text.trim();
-    let body = strip_prefix_ci(text, "isbn-13:")
-        .or_else(|| strip_prefix_ci(text, "isbn-10:"))
-        .or_else(|| strip_prefix_ci(text, "isbn:"))
-        .or_else(|| strip_prefix_ci(text, "isbn"))
-        .unwrap_or(text);
+    let body = ["isbn-13:", "isbn-10:", "isbn-13", "isbn-10", "isbn:", "isbn"]
+        .iter()
+        .find_map(|prefix| strip_prefix_ci(text, prefix))
+        .unwrap_or(text)
+        .trim();
     if body
         .chars()
         .any(|c| !(c.is_ascii_digit() || matches!(c, '-' | ' ' | 'x' | 'X')))
@@ -295,5 +380,40 @@ mod tests {
                 Identifier::Pmid("12345".into()),
             ]
         );
+    }
+
+    #[test]
+    fn records_from_bibtex_eprint_pmid_and_spaced_isbn_fields() {
+        let refs = crate::bibtex::load_str(
+            "t",
+            "@misc{a, title={A}, eprint={hep-th/9711200}, archivePrefix={arXiv}}
+             @article{b, title={B}, journal={J}, eprint={1706.03762v5}, eprinttype={arxiv}, pmid={12345678}}
+             @book{c, title={C}, isbn={978 0 306 40615 7}}
+             @article{d, title={D}, journal={J}, eprint={987}, eprinttype={pubmed}}",
+        )
+        .references;
+        let ids: Vec<_> = refs.iter().map(of_reference).collect();
+        assert!(ids[0].contains(&Identifier::Arxiv("hep-th/9711200".into())));
+        assert!(ids[1].contains(&Identifier::Arxiv("1706.03762".into())));
+        assert!(ids[1].contains(&Identifier::Doi("10.48550/arxiv.1706.03762".into())));
+        assert!(ids[1].contains(&Identifier::Pmid("12345678".into())));
+        assert_eq!(ids[2], [Identifier::Isbn("9780306406157".into())]);
+        assert_eq!(ids[3], [Identifier::Pmid("987".into())]);
+    }
+
+    #[test]
+    fn records_from_zotero_carry_pmid_isbn_and_arxiv() {
+        let item = serde_json::json!({
+            "key": "K", "version": 1, "data": { "key": "K", "itemType": "journalArticle" },
+            "csljson": {
+                "id": "1/K", "type": "article-journal", "title": "T", "PMID": "555",
+                "ISBN": "0-306-40615-2", "note": "Some note\narXiv: 2101.00001"
+            }
+        });
+        let r = &crate::zotero::load_items(crate::zotero::Library::User, &[item]).references[0];
+        let ids = of_reference(r);
+        assert!(ids.contains(&Identifier::Pmid("555".into())));
+        assert!(ids.contains(&Identifier::Isbn("9780306406157".into())));
+        assert!(ids.contains(&Identifier::Arxiv("2101.00001".into())));
     }
 }

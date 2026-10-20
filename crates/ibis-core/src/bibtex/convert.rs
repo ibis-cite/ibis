@@ -216,11 +216,28 @@ pub(crate) fn convert(
     set("publisher-place", &["location", "address"]);
     set("edition", &["edition"]);
     set("ISBN", &["isbn"]);
+    set("PMID", &["pmid"]);
+    set("PMCID", &["pmcid"]);
     set("ISSN", &["issn"]);
     set("collection-title", &["series"]);
     set("genre", &["type"]);
     set("note", &["note"]);
     set("event-title", &["eventtitle"]);
+    // BibLaTeX keeps arXiv and PubMed IDs in `eprint`. An arXiv ID goes where
+    // Zotero puts it, "arXiv:ID" in the number, so styles and search see it.
+    let eprint_type = text("eprinttype")
+        .or_else(|| text("archiveprefix"))
+        .map(|t| t.to_lowercase());
+    if let (Some(eprint_type), Some(eprint)) = (eprint_type, text("eprint")) {
+        let target = match eprint_type.as_str() {
+            "arxiv" => Some(("number", format!("arXiv:{eprint}"))),
+            "pubmed" => Some(("PMID", eprint)),
+            _ => None,
+        };
+        if let Some((csl, value)) = target {
+            variables.entry(csl.to_string()).or_insert(value);
+        }
+    }
     if let Some(short_title) = short_title {
         variables.insert("title-short".to_string(), short_title);
     }
