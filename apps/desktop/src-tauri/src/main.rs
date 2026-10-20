@@ -37,8 +37,8 @@ use tauri_plugin_global_shortcut::ShortcutState;
 use crate::diagnostics::{NativeIssue, application_message, checked, report};
 use crate::library::{Library, LibraryWatch, LoadRequests, SearchRequests, Source, start_open};
 use crate::picker::{
-    DialogOpen, ShortcutStatus, configured_shortcut, dismiss_picker, hides_on_blur, register_shortcut, show_picker,
-    toggle_picker,
+    DialogOpen, Pinned, ShortcutStatus, configured_shortcut, dismiss_picker, hides_on_blur, register_shortcut,
+    show_picker, toggle_picker,
 };
 use crate::placement::place_on_active_display;
 use crate::preferences::SettingsFile;
@@ -74,6 +74,7 @@ fn main() {
         .manage(SearchRequests::default())
         .manage(LibraryWatch::default())
         .manage(DialogOpen::default())
+        .manage(Pinned::default())
         .manage(Mutex::new(ShortcutStatus::default()))
         .manage(updater::Updates::default())
         .invoke_handler(bindings::commands().invoke_handler())
@@ -94,11 +95,12 @@ fn main() {
                 // not to its own file dialog.
                 WindowEvent::Focused(false) => {
                     let dialog_open = window.state::<DialogOpen>().0.load(Ordering::SeqCst);
+                    let pinned = window.state::<Pinned>().0.load(Ordering::SeqCst);
                     #[cfg(target_os = "macos")]
                     let startup_allows_blur = panel::allows_automatic_blur(window.app_handle());
                     #[cfg(not(target_os = "macos"))]
                     let startup_allows_blur = true;
-                    if startup_allows_blur && hides_on_blur(!cfg!(debug_assertions), dialog_open) {
+                    if startup_allows_blur && hides_on_blur(!cfg!(debug_assertions), dialog_open, pinned) {
                         dismiss_picker(window.app_handle());
                     }
                 }
@@ -174,7 +176,7 @@ fn main() {
                 Err(_) => application_message("the menu bar item is not available on this system"),
             }
             // After the tray, so the menu item shows the saved choice.
-            updater::start(app.handle(), loaded.settings.update_checks);
+            updater::start(app.handle(), loaded.settings.update_checks, loaded.problem.is_none());
             // The library from settings; IBIS_LIBRARY overrides it for development.
             let library = std::env::var_os("IBIS_LIBRARY")
                 .map(|path| Source::File(PathBuf::from(path)))
