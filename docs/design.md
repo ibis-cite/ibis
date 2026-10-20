@@ -14,7 +14,7 @@ comes from [ROADMAP.md](../ROADMAP.md); the rollout below separates remaining
 work from behavior already implemented. Native acceptance is recorded separately
 in [testing.md](testing.md), not established by this specification.
 
-## Seven rules
+## Eight rules
 
 1. **One anatomy everywhere.** Search, list, detail, citation tray and footer, in
    that order, in every form from a one-line bar to the large settings window.
@@ -29,6 +29,9 @@ in [testing.md](testing.md), not established by this specification.
    inserted, or why not. Colour is never the only signal.
 7. **Calm motion.** Movement only explains where something came from, and it
    switches off when the system asks for reduced motion.
+8. **No glow, no edge rings.** Selection is a fill, never an outline. No
+   coloured borders, outer glows or bright rims. A focus ring appears only when
+   the keyboard moved focus.
 
 ## Design language
 
@@ -67,7 +70,8 @@ platform, so a source or a reference type always looks the same.
 |---|---|---|---|
 | Material | Translucent glass | Mica, content on a lighter layer | Flat |
 | Window radius | 12 pt, the native panel corner (#236) | 8 px (4 px controls) | 14 px |
-| Selected row | Filled accent, white text | Soft grey with an accent pill on the left | Accent tint |
+| Selected row | Filled accent, white text | Soft grey with an accent pill on the left | Plain neutral fill |
+| Keyboard focus ring | 2 px accent, 1 px gap | 2 px in the text colour around a 1 px surface-coloured stroke (Fluent's focus visual) | 2 px half-accent, 1 px gap |
 | Search box | Frameless, large | Text box with an underline that turns accent on focus | Framed entry |
 | Shortcut labels | ⌘ ⌥ ⇧ | Ctrl Alt Shift | Ctrl Super Shift |
 | Copied | Pill near the top of the screen | Notice bottom-right | Toast at the bottom |
@@ -200,10 +204,12 @@ is pressed again.
 
 **Accessibility.** Reduced motion uses fades only. Screen readers hear the
 result count and, per row, title, first author, year and why it matched;
-"Copied" is announced politely. Every action has a key; focus rings are always
-visible (2 px, accent), except on the frameless macOS search field, where the
-caret and the active row are the cue, as in Spotlight. With increased contrast
-or forced colours, that field shows the ring too. Right-to-left titles align right within their row.
+"Copied" is announced politely. Every action has a key. Focus rings appear only for keyboard
+focus (`:focus-visible`), never after a click, in the platform's style (see the
+table above). The search box never shows one: it always has focus, the caret is
+the cue, and on Windows its accent underline. Rows moved with ↑ ↓ show their
+fill, not a ring. With increased contrast or forced colours, every control and
+the search box show a solid 2 px ring and the active row a 3 px edge. Right-to-left titles align right within their row.
 
 ## Rollout
 
