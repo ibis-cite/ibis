@@ -185,24 +185,58 @@ fn rank<'r, 'f>(
 
 /// Lowercase, strip accents, fold letter variants and turn punctuation into spaces.
 ///
+/// Accents are removed only where they are optional in practice: Latin,
+/// Greek and Cyrillic diacritics, Arabic vowel signs and Hebrew points. Marks
+/// that make a different letter in other scripts, such as Japanese voicing
+/// marks and Indic vowel signs, are kept, so が does not match か.
+///
 /// Folding covers letters whose lowercase form depends on position or that
 /// have common alternative spellings: Greek final sigma (ς → σ), German
-/// sharp s (ß → ss) and long s (ſ → s).
+/// sharp s (ß → ss), long s (ſ → s), Latin letters that do not decompose
+/// (ł, ø, æ, œ, đ, dotless ı), Persian and Arabic forms of kaf and yeh,
+/// the Arabic tatweel used for stretching words, and katakana to hiragana.
 pub fn normalize(text: &str) -> String {
     let folded: String = text
         .nfkd()
-        .filter(|c| !is_combining_mark(*c))
+        .filter(|c| !is_optional_mark(*c))
         .flat_map(char::to_lowercase)
         .flat_map(|c| match c {
             'ς' => ['σ', '\0'],
             'ß' => ['s', 's'],
             'ſ' => ['s', '\0'],
-            c if c.is_alphanumeric() => [c, '\0'],
+            'ł' => ['l', '\0'],
+            'ø' => ['o', '\0'],
+            'æ' => ['a', 'e'],
+            'œ' => ['o', 'e'],
+            'đ' => ['d', '\0'],
+            'ı' => ['i', '\0'],
+            '\u{06A9}' => ['\u{0643}', '\0'],
+            '\u{06CC}' | '\u{0649}' => ['\u{064A}', '\0'],
+            '\u{0640}' => ['\0', '\0'],
+            '\u{30A1}'..='\u{30F6}' => [char::from_u32(c as u32 - 0x60).unwrap_or(c), '\0'],
+            c if c.is_alphanumeric() || is_combining_mark(c) => [c, '\0'],
             _ => [' ', '\0'],
         })
         .filter(|c| *c != '\0')
+        .nfc()
         .collect();
     folded.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+/// Combining marks that readers treat as optional, so searches ignore them.
+fn is_optional_mark(c: char) -> bool {
+    matches!(c,
+        '\u{0300}'..='\u{036F}'
+        | '\u{1AB0}'..='\u{1AFF}'
+        | '\u{1DC0}'..='\u{1DFF}'
+        | '\u{20D0}'..='\u{20FF}'
+        | '\u{FE20}'..='\u{FE2F}'
+        | '\u{0483}'..='\u{0489}'
+        | '\u{0591}'..='\u{05C7}'
+        | '\u{0610}'..='\u{061A}'
+        | '\u{064B}'..='\u{065F}'
+        | '\u{0670}'
+        | '\u{06D6}'..='\u{06ED}')
 }
 
 fn starts_word(text: &str, term: &str) -> bool {
@@ -374,6 +408,72 @@ mod tests {
         let index = Index::new(&refs);
         assert_eq!(index.search("记忆", 10)[0].reference.id.native_key, "zh");
         assert_eq!(index.search("الذاكرة", 10)[0].reference.id.native_key, "ar");
+    }
+
+    #[test]
+    fn latin_letters_without_decomposition_match_their_plain_forms() {
+        let refs = [
+            reference("pl", "Historia Łodzi", "Kowalczyk", 2020),
+            reference("no", "Søvn og hukommelse", "Ødegård", 2021),
+            reference("fr", "Œuvres et Cæsar", "Đorđević", 2022),
+            reference("tr", "Uykunun ışığı", "Yılmaz", 2023),
+        ];
+        let index = Index::new(&refs);
+        assert_eq!(index.search("lodzi", 10)[0].reference.id.native_key, "pl");
+        assert_eq!(index.search("sovn odegard", 10)[0].reference.id.native_key, "no");
+        assert_eq!(
+            index.search("oeuvres caesar dordevic", 10)[0].reference.id.native_key,
+            "fr"
+        );
+        assert_eq!(index.search("isigi yilmaz", 10)[0].reference.id.native_key, "tr");
+    }
+
+    #[test]
+    fn persian_and_arabic_letter_variants_and_tatweel_match() {
+        // Arabic kaf and yeh as stored; Persian keyboards type ک and ی.
+        let refs = [
+            reference("fa", "كتاب الذكي", "علي", 2020),
+            reference("tw", "العـــلم", "مثال", 2021),
+        ];
+        let index = Index::new(&refs);
+        assert_eq!(index.search("کتاب", 10)[0].reference.id.native_key, "fa");
+        assert_eq!(index.search("علی", 10)[0].reference.id.native_key, "fa");
+        assert_eq!(index.search("العلم", 10)[0].reference.id.native_key, "tw");
+    }
+
+    #[test]
+    fn hiragana_and_katakana_match_each_other() {
+        let refs = [reference("ja", "ヤマダの研究", "ヤマダ", 2020)];
+        let index = Index::new(&refs);
+        assert_eq!(index.search("やまだ", 10).len(), 1);
+        assert_eq!(index.search("ﾔﾏﾀﾞ", 10).len(), 1);
+    }
+
+    #[test]
+    fn marks_that_change_letters_in_other_scripts_are_kept() {
+        let refs = [
+            reference("ga", "がっこう", "例", 2020),
+            reference("ka", "かっこう", "例", 2021),
+            reference("hi", "किताब", "उदाहरण", 2022),
+        ];
+        let index = Index::new(&refs);
+        let keys = |q| {
+            index
+                .search(q, 10)
+                .iter()
+                .map(|h| h.reference.id.native_key.clone())
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(keys("がっこう"), ["ga"]);
+        assert_eq!(keys("ガッコウ"), ["ga"]);
+        assert_eq!(keys("かっこう"), ["ka"]);
+        assert_eq!(keys("किताब"), ["hi"]);
+        assert!(keys("कताब").is_empty());
+
+        let refs = [reference("ko", "한국어 연구", "김", 2020)];
+        let index = Index::new(&refs);
+        assert_eq!(index.search("한국", 10).len(), 1);
+        assert!(index.search("하국", 10).is_empty());
     }
 
     #[test]
