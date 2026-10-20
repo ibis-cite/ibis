@@ -6,7 +6,7 @@
 use serde_json::Value;
 
 use super::Library;
-use super::api::{self, Snapshot, Transport, ZoteroError};
+use super::api::{self, Snapshot, Transport, TransportError, ZoteroError};
 use crate::model::{LoadResult, LoadWarning, WarningKind};
 
 /// Groups listed per request; the most Zotero returns at once.
@@ -120,7 +120,13 @@ pub fn refresh(
         })
     };
     let mut outcomes = Vec::with_capacity(libraries.len());
-    let mut changed = previous.is_none_or(|previous| previous.len() != libraries.len());
+    // A different choice or order of libraries is a change.
+    let mut changed = previous.is_none_or(|previous| {
+        !previous
+            .iter()
+            .map(|(library, _)| *library)
+            .eq(libraries.iter().copied())
+    });
     for &library in libraries {
         let outcome = match before(library) {
             // Unchanged so far: a cheap version check is enough.
@@ -184,7 +190,7 @@ pub fn refresh(
 fn fatal(error: ZoteroError) -> bool {
     matches!(
         error,
-        ZoteroError::Transport(_) | ZoteroError::NotAllowed | ZoteroError::UnsupportedApi
+        ZoteroError::Transport(TransportError::Unreachable) | ZoteroError::NotAllowed | ZoteroError::UnsupportedApi
     )
 }
 
@@ -202,7 +208,7 @@ mod tests {
     use serde_json::json;
 
     use super::*;
-    use crate::zotero::api::{Response, TransportError};
+    use crate::zotero::api::Response;
 
     fn ok(headers: &[(&str, String)], body: Value) -> Response {
         let mut all = vec![("Zotero-API-Version".to_string(), "3".to_string())];
@@ -387,6 +393,13 @@ mod tests {
         let (result, _) = loaded(refresh(&mut zotero, &twice, None).unwrap_or_else(|e| panic!("{e}")));
         assert_eq!(result.references.len(), 2);
 
+        // The same libraries in another order are read again in that order.
+        let reordered = [Library::Group(42), Library::User];
+        let (result, swapped) =
+            loaded(refresh(&mut zotero, &reordered, Some(&snapshots)).unwrap_or_else(|e| panic!("{e}")));
+        assert_eq!(result.references[0].id.source, "zotero:group:42");
+        assert_eq!(swapped[0].0, Library::Group(42));
+
         // Choosing fewer libraries is a change, not "unchanged".
         let only_user = [Library::User];
         let (result, _) = loaded(refresh(&mut zotero, &only_user, Some(&snapshots)).unwrap_or_else(|e| panic!("{e}")));
@@ -413,6 +426,24 @@ mod tests {
         let (result, _) = loaded(refresh(&mut zotero, &BOTH, Some(&snapshots)).unwrap_or_else(|e| panic!("{e}")));
         assert_eq!(result.references.len(), 2);
         assert!(result.warnings.is_empty());
+    }
+
+    #[test]
+    fn a_library_that_times_out_is_skipped_but_others_still_load() {
+        struct SlowGroup(Zotero);
+        impl Transport for SlowGroup {
+            fn get(&mut self, path: &str) -> Result<Response, TransportError> {
+                if path.starts_with("groups/42") {
+                    return Err(TransportError::TimedOut);
+                }
+                self.0.get(path)
+            }
+        }
+        let mut zotero = SlowGroup(Zotero::default().with("users/0", 5, &["MINE"]));
+        let (result, snapshots) = loaded(refresh(&mut zotero, &BOTH, None).unwrap_or_else(|e| panic!("{e}")));
+        assert_eq!(result.references.len(), 1);
+        assert!(result.warnings[0].message.starts_with("Zotero group 42 was skipped: "));
+        assert_eq!(snapshots[1], (Library::Group(42), None));
     }
 
     #[test]
