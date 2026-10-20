@@ -104,18 +104,23 @@ status bar do it: short words, colour only alongside them, detail on demand.
 | Starting, first run | "Checking library…", "No library chosen" | Grey |
 | Opening | "Zotero · opening…" | Grey |
 | Loaded | "Zotero · 1,204 references" or "thesis.bib · 1,204 references" | Done |
-| Just changed (ten minutes) | "… · updated 2 minutes ago" | Done |
+| Changed while open (ten minutes) | "… · updated 2 minutes ago", only when a reread brought different references | Done |
 | Reloading | "… · reloading…", count kept | Unchanged |
 | Reading notices, empty | "… · 2 reading notices", "Zotero · no references" | Look |
-| Update failed, old copy kept | "Zotero · not updated · read 2 hours ago" | Stop |
+| Update failed, old copy kept | "Zotero · not updated · checked 2 hours ago" | Stop |
+| Switch to another library failed | The library still searched, as when loaded | Stop |
 | Never opened | "thesis.bib · not opened" | Stop |
 
 Several Zotero libraries still read "Zotero"; rows name their library. The
 tooltip, and the top of More (also the name of its library group, so keyboard and
 screen-reader users reach it), give two lines: a short one ("Zotero · 1,204
-references") and a quieter one with the libraries, when they were read (relative
-and clock time) and any problem ("My Library, Lab group · read 2 hours ago,
-3:19 PM · Zotero could not be reached"). Times
+references") and a quieter one with the libraries, when they were last checked
+(relative and clock time) and any problem ("My Library, Lab group · checked 2
+hours ago, 3:19 PM · Zotero could not be reached"). "Updated" always means the
+references changed; "checked" means Ibis last read them or found them unchanged.
+The footer always names the library that is searched, even after a switch to
+another one failed. A long name is shortened before the state words, and names
+are isolated so right-to-left names keep their place. Times
 use `Intl.RelativeTimeFormat` in the app's language ("just now" under 45 seconds,
 a date after a week) and tick every 30 seconds without redrawing the picker. The
 live region holds only the words before the age, so a ticking clock is never

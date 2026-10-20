@@ -98,8 +98,10 @@ pub(crate) struct Library {
     pub(crate) note: Option<String>,
     /// Persistent startup recovery notice; includes a path for the interface only.
     pub(crate) settings_notice: Option<String>,
-    /// When the references in `index` were read from their source.
-    read_at: Option<SystemTime>,
+    /// When a reread of the same source last brought different references
+    /// during this run; `None` after the first read, so a launch or an
+    /// unchanged reload is not reported as an update.
+    changed_at: Option<SystemTime>,
     /// When the source was last found to match `index`: a read, or a Zotero
     /// check that found nothing changed. Kept when a later attempt fails.
     checked_at: Option<SystemTime>,
@@ -150,11 +152,17 @@ pub(crate) struct LibraryStatus {
     pub(crate) note: Option<String>,
     /// Startup settings recovery, separate from transient library status.
     pub(crate) settings_notice: Option<String>,
-    /// When the searchable references were read, in milliseconds since
-    /// 1970 (UTC); `null` without a snapshot.
+    /// Whether the searchable references are Zotero's, which can differ from
+    /// `zotero` (the requested source) after a failed switch.
+    pub(crate) snapshot_zotero: bool,
+    /// An update of the searched library failed and its earlier references
+    /// are still searched; not set when a switch to another library failed.
+    pub(crate) stale: bool,
+    /// When a reread of the same library last changed its references during
+    /// this run, in milliseconds since 1970 (UTC); `null` if it has not.
     pub(crate) updated_at: Option<f64>,
-    /// When the source was last found unchanged or read, in the same unit;
-    /// after a failed update, the time of the copy still being searched.
+    /// When the library was last read or found unchanged, in the same unit;
+    /// when `stale`, the time of the copy still being searched.
     pub(crate) checked_at: Option<f64>,
 }
 
@@ -254,9 +262,25 @@ pub(crate) fn status(library: &Library) -> LibraryStatus {
             None => library.note.clone(),
         },
         settings_notice: library.settings_notice.clone(),
-        updated_at: library.read_at.and_then(epoch_millis),
+        snapshot_zotero: matches!(library.source, Some(Source::Zotero(_))),
+        stale: stale(library),
+        updated_at: library.changed_at.and_then(epoch_millis),
         checked_at: library.checked_at.and_then(epoch_millis),
     }
+}
+
+/// The searched library's own update failed: the error is about the source
+/// that produced the references, not a different library that was chosen.
+fn stale(library: &Library) -> bool {
+    let (Some(error), Some(source)) = (&library.error, &library.source) else {
+        return false;
+    };
+    library.requested.as_ref().is_none_or(|requested| requested == source)
+        && retains(
+            error,
+            !library.index.references().is_empty(),
+            matches!(source, Source::Zotero(_)),
+        )
 }
 
 /// A time for the interface, which shows it relative to its own clock.
@@ -307,7 +331,6 @@ fn load_source(source: Source, reload: bool, previous: Option<libraries::Snapsho
 fn candidate(source: impl Into<Source>, loaded: ibis_core::model::LoadResult) -> Library {
     let now = SystemTime::now();
     Library {
-        read_at: Some(now),
         checked_at: Some(now),
         source: Some(source.into()),
         index: Arc::new(OwnedIndex::new(loaded.references)),
@@ -623,6 +646,8 @@ pub(crate) fn current_status(app: &AppHandle) -> LibraryStatus {
             error: Some("library state is unavailable".to_string()),
             note: None,
             settings_notice: None,
+            snapshot_zotero: false,
+            stale: false,
             updated_at: None,
             checked_at: None,
         })
@@ -650,7 +675,16 @@ pub(crate) const KEPT: &str = "; keeping the last loaded references";
 /// Retention belongs to the installed desktop snapshot, not the source error.
 /// Any failure to refresh Zotero keeps the references already read.
 fn error_with_snapshot_context(error: String, has_references: bool, zotero: bool) -> String {
-    if has_references
+    if retains(&error, has_references, zotero) {
+        format!("{error}{KEPT}")
+    } else {
+        error
+    }
+}
+
+/// Whether this failure leaves the loaded references searchable.
+fn retains(error: &str, has_references: bool, zotero: bool) -> bool {
+    has_references
         && (zotero
             || [
                 SourceError::Unavailable,
@@ -661,11 +695,6 @@ fn error_with_snapshot_context(error: String, has_references: bool, zotero: bool
             ]
             .iter()
             .any(|source| source.to_string() == error))
-    {
-        format!("{error}{KEPT}")
-    } else {
-        error
-    }
 }
 
 /// Make a loaded library current, or record why it failed to open. Returns
@@ -709,6 +738,15 @@ fn install_result(
     match loaded {
         Ok(mut new) => {
             new.settings_notice = library.settings_notice.take();
+            // Only a reread of the same library that brought different
+            // references is an update worth telling.
+            if new.source.is_some() && new.source == library.source {
+                new.changed_at = if new.index.references() == library.index.references() {
+                    library.changed_at
+                } else {
+                    new.checked_at
+                };
+            }
             if failed_choice {
                 new.requested = library.requested.take();
                 new.error = library.error.take();
@@ -1422,6 +1460,72 @@ mod tests {
     }
 
     #[test]
+    fn only_a_reread_that_changes_the_references_is_an_update() {
+        let file = PathBuf::from("synthetic.bib");
+        let read = |text: &str| candidate(file.clone(), ibis_core::bibtex::load_str("synthetic", text));
+        let library = Mutex::new(Library::default());
+        let requests = LoadRequests::default();
+        let install_now = |new: Library| {
+            let (request, _, _) = begin_open(&library, &requests, file.clone()).unwrap_or_else(|| panic!("opens"));
+            install(&library, &requests, request, Ok(new)).unwrap_or_else(|| panic!("current"))
+        };
+        let first = install_now(read("@misc{a, title={A}}"));
+        assert_eq!(first.updated_at, None, "opening is not an update");
+        let same = install_now(read("@misc{a, title={A}}"));
+        assert_eq!(same.updated_at, None, "rereading the same references is not an update");
+        let changed = install_now(read("@misc{a, title={A}}\n@misc{b, title={B}}"));
+        assert!(changed.updated_at.is_some(), "new references are an update");
+        assert_eq!(
+            install_now(read("@misc{a, title={A}}\n@misc{b, title={B}}")).updated_at,
+            changed.updated_at
+        );
+    }
+
+    #[test]
+    fn a_failed_switch_is_not_a_failed_update_of_the_searched_library() {
+        let open = |source: Source, error: &str| {
+            let library = Mutex::new(candidate(
+                source,
+                ibis_core::bibtex::load_str("synthetic", "@misc{kept, title={Kept}}"),
+            ));
+            let requests = LoadRequests::default();
+            let (request, _, _) = begin_open(&library, &requests, PathBuf::from("missing B.bib"))
+                .unwrap_or_else(|| panic!("the choice starts"));
+            install(&library, &requests, request, Err(error.to_string())).unwrap_or_else(|| panic!("current"))
+        };
+        let unavailable = SourceError::Unavailable.to_string();
+        for failed in [
+            open(PathBuf::from("A.bib").into(), &unavailable),
+            open(
+                Source::Zotero(ZoteroLibrary::User.into()),
+                "the library file is not UTF-8 text",
+            ),
+        ] {
+            assert!(!failed.stale, "{}", library_line(&failed));
+            assert!(
+                !library_line(&failed).contains("not updated"),
+                "{}",
+                library_line(&failed)
+            );
+        }
+
+        // From a file to Zotero while Zotero is closed: the file is still searched.
+        let library = Mutex::new(candidate(
+            PathBuf::from("thesis.bib"),
+            ibis_core::bibtex::load_str("synthetic", "@misc{kept, title={Kept}}"),
+        ));
+        let requests = LoadRequests::default();
+        let (request, _, _) = begin_open(&library, &requests, Source::Zotero(ZoteroLibrary::User.into()))
+            .unwrap_or_else(|| panic!("the choice starts"));
+        let failed = install(&library, &requests, request, Err("Zotero is not running".into()))
+            .unwrap_or_else(|| panic!("current"));
+        assert!(failed.zotero, "Zotero was asked for");
+        assert!(!failed.snapshot_zotero, "but the file is what is searched");
+        assert!(!failed.stale);
+        assert_eq!(failed.snapshot_name.as_deref(), Some("thesis.bib"));
+    }
+
+    #[test]
     fn several_zotero_libraries_are_named_listed_and_saved_in_order() {
         let chosen = ZoteroLibraries::new(vec![ZoteroLibrary::Group(7), ZoteroLibrary::User])
             .unwrap_or_else(|| panic!("valid choice"));
@@ -1459,16 +1563,9 @@ mod tests {
             .unwrap_or_else(|| panic!("the refresh is current"));
         assert_eq!(unchanged.state, LibraryState::Loaded);
         assert_eq!(unchanged.references, 1);
-        let read = unchanged
-            .updated_at
-            .unwrap_or_else(|| panic!("a snapshot has a read time"));
-        let checked = unchanged
-            .checked_at
-            .unwrap_or_else(|| panic!("a snapshot has a check time"));
-        assert!(
-            checked >= read,
-            "an unchanged check confirms the copy without rereading it"
-        );
+        assert_eq!(unchanged.updated_at, None, "nothing changed since it was opened");
+        assert!(unchanged.checked_at.is_some(), "an unchanged check confirms the copy");
+        assert!(!unchanged.stale);
 
         let saved = "the library opened but could not be saved for next time: synthetic";
         if let Ok(mut library) = library.lock() {
@@ -1499,6 +1596,8 @@ mod tests {
             (unchanged.updated_at, kept.checked_at),
             "a failed update keeps the time of the copy still searched"
         );
+        assert!(offline.stale, "the searched library itself could not be updated");
+        assert!(offline.snapshot_zotero);
         assert_eq!(
             offline.error.as_deref(),
             Some("Zotero is not running, or it is not accepting connections; keeping the last loaded references")

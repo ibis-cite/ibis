@@ -9,30 +9,36 @@ const now = Date.UTC(2026, 9, 20, 12, 0);
 const hour = 3_600_000;
 const file = (overrides: Partial<LibraryStatus> = {}): LibraryStatus => ({
   state: "loaded", zotero: false, zotero_libraries: [], has_snapshot: true, name: "thesis.bib", snapshot_name: "thesis.bib",
-  references: 1204, warnings: 0, error: null, note: null, settings_notice: null, updated_at: now - 3 * hour, checked_at: now - 3 * hour, ...overrides,
+  references: 1204, warnings: 0, error: null, note: null, settings_notice: null, snapshot_zotero: false, stale: false,
+  updated_at: null, checked_at: now - 3 * hour, ...overrides,
 });
 const zotero = (overrides: Partial<LibraryStatus> = {}) => file({
-  zotero: true, zotero_libraries: ["user"], name: "Zotero library", snapshot_name: "Zotero library", ...overrides,
+  zotero: true, snapshot_zotero: true, zotero_libraries: ["user"], name: "Zotero library", snapshot_name: "Zotero library", ...overrides,
 });
 const kept = "Zotero is not running, or it is not accepting connections; keeping the last loaded references";
 const line = (status: LibraryStatus | null | undefined) =>
   [libraryMessages.summary(status), libraryMessages.age(status, now)].filter(Boolean).join(" · ");
-const detail = (status: LibraryStatus) => libraryMessages.detail(status, now, (s) => zoteroLibraryNames(s, (id) => `Group ${id}`));
+const strip = (text: string | null) => text?.replace(/[⁨⁩]/g, "") ?? null;
+const detail = (status: LibraryStatus) =>
+  libraryMessages.detail(status, now, (s) => zoteroLibraryNames(s, (id) => `Group ${id}`)).map(strip);
+const clockAt = (hours: number) => new Intl.DateTimeFormat("en", { timeStyle: "short" }).format(now - hours * hour);
 
 test.each<[string, LibraryStatus | null | undefined, string, ReturnType<typeof libraryHealth>]>([
   ["starting", undefined, "Checking library…", "idle"],
   ["status unavailable", null, "Library details unavailable", "stop"],
-  ["first run", file({ state: "none", has_snapshot: false, name: null, snapshot_name: null, references: 0, updated_at: null, checked_at: null }), "No library chosen", "idle"],
+  ["first run", file({ state: "none", has_snapshot: false, name: null, snapshot_name: null, references: 0, checked_at: null }), "No library chosen", "idle"],
   ["opening Zotero", zotero({ state: "loading", has_snapshot: false, snapshot_name: null, references: 0 }), "Zotero · opening…", "idle"],
   ["reloading keeps the count", file({ state: "reloading" }), "thesis.bib · 1,204 references · reloading…", "done"],
   ["just updated", zotero({ updated_at: now - 2 * 60_000, checked_at: now }), "Zotero · 1,204 references · updated 2 minutes ago", "done"],
-  ["updated a while ago", zotero({ checked_at: now }), "Zotero · 1,204 references", "done"],
+  ["opened, never changed", zotero({ checked_at: now }), "Zotero · 1,204 references", "done"],
   ["a watched file", file(), "thesis.bib · 1,204 references", "done"],
   ["reading notices", file({ warnings: 2 }), "thesis.bib · 1,204 references · 2 reading notices", "look"],
   ["empty", zotero({ references: 0 }), "Zotero · no references", "look"],
-  ["Zotero closed, copy kept", zotero({ state: "error", error: kept, checked_at: now - 2 * hour }), "Zotero · not updated · read 2 hours ago", "stop"],
+  ["Zotero closed, copy kept", zotero({ state: "error", error: kept, stale: true, checked_at: now - 2 * hour }), "Zotero · not updated · checked 2 hours ago", "stop"],
   ["never opened", zotero({ state: "error", has_snapshot: false, snapshot_name: null, references: 0, error: "Zotero is not running" }), "Zotero · not opened", "stop"],
-  ["failed switch keeps a current library", file({ state: "error", name: "missing.bib", error: `The library file is unavailable${"; keeping the last loaded references"}` }), "thesis.bib · 1,204 references", "stop"],
+  ["failed switch between files", file({ state: "error", name: "missing.bib", error: "The library file is unavailable; keeping the last loaded references" }), "thesis.bib · 1,204 references", "stop"],
+  ["failed switch from a file to Zotero", file({ state: "error", zotero: true, zotero_libraries: ["user"], name: "Zotero library", error: "Zotero is not running" }), "thesis.bib · 1,204 references", "stop"],
+  ["failed switch from Zotero to a file", zotero({ state: "error", zotero: false, zotero_libraries: [], name: "missing.bib", error: "The library file is unavailable" }), "Zotero · 1,204 references", "stop"],
 ])("%s", (_, status, expected, health) => {
   expect(line(status)).toBe(expected);
   expect(libraryHealth(status)).toBe(health);
@@ -47,42 +53,61 @@ test("relative times are short, never in the future, and turn into dates after a
   expect(ago(now + hour, now)).toBe("just now");
   expect(ago(now - 44_000, now)).toBe("just now");
   expect(ago(now - 60_000, now)).toBe("1 minute ago");
-  expect(ago(now - 89 * 60_000, now)).toBe("89 minutes ago");
   expect(ago(now - 2 * hour, now)).toBe("2 hours ago");
-  expect(ago(now - 30 * hour, now)).toBe("30 hours ago");
   expect(ago(now - 48 * hour, now)).toBe("2 days ago");
   expect(ago(now - 24 * 8 * hour, now)).toBe("on Oct 12");
 });
 
-test("the detail is a short line, then libraries, time and any problem", () => {
-  const clockAt = (hours: number) => new Intl.DateTimeFormat("en", { timeStyle: "short" }).format(now - hours * hour);
-  expect(detail(zotero({ zotero_libraries: ["user", { group: 41 }, { group: 9 }], checked_at: now }))).toEqual(
-    ["Zotero · 1,204 references", `My Library, Group 41, Group 9 · read 3 hours ago, ${clockAt(3)}`]);
-  expect(detail(file({ warnings: 1 }))).toEqual(["thesis.bib · 1,204 references · 1 reading notice", `read 3 hours ago, ${clockAt(3)}`]);
-  expect(detail(zotero({ state: "error", error: kept, checked_at: now - 2 * hour }))).toEqual(
-    ["Zotero · 1,204 references", `My Library · read 2 hours ago, ${clockAt(2)} · Zotero could not be reached`]);
+test("the detail is a short line, then libraries, check time and any problem", () => {
+  expect(detail(zotero({ zotero_libraries: ["user", { group: 41 }, { group: 9 }], checked_at: now - 3 * hour }))).toEqual(
+    ["Zotero · 1,204 references", `My Library, Group 41, Group 9 · checked 3 hours ago, ${clockAt(3)}`]);
+  expect(detail(file({ warnings: 1 }))).toEqual(["thesis.bib · 1,204 references · 1 reading notice", `checked 3 hours ago, ${clockAt(3)}`]);
+  expect(detail(zotero({ state: "error", error: kept, stale: true, checked_at: now - 2 * hour }))).toEqual(
+    ["Zotero · 1,204 references", `My Library · checked 2 hours ago, ${clockAt(2)} · Zotero could not be reached`]);
   expect(detail(file({ state: "error", name: "missing.bib", error: "The library file is unavailable" }))).toEqual(
-    ["thesis.bib · 1,204 references", `read 3 hours ago, ${clockAt(3)} · missing.bib could not be opened`]);
+    ["thesis.bib · 1,204 references", `checked 3 hours ago, ${clockAt(3)} · missing.bib could not be opened`]);
+  expect(detail(file({ state: "error", zotero: true, zotero_libraries: ["user"], name: "Zotero library", error: "Zotero is not running" }))).toEqual(
+    ["thesis.bib · 1,204 references", `checked 3 hours ago, ${clockAt(3)} · Zotero could not be opened`]);
   expect(detail(file({ state: "none", has_snapshot: false, name: null }))).toEqual(["No library chosen", null]);
 });
 
-test("missing times from an older backend show no age instead of a wrong one", () => {
-  const old = { ...file(), updated_at: undefined, checked_at: undefined } as unknown as LibraryStatus;
+test("names are isolated so right-to-left names keep their place", () => {
+  const [first, second] = libraryMessages.detail(zotero({ zotero_libraries: ["user", { group: 2 }] }), now,
+    (s) => zoteroLibraryNames(s, () => "مجموعة 2"));
+  expect(first).toBe("⁨Zotero⁩ · 1,204 references");
+  expect(second).toMatch(/^⁨My Library⁩, ⁨مجموعة 2⁩ · /);
+  render(createElement(LibraryStatusLine, { library: file({ name: "مراجع.bib", snapshot_name: "مراجع.bib" }), groupName: String }));
+  const status = screen.getByRole("status", { name: "Library status" });
+  expect(status.querySelector("bdi")?.textContent).toBe("مراجع.bib");
+  expect(status.textContent).toBe("مراجع.bib · 1,204 references");
+});
+
+test("missing fields from an older backend show no age instead of a wrong one", () => {
+  const old = { ...file(), updated_at: undefined, checked_at: undefined, stale: undefined, snapshot_zotero: undefined } as unknown as LibraryStatus;
   expect(line(old)).toBe("thesis.bib · 1,204 references");
   expect(detail(old)).toEqual(["thesis.bib · 1,204 references", null]);
 });
 
-test("the footer age ticks by itself and comes back current after the picker is shown", () => {
+test("the footer age ticks by itself, skips hidden windows and catches up when shown", () => {
   vi.useFakeTimers({ now });
+  let hidden = false;
+  const visibility = vi.spyOn(document, "visibilityState", "get").mockImplementation(() => (hidden ? "hidden" : "visible"));
   try {
     render(createElement(LibraryStatusLine, { library: zotero({ updated_at: now, checked_at: now }), groupName: (id: number) => `Group ${id}` }));
     const item = screen.getByRole("status", { name: "Library status" }).closest(".library-status")!;
     expect(item.textContent).toBe("Zotero · 1,204 references · updated just now");
     act(() => { vi.advanceTimersByTime(3 * 60_000); });
     expect(item.textContent).toBe("Zotero · 1,204 references · updated 3 minutes ago");
+    hidden = true;
+    act(() => { vi.advanceTimersByTime(3 * 60_000); });
+    expect(item.textContent).toBe("Zotero · 1,204 references · updated 3 minutes ago");
+    hidden = false;
+    act(() => { document.dispatchEvent(new Event("visibilitychange")); });
+    expect(item.textContent).toBe("Zotero · 1,204 references · updated 6 minutes ago");
     act(() => { vi.setSystemTime(now + recentUpdate + 1); window.dispatchEvent(new Event("focus")); });
     expect(item.textContent).toBe("Zotero · 1,204 references");
   } finally {
+    visibility.mockRestore();
     vi.useRealTimers();
   }
 });

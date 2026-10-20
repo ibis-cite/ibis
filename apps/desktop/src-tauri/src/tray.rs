@@ -17,7 +17,7 @@ pub(crate) fn library_line(status: &LibraryStatus) -> String {
         (LibraryState::Loading, _, Some(name)) => format!("Opening {name}…"),
         (LibraryState::Reloading, _, Some(name)) => format!("Reloading {name}…"),
         // The last loaded references are still searched: say "not updated", not "could not be opened".
-        (_, Some(error), _) if error.ends_with(KEPT) => {
+        (_, Some(error), _) if status.stale => {
             let reason = error.trim_end_matches(KEPT);
             let name = status.snapshot_name.as_deref().unwrap_or("Library");
             format!("{name}: {} references, not updated: {reason}", status.references)
@@ -153,6 +153,8 @@ mod tests {
             error: error.map(String::from),
             note: None,
             settings_notice: None,
+            snapshot_zotero: false,
+            stale: false,
             updated_at: None,
             checked_at: None,
         };
@@ -189,6 +191,7 @@ mod tests {
             state: LibraryState::Error,
             name: Some("Zotero library".into()),
             snapshot_name: Some("Zotero library".into()),
+            stale: true,
             ..status(
                 Some("refs.bib"),
                 0,

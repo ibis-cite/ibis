@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { LibraryStatus, ZoteroLibrary } from "./bindings";
-import { appLocale, libraryMessages, pickerText } from "./messages";
+import { appLocale, isolate, libraryMessages, pickerText } from "./messages";
 
 /** Done, Look or Stop for the footer dot; words carry the same meaning. */
 export function libraryHealth(library: LibraryStatus | null | undefined): "done" | "look" | "stop" | "idle" {
@@ -14,8 +14,8 @@ const lists = new Intl.ListFormat(appLocale, { style: "short", type: "unit" });
 /** "My Library, Lab group", naming groups once their names are known. */
 export function zoteroLibraryNames(status: LibraryStatus, groupName: (id: number) => string) {
   const names = status.zotero_libraries.map((choice: ZoteroLibrary) =>
-    typeof choice === "object" ? groupName(choice.group) : pickerText.myLibrary);
-  return names.length > 0 ? lists.format(names) : pickerText.myLibrary;
+    isolate(typeof choice === "object" ? groupName(choice.group) : pickerText.myLibrary));
+  return names.length > 0 ? lists.format(names) : isolate(pickerText.myLibrary);
 }
 
 /** Re-renders only its user, so a relative time stays right while the picker
@@ -47,6 +47,7 @@ export function LibraryStatusLine({ library, groupName }: {
   useMinuteTick();
   const now = Date.now();
   const health = libraryHealth(library);
+  const [source, state] = libraryMessages.summaryParts(library);
   const age = libraryMessages.age(library, now);
   const detail = libraryMessages.detail(library, now, (status) => zoteroLibraryNames(status, groupName)).filter(Boolean).join("\n");
   return (
@@ -54,7 +55,8 @@ export function LibraryStatusLine({ library, groupName }: {
       <span className="status-dot" data-health={health} aria-hidden="true" />
       <span className="library-words">
         <span className="library-name" role="status" aria-label={pickerText.libraryStatus} aria-live="polite" aria-atomic="true">
-          {libraryMessages.summary(library)}
+          {source !== null && <bdi className="library-source">{source}</bdi>}
+          {state && <span className="library-state">{state}</span>}
         </span>
         {age && <span className="library-age"> · {age}</span>}
       </span>

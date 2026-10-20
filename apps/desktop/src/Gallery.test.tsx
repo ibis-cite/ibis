@@ -6,7 +6,7 @@ import { renderGalleryState } from "./gallery";
 import { libraryMessages } from "./messages";
 
 const syntheticApi: PickerApi = {
-  libraryStatus: async () => ({ state: "loaded", has_snapshot: true, zotero: false, zotero_libraries: [], name: "gallery.bib", snapshot_name: "gallery.bib", references: 1, warnings: 0, error: null, note: null, settings_notice: null, updated_at: null, checked_at: null }),
+  libraryStatus: async () => ({ state: "loaded", has_snapshot: true, zotero: false, zotero_libraries: [], name: "gallery.bib", snapshot_name: "gallery.bib", references: 1, warnings: 0, error: null, note: null, settings_notice: null, snapshot_zotero: false, stale: false, updated_at: null, checked_at: null }),
   search: async () => [{ id: { source: "synthetic-gallery", native_key: "example" }, key: "example", title: "Synthetic gallery reference", authors: "Example Author", year: 2026, matched: ["title"] }],
   copyCitation: async () => ({ text: "[@example]", warnings: [] }),
   copyFormat: async () => "pandoc",
@@ -213,8 +213,7 @@ test("gallery readiness follows the shared library summary used by the picker", 
   vi.useFakeTimers();
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
   vi.stubGlobal("cancelAnimationFrame", (frame: number) => window.clearTimeout(frame));
-  const messages = libraryMessages as typeof libraryMessages & { summary: (status: unknown) => string };
-  const summary = vi.spyOn(messages, "summary").mockReturnValue("Synthetic translated library summary");
+  const summary = vi.spyOn(libraryMessages, "summaryParts").mockReturnValue([null, "Synthetic translated library summary"]);
   const state = galleryStates.find((candidate) => candidate.id === "damaged-library")!;
   const acknowledge = vi.fn(async () => undefined);
   const container = document.createElement("div");

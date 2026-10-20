@@ -780,7 +780,7 @@ test.each(["backup", "defaults"])("settings recovery from %s stays visible throu
 test.each(["", "sleep"])("an empty loaded library is explained even for query %s", async (query) => {
   backend({ library_status: () => ({ state: "loaded", has_snapshot: true, zotero: false, name: "empty 研究.bib", snapshot_name: "empty 研究.bib", references: 0, warnings: 0, error: null, note: null }) });
   render(<App />);
-  await screen.findByText("empty 研究.bib · no references");
+  await waitFor(() => expect(screen.getByRole("status", { name: "Library status" }).textContent).toBe("empty 研究.bib · no references"));
   if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
   await screen.findByText("No references found in empty 研究.bib. Choose a BibTeX or BibLaTeX export with references, then try again.");
   expect(screen.queryByText("Type to find a reference")).toBeNull();
@@ -1786,8 +1786,10 @@ test("the footer says what Enter will copy, and holding Alt shows the other keys
 });
 
 test("the footer names the source and count, the age only when it matters, and the detail in More", async () => {
-  let status: Record<string, unknown> = { state: "loaded", has_snapshot: true, zotero: true, zotero_libraries: ["user", { group: 7 }], name: "2 Zotero libraries",
-    snapshot_name: "2 Zotero libraries", references: 1204, warnings: 0, error: null, note: null, updated_at: Date.now() - 3 * 3_600_000, checked_at: Date.now() };
+  const plain = (text: string | null | undefined) => text?.replace(/[\u2068\u2069]/g, "");
+  let status: Record<string, unknown> = { state: "loaded", has_snapshot: true, zotero: true, snapshot_zotero: true, stale: false,
+    zotero_libraries: ["user", { group: 7 }], name: "2 Zotero libraries", snapshot_name: "2 Zotero libraries", references: 1204, warnings: 0,
+    error: null, note: null, updated_at: null, checked_at: Date.now() - 3 * 3_600_000 };
   backend({ library_status: () => status, zotero_groups: () => [{ id: 7, name: "Lab group" }] });
   render(<App />);
   const live = await screen.findByRole("status", { name: "Library status" });
@@ -1795,24 +1797,25 @@ test("the footer names the source and count, the age only when it matters, and t
   const item = live.closest(".library-status")!;
   expect(item.textContent).toBe("Zotero · 1,204 references");
   expect(item.getAttribute("data-health")).toBe("done");
-  expect(item.getAttribute("title")).toMatch(/^Zotero · 1,204 references\nMy Library, (Group 7|Lab group) · read 3 hours ago, .+$/);
+  expect(plain(item.getAttribute("title"))).toMatch(/^Zotero · 1,204 references\nMy Library, (Group 7|Lab group) · checked 3 hours ago, .+$/);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  const group = await screen.findByRole("group", { name: /^Zotero · 1,204 references\. My Library, Lab group · read 3 hours ago, / });
-  expect(group.querySelector(".menu-detail-title")?.textContent).toBe("Zotero · 1,204 references");
+  const group = await screen.findByRole("group", { name: /Lab group/ });
+  expect(plain(group.getAttribute("aria-label"))).toMatch(/^Zotero · 1,204 references\. My Library, Lab group · checked 3 hours ago, /);
+  expect(plain(group.querySelector(".menu-detail-title")?.textContent)).toBe("Zotero · 1,204 references");
 
   // A change just arrived: the age shows, outside the live region.
-  status = { ...status, references: 1205, updated_at: Date.now() };
+  status = { ...status, references: 1205, updated_at: Date.now(), checked_at: Date.now() };
   await emit("library:changed", status);
   await waitFor(() => expect(live.textContent).toBe("Zotero · 1,205 references"));
   expect(item.textContent).toBe("Zotero · 1,205 references · updated just now");
 
-  // Zotero closed: the copy still searched says how old it is.
-  status = { ...status, state: "error", checked_at: Date.now() - 2 * 3_600_000,
+  // Zotero closed: the copy still searched says when it was last checked.
+  status = { ...status, state: "error", stale: true, checked_at: Date.now() - 2 * 3_600_000,
     error: "Zotero is not running, or it is not accepting connections; keeping the last loaded references" };
   await emit("library:changed", status);
-  await waitFor(() => expect(item.textContent).toBe("Zotero · not updated · read 2 hours ago"));
+  await waitFor(() => expect(item.textContent).toBe("Zotero · not updated · checked 2 hours ago"));
   expect(item.getAttribute("data-health")).toBe("stop");
-  expect(item.getAttribute("title")).toMatch(/^Zotero · 1,205 references\nMy Library, Lab group · read 2 hours ago, .+ · Zotero could not be reached$/);
+  expect(plain(item.getAttribute("title"))).toMatch(/^Zotero · 1,205 references\nMy Library, Lab group · checked 2 hours ago, .+ · Zotero could not be reached$/);
 });
 
 test("? lists every key in a modal dialog, but a ? typed in the search is text", async () => {

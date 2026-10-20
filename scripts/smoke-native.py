@@ -58,11 +58,12 @@ def strings(snapshot):
 
 def missing_library_evidence(snapshot, name):
     text = strings(snapshot)
-    return {key: fragment in text for key, fragment in {
+    return {key: fragment if type(fragment) is bool else fragment in text for key, fragment in {
         "failed_source_named": f"The library could not be opened: {name}",
         "retention_explained": "the library file is unavailable; keeping the last loaded references",
         "recovery_action": "Choose it again or reconnect the drive.",
-        "retained_snapshot": f"{name}: 4 references",
+        # The footer names the searched library apart from its state words.
+        "retained_snapshot": name in text and " · not updated" in text,
     }.items()}
 
 
@@ -963,7 +964,7 @@ def main():
             def recover():
                 library.write_text("", encoding="utf-8")
                 menu_action(native, "Reload")
-                wait_for(lambda: "0 references" in strings(snapshot()), "empty library count")
+                wait_for(lambda: " · no references" in strings(snapshot()), "empty library count")
                 library.write_text(fixture(), encoding="utf-8")
                 menu_action(native, "Reload")
                 wait_for(lambda: "3 references" in strings(snapshot()), "reload recovers after error")
@@ -994,8 +995,7 @@ def main():
             def damaged():
                 library.write_text((Path(__file__).resolve().parent.parent / "fixtures/bibtex/damaged.bib").read_text(encoding="utf-8"), encoding="utf-8")
                 launch("damaged")
-                wait_for(lambda: any(f"{library.name}: 4 references, 5 {suffix}" in strings(snapshot())
-                                    for suffix in ("could not be read fully", "reading notices")),
+                wait_for(lambda: library.name in strings(snapshot()) and " · 4 references · 5 reading notices" in strings(snapshot()),
                          "damaged library shows exact retained-reference and reading-notice counts")
                 query("good2", "Loads after the damage")
                 stop()
@@ -1007,7 +1007,7 @@ def main():
                 native.focus_editor()
                 before = time.monotonic()
                 launch(f"100000-{sample + 1}")
-                wait_for(lambda: "100000 references" in strings(snapshot()), "100,000-reference library load", timeout=120)
+                wait_for(lambda: "100,000 references" in strings(snapshot()), "100,000-reference library load", timeout=120)
                 startup = (time.monotonic() - before) * 1000
                 before = time.monotonic()
                 query("smoke099999", "Ibis smoke reference 099999")
@@ -1525,7 +1525,7 @@ class ContractTests(unittest.TestCase):
         message = (f"The library could not be opened: {name}. "
                    "the library file is unavailable; keeping the last loaded references. "
                    "Choose it again or reconnect the drive.")
-        current = {"nodes": [{"name": message}, {"value": f"{name}: 4 references"}]}
+        current = {"nodes": [{"name": message}, {"value": name}, {"value": " · not updated"}]}
         self.assertTrue(all(missing_library_evidence(current, name).values()))
         current["nodes"].pop()
         evidence = missing_library_evidence(current, name)

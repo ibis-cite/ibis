@@ -101,8 +101,12 @@ footer { border-top: var(--border-width) solid var(--line); padding: var(--foote
 .library-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--footer-gap); }
 /* One line that never pushes the keys aside: the age after the source and count
    is cut first, and the tooltip and More keep the whole detail. */
-.library-status { flex: 1; min-width: var(--library-min-width); display: flex; align-items: center; gap: var(--footer-gap); color: var(--muted); }
-.library-words { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.library-status { flex: 1; min-width: min(var(--library-min-width), 100%); display: flex; align-items: center; gap: var(--footer-gap); color: var(--muted); }
+.library-words, .library-name { display: flex; min-width: 0; overflow: hidden; white-space: pre; }
+/* A long name is shortened before the state words; the age goes first of all. */
+.library-source { min-width: 3ch; flex-shrink: 100; overflow: hidden; text-overflow: ellipsis; }
+.library-state { flex: none; }
+.library-age { min-width: 0; flex-shrink: 1000; overflow: hidden; text-overflow: ellipsis; }
 .library-status[data-health="stop"] .library-name, .library-status[data-health="look"] .library-name { color: var(--text); }
 .library-bar p { width: 100%; margin: var(--library-notice-margin); }
 /* The dot repeats what the words say, so colour is never the only signal. */

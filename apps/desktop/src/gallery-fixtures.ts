@@ -20,7 +20,7 @@ export type GalleryState = {
 function library(overrides: Partial<GalleryLibrary> = {}): GalleryLibrary {
   return { state: "loaded", name: "example.bib", snapshot_name: "example.bib", has_snapshot: true, zotero: false, zotero_libraries: [],
     references: 24, warnings: 0, error: null, note: null, settings_notice: null,
-    updated_at: hoursAgo(3), checked_at: hoursAgo(3), ...overrides };
+    snapshot_zotero: false, stale: false, updated_at: null, checked_at: hoursAgo(3), ...overrides };
 }
 
 /** Times relative to the page load, so captures say the same thing on every run. */
@@ -58,10 +58,10 @@ export const galleryStates: readonly GalleryState[] = [
   { id: "large-text", label: "Large text", library: library(), query: "memory", results: examples, largeText: true },
   { id: "dark", label: "Dark mode", library: library(), query: "memory", results: examples, theme: "dark" },
   { id: "high-contrast", label: "High contrast", library: library(), query: "memory", results: examples, theme: "contrast" },
-  { id: "zotero-updated", label: "Zotero, just updated", library: library({ name: "2 Zotero libraries", snapshot_name: "2 Zotero libraries", zotero: true,
+  { id: "zotero-updated", label: "Zotero, just updated", library: library({ name: "2 Zotero libraries", snapshot_name: "2 Zotero libraries", zotero: true, snapshot_zotero: true,
     zotero_libraries: ["user", { group: 41 }], references: 1204, updated_at: hoursAgo(2 / 60), checked_at: hoursAgo(2 / 60) }), query: "memory", results: examples },
-  { id: "zotero-kept", label: "Zotero closed, not updated", library: library({ state: "error", name: "Zotero library", snapshot_name: "Zotero library", zotero: true,
-    zotero_libraries: ["user"], references: 1204, updated_at: hoursAgo(26), checked_at: hoursAgo(2),
+  { id: "zotero-kept", label: "Zotero closed, not updated", library: library({ state: "error", name: "Zotero library", snapshot_name: "Zotero library", zotero: true, snapshot_zotero: true, stale: true,
+    zotero_libraries: ["user"], references: 1204, updated_at: null, checked_at: hoursAgo(2),
     error: "Zotero is not running, or it is not accepting connections; keeping the last loaded references" }), query: "memory", results: examples },
   { id: "copied-notice", label: "Copied notice after hiding", library: library(), query: "memory", results: examples, notice: "[@example2026]" },
 ];

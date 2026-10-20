@@ -165,46 +165,52 @@ export const libraryMessages = {
   empty: (name: string | null, zotero = false) => zotero
     ? `No references found in ${name ?? "your Zotero library"}. Add items in Zotero, then reload.`
     : `No references found in ${name ?? "this library"}. Choose a BibTeX or BibLaTeX export with references, then try again.`,
-  /** The footer words: where the references come from and how many. A ticking
-   * age is kept out of this text, so the live region never repeats a clock. */
-  summary: (status: LibraryStatus | null | undefined) => {
-    if (status === undefined) return "Checking library…";
-    if (status === null) return "Library details unavailable";
-    if (status.state === "loading") return sourceLabel(status, status.name);
-    if (status.state === "none" || (!status.has_snapshot && !status.name)) return "No library chosen";
-    if (!status.has_snapshot) return `${sourceLabel(status, status.name)} · not opened`;
-    // After a failed switch the previous library is still current: describe it.
-    const source = sourceLabel(status, status.snapshot_name);
-    if (kept(status)) return `${source} · not updated`;
-    if (status.references === 0) return `${source} · no references`;
-    return `${source} · ${count(status.references, "reference")}` +
-      (status.warnings > 0 ? ` · ${count(status.warnings, "reading notice")}` : "");
+  /** The footer words: the source, then its state. A ticking age is kept
+   * out of this text, so the live region never repeats a clock. The source is
+   * separate so the footer can isolate its direction and shorten it first. */
+  summaryParts: (status: LibraryStatus | null | undefined): [string | null, string] => {
+    if (status === undefined) return [null, "Checking library…"];
+    if (status === null) return [null, "Library details unavailable"];
+    if (status.state === "loading") return [requestedLabel(status), ""];
+    if (status.state === "none" || (!status.has_snapshot && !status.name)) return [null, "No library chosen"];
+    if (!status.has_snapshot) return [requestedLabel(status), " · not opened"];
+    // After a failed switch the previous library is still the one searched: describe it.
+    const source = snapshotLabel(status);
+    if (status.stale) return [source, " · not updated"];
+    if (status.references === 0) return [source, " · no references"];
+    return [source, ` · ${count(status.references, "reference")}` +
+      (status.warnings > 0 ? ` · ${count(status.warnings, "reading notice")}` : "")];
   },
-  /** The quiet age after the summary, or null when the age does not matter. */
+  summary: (status: LibraryStatus | null | undefined) => {
+    const [source, state] = libraryMessages.summaryParts(status);
+    return (source ?? "") + state;
+  },
+  /** The quiet age after the summary, or null when the age does not matter:
+   * "updated" only after a real change, "checked" for an old copy. */
   age: (status: LibraryStatus | null | undefined, now: number) => {
     if (status?.state === "loading") return "opening…";
     if (!status?.has_snapshot) return null;
     if (status.state === "reloading") return "reloading…";
     const { updated, checked } = times(status);
-    if (kept(status)) return checked === null ? null : `read ${ago(checked, now)}`;
+    if (status.stale) return checked === null ? null : `checked ${ago(checked, now)}`;
     if (status.error || updated === null || now - updated > recentUpdate) return null;
     return `updated ${ago(updated, now)}`;
   },
   /** Everything known, for the tooltip and the top of More: a short first
-   * line (source and count) and a quieter second (libraries, time, problem). */
+   * line (source and count) and a quieter second (libraries, check time, any
+   * problem). Names are isolated so right-to-left names keep their order. */
   detail: (status: LibraryStatus | null | undefined, now: number, libraryNames: (status: LibraryStatus) => string): [string, string | null] => {
-    const summary = libraryMessages.summary(status);
-    if (!status?.has_snapshot) return [summary, null];
-    const { updated, checked } = times(status);
-    // A kept copy is described by when it was last known to be right.
-    const at = kept(status) ? checked : updated;
+    const [source, state] = libraryMessages.summaryParts(status);
+    const summary = (source === null ? "" : isolate(source)) + state;
+    if (!status?.has_snapshot || status.state === "loading") return [summary, null];
+    const { checked } = times(status);
     const parts = [
-      status.zotero ? libraryNames(status) : null,
-      at === null ? null : `read ${ago(at, now)}, ${clock(at, now)}`,
-      kept(status) ? (status.zotero ? "Zotero could not be reached" : "the file could not be read")
-        : status.error ? `${status.name ?? "the chosen library"} could not be opened` : null,
+      zoteroSnapshot(status) && !(status.error && !status.stale) ? libraryNames(status) : null,
+      checked === null ? null : `checked ${ago(checked, now)}, ${clock(checked, now)}`,
+      status.stale ? (zoteroSnapshot(status) ? "Zotero could not be reached" : "the file could not be read")
+        : status.error ? `${isolate(status.zotero ? "Zotero" : status.name ?? "the chosen library")} could not be opened` : null,
     ].filter((part): part is string => part !== null);
-    const first = kept(status) ? `${sourceLabel(status, status.snapshot_name)} · ${count(status.references, "reference")}` : summary;
+    const first = status.stale ? `${isolate(snapshotLabel(status))} · ${count(status.references, "reference")}` : summary;
     return [first, parts.length > 0 ? parts.join(" · ") : null];
   },
 };
@@ -221,20 +227,29 @@ function count(n: number, noun: string) {
   return `${numbers.format(n)} ${n === 1 ? noun : `${noun}s`}`;
 }
 
-function sourceLabel(status: LibraryStatus, name: string | null) {
-  return status.zotero ? "Zotero" : name ?? "Library";
+/** The library asked for, which may not have opened. */
+function requestedLabel(status: LibraryStatus) {
+  return status.zotero ? "Zotero" : status.name ?? "Library";
+}
+
+/** Whether the searched references are Zotero's (older backends: the request). */
+function zoteroSnapshot(status: LibraryStatus) {
+  return status.snapshot_zotero ?? status.zotero;
+}
+
+/** The library actually searched. */
+function snapshotLabel(status: LibraryStatus) {
+  return zoteroSnapshot(status) ? "Zotero" : status.snapshot_name ?? "Library";
+}
+
+/** First-strong isolation for a name inside a sentence (tooltip, accessible name). */
+export function isolate(name: string) {
+  return `\u2068${name}\u2069`;
 }
 
 /** Times from an older backend or fixture may be missing. */
 function times(status: LibraryStatus) {
   return { updated: status.updated_at ?? null, checked: status.checked_at ?? null };
-}
-
-/** An update of the open library failed, so an older copy of it is searched.
- * A failed switch to another library keeps the previous one, which is current. */
-function kept(status: LibraryStatus) {
-  return Boolean(status.error && status.has_snapshot && status.name === status.snapshot_name
-    && status.error.replace(/\.$/, "").endsWith("keeping the last loaded references"));
 }
 
 /** "just now", "5 minutes ago", "yesterday"; a date after a week. Never in the future. */
