@@ -69,12 +69,15 @@ function hiddenMatch(matched: string[]): string | null {
   return matched[0] ?? null;
 }
 
-/** Authors as a row shows them: "García", "García, Okafor" or "García et al.".
- * The count comes from the record's creators, so a name with a comma is one;
- * with one or two creators the joined surnames are already the short form. */
-function shortAuthors(r: SearchResult): string {
-  return r.first_author && r.author_count > 2 ? `${r.first_author} ${rowText.etAl}` : r.authors;
+/** Rows name one or two authors in full and shorten three or more to
+ * "García et al.". The count comes from the record's creators, so a name with
+ * a comma is one; with one or two creators the joined surnames are the short form. */
+function abbreviatedAuthors(r: SearchResult): boolean {
+  return Boolean(r.first_author) && r.author_count > 2;
 }
+
+/** "et al." in its own isolate, so it keeps its reading order beside a right-to-left name. */
+const etAl = <bdi>{rowText.etAl}</bdi>;
 
 /** Done, Look or Stop for the footer dot; words carry the same meaning. */
 function libraryHealth(library: LibraryStatus | null | undefined): "done" | "look" | "stop" | "idle" {
@@ -839,7 +842,6 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             const compact = density === "compact";
             // A match in the container is always named: the row may shorten the container.
             const why = hiddenMatch(r.matched);
-            const authors = shortAuthors(r);
             const itemType = density === "spacious" ? rowText.itemType(r.item_type) : null;
             return (
               <li
@@ -856,7 +858,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               >
                 <span className="result-line">
                   <strong className="result-title">{r.title}</strong>
-                  {compact && r.first_author && <span className="result-first-author" dir="auto">{r.first_author}{r.author_count > 1 && ` ${rowText.etAl}`}</span>}
+                  {compact && r.first_author && <span className="result-first-author" dir="auto">{r.first_author}{r.author_count > 1 && <> {etAl}</>}</span>}
                   <span className="result-year">{r.year ?? pickerText.noDate}</span>
                 </span>
                 <span className="result-meta">
@@ -864,7 +866,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                       right-to-left row is cut at its end. The separator is its own part. */}
                   <span className="result-byline">
                     <span className="result-authors" dir="auto">
-                      {authors === r.authors ? authors : <><span aria-hidden="true">{authors}</span><span className="visually-hidden">{r.authors}</span></>}
+                      {abbreviatedAuthors(r) ? <><span aria-hidden="true">{r.first_author} {etAl}</span><span className="visually-hidden">{r.authors}</span></> : r.authors}
                     </span>
                     {!compact && r.container && r.authors && <span className="result-separator" aria-hidden="true">{"\u00a0·\u00a0"}</span>}
                     {!compact && r.container && <span className="result-container" dir="auto">{r.container}</span>}

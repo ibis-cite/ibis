@@ -73,6 +73,9 @@ main {
 .result-container { flex: 1 1 8em; min-width: min(8em, 70%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-separator { flex: none; white-space: nowrap; }
 .result-authors, .result-container { unicode-bidi: isolate; }
+/* These parts take their own direction (dir="auto") but align with the row,
+   so Latin text in a right-to-left row sits beside its separator. */
+.result-authors, .result-container, .result-key, .result-first-author { text-align: match-parent; }
 .result-key { flex: 0 1 auto; min-width: min(6ch, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
 .result-why { font-style: italic; }
 .result-library { flex: 0 1 auto; min-width: min(5em, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

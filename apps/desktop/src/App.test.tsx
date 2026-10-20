@@ -944,6 +944,10 @@ test("rows with the same first author and year are told apart by their container
   // Compact: the first author follows the title on the one line, before the year.
   const line = rows[0]?.querySelector(".result-line");
   expect(line?.querySelector(".result-first-author")?.getAttribute("dir")).toBe("auto");
+  // "et al." is isolated, so it keeps its order beside a right-to-left name,
+  // and the part aligns with the row rather than its own direction.
+  expect(line?.querySelector(".result-first-author bdi")?.textContent).toBe("et al.");
+  expect(styles).toMatch(/\.result-authors, \.result-container, \.result-key, \.result-first-author \{ text-align: match-parent; \}/);
   // It keeps its own width beside a long title, as in the prototype, capped and ellipsized.
   expect(styles).toMatch(/\.result-first-author \{ flex: none; max-width: var\(--key-max-width\);[^}]*text-overflow: ellipsis/);
   // A very narrow Compact row gives the title its own line instead.
@@ -969,6 +973,7 @@ test("rows shorten the authors and keep the journal, key and library label visib
   const authors = (row?: HTMLElement) => row?.querySelector(".result-authors");
   // Three or more: "García et al." on screen; screen readers still hear every name.
   expect(authors(rows[0])?.querySelector("[aria-hidden]")?.textContent).toBe("García et al.");
+  expect(authors(rows[0])?.querySelector("[aria-hidden] bdi")?.textContent).toBe("et al.");
   expect(authors(rows[0])?.querySelector(".visually-hidden")?.textContent).toBe("García, Okafor, Lima, Chen, Novak, Haddad");
   expect(authors(rows[1])?.textContent).toBe("Smith, Institute, Research");
   expect(authors(rows[2])?.textContent).toBe("Smith");
