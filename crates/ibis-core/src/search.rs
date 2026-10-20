@@ -6,6 +6,8 @@
 //! first. This in-memory index is the 0.x baseline; a persistent SQLite FTS5
 //! index replaces it when libraries become large.
 
+use std::collections::BTreeMap;
+
 use serde::Serialize;
 use unicode_normalization::UnicodeNormalization;
 use unicode_normalization::char::is_combining_mark;
@@ -114,17 +116,29 @@ pub struct OwnedIndex {
     references: Vec<Reference>,
     fields: Vec<[String; 8]>,
     identifiers: Vec<Vec<Identifier>>,
+    source_counts: BTreeMap<String, usize>,
 }
 
 impl OwnedIndex {
     pub fn new(references: Vec<Reference>) -> Self {
         let fields = references.iter().map(prepare).collect();
+        let mut source_counts = BTreeMap::new();
+        for reference in &references {
+            *source_counts.entry(reference.id.source.clone()).or_default() += 1;
+        }
         let identifiers = references.iter().map(identifier::of_reference).collect();
         OwnedIndex {
             references,
             fields,
             identifiers,
+            source_counts,
         }
+    }
+
+    /// Counts by unchanged record source ID, computed once with the snapshot.
+    /// Sources with no records have no entry.
+    pub fn source_counts(&self) -> &BTreeMap<String, usize> {
+        &self.source_counts
     }
 
     pub fn references(&self) -> &[Reference] {
@@ -467,7 +481,7 @@ mod tests {
     fn source_scopes_filter_before_limits_for_words_unicode_and_identifiers() {
         let mut refs = crate::bibtex::load_str(
             "zotero:user",
-            "@article{same,title={García 研究},doi={10.1000/scope},year={2026}}",
+            "@article{same,title={García 研究},doi={10.1000/scope},isbn={0-306-40615-2},pmid={12345},eprint={2101.00001},archiveprefix={arXiv},year={2026}}",
         )
         .references;
         for n in 0..3 {
@@ -479,9 +493,19 @@ mod tests {
         }
         let borrowed = Index::new(&refs);
         let owned = OwnedIndex::new(refs.clone());
+        assert_eq!(owned.source_counts().get("zotero:user"), Some(&1));
+        assert_eq!(owned.source_counts().get("zotero:group:7"), Some(&3));
+        assert_eq!(owned.source_counts().values().sum::<usize>(), owned.references().len());
         let group = vec!["zotero:group:7".into()];
         let all = vec!["zotero:user".into(), "zotero:group:7".into()];
-        for query in ["garcia", "研究", "10.1000/scope"] {
+        for query in [
+            "garcia",
+            "研究",
+            "10.1000/scope",
+            "978-0-306-40615-7",
+            "PMID:12345",
+            "arXiv:2101.00001",
+        ] {
             for scope in [
                 None,
                 Some(all.as_slice()),
@@ -521,22 +545,41 @@ mod tests {
     }
 
     #[test]
-    fn scoped_search_cancels_while_scanning_excluded_sources() {
+    fn scoped_search_cancels_when_a_concurrent_request_supersedes_it() {
+        use std::sync::{
+            atomic::{AtomicBool, Ordering},
+            mpsc,
+        };
         let mut r = reference("a", "Synthetic research", "Example", 2020);
         r.doi = Some("10.1000/scope".into());
         let index = OwnedIndex::new(vec![r; 10_000]);
         for query in ["research", "10.1000/scope"] {
-            let checks = std::cell::Cell::new(0);
-            let stop = || {
-                checks.set(checks.get() + 1);
-                checks.get() == 3
-            };
-            assert!(
-                index
-                    .search_scoped_until(query, 20, Some(&["excluded".into()]), &stop)
-                    .is_none()
-            );
-            assert_eq!(checks.get(), 3);
+            let cancelled = AtomicBool::new(false);
+            let (paused, ready) = mpsc::channel();
+            let (resume, wait) = mpsc::channel();
+            std::thread::scope(|threads| {
+                let index = &index;
+                let cancelled = &cancelled;
+                let running = threads.spawn(move || {
+                    let checks = std::cell::Cell::new(0);
+                    let stop = || {
+                        checks.set(checks.get() + 1);
+                        if checks.get() == 3 {
+                            paused.send(()).unwrap_or_else(|e| panic!("{e}"));
+                            wait.recv_timeout(std::time::Duration::from_secs(5))
+                                .unwrap_or_else(|e| panic!("{e}"));
+                        }
+                        cancelled.load(Ordering::SeqCst)
+                    };
+                    index.search_scoped_until(query, 20, Some(&["excluded".into()]), &stop)
+                });
+                ready
+                    .recv_timeout(std::time::Duration::from_secs(5))
+                    .unwrap_or_else(|e| panic!("{e}"));
+                cancelled.store(true, Ordering::SeqCst);
+                resume.send(()).unwrap_or_else(|e| panic!("{e}"));
+                assert!(running.join().unwrap_or_else(|_| panic!("search panicked")).is_none());
+            });
         }
     }
 
