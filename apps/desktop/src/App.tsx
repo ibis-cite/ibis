@@ -559,7 +559,10 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     }
     if (!ownsCompletion()) return;
     setCopied(outcome);
-    setSelected(new Map());
+    const clearedSelection = new Map<string, SearchResult>();
+    const completedContext = { ...context, selected: clearedSelection };
+    copyContext.current = completedContext;
+    setSelected(clearedSelection);
     // After a copy, reopening keeps the current search, not one cleared before it.
     escapedQuery.current = null;
     // Get out of the way so the user can paste, unless there is something to
@@ -567,7 +570,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     if (afterCopy(outcome, currentPin.current) === "hide-and-notify") {
       void perform("hide", async () => {
         await hidePicker();
-        if (request !== copyRequest.current || shownAt !== pickerShows.current) return;
+        if (request !== copyRequest.current || shownAt !== pickerShows.current || completedContext !== copyContext.current) return;
         // The notice is extra; a failure to show it never undoes the copy.
         await showCopiedNotice?.(outcome.text).catch(() => console.error(copiedNoticeText.noticeFailed));
       });

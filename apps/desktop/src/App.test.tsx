@@ -2541,3 +2541,19 @@ test("a delayed hide cannot show an old copy notice after reopening", async () =
   await act(async () => { await emit("picker:shown"); releaseHide(); });
   expect(calls).not.toContain("show_copied_notice");
 });
+
+test("a delayed hide cannot show an old notice over a newer selection", async () => {
+  let releaseHide: () => void = () => undefined;
+  const calls = backend({
+    search: () => [result("a", "First"), result("b", "Second")],
+    copy_citation: () => ({ text: "@a", warnings: [] }),
+    hide_picker: () => new Promise<void>((resolve) => { releaseHide = resolve; }),
+  });
+  render(<App />);
+  fireEvent.click(await screen.findByText("First"));
+  await waitFor(() => expect(calls).toContain("hide_picker"));
+  fireEvent.click(screen.getByText("Second"), { shiftKey: true });
+  await act(async () => { releaseHide(); });
+  expect(screen.queryByRole("button", { name: "Remove b from the selection" })).not.toBeNull();
+  expect(calls).not.toContain("show_copied_notice");
+});
