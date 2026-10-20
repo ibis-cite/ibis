@@ -2,8 +2,8 @@
 //! choosing or reloading a library file or the Zotero library.
 
 use std::path::PathBuf;
-use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, Mutex};
 
 use ibis_core::model::{LoadWarning, RecordId, Reference};
 use ibis_core::search::OwnedIndex;
@@ -77,7 +77,8 @@ pub(crate) struct Library {
     pub(crate) opening: bool,
     /// A Zotero change check is running; unlike `opening`, it is not shown.
     checking: bool,
-    pub(crate) index: OwnedIndex,
+    /// Shared so a search can run without holding the library lock.
+    pub(crate) index: Arc<OwnedIndex>,
     pub(crate) warnings: Vec<LoadWarning>,
     /// Exact initial load observation, reused when attaching the watcher.
     snapshot: Option<SourceSnapshot>,
@@ -98,6 +99,11 @@ pub(crate) struct Library {
 /// request never replaces the newer library.
 #[derive(Default)]
 pub(crate) struct LoadRequests(pub(crate) AtomicU64);
+
+/// Counts searches, so a search for a query the person has already typed past
+/// stops early instead of delaying the newer one.
+#[derive(Default)]
+pub(crate) struct SearchRequests(pub(crate) AtomicU64);
 
 /// The platform watcher and its worker stop when replaced or the app exits.
 #[derive(Default)]
@@ -259,7 +265,7 @@ fn load_source(source: Source, reload: bool, previous: Option<api::Snapshot>) ->
 fn candidate(source: impl Into<Source>, loaded: ibis_core::model::LoadResult) -> Library {
     Library {
         source: Some(source.into()),
-        index: OwnedIndex::new(loaded.references),
+        index: Arc::new(OwnedIndex::new(loaded.references)),
         warnings: loaded.warnings,
         snapshot: None,
         error: None,
@@ -507,6 +513,9 @@ fn begin_check(library: &Mutex<Library>, requests: &LoadRequests) -> Option<(u64
     let Source::Zotero(_) = source else {
         return None;
     };
+    // The library lock is held only to take the index, and a newer search
+    // stops this one; the interface ignores the empty result of a stopped
+    // search because it belongs to an outdated query.
     let request = requests.0.fetch_add(1, Ordering::SeqCst) + 1;
     library.checking = true;
     Some((request, source, library.zotero.clone()))
@@ -681,6 +690,9 @@ fn begin_open(
 ) -> Option<(u64, bool, LibraryStatus)> {
     let source = source.into();
     let mut library = library.lock().ok()?;
+    // The library lock is held only to take the index, and a newer search
+    // stops this one; the interface ignores the empty result of a stopped
+    // search because it belongs to an outdated query.
     let request = requests.0.fetch_add(1, Ordering::SeqCst) + 1;
     let reload = library.source.as_ref() == Some(&source);
     library.requested = Some(source);
@@ -729,17 +741,26 @@ pub(crate) async fn search(
     query: String,
     limit: usize,
     library: State<'_, Mutex<Library>>,
+    requests: State<'_, SearchRequests>,
 ) -> Result<Vec<SearchResult>, String> {
-    let library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
-    if library.source.is_none() {
-        return Err(match &library.error {
-            Some(error) => format!("the library could not be opened: {error}"),
-            None => "no library is open".to_string(),
-        });
-    }
-    Ok(library
-        .index
-        .search(&query, limit.min(200))
+    // The library lock is held only to take the index, and a newer search
+    // stops this one; the interface ignores the empty result of a stopped
+    // search because it belongs to an outdated query.
+    let request = requests.0.fetch_add(1, Ordering::SeqCst) + 1;
+    let index = {
+        let library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
+        if library.source.is_none() {
+            return Err(match &library.error {
+                Some(error) => format!("the library could not be opened: {error}"),
+                None => "no library is open".to_string(),
+            });
+        }
+        Arc::clone(&library.index)
+    };
+    let outdated = || requests.0.load(Ordering::SeqCst) != request;
+    Ok(index
+        .search_until(&query, limit.min(200), &outdated)
+        .unwrap_or_default()
         .into_iter()
         .map(|hit| {
             let matched = hit.matched.iter().map(|m| format!("{m:?}").to_lowercase()).collect();
