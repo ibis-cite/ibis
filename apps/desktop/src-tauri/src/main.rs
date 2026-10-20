@@ -24,6 +24,7 @@ mod picker;
 mod placement;
 mod preferences;
 mod tray;
+mod updater;
 
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -36,8 +37,8 @@ use tauri_plugin_global_shortcut::ShortcutState;
 use crate::diagnostics::{NativeIssue, application_message, checked, report};
 use crate::library::{Library, LibraryWatch, LoadRequests, Source, start_open};
 use crate::picker::{
-    DialogOpen, ShortcutStatus, configured_shortcut, dismiss_picker, hides_on_blur, register_shortcut, show_picker,
-    toggle_picker,
+    DialogOpen, Pinned, ShortcutStatus, configured_shortcut, dismiss_picker, hides_on_blur, register_shortcut,
+    show_picker, toggle_picker,
 };
 use crate::placement::place_on_active_display;
 use crate::preferences::SettingsFile;
@@ -58,6 +59,7 @@ fn main() {
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show_picker(app)))
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, _shortcut, event| {
@@ -71,7 +73,9 @@ fn main() {
         .manage(LoadRequests::default())
         .manage(LibraryWatch::default())
         .manage(DialogOpen::default())
+        .manage(Pinned::default())
         .manage(Mutex::new(ShortcutStatus::default()))
+        .manage(updater::Updates::default())
         .invoke_handler(bindings::commands().invoke_handler())
         .on_window_event(|window, event| {
             #[cfg(all(target_os = "macos", debug_assertions))]
@@ -90,11 +94,12 @@ fn main() {
                 // not to its own file dialog.
                 WindowEvent::Focused(false) => {
                     let dialog_open = window.state::<DialogOpen>().0.load(Ordering::SeqCst);
+                    let pinned = window.state::<Pinned>().0.load(Ordering::SeqCst);
                     #[cfg(target_os = "macos")]
                     let startup_allows_blur = panel::allows_automatic_blur(window.app_handle());
                     #[cfg(not(target_os = "macos"))]
                     let startup_allows_blur = true;
-                    if startup_allows_blur && hides_on_blur(!cfg!(debug_assertions), dialog_open) {
+                    if startup_allows_blur && hides_on_blur(!cfg!(debug_assertions), dialog_open, pinned) {
                         dismiss_picker(window.app_handle());
                     }
                 }
@@ -169,6 +174,8 @@ fn main() {
                 Ok(Err(error)) => report(Err::<(), _>(error), NativeIssue::TrayCreation),
                 Err(_) => application_message("the menu bar item is not available on this system"),
             }
+            // After the tray, so the menu item shows the saved choice.
+            updater::start(app.handle(), loaded.settings.update_checks, loaded.problem.is_none());
             // The library from settings; IBIS_LIBRARY overrides it for development.
             let library = std::env::var_os("IBIS_LIBRARY")
                 .map(|path| Source::File(PathBuf::from(path)))
