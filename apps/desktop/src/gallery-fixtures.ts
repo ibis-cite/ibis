@@ -24,6 +24,9 @@ export type GalleryState = {
   /** Seeded once the picker has rendered: pin it, open More, choose this many results, open All keys. */
   pinned?: boolean;
   menuOpen?: boolean;
+  /** Open the header's format menu, then type this into its filter. */
+  formatMenuOpen?: boolean;
+  formatFilter?: string;
   tray?: number;
   keys?: boolean;
 };
@@ -130,6 +133,8 @@ export const galleryStates: readonly GalleryState[] = [
   // Browser-only review states (board M); the native evidence app captures the fifteen above.
   { id: "pinned", label: "Pinned", library: library(), query: "memory", results: examples, pinned: true },
   { id: "menu-open", label: "More menu open", library: library(), query: "memory", results: examples, menuOpen: true },
+  { id: "format-menu-open", label: "Format menu open", library: library(), query: "memory", results: examples, formatMenuOpen: true },
+  { id: "format-menu-filtered", label: "Format menu, filtered", library: library(), query: "memory", results: examples, formatMenuOpen: true, formatFilter: "cite" },
   { id: "tray", label: "Several references chosen", library: library(), query: "memory", results: examples, tray: 2 },
   { id: "keys", label: "All keys", library: library(), query: "memory", results: examples, keys: true },
   { id: "compact", label: "Compact rows", library: library(), query: "memory", results: many, density: "compact" },
@@ -157,6 +162,9 @@ export function galleryProvider(state: GalleryState): { api: PickerApi; preview:
       onLibraryChanged: async () => () => undefined,
       onPickerShown: async () => () => undefined,
       onPickerHidden: async () => () => undefined,
+      // Offers the bundled styles in the format menu, as the app does; nothing is formatted here.
+      cslItems: async () => "[]",
+      copyFormatted: async () => null,
     },
   };
 }

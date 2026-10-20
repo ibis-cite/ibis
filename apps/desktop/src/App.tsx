@@ -1,12 +1,13 @@
 import type React from "react";
 import * as nativeApi from "./api";
-import { copiedNoticeText, copyFormatNames, densityNames, keyText, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText, rowText } from "./messages";
+import { copiedNoticeText, copyFormatMenu, copyFormatNames, densityNames, keyText, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText, rowText } from "./messages";
 import { ariaKeys, KEY_TABLE, keyLabel, keysFor, type KeyBinding } from "./keys";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LibrarySetup, shortcutLabel } from "./LibrarySetup";
 import { usePointerSelection } from "./pointerSelection";
 import { formatCitation, FORMATTED_STYLES, provisional, type FormattedCitation } from "./format/formatted";
-import { STYLE_NAMES, type StyleId } from "./format/styles";
+import { STYLE_NAMES, STYLE_SAMPLES, type StyleId } from "./format/styles";
+import { ToolbarMenu, type ToolbarMenuSection } from "./ToolbarMenu";
 import { render } from "./format/markup";
 import { afterCopy, rowClickAction } from "./copyFeedback";
 import {
@@ -708,6 +709,13 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     : KEY_TABLE;
   // What Enter does now, from the same state the copy uses; null when it does nothing.
   // A formatted citation still being made, or one that failed, is not copied.
+  // The seven key formats (ADR 0016), then the bundled styles (ADR 0020) when they can be formatted.
+  const formatSections: ToolbarMenuSection<Choice>[] = [
+    { label: pickerText.keyFormats, items: COPY_FORMATS.map((f) => ({ value: f.value, ...copyFormatMenu[f.value] })) },
+    ...(cslItems && copyFormatted
+      ? [{ label: pickerText.formattedStyles, items: FORMATTED_STYLES.map((s) => ({ value: `style:${s.id}` as Choice, label: s.title, sample: STYLE_SAMPLES[s.id] })) }]
+      : []),
+  ];
   const enterAction = !searchFocused || chosen.length === 0 || (style && (shown === null || shown === "failed")) ? null
     : chosen.length > 1 ? keyText.copySeveralAs(chosen.length, choiceName(format)) : keyText.copyAs(choiceName(format));
   const highlighted = current[active];
@@ -789,31 +797,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             }
           }}
         />
-        {/* The closed control shows one word; the list and screen readers get the full name. */}
-        <span className="format-picker" title={pickerText.copyAs}>
-          <span aria-hidden="true" className="format-name">{choiceName(format)}</span>
-          <label className="visually-hidden" htmlFor="format">
-            {pickerText.copyAs}
-          </label>
-          <select id="format" value={format} onChange={(e) => chooseFormat(e.target.value as Choice)}>
-            <optgroup label={pickerText.keyFormats}>
-              {COPY_FORMATS.map((f) => (
-                <option key={f.value} value={f.value}>
-                  {f.label}
-                </option>
-              ))}
-            </optgroup>
-            {cslItems && copyFormatted && (
-              <optgroup label={pickerText.formattedStyles}>
-                {FORMATTED_STYLES.map((s) => (
-                  <option key={s.id} value={`style:${s.id}`}>
-                    {s.title}
-                  </option>
-                ))}
-              </optgroup>
-            )}
-          </select>
-        </span>
+        {/* The closed control shows one word; the menu shows each choice with a sample. */}
+        <ToolbarMenu name={pickerText.copyAs} value={format} valueText={choiceName(format)} sections={formatSections}
+          onChoose={chooseFormat} onDone={() => input.current?.focus()} />
         <button
           type="button"
           className="pin-button"

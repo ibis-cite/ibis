@@ -25,3 +25,12 @@ export const STYLE_NAMES: Record<StyleId, string> = {
   ieee: "IEEE",
   "modern-language-association": "MLA",
 };
+
+// What an in-text citation looks like in each style, for the format menu.
+export const STYLE_SAMPLES: Record<StyleId, string> = {
+  apa: "(García, 2021)",
+  "chicago-author-date": "(García 2021)",
+  "harvard-cite-them-right": "(García, 2021)",
+  ieee: "[1]",
+  "modern-language-association": "(García)",
+};

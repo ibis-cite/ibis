@@ -245,3 +245,22 @@ export const copiedNoticeText = {
   source: "Ibis",
   noticeFailed: "The Copied notice could not be shown.",
 };
+
+// The header's toolbar menus (#536).
+export const toolbarMenuText = {
+  typeToFilter: "Type to filter",
+  nothingMatches: (query: string) => `Nothing matches “${query}”`,
+  matches: (count: number) => `${count} ${count === 1 ? "match" : "matches"}`,
+};
+
+// The format menu's names and, on the right, what each gives (board M).
+// Code samples are set in the monospace face; the others name the system.
+export const copyFormatMenu: Record<KeyFormat, { label: string; sample: string; code: boolean }> = {
+  pandoc: { label: "Pandoc", sample: "[@key]", code: true },
+  autocite: { label: "\\autocite", sample: "BibLaTeX", code: false },
+  parencite: { label: "\\parencite", sample: "BibLaTeX", code: false },
+  textcite: { label: "\\textcite", sample: "BibLaTeX", code: false },
+  cite: { label: "\\cite", sample: "LaTeX", code: false },
+  typst: { label: "Typst", sample: "@key", code: true },
+  keys: { label: "Keys only", sample: "key", code: true },
+};

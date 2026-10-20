@@ -1,0 +1,136 @@
+/* Toolbar menus in the header (#536; board M, round six): a quiet button with
+   the value and a 12 px chevron, a fill on hover and a pressed fill while
+   open, and a popover menu with a leading check column and a sample on the
+   right. The menu follows each platform: macOS fills the highlighted item
+   with the accent and appears at once; Windows highlights in neutral grey and
+   slides 8 px; GNOME highlights in neutral grey and grows from 96 %. */
+:root {
+  --tbm-height: 1.75rem;
+  --tbm-radius: 999px;
+  --tbm-turn: 120ms;
+  --tbm-hover: color-mix(in srgb, var(--text) 5%, transparent);
+  --tbm-pressed: color-mix(in srgb, var(--text) 9%, transparent);
+  --tbm-line: color-mix(in srgb, var(--text) 10%, transparent);
+  --tbm-menu-min-width: 16.5rem;
+  --tbm-menu-gap: .375rem;
+  --tbm-menu-radius: 12px;
+  --tbm-menu-padding: 5px;
+  --tbm-menu-background: color-mix(in srgb, var(--surface) 94%, transparent);
+  --tbm-menu-blur: blur(20px) saturate(180%);
+  --tbm-menu-shadow: 0 0 0 var(--border-width) var(--tbm-line), 0 .75rem 2rem rgb(0 0 0 / 20%);
+  --tbm-item-height: 1.75rem;
+  --tbm-item-radius: 6px;
+  --tbm-check-width: 1.125rem;
+  --tbm-item-gap: .375rem;
+  --tbm-item-padding: 0 .625rem 0 .375rem;
+  /* Headings and messages line up with the item labels, after the check column. */
+  --tbm-text-start: calc(.375rem + var(--tbm-check-width) + var(--tbm-item-gap));
+  --tbm-highlight: var(--selected-background);
+  --tbm-highlight-text: var(--selected-text);
+  --tbm-highlight-muted: color-mix(in srgb, var(--selected-text) 85%, transparent);
+  --tbm-gnome-scale: 150ms;
+}
+:root[data-platform="windows"] {
+  --tbm-height: 2rem; --tbm-radius: 4px;
+  --tbm-menu-radius: 8px; --tbm-menu-padding: 4px; --tbm-menu-blur: none;
+  --tbm-menu-shadow: 0 0 0 var(--border-width) var(--tbm-line), 0 .5rem 1rem rgb(0 0 0 / 14%);
+  --tbm-item-height: 2rem; --tbm-item-radius: 4px;
+  --tbm-highlight: color-mix(in srgb, var(--text) 6%, transparent); --tbm-highlight-text: var(--text); --tbm-highlight-muted: var(--muted);
+}
+:root[data-platform="linux"] {
+  --tbm-height: 2rem; --tbm-radius: 6px;
+  --tbm-menu-padding: 6px; --tbm-menu-blur: none;
+  --tbm-menu-shadow: 0 0 0 var(--border-width) var(--tbm-line), 0 .375rem 1.25rem rgb(0 0 0 / 18%);
+  --tbm-item-height: 2rem;
+  --tbm-highlight: color-mix(in srgb, var(--text) 8%, transparent); --tbm-highlight-text: var(--text); --tbm-highlight-muted: var(--muted);
+}
+@supports (color: light-dark(white, black)) {
+  :root[data-platform="windows"] { --tbm-menu-background: light-dark(#f9f9f9, #2c2c2c); }
+  :root[data-platform="linux"] { --tbm-menu-background: light-dark(#ffffff, #38383c); }
+}
+
+.toolbar-menu { position: relative; flex: none; display: inline-flex; }
+.toolbar-menu-button {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  height: var(--tbm-height); padding: 0 var(--space-2) 0 .625rem;
+  border: var(--border-width) solid var(--clear); border-radius: var(--tbm-radius);
+  background: var(--clear); color: var(--muted);
+  font-size: var(--type-meta-size); font-weight: var(--type-strong-weight); white-space: nowrap; cursor: default;
+}
+.toolbar-menu-button svg { flex: none; width: .75rem; height: .75rem; transition: transform var(--tbm-turn) var(--motion-ease); }
+.toolbar-menu-button:hover { background: var(--tbm-hover); color: var(--text); }
+.toolbar-menu-button[aria-expanded="true"] { background: var(--tbm-pressed); color: var(--text); }
+.toolbar-menu-button[aria-expanded="true"] svg { transform: rotate(180deg); }
+/* Focus is in the open menu; the pressed fill already marks the button. */
+.toolbar-menu-button[aria-expanded="true"]:focus-visible { outline: none; }
+
+/* Overrides the More menu's general [role="menu"] rules, which open upwards. */
+.toolbar-menu-popover[role="menu"] {
+  position: absolute; top: calc(100% + var(--tbm-menu-gap)); bottom: auto; inset-inline-end: 0; z-index: 1;
+  display: block; width: max-content;
+  min-width: min(var(--tbm-menu-min-width), calc(100vw - 2 * var(--space-4)));
+  max-width: calc(100vw - 2 * var(--space-4));
+  overflow: auto; overscroll-behavior: contain; overflow-wrap: normal;
+  padding: var(--tbm-menu-padding); border: 0; border-radius: var(--tbm-menu-radius);
+  background: var(--tbm-menu-background); -webkit-backdrop-filter: var(--tbm-menu-blur); backdrop-filter: var(--tbm-menu-blur);
+  box-shadow: var(--tbm-menu-shadow); color: var(--text);
+  font-size: var(--type-meta-size); font-weight: normal; cursor: default;
+  transform-origin: top right;
+  animation: tbm-appear 90ms linear;
+}
+[dir="rtl"] .toolbar-menu-popover[role="menu"] { transform-origin: top left; }
+.toolbar-menu-popover[role="menu"]:focus-visible { outline: none; }
+.toolbar-menu-popover [role="group"] { border-block: 0; }
+:root[data-platform="windows"] .toolbar-menu-popover[role="menu"] { animation: tbm-slide var(--motion-panel) var(--motion-ease); }
+:root[data-platform="linux"] .toolbar-menu-popover[role="menu"] { animation: tbm-scale var(--tbm-gnome-scale) var(--motion-ease); }
+@keyframes tbm-appear { from { opacity: 0; } }
+@keyframes tbm-slide { from { opacity: 0; transform: translateY(-.5rem); } }
+@keyframes tbm-scale { from { opacity: 0; transform: scale(.96); } }
+
+.toolbar-menu-heading { padding-block: var(--space-2) var(--space-1); padding-inline: var(--tbm-text-start) var(--space-2); color: var(--muted); font-size: var(--type-label-size); font-weight: var(--type-strong-weight); }
+.toolbar-menu-separator { height: var(--border-width); margin: var(--space-1) var(--space-2); background: var(--tbm-line); }
+.toolbar-menu-item {
+  display: flex; align-items: center; gap: var(--tbm-item-gap);
+  min-height: var(--tbm-item-height); padding: var(--tbm-item-padding);
+  border-radius: var(--tbm-item-radius); white-space: nowrap;
+}
+.toolbar-menu-check { flex: none; width: var(--tbm-check-width); display: grid; place-items: center; }
+.toolbar-menu-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.toolbar-menu-sample { flex: none; margin-inline-start: var(--space-4); color: var(--muted); font-size: var(--type-label-size); }
+/* Code reads left to right in every interface direction. */
+.toolbar-menu-sample.code { font-family: var(--font-mono); direction: ltr; unicode-bidi: isolate; }
+.toolbar-menu-item[data-highlighted] { background: var(--tbm-highlight); color: var(--tbm-highlight-text); }
+.toolbar-menu-item[data-highlighted] .toolbar-menu-sample { color: var(--tbm-highlight-muted); }
+/* macOS confirms the pick with one blink of the item before the menu closes. */
+.toolbar-menu-item[data-blink] { animation: tbm-blink 150ms steps(1); }
+@keyframes tbm-blink { 0% { background: var(--clear); color: var(--text); } 50% { background: var(--tbm-highlight); color: var(--tbm-highlight-text); } }
+
+.toolbar-menu-filter {
+  display: flex; align-items: center; gap: var(--space-2);
+  min-height: 1.875rem; margin-bottom: var(--space-1); padding: 0 var(--space-2);
+  border-radius: var(--tbm-item-radius); background: var(--tbm-hover); color: var(--muted);
+}
+.toolbar-menu-filter svg { flex: none; }
+.toolbar-menu-query { color: var(--text); font-weight: 500; }
+.toolbar-menu-query::after { content: ""; display: inline-block; width: var(--border-width); height: 1em; margin-inline-start: var(--border-width); vertical-align: text-bottom; background: var(--accent); }
+.toolbar-menu-empty { padding-block: .625rem var(--space-3); padding-inline: var(--tbm-text-start) var(--space-3); color: var(--muted); white-space: normal; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --tbm-turn: 1ms; --tbm-gnome-scale: 1ms; }
+  /* Only a fade, on every platform. */
+  :root[data-platform] .toolbar-menu-popover[role="menu"] { animation: tbm-appear 90ms linear; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .toolbar-menu-popover[role="menu"] { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  .toolbar-menu-popover[role="menu"] { background: var(--surface); border: var(--border-width) solid var(--line); }
+}
+@media (forced-colors: active) {
+  .toolbar-menu-button { border-color: ButtonText; }
+  .toolbar-menu-popover[role="menu"] { border: var(--border-width) solid CanvasText; }
+  /* The highlighted item keeps its system pair instead of the backplate. */
+  .toolbar-menu-item[data-highlighted] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .toolbar-menu-item[data-highlighted] .toolbar-menu-sample { color: HighlightText; }
+}
+:root[data-gallery-theme="contrast"] .toolbar-menu-popover[role="menu"] { background: var(--surface); border: var(--border-width) solid var(--line); }

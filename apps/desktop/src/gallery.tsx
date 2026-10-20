@@ -59,6 +59,8 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
   if (state.pinned) steps.push(() => pinButton(root)?.click());
   if (state.keys) steps.push(() => press(root.querySelector("main"), "?"));
   if (state.menuOpen) steps.push(() => root.querySelector<HTMLButtonElement>('footer button[aria-haspopup="menu"]')?.click());
+  if (state.formatMenuOpen) steps.push(() => root.querySelector<HTMLButtonElement>('header button[aria-haspopup="menu"]')?.click());
+  for (const key of state.formatFilter ?? "") steps.push(() => press(root.querySelector('header [role="menu"]'), key));
   return steps;
 }
 
@@ -68,7 +70,9 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
   return html.dataset.density === (state.density ?? "comfortable")
     && html.dataset.textSize === (state.largerTextSetting ? "larger" : "normal")
     && (pinButton(root)?.getAttribute("aria-pressed") === "true") === Boolean(state.pinned)
-    && (root.querySelector('[role="menu"]') !== null) === Boolean(state.menuOpen)
+    && (root.querySelector('footer [role="menu"]') !== null) === Boolean(state.menuOpen)
+    && (root.querySelector('header [role="menu"]') !== null) === Boolean(state.formatMenuOpen)
+    && (root.querySelector('header [role="menu"] .toolbar-menu-query')?.textContent ?? "") === (state.formatFilter ?? "")
     && (root.querySelector('[role="dialog"]') !== null) === Boolean(state.keys)
     && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li`).length === (state.tray ?? 0);
 }
