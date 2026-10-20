@@ -18,13 +18,15 @@ export const {
   copyFormat,
 } = commands;
 
+// The limit default, page and request number are not part of the UI's API:
+// each search is numbered so the app can stop searches for outdated queries,
+// and the page is named because a reloaded page counts from the start again.
+const searchPage = crypto.getRandomValues(new Uint32Array(1))[0] ?? 0;
 let searchRequest = 0;
 
-// The limit default and the request number are not part of the UI's API: each
-// search is numbered so the app can stop searches for outdated queries.
 export function search(query: string, limit = 20) {
   searchRequest += 1;
-  return commands.search(query, limit, searchRequest);
+  return commands.search(query, limit, searchPage, searchRequest);
 }
 
 /** Called whenever the picker is shown by the global shortcut or a second launch. */
