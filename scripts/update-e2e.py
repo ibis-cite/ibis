@@ -252,19 +252,20 @@ class Linux:
         return {"appimage_matches_new_package": self.updated()}
 
     def look(self, pids, press=None):
-        seen = []
+        seen, visited = [], 0
         for app in self.atspi.Registry.getDesktop(0):
             if not app:
                 continue
             stack = [app]
-            while stack and len(seen) < 200:
+            while stack and visited < 20000:
                 item = stack.pop()
+                visited += 1
                 try:
                     role = item.getRoleName()
                     if press and role == "push button" and item.name == press:
                         item.queryAction().doAction(0)
                         return True, []
-                    if role in ("frame", "dialog", "alert", "push button", "label") and item.name:
+                    if role in ("frame", "dialog", "alert", "push button", "label") and item.name and len(seen) < 200:
                         seen.append(f"{app.name}[{app.get_process_id()}] {role}: {item.name[:200]}")
                     stack.extend(child for child in item if child)
                 except Exception:  # Accessibility objects vanish while windows change.
@@ -523,12 +524,13 @@ class Tests(unittest.TestCase):
     def test_environment_drops_an_outer_appimage(self):
         env = environment({"APPIMAGE": "/outer", "PATH": "/bin"}, Path("/c"), Path("/l.bib"))
         self.assertNotIn("APPIMAGE", env)
-        self.assertEqual((env["XDG_CONFIG_HOME"], env["PATH"]), ("/c", "/bin"))
+        self.assertEqual((env["XDG_CONFIG_HOME"], env["PATH"]), (str(Path("/c")), "/bin"))
 
     def test_environment_without_a_config_folder_sets_only_the_library(self):
         env = environment({"PATH": "/bin", "IBIS_GALLERY": "1"}, None, Path("/l.bib"))
-        self.assertEqual(env, {"PATH": "/bin", "IBIS_LIBRARY": "/l.bib"})
+        self.assertEqual(env, {"PATH": "/bin", "IBIS_LIBRARY": str(Path("/l.bib"))})
 
+    @unittest.skipIf(os.name == "nt", "AppImages and /proc exist only on Linux")
     def test_instances_match_the_exact_appimage_path(self):
         with tempfile.TemporaryDirectory() as temporary:
             proc = Path(temporary)
