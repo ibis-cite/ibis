@@ -1,0 +1,28 @@
+# 0021. Build the desktop interface on React Aria Components and layered CSS tokens
+
+Status: proposed (2026-10-20)
+
+## Context
+
+The picker's interface (`apps/desktop/src`) is React and TypeScript in a Tauri 2 webview: WKWebView on macOS, WebView2 on Windows and WebKitGTK on Linux. `App.tsx` holds about 1,000 lines: the header, result list, More menu, keys dialog and notices. Menus, keyboard-only focus rings and the format choice are written by hand, and the format choice is a native `<select>`, whose popup is native only on macOS. Coming work needs many more of the same parts: the toolbar menus for format and library scope (#536, #537), tooltips, the preview pane with page navigation, a companion window, settings, and tray and menu actions ([design](../design.md), #223).
+
+Accessible menus, filterable lists, tooltips and dialogs are where hand-written interfaces most often go wrong: keyboard paths, focus return, `aria-activedescendant`, screen-reader announcements, input-method composition and right-to-left layout. The paused draft for #536 reached this point. Five maintained headless React libraries were compared: React Aria Components, Radix Primitives, Base UI, Ark UI and Headless UI. The comparison, the sources and a bundle measurement are in #541.
+
+For tokens, the W3C Design Tokens Community Group format reached a stable version (2025.10), with a resolver module for themes. Its colour type allows only numeric colour components. Ibis's colour roles are mostly CSS system colours (`Canvas`, `Highlight`, `AccentColor`), `light-dark()` and `color-mix()`, so that they follow the system accent, dark mode and high contrast. The DTCG colour type cannot express these.
+
+## Decision
+
+1. **One headless component library.** The desktop interface uses React Aria Components (npm `react-aria-components`, Apache-2.0, maintained by Adobe in `adobe/react-spectrum`) for interactive parts: buttons, menus and toolbar menus, filterable lists, popovers, tooltips, dialogs, tabs, switches and text fields. The version is pinned exactly. Other headless or styled component libraries are not added alongside it. Ibis keeps its own appearance: no React Spectrum styles, no CSS framework.
+2. **Shared components live in `src/ui/`.** They know nothing about references or libraries. Screens and their state live in `src/features/<feature>/`. Each `ui/` component has its own CSS file and a vitest test (roles, names, keyboard path, Escape and focus return, axe-core) for each platform look, and a state in the gallery.
+3. **Tokens stay hand-written CSS in three layers.** The base layer holds sizes, type, motion and raw brand colours. The role layer holds surface, text, accent, selection, status and citation. The look layer holds overrides under `:root[data-platform="macos|windows|linux"]`, then increased contrast and forced colours. Components read role tokens only. A test checks that every custom property used is defined and that sizes sit on the 4 px grid. A DTCG file and a generator are added only when a second consumer needs the same values, such as native Rust windows or a design tool. Even then, they cover only the non-colour tokens unless DTCG gains system colours.
+4. **Platform behaviour stays in Ibis's own tables.** Shortcut labels come from `keys.ts`. The pointer-selection rule (`pointerSelection.ts`) and the native Copied notice window (`notice.ts`) stay. React Aria's input-modality tracking replaces hand-written modality code.
+5. **Migration is incremental.** First `App.tsx` is split without any visible change. The token layers are named next, and then the dependency is added together with its first component. After that, one component moves per pull request, each under about 300 changed lines. The pull request that adds the dependency records the production bundle change; the expected change is about 70 KB gzip.
+
+## Consequences
+
+- One tested implementation of menus, focus and filtering serves every window. Right-to-left layout and built-in strings in more than 30 locales come from the library.
+- Ibis depends on Adobe continuing to maintain React Aria. A replacement would touch only `src/ui/`, because screens use Ibis's own components, not the library directly. Base UI is the closest alternative.
+- React Aria's Toast is still marked unstable. In-window notices use `role="status"` until it is stable.
+- Popovers cannot extend beyond the webview window, so menus must fit inside the picker. Native popup windows, as Raycast uses, are a separate decision if ever needed.
+- The result list keeps its current combobox semantics (#485) until moving it is shown to be worth the risk.
+- No network use, data format, settings field or security boundary changes.
