@@ -566,13 +566,16 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const nothingMatched = Boolean(query) && resultsQuery === query && results.length === 0 && !error;
   const wantGroups = Boolean(zoteroGroups && library?.zotero && (menuOpen || severalLibraries || nothingMatched));
   useEffect(() => {
+    // Group names can refresh in the background, but a failure belongs only
+    // to this menu opening. Closing it also invalidates its pending request.
+    report("zoteroGroups", false);
     if (!wantGroups || !zoteroGroups) return;
     let current = true;
     zoteroGroups()
       .then((list) => { if (current) { setGroups(list); report("zoteroGroups", false); } })
-      .catch(() => { if (current) report("zoteroGroups"); });
+      .catch(() => { if (current && menuOpen) report("zoteroGroups"); });
     return () => { current = false; };
-  }, [wantGroups, libraryVersion]);
+  }, [wantGroups, menuOpen, libraryVersion]);
   const isChosen = (choice: ZoteroLibrary) => chosenLibraries.some((chosen) => sameLibrary(chosen, choice));
   const toggleLibrary = (choice: ZoteroLibrary) => {
     if (!useZoteroLibraries) return;
