@@ -183,7 +183,13 @@ fn scan_once(transport: &mut impl Transport, library: Library) -> Result<Option<
                 ranges.push((start + limit / 2, limit - limit / 2));
                 ranges.push((start, limit / 2));
             } else {
-                skipped.push(unexported(transport, library, start));
+                // A failed export carries no library version, so the skipped
+                // item is tied to one through the key lookup's answer.
+                let (warning, keys) = unexported(transport, library, start)?;
+                if !consistent(&keys, &mut first, &mut total)? {
+                    return Ok(None);
+                }
+                skipped.push(warning);
                 if skipped.len() > MAX_SKIPPED {
                     return Err(ZoteroError::Status(500));
                 }
@@ -191,20 +197,10 @@ fn scan_once(transport: &mut impl Transport, library: Library) -> Result<Option<
             continue;
         }
         let response = checked(response, library)?;
-        let seen = snapshot(&response)?;
-        match &first {
-            None => first = Some(seen),
-            Some(first) if *first != seen => return Ok(None),
-            Some(_) => {}
-        }
-        let count: usize = response
-            .header("Total-Results")
-            .and_then(|t| t.parse().ok())
-            .ok_or(ZoteroError::Incomplete)?;
-        if total.is_some_and(|total| total != count) {
+        if !consistent(&response, &mut first, &mut total)? {
             return Ok(None);
         }
-        total = Some(count);
+        let count = total.ok_or(ZoteroError::Incomplete)?;
         let Value::Array(page_items) = serde_json::from_slice(&response.body).map_err(|_| ZoteroError::Incomplete)?
         else {
             return Err(ZoteroError::Incomplete);
@@ -218,6 +214,11 @@ fn scan_once(transport: &mut impl Transport, library: Library) -> Result<Option<
             continue;
         }
         if items.len() + skipped.len() >= count {
+            if items.is_empty() && !skipped.is_empty() {
+                // Zotero exported nothing at all: that is a broken Zotero,
+                // not an empty library.
+                return Err(ZoteroError::Status(500));
+            }
             let snapshot = first.ok_or(ZoteroError::Incomplete)?;
             let mut result = load_items(library, &items);
             result.warnings.extend(skipped);
@@ -232,29 +233,54 @@ fn scan_once(transport: &mut impl Transport, library: Library) -> Result<Option<
     Err(ZoteroError::TooLarge)
 }
 
-/// A reading notice for the item at `position` that Zotero could not export.
-/// Its key is asked for separately, since listing keys exports nothing.
-fn unexported(transport: &mut impl Transport, library: Library, position: usize) -> LoadWarning {
-    let key = transport
-        .get(&format!(
-            "{}?format=keys&limit=1&start={position}",
-            top_items_path(library)
-        ))
+/// Whether `response` belongs to the same library version and size as the
+/// scan so far; the first answer sets both.
+fn consistent(
+    response: &Response,
+    first: &mut Option<Snapshot>,
+    total: &mut Option<usize>,
+) -> Result<bool, ZoteroError> {
+    let seen = snapshot(response)?;
+    let count: usize = response
+        .header("Total-Results")
+        .and_then(|t| t.parse().ok())
+        .ok_or(ZoteroError::Incomplete)?;
+    if first.as_ref().is_some_and(|first| *first != seen) || total.is_some_and(|total| total != count) {
+        return Ok(false);
+    }
+    *first = Some(seen);
+    *total = Some(count);
+    Ok(true)
+}
+
+/// A reading notice for the item at `position` that Zotero could not export,
+/// and the key lookup's answer. Listing keys exports nothing, so it answers
+/// even when the export fails, with the library version and size.
+fn unexported(
+    transport: &mut impl Transport,
+    library: Library,
+    position: usize,
+) -> Result<(LoadWarning, Response), ZoteroError> {
+    let response = request(
+        transport,
+        library,
+        &format!("{}?format=keys&limit=1&start={position}", top_items_path(library)),
+    )?;
+    let key = std::str::from_utf8(&response.body)
         .ok()
-        .filter(|response| response.status == 200)
-        .and_then(|response| String::from_utf8(response.body).ok())
         .map(|keys| keys.trim().to_string())
         .filter(|key| !key.is_empty() && key.len() <= 32 && key.bytes().all(|b| b.is_ascii_alphanumeric()));
     let message = match &key {
         Some(key) => format!("Zotero could not export the item `{key}`; it was skipped"),
         None => "Zotero could not export one item; it was skipped".to_string(),
     };
-    LoadWarning {
+    let warning = LoadWarning {
         kind: WarningKind::Syntax,
         line: None,
         key,
         message,
-    }
+    };
+    Ok((warning, response))
 }
 
 fn request(transport: &mut impl Transport, library: Library, path: &str) -> Result<Response, ZoteroError> {
@@ -349,6 +375,22 @@ mod tests {
         keys: Vec<String>,
         bad: Vec<usize>,
         asked: Vec<String>,
+        version: u64,
+        /// Right after a key lookup, the library gains an item and the
+        /// failing export is fixed.
+        change_on_lookup: bool,
+    }
+
+    impl Exporting {
+        fn new(keys: Vec<String>, bad: Vec<usize>) -> Self {
+            Self {
+                keys,
+                bad,
+                asked: Vec::new(),
+                version: 9,
+                change_on_lookup: false,
+            }
+        }
     }
 
     impl Transport for Exporting {
@@ -364,8 +406,13 @@ mod tests {
             let end = (start + limit).min(self.keys.len());
             let range = start.min(end)..end;
             if path.contains("format=keys") {
-                let mut answer = page(9, self.keys.len(), &[]);
+                let mut answer = page(self.version, self.keys.len(), &[]);
                 answer.body = self.keys[range].join("\n").into_bytes();
+                if std::mem::take(&mut self.change_on_lookup) {
+                    self.version += 1;
+                    self.bad.clear();
+                    self.keys.push("NEW".into());
+                }
                 return Ok(answer);
             }
             if self.bad.iter().any(|bad| range.contains(bad)) {
@@ -375,17 +422,13 @@ mod tests {
                 });
             }
             let keys: Vec<&str> = self.keys[range].iter().map(String::as_str).collect();
-            Ok(page(9, self.keys.len(), &keys))
+            Ok(page(self.version, self.keys.len(), &keys))
         }
     }
 
     #[test]
     fn an_item_zotero_cannot_export_is_skipped_and_named_not_fatal() {
-        let mut zotero = Exporting {
-            keys: many("K", PAGE_SIZE + 30),
-            bad: vec![7, PAGE_SIZE + 3],
-            asked: Vec::new(),
-        };
+        let mut zotero = Exporting::new(many("K", PAGE_SIZE + 30), vec![7, PAGE_SIZE + 3]);
         let (result, _) = scan(&mut zotero, Library::User).unwrap_or_else(|e| panic!("{e}"));
         let expected: Vec<String> = zotero
             .keys
@@ -408,21 +451,34 @@ mod tests {
 
     #[test]
     fn a_zotero_that_cannot_export_anything_is_an_error_not_an_empty_library() {
-        let mut zotero = Exporting {
-            keys: many("K", 3 * MAX_SKIPPED),
-            bad: (0..3 * MAX_SKIPPED).collect(),
-            asked: Vec::new(),
-        };
+        let mut zotero = Exporting::new(many("K", 3 * MAX_SKIPPED), (0..3 * MAX_SKIPPED).collect());
+        assert_eq!(scan(&mut zotero, Library::User).err(), Some(ZoteroError::Status(500)));
+    }
+
+    #[test]
+    fn a_change_after_skipping_a_bad_first_item_restarts_the_scan() {
+        // The first item fails before any page has given a version, so its
+        // key lookup sets version 9. The library then changes: the next page
+        // at version 10 restarts the scan rather than dropping an item that
+        // version 10 exports fine.
+        let mut zotero = Exporting::new(many("K", 80), vec![0]);
+        zotero.change_on_lookup = true;
+        let (result, snapshot) = scan(&mut zotero, Library::User).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(result.references.len(), 81);
+        assert_eq!(keys(&result).first(), Some(&"K0"));
+        assert!(result.warnings.is_empty());
+        assert_eq!(snapshot.version, 10);
+    }
+
+    #[test]
+    fn a_library_whose_every_item_fails_is_an_error_not_empty() {
+        let mut zotero = Exporting::new(many("K", 3), vec![0, 1, 2]);
         assert_eq!(scan(&mut zotero, Library::User).err(), Some(ZoteroError::Status(500)));
     }
 
     #[test]
     fn a_skipped_item_whose_key_cannot_be_read_is_still_reported() {
-        let mut zotero = Exporting {
-            keys: vec!["A".into(), "B<script>".into(), "C".into()],
-            bad: vec![1],
-            asked: Vec::new(),
-        };
+        let mut zotero = Exporting::new(vec!["A".into(), "B<script>".into(), "C".into()], vec![1]);
         let (result, _) = scan(&mut zotero, Library::User).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(keys(&result), ["A", "C"]);
         assert_eq!(result.warnings.len(), 1);
