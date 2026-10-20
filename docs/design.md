@@ -73,7 +73,7 @@ platform, so a source or a reference type always looks the same.
 | Copied | Pill near the top of the screen | Notification bottom-right | Toast at the bottom |
 
 High contrast and reduced transparency replace every material with the opaque
-system surface, as [native appearance](native-appearance.md) already does.
+system surface, as [native appearance groundwork](https://github.com/ibiscite/ibis/pull/232#issuecomment-6282577029) already does.
 
 ## What shows, and when
 
@@ -203,14 +203,15 @@ visible (2 px, accent). Right-to-left titles align right within their row.
 Each step is one pull request against #223 (or an issue split from it), reviewed
 with the states gallery on every platform. Steps 1–3 need no new data or
 settings. Settings format 2 is recorded in [ADR 0018](adr/0018-settings-format-2.md);
-[ADR 0020](adr/0020-picker-preferences.md) already adds remembered density and
-Larger text. Remaining choices kept across restarts (window position per display,
-display choice, how long a search is kept, which tips were seen) need an ADR
-before new `settings.json` fields are added.
+[ADR 0019](adr/0019-update-checks.md) and
+[ADR 0020](adr/0020-picker-preferences.md) add optional update and picker fields.
+Density and Larger text are already remembered. Remaining choices kept across
+restarts (window position per display, display choice, how long a search is kept,
+which tips were seen) need an ADR before new `settings.json` fields are added.
 
-1. Design values in `tokens.css`: type scale, densities, radii, motion and
-   colour roles, without changing layout. Enforce the 280 ms motion cap and
-   reduced-motion behavior for every transition.
+1. **Done (#307).** Design values in `tokens.css`: type scale, densities, radii,
+   motion and colour roles, without changing layout. Remaining motion work:
+   enforce the 280 ms cap and reduced-motion behavior for every transition.
 2. Picker layout: header (search, format, pin), rows, footer with library status
    and More, empty and no-result text.
 3. Window behaviour that needs no settings: outside-click hiding, keeping the
@@ -221,10 +222,10 @@ before new `settings.json` fields are added.
    Separately verify the macOS panel opens over full-screen apps in the current
    Space; the panel already has this configuration, which is not evidence that
    every native scenario passes.
-4. An ADR for display choice and remembered per-display position, then change
-   the opening default from the pointer's display to the focused window's
-   display, with the pointer and last-position alternatives. Density and Larger
-   text already use the settings in ADR 0020.
+4. Density and Larger text are settings under ADR 0020 (#407, #408). Remaining
+   work: an ADR for display choice and remembered per-display position, then
+   change the opening default from the pointer's display to the focused window's
+   display, with the pointer and last-position alternatives.
 5. Footer tips, and `#tag`, `y:` and `a:` filters (tags need source support).
 6. Recently cited and Recently added (needs a local history that stays on the
    device and, as PRIVACY.md promises, can be turned off and cleared).
