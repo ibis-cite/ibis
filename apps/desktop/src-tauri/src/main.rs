@@ -198,7 +198,7 @@ fn main() {
             if let Ok(mut current) = app.state::<Mutex<ShortcutStatus>>().lock() {
                 *current = status;
             }
-            let login_items = login_item::LoginItems::new(login_item::for_app(app.handle()));
+            let login_items = login_item::for_app(app.handle());
             login_items.refresh();
             app.manage(login_items);
             let shown_shortcut = app

@@ -13,8 +13,9 @@
 //! Ibis and Ibis Nightly have different names and identifiers, so each has
 //! its own entry; debug builds use another one again.
 
-#[cfg(any(target_os = "linux", test))]
-use std::path::{Path, PathBuf};
+#[cfg(target_os = "linux")]
+mod linux;
+
 use std::sync::Mutex;
 
 use serde::Serialize;
@@ -40,8 +41,17 @@ pub(crate) enum LoginItemProblem {
 }
 
 /// Whether Ibis starts when the person logs in, as the system reports it.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, specta::Type)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, specta::Type)]
 pub(crate) struct LoginItem {
+    /// The app's name, such as "Ibis" or "Ibis Nightly", for the interface.
+    pub(crate) name: String,
+    pub(crate) enabled: bool,
+    pub(crate) problem: Option<LoginItemProblem>,
+}
+
+/// What the system reported, before it is named for the interface.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct Reading {
     pub(crate) enabled: bool,
     pub(crate) problem: Option<LoginItemProblem>,
 }
@@ -56,17 +66,29 @@ pub(crate) trait Entry: Send + Sync {
     fn is_enabled(&self) -> Result<bool, Failed>;
     fn enable(&self) -> Result<(), Failed>;
     fn disable(&self) -> Result<(), Failed>;
+    /// Registered, but the system waits for the person to allow it (macOS).
+    fn awaiting_approval(&self) -> bool {
+        false
+    }
+    /// Point an entry that is on at this copy of Ibis, where that is safe.
+    fn refresh(&self) -> Result<(), Failed> {
+        Ok(())
+    }
 }
 
 /// The state now, as the system reports it.
-pub(crate) fn read(entry: Option<&dyn Entry>) -> LoginItem {
-    match entry.map(Entry::is_enabled) {
-        None => LoginItem {
+pub(crate) fn read(entry: Option<&dyn Entry>) -> Reading {
+    match entry.map(|entry| (entry.is_enabled(), entry)) {
+        None => Reading {
             enabled: false,
             problem: Some(LoginItemProblem::Unsupported),
         },
-        Some(Ok(enabled)) => LoginItem { enabled, problem: None },
-        Some(Err(Failed)) => LoginItem {
+        Some((Ok(false), entry)) if entry.awaiting_approval() => Reading {
+            enabled: false,
+            problem: Some(LoginItemProblem::NeedsApproval),
+        },
+        Some((Ok(enabled), _)) => Reading { enabled, problem: None },
+        Some((Err(Failed), _)) => Reading {
             enabled: false,
             problem: Some(LoginItemProblem::Unreadable),
         },
@@ -76,22 +98,22 @@ pub(crate) fn read(entry: Option<&dyn Entry>) -> LoginItem {
 /// Ask for `on`, then report what the system actually did. `approval` is
 /// true where the system can accept a registration but wait for the person
 /// to allow it (macOS).
-pub(crate) fn change(entry: Option<&dyn Entry>, on: bool, approval: bool) -> LoginItem {
+pub(crate) fn change(entry: Option<&dyn Entry>, on: bool, approval: bool) -> Reading {
     let Some(entry) = entry else {
         return read(None);
     };
     let asked = if on { entry.enable() } else { entry.disable() };
     match (asked, entry.is_enabled()) {
-        (_, Ok(enabled)) if enabled == on => LoginItem { enabled, problem: None },
-        (Ok(()), Ok(enabled)) if on && approval => LoginItem {
+        (_, Ok(enabled)) if enabled == on => Reading { enabled, problem: None },
+        (Ok(()), Ok(enabled)) if on && approval => Reading {
             enabled,
             problem: Some(LoginItemProblem::NeedsApproval),
         },
-        (_, Ok(enabled)) => LoginItem {
+        (_, Ok(enabled)) => Reading {
             enabled,
             problem: Some(LoginItemProblem::Refused),
         },
-        (_, Err(Failed)) => LoginItem {
+        (_, Err(Failed)) => Reading {
             enabled: false,
             problem: Some(LoginItemProblem::Unreadable),
         },
@@ -100,14 +122,16 @@ pub(crate) fn change(entry: Option<&dyn Entry>, on: bool, approval: bool) -> Log
 
 /// The app's login entry, or `None` where the system has none to offer.
 pub(crate) struct LoginItems {
+    name: String,
     entry: Option<Box<dyn Entry>>,
     /// One change at a time, from the picker or the menu.
     changing: Mutex<()>,
 }
 
 impl LoginItems {
-    pub(crate) fn new(entry: Option<Box<dyn Entry>>) -> Self {
+    pub(crate) fn new(name: &str, entry: Option<Box<dyn Entry>>) -> Self {
         LoginItems {
+            name: name.to_string(),
             entry,
             changing: Mutex::new(()),
         }
@@ -117,27 +141,36 @@ impl LoginItems {
         self.entry.is_some()
     }
 
-    pub(crate) fn read(&self) -> LoginItem {
+    fn named(&self, reading: Reading) -> LoginItem {
+        LoginItem {
+            name: self.name.clone(),
+            enabled: reading.enabled,
+            problem: reading.problem,
+        }
+    }
+
+    pub(crate) fn reading(&self) -> Reading {
         read(self.entry.as_deref())
+    }
+
+    pub(crate) fn read(&self) -> LoginItem {
+        self.named(self.reading())
     }
 
     pub(crate) fn change(&self, on: bool) -> LoginItem {
         let _changing = self.changing.lock();
-        change(self.entry.as_deref(), on, cfg!(target_os = "macos"))
+        self.named(change(self.entry.as_deref(), on, cfg!(target_os = "macos")))
     }
 
     /// An entry left by an earlier copy of Ibis (a moved AppImage, say) is
-    /// pointed at this one. Only when it is on: a switched-off entry stays off.
+    /// pointed at this one where the platform can tell that is safe. Only
+    /// when it is on: a switched-off entry stays off.
     pub(crate) fn refresh(&self) {
-        if cfg!(target_os = "macos") {
-            // SMAppService follows the app bundle by itself.
-            return;
-        }
+        let _changing = self.changing.lock();
         if let Some(entry) = &self.entry
             && entry.is_enabled() == Ok(true)
         {
-            let _changing = self.changing.lock();
-            let _ = entry.enable();
+            let _ = entry.refresh();
         }
     }
 }
@@ -153,9 +186,9 @@ fn entry_name(product: &str) -> String {
 }
 
 /// The login entry for this app.
-pub(crate) fn for_app(app: &AppHandle) -> Option<Box<dyn Entry>> {
-    let name = entry_name(&app.package_info().name);
-    platform_entry(app, &name)
+pub(crate) fn for_app(app: &AppHandle) -> LoginItems {
+    let product = &app.package_info().name;
+    LoginItems::new(product, platform_entry(app, &entry_name(product)))
 }
 
 #[cfg(target_os = "linux")]
@@ -169,14 +202,16 @@ fn platform_entry(app: &AppHandle, name: &str) -> Option<Box<dyn Entry>> {
         format!("{identifier}.desktop")
     };
     // An AppImage runs from a temporary mount; the entry must name the file.
-    let program = app
-        .env()
-        .appimage
-        .map(PathBuf::from)
-        .or_else(|| std::env::current_exe().ok())?;
-    Some(Box::new(DesktopFile {
+    let env = app.env();
+    let program = linux::launch_program(
+        std::env::current_exe().ok(),
+        env.appimage.map(std::path::PathBuf::from),
+        env.appdir.map(std::path::PathBuf::from),
+    )?;
+    Some(Box::new(linux::DesktopFile {
         path: config.join("autostart").join(file),
-        contents: desktop_entry(name, &program),
+        name: name.to_string(),
+        program,
     }))
 }
 
@@ -195,7 +230,9 @@ fn platform_entry(_app: &AppHandle, name: &str) -> Option<Box<dyn Entry>> {
         builder
             .set_app_path(&format!("\"{}\"", program.to_str()?))
             .set_args(&[AT_LOGIN_ARG])
-            // Never all users' HKLM key, even when Ibis runs as administrator.
+            // Writes only the current user's key, even when Ibis runs as
+            // administrator. Reading and removing also look at the all-users
+            // key, as auto-launch does.
             .set_windows_enable_mode(auto_launch::WindowsEnableMode::CurrentUser);
     }
     builder
@@ -227,114 +264,11 @@ impl Entry for SystemEntry {
             result => result.map_err(|_| Failed),
         }
     }
-}
-
-#[cfg(any(target_os = "linux", test))]
-/// An XDG autostart entry: on while the file exists and is not hidden.
-pub(crate) struct DesktopFile {
-    pub(crate) path: PathBuf,
-    /// `None` when the program path cannot be written in a desktop entry.
-    pub(crate) contents: Option<String>,
-}
-
-#[cfg(any(target_os = "linux", test))]
-impl Entry for DesktopFile {
-    fn is_enabled(&self) -> Result<bool, Failed> {
-        match std::fs::read_to_string(&self.path) {
-            Ok(text) => Ok(!switched_off(&text)),
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(false),
-            Err(_) => Err(Failed),
-        }
+    #[cfg(target_os = "macos")]
+    fn awaiting_approval(&self) -> bool {
+        use smappservice_rs::{AppService, ServiceStatus, ServiceType};
+        AppService::new(ServiceType::MainApp).status() == ServiceStatus::RequiresApproval
     }
-
-    fn enable(&self) -> Result<(), Failed> {
-        let contents = self.contents.as_deref().ok_or(Failed)?;
-        let folder = self.path.parent().ok_or(Failed)?;
-        std::fs::create_dir_all(folder).map_err(|_| Failed)?;
-        // Written beside it and renamed, so a session starting meanwhile
-        // never reads half a file.
-        let partial = self.path.with_extension("desktop.partial");
-        std::fs::write(&partial, contents).map_err(|_| Failed)?;
-        std::fs::rename(&partial, &self.path).map_err(|_| {
-            let _ = std::fs::remove_file(&partial);
-            Failed
-        })
-    }
-
-    fn disable(&self) -> Result<(), Failed> {
-        match std::fs::remove_file(&self.path) {
-            Ok(()) => Ok(()),
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
-            Err(_) => Err(Failed),
-        }
-    }
-}
-
-#[cfg(any(target_os = "linux", test))]
-/// Desktops switch an entry off by hiding it rather than deleting it.
-fn switched_off(text: &str) -> bool {
-    let mut in_entry = false;
-    text.lines().map(str::trim).any(|line| {
-        if line.starts_with('[') {
-            in_entry = line == "[Desktop Entry]";
-            return false;
-        }
-        let Some((key, value)) = line.split_once('=') else {
-            return false;
-        };
-        let (key, value) = (key.trim(), value.trim());
-        in_entry && ((key == "Hidden" && value == "true") || (key == "X-GNOME-Autostart-enabled" && value == "false"))
-    })
-}
-
-#[cfg(any(target_os = "linux", test))]
-/// The autostart entry that starts `program` hidden, or `None` when its path
-/// cannot be represented (not Unicode, or with control characters).
-pub(crate) fn desktop_entry(name: &str, program: &Path) -> Option<String> {
-    let program = program.to_str()?;
-    if !program.starts_with('/') || program.chars().chain(name.chars()).any(char::is_control) {
-        return None;
-    }
-    Some(format!(
-        "[Desktop Entry]\n\
-         Type=Application\n\
-         Name={name}\n\
-         Comment=Keeps the Ibis shortcut ready after you log in\n\
-         TryExec={try_exec}\n\
-         Exec={exec} {AT_LOGIN_ARG}\n\
-         Terminal=false\n\
-         StartupNotify=false\n\
-         X-GNOME-Autostart-enabled=true\n",
-        name = escape_string(name),
-        // When the program is removed, the session skips the entry.
-        try_exec = escape_string(program),
-        exec = escape_string(&quote_argument(program)),
-    ))
-}
-
-#[cfg(any(target_os = "linux", test))]
-/// An `Exec` argument, quoted as the Desktop Entry specification says.
-fn quote_argument(argument: &str) -> String {
-    let mut quoted = String::from("\"");
-    for c in argument.chars() {
-        match c {
-            '"' | '`' | '$' | '\\' => {
-                quoted.push('\\');
-                quoted.push(c);
-            }
-            // A literal percent sign; `%f` and the like are field codes.
-            '%' => quoted.push_str("%%"),
-            c => quoted.push(c),
-        }
-    }
-    quoted.push('"');
-    quoted
-}
-
-#[cfg(any(target_os = "linux", test))]
-/// A desktop entry string value: backslashes are escaped once more.
-fn escape_string(value: &str) -> String {
-    value.replace('\\', "\\\\")
 }
 
 /// Whether the Windows or Linux login entry started this process.
@@ -382,12 +316,16 @@ pub(crate) struct LoginMenuItem(pub(crate) CheckMenuItem<tauri::Wry>);
 pub(crate) fn current(app: &AppHandle) -> LoginItem {
     let item = app
         .try_state::<LoginItems>()
-        .map_or_else(|| read(None), |items| items.read());
-    show_in_menu(app, item);
+        .map_or_else(|| unsupported(app), |items| items.read());
+    show_in_menu(app, &item);
     item
 }
 
-fn show_in_menu(app: &AppHandle, item: LoginItem) {
+fn unsupported(app: &AppHandle) -> LoginItem {
+    LoginItems::new(&app.package_info().name, None).read()
+}
+
+fn show_in_menu(app: &AppHandle, item: &LoginItem) {
     if let Some(menu) = app.try_state::<LoginMenuItem>() {
         let _ = menu.0.set_checked(item.enabled);
     }
@@ -397,8 +335,8 @@ fn show_in_menu(app: &AppHandle, item: LoginItem) {
 pub(crate) fn set(app: &AppHandle, on: bool) -> LoginItem {
     let item = app
         .try_state::<LoginItems>()
-        .map_or_else(|| read(None), |items| items.change(on));
-    show_in_menu(app, item);
+        .map_or_else(|| unsupported(app), |items| items.change(on));
+    show_in_menu(app, &item);
     item
 }
 
@@ -406,14 +344,22 @@ pub(crate) fn set(app: &AppHandle, on: bool) -> LoginItem {
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn login_item(app: AppHandle) -> LoginItem {
-    current(&app)
+    // Registry, file and ServiceManagement calls block; keep them off the
+    // async workers.
+    let fallback = unsupported(&app);
+    tauri::async_runtime::spawn_blocking(move || current(&app))
+        .await
+        .unwrap_or(fallback)
 }
 
 /// Start Ibis when the person logs in, or stop doing so.
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn set_login_item(app: AppHandle, enabled: bool) -> LoginItem {
-    set(&app, enabled)
+    let fallback = unsupported(&app);
+    tauri::async_runtime::spawn_blocking(move || set(&app, enabled))
+        .await
+        .unwrap_or(fallback)
 }
 
 /// The menu item was chosen: the menu already shows the new tick, so ask for
@@ -457,7 +403,7 @@ pub(crate) fn problem_message(problem: LoginItemProblem, name: &str) -> String {
             format!("This system cannot start {name} when you log in. You can add it in {place}.")
         }
         LoginItemProblem::NeedsApproval => {
-            format!("macOS needs your approval. Turn on {name} in {place}.")
+            format!("macOS is waiting for your approval. Turn on {name} in {place}.")
         }
         LoginItemProblem::Refused => {
             format!("The system did not let {name} change this. You can change it in {place}.")
@@ -478,6 +424,9 @@ mod tests {
         refuse: bool,
         approve: bool,
         unreadable: bool,
+        /// Registrations made but not allowed yet.
+        pending: std::sync::atomic::AtomicBool,
+        refreshed: std::sync::atomic::AtomicUsize,
     }
 
     impl FakeEntry {
@@ -487,6 +436,8 @@ mod tests {
                 refuse: false,
                 approve: true,
                 unreadable: false,
+                pending: false.into(),
+                refreshed: 0.into(),
             }
         }
         fn set(&self, on: bool) -> Result<(), Failed> {
@@ -494,6 +445,8 @@ mod tests {
                 return Err(Failed);
             }
             *self.on.lock().map_err(|_| Failed)? = on && self.approve;
+            self.pending
+                .store(on && !self.approve, std::sync::atomic::Ordering::SeqCst);
             Ok(())
         }
     }
@@ -511,10 +464,17 @@ mod tests {
         fn disable(&self) -> Result<(), Failed> {
             self.set(false)
         }
+        fn awaiting_approval(&self) -> bool {
+            self.pending.load(std::sync::atomic::Ordering::SeqCst)
+        }
+        fn refresh(&self) -> Result<(), Failed> {
+            self.refreshed.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        }
     }
 
-    const fn item(enabled: bool, problem: Option<LoginItemProblem>) -> LoginItem {
-        LoginItem { enabled, problem }
+    const fn item(enabled: bool, problem: Option<LoginItemProblem>) -> Reading {
+        Reading { enabled, problem }
     }
 
     #[test]
@@ -588,13 +548,63 @@ mod tests {
 
     #[test]
     fn refreshing_never_turns_on_a_switched_off_entry() {
-        let off = LoginItems::new(Some(Box::new(FakeEntry::new(false))));
+        let off = LoginItems::new("Ibis", Some(Box::new(FakeEntry::new(false))));
         off.refresh();
-        assert_eq!(off.read(), item(false, None));
-        let on = LoginItems::new(Some(Box::new(FakeEntry::new(true))));
+        assert_eq!(off.reading(), item(false, None));
+        let on = LoginItems::new("Ibis", Some(Box::new(FakeEntry::new(true))));
         on.refresh();
-        assert_eq!(on.read(), item(true, None));
-        assert!(!LoginItems::new(None).available());
+        assert_eq!(on.reading(), item(true, None));
+        assert!(!LoginItems::new("Ibis", None).available());
+        // Only an entry that is on is offered a refresh.
+        let entry = std::sync::Arc::new(FakeEntry::new(false));
+        struct Shared(std::sync::Arc<FakeEntry>);
+        impl Entry for Shared {
+            fn is_enabled(&self) -> Result<bool, Failed> {
+                self.0.is_enabled()
+            }
+            fn enable(&self) -> Result<(), Failed> {
+                self.0.enable()
+            }
+            fn disable(&self) -> Result<(), Failed> {
+                self.0.disable()
+            }
+            fn refresh(&self) -> Result<(), Failed> {
+                self.0.refresh()
+            }
+        }
+        let items = LoginItems::new("Ibis", Some(Box::new(Shared(entry.clone()))));
+        items.refresh();
+        assert_eq!(entry.refreshed.load(std::sync::atomic::Ordering::SeqCst), 0);
+        let _ = items.change(true);
+        items.refresh();
+        assert_eq!(entry.refreshed.load(std::sync::atomic::Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn a_registration_waiting_for_approval_still_reads_as_waiting() {
+        let waiting = FakeEntry {
+            approve: false,
+            ..FakeEntry::new(false)
+        };
+        assert_eq!(read(Some(&waiting)), item(false, None));
+        let _ = change(Some(&waiting), true, true);
+        assert_eq!(read(Some(&waiting)), item(false, Some(LoginItemProblem::NeedsApproval)));
+        let _ = change(Some(&waiting), false, true);
+        assert_eq!(read(Some(&waiting)), item(false, None));
+    }
+
+    #[test]
+    fn the_interface_gets_the_apps_own_name() {
+        let items = LoginItems::new("Ibis Nightly", Some(Box::new(FakeEntry::new(true))));
+        assert_eq!(
+            items.read(),
+            LoginItem {
+                name: "Ibis Nightly".into(),
+                enabled: true,
+                problem: None
+            }
+        );
+        assert_eq!(items.change(false).name, "Ibis Nightly");
     }
 
     #[test]
@@ -611,115 +621,6 @@ mod tests {
         let name = entry_name("Ibis");
         assert_eq!(name == "Ibis", !cfg!(debug_assertions));
         assert_ne!(entry_name("Ibis"), entry_name("Ibis Nightly"));
-    }
-
-    #[test]
-    fn exec_paths_with_reserved_characters_are_quoted() {
-        let Some(entry) = desktop_entry(
-            "Ibis Nightly",
-            Path::new("/home/a b/$x/`c`/d\"e/f\\g/50%/Ibis.AppImage"),
-        ) else {
-            panic!("a Unicode absolute path is representable");
-        };
-        assert!(
-            entry.contains("Exec=\"/home/a b/\\\\$x/\\\\`c\\\\`/d\\\\\"e/f\\\\\\\\g/50%%/Ibis.AppImage\" --at-login\n")
-        );
-        assert!(entry.contains("TryExec=/home/a b/$x/`c`/d\"e/f\\\\g/50%/Ibis.AppImage\n"));
-        assert!(entry.contains("Name=Ibis Nightly\n"));
-        assert!(entry.starts_with("[Desktop Entry]\n"));
-    }
-
-    #[test]
-    fn unrepresentable_paths_are_refused_not_mangled() {
-        assert_eq!(desktop_entry("Ibis", Path::new("relative/ibis")), None);
-        assert_eq!(desktop_entry("Ibis", Path::new("/tmp/a\nExec=evil")), None);
-        assert_eq!(desktop_entry("Ibis\nExec=evil", Path::new("/usr/bin/ibis")), None);
-        #[cfg(unix)]
-        {
-            use std::os::unix::ffi::OsStrExt;
-            let invalid = std::ffi::OsStr::from_bytes(b"/tmp/\xff/ibis");
-            assert_eq!(desktop_entry("Ibis", Path::new(invalid)), None);
-        }
-        let entry = DesktopFile {
-            path: PathBuf::from("/nonexistent/autostart/ibis.desktop"),
-            contents: None,
-        };
-        assert_eq!(entry.enable(), Err(Failed));
-    }
-
-    #[test]
-    fn hidden_entries_count_as_off() {
-        assert!(!switched_off(
-            "[Desktop Entry]\nName=Ibis\nX-GNOME-Autostart-enabled=true\n"
-        ));
-        assert!(switched_off("[Desktop Entry]\nName=Ibis\nHidden=true\n"));
-        assert!(switched_off("[Desktop Entry]\nX-GNOME-Autostart-enabled = false\n"));
-        // Keys of other groups are not the entry's.
-        assert!(!switched_off(
-            "[Desktop Entry]\nName=Ibis\n[Desktop Action x]\nHidden=true\n"
-        ));
-    }
-
-    /// The entry appears and disappears in a temporary configuration folder,
-    /// the way it does in `$XDG_CONFIG_HOME/autostart`.
-    #[test]
-    fn the_autostart_file_appears_and_disappears() {
-        let home = tempfile::tempdir().unwrap_or_else(|e| panic!("temporary folder: {e}"));
-        let path = home
-            .path()
-            .join("config dir/autostart/io.github.ibiscite.ibis.nightly.desktop");
-        let stable = home.path().join("config dir/autostart/io.github.ibiscite.ibis.desktop");
-        let entry = DesktopFile {
-            path: path.clone(),
-            contents: desktop_entry("Ibis Nightly", Path::new("/opt/Ibis Nightly/ibis")),
-        };
-        let items = LoginItems::new(Some(Box::new(entry)));
-        assert_eq!(items.read(), item(false, None));
-        assert_eq!(items.change(true), item(true, None));
-        let written = std::fs::read_to_string(&path).unwrap_or_default();
-        assert!(written.contains("Exec=\"/opt/Ibis Nightly/ibis\" --at-login\n"));
-        assert!(!stable.exists(), "Nightly must not write the stable entry");
-        assert!(!path.with_extension("desktop.partial").exists());
-
-        // Switched off in the desktop's settings: shown as off, and turning it
-        // on again writes a fresh entry.
-        std::fs::write(&path, format!("{written}Hidden=true\n")).unwrap_or_default();
-        assert_eq!(items.read(), item(false, None));
-        assert_eq!(items.change(true), item(true, None));
-
-        // Deleted by hand: shown as off.
-        std::fs::remove_file(&path).unwrap_or_default();
-        assert_eq!(items.read(), item(false, None));
-
-        assert_eq!(items.change(true), item(true, None));
-        assert_eq!(items.change(false), item(false, None));
-        assert!(!path.exists());
-        assert_eq!(items.change(false), item(false, None));
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn an_unwritable_folder_is_a_visible_refusal() {
-        use std::os::unix::fs::PermissionsExt;
-        let home = tempfile::tempdir().unwrap_or_else(|e| panic!("temporary folder: {e}"));
-        let folder = home.path().join("autostart");
-        std::fs::create_dir(&folder).unwrap_or_default();
-        std::fs::set_permissions(&folder, std::fs::Permissions::from_mode(0o500)).unwrap_or_default();
-        let probe = folder.join("probe");
-        if std::fs::write(&probe, "").is_ok() {
-            // Running as root: permissions do not apply, nothing to observe.
-            let _ = std::fs::remove_file(probe);
-            return;
-        }
-        let entry = DesktopFile {
-            path: folder.join("ibis.desktop"),
-            contents: desktop_entry("Ibis", Path::new("/usr/bin/ibis")),
-        };
-        assert_eq!(
-            change(Some(&entry), true, false),
-            item(false, Some(LoginItemProblem::Refused))
-        );
-        std::fs::set_permissions(&folder, std::fs::Permissions::from_mode(0o700)).unwrap_or_default();
     }
 
     #[test]

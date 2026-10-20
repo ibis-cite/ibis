@@ -21,6 +21,7 @@ export const operationFailures = {
   findSources: "Ibis could not look for libraries on this computer. Choose a file instead.",
   openFound: "That file could not be opened from the list. Pick it again from the new list.",
   loginItem: "Ibis could not check whether it starts when you log in. Try again.",
+  loginItemChange: "Ibis could not change whether it starts when you log in. Try again.",
 } as const;
 
 /** Where people turn login items on and off on each system. */
@@ -32,13 +33,13 @@ export function loginItemsPlace(platform: string): string {
 
 /** Starting Ibis at login. The menu bar or tray has the same sentences in login_item.rs. */
 export const loginItemText = {
-  label: "Start Ibis when you log in",
+  label: (name: string) => `Start ${name} when you log in`,
   title: "Keep the shortcut ready after you restart or log in",
-  problem: (problem: LoginItemProblem, place: string) => ({
-    unsupported: `This system cannot start Ibis when you log in. You can add it in ${place}.`,
-    needs_approval: `macOS needs your approval. Turn on Ibis in ${place}.`,
-    refused: `The system did not let Ibis change this. You can change it in ${place}.`,
-    unreadable: `Ibis could not check whether it starts when you log in. Look in ${place}.`,
+  problem: (problem: LoginItemProblem, place: string, name: string) => ({
+    unsupported: `This system cannot start ${name} when you log in. You can add it in ${place}.`,
+    needs_approval: `macOS is waiting for your approval. Turn on ${name} in ${place}.`,
+    refused: `The system did not let ${name} change this. You can change it in ${place}.`,
+    unreadable: `${name} could not check whether it starts when you log in. Look in ${place}.`,
   })[problem],
 } as const;
 

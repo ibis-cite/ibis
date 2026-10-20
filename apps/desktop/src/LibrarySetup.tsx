@@ -53,7 +53,7 @@ export function LibrarySetup({ api, perform, writing, shortcut, startAtLogin }: 
   /** The shortcut that opens Ibis, when it is registered. */
   shortcut?: string | null;
   /** Starting at login, offered once here and kept in More; off until chosen. */
-  startAtLogin?: { enabled: boolean; toggle: () => void };
+  startAtLogin?: { name: string; enabled: boolean; toggle: () => void };
 }) {
   const { chooseLibrary, useZotero, findSources, openFoundLibrary } = api;
   // Undefined while looking; null when looking failed or is not offered.
@@ -143,7 +143,7 @@ export function LibrarySetup({ api, perform, writing, shortcut, startAtLogin }: 
         // The shortcut works only while Ibis runs, so this sits beside it.
         <label className="setup-login empty-hint" title={loginItemText.title}>
           <input type="checkbox" checked={startAtLogin.enabled} onChange={startAtLogin.toggle} />
-          {loginItemText.label}
+          {loginItemText.label(startAtLogin.name)}
         </label>
       )}
     </div>

@@ -381,19 +381,29 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // Whether Ibis starts at login, as the system reports it; read again each
   // time the picker opens, since people also change it in system settings.
   const [startAtLogin, setStartAtLogin] = useState<LoginItem | null>(null);
+  // Calls run one after another, and only the newest one's answer is shown,
+  // so quick clicks end in the state of the last click.
+  const loginQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const loginRequest = useRef(0);
+  const askLoginItem = (operation: "loginItem" | "loginItemChange", call: () => Promise<LoginItem>, failed?: () => void) => {
+    const request = ++loginRequest.current;
+    const run = loginQueue.current.catch(() => undefined).then(call).then(
+      (item) => { if (request === loginRequest.current) setStartAtLogin(item); },
+      (error: unknown) => { if (request === loginRequest.current) failed?.(); throw error; },
+    );
+    loginQueue.current = run;
+    void perform(operation, () => run);
+  };
   const readLoginItem = () => {
-    if (!loginItem) return;
-    void perform("loginItem", () => loginItem().then(setStartAtLogin));
+    if (loginItem) askLoginItem("loginItem", loginItem);
   };
   const toggleStartAtLogin = () => {
     if (!setLoginItem || !startAtLogin) return;
-    const on = !startAtLogin.enabled;
+    const before = startAtLogin;
+    const on = !before.enabled;
     // Shown at once; the system's answer replaces it.
-    setStartAtLogin({ enabled: on, problem: null });
-    void perform("loginItem", () => setLoginItem(on).then(setStartAtLogin, (error: unknown) => {
-      setStartAtLogin({ ...startAtLogin, problem: null });
-      throw error;
-    }));
+    setStartAtLogin({ ...before, enabled: on, problem: null });
+    askLoginItem("loginItemChange", () => setLoginItem(on), () => setStartAtLogin({ ...before, problem: null }));
   };
   useEffect(() => { if (menuOpen) readLoginItem(); }, [menuOpen]);
   const loginItemOffered = Boolean(setLoginItem) && startAtLogin !== null && startAtLogin.problem !== "unsupported";
@@ -860,7 +870,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           <p role="alert" key={operation}>{FAILURE_MESSAGES[operation]}</p>
         ))}
         {startAtLogin?.problem && startAtLogin.problem !== "unsupported" && (
-          <p role="alert">{loginItemText.problem(startAtLogin.problem, loginItemsPlace(navigator.platform))}</p>
+          <p role="alert">{loginItemText.problem(startAtLogin.problem, loginItemsPlace(navigator.platform), startAtLogin.name)}</p>
         )}
         {error && <p role="alert">{error}</p>}
         {copyError && <p role="alert">{copyError}</p>}
@@ -1004,7 +1014,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               <LibrarySetup api={setupApi} perform={perform}
                 writing={{ format, formatted: Boolean(cslItems && copyFormatted), choose: chooseFormat }}
                 shortcut={shortcut?.registered ? shortcutLabel(shortcut.shortcut, isMac) : null}
-                startAtLogin={loginItemOffered && startAtLogin ? { enabled: startAtLogin.enabled, toggle: toggleStartAtLogin } : undefined} />
+                startAtLogin={loginItemOffered && startAtLogin ? { name: startAtLogin.name, enabled: startAtLogin.enabled, toggle: toggleStartAtLogin } : undefined} />
             ) : null}
           </div>
         )}
@@ -1066,7 +1076,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                 <MenuItem label={pickerText.density(densityNames[density])} title={pickerText.densityTitle} onSelect={changeDensity} />
                 <MenuItem label={pickerText.largerText} checked={largerText} onSelect={toggleLargerText} />
                 {loginItemOffered && startAtLogin && (
-                  <MenuItem label={loginItemText.label} title={loginItemText.title} checked={startAtLogin.enabled} onSelect={toggleStartAtLogin} />
+                  <MenuItem label={loginItemText.label(startAtLogin.name)} title={loginItemText.title} checked={startAtLogin.enabled} onSelect={toggleStartAtLogin} />
                 )}
                 {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
                 <MenuItem label={keyText.title} keys={label(keysFor("keys"))} onSelect={openKeys} />

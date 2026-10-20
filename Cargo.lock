@@ -2003,6 +2003,7 @@ dependencies = [
  "raw-window-handle",
  "serde",
  "serde_json",
+ "smappservice-rs",
  "specta",
  "specta-typescript",
  "tauri",

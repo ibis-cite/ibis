@@ -178,6 +178,8 @@ export type LibraryStatus = {
 
 /**  Whether Ibis starts when the person logs in, as the system reports it. */
 export type LoginItem = {
+	/**  The app's name, such as "Ibis" or "Ibis Nightly", for the interface. */
+	name: string,
 	enabled: boolean,
 	problem: LoginItemProblem | null,
 };

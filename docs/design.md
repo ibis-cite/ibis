@@ -247,15 +247,19 @@ the system each time the picker or the menu opens, never from `settings.json`,
 so turning Ibis off in System Settings > General > Login Items (macOS), Task
 Manager's Startup apps (Windows) or the desktop's startup settings (Linux)
 shows at once. If the system refuses, the tick shows the real state and a
-sentence says where to change it; macOS may also ask the person to approve the
-login item there. Ibis Nightly and development builds register under their own
+sentence says where to change it; while macOS waits for the person to approve
+the login item there, the picker says so each time it opens. Ibis Nightly and development builds register under their own
 names and never replace stable Ibis's entry.
 
 - macOS 13 and later: `SMAppService.mainApp` (Open at Login). Older macOS
   shows no choice.
-- Windows: the current user's `Run` key, never all users'.
+- Windows: Ibis writes only the current user's `Run` key. Reading and
+  removing also look at the all-users key, where an administrator may have
+  added Ibis.
 - Linux: an XDG autostart file in `$XDG_CONFIG_HOME/autostart`, skipped by the
-  session if the program has been removed (`TryExec`).
+  session if the program has been removed (`TryExec`). When an AppImage has
+  moved, Ibis repoints the entry it wrote and keeps the person's own keys; a
+  linked or hand-written entry is left alone.
 
 ## Rollout
 

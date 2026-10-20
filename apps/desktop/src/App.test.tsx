@@ -86,8 +86,8 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
     copy_format: () => "pandoc",
     picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: false }),
     set_picker_preferences: () => null,
-    login_item: () => ({ enabled: false, problem: null }),
-    set_login_item: ({ enabled }) => ({ enabled, problem: null }),
+    login_item: () => ({ name: "Ibis", enabled: false, problem: null }),
+    set_login_item: ({ enabled }) => ({ name: "Ibis", enabled, problem: null }),
     find_sources: () => ({ zotero: "absent", list: 1, files: [], cut_short: false }),
     library_status: () => ({ state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }),
   };
@@ -2076,7 +2076,7 @@ test("the footer offers Enter only when Enter in the search box would copy", asy
 test("More shows whether Ibis starts at login as the system reports it, and follows changes made elsewhere", async () => {
   let system = true;
   const calls = backend({
-    login_item: () => ({ enabled: system, problem: null }),
+    login_item: () => ({ name: "Ibis", enabled: system, problem: null }),
     set_login_item: ({ enabled }) => { system = Boolean(enabled); return { enabled: system, problem: null }; },
   });
   render(<App />);
@@ -2095,7 +2095,7 @@ test("More shows whether Ibis starts at login as the system reports it, and foll
 });
 
 test("a refused login item is explained kindly and never shown as on", async () => {
-  backend({ set_login_item: () => ({ enabled: false, problem: "refused" }) });
+  backend({ set_login_item: () => ({ name: "Ibis", enabled: false, problem: "refused" }) });
   render(<App />);
   await chooseFromMore("Start Ibis when you log in", "menuitemcheckbox");
   const alert = await screen.findByText(/^The system did not let Ibis change this\. You can change it in /);
@@ -2108,13 +2108,13 @@ test("a failed login item command restores the previous state and says so", asyn
   backend({ set_login_item: () => { throw new Error("ipc"); } });
   render(<App />);
   await chooseFromMore("Start Ibis when you log in", "menuitemcheckbox");
-  expect(await screen.findByText("Ibis could not check whether it starts when you log in. Try again.")).toBeTruthy();
+  expect(await screen.findByText("Ibis could not change whether it starts when you log in. Try again.")).toBeTruthy();
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   expect((await screen.findByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).getAttribute("aria-checked")).toBe("false");
 });
 
 test("systems without login items, and pickers without the commands, offer no choice", async () => {
-  backend({ login_item: () => ({ enabled: false, problem: "unsupported" }) });
+  backend({ login_item: () => ({ name: "Ibis", enabled: false, problem: "unsupported" }) });
   render(<App />);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   await screen.findByRole("menuitemcheckbox", { name: "Larger text" });
@@ -2134,7 +2134,7 @@ test("first-run setup offers starting at login beside the shortcut, off until ch
   let system = false;
   backend({
     library_status: () => NO_LIBRARY,
-    login_item: () => ({ enabled: system, problem: null }),
+    login_item: () => ({ name: "Ibis", enabled: system, problem: null }),
     set_login_item: ({ enabled }) => { system = Boolean(enabled); return { enabled: system, problem: null }; },
   });
   const { container } = render(<App />);
@@ -2154,6 +2154,35 @@ test("each system's login item problems name where to look", async () => {
   expect(loginItemsPlace("Win32")).toBe("Settings > Apps > Startup");
   expect(loginItemsPlace("Linux x86_64")).toMatch(/startup applications/);
   for (const problem of ["unsupported", "needs_approval", "refused", "unreadable"] as const) {
-    expect(loginItemText.problem(problem, "PLACE")).toMatch(/PLACE\.$/);
+    expect(loginItemText.problem(problem, "PLACE", "Ibis Nightly")).toMatch(/Ibis Nightly.*PLACE\.$/);
   }
+});
+
+test("quick clicks end in the state of the last click, and the app's own name is shown", async () => {
+  let system = false;
+  const order: boolean[] = [];
+  const pending: (() => void)[] = [];
+  backend({
+    login_item: () => ({ name: "Ibis Nightly", enabled: system, problem: null }),
+    // The first change answers last if the calls were not kept in order.
+    set_login_item: ({ enabled }) => new Promise((resolve) => {
+      order.push(Boolean(enabled));
+      const finish = () => { system = Boolean(enabled); resolve({ name: "Ibis Nightly", enabled: system, problem: null }); };
+      if (order.length === 1) pending.push(finish); else finish();
+    }),
+  });
+  render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: /^More/ }));
+  const item = await screen.findByRole("menuitemcheckbox", { name: "Start Ibis Nightly when you log in" });
+  fireEvent.click(item);
+  await waitFor(() => expect(item.getAttribute("aria-checked")).toBe("true"));
+  fireEvent.click(item);
+  await waitFor(() => expect(item.getAttribute("aria-checked")).toBe("false"));
+  // The second call waits for the first.
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); });
+  expect(order).toEqual([true]);
+  await act(async () => { pending.shift()?.(); await new Promise((resolve) => setTimeout(resolve, 0)); });
+  await waitFor(() => expect(order).toEqual([true, false]));
+  await waitFor(() => expect(system).toBe(false));
+  expect(item.getAttribute("aria-checked")).toBe("false");
 });
