@@ -51,6 +51,9 @@ export function LibraryStatusLine({ library, groupName }: {
   const age = libraryMessages.age(library, now);
   const lines = libraryMessages.detail(library, now, (status) => zoteroLibraryNames(status, groupName));
   const detail = lines.filter(Boolean).join("\n");
+  // A kept copy's age ("checked …") is already in the second line.
+  const heard = age && !library?.stale ? `${lines[0]} · ${age}` : lines[0];
+  const spoken = age || lines[1] ? [heard, lines[1]].filter(Boolean).join(". ") : null;
   return (
     <>
       <span className="library-status" data-health={health} title={detail}>
@@ -63,8 +66,8 @@ export function LibraryStatusLine({ library, groupName }: {
           {age && <span className="library-age" aria-hidden="true"> · {age}</span>}
         </span>
       </span>
-      {/* The hover detail, for screen readers reading the footer; not live. */}
-      {lines[1] && <span className="visually-hidden library-detail">{`${lines[0]}. ${lines[1]}`}</span>}
+      {/* The visible age and the hover detail, read once by screen readers; not live. */}
+      {spoken && <span className="visually-hidden library-detail">{spoken}</span>}
     </>
   );
 }

@@ -128,8 +128,9 @@ test("the footer shortens the age, then the name, and only then the state words,
   const styles = readFileSync(new FileURL("./styles.css", import.meta.url), "utf8");
   const rule = (selector: string) => styles.match(new RegExp(`^\\${selector} \\{([^}]*)\\}`, "m"))?.[1] ?? "";
   const shrink = (selector: string) => Number(rule(selector).match(/flex-shrink: ([\d.]+)|flex: 0 ([\d.]+) auto/)?.slice(1).find(Boolean));
-  expect(shrink(".library-age")).toBeGreaterThan(1);
-  expect(shrink(".library-source")).toBeGreaterThan(shrink(".library-age"));
+  // The age has no width of its own: it only fills what the name and state leave.
+  expect(rule(".library-age")).toContain("flex: 1 1 0");
+  expect(shrink(".library-source")).toBeGreaterThan(1);
   expect(rule(".library-state")).toContain("flex: 0 1 auto");
   for (const selector of [".library-source", ".library-state", ".library-age"]) {
     expect(rule(selector)).toContain("text-overflow: ellipsis");
@@ -140,5 +141,13 @@ test("the footer shortens the age, then the name, and only then the state words,
 test("the visible age is hidden from screen readers, which read the detail instead", () => {
   const { container } = render(createElement(LibraryStatusLine, { library: zotero({ updated_at: Date.now(), checked_at: Date.now() }), groupName: String }));
   expect(container.querySelector(".library-age")?.getAttribute("aria-hidden")).toBe("true");
-  expect(strip(container.querySelector(".library-detail")?.textContent ?? null)).toMatch(/checked just now/);
+  expect(strip(container.querySelector(".library-detail")?.textContent ?? null)).toMatch(
+    /^Zotero · 1,204 references · updated just now\. My Library · checked just now, /);
+  // A kept copy says its age once, in the detail.
+  const kept = render(createElement(LibraryStatusLine, {
+    library: zotero({ state: "error", stale: true, error: "Zotero is not running; keeping the last loaded references", checked_at: Date.now() - 2 * hour }),
+    groupName: String,
+  }));
+  const heard = strip(kept.container.querySelector(".library-detail")?.textContent ?? null) ?? "";
+  expect(heard.match(/checked 2 hours ago/g)).toHaveLength(1);
 });
