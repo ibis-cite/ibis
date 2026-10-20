@@ -54,6 +54,12 @@ test("leaves notes that already have a download table unchanged", () => {
   assert.equal(releaseNotes("v0.1.1", once), once);
 });
 
+test("still cleans notes that only mention a download heading inside an item", () => {
+  const notes = releaseNotes("v0.1.1", generated.replace("in the picker (", "in the picker, see ## Download ("));
+  assert.match(notes, /^## Download$/m);
+  assert.doesNotMatch(notes, /beep/);
+});
+
 test("says where to look when the change list is empty", () => {
   assert.match(releaseNotes("v0.2.0", ":robot: I have created a release *beep* *boop*\n---\n"), /See the commits since the previous release\./);
 });

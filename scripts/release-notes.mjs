@@ -39,7 +39,7 @@ export function changes(generated) {
 }
 
 export function releaseNotes(tag, generated, repo = "ibiscite/ibis") {
-  if (generated.includes("## Download")) return generated;
+  if (/^## Download$/m.test(generated)) return generated;
   const base = `https://github.com/${repo}/releases/download/${tag}`;
   const rows = DOWNLOADS.map(([system, file, extra = ""]) => `| ${system} | [${file}](${base}/${file})${extra} |`);
   const list = changes(generated);
