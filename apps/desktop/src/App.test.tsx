@@ -56,7 +56,7 @@ async function chooseFromMore(name: string, role: "menuitem" | "menuitemcheckbox
 
 function result(key: string, title: string, source = "refs.bib") {
   return {
-    id: { source, native_key: key }, key, title, authors: "Smith", year: 2020, matched: ["title"],
+    revision: "1", id: { source, native_key: key }, key, title, authors: "Smith", year: 2020, matched: ["title"],
     first_author: "Smith", author_count: 1, container: null as string | null, item_type: "article-journal",
   };
 }
@@ -96,7 +96,8 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
       calls.push(cmd);
       const handler = overrides[cmd] ?? defaults[cmd];
       if (!handler) throw new Error(`unexpected command ${cmd}`);
-      return handler((args ?? {}) as Record<string, unknown>);
+      const value = handler((args ?? {}) as Record<string, unknown>);
+      return cmd === "library_status" ? Promise.resolve(value).then((status) => ({ revision: "1", ...status as object })) : value;
     },
     { shouldMockEvents: true },
   );
@@ -197,7 +198,7 @@ test("opening the first library searches the untouched empty query", async () =>
   render(<App />);
   await screen.findByRole("button", { name: "Choose library to get started" });
   expect(calls).not.toContain("search");
-  await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
+  await emit("library:changed", { revision: "1", state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
   expect(await screen.findByText("First reference")).toBeTruthy();
   expect(screen.queryByRole("button", { name: "Choose library to get started" })).toBeNull();
 });
@@ -227,7 +228,7 @@ test.each([
   render(<App />);
   await act(async () => { await Promise.resolve(); });
   await act(async () => {
-    await emit("library:changed", {
+    await emit("library:changed", { revision: "1",
       name: "new.bib", snapshot_name: "new.bib", references: failed ? 0 : 1, warnings: 0,
       error: failed ? "synthetic load failed" : null, note: null,
     });
@@ -310,7 +311,7 @@ test("the query is searched again when a library finishes opening", async () => 
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
   expect((await screen.findByText("Ibis could not search your library. Use Reload, then try again.")).getAttribute("role")).toBe("alert");
   open = true;
-  await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
+  await emit("library:changed", { revision: "1", state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null });
   expect(await screen.findByText("Sleep and memory")).toBeTruthy();
   expect(screen.queryByRole("alert")).toBeNull();
 });
@@ -333,7 +334,7 @@ test("Enter copies the highlighted result in the remembered format and hides the
   fireEvent.keyDown(box, { key: "ArrowDown" });
   fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(calls).toContain("hide_picker"));
-  expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "b" }], format: "typst" }]);
+  expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "b" }], format: "typst", expectedRevision: "1" }]);
   expect(screen.getAllByRole("status").some((status) => status.textContent?.includes("Copied @b"))).toBe(true);
 });
 
@@ -451,7 +452,7 @@ test("while a newer search is pending, no key, click or hint acts on the previou
   fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(copied).toHaveLength(1));
   expect(chosenKeys()).not.toContain("old");
-  expect(copied).toEqual([{ ids: [{ source: "refs.bib", native_key: "kept" }], format: "pandoc" }]);
+  expect(copied).toEqual([{ ids: [{ source: "refs.bib", native_key: "kept" }], format: "pandoc", expectedRevision: "1" }]);
   await act(async () => { pending.pending!.resolve([result("new", "New result")]); });
   await screen.findByText("New result");
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
@@ -479,11 +480,11 @@ test("the library is shown, can be chosen and reloaded, and failures are explain
   await waitFor(() => expect(bar.textContent).toContain("No library chosen"));
   await chooseFromMore("Choose library…");
   await waitFor(() => expect(calls).toContain("choose_library"));
-  await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 3, warnings: 1, error: null, note: null });
+  await emit("library:changed", { revision: "1", state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 3, warnings: 1, error: null, note: null });
   await waitFor(() => expect(bar.textContent).toContain("refs.bib · 3 references · 1 reading notice"));
   await chooseFromMore("Reload");
   await waitFor(() => expect(calls).toContain("reload_library"));
-  await emit("library:changed", {
+  await emit("library:changed", { revision: "1",
     state: "error",
     has_snapshot: true, zotero: false,
     name: "refs.bib",
@@ -505,7 +506,7 @@ test("opening the first library searches the query typed before choosing it", as
   render(<App />);
   await screen.findByRole("button", { name: "Choose library to get started" });
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });
-  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }); });
+  await act(async () => { await emit("library:changed", { revision: "1", state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null }); });
   await screen.findByText("Matching reference");
   expect(queries).toEqual(["sleep"]);
 });
@@ -720,7 +721,7 @@ test("opening a chosen library shows its name and searches only when ready", asy
   expect(calls).not.toContain("search");
   await chooseFromMore("Choose library…");
   await waitFor(() => expect(calls).toContain("choose_library"));
-  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 1, warnings: 0, error: null, note: null }); });
+  await act(async () => { await emit("library:changed", { revision: "1", state: "loaded", has_snapshot: true, zotero: false, name: "研究 refs.bib", snapshot_name: "研究 refs.bib", references: 1, warnings: 0, error: null, note: null }); });
   await waitFor(() => expect(calls).toContain("search"));
 });
 
@@ -784,7 +785,7 @@ test.each(["backup", "defaults"])("settings recovery from %s stays visible throu
   backend({ library_status: () => ({ state: "loading", has_snapshot: false, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 0, warnings: 0, error: null, note: null, settings_notice: notice }) });
   render(<App />);
   expect((await screen.findByText(notice)).getAttribute("role")).toBe("alert");
-  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null, settings_notice: notice }); });
+  await act(async () => { await emit("library:changed", { revision: "1", state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", snapshot_name: "refs.bib", references: 1, warnings: 0, error: null, note: null, settings_notice: notice }); });
   expect(screen.getByText(notice).getAttribute("role")).toBe("alert");
   expect(screen.getAllByText(notice)).toHaveLength(1);
 });
@@ -1431,7 +1432,7 @@ test("setup says what it found, says when it found nothing, and Look again keeps
 });
 
 function zoteroStatus(libraries: unknown[]) {
-  return { state: "loaded", has_snapshot: true, zotero: true, zotero_libraries: libraries,
+  return { revision: "1", state: "loaded", has_snapshot: true, zotero: true, zotero_libraries: libraries,
     name: libraries.length > 1 ? `${libraries.length} Zotero libraries` : "Zotero library",
     snapshot_name: "Zotero library", references: 2, warnings: 0, error: null, note: null };
 }
@@ -1606,7 +1607,7 @@ test("switching to a file removes a previous Zotero group-list failure", async (
   await waitFor(() => expect(screen.getByRole("region", { name: "Library" }).textContent).toMatch(/Zotero/));
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   await screen.findByText(/could not list your Zotero groups/);
-  await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, zotero: false,
+  await act(async () => { await emit("library:changed", { revision: "1", state: "loaded", has_snapshot: true, zotero: false,
     name: "synthetic.bib", snapshot_name: "synthetic.bib", references: 1, warnings: 0, error: null, note: null }); });
   expect(screen.queryByRole("group", { name: "Zotero libraries" })).toBeNull();
   expect(screen.queryByText(/could not list your Zotero groups/)).toBeNull();
@@ -1765,7 +1766,7 @@ test("clicking a row copies it like Enter, and Shift+click adds it like Shift+En
   expect(copies).toEqual([]);
   fireEvent.click(second);
   await waitFor(() => expect(calls).toContain("hide_picker"));
-  expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "b" }], format: "pandoc" }]);
+  expect(copies).toEqual([{ ids: [{ source: "refs.bib", native_key: "b" }], format: "pandoc", expectedRevision: "1" }]);
   expect(second.getAttribute("aria-selected")).toBe("true");
 });
 
@@ -2238,4 +2239,32 @@ test.each(["style:ieee", "pandoc", "style:apa"])("changing format cancels a clic
     ? { format: "pandoc", ids: [{ source: "refs.bib", native_key: "b" }] }
     : { text: next === "style:ieee" ? "[1]" : "(Smith, 2020)" });
   expect(calls).toContain(next === "pandoc" ? "copy_citation" : "copy_formatted");
+});
+
+test.each(["click", "Enter", "Shift+Enter"])("a replacement snapshot blocks prior rows until refreshed search (%s)", async (action) => {
+  let replacement = false;
+  let release: (value: unknown) => void = () => undefined;
+  const copied: unknown[] = [];
+  const status = (revision: string) => ({ state: "loaded", has_snapshot: true, zotero: true, zotero_libraries: ["user"], snapshot_zotero: true, stale: false, updated_at: null, checked_at: null, settings_notice: null, name: "Zotero library", snapshot_name: "Zotero library", references: 1, warnings: 0, error: null, note: null, revision });
+  const old = { ...result("ITEM0001", "Old title and key", "zotero:user"), key: "oldkey", revision: "snapshot-1" };
+  const fresh = { ...result("ITEM0001", "Replacement title and key", "zotero:user"), key: "newkey", revision: "snapshot-2" };
+  const calls = backend({
+    library_status: () => status("snapshot-1"),
+    search: () => replacement ? new Promise((resolve) => { release = resolve; }) : [old],
+    copy_citation: (args) => { copied.push(args); return { text: replacement ? "[@newkey]" : "[@oldkey]", warnings: [] }; },
+  });
+  render(<App />);
+  await screen.findByText("Old title and key");
+  replacement = true;
+  await act(async () => { await emit("library:changed", status("snapshot-2")); });
+  if (action === "click") fireEvent.click(screen.getByText("Old title and key"));
+  else fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter", shiftKey: action === "Shift+Enter" });
+  await act(async () => { await Promise.resolve(); });
+  expect(copied).toEqual([]);
+  expect(screen.queryByRole("list", { name: "Selected references" })).toBeNull();
+  expect(calls).not.toContain("hide_picker");
+  await act(async () => { release([fresh]); });
+  fireEvent.click(await screen.findByText("Replacement title and key"));
+  await waitFor(() => expect(copied).toHaveLength(1));
+  expect(copied[0]).toMatchObject({ expectedRevision: "snapshot-2" });
 });

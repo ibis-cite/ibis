@@ -50,19 +50,19 @@ export const commands = {
 	 *  Copy the selected records as a citation to the clipboard. Format choices
 	 *  are saved separately when selected, even if no citation is copied.
 	 */
-	copyCitation: (ids: RecordId[], format: KeyFormat) => __TAURI_INVOKE<Copied>("copy_citation", { ids, format }),
+	copyCitation: (ids: RecordId[], format: KeyFormat, expectedRevision: string) => __TAURI_INVOKE<Copied>("copy_citation", { ids, format, expectedRevision }),
 	/**  The format the picker starts with: the last one chosen, or Pandoc. */
 	copyFormat: () => __TAURI_INVOKE<KeyFormat>("copy_format"),
 	/**
 	 *  The selected records as CSL-JSON, in the order given, for the citation
 	 *  engine. Sent as JSON text so the fields stay exactly as the core writes them.
 	 */
-	cslItems: (ids: RecordId[]) => __TAURI_INVOKE<string>("csl_items", { ids }),
+	cslItems: (ids: RecordId[], expectedRevision: string) => __TAURI_INVOKE<string>("csl_items", { ids, expectedRevision }),
 	/**
 	 *  Copy a formatted citation or bibliography as HTML with a plain-text
 	 *  alternative, so word processors keep italics and plain editors get text.
 	 */
-	copyFormatted: (text: string, html: string) => __TAURI_INVOKE<null>("copy_formatted", { text, html }),
+	copyFormatted: (text: string, html: string, expectedRevision: string) => __TAURI_INVOKE<null>("copy_formatted", { text, html, expectedRevision }),
 	/**  The preferences the picker starts with. */
 	pickerPreferences: () => __TAURI_INVOKE<PickerPreferences>("picker_preferences"),
 	/**  Remember the picker preferences; other settings in the file are kept. */
@@ -158,6 +158,7 @@ export type LibraryState = "none" | "loading" | "loaded" | "reloading" | "error"
 /**  Sent to the interface with the `library:changed` event. */
 export type LibraryStatus = {
 	state: LibraryState,
+	revision: string,
 	/**  Whether the requested library is Zotero rather than a file. */
 	zotero: boolean,
 	/**  The Zotero libraries requested, in order; empty for a file. */
@@ -238,6 +239,8 @@ export type RecordId = {
 };
 
 export type SearchResult = {
+	/**  Revision captured with the index used for this result. */
+	revision: string,
 	/**  Identity of the record; selection and copying use this, not the key. */
 	id: RecordId,
 	key: string,
