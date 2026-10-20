@@ -156,3 +156,14 @@ test.each(["ctrlKey", "metaKey"])("%s shortcuts reach the picker only outside co
   expect(screen.getByRole("menu")).toBeTruthy();
   fireEvent.compositionEnd(menu);
 });
+
+test("Escape on a closed trigger reaches the picker, except during composition", () => {
+  const { trigger, parentKeys } = mount();
+  fireEvent.keyDown(trigger, { key: "Escape" });
+  expect(parentKeys).toHaveBeenCalledOnce();
+  parentKeys.mockClear();
+  fireEvent.compositionStart(trigger);
+  fireEvent.keyDown(trigger, { key: "Escape" });
+  expect(parentKeys).not.toHaveBeenCalled();
+  fireEvent.compositionEnd(trigger);
+});
