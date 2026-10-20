@@ -34,7 +34,7 @@ export const setupText = {
   lookAgain: "Look again",
   whereYouWrite: "Where do you write?",
   places: { markdown: "Markdown or Pandoc", latex: "LaTeX", typst: "Typst", word: "Word or Google Docs" },
-  styleHint: "Citations copy as APA. Pick another style under Copy as.",
+  styleHint: (style: string) => `Citations copy as ${style}. Pick another style under Copy as.`,
   shortcut: (keys: string) => `Open Ibis from any app with ${keys}.`,
   nothingFound: "No Zotero or .bib files found nearby. Use Choose library… to pick a file.",
   found: (files: number, zotero: boolean) =>

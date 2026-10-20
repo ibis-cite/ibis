@@ -1216,10 +1216,17 @@ test("setup asks where you write, sets Copy as to match, and shows the shortcut"
   await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
   expect(screen.getByText("Citations copy as APA. Pick another style under Copy as.")).toBeTruthy();
   expect(screen.getByText(/^Open Ibis from any app with /)).toBeTruthy();
+  fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:ieee" } });
+  expect(await screen.findByText("Citations copy as IEEE. Pick another style under Copy as.")).toBeTruthy();
+  expect(within(places).getByRole("button", { name: "Word or Google Docs" }).getAttribute("aria-pressed")).toBe("false");
 });
 
 test("shortcuts read as people type them on each system", async () => {
   const { shortcutLabel } = await import("./LibrarySetup");
   expect(shortcutLabel("Control+Command+R", true)).toBe("⌃⌘R");
   expect(shortcutLabel("Control+Shift+Y", false)).toBe("Ctrl+Shift+Y");
+  expect(shortcutLabel("CmdOrCtrl+Shift+KeyR", true)).toBe("⌘⇧R");
+  expect(shortcutLabel("cmdorctrl + shift + keyr", false)).toBe("Ctrl+Shift+R");
+  expect(shortcutLabel("control+command+r", true)).toBe("⌃⌘R");
+  expect(shortcutLabel("Alt+Space", false)).toBe("Alt+Space");
 });

@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from "react";
 import type { Choice } from "./App";
 import type { Sources } from "./bindings";
 import { pickerText, setupText } from "./messages";
+import { STYLE_NAMES, type StyleId } from "./format/styles";
 
 type SetupApi = {
   chooseLibrary: () => Promise<unknown>;
@@ -22,10 +23,23 @@ const WRITING_PLACES: { name: string; choice: Choice; formatted?: true }[] = [
 
 /** A shortcut as people read it: `⌃⌘R` on macOS, `Ctrl+Shift+Y` elsewhere. */
 export function shortcutLabel(shortcut: string, mac: boolean): string {
-  const keys = shortcut.split("+");
-  if (!mac) return keys.map((key) => (key === "Control" ? "Ctrl" : key)).join("+");
-  const symbols: Record<string, string> = { Control: "⌃", Alt: "⌥", Option: "⌥", Shift: "⇧", Command: "⌘", Super: "⌘" };
-  return keys.map((key) => symbols[key] ?? key).join("");
+  // Settings may spell keys in any case and with the aliases the shortcut
+  // parser accepts, such as `CmdOrCtrl` or `KeyR`.
+  const names: Record<string, [mac: string, other: string]> = {
+    control: ["⌃", "Ctrl"], ctrl: ["⌃", "Ctrl"],
+    alt: ["⌥", "Alt"], option: ["⌥", "Alt"],
+    shift: ["⇧", "Shift"],
+    command: ["⌘", "Super"], cmd: ["⌘", "Super"], super: ["⌘", "Super"], meta: ["⌘", "Super"],
+    commandorcontrol: ["⌘", "Ctrl"], cmdorctrl: ["⌘", "Ctrl"], commandorctrl: ["⌘", "Ctrl"], cmdorcontrol: ["⌘", "Ctrl"],
+    space: ["Space", "Space"],
+  };
+  const keys = shortcut.split("+").map((key) => key.trim()).filter(Boolean).map((key) => {
+    const known = names[key.toLowerCase()];
+    if (known) return mac ? known[0] : known[1];
+    const plain = /^(?:Key|Digit)(.)$/i.exec(key)?.[1] ?? key;
+    return plain.length === 1 ? plain.toUpperCase() : plain;
+  });
+  return keys.join(mac ? "" : "+");
 }
 
 // First-run setup while no library is chosen: Zotero if it is open, `.bib`
@@ -117,7 +131,9 @@ export function LibrarySetup({ api, perform, writing, shortcut }: {
               </button>
             ))}
           </div>
-          {writing.format.startsWith("style:") && <p className="empty-hint">{setupText.styleHint}</p>}
+          {writing.format.startsWith("style:") && (
+            <p className="empty-hint">{setupText.styleHint(STYLE_NAMES[writing.format.slice("style:".length) as StyleId] ?? "")}</p>
+          )}
         </section>
       )}
       {shortcut && <p className="empty-hint">{setupText.shortcut(shortcut)}</p>}
