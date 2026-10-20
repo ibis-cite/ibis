@@ -33,6 +33,8 @@ Choose product defaults that users notice (for example the shortcut) from eviden
 
 Without that authorization (for example, an outside contributor's agent), follow "Version control" below.
 
+For visual feature changes, include before/after screenshots using synthetic data for the relevant operating systems and light/dark appearances, label the source commit and browser or native capture, and explain any applicable views still missing.
+
 ### The loop
 
 1. Take the next queue item; read its issue and the tracking issue.
