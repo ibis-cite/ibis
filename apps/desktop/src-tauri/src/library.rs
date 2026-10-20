@@ -168,8 +168,9 @@ pub(crate) struct SearchResult {
     /// Family name of the first author (or the whole name of an
     /// organization); empty when the record names no authors.
     first_author: String,
-    /// Whether further authors follow the first.
-    more_authors: bool,
+    /// How many creators the record names (an organization counts as one),
+    /// so a row can name two authors and shorten three or more.
+    author_count: u32,
     /// Journal, book or proceedings title, else the publisher; capped at
     /// 120 characters.
     container: Option<String>,
@@ -201,7 +202,7 @@ impl SearchResult {
     fn from(reference: &Reference, matched: Vec<String>) -> Self {
         SearchResult {
             first_author: reference.authors.first().map(surname).unwrap_or_default(),
-            more_authors: reference.authors.len() > 1,
+            author_count: u32::try_from(reference.authors.len()).unwrap_or(u32::MAX),
             container: reference.container_plain().map(|text| capped(text, CONTAINER_LIMIT)),
             item_type: reference.item_type.clone(),
             id: reference.id.clone(),
@@ -897,11 +898,11 @@ mod tests {
             .map(|r| SearchResult::from(r, Vec::new()))
             .collect();
         assert_eq!(results[0].first_author, "García");
-        assert!(results[0].more_authors);
+        assert_eq!(results[0].author_count, 2);
         assert_eq!(results[0].container.as_deref(), Some("Journal of Synthetic Studies"));
         assert_eq!(results[0].item_type, "article-journal");
         assert_eq!(results[1].first_author, "Example Group");
-        assert!(!results[1].more_authors);
+        assert_eq!(results[1].author_count, 1);
         assert_eq!(results[1].item_type, "book");
         let capped = results[1].container.as_deref().unwrap_or_default();
         assert_eq!(capped.chars().count(), CONTAINER_LIMIT);
@@ -909,11 +910,31 @@ mod tests {
         assert_eq!(
             (
                 results[2].first_author.as_str(),
-                results[2].more_authors,
+                results[2].author_count,
                 results[2].container.as_deref()
             ),
-            ("", false, None)
+            ("", 0, None)
         );
+    }
+
+    #[test]
+    fn the_author_count_comes_from_the_creator_list() {
+        // A literal organization name with a comma is one creator, so the
+        // count is not read from the comma-joined display string.
+        let bib = "@article{a, title={Sleep}, author={Smith, Ann and {Institute, Research}}, year={2021}}\n\
+                   @article{b, title={Sleep}, author={Smith, Ann and Okafor, Tobi and Lima, Ana}, year={2021}}";
+        let loaded = ibis_core::bibtex::load_str("t", bib);
+        assert!(loaded.warnings.is_empty(), "{:?}", loaded.warnings);
+        let results: Vec<SearchResult> = loaded
+            .references
+            .iter()
+            .map(|r| SearchResult::from(r, Vec::new()))
+            .collect();
+        assert_eq!(
+            (results[0].author_count, results[0].authors.as_str()),
+            (2, "Smith, Institute, Research")
+        );
+        assert_eq!(results[1].author_count, 3);
     }
 
     #[test]

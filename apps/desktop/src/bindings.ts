@@ -192,8 +192,11 @@ export type SearchResult = {
 	 *  organization); empty when the record names no authors.
 	 */
 	first_author: string,
-	/**  Whether further authors follow the first. */
-	more_authors: boolean,
+	/**
+	 *  How many creators the record names (an organization counts as one),
+	 *  so a row can name two authors and shorten three or more.
+	 */
+	author_count: number,
 	/**
 	 *  Journal, book or proceedings title, else the publisher; capped at
 	 *  120 characters.

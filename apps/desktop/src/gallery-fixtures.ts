@@ -23,7 +23,7 @@ function library(overrides: Partial<GalleryLibrary> = {}): GalleryLibrary {
 function reference(key: string, title: string, authors = "Example Author", container: string | null = null): SearchResult {
   const names = authors.split(", ");
   return { id: { source: "synthetic-gallery", native_key: key }, key, title, authors, year: 2026, matched: ["title"],
-    first_author: names[0] ?? "", more_authors: names.length > 1, container, item_type: "article-journal" };
+    first_author: names[0] ?? "", author_count: names.length, container, item_type: "article-journal" };
 }
 
 const examples = [

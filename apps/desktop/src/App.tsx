@@ -69,10 +69,11 @@ function hiddenMatch(matched: string[]): string | null {
   return matched[0] ?? null;
 }
 
-/** Authors as a row shows them: "García", or "García et al." when more follow.
- * Uses the core fields only, so a name containing a comma is never miscounted. */
+/** Authors as a row shows them: "García", "García, Okafor" or "García et al.".
+ * The count comes from the record's creators, so a name with a comma is one;
+ * with one or two creators the joined surnames are already the short form. */
 function shortAuthors(r: SearchResult): string {
-  return r.first_author && r.more_authors ? `${r.first_author} ${rowText.etAl}` : r.authors;
+  return r.first_author && r.author_count > 2 ? `${r.first_author} ${rowText.etAl}` : r.authors;
 }
 
 /** Done, Look or Stop for the footer dot; words carry the same meaning. */
@@ -849,7 +850,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               >
                 <span className="result-line">
                   <strong className="result-title">{r.title}</strong>
-                  {compact && r.first_author && <span className="result-first-author"><bdi>{r.first_author}</bdi>{r.more_authors && ` ${rowText.etAl}`}</span>}
+                  {compact && r.first_author && <span className="result-first-author"><bdi>{r.first_author}</bdi>{r.author_count > 1 && ` ${rowText.etAl}`}</span>}
                   <span className="result-year">{r.year ?? pickerText.noDate}</span>
                 </span>
                 <span className="result-meta">

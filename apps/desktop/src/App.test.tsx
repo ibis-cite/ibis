@@ -57,7 +57,7 @@ async function chooseFromMore(name: string, role: "menuitem" | "menuitemcheckbox
 function result(key: string, title: string, source = "refs.bib") {
   return {
     id: { source, native_key: key }, key, title, authors: "Smith", year: 2020, matched: ["title"],
-    first_author: "Smith", more_authors: false, container: null as string | null, item_type: "article-journal",
+    first_author: "Smith", author_count: 1, container: null as string | null, item_type: "article-journal",
   };
 }
 
@@ -889,7 +889,7 @@ test("a row says why it matched only when the match is not visible", async () =>
 });
 
 test("rows with the same first author and year are told apart by their container and type", async () => {
-  const garcia = { authors: "García, Okafor", first_author: "García", more_authors: true, year: 2021 };
+  const garcia = { authors: "García, Okafor", first_author: "García", author_count: 2, year: 2021 };
   let density = "comfortable";
   backend({
     picker_preferences: () => ({ citation_style: null, density, larger_text: false }),
@@ -912,7 +912,7 @@ test("rows with the same first author and year are told apart by their container
   // after, with no gap, margin or padding of its own.
   const byline = rows[0]?.querySelector(".result-byline");
   expect(byline?.querySelector(".result-authors + .result-container")).toBeTruthy();
-  expect(byline?.textContent).toBe("García et al.García, Okafor\u00a0· Journal of Sleep \u202eResearch");
+  expect(byline?.textContent).toBe("García, Okafor\u00a0· Journal of Sleep \u202eResearch");
   expect([...(byline?.querySelectorAll(".result-container [aria-hidden]") ?? [])].map((e) => e.textContent)).toEqual(["\u00a0· "]);
   const bylineRules = [...styles.matchAll(/([^{}]*\.result-(?:byline|authors|container)\b[^{}]*)\{([^}]*)\}/g)];
   expect(bylineRules.length).toBeGreaterThan(0);
@@ -949,9 +949,9 @@ test("rows with the same first author and year are told apart by their container
 
 test("rows shorten the authors and keep the journal, key and library label visible", async () => {
   backend({ search: () => [
-    { ...result("a", "Six authors"), authors: "García, Okafor, Lima, Chen, Novak, Haddad", first_author: "García", more_authors: true, container: "Journal of Sleep Research" },
-    // The core says more authors follow; a comma inside one name is not counted.
-    { ...result("b", "Organisation"), authors: "Institute, Research", first_author: "Institute, Research", more_authors: false, container: "Sleep" },
+    { ...result("a", "Six authors"), authors: "García, Okafor, Lima, Chen, Novak, Haddad", first_author: "García", author_count: 6, container: "Journal of Sleep Research" },
+    // Two creators are both named; the core counts an organisation with a comma as one.
+    { ...result("b", "Organisation"), authors: "Smith, Institute, Research", first_author: "Smith", author_count: 2, container: "Sleep" },
     { ...result("c", "One author"), container: "Sleep" },
   ] });
   render(<App />);
@@ -959,10 +959,10 @@ test("rows shorten the authors and keep the journal, key and library label visib
   await screen.findByText("One author");
   const rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
   const authors = (row?: HTMLElement) => row?.querySelector(".result-authors");
-  // More authors: "García et al." on screen; screen readers still hear every name.
+  // Three or more: "García et al." on screen; screen readers still hear every name.
   expect(authors(rows[0])?.querySelector("[aria-hidden]")?.textContent).toBe("García et al.");
   expect(authors(rows[0])?.querySelector(".visually-hidden")?.textContent).toBe("García, Okafor, Lima, Chen, Novak, Haddad");
-  expect(authors(rows[1])?.textContent).toBe("Institute, Research");
+  expect(authors(rows[1])?.textContent).toBe("Smith, Institute, Research");
   expect(authors(rows[2])?.textContent).toBe("Smith");
   // The byline keeps a real share for the journal. The key and library label
   // never shrink to nothing: below their few-letter minimum the meta line
