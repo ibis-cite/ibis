@@ -18,9 +18,13 @@ export const {
   copyFormat,
 } = commands;
 
-// This UI default is not part of the Rust command signature.
+let searchRequest = 0;
+
+// The limit default and the request number are not part of the UI's API: each
+// search is numbered so the app can stop searches for outdated queries.
 export function search(query: string, limit = 20) {
-  return commands.search(query, limit);
+  searchRequest += 1;
+  return commands.search(query, limit, searchRequest);
 }
 
 /** Called whenever the picker is shown by the global shortcut or a second launch. */

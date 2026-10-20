@@ -145,7 +145,10 @@ fn rank<'r, 'f>(
         return Some(Vec::new());
     }
     let normalized = normalized.trim();
-    let exact_query: String = query.trim().chars().flat_map(char::to_lowercase).collect();
+    // Lowercase character by character, with final sigma folded, so keys are
+    // compared without allocating per record.
+    let lower = |c: char| char::to_lowercase(c).map(|c| if c == 'ς' { 'σ' } else { c });
+    let exact_query: String = query.trim().chars().flat_map(lower).collect();
     // Score every record without allocating; matched fields are a bit set and
     // become a list only for the records that are returned.
     let mut candidates: Vec<(u32, u8, &'r Reference)> = Vec::new();
@@ -182,7 +185,7 @@ fn rank<'r, 'f>(
         let exact_key = reference
             .citekey
             .as_deref()
-            .is_some_and(|k| k.chars().flat_map(char::to_lowercase).eq(exact_query.chars()));
+            .is_some_and(|k| k.chars().flat_map(lower).eq(exact_query.chars()));
         if exact_key {
             score += 2000;
         } else if fields[0] == normalized {
@@ -576,6 +579,20 @@ mod tests {
         let ids = |hits: &[Hit]| hits.iter().map(|h| h.reference.id.clone()).collect::<Vec<_>>();
         assert_eq!(ids(&top), ids(&all[..5]));
         assert_eq!(top[0].matched, [MatchField::Title]);
+    }
+
+    #[test]
+    fn exact_keys_with_greek_sigma_match_in_any_case() {
+        let refs = [
+            reference("ΜΑΣ", "Other", "X", 2020),
+            reference("μας13", "Other", "Y", 2021),
+        ];
+        let index = Index::new(&refs);
+        for (query, key) in [("μας", "ΜΑΣ"), ("Μας", "ΜΑΣ"), ("ΜΑΣ13", "μας13")] {
+            let hits = index.search(query, 10);
+            assert_eq!(hits[0].reference.id.native_key, key, "{query}");
+            assert!(hits[0].score >= 2000, "{query}");
+        }
     }
 
     #[test]
