@@ -1,6 +1,6 @@
 import type React from "react";
 import * as nativeApi from "./api";
-import { copiedNoticeText, copyFormatNames, densityNames, keyText, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
+import { copiedNoticeText, copyFormatNames, densityNames, keyText, libraryMessages, loginItemsPlace, loginItemText, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
 import { ariaKeys, KEY_TABLE, keyLabel, keysFor, type KeyBinding } from "./keys";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LibrarySetup, shortcutLabel } from "./LibrarySetup";
@@ -15,6 +15,7 @@ import {
   type CopyFormat,
   type Density,
   type LibraryStatus,
+  type LoginItem,
   type PickerPreferences,
   type RecordId,
   type SearchResult,
@@ -195,7 +196,7 @@ function KeysDialog({ bindings, onClose }: { bindings: readonly KeyBinding[]; on
 export type PickerApi = Pick<typeof nativeApi,
   "chooseLibrary" | "useZotero" | "libraryStatus" | "reloadLibrary" | "copyCitation" | "copyFormat" | "pickerPreferences" | "setPickerPreferences" |
   "hidePicker" | "setPinned" | "onLibraryChanged" | "onPickerShown" | "onPickerHidden" | "quit" | "search" | "shortcutStatus"> &
-  Partial<Pick<typeof nativeApi, "cslItems" | "copyFormatted" | "useZoteroLibraries" | "zoteroGroups" | "findSources" | "openFoundLibrary" | "showCopiedNotice">>;
+  Partial<Pick<typeof nativeApi, "cslItems" | "copyFormatted" | "useZoteroLibraries" | "zoteroGroups" | "findSources" | "openFoundLibrary" | "showCopiedNotice" | "loginItem" | "setLoginItem">>;
 
 /** A citation-key syntax, or a citation style written as `style:<id>`. */
 export type Choice = CopyFormat | `style:${StyleId}`;
@@ -221,7 +222,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const { chooseLibrary, useZotero, libraryStatus, reloadLibrary, copyCitation, copyFormat,
     hidePicker, setPinned, onLibraryChanged, onPickerShown, onPickerHidden, quit, search, shortcutStatus, cslItems, copyFormatted,
     pickerPreferences, setPickerPreferences, useZoteroLibraries, zoteroGroups } = api;
-  const { findSources, openFoundLibrary, showCopiedNotice } = api;
+  const { findSources, openFoundLibrary, showCopiedNotice, loginItem, setLoginItem } = api;
   const setupApi = useMemo(() => ({ chooseLibrary, useZotero, findSources, openFoundLibrary }),
     [chooseLibrary, useZotero, findSources, openFoundLibrary]);
   const [query, setQuery] = useState(preview?.query ?? "");
@@ -367,6 +368,26 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     };
   }, []);
 
+  // Whether Ibis starts at login, as the system reports it; read again each
+  // time the picker opens, since people also change it in system settings.
+  const [startAtLogin, setStartAtLogin] = useState<LoginItem | null>(null);
+  const readLoginItem = () => {
+    if (!loginItem) return;
+    void perform("loginItem", () => loginItem().then(setStartAtLogin));
+  };
+  const toggleStartAtLogin = () => {
+    if (!setLoginItem || !startAtLogin) return;
+    const on = !startAtLogin.enabled;
+    // Shown at once; the system's answer replaces it.
+    setStartAtLogin({ enabled: on, problem: null });
+    void perform("loginItem", () => setLoginItem(on).then(setStartAtLogin, (error: unknown) => {
+      setStartAtLogin({ ...startAtLogin, problem: null });
+      throw error;
+    }));
+  };
+  useEffect(() => { if (menuOpen) readLoginItem(); }, [menuOpen]);
+  const loginItemOffered = Boolean(setLoginItem) && startAtLogin !== null && startAtLogin.problem !== "unsupported";
+
   const togglePin = () => {
     const on = !pinned;
     setPinnedState(on);
@@ -393,6 +414,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         setRestored((n) => n + 1);
       }
       hiddenAt.current = null;
+      readLoginItem();
       input.current?.focus();
       input.current?.select();
     };
@@ -415,6 +437,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     libraryStatus()
       .then((status) => { if (acceptInitialStatus) setLibrary(status); })
       .catch(() => { if (acceptInitialStatus) { setLibrary(null); report("status"); } });
+    readLoginItem();
     shortcutStatus()
       .then(setShortcut)
       .catch(() => { setShortcut(null); report("shortcut"); });
@@ -819,6 +842,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         {(Object.keys(failures) as Operation[]).filter((operation) => failures[operation]).map((operation) => (
           <p role="alert" key={operation}>{FAILURE_MESSAGES[operation]}</p>
         ))}
+        {startAtLogin?.problem && startAtLogin.problem !== "unsupported" && (
+          <p role="alert">{loginItemText.problem(startAtLogin.problem, loginItemsPlace(navigator.platform))}</p>
+        )}
         {error && <p role="alert">{error}</p>}
         {copyError && <p role="alert">{copyError}</p>}
         {copied && (
@@ -947,7 +973,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             ) : library?.state === "none" ? (
               <LibrarySetup api={setupApi} perform={perform}
                 writing={{ format, formatted: Boolean(cslItems && copyFormatted), choose: chooseFormat }}
-                shortcut={shortcut?.registered ? shortcutLabel(shortcut.shortcut, isMac) : null} />
+                shortcut={shortcut?.registered ? shortcutLabel(shortcut.shortcut, isMac) : null}
+                startAtLogin={loginItemOffered && startAtLogin ? { enabled: startAtLogin.enabled, toggle: toggleStartAtLogin } : undefined} />
             ) : null}
           </div>
         )}
@@ -1008,6 +1035,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                 )}
                 <MenuItem label={pickerText.density(densityNames[density])} title={pickerText.densityTitle} onSelect={changeDensity} />
                 <MenuItem label={pickerText.largerText} checked={largerText} onSelect={toggleLargerText} />
+                {loginItemOffered && startAtLogin && (
+                  <MenuItem label={loginItemText.label} title={loginItemText.title} checked={startAtLogin.enabled} onSelect={toggleStartAtLogin} />
+                )}
                 {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
                 <MenuItem label={keyText.title} keys={label(keysFor("keys"))} onSelect={openKeys} />
                 <MenuItem label={pickerText.quitLabel} keys={label(keysFor("quit"))} onSelect={() => runFromMenu("quit", quitAfterSaving)} />

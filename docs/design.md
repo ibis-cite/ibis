@@ -205,6 +205,32 @@ visible (2 px, accent), except on the frameless macOS search field, where the
 caret and the active row are the cue, as in Spotlight. With increased contrast
 or forced colours, that field shows the ring too. Right-to-left titles align right within their row.
 
+## Settings
+
+Until the settings window exists (rollout step 9), settings live in the More
+menu and the menu bar or tray menu, and each takes effect at once.
+
+**Start Ibis when you log in.** The shortcut only works while Ibis runs, so
+Ibis offers to start at login: once during first-run setup, beside the
+shortcut it teaches, and always in More and the menu bar or tray menu. It is
+off until the person ticks it: Apple's App Review Guideline 2.4.5(iii) asks
+Mac apps for consent first, and Raycast, Alfred, PowerToys and 1Password offer
+it as a setting. A login start
+leaves the picker hidden until the shortcut is pressed. The tick is read from
+the system each time the picker or the menu opens, never from `settings.json`,
+so turning Ibis off in System Settings > General > Login Items (macOS), Task
+Manager's Startup apps (Windows) or the desktop's startup settings (Linux)
+shows at once. If the system refuses, the tick shows the real state and a
+sentence says where to change it; macOS may also ask the person to approve the
+login item there. Ibis Nightly and development builds register under their own
+names and never replace stable Ibis's entry.
+
+- macOS 13 and later: `SMAppService.mainApp` (Open at Login). Older macOS
+  shows no choice.
+- Windows: the current user's `Run` key, never all users'.
+- Linux: an XDG autostart file in `$XDG_CONFIG_HOME/autostart`, skipped by the
+  session if the program has been removed (`TryExec`).
+
 ## Rollout
 
 Each step is one pull request against #223 (or an issue split from it), reviewed
