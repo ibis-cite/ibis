@@ -187,7 +187,8 @@ fn arxiv(text: &str) -> Option<String> {
     if let Some(path) = strip_link(text, &["arxiv.org/abs/", "arxiv.org/pdf/", "arxiv.org/html/"]) {
         return arxiv_id(link_path(path).trim_end_matches(".pdf"));
     }
-    arxiv_prefixed(text).or_else(|| arxiv_id(text).filter(|_| text.contains('.') && !text.contains('/')))
+    // Both shapes are strict enough to recognize without a prefix.
+    arxiv_prefixed(text).or_else(|| arxiv_id(text))
 }
 
 fn arxiv_prefixed(text: &str) -> Option<String> {
@@ -326,9 +327,18 @@ mod tests {
         ] {
             assert_eq!(parse_query(q), arxiv, "{q}");
         }
+        let old_style = Some(Identifier::Arxiv("hep-th/9901001".into()));
+        for q in [
+            "arXiv:hep-th/9901001",
+            "hep-th/9901001",
+            "hep-th/9901001v2",
+            "https://arxiv.org/abs/hep-th/9901001",
+        ] {
+            assert_eq!(parse_query(q), old_style, "{q}");
+        }
         assert_eq!(
-            parse_query("arXiv:hep-th/9901001"),
-            Some(Identifier::Arxiv("hep-th/9901001".into()))
+            parse_query("math.AG/0501001"),
+            Some(Identifier::Arxiv("math/0501001".into()))
         );
         let pmid = Some(Identifier::Pmid("12345678".into()));
         for q in [
@@ -367,6 +377,10 @@ mod tests {
             "pmid:",
             "pmid:abc",
             "doi:10.1000/a b",
+            "and/or",
+            "hep-th/99",
+            "hep-th/99010012",
+            "input/output",
         ] {
             assert_eq!(parse_query(q), None, "{q:?}");
         }

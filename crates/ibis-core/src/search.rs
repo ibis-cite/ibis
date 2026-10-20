@@ -671,6 +671,7 @@ mod tests {
              @book{isbn1, title={Memory}, isbn={0-306-40615-2}, year={2019}}
              @article{arx, title={Dreams}, url={https://arxiv.org/abs/2101.00001v2}, year={2021}}
              @article{pm, title={Naps}, url={https://pubmed.ncbi.nlm.nih.gov/12345/}, year={2022}}
+             @article{old, title={Strings}, eprint={hep-th/9711200}, archiveprefix={arXiv}, year={1997}}
              @article{other, title={Mentions 10.1000/abc.1 in passing}, year={2023}}",
         )
         .references;
@@ -681,6 +682,9 @@ mod tests {
             ("978-0-306-40615-7", "isbn1", MatchField::Identifier),
             ("arXiv:2101.00001", "arx", MatchField::Identifier),
             ("PMID:12345", "pm", MatchField::Identifier),
+            ("hep-th/9711200", "old", MatchField::Identifier),
+            ("arXiv:hep-th/9711200", "old", MatchField::Identifier),
+            ("https://arxiv.org/abs/hep-th/9711200", "old", MatchField::Identifier),
         ] {
             for hits in [borrowed.search(query, 10), owned.search(query, 10)] {
                 assert_eq!(hits.len(), 1, "{query}");
