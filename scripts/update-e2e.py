@@ -102,6 +102,7 @@ def run(args):
 
     report = {"status": "failed", "steps": []}
     started = []
+    log = None
     try:
         with tempfile.TemporaryDirectory(prefix="ibis update test ") as temporary:
             folder = Path(temporary)
@@ -153,6 +154,8 @@ def run(args):
         for app in started:
             if app.poll() is None:
                 app.kill()
+        if log:
+            log.close()
         (args.output / "update-e2e.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2))
     return 0 if report["status"] == "passed" else 1
