@@ -41,7 +41,10 @@ cargo insta review                             # review changed snapshots
 
 The full check includes the default workspace and every desktop crate test.
 CI also tests core/CLI with the Rust 1.90 minimum, the core in release mode, and
-builds the web interface once for all three native apps. Pandoc comparisons skip
+builds the web interface once for all three native apps. Docs-only PRs report
+success for Desktop jobs without building the app; docs-only merges start no
+main run. Newer PR/main pushes supersede older CI runs, and only main saves
+Rust build caches. Pandoc comparisons skip
 when Pandoc is absent; `IBIS_REQUIRE_PANDOC=1` requires them (in PowerShell,
 `$env:IBIS_REQUIRE_PANDOC = '1'`). Missing optional Pandoc does not make the full
 check incomplete. Review changed snapshots like code.

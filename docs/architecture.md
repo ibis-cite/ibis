@@ -24,7 +24,6 @@
 - **Behaviour as data.** Destination profiles, output templates and styles are validated data and never execute code.
 - **Escape output.** Escape every output for its target syntax, including LaTeX, Pandoc, Typst, HTML and RTF.
 - **Keep private data private.** Never put real reference data, document text, clipboard contents, credentials, personal paths or usernames in tests, logs, diagnostics, issues or commits. Never commit or print these. Fixtures are synthetic; diagnostics use an allowlist rather than raw errors or payloads.
-
 - **Local endpoints.** Bind to `127.0.0.1`, require a token and reject browser `Origin` headers.
 
 ## Data model
