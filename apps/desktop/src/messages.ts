@@ -166,7 +166,7 @@ export const copyFormatLabels: Record<KeyFormat, string> = {
 // The notice shown after a clean copy hides the picker (#496).
 export const copiedNoticeText = {
   title: "Copied",
-  windowsTitle: "Citation copied",
+  windowsTitle: "Citation copied. Press Ctrl+V to paste.",
   source: "Ibis",
   noticeFailed: "The Copied notice could not be shown.",
 };

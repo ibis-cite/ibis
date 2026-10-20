@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "notice",
-  "description": "The Copied notice only listens for the text it shows. It has no window, file system, shell, network, menu or tray access.",
+  "description": "Core permissions for the Copied notice: event listening only. App commands are not restricted per window (no app manifest yet), so this does not limit which Ibis commands the page could call.",
   "windows": [
     "notice"
   ],

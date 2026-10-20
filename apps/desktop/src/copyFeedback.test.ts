@@ -52,10 +52,10 @@ test("the notice is a polite status that shows text as text and replays when sho
   expect(notice.querySelectorAll("code")).toHaveLength(1);
   const windows = document.createElement("div");
   renderNotice(windows, "windows")("[@a]");
-  expect(windows.textContent).toContain("Citation copied");
+  expect(windows.textContent).toContain("Citation copied. Press Ctrl+V to paste.");
 });
 
-test("the notice window may only listen for its text", () => {
+test("the notice window is granted no core permission beyond event listening", () => {
   expect(noticeCapability.windows).toEqual(["notice"]);
   expect([...noticeCapability.permissions].sort()).toEqual(["core:event:allow-listen", "core:event:allow-unlisten"]);
 });

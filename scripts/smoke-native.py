@@ -411,6 +411,12 @@ class Linux:
             stack.extend(c for c in item if c)
         raise AssertionError(f"No invokable accessibility control {name!r}")
 
+    def notice_visible(self):
+        try:
+            return bool(run("xdotool", "search", "--onlyvisible", "--pid", str(self.app.pid), "--name", f"^{NOTICE_TITLE}$"))
+        except subprocess.CalledProcessError:
+            return False
+
     def focus_editor(self):
         window = self.window(self.editor.pid)
         if not window:
@@ -811,6 +817,11 @@ def main():
                 except AssertionError:
                     capture_editor_focus("copy-restoration-timeout")
                     raise
+                # The Copied notice (#496) is up while the editor keeps focus.
+                # Only the Linux adapter can see it; others skip this check.
+                if hasattr(native, "notice_visible"):
+                    wait_for(lambda: native.notice_visible() and native.editor_focused(),
+                             "Copied notice shows while the editor keeps focus", timeout=5)
 
             def live_settings_copy():
                 paths = [settings.with_suffix(suffix) for suffix in (".json", ".json.bak", ".json.tmp")]

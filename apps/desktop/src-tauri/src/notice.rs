@@ -19,8 +19,8 @@ use crate::placement::{Area, display};
 pub(crate) const LABEL: &str = "notice";
 /// The window title, which screen readers may read; never the citation.
 const TITLE: &str = "Ibis notice";
-/// About two seconds visible, then a 200 ms fade drawn by the page.
-const SHOWN_FOR: Duration = Duration::from_millis(2_200);
+/// As long as the prototype shows it, ending with a 200 ms fade drawn by the page.
+const SHOWN_FOR: Duration = Duration::from_millis(2_800);
 /// The notice names what was copied on one line; longer text is cut short.
 const TEXT_LIMIT: usize = 200;
 
@@ -41,13 +41,13 @@ impl Platform {
     };
 }
 
-/// Window size in points. On macOS and Windows the window is transparent and
-/// a little larger than the notice it draws, leaving room for its shadow; on
-/// Linux the window is opaque and is the toast itself.
+/// Window size in points. The window is transparent and a little larger than
+/// the notice it draws on macOS and Windows, leaving room for its shadow; on
+/// Linux it is the rounded toast itself.
 pub(crate) fn notice_size(platform: Platform) -> (f64, f64) {
     match platform {
         Platform::MacOs => (400.0, 76.0),
-        Platform::Windows => (380.0, 112.0),
+        Platform::Windows => (420.0, 112.0),
         Platform::Linux => (360.0, 44.0),
     }
 }
@@ -67,6 +67,22 @@ pub(crate) fn notice_position(platform: Platform, usable: Area, width: f64, heig
         Platform::Windows => (right, bottom(0.0)),
         Platform::Linux => (centre, bottom(28.0)),
     }
+}
+
+/// The window's corner on a display in the shared space of `placement`
+/// (points on macOS, pixels elsewhere). `scale` converts the notice's size in
+/// points to that space: 1 on macOS, the display's scale elsewhere.
+/// Margins and sizes are in points, so the area is measured in points first.
+pub(crate) fn notice_corner(platform: Platform, usable: Area, scale: f64) -> (f64, f64) {
+    let (width, height) = notice_size(platform);
+    let points = Area {
+        x: usable.x / scale,
+        y: usable.y / scale,
+        width: usable.width / scale,
+        height: usable.height / scale,
+    };
+    let (x, y) = notice_position(platform, points, width, height);
+    (x * scale, y * scale)
 }
 
 /// One line of the copied text, cut at a character boundary.
@@ -123,8 +139,8 @@ fn show(app: &AppHandle, text: String) {
             Some(window) => {
                 // Already open (or, on macOS, kept hidden): move it to the
                 // picker's display and replay it with the new text.
-                if let Some((x, y)) = position(app) {
-                    report(window.set_position(placed(x, y)), NativeIssue::Position);
+                if let Some(corner) = position(app) {
+                    report(window.set_position(corner.position()), NativeIssue::Position);
                 }
                 report(window.emit_to(LABEL, "notice:show", &text), NativeIssue::Notice);
                 present(app);
@@ -149,31 +165,49 @@ fn show(app: &AppHandle, text: String) {
     }
 }
 
-/// The notice's corner on the display the picker was on, in the shared space
-/// used by `placement`: points on macOS, pixels elsewhere.
-fn position(app: &AppHandle) -> Option<(f64, f64)> {
+/// Where the notice goes on the display the picker was on.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) struct Corner {
+    /// In the shared space of `placement`: points on macOS, pixels elsewhere.
+    shared: (f64, f64),
+    /// Points to pixels on the target display; 1 on macOS.
+    scale: f64,
+}
+
+impl Corner {
+    /// For moving an existing window. Off macOS the pixels are used as they
+    /// are, like the picker does, so the window's current display scale
+    /// never converts them (#517 review).
+    fn position(self) -> tauri::Position {
+        let (x, y) = self.shared;
+        if cfg!(target_os = "macos") {
+            tauri::LogicalPosition::new(x, y).into()
+        } else {
+            tauri::PhysicalPosition::new(x.round() as i32, y.round() as i32).into()
+        }
+    }
+
+    /// For a new window's builder, which takes points; tao converts them back
+    /// at the scale of the display that holds them.
+    fn points(self) -> (f64, f64) {
+        (self.shared.0 / self.scale, self.shared.1 / self.scale)
+    }
+}
+
+fn position(app: &AppHandle) -> Option<Corner> {
     let picker = app.get_webview_window("main")?;
     let monitor = checked(picker.current_monitor(), NativeIssue::Monitor)
         .flatten()
         .or_else(|| checked(app.primary_monitor(), NativeIssue::Monitor).flatten())?;
-    let (width, height) = notice_size(Platform::CURRENT);
     let scale = if cfg!(target_os = "macos") {
         1.0
     } else {
         monitor.scale_factor()
     };
-    let (x, y) = notice_position(
-        Platform::CURRENT,
-        display(&monitor).usable,
-        width * scale,
-        height * scale,
-    );
-    // Builders and set_position take points; convert at the target's scale.
-    Some((x / scale, y / scale))
-}
-
-fn placed(x: f64, y: f64) -> tauri::Position {
-    tauri::LogicalPosition::new(x, y).into()
+    Some(Corner {
+        shared: notice_corner(Platform::CURRENT, display(&monitor).usable, scale),
+        scale,
+    })
 }
 
 fn create(app: &AppHandle) -> Option<()> {
@@ -204,21 +238,17 @@ fn create(app: &AppHandle) -> Option<()> {
         .visible_on_all_workspaces(true)
         .focused(false)
         .focusable(false);
-    if let Some((x, y)) = position(app) {
+    if let Some(corner) = position(app) {
+        let (x, y) = corner.points();
         builder = builder.position(x, y);
     }
     if let Some(args) = browser_args.as_deref() {
         builder = builder.additional_browser_args(args);
     }
-    #[cfg(any(target_os = "macos", target_os = "windows"))]
-    {
-        builder = builder.transparent(true);
-    }
-    // Linux draws an opaque toast; start in its colour, not a white flash.
-    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
-    {
-        builder = builder.background_color(tauri::webview::Color(0x3a, 0x3a, 0x3e, 0xff));
-    }
+    // Transparent everywhere, so each notice keeps its rounded shape; the
+    // page draws an opaque surface. Without a compositor (some X11 window
+    // managers) Linux shows dark corners instead.
+    builder = builder.transparent(true);
     // Windows and Linux show it as it is created: tao shows a window built
     // unfocused without activating it, which a later show would not do.
     // macOS shows it once it is a non-activating panel.
@@ -226,8 +256,10 @@ fn create(app: &AppHandle) -> Option<()> {
     let window = checked(builder.build(), NativeIssue::Notice)?;
     #[cfg(target_os = "macos")]
     macos::configure(app, &window);
+    // Clicks pass through, including its transparent margins, so it never
+    // blocks what is under it (macOS does this in `configure`).
     #[cfg(not(target_os = "macos"))]
-    let _ = window;
+    report(window.set_ignore_cursor_events(true), NativeIssue::Notice);
     Some(())
 }
 
@@ -380,6 +412,24 @@ mod tests {
             let (x, y) = notice_position(platform, tiny, width, height);
             assert!(x >= tiny.x && y >= tiny.y, "{platform:?} placed it off the display");
         }
+    }
+
+    /// A second copy moves the open window with pixels, not points, so a
+    /// display with a different scale than the window's current one cannot
+    /// misplace it; a new window gets points for its builder.
+    #[test]
+    fn corners_are_in_display_pixels_and_points_for_new_windows() {
+        let hidpi = rect(1920.0, 0.0, 3840.0, 2112.0);
+        let corner = Corner {
+            shared: notice_corner(Platform::Windows, hidpi, 2.0),
+            scale: 2.0,
+        };
+        // The card's corner meets the display's bottom-right corner.
+        assert_eq!(corner.shared, (1920.0 + 3840.0 - 840.0, 2112.0 - 224.0));
+        assert_eq!(corner.points(), (2460.0, 944.0));
+        // The toast's 28-point margin is 42 pixels at 150%.
+        let linux = notice_corner(Platform::Linux, hidpi, 1.5);
+        assert_eq!(linux, (1920.0 + (3840.0 - 540.0) / 2.0, 2112.0 - 66.0 - 42.0));
     }
 
     #[test]

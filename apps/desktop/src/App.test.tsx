@@ -1605,6 +1605,8 @@ test("a drag, a double click's second click or a modified click on a row copies 
 });
 
 test("a click on a row waits for its formatted preview before copying it", async () => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
   const copies: unknown[] = [];
   backend({
     picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
@@ -1670,4 +1672,34 @@ test("a search cleared by Escape stays cleared once something else is typed or c
   await act(async () => { await emit("picker:hidden"); });
   await act(async () => { await emit("picker:shown"); });
   expect(box.value).toBe("");
+});
+
+test.each(["Escape", "hidden"])("a click waiting for its preview never copies after the picker is left (%s)", async (leave) => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
+  let release: () => void = () => undefined;
+  const ready = new Promise<void>((resolve) => { release = resolve; });
+  const calls = backend({
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+    search: () => [result("a", "First"), result("b", "Second")],
+    csl_items: ({ ids }) => ready.then(() => JSON.stringify((ids as { native_key: string }[]).map((id) => ({
+        id: id.native_key, type: "article-journal", title: id.native_key,
+        author: [{ family: "Smith", given: "A" }], issued: { "date-parts": [[2020]] },
+      })))),
+    copy_formatted: () => null,
+  });
+  render(<App />);
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
+  fireEvent.click(await screen.findByText("Second"));
+  if (leave === "Escape") {
+    fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Escape" });
+    await waitFor(() => expect(calls).toContain("hide_picker"));
+  }
+  await act(async () => { await emit("picker:hidden"); });
+  const hides = calls.filter((c) => c === "hide_picker").length;
+  await act(async () => { release(); await new Promise((resolve) => setTimeout(resolve, 50)); });
+  await waitFor(() => expect(document.querySelector(".format-preview")?.textContent).toContain("Smith"));
+  expect(calls).not.toContain("copy_formatted");
+  expect(calls.filter((c) => c === "hide_picker")).toHaveLength(hides);
+  expect(calls).not.toContain("show_copied_notice");
 });

@@ -196,7 +196,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     try { await action(); report(operation, false); }
     catch { report(operation); }
   };
-  const hide = () => void perform("hide", hidePicker);
+  // A click still waiting for its preview must never copy once the user has left.
+  const [clickCopy, setClickCopy] = useState<string | null>(null);
+  const hide = () => {
+    setClickCopy(null);
+    void perform("hide", hidePicker);
+  };
   const clearSearch = () => {
     escapedQuery.current = null;
     setQuery("");
@@ -297,7 +302,10 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     };
     // Every hide is reported, including the native one when focus moves away;
     // a monotonic clock keeps clock changes from clearing or keeping a search.
-    const unlistenHidden = onPickerHidden(() => { hiddenAt.current = performance.now(); })
+    const unlistenHidden = onPickerHidden(() => {
+      hiddenAt.current = performance.now();
+      setClickCopy(null);
+    })
       .catch(() => subscriptionFailure("pickerEvents"));
     const unlisten = onPickerShown(focusSearch).catch(() => subscriptionFailure("pickerEvents"));
     const unlistenLibrary = onLibraryChanged((status) => {
@@ -470,7 +478,6 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   };
   // A click on a row copies what Enter would copy then (the row, or the
   // citation being built), once that is ready; anything changing first cancels it.
-  const [clickCopy, setClickCopy] = useState<string | null>(null);
   useEffect(() => {
     if (clickCopy === null) return;
     if (chosenKey !== clickCopy) {
@@ -554,6 +561,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         if (composing(e)) return;
         if (e.key === "Escape") {
           e.preventDefault();
+          setClickCopy(null);
           // Escape steps back one layer: the menu, then the search, then the
           // picker. Chosen references stay; hiding keeps them for a minute.
           if (menuOpen) closeMenu(true);
