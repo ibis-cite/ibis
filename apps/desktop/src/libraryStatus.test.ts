@@ -5,6 +5,8 @@ import type { LibraryStatus } from "./bindings";
 import { libraryHealth, LibraryStatusLine, zoteroLibraryNames } from "./LibraryStatusLine";
 import { ago, libraryMessages, recentUpdate } from "./messages";
 
+const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
+const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
 const now = Date.UTC(2026, 9, 20, 12, 0);
 const hour = 3_600_000;
 const file = (overrides: Partial<LibraryStatus> = {}): LibraryStatus => ({
@@ -120,4 +122,23 @@ test("the footer age ticks by itself, skips hidden windows and catches up when s
     visibility.mockRestore();
     vi.useRealTimers();
   }
+});
+
+test("the footer shortens the age, then the name, and only then the state words, with an ellipsis", () => {
+  const styles = readFileSync(new FileURL("./styles.css", import.meta.url), "utf8");
+  const rule = (selector: string) => styles.match(new RegExp(`^\\${selector} \\{([^}]*)\\}`, "m"))?.[1] ?? "";
+  const shrink = (selector: string) => Number(rule(selector).match(/flex-shrink: ([\d.]+)|flex: 0 ([\d.]+) auto/)?.slice(1).find(Boolean));
+  expect(shrink(".library-age")).toBeGreaterThan(1);
+  expect(shrink(".library-source")).toBeGreaterThan(shrink(".library-age"));
+  expect(rule(".library-state")).toContain("flex: 0 1 auto");
+  for (const selector of [".library-source", ".library-state", ".library-age"]) {
+    expect(rule(selector)).toContain("text-overflow: ellipsis");
+    expect(rule(selector)).toContain("overflow: hidden");
+  }
+});
+
+test("the visible age is hidden from screen readers, which read the detail instead", () => {
+  const { container } = render(createElement(LibraryStatusLine, { library: zotero({ updated_at: Date.now(), checked_at: Date.now() }), groupName: String }));
+  expect(container.querySelector(".library-age")?.getAttribute("aria-hidden")).toBe("true");
+  expect(strip(container.querySelector(".library-detail")?.textContent ?? null)).toMatch(/checked just now/);
 });

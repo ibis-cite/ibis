@@ -60,7 +60,7 @@ export function LibraryStatusLine({ library, groupName }: {
             {source !== null && <bdi className="library-source">{source}</bdi>}
             {state && <span className="library-state">{state}</span>}
           </span>
-          {age && <span className="library-age"> · {age}</span>}
+          {age && <span className="library-age" aria-hidden="true"> · {age}</span>}
         </span>
       </span>
       {/* The hover detail, for screen readers reading the footer; not live. */}
