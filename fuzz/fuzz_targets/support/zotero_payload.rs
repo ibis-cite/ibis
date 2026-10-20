@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use ibis_core::library::SelectError;
 use ibis_core::zotero::{Library, load_items};
 use serde_json::{Value, json};
 
@@ -56,11 +57,23 @@ pub fn exercise(data: &[u8]) {
             let encoded = serde_json::to_vec(&csl).unwrap_or_else(|error| panic!("CSL serialization: {error}"));
             assert_eq!(serde_json::from_slice::<Value>(&encoded).ok(), Some(csl));
         }
-        // Duplicate citation IDs may legitimately be refused; neither path
-        // may panic or silently serialize only part of a successful export.
-        if let Ok(csl) = ibis_core::library::csl_items(&loaded.references) {
-            assert_eq!(csl.len(), loaded.references.len());
-            assert!(serde_json::to_vec(&csl).is_ok());
+        // Export must refuse exactly the records whose public citation IDs
+        // collide; an unrelated error must not hide a mapper regression.
+        let mut csl_ids = HashSet::new();
+        let collision = loaded
+            .references
+            .iter()
+            .any(|reference| !csl_ids.insert(reference.citekey.as_deref().unwrap_or(&reference.id.native_key)));
+        match ibis_core::library::csl_items(&loaded.references) {
+            Ok(csl) => {
+                assert!(!collision, "export accepted duplicate citation IDs");
+                assert_eq!(csl.len(), loaded.references.len());
+                assert!(serde_json::to_vec(&csl).is_ok());
+            }
+            Err(SelectError::DuplicateKeys { .. }) => {
+                assert!(collision, "export rejected unique citation IDs");
+            }
+            Err(error) => panic!("unexpected CSL export failure: {error}"),
         }
     }
 }
