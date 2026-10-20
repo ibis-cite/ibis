@@ -11,6 +11,7 @@ const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
 
 const tokens = readFileSync(new FileURL("./tokens.css", import.meta.url), "utf8");
 const styles = readFileSync(new FileURL("./styles.css", import.meta.url), "utf8");
+const gallery = readFileSync(new FileURL("./gallery.css", import.meta.url), "utf8");
 const corners = readFileSync(new FileURL("../src-tauri/src/native_corners.rs", import.meta.url), "utf8");
 
 afterEach(() => { cleanup(); clearMocks(); delete document.documentElement.dataset.platform; });
@@ -235,5 +236,22 @@ test("the frameless macOS search has no ring except with contrast or forced colo
   expect(tokens).toMatch(/--control-min-size:\s*2rem/);
   expect(tokens).toMatch(/--icon-size:\s*1rem/);
   const forced = styles.slice(styles.indexOf("@media (forced-colors: active)"));
-  expect(rules(forced, "#search::-webkit-search-cancel-button")).toMatch(/background:\s*ButtonText/);
+  expect(rules(forced, "#search::-webkit-search-cancel-button")).toMatch(/background:\s*FieldText/);
+  // The gallery's contrast preview restores the ring as prefers-contrast does.
+  expect(rules(gallery, ':root[data-gallery-theme="contrast"]:not([data-platform="windows"]):not([data-platform="linux"]) #search:focus-visible'))
+    .toMatch(/outline:\s*var\(--focus-width\) solid var\(--focus\)/);
+});
+
+test("under forced colours the active row opts out of the backplate so HighlightText stays on Highlight", () => {
+  const start = styles.indexOf("@media (forced-colors: active)");
+  const forced = styles.slice(start, styles.indexOf("\n}\n", start));
+  // Without this, Chromium and WebView2 paint a Canvas backplate behind the
+  // HighlightText label: white on white in the default palette.
+  expect(rules(forced, '[role="option"][data-active]')).toMatch(/forced-color-adjust:\s*none/);
+  // Every colour that row then paints is a system colour from the forced palette.
+  const forcedTokens = tokens.slice(tokens.indexOf("@media (forced-colors: active)"));
+  expect(forcedTokens).toMatch(/--row-active-background:\s*Highlight;/);
+  expect(forcedTokens).toMatch(/--row-active-text:\s*HighlightText;/);
+  expect(rules(forced, '[role="option"][data-active][data-citation-selected]')).toMatch(/outline-color:\s*HighlightText/);
+  expect(rules(forced, ':root[data-platform="windows"] [role="option"][data-active]::before')).toMatch(/background:\s*HighlightText/);
 });

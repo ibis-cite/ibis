@@ -9,4 +9,5 @@ main.gallery-catalog { height: auto; padding: var(--gallery-padding); gap: var(-
 :root[data-gallery-theme="dark"] { color-scheme: dark; }
 :root[data-gallery-theme="contrast"] { color-scheme: light; }
 :root[data-gallery-theme="contrast"] [role="option"][data-active] { border-color: var(--active-edge); border-width: var(--contrast-border-width); }
+:root[data-gallery-theme="contrast"]:not([data-platform="windows"]):not([data-platform="linux"]) #search:focus-visible { outline: var(--focus-width) solid var(--focus); }
 :root[data-gallery-size="large"] { font-size: var(--gallery-large-text-size); }
