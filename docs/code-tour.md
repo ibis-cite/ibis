@@ -61,8 +61,10 @@ with the explicit `bindings::tests::export_contract` test described in that file
 4. [core cite.rs](../crates/ibis-core/src/cite.rs)'s `render` validates keys and
    applies the chosen Pandoc, LaTeX, BibLaTeX or Typst syntax. Follow that format's
    escaping helper when output is wrong.
-5. The desktop command writes the rendered text with the clipboard plugin, then
-   remembers the format in settings. It returns text and warnings to React.
+5. The desktop command writes the rendered text with the clipboard plugin and
+   returns text and warnings to React. Format choices are saved when selected,
+   through the same locked settings update as the other picker preferences,
+   even if no citation is copied.
    React hides the picker after a successful copy with no warnings; otherwise
    it keeps the result or error visible. Every dismissal (copy, Escape, shortcut,
    blur or close) uses `picker::dismiss_picker`: it hides the window and, on
