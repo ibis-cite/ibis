@@ -187,6 +187,20 @@ export type SearchResult = {
 	authors: string,
 	year: number | null,
 	matched: string[],
+	/**
+	 *  Family name of the first author (or the whole name of an
+	 *  organization); empty when the record names no authors.
+	 */
+	first_author: string,
+	/**  Whether further authors follow the first. */
+	more_authors: boolean,
+	/**
+	 *  Journal, book or proceedings title, else the publisher; capped at
+	 *  120 characters.
+	 */
+	container: string | null,
+	/**  CSL item type, such as `article-journal`. */
+	item_type: string,
 };
 
 /**  Whether the global shortcut is working, shown in the interface. */

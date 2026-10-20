@@ -1,6 +1,6 @@
 import type React from "react";
 import * as nativeApi from "./api";
-import { copyFormatNames, densityNames, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText } from "./messages";
+import { copyFormatNames, densityNames, libraryMessages, operationFailures as FAILURE_MESSAGES, pickerText, rowText } from "./messages";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LibrarySetup, shortcutLabel } from "./LibrarySetup";
 import { formatCitation, FORMATTED_STYLES, provisional, type FormattedCitation } from "./format/formatted";
@@ -49,8 +49,9 @@ const commandKey = (e: React.KeyboardEvent) => (isMac ? e.metaKey && !e.ctrlKey 
 const VISIBLE_FIELDS = new Set(["title", "author", "citekey", "year"]);
 
 /** The strongest match the row does not show, if every match is hidden. */
-function hiddenMatch(matched: string[]): string | null {
-  if (matched.length === 0 || matched.some((field) => VISIBLE_FIELDS.has(field))) return null;
+function hiddenMatch(matched: string[], containerShown = false): string | null {
+  const shown = (field: string) => VISIBLE_FIELDS.has(field) || (containerShown && field === "container");
+  if (matched.length === 0 || matched.some(shown)) return null;
   return matched[0] ?? null;
 }
 
@@ -682,7 +683,10 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         </p>
         <ul id="results" role="listbox" aria-label={pickerText.results}>
           {results.map((r, i) => {
-            const why = hiddenMatch(r.matched);
+            const compact = density === "compact";
+            // Comfortable and Spacious rows show the container, so a match there is visible.
+            const why = hiddenMatch(r.matched, !compact && Boolean(r.container));
+            const itemType = density === "spacious" ? rowText.itemType(r.item_type) : null;
             return (
               <li
                 key={idKey(r.id)}
@@ -698,10 +702,13 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               >
                 <span className="result-line">
                   <strong className="result-title">{r.title}</strong>
+                  {compact && r.first_author && <span className="result-first-author"><bdi>{r.first_author}</bdi>{r.more_authors && ` ${rowText.etAl}`}</span>}
                   <span className="result-year">{r.year ?? pickerText.noDate}</span>
                 </span>
                 <span className="result-meta">
                   <span className="result-authors">{r.authors}</span>
+                  {!compact && r.container && <span className="result-container"><span aria-hidden="true">· </span><bdi>{r.container}</bdi></span>}
+                  {itemType && <span className="result-type">{itemType}</span>}
                   <code className="result-key">{r.key}</code>
                   {severalLibraries && libraryOf(r.id.source) && <span className="result-library">{libraryOf(r.id.source)}</span>}
                 </span>

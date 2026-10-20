@@ -143,3 +143,18 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 [role="menuitemcheckbox"][aria-checked="true"]::after { content: "✓"; }
 [role="menu"] [role="group"] { border-block: var(--border-width) solid var(--line); }
 [role="menuitemcheckbox"][aria-disabled="true"] { color: var(--muted); }
+
+/* Rows that tell similar references apart (#492). Comfortable and Spacious
+   rows show the container after the authors, each shortened with an ellipsis;
+   Spacious adds the item type; Compact puts the first author after the title. */
+.result-container { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-meta:has(.result-container) .result-authors { flex: 0 1 auto; max-width: 50%; }
+.result-type { flex-shrink: 0; }
+.result-first-author { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
+[data-citation-selected] .result-first-author { color: inherit; }
+:root[data-density="compact"] .result-title { flex: 0 1 auto; }
+:root[data-density="compact"] .result-year { margin-inline-start: auto; }
+@media (max-width: 460px) {
+  .result-container { white-space: normal; overflow-wrap: anywhere; }
+  .result-meta:has(.result-container) .result-authors { max-width: none; }
+}

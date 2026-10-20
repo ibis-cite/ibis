@@ -55,7 +55,10 @@ async function chooseFromMore(name: string, role: "menuitem" | "menuitemcheckbox
 }
 
 function result(key: string, title: string, source = "refs.bib") {
-  return { id: { source, native_key: key }, key, title, authors: "Smith", year: 2020, matched: ["title"] };
+  return {
+    id: { source, native_key: key }, key, title, authors: "Smith", year: 2020, matched: ["title"],
+    first_author: "Smith", more_authors: false, container: null as string | null, item_type: "article-journal",
+  };
 }
 
 type Handler = (args: Record<string, unknown>) => unknown;
@@ -883,6 +886,55 @@ test("a row says why it matched only when the match is not visible", async () =>
   expect(rows[0]?.textContent).not.toContain("Matched in");
   expect(rows[1]?.textContent).toContain("Matched in the abstract");
   expect(screen.getByText("Best matches")).toBeTruthy();
+});
+
+test("rows with the same first author and year are told apart by their container and type", async () => {
+  const garcia = { authors: "García, Okafor", first_author: "García", more_authors: true, year: 2021 };
+  let density = "comfortable";
+  backend({
+    picker_preferences: () => ({ citation_style: null, density, larger_text: false }),
+    search: () => [
+      { ...result("a", "Sleep spindles"), ...garcia, container: "Journal of Sleep \u202eResearch", matched: ["title"] },
+      { ...result("b", "Sleep spindles: a replication"), ...garcia, container: "Sleep", item_type: "book", matched: ["container", "abstract"] },
+      { ...result("c", "Untyped"), item_type: "constructor", matched: ["title"] },
+    ],
+  });
+  const { unmount } = render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "spindles" } });
+  await screen.findByText("Untyped");
+  let rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
+  // Comfortable: authors and container, no type word and no first-author repeat.
+  expect(rows[0]?.querySelector(".result-container bdi")?.textContent).toBe("Journal of Sleep \u202eResearch");
+  expect(rows[0]?.textContent).toContain("García, Okafor");
+  expect(rows[0]?.querySelector(".result-type, .result-first-author")).toBeNull();
+  // A match in the container that the row shows needs no explanation.
+  expect(rows[1]?.textContent).not.toContain("Matched in");
+  expect(rows[2]?.querySelector(".result-container")).toBeNull();
+  unmount();
+
+  density = "spacious";
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "spindles" } });
+  await screen.findByText("Untyped");
+  rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
+  expect(rows[0]?.querySelector(".result-type")?.textContent).toBe("Article");
+  expect(rows[1]?.querySelector(".result-type")?.textContent).toBe("Book");
+  expect(rows[2]?.querySelector(".result-type")).toBeNull();
+  cleanup();
+
+  density = "compact";
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "spindles" } });
+  await screen.findByText("Untyped");
+  rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
+  // Compact: the first author follows the title on the one line, before the year.
+  const line = rows[0]?.querySelector(".result-line");
+  expect(line?.querySelector(".result-first-author bdi")?.textContent).toBe("García");
+  expect(line?.textContent).toBe("Sleep spindlesGarcía et al.2021");
+  expect(rows[2]?.querySelector(".result-first-author")?.textContent).toBe("Smith");
+  expect(rows[0]?.querySelector(".result-container, .result-type")).toBeNull();
+  // The container is out of sight in Compact, so a match there is named.
+  expect(rows[1]?.textContent).toContain("Matched in");
 });
 
 test("Escape clears the search before it hides the picker, keeping chosen references", async () => {
