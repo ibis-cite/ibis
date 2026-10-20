@@ -43,6 +43,8 @@ pub(crate) fn open_in_browser(app: &AppHandle, url: String) {
             } else {
                 format!("Ibis could not open your browser. Open this link to send feedback:\n{url}")
             };
+            #[cfg(target_os = "macos")]
+            crate::panel::activate_for_dialog(&app);
             app.dialog().message(text).title("Send feedback").show(|_| {});
         }
     });
