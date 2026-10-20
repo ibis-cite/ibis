@@ -2,6 +2,8 @@
 
 ## 0.1.0 (2026-10-20)
 
+The first preview. Press the shortcut anywhere, search a `.bib` file or your Zotero library (personal and group libraries, while Zotero is open), and copy a citation key or a formatted citation in one of five styles. Ibis works offline and never changes your library. The apps are not signed by Apple or Microsoft yet, so your system may warn before opening them; in-app updates are opt-in and signed.
+
 
 ### Features
 
