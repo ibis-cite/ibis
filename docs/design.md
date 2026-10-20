@@ -41,7 +41,7 @@ in [testing.md](testing.md), not established by this specification.
 
 | Role | Size / line | Example |
 |---|---|---|
-| Search | 22/28 (16 on Windows and Linux, which use a framed text box) | Search references… |
+| Search | 22/28 on macOS (frameless, sized like Spotlight's query); 16/22 on Windows and Linux, in a framed text box like PowerToys Run (16) and GNOME's search entries | Search references… |
 | Title | 15/20, semibold | Sleep spindles predict memory |
 | Body | 14/20 | Spindle density predicted recall. |
 | Meta | 13/18 | García, Okafor · 2021 |
@@ -107,14 +107,16 @@ instead of going square or looking like a separate floating slab.
 
 | | macOS | Windows 11 | Linux (GNOME) |
 |---|---|---|---|
-| `--r-win` | 12 pt today, the native panel corner (#236); 28 with Liquid Glass (Rollout 9) | 8 | 14 |
+| `--r-win` | 28 on macOS 26 and later; 12 pt before that (the native panel corner, #236) | 8 | 14 |
 | `--inset` · `--r-min` | 8 · 6 | 4 · 2 | 8 · 4 |
-| `--r-row` | 6 today; 20 with Liquid Glass | 4 | 6 |
-| `--r-tile` | 6 today; 8 with Liquid Glass | 2 | 4 |
+| `--r-row` | 20 on macOS 26 and later; 6 before | 4 | 6 |
+| `--r-tile` | 8 on macOS 26 and later; 6 before | 2 | 4 |
 | `--r-menu` · `--menu-pad` · `--r-mi` | 12 · 6 · 6 | 8 · 4 · 4 | 12 · 6 · 6 |
+| `--e2` menu shadow, plus a 1 px hairline | `0 12px 32px` black 16% | `0 8px 16px` black 14% | `0 2px 8px` black 20% |
 
 Not implemented yet: `tokens.css` still uses the earlier fixed radii (rows
-10 px on macOS, 9 px on Linux; tiles 7 px, 4 px on Windows). On GNOME, rows are
+10 px on macOS, 9 px on Linux; tiles 7 px, 4 px on Windows) and a macOS menu
+shadow of `0 16px 40px` black 22%. On GNOME, rows are
 flat with the 6 px radius of Adwaita's sidebar and popover rows: a boxed list
 cannot be concentric at an 8 px inset in a 14 px window.
 
