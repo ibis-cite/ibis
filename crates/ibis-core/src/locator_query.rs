@@ -57,15 +57,25 @@ pub fn split(query: &str) -> Option<LocatorQuery> {
     None
 }
 
-/// Whether the locator found at `start` is the end of a longer list of values
-/// that begins before `floor`, so it is too long to read and only its end
-/// would be taken. Starts from `floor` on were already tried in order.
+/// Whether the locator found at `start` is the end of a longer locator that
+/// begins before `floor`, so it is too long to read and only its end would be
+/// taken. That longer locator is a list of values, possibly after a label
+/// (`pp 1, 2, …`). Starts from `floor` on were already tried in order.
 fn continues_before(q: &str, start: usize, floor: usize) -> bool {
-    let before = q[..start].trim_end();
-    let Some(before) = before.strip_suffix([',', '&']) else {
-        return false;
-    };
-    value_start(before.trim_end()).is_some_and(|item| item < floor)
+    let mut before = q[..start].trim_end();
+    while let Some(rest) = before.strip_suffix([',', '&']) {
+        let rest = rest.trim_end();
+        match value_start(rest) {
+            Some(item) if item < floor => return true,
+            Some(item) => before = rest[..item].trim_end(),
+            None => {
+                before = rest;
+                break;
+            }
+        }
+    }
+    let word = before.rfind(char::is_whitespace).map_or(0, |i| i + 1);
+    word < floor && label(&format!("{} ", &before[word..])).is_some()
 }
 
 /// Where the value ending `text` starts, if `text` ends with one. A value is
@@ -315,6 +325,16 @@ mod tests {
             }
         }
         // A long search before a short locator is still split.
+        // The label counts toward the length too, wherever the limit falls.
+        let label_split = format!("smith pp {}12", "1, ".repeat(20));
+        assert_eq!(label_split.len() - "smith ".len(), 65);
+        let label_spaced = format!("smith pp{}1, 2", " ".repeat(65));
+        for query in [label_split, label_spaced, format!("smith §1, {}2", "1, ".repeat(20))] {
+            assert_eq!(split(&query), None, "{query}");
+        }
+        let at_limit = format!("smith pp {}2", "1, ".repeat(20));
+        assert_eq!(at_limit.len() - "smith ".len(), 64);
+        assert_eq!(split(&at_limit).map(|q| q.typed.len()), Some(64));
         let long_search = format!("{} p 45", "sleep ".repeat(30));
         assert_eq!(split(&long_search).map(|q| q.locator.value), Some("45".into()));
         let long_list_search = format!("{}smith, 2020, 45", "1, ".repeat(30));
