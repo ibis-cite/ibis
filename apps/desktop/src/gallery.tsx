@@ -232,6 +232,7 @@ if (root && (import.meta.env.DEV || import.meta.env.MODE === "evidence")) {
   const state = galleryStates.find((candidate) => candidate.id === id);
   if (toolbarMenuGalleryStates.some((candidate) => candidate.id === id) && !isTauri()) {
     if (switches.theme) document.documentElement.dataset.galleryTheme = switches.theme;
+    document.documentElement.dataset.textSize = switches.text === "large" ? "larger" : "normal";
     renderToolbarMenuGallery(root, id!);
   } else if (state) {
     renderGalleryState(root, withSwitches(state, switches));
