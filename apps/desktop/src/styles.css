@@ -79,13 +79,14 @@ footer { border-top: var(--border-width) solid var(--line); padding: var(--foote
 .status-dot[data-health="stop"] { background: var(--status-stop); }
 
 /* The format control shows one word; the native list keeps every label and key. */
-.format-picker { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: var(--space-1); min-height: var(--control-min-size); padding: 0 var(--space-2); border-radius: var(--button-radius); color: var(--muted); font-size: var(--metadata-size); cursor: default; }
+/* Contain the invisible native select: older WebKit otherwise propagates its
+   long option labels into the page's scrollable area. The focus ring belongs
+   to this wrapper and the full option labels stay in the native popup. */
+.format-picker { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: var(--space-1); min-height: var(--control-min-size); padding: 0 var(--space-2); border-radius: var(--button-radius); color: var(--muted); font-size: var(--metadata-size); cursor: default; overflow: hidden; }
 .format-picker::after { content: "▾"; }
 .format-picker:hover { background: var(--hover-background); color: var(--text); }
 .format-picker:focus-within { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
-/* Older WebKit lets long option labels extend a flex item's scrollable area
-   even though the closed select fits. Contain that native control, not the page. */
-.format-picker select { position: absolute; inset: 0; width: 100%; overflow: hidden; opacity: 0; cursor: default; }
+.format-picker select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: default; }
 
 /* The pin appears with the pointer or while on, without moving anything. */
 .pin-button { display: inline-grid; place-items: center; min-width: var(--control-min-size); min-height: var(--control-min-size); padding: 0; background: var(--clear); border-color: var(--clear); color: var(--muted); opacity: 0; transition: opacity var(--motion-feedback) var(--motion-ease); }
@@ -96,7 +97,7 @@ main:hover .pin-button, .pin-button:focus-visible { opacity: 1; }
 /* More stays at the far end even when the footer wraps, so its menu opens inward. */
 .more { position: relative; margin-inline-start: auto; }
 .more > button { min-height: var(--control-min-size); }
-[role="menu"] { position: absolute; bottom: calc(100% + var(--space-1)); inset-inline-end: 0; z-index: 1; min-width: min(var(--menu-min-width), calc(100vw - 2 * var(--space-4))); display: flex; flex-direction: column; padding: var(--space-1); background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }
+[role="menu"] { position: absolute; bottom: calc(100% + var(--space-1)); inset-inline-end: 0; z-index: 1; min-width: min(var(--menu-min-width), calc(100vw - 2 * var(--space-4))); max-width: calc(100vw - 2 * var(--space-4)); overflow-wrap: anywhere; display: flex; flex-direction: column; padding: var(--space-1); background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }
 [role="menuitem"] { display: flex; justify-content: space-between; gap: var(--space-4); min-height: var(--control-min-size); align-items: center; text-align: start; border: 0; background: var(--clear); }
 [role="menuitem"]:hover, [role="menuitem"]:focus-visible { background: var(--hover-background); }
 [role="menuitem"] kbd { color: var(--muted); }
