@@ -27,7 +27,7 @@ The newest development build for Windows, macOS and Linux is always at **[Releas
 
 The menu bar or tray menu shows which build and version you are running. Send questions and feedback to [GitHub Discussions](https://github.com/ibiscite/ibis/discussions), and problems to [the issues](https://github.com/ibiscite/ibis/issues/new/choose).
 
-The first time the picker opens, it offers Zotero if Zotero is open and lists `.bib` files it finds in your Documents, Desktop and Downloads folders, by name only, so you can pick one; **Choose library…** opens any other file.
+The first time the picker opens, it offers Zotero if Zotero is open and lists `.bib` files it finds in your Documents, Desktop and Downloads folders, by name only, so you can pick one; **Choose library…** opens any other file. It also asks where you write (Markdown, LaTeX, Typst, or Word and Google Docs) and sets **Copy as** to match.
 
 ## Use with Zotero
 

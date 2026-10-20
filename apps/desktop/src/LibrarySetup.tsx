@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from "react";
+import type { Choice } from "./App";
 import type { Sources } from "./bindings";
 import { pickerText, setupText } from "./messages";
 
@@ -11,12 +12,32 @@ type SetupApi = {
 
 type Action = "choose" | "zotero" | "findSources" | "openFound";
 
+/** Where people write, and the copy format that suits each. */
+const WRITING_PLACES: { name: string; choice: Choice; formatted?: true }[] = [
+  { name: setupText.places.markdown, choice: "pandoc" },
+  { name: setupText.places.latex, choice: "cite" },
+  { name: setupText.places.typst, choice: "typst" },
+  { name: setupText.places.word, choice: "style:apa", formatted: true },
+];
+
+/** A shortcut as people read it: `⌃⌘R` on macOS, `Ctrl+Shift+Y` elsewhere. */
+export function shortcutLabel(shortcut: string, mac: boolean): string {
+  const keys = shortcut.split("+");
+  if (!mac) return keys.map((key) => (key === "Control" ? "Ctrl" : key)).join("+");
+  const symbols: Record<string, string> = { Control: "⌃", Alt: "⌥", Option: "⌥", Shift: "⇧", Command: "⌘", Super: "⌘" };
+  return keys.map((key) => symbols[key] ?? key).join("");
+}
+
 // First-run setup while no library is chosen: Zotero if it is open, `.bib`
 // files found nearby, or any file through the system chooser. Only names are
 // shown; nothing is read until one is picked.
-export function LibrarySetup({ api, perform }: {
+export function LibrarySetup({ api, perform, writing, shortcut }: {
   api: SetupApi;
   perform: (action: Action, run: () => Promise<unknown>) => Promise<void>;
+  /** The copy format now, whether formatted styles are offered, and how to change it. */
+  writing?: { format: Choice; formatted: boolean; choose: (choice: Choice) => void };
+  /** The shortcut that opens Ibis, when it is registered. */
+  shortcut?: string | null;
 }) {
   const { chooseLibrary, useZotero, findSources, openFoundLibrary } = api;
   // Undefined while looking; null when looking failed or is not offered.
@@ -85,6 +106,21 @@ export function LibrarySetup({ api, perform }: {
           {setupText.lookAgain}
         </button>
       )}
+      {writing && (
+        <section aria-labelledby={`${heading}-writing`} className="setup-writing">
+          <p className="empty-hint" id={`${heading}-writing`}>{setupText.whereYouWrite}</p>
+          <div className="setup-choices">
+            {WRITING_PLACES.filter((place) => !place.formatted || writing.formatted).map((place) => (
+              <button type="button" key={place.name} aria-pressed={writing.format === place.choice}
+                onClick={() => writing.choose(place.choice)}>
+                {place.name}
+              </button>
+            ))}
+          </div>
+          {writing.format.startsWith("style:") && <p className="empty-hint">{setupText.styleHint}</p>}
+        </section>
+      )}
+      {shortcut && <p className="empty-hint">{setupText.shortcut(shortcut)}</p>}
     </div>
   );
 }
