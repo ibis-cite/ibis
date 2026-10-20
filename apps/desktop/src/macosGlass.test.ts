@@ -55,7 +55,8 @@ test("macOS fills and hairlines are translucent so the native material shows thr
 });
 
 test("only native success shows the material, under a veil; reduced transparency stays opaque", () => {
-  expect(native).toMatch(/:root\[data-native-appearance="vibrancy"\] \{ background: var\(--vibrancy-tint, transparent\); \}/);
+  // Never bare: webviews without light-dark() fall back to the surface at 55%.
+  expect(native).toMatch(/:root\[data-native-appearance="vibrancy"\] \{ background: var\(--vibrancy-tint, color-mix\(in srgb, var\(--surface\) 55%, transparent\)\); \}/);
   expect(native).toMatch(/:root\[data-native-appearance="mica"\] \{ background: transparent; \}/);
   // The defensive override comes after, with the same specificity, so it wins.
   const veil = native.indexOf('[data-native-appearance="vibrancy"] { background');

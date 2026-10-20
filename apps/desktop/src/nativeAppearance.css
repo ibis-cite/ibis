@@ -1,8 +1,9 @@
 /* The existing opaque surface remains the default. Native success alone opts in.
-   On macOS a light veil (--vibrancy-tint, tokens.css) keeps text legible over the
-   material; Windows Mica already supplies its own tint. */
+   On macOS a light veil (--vibrancy-tint, tokens.css; the surface at 55% in
+   webviews without light-dark()) keeps text legible over the material. Windows
+   Mica already supplies its own tint. */
 :root[data-native-appearance="mica"] { background: transparent; }
-:root[data-native-appearance="vibrancy"] { background: var(--vibrancy-tint, transparent); }
+:root[data-native-appearance="vibrancy"] { background: var(--vibrancy-tint, color-mix(in srgb, var(--surface) 55%, transparent)); }
 
 /* Defensive overrides also cover preferences changed before native refresh. */
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
