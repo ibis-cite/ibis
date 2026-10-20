@@ -795,7 +795,6 @@ def main():
     except (AssertionError, RuntimeError, ValueError, KeyError, TypeError, subprocess.SubprocessError, OSError) as error:
         report.update(reason=str(error) if isinstance(error, (AssertionError, Unavailable)) else type(error).__name__)
         print(f"FAIL: {report['reason']}", file=sys.stderr)
-        print(f"::warning title=smoke failure::{report['reason']} " + json.dumps(report.get("last_native_state")), flush=True)  # TEMPORARY #341
         if "last_native_state" in report:
             print("LAST NATIVE STATE " + json.dumps(report["last_native_state"]), file=sys.stderr)
         try:
@@ -827,6 +826,9 @@ def main():
                 report.update(status="failed", reason="Disposable settings cleanup failed")
                 exit_code = 1
         report["elapsed_seconds"] = round(time.monotonic() - started, 2)
+        if os.environ.get("GITHUB_ACTIONS"):  # TEMPORARY #341 diagnostics
+            print("::notice title=smoke summary::" + json.dumps({key: report.get(key) for key in (
+                "status", "reason", "last_native_state", "elapsed_seconds")} | {"passed": len(report["checks"])}), flush=True)
         (args.output / "smoke.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return exit_code
 

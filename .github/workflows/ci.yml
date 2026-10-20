@@ -331,7 +331,7 @@ jobs:
         if: ${{ !cancelled() && env.NATIVE == 'true' && steps.native_build.outcome == 'success' && runner.os == 'Windows' }}
         timeout-minutes: 25
         run: |
-          cargo build --release -p ibis-desktop --locked --features tauri/custom-protocol
+          cargo build --release -p ibis-desktop --locked --features tauri/custom-protocol || { echo "::warning::release build failed"; exit 1; }
           python scripts/smoke-native.py --app target/release/ibis-desktop.exe --output screenshots/smoke-Windows-release
 
       - name: Observe native materials and accessibility changes (macOS)
