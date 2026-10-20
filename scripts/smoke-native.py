@@ -325,9 +325,16 @@ def require_tree(snapshot):
     assert any("list" in n["role"].lower() and "item" not in n["role"].lower() for n in results), "Named Results is not a list"
 
 
+def window_state_skips_taskbar(xprop_line):
+    """Whether an `xprop _NET_WM_STATE` line asks to stay out of the taskbar and pager."""
+    _, separator, atoms = xprop_line.partition("=")
+    names = {atom.strip() for atom in atoms.split(",")} if separator else set()
+    return {"_NET_WM_STATE_SKIP_TASKBAR", "_NET_WM_STATE_SKIP_PAGER"} <= names
+
+
 class Linux:
     def __init__(self):
-        for program in ("xdotool", "xclip", "xterm", "openbox"):
+        for program in ("xdotool", "xclip", "xterm", "openbox", "xprop"):
             if not shutil.which(program):
                 raise Unavailable(f"Linux native smoke needs {program}")
         if not os.environ.get("DISPLAY") or not os.environ.get("DBUS_SESSION_BUS_ADDRESS"):
@@ -415,6 +422,10 @@ class Linux:
         # terminal child without _NET_WM_PID does not hide the actual owner.
         focused = run("xdotool", "getwindowfocus")
         return run("xdotool", "getwindowpid", focused) == str(self.editor.pid)
+
+    def skips_taskbar(self):
+        window = self.window(self.app.pid)
+        return bool(window) and window_state_skips_taskbar(run("xprop", "-id", window, "_NET_WM_STATE"))
 
     def clipboard(self):
         return run("xclip", "-selection", "clipboard", "-out")
@@ -742,6 +753,12 @@ def main():
             check("startup", lambda: wait_for(lambda: "3 references" in strings(snapshot()), "synthetic library startup"))
             check("accessibility named search/count/list", lambda: require_tree(snapshot()))
 
+            def skips_taskbar():
+                # Window managers build the taskbar and Alt+Tab from these hints.
+                wait_for(native.skips_taskbar, "picker window skips the taskbar and pager")
+            if system == "Linux":
+                check("first picker stays out of the taskbar and window switcher", skips_taskbar)
+
             def show():
                 if system == "Darwin":
                     prepare_initial_picker_show(native, snapshot)
@@ -769,6 +786,8 @@ def main():
                 focus_state("after-second-shortcut")
                 wait_for(picker_ready, "global shortcut visible, foreground and search focus")
             check("global shortcut shows foreground picker with focused search", show)
+            if system == "Linux":
+                check("shown picker stays out of the taskbar and window switcher", skips_taskbar)
 
             def second_instance():
                 escape_to_hide(native, snapshot, "picker hidden before second launch")
@@ -967,6 +986,13 @@ def main():
 
 
 class ContractTests(unittest.TestCase):
+    def test_taskbar_hints_are_read_from_the_window_manager_state(self):
+        self.assertTrue(window_state_skips_taskbar(
+            "_NET_WM_STATE(ATOM) = _NET_WM_STATE_FOCUSED, _NET_WM_STATE_SKIP_TASKBAR, _NET_WM_STATE_SKIP_PAGER"))
+        for line in ("_NET_WM_STATE(ATOM) = _NET_WM_STATE_SKIP_PAGER", "_NET_WM_STATE:  not found.",
+                     "_NET_WM_STATE(ATOM) = ", "_NET_WM_STATE(ATOM) = _NET_WM_STATE_SKIP_TASKBAR_X, _NET_WM_STATE_SKIP_PAGER"):
+            self.assertFalse(window_state_skips_taskbar(line), line)
+
     class CopyClock:
         def __init__(self, step=10):
             self.elapsed = 0

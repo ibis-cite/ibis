@@ -222,6 +222,13 @@ which tips were seen) need an ADR before new `settings.json` fields are added.
    Separately verify the macOS panel opens over full-screen apps in the current
    Space; the panel already has this configuration, which is not evidence that
    every native scenario passes.
+   Status (#495): the quick picker asks to stay out of the taskbar on Windows
+   and Linux, and the Linux native smoke checks the X11 hints. The full-screen
+   guard (a second press within 2 seconds opens Ibis anyway) works where the
+   window manager reports full-screen windows (X11). Windows and macOS have no
+   detection yet: it needs native calls the safe dependencies do not offer, so
+   there the shortcut always opens Ibis. Hiding the picker from Windows Alt+Tab
+   needs a tool-window style for the same reason.
 4. Density and Larger text are settings under ADR 0020 (#407, #408). Remaining
    work: an ADR for display choice and remembered per-display position, then
    change the opening default from the pointer's display to the focused window's
