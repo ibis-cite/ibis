@@ -795,6 +795,7 @@ def main():
     except (AssertionError, RuntimeError, ValueError, KeyError, TypeError, subprocess.SubprocessError, OSError) as error:
         report.update(reason=str(error) if isinstance(error, (AssertionError, Unavailable)) else type(error).__name__)
         print(f"FAIL: {report['reason']}", file=sys.stderr)
+        print(f"::warning title=smoke failure::{report['reason']} " + json.dumps(report.get("last_native_state")), flush=True)  # TEMPORARY #341
         if "last_native_state" in report:
             print("LAST NATIVE STATE " + json.dumps(report["last_native_state"]), file=sys.stderr)
         try:
