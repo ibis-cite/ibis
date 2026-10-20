@@ -60,25 +60,25 @@ main {
 /* The meta line wraps only when the byline, type, key and badge cannot all
    fit at their sizes; then they move under the byline. A row at least 25em
    wide (any window of 461px or more at normal text) keeps one line, and its
-   key and badge shorten to their minimums instead. */
+   key and badge shorten towards their minimums instead. */
 .result-meta { margin-top: var(--metadata-gap); flex-wrap: wrap; row-gap: 0; }
 [role="option"] { container-type: inline-size; }
 @container (min-width: 25em) { .result-meta { flex-wrap: nowrap; } }
-/* Shortened authors and the container keep 60% of the line (or 12em); the
-   key and library badge shorten first. Within it the authors shorten faster
-   and the container keeps most of the room, each with an ellipsis. The
-   separator is its own part, so the byline has no gap. */
-.result-byline { display: flex; align-items: baseline; flex: 1 1 0; min-width: min(12em, 60%); overflow: hidden; }
-.result-authors { flex: 0 3 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.result-container { flex: 1 1 8em; min-width: min(8em, 70%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.result-separator { flex: none; white-space: nowrap; }
+/* The byline (authors · container) fills the line; the key and library badge
+   give way first, down to a few letters (their shrink factor is far larger),
+   and the type word never shrinks. Inside the byline each part is only as
+   wide as its text, so in a right-to-left row a Latin journal sits beside its
+   separator. The authors keep their width up to 60% of the byline and the
+   container shortens first, each with an ellipsis. The separator keeps its
+   trailing space. */
+.result-byline { display: flex; align-items: baseline; flex: 1 1 auto; min-width: min(12em, 60%); overflow: hidden; }
+.result-authors { flex: none; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-container { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-separator { flex: none; white-space: pre; }
 .result-authors, .result-container { unicode-bidi: isolate; }
-/* These parts take their own direction (dir="auto") but align with the row,
-   so Latin text in a right-to-left row sits beside its separator. */
-.result-authors, .result-container, .result-key, .result-first-author { text-align: match-parent; }
-.result-key { flex: 0 1 auto; min-width: min(6ch, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
+.result-key { flex: 0 1000 auto; min-width: min(6ch, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
 .result-why { font-style: italic; }
-.result-library { flex: 0 1 auto; min-width: min(5em, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-library { flex: 0 1000 auto; min-width: min(5em, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 [role="option"]:hover:not([data-active]):not([data-citation-selected]) { background: var(--hover-background); }
 /* Active and selected remain distinguishable even without colour. */
 /* The selected (active) row follows the platform: filled accent on macOS,
@@ -183,6 +183,8 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
   /* Authors and container flow as one wrapping run of text. */
   .result-byline { display: block; }
   .result-authors, .result-container { white-space: normal; overflow-wrap: anywhere; }
+  /* Let the line break after the separator rather than inside a word. */
+  .result-separator { white-space: pre-wrap; }
 }
 /* No animation: reduced-motion users get the same immediate feedback. */
 
@@ -201,7 +203,7 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 /* Rows that tell similar references apart (#492). Comfortable and Spacious
    rows show shortened authors and the container on one line; Spacious adds
    the item type; Compact puts the first author after the title. */
-.result-type { flex: 0 1 auto; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-type { flex: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-first-author { flex: none; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 [data-active] .result-first-author { color: var(--row-active-muted); }
 :root[data-density="compact"] .result-title { flex: 0 1 auto; }

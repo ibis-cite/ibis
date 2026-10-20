@@ -942,7 +942,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
                     <span className="result-authors" dir="auto">
                       {abbreviatedAuthors(r) ? <><span aria-hidden="true">{r.first_author} {etAl}</span><span className="visually-hidden">{r.authors}</span></> : r.authors}
                     </span>
-                    {!compact && r.container && r.authors && <span className="result-separator" aria-hidden="true">{"\u00a0·\u00a0"}</span>}
+                    {!compact && r.container && r.authors && <span className="result-separator" aria-hidden="true">{"\u00a0· "}</span>}
                     {!compact && r.container && <span className="result-container" dir="auto">{r.container}</span>}
                   </span>
                   {itemType && <span className="result-type">{itemType}</span>}
