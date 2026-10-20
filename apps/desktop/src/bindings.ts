@@ -238,6 +238,12 @@ export type RecordId = {
 	native_key: string,
 };
 
+/**  A search keeps its snapshot identity even when no references match. */
+export type SearchReply = {
+	revision: string,
+	results: SearchResult[],
+};
+
 export type SearchResult = {
 	/**  Revision captured with the index used for this result. */
 	revision: string,

@@ -157,7 +157,7 @@ export function galleryProvider(state: GalleryState): { api: PickerApi; preview:
     preview: { query: state.query, copied: state.copied },
     api: {
       libraryStatus: async () => state.library,
-      search: async () => state.results ?? [],
+      search: async () => ({ revision: state.library.revision, results: state.results ?? [] }),
       copyCitation: async () => ({ text: "[@example2026]", warnings: [] }),
       copyFormat: async () => "pandoc",
       pickerPreferences: async () => ({ citation_style: null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false }),

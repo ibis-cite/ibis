@@ -135,6 +135,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const [announcement, setAnnouncement] = useState("");
   // The query the shown results belong to; differs while a search is pending.
   const [resultsQuery, setResultsQuery] = useState<string | null>(null);
+  const [resultsRevision, setResultsRevision] = useState<string | null>(null);
   const [active, setActive] = useState(0);
   const pointer = usePointerSelection(active, setActive);
   const [selected, setSelected] = useState<Map<string, SearchResult>>(new Map());
@@ -405,9 +406,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     let current = true;
     let announcementTimer: number | undefined;
     search(query)
-      .then((found) => {
+      .then(({ revision, results: found }) => {
         if (current) {
           setResults(found);
+          setResultsRevision(revision);
+          if (revision !== library?.revision) refreshSnapshot();
           setResultsQuery(query);
           setActive(0);
           setError(null);
@@ -464,7 +467,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // Results belong to the query that produced them. While a newer search is
   // pending, the rows still on screen are not acted on or offered by any key,
   // click or footer hint; only these current results are.
-  const current = resultsQuery === query && results.every((record) => record.revision === library?.revision) ? results : [];
+  const current = resultsQuery === query && resultsRevision === library?.revision && results.every((record) => record.revision === resultsRevision) ? results : [];
   // The selection, or the highlighted result when nothing is selected.
   const chosen = selected.size > 0 ? [...selected.values()] : current.slice(active, active + 1);
   const chosenKey = choiceKey(chosen);
@@ -479,7 +482,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       if (statusReads.current !== request) return;
       setLibrary(status);
       setLibraryVersion((version) => version + 1);
-    }).catch(() => report("status"));
+      report("status", false);
+    }).catch(() => { if (statusReads.current === request) report("status"); });
   };
 
   // Format the preview again whenever the choice or the style changes.

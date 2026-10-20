@@ -26,7 +26,7 @@ function backend(search: (query: string) => ReturnType<typeof result>[]) {
   mockIPC((cmd, args) => {
     const handlers: Record<string, () => unknown> = {
       shortcut_status: () => ({ shortcut: "Ctrl+Shift+Y", registered: true, error: null }),
-      search: () => search(String((args as { query?: string } | undefined)?.query ?? "")),
+      search: () => ({ revision: "1", results: search(String((args as { query?: string } | undefined)?.query ?? "")) }),
       hide_picker: () => null,
       set_pinned: () => null,
       copy_format: () => "pandoc",

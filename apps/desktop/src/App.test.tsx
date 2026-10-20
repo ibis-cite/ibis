@@ -97,7 +97,9 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
       const handler = overrides[cmd] ?? defaults[cmd];
       if (!handler) throw new Error(`unexpected command ${cmd}`);
       const value = handler((args ?? {}) as Record<string, unknown>);
-      return cmd === "library_status" ? Promise.resolve(value).then((status) => ({ revision: "1", ...status as object })) : value;
+      if (cmd === "library_status") return Promise.resolve(value).then((status) => ({ revision: "1", ...status as object }));
+      if (cmd === "search") return Promise.resolve(value).then((reply) => Array.isArray(reply) ? { revision: reply[0]?.revision ?? "1", results: reply } : reply);
+      return value;
     },
     { shouldMockEvents: true },
   );
@@ -364,6 +366,7 @@ test("the selection is kept by record identity across queries and copied in orde
       { source: "b.bib", native_key: "same" },
     ],
     format: "pandoc",
+    expectedRevision: "1",
   });
 });
 
@@ -837,7 +840,7 @@ test("a citation style shows a safe preview and copies rich text with its warnin
     await within(preview).findByText("(Garcia, 2021); Second");
     fireEvent.keyDown(box, { key: "Enter" });
     await waitFor(() => expect(copies).toHaveLength(1));
-    expect(copies[0]).toEqual({ text: "(Garcia, 2021); Second", html: "(Garcia, 2021); Second" });
+    expect(copies[0]).toEqual({ text: "(Garcia, 2021); Second", html: "(Garcia, 2021); Second", expectedRevision: "1" });
     await screen.findByText("Copied");
     expect(screen.getAllByText(/“Second”: this style could not format the reference/).length).toBeGreaterThan(0);
   } finally {
@@ -1780,7 +1783,7 @@ test("with sources in the citation, a click copies the citation like Enter", asy
   fireEvent.click(await screen.findByText("First"), { shiftKey: true });
   fireEvent.click(screen.getByText("Second"));
   await waitFor(() => expect(copies).toHaveLength(1));
-  expect(copies[0]).toEqual({ ids: [{ source: "refs.bib", native_key: "a" }], format: "pandoc" });
+  expect(copies[0]).toEqual({ ids: [{ source: "refs.bib", native_key: "a" }], format: "pandoc", expectedRevision: "1" });
 });
 
 test("a drag, a double click's second click or a modified click on a row copies nothing", async () => {
@@ -2267,4 +2270,170 @@ test.each(["click", "Enter", "Shift+Enter"])("a replacement snapshot blocks prio
   fireEvent.click(await screen.findByText("Replacement title and key"));
   await waitFor(() => expect(copied).toHaveLength(1));
   expect(copied[0]).toMatchObject({ expectedRevision: "snapshot-2" });
+});
+
+test("a newer search revision refreshes status even before its event arrives", async () => {
+  let reads = 0;
+  const copied: unknown[] = [];
+  backend({
+    library_status: () => ({ state: "loaded", has_snapshot: true, zotero: false, name: "refs.bib", references: 1, warnings: 0, error: null, revision: ++reads === 1 ? "1" : "2" }),
+    search: () => [{ ...result("a", "Fresh before event"), revision: "2" }],
+    copy_citation: (args) => { copied.push(args); return { text: "@a", warnings: [] }; },
+  });
+  render(<App />);
+  await screen.findByText("Fresh before event");
+  await waitFor(() => expect(reads).toBeGreaterThan(1));
+  fireEvent.click(screen.getByText("Fresh before event"));
+  await waitFor(() => expect(copied).toHaveLength(1));
+  expect(copied[0]).toMatchObject({ expectedRevision: "2" });
+});
+
+
+test.each([false, true])("pre-event search replies recover status, including empty replies (%s)", async (empty) => {
+  let reads = 0;
+  backend({
+    library_status: () => ({ ...zoteroStatus(["user"]), revision: ++reads === 1 ? "1" : "2", references: empty ? 0 : 1 }),
+    search: () => ({ revision: "2", results: empty ? [] : [{ ...result("a", "Fresh revision"), revision: "2" }] }),
+  });
+  render(<App />);
+  await waitFor(() => expect(reads).toBe(2));
+  if (!empty) await screen.findByText("Fresh revision");
+  await act(async () => { await Promise.resolve(); });
+  expect(reads).toBe(2);
+});
+
+test("a pre-event copy rejection recovers without copying or hiding until a fresh click", async () => {
+  let revision = "1";
+  const attempts: unknown[] = [];
+  const writes: string[] = [];
+  const calls = backend({
+    library_status: () => ({ ...zoteroStatus(["user"]), revision }),
+    search: () => [{ ...result("ITEM0001", `Snapshot ${revision}`, "zotero:user"), revision }],
+    copy_citation: (args) => {
+      attempts.push(args.expectedRevision);
+      if (args.expectedRevision !== revision) throw "library snapshot changed";
+      writes.push(revision);
+      return { text: "fresh copy", warnings: [] };
+    },
+  });
+  render(<App />);
+  await screen.findByText("Snapshot 1");
+  revision = "2";
+  fireEvent.click(screen.getByText("Snapshot 1"));
+  await screen.findByText("The library changed. Search again and reselect the references before copying.");
+  await screen.findByText("Snapshot 2");
+  expect(attempts).toEqual(["1"]);
+  expect(writes).toEqual([]);
+  expect(calls).not.toContain("hide_picker");
+  fireEvent.click(screen.getByText("Snapshot 2"));
+  await waitFor(() => expect(writes).toEqual(["2"]));
+  expect(attempts).toEqual(["1", "2"]);
+});
+
+test("mixed selected revisions retain their original tokens and cannot copy", async () => {
+  let revision = "1";
+  const copies: unknown[] = [];
+  backend({
+    library_status: () => ({ ...zoteroStatus(["user"]), revision }),
+    search: () => [{ ...result(revision, `Selected ${revision}`), revision }],
+    copy_citation: (args) => { copies.push(args); return { text: "unexpected", warnings: [] }; },
+  });
+  render(<App />);
+  fireEvent.click(await screen.findByText("Selected 1"), { shiftKey: true });
+  revision = "2";
+  await act(async () => { await emit("library:changed", { ...zoteroStatus(["user"]), revision }); });
+  fireEvent.click(await screen.findByText("Selected 2"), { shiftKey: true });
+  fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
+  await screen.findByText("The library changed. Search again and reselect the references before copying.");
+  expect(copies).toEqual([]);
+  expect(screen.getAllByRole("button", { name: /^Remove / })).toHaveLength(2);
+});
+
+test.each(["resolve", "reject"])("an older recovery status cannot override a newer event (%s)", async (outcome) => {
+  let revision = "1";
+  let reads = 0;
+  let finish: (value: unknown) => void = () => undefined;
+  let reject: (reason: unknown) => void = () => undefined;
+  const calls = backend({
+    library_status: () => ++reads === 1 ? { ...zoteroStatus(["user"]), revision } : new Promise((resolve, fail) => { finish = resolve; reject = fail; }),
+    search: () => [{ ...result("a", `Recovery ${revision}`), revision }],
+    copy_citation: () => { throw "library snapshot changed"; },
+  });
+  render(<App />);
+  fireEvent.click(await screen.findByText("Recovery 1"));
+  await waitFor(() => expect(reads).toBe(2));
+  revision = "3";
+  await act(async () => { await emit("library:changed", { ...zoteroStatus(["user"]), revision }); });
+  await screen.findByText("Recovery 3");
+  await act(async () => { if (outcome === "resolve") finish({ ...zoteroStatus(["user"]), revision: "2" }); else reject("synthetic failure"); });
+  expect(screen.queryByText("Recovery 3")).not.toBeNull();
+  expect(screen.queryByText("Ibis could not check your library. Choose the file again.")).toBeNull();
+  expect(calls).not.toContain("hide_picker");
+});
+
+
+test("a retired formatted preview sends its own revision and requires a fresh copy", async () => {
+  const { InlineWorker } = await import("./format/inline-worker");
+  vi.stubGlobal("Worker", InlineWorker);
+  let revision = "1";
+  const attempts: unknown[] = [];
+  const writes: string[] = [];
+  const calls = backend({
+    library_status: () => ({ ...zoteroStatus(["user"]), revision }),
+    search: () => [{ ...result("ITEM0001", `Formatted ${revision}`, "zotero:user"), revision }],
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+    csl_items: ({ expectedRevision }) => {
+      if (expectedRevision !== revision) throw "library snapshot changed";
+      return JSON.stringify([{ id: "ITEM0001", type: "book", title: "Synthetic", author: [{ family: "Smith" }], issued: { "date-parts": [[2020]] } }]);
+    },
+    copy_formatted: ({ expectedRevision }) => {
+      attempts.push(expectedRevision);
+      if (expectedRevision !== revision) throw "library snapshot changed";
+      writes.push(revision);
+      return null;
+    },
+  });
+  try {
+    render(<App />);
+    await screen.findByText("Formatted 1");
+    const preview = await screen.findByRole("region", { name: "Preview" });
+    await within(preview).findByText("(Smith, 2020)");
+    revision = "2";
+    fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
+    await screen.findByText("The library changed. Search again and reselect the references before copying.");
+    await screen.findByText("Formatted 2");
+    await within(preview).findByText("(Smith, 2020)");
+    expect(attempts).toEqual(["1"]);
+    expect(writes).toEqual([]);
+    expect(calls).not.toContain("hide_picker");
+    fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
+    await waitFor(() => expect(writes).toEqual(["2"]));
+    expect(attempts).toEqual(["1", "2"]);
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
+
+test("a late search reply cannot replace rows from the newer snapshot", async () => {
+  let revision = "1";
+  const pending: Record<string, (value: unknown) => void> = {};
+  const copied: unknown[] = [];
+  backend({
+    library_status: () => ({ ...zoteroStatus(["user"]), revision }),
+    search: () => revision === "1" ? [result("a", "Late 1")] : new Promise((resolve) => { pending[revision] = resolve; }),
+    copy_citation: (args) => { copied.push(args.expectedRevision); return { text: "@a", warnings: [] }; },
+  });
+  render(<App />);
+  await screen.findByText("Late 1");
+  for (const next of ["2", "3"]) {
+    revision = next;
+    await act(async () => { await emit("library:changed", { ...zoteroStatus(["user"]), revision }); });
+    await waitFor(() => expect(pending[next]).toBeTypeOf("function"));
+  }
+  await act(async () => { pending["3"]!({ revision: "3", results: [{ ...result("a", "Late 3"), revision: "3" }] }); });
+  await screen.findByText("Late 3");
+  await act(async () => { pending["2"]!({ revision: "2", results: [{ ...result("a", "Late 2"), revision: "2" }] }); });
+  expect(screen.queryByText("Late 2")).toBeNull();
+  fireEvent.click(screen.getByText("Late 3"));
+  await waitFor(() => expect(copied).toEqual(["3"]));
 });

@@ -970,7 +970,7 @@ pub(crate) async fn search(
     scope: Option<Vec<String>>,
     library: State<'_, Mutex<Library>>,
     requests: State<'_, SearchRequests>,
-) -> Result<Vec<SearchResult>, String> {
+) -> Result<SearchReply, String> {
     // The library lock is held only to take the index.
     let (index, revision) = {
         let library = library.lock().map_err(|_| "library state is unavailable".to_string())?;
@@ -982,15 +982,35 @@ pub(crate) async fn search(
         }
         (Arc::clone(&library.index), library.revision.to_string())
     };
-    Ok(search_newest(
+    Ok(search_snapshot(
         &index,
-        &revision,
+        revision,
         &query,
         limit,
         request,
         &requests.newest(page),
         scope.as_deref(),
     ))
+}
+
+/// A search keeps its snapshot identity even when no references match.
+#[derive(Serialize, specta::Type)]
+pub(crate) struct SearchReply {
+    revision: String,
+    results: Vec<SearchResult>,
+}
+
+fn search_snapshot(
+    index: &OwnedIndex,
+    revision: String,
+    query: &str,
+    limit: usize,
+    request: u32,
+    newest: &AtomicU32,
+    scope: Option<&[String]>,
+) -> SearchReply {
+    let results = search_newest(index, &revision, query, limit, request, newest, scope);
+    SearchReply { revision, results }
 }
 
 /// Run a search unless a newer request has started, stopping if one does.
@@ -1937,7 +1957,12 @@ mod tests {
             .unwrap_or_else(|| panic!("synthetic request is current"));
         assert_ne!(replaced.revision, old_revision);
         // The index has changed, but no event has been published to JavaScript.
-        let late = search_newest(&old_index, &old_revision, "sleep", 20, 1, &AtomicU32::default(), None);
+        let late_reply = search_snapshot(&old_index, old_revision.clone(), "sleep", 20, 1, &AtomicU32::default(), None);
+        assert_eq!(late_reply.revision, old_revision);
+        let empty = search_snapshot(&old_index, old_revision.clone(), "no-match", 20, 2, &AtomicU32::default(), None);
+        assert!(empty.results.is_empty());
+        assert_eq!(empty.revision, old_revision);
+        let late = late_reply.results;
         assert_eq!(late[0].key, "oldkey");
         assert_eq!(late[0].revision, old_revision);
         let ids = vec![late[0].id.clone()];
@@ -1998,5 +2023,23 @@ mod tests {
         )
         .unwrap_or_else(|e| panic!("{e}"));
         assert!(wrote.get());
+        let (request, _, _) =
+            begin_open(&library, &requests, source.clone()).unwrap_or_else(|| panic!("synthetic request is current"));
+        let empty = install(
+            &library,
+            &requests,
+            request,
+            Ok(candidate(source, ibis_core::bibtex::load_str("synthetic", ""))),
+        )
+        .unwrap_or_else(|| panic!("synthetic request is current"));
+        assert!(empty.has_snapshot);
+        assert_eq!(empty.references, 0);
+        assert_ne!(empty.revision, replaced.revision);
+        let locked = library.lock().unwrap_or_else(|e| panic!("{e}"));
+        assert!(locked.require_revision(&replaced.revision).is_err());
+        assert!(locked.require_revision(&empty.revision).is_ok());
+        let reply = search_snapshot(&locked.index, empty.revision.clone(), "", 20, 3, &AtomicU32::default(), None);
+        assert!(reply.results.is_empty());
+        assert_eq!(reply.revision, empty.revision);
     }
 }
