@@ -435,7 +435,7 @@ class Scripted:
             state = self.call("click", name)
             if self.system == "Windows" and isinstance(state, dict):
                 # Diagnostic for #341: window classes and process names only.
-                print("NATIVE CLICK FOCUS " + json.dumps(state.get("focus")), flush=True)
+                print(f"::notice title=click {name}::NATIVE CLICK FOCUS " + json.dumps(state.get("focus")), flush=True)
             return
         state = {}
         def pressed():
