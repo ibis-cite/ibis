@@ -1013,10 +1013,13 @@ test("a choice made while saved choices load is kept and saved, not replaced", a
 
 test("unreadable saved choices are reported and never overwritten with defaults", async () => {
   const calls = backend({
+    copy_format: () => "typst",
     picker_preferences: () => { throw new Error("synthetic settings failure"); },
   });
   render(<App />);
   await screen.findByText(/could not read or save your picker choices/);
+  // The saved key format still applies, so the next copy does not replace it.
+  expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst");
   fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
   await chooseFromMore("Larger text", "menuitemcheckbox");
   expect(document.documentElement.dataset.textSize).toBe("larger");

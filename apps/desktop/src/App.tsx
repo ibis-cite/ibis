@@ -211,6 +211,10 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   useEffect(() => {
     document.documentElement.dataset.density = density;
     document.documentElement.dataset.textSize = largerText ? "larger" : "normal";
+    return () => {
+      delete document.documentElement.dataset.density;
+      delete document.documentElement.dataset.textSize;
+    };
   }, [density, largerText]);
 
   const togglePin = () => {
@@ -258,7 +262,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     void Promise.allSettled([copyFormat(), pickerPreferences()]).then(([key, saved]) => {
       if (!mounted) return;
       if (key.status === "rejected") report("format");
-      if (saved.status === "rejected") { report("preferences"); return; }
+      if (saved.status === "rejected") {
+        // Without saved preferences the saved key format still applies.
+        report("preferences");
+        if (pending.current.citation_style === undefined && key.status === "fulfilled") setFormat(key.value);
+        return;
+      }
       const loaded = { ...saved.value, ...pending.current } as PickerPreferences;
       savedPreferences.current = saved.value;
       setDensity(loaded.density);
