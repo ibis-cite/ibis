@@ -22,10 +22,11 @@ export const commands = {
 	 */
 	findSources: () => __TAURI_INVOKE<Sources>("find_sources"),
 	/**
-	 *  Open the file at `index` in the list [`find_sources`] last returned and
-	 *  remember it; the result arrives as `library:changed`.
+	 *  Open the file at `index` in list `list` from [`find_sources`] and
+	 *  remember it; the result arrives as `library:changed`. A choice from a
+	 *  list that has since been replaced is refused.
 	 */
-	openFoundLibrary: (index: number) => __TAURI_INVOKE<null>("open_found_library", { index }),
+	openFoundLibrary: (list: number, index: number) => __TAURI_INVOKE<null>("open_found_library", { list, index }),
 	/**  The library as it is now, for the interface when it starts. */
 	libraryStatus: () => __TAURI_INVOKE<LibraryStatus>("library_status"),
 	/**
@@ -171,7 +172,14 @@ export type ShortcutStatus = {
 /**  What first-run setup can offer. */
 export type Sources = {
 	zotero: ZoteroPresence,
+	/**  The number to send back with a choice from `files`. */
+	list: number,
 	files: FoundFile[],
+	/**
+	 *  Some folders were too large to search fully, or more files were
+	 *  found than are listed.
+	 */
+	cut_short: boolean,
 };
 
 export type ZoteroPresence = "available" | "access_off" | "absent";

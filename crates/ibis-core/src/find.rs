@@ -13,7 +13,7 @@ use std::time::SystemTime;
 pub const MAX_DEPTH: usize = 3;
 /// Files returned at most.
 pub const MAX_FOUND: usize = 20;
-/// Directory entries looked at before stopping.
+/// Directory entries looked at in each starting folder before stopping.
 const MAX_VISITED: usize = 20_000;
 
 /// Folders that hold tools, caches or other applications' data, never a
@@ -36,29 +36,56 @@ pub struct Found {
     pub modified: Option<SystemTime>,
 }
 
-/// `.bib` files below `roots`, newest first, at most [`MAX_FOUND`].
-pub fn bib_files(roots: &[PathBuf]) -> Vec<Found> {
-    let mut found = Vec::new();
-    let mut visited = 0;
-    for root in roots {
-        walk(root, 0, &mut visited, &mut found);
-    }
-    found.sort_by(|a, b| b.modified.cmp(&a.modified).then_with(|| a.path.cmp(&b.path)));
-    found.dedup_by(|a, b| a.path == b.path);
-    found.truncate(MAX_FOUND);
-    found
+/// What a search found, and whether it stopped before looking everywhere.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Search {
+    /// Newest first, at most [`MAX_FOUND`].
+    pub files: Vec<Found>,
+    /// A starting folder held more entries than are looked at, or more
+    /// files were found than are returned.
+    pub cut_short: bool,
 }
 
-fn walk(folder: &Path, depth: usize, visited: &mut usize, found: &mut Vec<Found>) {
+/// `.bib` files below `roots`, newest first. Each starting folder has its
+/// own budget, so a huge one does not hide files in the others.
+pub fn bib_files(roots: &[PathBuf]) -> Search {
+    search(roots, MAX_VISITED)
+}
+
+fn search(roots: &[PathBuf], budget: usize) -> Search {
+    let mut files = Vec::new();
+    let mut cut_short = false;
+    for root in roots {
+        let mut left = budget;
+        walk(root, 0, &mut left, &mut files);
+        if left == 0 {
+            cut_short = true;
+        }
+    }
+    files.sort_by(|a, b| b.modified.cmp(&a.modified).then_with(|| a.path.cmp(&b.path)));
+    files.dedup_by(|a, b| a.path == b.path);
+    if files.len() > MAX_FOUND {
+        files.truncate(MAX_FOUND);
+        cut_short = true;
+    }
+    Search { files, cut_short }
+}
+
+/// Walk `folder`, spending one unit of `left` per entry; stops as soon as
+/// it reaches zero, before opening another folder.
+fn walk(folder: &Path, depth: usize, left: &mut usize, found: &mut Vec<Found>) {
+    if *left == 0 {
+        return;
+    }
     let Ok(entries) = fs::read_dir(folder) else {
         return;
     };
     let mut folders = Vec::new();
     for entry in entries.flatten() {
-        *visited += 1;
-        if *visited > MAX_VISITED {
+        if *left == 0 {
             return;
         }
+        *left -= 1;
         let name = entry.file_name();
         let Some(name) = name.to_str() else {
             continue;
@@ -88,7 +115,7 @@ fn walk(folder: &Path, depth: usize, visited: &mut usize, found: &mut Vec<Found>
     }
     folders.sort();
     for child in folders {
-        walk(&child, depth + 1, visited, found);
+        walk(&child, depth + 1, left, found);
     }
 }
 
@@ -137,7 +164,8 @@ mod tests {
         touch(&root.join("notes.bibx"), 1);
         touch(&root.join("refs.bib.bak"), 1);
         fs::create_dir_all(root.join("folder.bib")).unwrap_or_else(|e| panic!("{e}"));
-        let found = bib_files(&[root.to_path_buf(), root.join("missing")]);
+        let found = bib_files(&[root.to_path_buf(), root.join("missing")]).files;
+        assert!(!bib_files(&[root.to_path_buf()]).cut_short);
         assert_eq!(names(&found, root), ["thesis/refs.BIB", "a/b/c/deep.bib", "old.bib"]);
     }
 
@@ -148,7 +176,9 @@ mod tests {
             touch(&dir.path().join(format!("r{i:02}.bib")), i as u64 + 1);
         }
         let root = dir.path().to_path_buf();
-        let found = bib_files(&[root.clone(), root]);
+        let search = bib_files(&[root.clone(), root]);
+        assert!(search.cut_short);
+        let found = search.files;
         assert_eq!(found.len(), MAX_FOUND);
         assert_eq!(names(&found[..2], dir.path()), ["r00.bib", "r01.bib"]);
     }
@@ -162,6 +192,19 @@ mod tests {
         std::os::unix::fs::symlink(root, root.join("real/loop")).unwrap_or_else(|e| panic!("{e}"));
         std::os::unix::fs::symlink(root.join("real/refs.bib"), root.join("linked.bib"))
             .unwrap_or_else(|e| panic!("{e}"));
-        assert_eq!(names(&bib_files(&[root.to_path_buf()]), root), ["real/refs.bib"]);
+        assert_eq!(names(&bib_files(&[root.to_path_buf()]).files, root), ["real/refs.bib"]);
+    }
+
+    #[test]
+    fn a_full_folder_stops_its_own_search_only_and_says_so() {
+        let dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+        let (big, small) = (dir.path().join("big"), dir.path().join("small"));
+        for i in 0..10 {
+            touch(&big.join(format!("sub{i}/note.txt")), 1);
+        }
+        touch(&small.join("refs.bib"), 1);
+        let search = search(&[big, small], 5);
+        assert!(search.cut_short);
+        assert_eq!(names(&search.files, dir.path()), ["small/refs.bib"]);
     }
 }
