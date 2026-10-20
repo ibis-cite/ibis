@@ -16,7 +16,7 @@ pub(crate) fn library_line(status: &LibraryStatus) -> String {
     let line = match (status.state, &status.error, &status.name) {
         (LibraryState::Loading, _, Some(name)) => format!("Opening {name}…"),
         (LibraryState::Reloading, _, Some(name)) => format!("Reloading {name}…"),
-        // The last good copy is still searched: say so instead of "could not be opened".
+        // The last loaded references are still searched: say "not updated", not "could not be opened".
         (_, Some(error), _) if error.ends_with(KEPT) => {
             let reason = error.trim_end_matches(KEPT);
             let name = status.snapshot_name.as_deref().unwrap_or("Library");

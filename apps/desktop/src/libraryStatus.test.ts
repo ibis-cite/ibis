@@ -30,7 +30,7 @@ test.each<[string, LibraryStatus | null | undefined, string, ReturnType<typeof l
   ["a watched file", file(), "thesis.bib · 1,204 references", "done"],
   ["reading notices", file({ warnings: 2 }), "thesis.bib · 1,204 references · 2 reading notices", "look"],
   ["empty", zotero({ references: 0 }), "Zotero · no references", "look"],
-  ["Zotero closed, copy kept", zotero({ state: "error", error: kept, checked_at: now - 2 * hour }), "Zotero · last good copy · read 2 hours ago", "stop"],
+  ["Zotero closed, copy kept", zotero({ state: "error", error: kept, checked_at: now - 2 * hour }), "Zotero · not updated · read 2 hours ago", "stop"],
   ["never opened", zotero({ state: "error", has_snapshot: false, snapshot_name: null, references: 0, error: "Zotero is not running" }), "Zotero · not opened", "stop"],
   ["failed switch keeps a current library", file({ state: "error", name: "missing.bib", error: `The library file is unavailable${"; keeping the last loaded references"}` }), "thesis.bib · 1,204 references", "stop"],
 ])("%s", (_, status, expected, health) => {
@@ -54,20 +54,22 @@ test("relative times are short, never in the future, and turn into dates after a
   expect(ago(now - 24 * 8 * hour, now)).toBe("on Oct 12");
 });
 
-test("the detail says where from, when, and how Ibis keeps it current", () => {
-  expect(detail(zotero({ zotero_libraries: ["user", { group: 41 }, { group: 9 }], checked_at: now }))).toMatch(
-    /^Zotero: My Library, Group 41, and Group 9\. 1,204 references, read 3 hours ago \(.+\)\. Checked just now\. Checked for changes each time Ibis opens\.$/);
-  expect(detail(file({ warnings: 1 }))).toMatch(/^thesis\.bib\. 1,204 references, read 3 hours ago \(.+\)\. 1 reading notice\. Reread whenever the file changes\.$/);
-  expect(detail(zotero({ state: "error", error: kept, checked_at: now - 2 * hour }))).toMatch(
-    /^Zotero: My Library\. Zotero could not be reached, so Ibis is searching the 1,204 references last checked 2 hours ago \(.+\)\.$/);
-  expect(detail(file({ state: "error", name: "missing.bib", error: "The library file is unavailable" }))).toMatch(/^missing\.bib could not be opened\. Still searching thesis\.bib\. 1,204 references/);
-  expect(detail(file({ state: "none", has_snapshot: false, name: null }))).toBe("No library chosen");
+test("the detail is a short line, then libraries, time and any problem", () => {
+  const clockAt = (hours: number) => new Intl.DateTimeFormat("en", { timeStyle: "short" }).format(now - hours * hour);
+  expect(detail(zotero({ zotero_libraries: ["user", { group: 41 }, { group: 9 }], checked_at: now }))).toEqual(
+    ["Zotero · 1,204 references", `My Library, Group 41, Group 9 · read 3 hours ago, ${clockAt(3)}`]);
+  expect(detail(file({ warnings: 1 }))).toEqual(["thesis.bib · 1,204 references · 1 reading notice", `read 3 hours ago, ${clockAt(3)}`]);
+  expect(detail(zotero({ state: "error", error: kept, checked_at: now - 2 * hour }))).toEqual(
+    ["Zotero · 1,204 references", `My Library · read 2 hours ago, ${clockAt(2)} · Zotero could not be reached`]);
+  expect(detail(file({ state: "error", name: "missing.bib", error: "The library file is unavailable" }))).toEqual(
+    ["thesis.bib · 1,204 references", `read 3 hours ago, ${clockAt(3)} · missing.bib could not be opened`]);
+  expect(detail(file({ state: "none", has_snapshot: false, name: null }))).toEqual(["No library chosen", null]);
 });
 
 test("missing times from an older backend show no age instead of a wrong one", () => {
   const old = { ...file(), updated_at: undefined, checked_at: undefined } as unknown as LibraryStatus;
   expect(line(old)).toBe("thesis.bib · 1,204 references");
-  expect(detail(old)).toBe("thesis.bib. 1,204 references. Reread whenever the file changes.");
+  expect(detail(old)).toEqual(["thesis.bib · 1,204 references", null]);
 });
 
 test("the footer age ticks by itself and comes back current after the picker is shown", () => {

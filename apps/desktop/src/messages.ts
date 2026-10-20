@@ -175,7 +175,7 @@ export const libraryMessages = {
     if (!status.has_snapshot) return `${sourceLabel(status, status.name)} · not opened`;
     // After a failed switch the previous library is still current: describe it.
     const source = sourceLabel(status, status.snapshot_name);
-    if (kept(status)) return `${source} · last good copy`;
+    if (kept(status)) return `${source} · not updated`;
     if (status.references === 0) return `${source} · no references`;
     return `${source} · ${count(status.references, "reference")}` +
       (status.warnings > 0 ? ` · ${count(status.warnings, "reading notice")}` : "");
@@ -190,25 +190,22 @@ export const libraryMessages = {
     if (status.error || updated === null || now - updated > recentUpdate) return null;
     return `updated ${ago(updated, now)}`;
   },
-  /** Everything known, for the tooltip and the top of More. */
-  detail: (status: LibraryStatus | null | undefined, now: number, libraryNames: (status: LibraryStatus) => string) => {
+  /** Everything known, for the tooltip and the top of More: a short first
+   * line (source and count) and a quieter second (libraries, time, problem). */
+  detail: (status: LibraryStatus | null | undefined, now: number, libraryNames: (status: LibraryStatus) => string): [string, string | null] => {
     const summary = libraryMessages.summary(status);
-    if (!status?.has_snapshot) return summary;
+    if (!status?.has_snapshot) return [summary, null];
     const { updated, checked } = times(status);
-    const from = status.zotero ? `Zotero: ${libraryNames(status)}` : status.snapshot_name ?? "Library";
-    const read = updated === null ? "" : `, read ${ago(updated, now)} (${clock(updated, now)})`;
-    const what = `${from}. ${count(status.references, "reference")}${read}.`;
-    if (kept(status)) {
-      const at = checked === null ? "" : ` last checked ${ago(checked, now)} (${clock(checked, now)})`;
-      return `${from}. ${status.zotero ? "Zotero could not be reached" : "The file could not be read"}, so Ibis is searching the ` +
-        `${count(status.references, "reference")}${at}.`;
-    }
-    if (status.error) return `${status.name ?? "The chosen library"} could not be opened. Still searching ${what}`;
-    const confirmed = status.zotero && checked !== null && updated !== null && checked - updated > minute
-      ? ` Checked ${ago(checked, now)}.` : "";
-    const how = status.zotero ? " Checked for changes each time Ibis opens." : " Reread whenever the file changes.";
-    const notices = status.warnings > 0 ? ` ${count(status.warnings, "reading notice")}.` : "";
-    return what + confirmed + notices + how;
+    // A kept copy is described by when it was last known to be right.
+    const at = kept(status) ? checked : updated;
+    const parts = [
+      status.zotero ? libraryNames(status) : null,
+      at === null ? null : `read ${ago(at, now)}, ${clock(at, now)}`,
+      kept(status) ? (status.zotero ? "Zotero could not be reached" : "the file could not be read")
+        : status.error ? `${status.name ?? "the chosen library"} could not be opened` : null,
+    ].filter((part): part is string => part !== null);
+    const first = kept(status) ? `${sourceLabel(status, status.snapshot_name)} · ${count(status.references, "reference")}` : summary;
+    return [first, parts.length > 0 ? parts.join(" · ") : null];
   },
 };
 

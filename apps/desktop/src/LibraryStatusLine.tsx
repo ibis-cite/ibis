@@ -9,9 +9,9 @@ export function libraryHealth(library: LibraryStatus | null | undefined): "done"
   return library.warnings > 0 || library.references === 0 ? "look" : "done";
 }
 
-const lists = new Intl.ListFormat(appLocale, { style: "long", type: "conjunction" });
+const lists = new Intl.ListFormat(appLocale, { style: "short", type: "unit" });
 
-/** "My Library and Lab group", naming groups once their names are known. */
+/** "My Library, Lab group", naming groups once their names are known. */
 export function zoteroLibraryNames(status: LibraryStatus, groupName: (id: number) => string) {
   const names = status.zotero_libraries.map((choice: ZoteroLibrary) =>
     typeof choice === "object" ? groupName(choice.group) : pickerText.myLibrary);
@@ -48,7 +48,7 @@ export function LibraryStatusLine({ library, groupName }: {
   const now = Date.now();
   const health = libraryHealth(library);
   const age = libraryMessages.age(library, now);
-  const detail = libraryMessages.detail(library, now, (status) => zoteroLibraryNames(status, groupName));
+  const detail = libraryMessages.detail(library, now, (status) => zoteroLibraryNames(status, groupName)).filter(Boolean).join("\n");
   return (
     <span className="library-status" data-health={health} title={detail}>
       <span className="status-dot" data-health={health} aria-hidden="true" />
@@ -59,5 +59,15 @@ export function LibraryStatusLine({ library, groupName }: {
         {age && <span className="library-age"> · {age}</span>}
       </span>
     </span>
+  );
+}
+
+/** The library detail at the top of More: a short line, then a quieter one. */
+export function LibraryDetail({ lines }: { lines: [string, string | null] }) {
+  return (
+    <p className="menu-detail" aria-hidden="true">
+      <span className="menu-detail-title">{lines[0]}</span>
+      {lines[1] && <span>{lines[1]}</span>}
+    </p>
   );
 }

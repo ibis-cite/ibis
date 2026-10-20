@@ -1795,10 +1795,10 @@ test("the footer names the source and count, the age only when it matters, and t
   const item = live.closest(".library-status")!;
   expect(item.textContent).toBe("Zotero · 1,204 references");
   expect(item.getAttribute("data-health")).toBe("done");
-  expect(item.getAttribute("title")).toMatch(/^Zotero: My Library and Lab group\. 1,204 references, read 3 hours ago .*Checked for changes each time Ibis opens\.$/);
+  expect(item.getAttribute("title")).toMatch(/^Zotero · 1,204 references\nMy Library, (Group 7|Lab group) · read 3 hours ago, .+$/);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  const group = await screen.findByRole("group", { name: /Lab group\. 1,204 references/ });
-  expect(group.querySelector("p")?.textContent).toBe(group.getAttribute("aria-label"));
+  const group = await screen.findByRole("group", { name: /^Zotero · 1,204 references\. My Library, Lab group · read 3 hours ago, / });
+  expect(group.querySelector(".menu-detail-title")?.textContent).toBe("Zotero · 1,204 references");
 
   // A change just arrived: the age shows, outside the live region.
   status = { ...status, references: 1205, updated_at: Date.now() };
@@ -1810,9 +1810,9 @@ test("the footer names the source and count, the age only when it matters, and t
   status = { ...status, state: "error", checked_at: Date.now() - 2 * 3_600_000,
     error: "Zotero is not running, or it is not accepting connections; keeping the last loaded references" };
   await emit("library:changed", status);
-  await waitFor(() => expect(item.textContent).toBe("Zotero · last good copy · read 2 hours ago"));
+  await waitFor(() => expect(item.textContent).toBe("Zotero · not updated · read 2 hours ago"));
   expect(item.getAttribute("data-health")).toBe("stop");
-  expect(item.getAttribute("title")).toContain("Zotero could not be reached, so Ibis is searching the 1,205 references last checked 2 hours ago");
+  expect(item.getAttribute("title")).toMatch(/^Zotero · 1,205 references\nMy Library, Lab group · read 2 hours ago, .+ · Zotero could not be reached$/);
 });
 
 test("? lists every key in a modal dialog, but a ? typed in the search is text", async () => {

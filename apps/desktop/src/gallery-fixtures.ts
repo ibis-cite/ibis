@@ -60,7 +60,7 @@ export const galleryStates: readonly GalleryState[] = [
   { id: "high-contrast", label: "High contrast", library: library(), query: "memory", results: examples, theme: "contrast" },
   { id: "zotero-updated", label: "Zotero, just updated", library: library({ name: "2 Zotero libraries", snapshot_name: "2 Zotero libraries", zotero: true,
     zotero_libraries: ["user", { group: 41 }], references: 1204, updated_at: hoursAgo(2 / 60), checked_at: hoursAgo(2 / 60) }), query: "memory", results: examples },
-  { id: "zotero-kept", label: "Zotero closed, last good copy", library: library({ state: "error", name: "Zotero library", snapshot_name: "Zotero library", zotero: true,
+  { id: "zotero-kept", label: "Zotero closed, not updated", library: library({ state: "error", name: "Zotero library", snapshot_name: "Zotero library", zotero: true,
     zotero_libraries: ["user"], references: 1204, updated_at: hoursAgo(26), checked_at: hoursAgo(2),
     error: "Zotero is not running, or it is not accepting connections; keeping the last loaded references" }), query: "memory", results: examples },
   { id: "copied-notice", label: "Copied notice after hiding", library: library(), query: "memory", results: examples, notice: "[@example2026]" },

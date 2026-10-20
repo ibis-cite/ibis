@@ -107,14 +107,15 @@ status bar do it: short words, colour only alongside them, detail on demand.
 | Just changed (ten minutes) | "… · updated 2 minutes ago" | Done |
 | Reloading | "… · reloading…", count kept | Unchanged |
 | Reading notices, empty | "… · 2 reading notices", "Zotero · no references" | Look |
-| Update failed, old copy kept | "Zotero · last good copy · read 2 hours ago" | Stop |
+| Update failed, old copy kept | "Zotero · not updated · read 2 hours ago" | Stop |
 | Never opened | "thesis.bib · not opened" | Stop |
 
 Several Zotero libraries still read "Zotero"; rows name their library. The
-tooltip, and the name of the library group at the top of More (so keyboard and
-screen-reader users reach it), say which libraries, when they were read (relative
-and clock time), when Zotero was last checked, and how Ibis keeps them current:
-Zotero is checked each time Ibis opens; a file is reread whenever it changes. Times
+tooltip, and the top of More (also the name of its library group, so keyboard and
+screen-reader users reach it), give two lines: a short one ("Zotero · 1,204
+references") and a quieter one with the libraries, when they were read (relative
+and clock time) and any problem ("My Library, Lab group · read 2 hours ago,
+3:19 PM · Zotero could not be reached"). Times
 use `Intl.RelativeTimeFormat` in the app's language ("just now" under 45 seconds,
 a date after a week) and tick every 30 seconds without redrawing the picker. The
 live region holds only the words before the age, so a ticking clock is never

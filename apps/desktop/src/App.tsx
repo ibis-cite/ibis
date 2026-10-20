@@ -4,7 +4,7 @@ import { copiedNoticeText, copyFormatNames, densityNames, keyText, libraryMessag
 import { ariaKeys, KEY_TABLE, keyLabel, keysFor, type KeyBinding } from "./keys";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LibrarySetup, shortcutLabel } from "./LibrarySetup";
-import { LibraryStatusLine, zoteroLibraryNames } from "./LibraryStatusLine";
+import { LibraryDetail, LibraryStatusLine, zoteroLibraryNames } from "./LibraryStatusLine";
 import { usePointerSelection } from "./pointerSelection";
 import { formatCitation, FORMATTED_STYLES, provisional, type FormattedCitation } from "./format/formatted";
 import { STYLE_NAMES, type StyleId } from "./format/styles";
@@ -651,7 +651,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   };
   const groupName = (id: number) => groups?.find((group) => group.id === id)?.name ?? pickerText.groupLibrary(id);
   // Read when More opens, the only time it is shown there.
-  const libraryDetail = menuOpen ? libraryMessages.detail(library, Date.now(), (status) => zoteroLibraryNames(status, groupName)) : "";
+  const libraryDetail = menuOpen ? libraryMessages.detail(library, Date.now(), (status) => zoteroLibraryNames(status, groupName)) : null;
   // Every group Zotero lists, plus chosen groups it no longer lists, so they can be turned off.
   const offeredGroups = [...(groups?.map((group) => group.id) ?? []),
     ...chosenLibraries.flatMap((chosen) => (typeof chosen === "object" ? [chosen.group] : []))]
@@ -977,8 +977,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               <MoreMenu onClose={closeMenu}>
                 {/* Where the references come from and how fresh they are, read
                     as the group's name when the menu is reached by keyboard. */}
-                <div role="group" className="menu-library" aria-label={libraryDetail}>
-                <p className="menu-detail" aria-hidden="true">{libraryDetail}</p>
+                <div role="group" className="menu-library" aria-label={libraryDetail?.filter(Boolean).join(". ")}>
+                {libraryDetail && <LibraryDetail lines={libraryDetail} />}
                 <MenuItem label={pickerText.chooseLibrary} title={pickerText.chooseTitle} onSelect={() => runFromMenu("choose", chooseLibrary)} />
                 {!library?.zotero && (
                   <MenuItem label={pickerText.useZotero} title={pickerText.useZoteroTitle} onSelect={() => runFromMenu("zotero", useZotero)} />
