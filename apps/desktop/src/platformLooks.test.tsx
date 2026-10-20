@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { App } from "./App";
 import { galleryProvider, galleryStates } from "./gallery-fixtures";
@@ -168,7 +168,72 @@ test("the Windows search keeps the contrast-safe focus ring beside the accent un
   expect(focus).not.toMatch(/outline(-style|-width)?:\s*(none|0)/);
   // No platform rule anywhere removes the focus outline from the search box.
   for (const [, head, body] of styles.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-    if (head!.includes("#search")) expect(body, head).not.toMatch(/outline(-style|-width)?:\s*(none|0)\b/);
+    if (head!.includes("#search") && /:root\[data-platform="(windows|linux)"\]/.test(head!)) expect(body, head).not.toMatch(/outline(-style|-width)?:\s*(none|0)\b/);
   }
   expect(rules(styles, ":focus-visible")).toMatch(/outline:\s*var\(--focus-width\) solid var\(--focus\)/);
+});
+
+test("under forced colours an active added row differs from an active row in its computed style", async () => {
+  mockIPC(() => { throw new Error("Native commands must not run here"); }, { shouldMockEvents: true });
+  // jsdom evaluates no media queries, so apply the forced-colours rules as forced mode would.
+  const start = styles.indexOf("@media (forced-colors: active) {");
+  const forced = styles.slice(start + "@media (forced-colors: active) {".length, styles.indexOf("\n}\n", start));
+  const sheet = document.createElement("style");
+  sheet.textContent = forced;
+  document.head.append(sheet);
+  try {
+    const state = galleryStates.find((candidate) => candidate.id === "many-results")!;
+    render(<App {...galleryProvider(state)} />);
+    const row = (n: number) => document.querySelectorAll<HTMLElement>('#results [role="option"]')[n]!;
+    await waitFor(() => expect(row(2)).toBeTruthy());
+    const box = screen.getByLabelText("Search references");
+    // Add the first two rows, then look at row 1 (active and added) and row 2 (active only).
+    fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+    fireEvent.keyDown(box, { key: "ArrowDown" });
+    fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+    await waitFor(() => expect(row(1).hasAttribute("data-citation-selected")).toBe(true));
+    expect(row(1).hasAttribute("data-active")).toBe(true);
+    const activeAdded = getComputedStyle(row(1)).outlineColor;
+    fireEvent.keyDown(box, { key: "ArrowDown" });
+    await waitFor(() => expect(row(2).hasAttribute("data-active")).toBe(true));
+    expect(row(2).hasAttribute("data-citation-selected")).toBe(false);
+    const activeOnly = getComputedStyle(row(2));
+    const system = (name: string) => {
+      const probe = document.createElement("span");
+      probe.style.color = name;
+      document.body.append(probe);
+      const value = getComputedStyle(probe).color;
+      probe.remove();
+      return value;
+    };
+    expect(system("HighlightText")).not.toBe(system("Highlight"));
+    // The ring on an active added row uses the text colour paired with the Highlight fill.
+    expect(activeAdded).toBe(system("HighlightText"));
+    // An active row that is not added has no such ring.
+    expect(activeOnly.outlineStyle === "" || activeOnly.outlineStyle === "none" || activeOnly.outlineColor !== activeAdded).toBe(true);
+  } finally {
+    sheet.remove();
+  }
+});
+
+test("the frameless macOS search has no ring except with contrast or forced colours, and a quiet clear glyph", () => {
+  const mac = ':root:not([data-platform="windows"]):not([data-platform="linux"]) #search:focus-visible';
+  const outside = styles.slice(0, styles.indexOf("@media (prefers-contrast: more)"));
+  expect(rules(outside, mac)).toMatch(/outline:\s*none/);
+  for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
+    const block = styles.slice(styles.indexOf(media), styles.indexOf("\n}\n", styles.indexOf(media)));
+    expect(rules(block, mac), media).toMatch(/outline:\s*var\(--focus-width\) solid/);
+  }
+  // Every other control keeps the 2 px ring.
+  expect(rules(styles, ":focus-visible")).toMatch(/outline:\s*var\(--focus-width\) solid var\(--focus\)/);
+  expect(tokens).toMatch(/--focus-width:\s*2px/);
+  const clear = rules(styles, "#search::-webkit-search-cancel-button");
+  expect(clear).toMatch(/appearance:\s*none/);
+  expect(clear).toMatch(/width:\s*var\(--control-min-size\)/);
+  expect(clear).toMatch(/background:\s*var\(--muted\)/);
+  expect(clear).toMatch(/center \/ var\(--icon-size\)/);
+  expect(tokens).toMatch(/--control-min-size:\s*2rem/);
+  expect(tokens).toMatch(/--icon-size:\s*1rem/);
+  const forced = styles.slice(styles.indexOf("@media (forced-colors: active)"));
+  expect(rules(forced, "#search::-webkit-search-cancel-button")).toMatch(/background:\s*ButtonText/);
 });
