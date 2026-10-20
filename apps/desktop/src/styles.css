@@ -21,18 +21,37 @@ main {
   overflow: auto;
 }
 
-.search-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--search-gap); padding: var(--search-padding); border-bottom: var(--border-width) solid var(--line); cursor: move; user-select: none; }
+.search-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--search-gap); min-height: var(--search-bar-height); padding: var(--search-padding); border-bottom: var(--border-width) solid var(--line); cursor: move; user-select: none; }
 .search-bar svg { width: var(--search-icon-width); stroke-width: var(--search-icon-stroke); flex-shrink: 0; color: var(--muted); pointer-events: none; }
 .search-bar:focus-within { border-bottom-color: var(--search-active-border); }
 /* Reserve readable query space before wrapping controls, at every text size. */
 #search { flex: 1; width: auto; min-width: min(var(--search-min-width), calc(100% - var(--search-icon-width) - var(--search-gap))); font-size: var(--search-size); letter-spacing: var(--search-tracking); background: var(--clear); border: 0; padding: var(--search-input-padding); outline-offset: var(--search-focus-offset); cursor: text; user-select: text; }
 #search::placeholder { color: var(--muted); }
+/* macOS: the frameless search shows no ring; the caret and the active row are
+   the cue, as in Spotlight (docs/design.md). Contrast and forced colours restore
+   it below. The clear glyph is quiet like the other icons: secondary colour,
+   16 px glyph in a 32 px target. */
+#search { border-radius: var(--button-radius); }
+:root:not([data-platform="windows"]):not([data-platform="linux"]) #search:focus-visible { outline: none; }
+#search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; width: var(--control-min-size); height: var(--control-min-size); margin: 0; background: var(--muted); -webkit-mask: var(--clear-glyph) center / var(--icon-size) no-repeat; mask: var(--clear-glyph) center / var(--icon-size) no-repeat; cursor: default; }
+#search::-webkit-search-cancel-button:hover { background: var(--text); }
+/* Windows and Linux search in a framed 16 px text box with the icon inside it.
+   The icon overlaps the box's start padding, so the flex row never changes. */
+/* Only the search glyph (the header's direct child), never the pin icon inside its button. */
+:root[data-platform="windows"] .search-bar > svg, :root[data-platform="linux"] .search-bar > svg { position: relative; z-index: 1; margin-inline: var(--space-3) calc(-1 * (var(--search-icon-width) + var(--space-3) + var(--search-gap))); }
+:root[data-platform="windows"] #search, :root[data-platform="linux"] #search { padding: var(--field-padding); padding-inline-start: calc(var(--search-icon-width) + 2 * var(--space-3)); border-radius: var(--field-radius); background: var(--field-background); }
+/* Windows: an underline that turns accent on focus. The --focus ring stays as
+   well, because a bright system accent alone can fall far below 3:1. */
+:root[data-platform="windows"] #search { border: var(--border-width) solid var(--field-edge); border-bottom-color: var(--line); }
+:root[data-platform="windows"] #search:focus { outline-offset: var(--focus-offset); border-bottom-color: var(--accent); box-shadow: inset 0 calc(-1 * var(--border-width)) var(--accent); }
+/* Linux: a framed entry with the focus ring drawn on its edge. */
+:root[data-platform="linux"] #search { border: var(--border-width) solid var(--clear); outline-offset: 0; }
 .visually-hidden { position: absolute; width: var(--hidden-size); height: var(--hidden-size); padding: 0; margin: var(--hidden-margin); overflow: hidden; clip-path: var(--hidden-clip); white-space: nowrap; }
 
 .results-area { flex: 1; min-height: var(--results-min-height); overflow: auto; padding: var(--results-padding); scrollbar-width: thin; }
 .results-heading { display: flex; justify-content: space-between; padding: var(--heading-padding); color: var(--muted); font-size: var(--heading-size); font-weight: var(--heading-weight); letter-spacing: var(--heading-tracking); }
 #results { list-style: none; padding: 0; margin: 0; }
-[role="option"] { display: flex; flex-direction: column; justify-content: center; min-height: var(--row-height); cursor: default; padding: var(--result-padding); margin: var(--result-margin); border-radius: var(--result-radius); border: var(--border-width) solid var(--clear); }
+[role="option"] { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: var(--row-height); cursor: default; padding: var(--result-padding); margin: var(--result-margin); border-radius: var(--result-radius); border: var(--border-width) solid var(--clear); }
 /* Title and year share the first line; the year sits at the same edge on every row. */
 .result-line, .result-meta { display: flex; align-items: baseline; gap: var(--space-3); min-width: 0; }
 .result-title { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: var(--title-size); font-weight: var(--title-weight); line-height: var(--title-line-height); letter-spacing: var(--title-tracking); }
@@ -52,9 +71,16 @@ main {
 .result-library { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 [role="option"]:hover:not([data-active]):not([data-citation-selected]) { background: var(--hover-background); }
 /* Active and selected remain distinguishable even without colour. */
-[role="option"][data-active] { background: var(--active-background); border-color: var(--active-edge); box-shadow: inset var(--active-edge-width) 0 var(--accent); }
-[role="option"][data-citation-selected] { background: var(--selected-background); color: var(--selected-text); }
-[data-citation-selected] .result-meta, [data-citation-selected] .result-year, [data-citation-selected] .result-why { color: inherit; }
+/* The selected (active) row follows the platform: filled accent on macOS,
+   soft grey with an accent pill on Windows, accent tint on Linux. A row added
+   to the citation keeps a scarlet frame and key, so the two never look alike. */
+[role="option"][data-active] { background: var(--row-active-background); color: var(--row-active-text); border-color: var(--row-active-edge); }
+[data-active] .result-meta, [data-active] .result-year, [data-active] .result-why { color: var(--row-active-muted); }
+:root[data-platform="windows"] [role="option"][data-active]::before { content: ""; position: absolute; inset-inline-start: 0; top: 50%; width: var(--pill-width); height: var(--pill-height); margin-top: calc(var(--pill-height) / -2); border-radius: var(--pill-width); background: var(--accent); }
+/* An inset ring marks an added row whatever its fill, active or not, in every theme. */
+[role="option"][data-citation-selected] { border-color: var(--citation); box-shadow: inset 0 0 0 var(--focus-width) var(--citation); }
+[data-citation-selected]:not([data-active]) .result-key { color: var(--citation); }
+[role="option"][data-active][data-citation-selected] { box-shadow: inset 0 0 0 var(--focus-width) var(--row-active-text); }
 .empty-state { color: var(--muted); text-align: center; padding: var(--empty-padding); }
 .empty-state p:first-child { color: var(--text); font-weight: var(--type-strong-weight); }
 .empty-hint { font-size: var(--metadata-size); }
@@ -68,6 +94,7 @@ main {
 .notices:empty { display: none; }
 .notices { padding: var(--notice-padding); overflow-wrap: anywhere; }
 .notices p { margin: var(--notice-margin); }
+.copy-notice code, .format-preview .preview-text, [aria-label="Selected references"] code { color: var(--citation); }
 .copy-notice { border-bottom: var(--border-width) solid var(--line); padding-bottom: var(--copy-padding); }
 .format-preview { border-bottom: var(--border-width) solid var(--line); padding: var(--copy-padding); overflow-wrap: anywhere; }
 .format-preview .provisional { color: var(--muted); font-size: var(--metadata-size); margin: var(--metadata-gap) 0 0; }
@@ -112,18 +139,27 @@ main:hover .pin-button, .pin-button:focus-visible { opacity: 1; }
 [role="menuitem"] kbd { color: var(--muted); }
 .quiet-button, .icon-button { background: var(--clear); border-color: var(--clear); color: var(--muted); }
 .icon-button { font-size: var(--icon-size); padding: var(--icon-padding); }
-.key-hints { color: var(--muted); font-size: var(--hint-size); }
 kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding: var(--hint-padding); border: var(--border-width) solid var(--line); border-radius: var(--hint-radius); margin-inline-start: var(--hint-margin); }
 
 @media (prefers-contrast: more) {
 
-  [role="option"][data-active] { border-width: var(--contrast-border-width); }
+  [role="option"][data-active] { border-color: var(--active-edge); border-width: var(--contrast-border-width); }
+  :root[data-platform] #search { border-color: var(--line); }
+  :root:not([data-platform="windows"]):not([data-platform="linux"]) #search:focus-visible { outline: var(--focus-width) solid var(--focus); }
 }
 @media (forced-colors: active) {
 
-  [role="option"][data-active] { border-color: var(--selected-background); }
+  /* Opt the active row out of the forced-colours backplate, which would paint
+     Canvas behind its HighlightText text; its colours are already system pairs. */
+  [role="option"][data-active] { border-color: var(--selected-background); forced-color-adjust: none; }
   [role="option"][data-citation-selected] { outline: var(--focus-width) solid var(--selected-background); outline-offset: var(--forced-selected-offset); }
+  /* Forced colours drop box-shadow, so an active added row needs its own ring
+     in the text colour paired with the Highlight fill. */
+  [role="option"][data-active][data-citation-selected] { outline-color: HighlightText; }
   .search-bar:focus-within { outline: var(--focus-width) solid var(--selected-background); outline-offset: var(--forced-search-offset); }
+  #search::-webkit-search-cancel-button { forced-color-adjust: none; background: FieldText; }
+  :root:not([data-platform="windows"]):not([data-platform="linux"]) #search:focus-visible { outline: var(--focus-width) solid CanvasText; }
+  :root[data-platform="windows"] [role="option"][data-active]::before { background: HighlightText; }
 }
 @media (max-width: 460px) {
   /* Reflow into one vertical scroller instead of squeezing large text between
@@ -137,7 +173,6 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
   /* Authors and container flow as one wrapping run of text. */
   .result-byline { display: block; }
   .result-authors, .result-container { white-space: normal; overflow-wrap: anywhere; }
-  .key-hints { display: none; }
 }
 /* No animation: reduced-motion users get the same immediate feedback. */
 
@@ -158,6 +193,33 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
    the item type; Compact puts the first author after the title. */
 .result-type { flex: none; }
 .result-first-author { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
-[data-citation-selected] .result-first-author { color: inherit; }
+[data-active] .result-first-author { color: var(--row-active-muted); }
 :root[data-density="compact"] .result-title { flex: 0 1 auto; }
 :root[data-density="compact"] .result-year { margin-inline-start: auto; }
+
+/* Footer key hints (#491): what Enter does now, or with Alt held the other
+   keys. They stay in narrow windows and wrap instead of overlapping. */
+.enter-hints { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-3); min-width: 0; color: var(--muted); font-size: var(--hint-size); overflow-wrap: anywhere; }
+.enter-hints kbd { margin-inline: 0 var(--space-1); }
+.empty-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); margin-top: var(--space-3); }
+
+/* The keys overlay: one table of every key, above a dimmed picker. */
+.keys-backdrop { position: fixed; inset: 0; z-index: 2; display: grid; place-items: center; padding: var(--space-4); background: color-mix(in srgb, var(--text) 30%, transparent); }
+.keys-dialog { display: flex; flex-direction: column; width: min(36rem, 100%); max-height: 100%; min-height: 0; background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }
+.keys-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); padding-block: var(--space-2); padding-inline: var(--space-4) var(--space-2); border-bottom: var(--border-width) solid var(--line); }
+.keys-heading h2 { margin: 0; font-size: inherit; font-weight: var(--type-strong-weight); }
+.keys-heading button { min-height: var(--control-min-size); }
+.keys-scroll { overflow: auto; min-height: 0; padding: var(--space-2) var(--space-4) var(--space-4); }
+.keys-scroll table { width: 100%; border-collapse: collapse; font-size: var(--metadata-size); }
+.keys-scroll th { text-align: start; color: var(--muted); font-weight: var(--type-strong-weight); }
+.keys-scroll th, .keys-scroll td { padding: var(--space-1) var(--space-2); vertical-align: top; overflow-wrap: anywhere; border-bottom: var(--border-width) solid var(--line); }
+.keys-scroll td:first-child { white-space: nowrap; }
+.keys-scroll td:last-child { color: var(--muted); }
+.keys-scroll kbd { margin-inline-start: 0; }
+@media (forced-colors: active) {
+  .keys-backdrop { background: Canvas; }
+  .keys-dialog { border-color: CanvasText; }
+}
+@media (max-width: 460px) {
+  .keys-scroll td:first-child { white-space: normal; }
+}
