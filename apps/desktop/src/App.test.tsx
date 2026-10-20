@@ -538,9 +538,13 @@ test("counts use singular and plural and announce only settled current searches"
   expect(announcement.textContent).toBe("0 results");
 });
 
-test("the focus ring contrasts with both themes independent of the system accent", () => {
-  const focusToken = styles.match(/:focus-visible\s*\{[^}]*outline:\s*[^;]*solid var\((--[\w-]+)/)?.[1];
-  expect(focusToken).toBeTruthy();
+test("the Windows focus ring contrasts with both themes independent of the system accent", () => {
+  // macOS and Linux draw the ring in the system accent, as their own controls do
+  // (docs/design.md); increased contrast and forced colours make it CanvasText.
+  // Windows uses Fluent's ink ring, which must reach 3:1 on every row fill.
+  expect(styles).toMatch(/:focus-visible\s*\{[^}]*outline:\s*var\(--focus-ring-width\) solid var\(--focus-ring-color\)/);
+  const focusToken = tokens.match(/:root\[data-platform="windows"\]\s*\{[^}]*--focus-ring-color:\s*var\((--[\w-]+)\)/)?.[1];
+  expect(focusToken).toBe("--text");
   const theme = (token: string) => {
     const pair = tokens.match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]+),\\s*(#[0-9a-f]+)\\)`));
     expect(pair, `${token} needs defined theme colors`).not.toBeNull();
@@ -566,6 +570,8 @@ test("combobox focus is separate from citation selection and only additions/remo
   await screen.findByText("First");
   const box = screen.getByRole("combobox", { name: "Search references" });
   const list = screen.getByRole("listbox", { name: "Results" });
+  expect(box.getAttribute("aria-autocomplete")).toBe("list");
+  expect(box.getAttribute("aria-controls")).toBe(list.id);
   expect(list.hasAttribute("aria-multiselectable")).toBe(false);
   expect(within(list).getAllByRole("option", { selected: true })).toHaveLength(1);
   const notice = screen.getByRole("status", { name: "Citation selection" });
@@ -586,6 +592,7 @@ test("combobox focus is separate from citation selection and only additions/remo
   expect(notice.textContent).toBe("1 reference selected for citation");
   fireEvent.change(box, { target: { value: "reorder" } });
   await waitFor(() => expect(within(list).getAllByRole("option")[0]?.textContent).toContain("Second"));
+  expect((box as HTMLInputElement).value).toBe("reorder");
   expect(screen.getByText("First").closest('[role="option"]')?.hasAttribute("data-citation-selected")).toBe(true);
   expect(within(list).getAllByRole("option", { selected: true })).toHaveLength(1);
   expect(document.getElementById(box.getAttribute("aria-activedescendant")!)?.textContent).toContain("Second");
