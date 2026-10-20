@@ -16,7 +16,7 @@ In plain words, for someone who did not write it: which files matter, how the pi
 
 Anything tested manually (which OS, which app, which library)?
 
-## Visual evidence (for interface feature changes)
+## Visual evidence (for meaningful interface changes)
 
 Embed or link before/after screenshots so reviewers can compare without installing a build. Use synthetic references; label each capture with its source commit, OS, light/dark appearance, and native app or browser preview.
 
