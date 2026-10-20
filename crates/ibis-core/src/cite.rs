@@ -226,9 +226,9 @@ fn pandoc(items: &[CiteItem]) -> String {
 fn pandoc_key(key: &str) -> String {
     const INNER: &str = ":.#$%&-+?<>~/";
     let chars: Vec<char> = key.chars().collect();
-    // Pandoc's isAlphaNum accepts letters/numbers, while Rust's Alphabetic
-    // property also includes marks. Brace those keys to keep their identity.
-    let word = |c: char| (c.is_alphanumeric() && !unicode_normalization::char::is_combining_mark(c)) || c == '_';
+    // Use a conservative ASCII subset: Rust's Alphabetic also includes marks
+    // and symbols that Pandoc's isAlphaNum rejects. Braces keep Unicode exact.
+    let word = |c: char| c.is_ascii_alphanumeric() || c == '_';
     let simple = chars.first().is_some_and(|c| word(*c))
         && chars.last().is_some_and(|c| word(*c))
         && chars.iter().all(|c| word(*c) || INNER.contains(*c))
