@@ -142,7 +142,9 @@ footer { border-top: var(--border-width) solid var(--line); padding: var(--foote
 /* Takes only the room the name and state leave, so it is cut before them. */
 .library-age { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .library-status[data-health="stop"] .library-name, .library-status[data-health="look"] .library-name { color: var(--text); }
-.library-bar p { width: 100%; margin: var(--library-notice-margin); }
+/* Only the visible notice line; never the hidden spoken detail, which must keep
+   its 1 px .visually-hidden box or the page grows wider than the window. */
+.library-bar > p[role="status"] { width: 100%; margin: var(--library-notice-margin); }
 /* The dot repeats what the words say, so colour is never the only signal. */
 .status-dot { width: var(--status-dot-size); height: var(--status-dot-size); border-radius: 50%; flex-shrink: 0; background: var(--muted); }
 .status-dot[data-health="done"] { background: var(--status-done); }

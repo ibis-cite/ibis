@@ -133,6 +133,25 @@ test("the footer age ticks by itself, skips hidden windows and catches up when s
   }
 });
 
+test("no sizing rule reaches the hidden spoken detail, so the footer never widens the page", () => {
+  // `.library-bar p { width: 100% }` once matched it and beat .visually-hidden (#531).
+  const styles = readFileSync(new FileURL("./styles.css", import.meta.url), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "");
+  const bar = document.createElement("section");
+  bar.className = "library-bar";
+  document.body.append(bar);
+  const { container } = render(createElement(LibraryStatusLine, { library: file({ updated_at: now }), groupName: String }), { container: bar });
+  const hidden = container.querySelector(".library-detail");
+  expect(hidden).not.toBeNull();
+  const sizing = [...styles.matchAll(/([^{}]+)\{([^}]*)\}/g)]
+    .filter(([, , body]) => /(^|[;\s])(width|min-width|margin|padding|position)\s*:/.test(body ?? ""))
+    .flatMap(([, selector]) => (selector ?? "").split(",").map((part) => part.trim()))
+    .filter((selector) => selector.includes("library") && !selector.startsWith("@"));
+  const reaching = sizing.filter((selector) => { try { return hidden?.matches(selector); } catch { return false; } });
+  expect(reaching).toEqual([]);
+  bar.remove();
+});
+
 test("the footer shortens the age, then the name, and only then the state words, with an ellipsis", () => {
   const styles = readFileSync(new FileURL("./styles.css", import.meta.url), "utf8");
   const rule = (selector: string) => styles.match(new RegExp(`^\\${selector} \\{([^}]*)\\}`, "m"))?.[1] ?? "";
