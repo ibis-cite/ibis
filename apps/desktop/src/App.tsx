@@ -69,11 +69,10 @@ function hiddenMatch(matched: string[]): string | null {
   return matched[0] ?? null;
 }
 
-/** Authors as a row shows them: "García", "García, Okafor" or "García et al.". */
+/** Authors as a row shows them: "García", or "García et al." when more follow.
+ * Uses the core fields only, so a name containing a comma is never miscounted. */
 function shortAuthors(r: SearchResult): string {
-  if (!r.first_author || !r.more_authors) return r.authors;
-  const rest = r.authors.startsWith(`${r.first_author}, `) ? r.authors.slice(r.first_author.length + 2) : null;
-  return rest !== null && !rest.includes(", ") ? r.authors : `${r.first_author} ${rowText.etAl}`;
+  return r.first_author && r.more_authors ? `${r.first_author} ${rowText.etAl}` : r.authors;
 }
 
 /** Done, Look or Stop for the footer dot; words carry the same meaning. */

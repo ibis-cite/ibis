@@ -57,7 +57,10 @@ main {
 .result-title { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: var(--title-size); font-weight: var(--title-weight); line-height: var(--title-line-height); letter-spacing: var(--title-tracking); }
 .result-year, .result-meta, .result-why { color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 .result-year { flex-shrink: 0; font-variant-numeric: tabular-nums; }
-.result-meta { margin-top: var(--metadata-gap); }
+/* The meta line wraps only when the byline, type, key and badge cannot all
+   fit at their sizes (enlarged text in a narrow window); then they move under
+   the byline. Normal sizes keep one line. */
+.result-meta { margin-top: var(--metadata-gap); flex-wrap: wrap; row-gap: 0; }
 /* Shortened authors and the container keep 60% of the line (or 12em); the
    key and library badge shorten first. Within it the authors shorten faster
    and the container keeps most of the room, each with an ellipsis. The
@@ -66,9 +69,9 @@ main {
 .result-authors { flex: 0 3 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-container { flex: 1 1 8em; min-width: min(8em, 70%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-authors, .result-container { unicode-bidi: isolate; }
-.result-key { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
+.result-key { flex: 0 1 auto; min-width: min(6ch, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
 .result-why { font-style: italic; }
-.result-library { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-library { flex: 0 1 auto; min-width: min(5em, 100%); max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 [role="option"]:hover:not([data-active]):not([data-citation-selected]) { background: var(--hover-background); }
 /* Active and selected remain distinguishable even without colour. */
 /* The selected (active) row follows the platform: filled accent on macOS,
@@ -191,7 +194,7 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 /* Rows that tell similar references apart (#492). Comfortable and Spacious
    rows show shortened authors and the container on one line; Spacious adds
    the item type; Compact puts the first author after the title. */
-.result-type { flex: none; }
+.result-type { flex: 0 1 auto; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-first-author { flex: 0 1 auto; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 [data-active] .result-first-author { color: var(--row-active-muted); }
 :root[data-density="compact"] .result-title { flex: 0 1 auto; }

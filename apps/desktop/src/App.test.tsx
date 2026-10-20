@@ -912,8 +912,8 @@ test("rows with the same first author and year are told apart by their container
   // after, with no gap, margin or padding of its own.
   const byline = rows[0]?.querySelector(".result-byline");
   expect(byline?.querySelector(".result-authors + .result-container")).toBeTruthy();
-  expect(byline?.textContent).toBe("García, Okafor\u00a0· Journal of Sleep \u202eResearch");
-  expect([...(byline?.querySelectorAll("[aria-hidden]") ?? [])].map((e) => e.textContent)).toEqual(["\u00a0· "]);
+  expect(byline?.textContent).toBe("García et al.García, Okafor\u00a0· Journal of Sleep \u202eResearch");
+  expect([...(byline?.querySelectorAll(".result-container [aria-hidden]") ?? [])].map((e) => e.textContent)).toEqual(["\u00a0· "]);
   const bylineRules = [...styles.matchAll(/([^{}]*\.result-(?:byline|authors|container)\b[^{}]*)\{([^}]*)\}/g)];
   expect(bylineRules.length).toBeGreaterThan(0);
   for (const [, , body] of bylineRules) expect(body).not.toMatch(/margin|padding|gap|(^|[^-])width:/);
@@ -947,10 +947,11 @@ test("rows with the same first author and year are told apart by their container
   expect(rows[1]?.textContent).toContain("Matched in");
 });
 
-test("rows shorten the authors and keep the meta line to one line with room for the journal", async () => {
+test("rows shorten the authors and keep the journal, key and library label visible", async () => {
   backend({ search: () => [
     { ...result("a", "Six authors"), authors: "García, Okafor, Lima, Chen, Novak, Haddad", first_author: "García", more_authors: true, container: "Journal of Sleep Research" },
-    { ...result("b", "Two authors"), authors: "García, Okafor", first_author: "García", more_authors: true, container: "Sleep" },
+    // The core says more authors follow; a comma inside one name is not counted.
+    { ...result("b", "Organisation"), authors: "Institute, Research", first_author: "Institute, Research", more_authors: false, container: "Sleep" },
     { ...result("c", "One author"), container: "Sleep" },
   ] });
   render(<App />);
@@ -958,23 +959,24 @@ test("rows shorten the authors and keep the meta line to one line with room for 
   await screen.findByText("One author");
   const rows = within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option");
   const authors = (row?: HTMLElement) => row?.querySelector(".result-authors");
-  // Three or more: "García et al." on screen; screen readers still hear every name.
+  // More authors: "García et al." on screen; screen readers still hear every name.
   expect(authors(rows[0])?.querySelector("[aria-hidden]")?.textContent).toBe("García et al.");
   expect(authors(rows[0])?.querySelector(".visually-hidden")?.textContent).toBe("García, Okafor, Lima, Chen, Novak, Haddad");
-  expect(authors(rows[1])?.textContent).toBe("García, Okafor");
+  expect(authors(rows[1])?.textContent).toBe("Institute, Research");
   expect(authors(rows[2])?.textContent).toBe("Smith");
-  // One line (wrapping only in the narrow layout), with a real share for the
-  // journal; the key and library badge shorten first. Chromium probe numbers
+  // The byline keeps a real share for the journal. The key and library label
+  // never shrink to nothing: below their few-letter minimum the meta line
+  // wraps them under the byline instead (no row gap). Chromium probe numbers
   // for the crowded cases are in PR #502.
-  const narrow = styles.indexOf("@media (max-width: 460px)");
-  const wide = styles.slice(0, narrow) + styles.slice(styles.indexOf("}\n/* No animation", narrow));
-  expect(wide).not.toMatch(/\.result-(?:meta|byline)[^{]*\{[^}]*flex-wrap/);
   expect(styles).not.toMatch(/line-clamp/);
+  expect(styles).toMatch(/\.result-meta \{[^}]*flex-wrap: wrap; row-gap: 0;/);
   expect(styles).toMatch(/\.result-byline \{[^}]*flex: 1 1 0; min-width: min\(12em, 60%\)/);
   expect(styles).toMatch(/\.result-authors \{ flex: 0 3 auto; min-width: 0;[^}]*text-overflow: ellipsis/);
   expect(styles).toMatch(/\.result-container \{ flex: 1 1 8em; min-width: min\(8em, 70%\);[^}]*text-overflow: ellipsis/);
-  expect(styles).toMatch(/\.result-key \{ flex: 0 1 auto; min-width: 0;/);
-  expect(styles).toMatch(/\.result-library \{ flex: 0 1 auto; min-width: 0;/);
+  expect(styles).toMatch(/\.result-key \{ flex: 0 1 auto; min-width: min\(6ch, 100%\);[^}]*text-overflow: ellipsis/);
+  expect(styles).toMatch(/\.result-library \{ flex: 0 1 auto; min-width: min\(5em, 100%\);[^}]*text-overflow: ellipsis/);
+  expect(styles).toMatch(/\.result-type \{[^}]*max-width: 100%;[^}]*text-overflow: ellipsis/);
+  for (const name of ["key", "library"]) expect(styles).not.toMatch(new RegExp(`\\.result-${name} \\{[^}]*min-width: 0`));
 });
 
 test("Escape clears the search before it hides the picker, keeping chosen references", async () => {
