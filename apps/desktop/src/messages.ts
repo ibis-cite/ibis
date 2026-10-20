@@ -364,3 +364,15 @@ export const copiedNoticeText = {
   source: "Ibis",
   noticeFailed: "The Copied notice could not be shown.",
 };
+
+// The format menu separates the existing short names from real output samples.
+export const copyFormatMenu: Record<KeyFormat, { label: string; sample: string }> = {
+  pandoc: { label: "Pandoc", sample: "[@key]" },
+  autocite: { label: "\\autocite", sample: "\\autocite{key}" },
+  parencite: { label: "\\parencite", sample: "\\parencite{key}" },
+  textcite: { label: "\\textcite", sample: "\\textcite{key}" },
+  cite: { label: "\\cite", sample: "\\cite{key}" },
+  typst: { label: "Typst", sample: "@key" },
+  keys: { label: "Keys only", sample: "key" },
+};
+export const toolbarMenuText = { filterFormats: "Filter formats", keyFormats: "Key formats", citationStyles: "Citation styles" } as const;

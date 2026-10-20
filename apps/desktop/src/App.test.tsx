@@ -2203,3 +2203,60 @@ test("quick clicks end in the state of the last click, and the app's own name is
   await waitFor(() => expect(system).toBe(false));
   expect(item.getAttribute("aria-checked")).toBe("false");
 });
+
+test("format toolbar menu exposes both sections and saves a choice without copying", async () => {
+  const saved: unknown[] = [];
+  const calls = backend({ set_picker_preferences: (args) => { saved.push(args.copyFormat); return null; } });
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: "Copy as Pandoc" }));
+  expect(screen.getByRole("group", { name: "Key formats" })).toBeTruthy();
+  expect(screen.getByRole("group", { name: "Citation styles" })).toBeTruthy();
+  expect(screen.getAllByRole("menuitemradio")).toHaveLength(12);
+  expect(screen.getByRole("menuitemradio", { name: /Pandoc/ }).getAttribute("aria-checked")).toBe("true");
+  fireEvent.click(screen.getByRole("menuitemradio", { name: "\\autocite" }));
+  await waitFor(() => expect(saved).toContain("autocite"));
+  expect(calls).not.toContain("copy_citation");
+  expect(screen.getByRole("button", { name: "Copy as \\autocite" })).toBeTruthy();
+  await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText("Search references")));
+});
+
+test("unavailable citation styles stay visible and reachable without changing preferences", async () => {
+  const saved = vi.fn(() => null);
+  backend({ set_picker_preferences: saved });
+  render(<App api={{ ...api, cslItems: undefined, copyFormatted: undefined }} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Copy as Pandoc" }));
+  const filter = screen.getByRole("searchbox");
+  fireEvent.keyDown(filter, { key: "End" });
+  const mla = screen.getByRole("menuitemradio", { name: /MLA/ });
+  expect(mla.getAttribute("aria-disabled")).toBe("true");
+  expect(filter.getAttribute("aria-activedescendant")).toBe(mla.id);
+  fireEvent.keyDown(filter, { key: "Enter" });
+  fireEvent.keyUp(filter, { key: "Enter" });
+  expect(saved).not.toHaveBeenCalled();
+  expect(screen.getByRole("menu")).toBeTruthy();
+});
+
+test("format filter IME and Escape preserve the query, and Ctrl+K switches layers", async () => {
+  const calls = backend();
+  render(<App />);
+  const search = screen.getByLabelText("Search references") as HTMLInputElement;
+  fireEvent.change(search, { target: { value: "sleep" } });
+  const trigger = await screen.findByRole("button", { name: "Copy as Pandoc" });
+  fireEvent.click(trigger);
+  const filter = screen.getByRole("searchbox");
+  fireEvent.change(filter, { target: { value: "APA" } });
+  fireEvent.compositionStart(filter);
+  for (const key of ["Enter", "Escape", "k"]) fireEvent.keyDown(filter, { key, ctrlKey: key === "k", isComposing: true });
+  expect(screen.getByRole("menu")).toBeTruthy();
+  expect(calls).not.toContain("hide_picker");
+  expect(calls).not.toContain("set_picker_preferences");
+  fireEvent.compositionEnd(filter);
+  fireEvent.keyDown(filter, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+  expect(search.value).toBe("sleep");
+  expect(calls).not.toContain("hide_picker");
+  fireEvent.click(trigger);
+  fireEvent.keyDown(screen.getByRole("searchbox"), { key: "k", ctrlKey: true });
+  expect(await screen.findByRole("menu", { name: /^More/ })).toBeTruthy();
+  expect(screen.queryByRole("searchbox")).toBeNull();
+});
