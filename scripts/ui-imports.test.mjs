@@ -45,3 +45,20 @@ test("comments and line breaks do not hide dependency imports", (t) => {
   writeFileSync(join(root, "Feature.tsx"), '/* import "react-aria" */\nconst help = "import \\\"react-aria\\\"";\nconst template = `from "react-aria-components"`;');
   assert.deepEqual(forbiddenUiImports(root), []);
 });
+
+test("JavaScript syntax cannot hide imports or turn regular expressions into imports", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "ibis-ui-syntax-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  for (const source of [
+    'const menu = import(("react-aria-components"));',
+    'const text = `${import("react-aria-components")}`;',
+    'type Menu = import("react-aria-components").MenuProps;',
+    'const menu = import(`react-aria-components/Menu`);',
+    'import "react\\u002daria-components";',
+  ]) {
+    writeFileSync(join(root, "Feature.tsx"), source);
+    assert.deepEqual(forbiddenUiImports(root), ["Feature.tsx"]);
+  }
+  writeFileSync(join(root, "Feature.tsx"), 'const pattern = /from "react-aria-components"/;');
+  assert.deepEqual(forbiddenUiImports(root), []);
+});

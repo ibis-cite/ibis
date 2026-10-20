@@ -64,7 +64,8 @@ Until measurements justify more, the app is a single process that keeps the libr
 
 Shared interactive web controls live in `apps/desktop/src/ui/` (ADR 0021).
 Only that directory imports React Aria; `scripts/ui-imports.mjs` checks static
-imports, re-exports and literal dynamic imports/require calls. It is a contributor
-boundary check, not a security sandbox or a general JavaScript parser. During
+imports, re-exports and literal dynamic imports/require calls. It reuses Vite's
+pinned JavaScript/TypeScript parser; it is a contributor boundary check, not a
+security sandbox for computed module names. During
 incremental migration, toolbar-menu role overrides in `tokens.css` apply locally
 to its popover, preserving the existing More menu and keys dialog roles.
