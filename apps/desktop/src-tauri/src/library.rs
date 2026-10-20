@@ -743,7 +743,9 @@ pub(crate) fn use_zotero(app: AppHandle) {
 #[specta::specta]
 pub(crate) fn use_zotero_libraries(app: AppHandle, libraries: Vec<ZoteroLibrary>) -> Result<(), String> {
     let chosen = ZoteroLibraries::new(libraries).ok_or("Choose at least one Zotero library, each once")?;
-    open_zotero(&app, chosen);
+    // Chosen from the open picker: showing it again would move focus out of
+    // the menu.
+    start_open(&app, Source::Zotero(chosen), true);
     Ok(())
 }
 

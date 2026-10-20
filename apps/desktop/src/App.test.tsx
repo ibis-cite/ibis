@@ -1086,3 +1086,32 @@ test("a failed group list is reported and My Library stays available", async () 
   const group = screen.getByRole("group", { name: "Zotero libraries" });
   expect(within(group).getAllByRole("menuitemcheckbox").map((box) => box.textContent)).toEqual(["My Library"]);
 });
+
+test("two Zotero libraries turned on before the first is reported are both kept, and a refused choice is undone", async () => {
+  const chosen: unknown[][] = [];
+  let refuse = false;
+  backend({
+    library_status: () => zoteroStatus(["user"]),
+    zotero_groups: () => [{ id: 42, name: "Synthetic lab" }, { id: 7, name: "Reading group" }],
+    use_zotero_libraries: ({ libraries }) => {
+      if (refuse) throw new Error("synthetic refusal");
+      chosen.push(libraries as unknown[]);
+      return null;
+    },
+  });
+  render(<App />);
+  await waitFor(() => expect(screen.getByRole("region", { name: "Library" }).textContent).toMatch(/Zotero/));
+  fireEvent.click(screen.getByRole("button", { name: /^More/ }));
+  const group = await screen.findByRole("group", { name: "Zotero libraries" });
+  fireEvent.click(await within(group).findByRole("menuitemcheckbox", { name: "Synthetic lab" }));
+  fireEvent.click(within(group).getByRole("menuitemcheckbox", { name: "Reading group" }));
+  await waitFor(() => expect(chosen).toEqual([["user", { group: 42 }], ["user", { group: 42 }, { group: 7 }]]));
+  expect(within(group).getByRole("menuitemcheckbox", { name: "Reading group" }).getAttribute("aria-checked")).toBe("true");
+
+  await act(async () => { await emit("library:changed", zoteroStatus(["user", { group: 42 }, { group: 7 }])); });
+  refuse = true;
+  const menu = screen.getByRole("group", { name: "Zotero libraries" });
+  fireEvent.click(within(menu).getByRole("menuitemcheckbox", { name: "Reading group" }));
+  await screen.findByText(/could not start reading Zotero/);
+  expect(within(menu).getByRole("menuitemcheckbox", { name: "Reading group" }).getAttribute("aria-checked")).toBe("true");
+});

@@ -420,7 +420,15 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // Zotero libraries: the ones chosen, and the groups Zotero offers, listed
   // when the menu opens or when results come from several libraries.
   const [groups, setGroups] = useState<ZoteroGroup[] | null>(null);
-  const chosenLibraries = library?.zotero_libraries ?? [];
+  // A choice sent but not yet reported back, so a second toggle builds on it.
+  const [pendingLibraries, setPendingLibraries] = useState<ZoteroLibrary[] | null>(null);
+  const reportedLibraries = library?.zotero_libraries ?? [];
+  const sameChoice = (a: ZoteroLibrary[], b: ZoteroLibrary[]) =>
+    a.length === b.length && a.every((choice, i) => sameLibrary(choice, b[i]!));
+  useEffect(() => {
+    if (pendingLibraries && sameChoice(pendingLibraries, reportedLibraries)) setPendingLibraries(null);
+  }, [library]);
+  const chosenLibraries = pendingLibraries ?? reportedLibraries;
   const severalLibraries = chosenLibraries.length > 1;
   const wantGroups = Boolean(zoteroGroups && library?.zotero && (menuOpen || severalLibraries));
   useEffect(() => {
@@ -437,7 +445,12 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     const next = isChosen(choice)
       ? chosenLibraries.filter((chosen) => !sameLibrary(chosen, choice))
       : [...chosenLibraries, choice];
-    if (next.length > 0) void perform("zotero", () => useZoteroLibraries(next));
+    if (next.length === 0) return;
+    setPendingLibraries(next);
+    void perform("zotero", () => useZoteroLibraries(next).catch((error: unknown) => {
+      setPendingLibraries(null);
+      throw error;
+    }));
   };
   const groupName = (id: number) => groups?.find((group) => group.id === id)?.name ?? pickerText.groupLibrary(id);
   // Every group Zotero lists, plus chosen groups it no longer lists, so they can be turned off.
