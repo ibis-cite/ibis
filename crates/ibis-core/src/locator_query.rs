@@ -44,6 +44,9 @@ pub fn split(query: &str) -> Option<LocatorQuery> {
         }
         let tail = &q[i..];
         if let Some(locator) = read(tail, after_comma) {
+            if continues_before(q, i, floor) {
+                return None;
+            }
             return Some(LocatorQuery {
                 search: search.to_string(),
                 locator,
@@ -52,6 +55,21 @@ pub fn split(query: &str) -> Option<LocatorQuery> {
         }
     }
     None
+}
+
+/// Whether the locator found at `start` is the end of a longer list of values
+/// that begins before `floor`, so it is too long to read and only its end
+/// would be taken. Starts from `floor` on were already tried in order.
+fn continues_before(q: &str, start: usize, floor: usize) -> bool {
+    let before = q[..start].trim_end();
+    let Some(before) = before.strip_suffix([',', '&']) else {
+        return false;
+    };
+    let before = before.trim_end();
+    let item_start = before
+        .rfind(|c: char| c == ',' || c == '&' || c.is_whitespace())
+        .map_or(0, |i| i + before[i..].chars().next().map_or(1, char::len_utf8));
+    item_start < floor && is_range(&before[item_start..], true)
 }
 
 /// Read `tail` as a whole locator.
@@ -267,6 +285,22 @@ mod tests {
         ] {
             assert_eq!(split(query), None, "{query}");
         }
+    }
+
+    #[test]
+    fn an_overlong_locator_is_left_whole_in_the_search() {
+        for query in [
+            format!("smith p {}1", "1, ".repeat(30)),
+            format!("smith, {}1", "1, ".repeat(30)),
+            format!("smith pp {}1", "1-2, ".repeat(20)),
+        ] {
+            assert_eq!(split(&query), None, "{query}");
+        }
+        // A long search before a short locator is still split.
+        let long_search = format!("{} p 45", "sleep ".repeat(30));
+        assert_eq!(split(&long_search).map(|q| q.locator.value), Some("45".into()));
+        let long_list_search = format!("{}smith, 2020, 45", "1, ".repeat(30));
+        assert_eq!(split(&long_list_search).map(|q| q.locator.value), Some("45".into()));
     }
 
     #[test]
