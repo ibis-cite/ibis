@@ -56,6 +56,16 @@ def strings(snapshot):
     return "\n".join(str(n.get(k, "")) for n in snapshot["nodes"] for k in ("name", "value"))
 
 
+def shows_count(snapshot, count):
+    """Whether the footer's count, such as "3 references", reaches the accessibility tree.
+
+    The footer splits the library name and the count into separate elements.
+    WebKitGTK exposes only text in elements it keeps (the name's <bdi>, the
+    count's <bdi>, the spoken detail's <p>); a plain <span> beside them loses its text.
+    """
+    return count in strings(snapshot)
+
+
 def missing_library_evidence(snapshot, name):
     text = strings(snapshot)
     return {key: fragment if type(fragment) is bool else fragment in text for key, fragment in {
@@ -1032,7 +1042,7 @@ def main():
 
             shortcut = args.shortcut or ("ctrl+super+r" if system == "Darwin" else "ctrl+shift+y")
             launch("small")
-            check("startup", lambda: wait_for(lambda: "3 references" in strings(snapshot()), "synthetic library startup"))
+            check("startup", lambda: wait_for(lambda: shows_count(snapshot(), "3 references"), "synthetic library startup"))
             check("accessibility named search/count/list", lambda: require_tree(snapshot()))
 
             def skips_taskbar():
@@ -1149,7 +1159,7 @@ def main():
 
             def reload():
                 library.write_text(fixture(4), encoding="utf-8")
-                wait_for(lambda: "4 references" in strings(snapshot()), "file watcher updates reference count")
+                wait_for(lambda: shows_count(snapshot(), "4 references"), "file watcher updates reference count")
                 query("smoke000003", "Ibis smoke reference 000003")
             check("edited library reloads through native watcher", reload)
 
@@ -1172,7 +1182,7 @@ def main():
                 wait_for(lambda: " · no references" in strings(snapshot()), "empty library count")
                 library.write_text(fixture(), encoding="utf-8")
                 menu_action(native, "Reload")
-                wait_for(lambda: "3 references" in strings(snapshot()), "reload recovers after error")
+                wait_for(lambda: shows_count(snapshot(), "3 references"), "reload recovers after error")
             check("empty library and recovery after error", recover)
             stop()
 
@@ -1183,7 +1193,7 @@ def main():
                 if backup.exists():
                     backup.unlink()
                 launch(label)
-                wait_for(lambda: "3 references" in strings(snapshot()), f"{label} retains library access")
+                wait_for(lambda: shows_count(snapshot(), "3 references"), f"{label} retains library access")
                 def explained():
                     text = strings(snapshot())
                     return all(fragment in text for fragment in (problem,
@@ -2027,6 +2037,21 @@ class ContractTests(unittest.TestCase):
         native.command = [sys.executable, "-c", f"import sys; sys.stdout.buffer.write(bytes.fromhex('{payload}'))"]
         with patch("locale.getencoding", return_value="cp1252"), patch("builtins.print"):
             self.assertEqual(native.call("snapshot"), expected)
+
+    def test_startup_waits_for_the_count_in_the_native_footer_tree(self):
+        # The Linux tree as WebKitGTK reported it when the count sat in a plain
+        # <span> beside the name: the status kept only the name (#531).
+        name = "synthetic 引用.bib"
+        lost = {"nodes": [{"role": "status bar", "name": "Library status", "value": ""},
+                          {"role": "section", "name": "", "value": name}]}
+        self.assertFalse(shows_count(lost, "3 references"))
+        # The count in its own element, and the spoken detail in a paragraph.
+        kept = {"nodes": lost["nodes"] + [
+            {"role": "section", "name": "", "value": " · 3 references"},
+            {"role": "paragraph", "name": "", "value": f"\u2068{name}\u2069 · 3 references. checked just now, 6:38 PM"}]}
+        self.assertTrue(shows_count(kept, "3 references"))
+        self.assertTrue(shows_count({"nodes": kept["nodes"][-1:]}, "3 references"))
+        self.assertFalse(shows_count(kept, "4 references"))
 
     def test_missing_library_requires_both_recovery_message_and_retained_snapshot(self):
         name = "synthetic 引用.bib"

@@ -61,13 +61,15 @@ export function LibraryStatusLine({ library, groupName }: {
         <span className="library-words">
           <span className="library-name" role="status" aria-label={pickerText.libraryStatus} aria-live="polite" aria-atomic="true">
             {source !== null && <bdi className="library-source">{source}</bdi>}
-            {state && <span className="library-state">{state}</span>}
+            {state && <bdi className="library-state">{state}</bdi>}
           </span>
           {age && <span className="library-age" aria-hidden="true"> · {age}</span>}
         </span>
       </span>
-      {/* The visible age and the hover detail, read once by screen readers; not live. */}
-      {spoken && <span className="visually-hidden library-detail">{spoken}</span>}
+      {/* The visible age and the hover detail, read once by screen readers; not live.
+          A <p>, like the state's <bdi>: WebKitGTK drops the text of a plain span
+          that sits beside other exposed elements, so Orca would not hear it. */}
+      {spoken && <p className="visually-hidden library-detail">{spoken}</p>}
     </>
   );
 }

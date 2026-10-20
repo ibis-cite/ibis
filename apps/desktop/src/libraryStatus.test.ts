@@ -94,6 +94,15 @@ test("screen readers can read the detail, including the count kept after a faile
     /^thesis\.bib · 4 references\. checked .+ ago, .+ · the file could not be read$/);
 });
 
+test("every footer text sits in an element WebKitGTK exposes, not a plain span beside one", () => {
+  // Linux screen readers lost the count and the detail when they were plain spans (#531).
+  const { container } = render(createElement(LibraryStatusLine, { library: file({ updated_at: now }), groupName: String }));
+  const words = container.querySelector(".library-name");
+  expect([...(words?.children ?? [])].map((child) => child.tagName)).toEqual(["BDI", "BDI"]);
+  expect(container.querySelector(".library-state")?.textContent).toBe(" · 1,204 references");
+  expect(container.querySelector(".library-detail")?.tagName).toBe("P");
+});
+
 test("missing fields from an older backend show no age instead of a wrong one", () => {
   const old = { ...file(), updated_at: undefined, checked_at: undefined, stale: undefined, snapshot_zotero: undefined } as unknown as LibraryStatus;
   expect(line(old)).toBe("thesis.bib · 1,204 references");
