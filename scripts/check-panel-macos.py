@@ -164,7 +164,9 @@ def main():
                 try:
                     cleanup()
                 except (OSError, RuntimeError, subprocess.SubprocessError, ValueError):
-                    report.update(status="failed", reason="Synthetic editor cleanup failed")
+                    # Keep the first failure's reason; cleanup often fails after it.
+                    if report.get("status") != "failed":
+                        report.update(status="failed", reason="Synthetic editor cleanup failed")
                     exit_code = 1
         if owned:
             try:
