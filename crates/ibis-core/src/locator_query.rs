@@ -65,11 +65,20 @@ fn continues_before(q: &str, start: usize, floor: usize) -> bool {
     let Some(before) = before.strip_suffix([',', '&']) else {
         return false;
     };
-    let before = before.trim_end();
-    let item_start = before
-        .rfind(|c: char| c == ',' || c == '&' || c.is_whitespace())
-        .map_or(0, |i| i + before[i..].chars().next().map_or(1, char::len_utf8));
-    item_start < floor && is_range(&before[item_start..], true)
+    value_start(before.trim_end()).is_some_and(|item| item < floor)
+}
+
+/// Where the value ending `text` starts, if `text` ends with one. A value is
+/// at most three words (`12 - 14`), so only the last three are tried.
+fn value_start(text: &str) -> Option<usize> {
+    let item = text.rfind([',', '&']).map_or(0, |i| i + 1);
+    let mut starts: Vec<usize> = text[item..]
+        .char_indices()
+        .filter(|&(i, c)| !c.is_whitespace() && text[item..][..i].chars().next_back().is_none_or(char::is_whitespace))
+        .map(|(i, _)| item + i)
+        .collect();
+    starts.drain(..starts.len().saturating_sub(3));
+    starts.into_iter().find(|&i| is_range(&text[i..], true))
 }
 
 /// Read `tail` as a whole locator.
@@ -295,6 +304,15 @@ mod tests {
             format!("smith pp {}1", "1-2, ".repeat(20)),
         ] {
             assert_eq!(split(&query), None, "{query}");
+        }
+        // Spaced ranges, with the limit falling at every point inside one.
+        for dash in ["-", "–"] {
+            for last in ["1", "12", "123", "1234"] {
+                for count in 10..18 {
+                    let query = format!("smith pp {}{last}", format!("1 {dash} 2, ").repeat(count));
+                    assert_eq!(split(&query), None, "{query}");
+                }
+            }
         }
         // A long search before a short locator is still split.
         let long_search = format!("{} p 45", "sleep ".repeat(30));
