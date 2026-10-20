@@ -91,7 +91,7 @@ system surface, as [native appearance groundwork](https://github.com/ibiscite/ib
 | Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab cycles them. |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter or Tab picks the first. |
 | Row: title and year | Always | Year at the right edge, in the same place on every row. |
-| Row: authors and journal | Comfortable and Spacious | Compact shows the first author ("García et al.") after the title. |
+| Row: authors and journal | Comfortable and Spacious | Tells apart references with the same first author and year. The journal is the container title (journal, book or proceedings), else the publisher. Spacious adds the item type as one word ("Article", "Book"). One line: authors are shortened as in a citation ("García", "García, Okafor", or "García et al." for three or more; screen readers hear every name), then the journal, each with an ellipsis (the key and library label shorten first, never below a few letters, and the type word stays whole; only when enlarged text leaves no room do they move under them); a match in the journal is always named, since it may be shortened. Compact shows the first author ("García et al.") after the title. |
 | Row: why it matched | Only when hidden | "In the abstract: …sleep…" or "Tagged: …" when the match is not in the title or authors. |
 | PDF or Web label | When a file is attached | Says what is attached ("PDF · 12 pp") and opens the preview. No empty column otherwise. |
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
@@ -203,10 +203,11 @@ is pressed again.
   directly, as on Windows.
 
 **Accessibility.** Reduced motion uses fades only. Screen readers hear the
-result count and, per row, title, first author, year and why it matched;
+result count and, per row, title, first author, year, journal or container
+(Comfortable and Spacious) and why it matched;
 "Copied" is announced politely. Every action has a key. Focus rings appear only for keyboard
 focus (`:focus-visible`), never after a click, in the platform's style (see the
-table above). The search box never shows one: it always has focus, the caret is
+table above), and reach 3:1 against the surface. The search box never shows one: it always has focus, the caret is
 the cue, and on Windows its accent underline. Rows moved with ↑ ↓ show their
 fill, not a ring. With increased contrast or forced colours, every control and
 the search box show a solid 2 px ring and the active row a 3 px edge. Right-to-left titles align right within their row.
