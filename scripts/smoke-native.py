@@ -417,8 +417,11 @@ class Linux:
         focused = run("xdotool", "getwindowfocus")
         return run("xdotool", "getwindowpid", focused) == str(self.editor.pid)
 
-    def clipboard(self):
-        return run("xclip", "-selection", "clipboard", "-out")
+    def clipboard(self, *, timeout=20):
+        # Clipboard equality includes whitespace; command-output normalization
+        # is appropriate for window IDs, not copied citation text.
+        return subprocess.check_output(["xclip", "-selection", "clipboard", "-out"],
+                                       text=True, stderr=subprocess.PIPE, timeout=timeout)
 
     def set_clipboard(self, text):
         subprocess.run(["xclip", "-selection", "clipboard", "-in"], input=text, text=True, check=True,
@@ -607,8 +610,8 @@ class Scripted:
     def editor_focused(self):
         return self.call("editor-focused")
 
-    def clipboard(self):
-        return self.call("clipboard")
+    def clipboard(self, *, timeout=None):
+        return self.call("clipboard", **({} if timeout is None else {"timeout": timeout}))
 
     def set_clipboard(self, text):
         self.call("write-clipboard", text)
@@ -760,7 +763,14 @@ def first_run_preferences_main(args):
         wait_for_query(snapshot, "smoke000001", "Ibis smoke reference 000001", report)
         prime_clipboard(native)
         native.key("Return")
-        wait_for(lambda: native.clipboard() == "@smoke000001", "saved Typst output on the OS clipboard")
+        copy_deadline = time.monotonic() + 20
+        def copied():
+            remaining = copy_deadline - time.monotonic()
+            assert remaining > 0, "Native copy exceeded its clipboard-read budget"
+            value = native.clipboard(timeout=remaining)
+            assert time.monotonic() < copy_deadline, "Native copy exceeded its clipboard-read budget"
+            return value == "@smoke000001"
+        wait_for(copied, "saved Typst output on the OS clipboard")
         passed("relaunch uses saved Typst without choosing a format again")
         wait_for(lambda: not snapshot()["visible"], "Typst copy hides picker")
         native.key(shortcut)
@@ -1189,6 +1199,8 @@ class ContractTests(unittest.TestCase):
             if chord == "Return":
                 self.assertEqual(len(launches), 2, "Copy happened before relaunch")
                 native.value = "[@smoke000001]" if failure == "wrong-copy" else "@smoke000001"
+                if failure == "whitespace-copy":
+                    native.value += "\n"
                 native.visible = False
             elif chord == "ctrl+shift+y":
                 native.visible = True
@@ -1208,7 +1220,12 @@ class ContractTests(unittest.TestCase):
         native.text.side_effect = lambda text: setattr(native, "query", text)
         native.snapshot.side_effect = snapshot
         native.set_clipboard.side_effect = lambda value: setattr(native, "value", value)
-        native.clipboard.side_effect = lambda: native.value
+        original_clipboard = Linux.clipboard
+        native.clipboard.side_effect = lambda **kwargs: original_clipboard(native, **kwargs)
+        def clipboard_read(*_args, **_kwargs):
+            if failure == "late-copy" and native.value == "@smoke000001":
+                clock[0] += 25
+            return native.value
         if failure == "cleanup":
             native.close.side_effect = RuntimeError("Synthetic cleanup failure")
         with tempfile.TemporaryDirectory() as temporary:
@@ -1230,6 +1247,7 @@ class ContractTests(unittest.TestCase):
             with patch("platform.system", return_value="Linux"), patch.object(sys.modules[__name__], "Linux", return_value=native), \
                     patch.object(sys.modules[__name__], "settings_path", side_effect=locate), \
                     patch("subprocess.Popen", side_effect=launch), patch("time.monotonic", side_effect=lambda: clock[0]), \
+                    patch("subprocess.check_output", side_effect=clipboard_read), \
                     patch("time.sleep", side_effect=lambda seconds: clock.__setitem__(0, clock[0] + seconds)), \
                     patch.dict(os.environ, {"IBIS_LIBRARY": "/unowned.bib", "IBIS_GALLERY": "1", "IBIS_GALLERY_STATE": "loaded"}), \
                     patch("builtins.print"):
@@ -1261,6 +1279,13 @@ class ContractTests(unittest.TestCase):
             with self.subTest(failure=failure):
                 result, report, _launches, _actions = self.preference_probe(failure)
                 self.assertEqual((result, report["status"]), (1, "failed"))
+
+    def test_first_run_preferences_reject_late_or_nonexact_os_clipboard_reads(self):
+        for failure in ("late-copy", "whitespace-copy"):
+            with self.subTest(failure=failure):
+                result, report, _launches, actions = self.preference_probe(failure)
+                self.assertEqual((result, report["status"]), (1, "failed"))
+                self.assertEqual([action for action in actions if action[0] == "Return"], [("Return", 2)])
 
     def test_scripted_calls_accept_a_remaining_budget_without_resetting_it(self):
         native = Scripted.__new__(Scripted)
