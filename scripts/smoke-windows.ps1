@@ -32,6 +32,24 @@ public static class IbisSmoke {
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr w);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr w);
   [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr w);
+  [StructLayout(LayoutKind.Sequential)] public struct RECT { public int l,t,r,b; }
+  [StructLayout(LayoutKind.Sequential)] public struct GUITHREADINFO {
+    public uint size, flags; public IntPtr active, focus, capture, menuOwner, moveSize, caret; public RECT caretRect;
+  }
+  [DllImport("user32.dll")] static extern bool GetGUIThreadInfo(uint thread, ref GUITHREADINFO info);
+  [DllImport("user32.dll", CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr w, System.Text.StringBuilder name, int size);
+  public static string ClassOf(IntPtr w) {
+    if (w == IntPtr.Zero) return "";
+    var name = new System.Text.StringBuilder(64); GetClassName(w, name, 64); return name.ToString();
+  }
+  // Window classes and owning process ids only, never window titles.
+  public static string[] FocusFacts() {
+    var info = new GUITHREADINFO { size = (uint) Marshal.SizeOf(typeof(GUITHREADINFO)) };
+    var foreground = GetForegroundWindow();
+    uint pid; uint thread = GetWindowThreadProcessId(foreground, out pid);
+    if (thread == 0 || !GetGUIThreadInfo(thread, ref info)) info = new GUITHREADINFO();
+    return new string[] { pid.ToString(), ClassOf(foreground), ClassOf(info.focus), OwnerPid(info.focus).ToString() };
+  }
   public static uint OwnerPid(IntPtr w) {
     uint pid; GetWindowThreadProcessId(w, out pid); return pid;
   }
@@ -158,12 +176,30 @@ try {
       if (!$element) { throw 'Named accessibility control missing' }
       # Chromium gives menu buttons (aria-haspopup) ExpandCollapse instead of Invoke.
       $pattern = $null
+      $samples = [System.Collections.Generic.List[object]]::new()
+      $sample = {
+        param($stage)
+        $facts = [IbisSmoke]::FocusFacts()
+        $owner = [int] $facts[0]
+        $process = if ($owner -eq $AppId) { 'app' } else { (Get-Process -Id $owner -ErrorAction SilentlyContinue).ProcessName }
+        $entry = @{stage=$stage;foreground_app=($owner -eq $AppId);foreground_process=[string] $process;
+                   foreground_class=$facts[1];focus_class=$facts[2];focus_app=([int] $facts[3] -eq $AppId)}
+        $last = if ($samples.Count) { $samples[$samples.Count - 1] } else { $null }
+        if (!$last -or $last.foreground_class -ne $entry.foreground_class -or $last.focus_class -ne $entry.focus_class -or
+            $last.foreground_process -ne $entry.foreground_process) { $samples.Add($entry) }
+      }
+      & $sample 'before'
       if ($element.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern, [ref] $pattern)) {
         $pattern.Invoke()
       } elseif ($element.TryGetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern, [ref] $pattern)) {
         $pattern.Expand()
       } else { throw 'Named accessibility control cannot be pressed' }
-      $true
+      $start = [DateTime]::UtcNow
+      while (([DateTime]::UtcNow - $start).TotalMilliseconds -lt 1500) {
+        & $sample ([int] ([DateTime]::UtcNow - $start).TotalMilliseconds)
+        Start-Sleep -Milliseconds 25
+      }
+      @{pressed=$true;focus=@($samples)}
     }
     'focus-editor' {
       $facts = @{stage='identity';owned=$false;window_valid=$false;request_accepted=$false;current_foreground=$false}

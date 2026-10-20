@@ -163,7 +163,7 @@ jobs:
     name: Desktop (${{ matrix.os }})
     needs: [changes, web]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       NATIVE: ${{ needs.changes.outputs.native }}
     strategy:
@@ -326,6 +326,13 @@ jobs:
         run: |
           python scripts/smoke-native.py --self-test
           python scripts/smoke-native.py --app target/debug/ibis-desktop.exe --output screenshots/smoke-Windows --budgets scripts/smoke-budgets.json
+
+      - name: TEMPORARY release smoke (Windows, #341)
+        if: ${{ !cancelled() && env.NATIVE == 'true' && steps.native_build.outcome == 'success' && runner.os == 'Windows' }}
+        timeout-minutes: 25
+        run: |
+          cargo build --release -p ibis-desktop --locked --features tauri/custom-protocol
+          python scripts/smoke-native.py --app target/release/ibis-desktop.exe --output screenshots/smoke-Windows-release
 
       - name: Observe native materials and accessibility changes (macOS)
         if: ${{ !cancelled() && env.NATIVE == 'true' && steps.native_build.outcome == 'success' && runner.os == 'macOS' }}

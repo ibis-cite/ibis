@@ -432,7 +432,10 @@ class Scripted:
 
     def click(self, name):
         if self.system != "Darwin":
-            self.call("click", name)
+            state = self.call("click", name)
+            if self.system == "Windows" and isinstance(state, dict):
+                # Diagnostic for #341: window classes and process names only.
+                print("NATIVE CLICK FOCUS " + json.dumps(state.get("focus")), flush=True)
             return
         state = {}
         def pressed():
