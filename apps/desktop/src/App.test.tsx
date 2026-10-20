@@ -1812,7 +1812,7 @@ test("the footer names the source and count, the age only when it matters, and t
   await emit("library:changed", status);
   await waitFor(() => expect(item.textContent).toBe("Zotero · last good copy · read 2 hours ago"));
   expect(item.getAttribute("data-health")).toBe("stop");
-  expect(item.getAttribute("title")).toContain("Zotero could not be reached, so Ibis is searching the copy from");
+  expect(item.getAttribute("title")).toContain("Zotero could not be reached, so Ibis is searching the 1,205 references last checked 2 hours ago");
 });
 
 test("? lists every key in a modal dialog, but a ? typed in the search is text", async () => {

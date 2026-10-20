@@ -58,7 +58,8 @@ test("the detail says where from, when, and how Ibis keeps it current", () => {
   expect(detail(zotero({ zotero_libraries: ["user", { group: 41 }, { group: 9 }], checked_at: now }))).toMatch(
     /^Zotero: My Library, Group 41, and Group 9\. 1,204 references, read 3 hours ago \(.+\)\. Checked just now\. Checked for changes each time Ibis opens\.$/);
   expect(detail(file({ warnings: 1 }))).toMatch(/^thesis\.bib\. 1,204 references, read 3 hours ago \(.+\)\. 1 reading notice\. Reread whenever the file changes\.$/);
-  expect(detail(zotero({ state: "error", error: kept, checked_at: now - 2 * hour }))).toContain("Zotero could not be reached, so Ibis is searching the copy from ");
+  expect(detail(zotero({ state: "error", error: kept, checked_at: now - 2 * hour }))).toMatch(
+    /^Zotero: My Library\. Zotero could not be reached, so Ibis is searching the 1,204 references last checked 2 hours ago \(.+\)\.$/);
   expect(detail(file({ state: "error", name: "missing.bib", error: "The library file is unavailable" }))).toMatch(/^missing\.bib could not be opened\. Still searching thesis\.bib\. 1,204 references/);
   expect(detail(file({ state: "none", has_snapshot: false, name: null }))).toBe("No library chosen");
 });

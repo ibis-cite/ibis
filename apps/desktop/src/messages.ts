@@ -199,8 +199,9 @@ export const libraryMessages = {
     const read = updated === null ? "" : `, read ${ago(updated, now)} (${clock(updated, now)})`;
     const what = `${from}. ${count(status.references, "reference")}${read}.`;
     if (kept(status)) {
-      const at = checked === null ? "" : ` from ${clock(checked, now)}`;
-      return `${what} ${status.zotero ? "Zotero could not be reached" : "The file could not be read"}, so Ibis is searching the copy${at}.`;
+      const at = checked === null ? "" : ` last checked ${ago(checked, now)} (${clock(checked, now)})`;
+      return `${from}. ${status.zotero ? "Zotero could not be reached" : "The file could not be read"}, so Ibis is searching the ` +
+        `${count(status.references, "reference")}${at}.`;
     }
     if (status.error) return `${status.name ?? "The chosen library"} could not be opened. Still searching ${what}`;
     const confirmed = status.zotero && checked !== null && updated !== null && checked - updated > minute
