@@ -5,12 +5,14 @@ import "./ToolbarMenu.css";
 export type ToolbarMenuSection = { id: string; label: string; items: { id: string; label: string; sample?: string; prose?: boolean; disabled?: boolean }[] };
 type Props = {
   label: string; value: string; sections: ToolbarMenuSection[]; selectedKey: string;
+  isOpen?: boolean; onOpenChange?: (open: boolean) => void;
   filterLabel: string; onAction: (key: string) => void; returnFocusRef?: RefObject<HTMLElement | null>;
 };
 
 /** A reference-independent menu. React Aria owns selection, navigation and virtual focus. */
-export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, onAction, returnFocusRef }: Props) {
-  const [open, setOpen] = useState(false);
+export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, onAction, returnFocusRef, isOpen, onOpenChange }: Props) {
+  const [internalOpen, setOpen] = useState(false);
+  const open = isOpen ?? internalOpen;
   const composing = useRef(false);
   const focusFrame = useRef(0);
   useEffect(() => () => cancelAnimationFrame(focusFrame.current), []);
@@ -19,6 +21,7 @@ export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, 
   function changeOpen(next: boolean) {
     cancelAnimationFrame(focusFrame.current);
     setOpen(next);
+    onOpenChange?.(next);
     if (!next && returnFocusRef) focusFrame.current = requestAnimationFrame(() => returnFocusRef.current?.focus());
   }
   // aria-disabled keeps unavailable choices in the arrow-key order (ADR 0021).
@@ -35,8 +38,11 @@ export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, 
     </MenuSection>)}
   </Menu>;
   return <span className="toolbar-menu-control" onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { composing.current = false; }}
-    onKeyDownCapture={(event) => { if (composing.current || event.nativeEvent.isComposing || event.keyCode === 229) event.stopPropagation(); }}
-    onKeyDown={(event) => { event.stopPropagation(); if (open && event.key === "Tab") { event.preventDefault(); changeOpen(false); } }}>
+    onKeyDownCapture={(event) => {
+      if (composing.current || event.nativeEvent.isComposing || event.keyCode === 229) event.stopPropagation();
+      else if (open && (event.key === "Escape" || event.key === "Tab")) { event.preventDefault(); event.stopPropagation(); changeOpen(false); }
+    }}
+    onKeyDown={(event) => { if (!event.ctrlKey && !event.metaKey) event.stopPropagation(); }}>
     <MenuTrigger isOpen={open} onOpenChange={changeOpen}>
       <Button className="toolbar-menu-button" aria-label={`${label} ${value}`}>{value}<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m3 4.5 3 3 3-3" /></svg></Button>
       <Popover className="toolbar-menu-popover" placement="bottom end" offset={6}>

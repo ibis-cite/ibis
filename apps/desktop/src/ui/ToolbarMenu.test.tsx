@@ -15,11 +15,12 @@ function mount(items = sections) {
   vi.stubGlobal("ResizeObserver", class { observe() {} unobserve() {} disconnect() {} });
   Element.prototype.scrollIntoView = vi.fn();
   const onAction = vi.fn();
+  const parentKeys = vi.fn();
   const returnFocusRef = createRef<HTMLInputElement>();
-  render(<main><input aria-label="Search references" ref={returnFocusRef} /><ToolbarMenu
+  render(<main onKeyDown={parentKeys}><input aria-label="Search references" ref={returnFocusRef} /><ToolbarMenu
     label="Copy as" value="Pandoc" sections={items} selectedKey="pandoc" onAction={onAction}
     filterLabel="Filter formats" returnFocusRef={returnFocusRef} /></main>);
-  return { onAction, trigger: screen.getByRole("button", { name: "Copy as Pandoc" }), search: screen.getByRole("textbox") };
+  return { onAction, parentKeys, trigger: screen.getByRole("button", { name: "Copy as Pandoc" }), search: screen.getByRole("textbox") };
 }
 
 test.each(["macos", "windows", "linux"])("%s menu has named sections, radio items, keyboard navigation and no axe violations", async (platform) => {
@@ -48,16 +49,14 @@ test.each(["macos", "windows", "linux"])("%s menu has named sections, radio item
 });
 
 test.each(["Escape", "Tab"])("%s closes just the menu and returns focus", async (key) => {
-  const { trigger, search } = mount();
-  const parent = vi.fn();
-  search.parentElement!.addEventListener("keydown", parent);
+  const { trigger, search, parentKeys } = mount();
   act(() => trigger.focus());
   fireEvent.click(trigger);
   const menu = await screen.findByRole("menu");
   fireEvent.keyDown(menu, { key });
   await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
   await waitFor(() => expect(document.activeElement).toBe(search));
-  expect(parent).not.toHaveBeenCalled();
+  expect(parentKeys).not.toHaveBeenCalled();
 });
 
 test("more than seven items filter with virtual focus and ignore composing shortcuts and picks", async () => {
@@ -104,4 +103,56 @@ test("menu role tokens exist, forced colours frame the button, and reduced motio
   expect(menuCss).toMatch(/background: Highlight; color: HighlightText/);
   expect(tokens).toMatch(/prefers-reduced-motion: reduce[\s\S]*--menu-enter-transform: none; --menu-open-duration: 100ms/);
   expect(menuCss).toMatch(/prefers-reduced-motion: reduce[\s\S]*transition: none/);
+});
+
+test("Space on an unavailable choice neither selects nor closes", async () => {
+  const { trigger, onAction } = mount();
+  fireEvent.click(trigger);
+  const menu = await screen.findByRole("menu");
+  fireEvent.keyDown(menu, { key: "ArrowDown" });
+  fireEvent.keyDown(document.activeElement!, { key: "End" });
+  const unavailable = screen.getByRole("menuitemradio", { name: "Typst" });
+  expect(document.activeElement).toBe(unavailable);
+  fireEvent.keyDown(unavailable, { key: " " });
+  fireEvent.keyUp(unavailable, { key: " " });
+  expect(onAction).not.toHaveBeenCalled();
+  expect(screen.getByRole("menuitemradio", { name: "Pandoc" }).getAttribute("aria-checked")).toBe("true");
+  expect(screen.getByRole("menu")).toBeTruthy();
+});
+
+test("an empty filter keeps the menu open and Escape still contains the layer", async () => {
+  const { trigger, search } = mount([{ id: "many", label: "Formats", items: Array.from({ length: 8 }, (_, i) => ({ id: `f${i}`, label: `Format ${i}` })) }]);
+  fireEvent.click(trigger);
+  const filter = await screen.findByRole("searchbox");
+  fireEvent.change(filter, { target: { value: "no matches 研究" } });
+  await waitFor(() => expect(screen.queryAllByRole("menuitemradio")).toHaveLength(0));
+  expect(screen.getByRole("menu")).toBeTruthy();
+  fireEvent.keyDown(filter, { key: "Escape" });
+  await waitFor(() => expect(document.activeElement).toBe(search));
+  expect(screen.queryByRole("menu")).toBeNull();
+});
+
+test("toolbar shadows stay local while legacy More and keys shadows retain their values", () => {
+  const legacy = tokens.slice(0, tokens.indexOf("/* ADR 0021 look layer"));
+  expect(legacy).toContain("--menu-shadow: 0 .5rem 1.5rem rgb(0 0 0 / 20%);");
+  expect(legacy).toContain("--menu-shadow: 0 1rem 2.5rem rgb(0 0 0 / 22%);");
+  const look = tokens.slice(legacy.length);
+  for (const [, selector] of look.matchAll(/([^{}]+)\{[^{}]*--menu-shadow:/g)) expect(selector).toContain(".toolbar-menu-popover");
+  expect(look).toMatch(/windows"\] \.toolbar-menu-popover\s*\{[^}]*--menu-item-height: 32px/);
+  expect(look).toMatch(/linux"\] \.toolbar-menu-popover\s*\{[^}]*--menu-item-height: 32px/);
+});
+
+test.each(["ctrlKey", "metaKey"])("%s shortcuts reach the picker only outside composition", async (modifier) => {
+  const { trigger, parentKeys } = mount();
+  fireEvent.click(trigger);
+  const menu = await screen.findByRole("menu");
+  fireEvent.keyDown(menu, { key: "k", [modifier]: true });
+  expect(parentKeys).toHaveBeenCalledOnce();
+  parentKeys.mockClear();
+  fireEvent.compositionStart(menu);
+  fireEvent.keyDown(menu, { key: "k", [modifier]: true });
+  fireEvent.keyDown(menu, { key: "Escape" });
+  expect(parentKeys).not.toHaveBeenCalled();
+  expect(screen.getByRole("menu")).toBeTruthy();
+  fireEvent.compositionEnd(menu);
 });
