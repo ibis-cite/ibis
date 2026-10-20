@@ -62,10 +62,14 @@ test("the selected row follows each platform", () => {
   expect(tokens).toMatch(/--row-active-background:\s*var\(--selected-background\)/);
   expect(tokens).toMatch(/--selected-background:\s*AccentColor/);
   expect(tokens).toMatch(/--selected-text:\s*AccentColorText/);
-  // Windows: soft grey with an accent pill; Linux: accent tint.
+  // Windows: soft grey with an accent pill; Linux: GTK's selection colour (the Highlight pair).
   expect(rules(tokens, ':root[data-platform="windows"]')).toMatch(/--row-active-background:\s*color-mix\(in srgb, var\(--text\)/);
   expect(rules(styles, ':root[data-platform="windows"] [role="option"][data-active]::before')).toMatch(/background:\s*var\(--accent\)/);
-  expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--row-active-background:\s*color-mix\(in srgb, var\(--accent\)/);
+  const linux = rules(tokens, ':root[data-platform="linux"]');
+  expect(linux).toMatch(/--row-active-background:\s*Highlight;/);
+  expect(linux).toMatch(/--row-active-text:\s*HighlightText;/);
+  // No later Linux rule turns it back into a faint tint or neutral fill.
+  expect(linux.slice(linux.indexOf("Highlight;"))).not.toMatch(/--row-active-background/);
 });
 
 test("high contrast keeps a non-colour edge on the active row", () => {
@@ -95,12 +99,12 @@ test("scarlet marks only the citation: copied text, preview and tray", () => {
   }
 });
 
-test("meta text on the Windows grey row stays at 4.5:1 in both themes", () => {
+test.each(["windows"])("meta text on the %s grey row stays at 4.5:1 in both themes", (platform) => {
   const hex = (value: string) => [1, 3, 5].map((i) => parseInt(value.slice(i, i + 2), 16) / 255);
   const luminance = (rgb: number[]) => rgb.map((c) => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
     .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
   const pair = (token: string) => tokens.match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]{6}),\\s*(#[0-9a-f]{6})\\)`))!.slice(1, 3).map(hex);
-  const tint = Number(rules(tokens, ':root[data-platform="windows"]').match(/--row-active-background:\s*color-mix\(in srgb, var\(--text\) (\d+)%/)?.[1]) / 100;
+  const tint = Number(rules(tokens, `:root[data-platform="${platform}"]`).match(/--row-active-background:\s*color-mix\(in srgb, var\(--text\) (\d+)%/)?.[1]) / 100;
   const [surface, text, muted] = [pair("--surface"), pair("--text"), pair("--muted")];
   for (const mode of [0, 1]) {
     const row = surface[mode]!.map((c: number, i: number) => c * (1 - tint) + text[mode]![i]! * tint);
@@ -109,39 +113,82 @@ test("meta text on the Windows grey row stays at 4.5:1 in both themes", () => {
   }
 });
 
-test("an added row keeps a ring that does not depend on the fill, active or not, in every theme", () => {
-  const ring = /box-shadow:\s*inset 0 0 0 var\(--focus-width\) var\((--[\w-]+)\)/;
-  expect(rules(styles, '[role="option"][data-citation-selected]').match(ring)?.[1]).toBe("--citation");
-  // On the active row the ring takes the row's own text colour, so it shows on any fill.
-  const activeAdded = rules(styles, '[role="option"][data-active][data-citation-selected]');
-  expect(activeAdded.match(ring)?.[1]).toBe("--row-active-text");
-  expect(rules(styles, '[role="option"][data-active]')).not.toMatch(/box-shadow/);
-  // The ring applies on every platform, and high contrast never removes it.
-  expect(styles).not.toMatch(/data-platform[^{]*\[data-active\]\[data-citation-selected\]/);
-  for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
-    const block = styles.slice(styles.indexOf(media), styles.indexOf("}\n}", styles.indexOf(media)));
-    expect(block, media).not.toMatch(/box-shadow:\s*none/);
+test("an added row shows only its scarlet tile with a check: no wash, ring or scarlet key on the row", () => {
+  const tile = rules(styles, '[role="option"][data-citation-selected] .result-tile');
+  expect(tile).toMatch(/background:\s*var\(--citation-tile\)/);
+  expect(tile).toMatch(/color:\s*var\(--on-citation\)/);
+  expect(tokens).toMatch(/--on-citation:\s*#fff/);
+  // Nothing outside contrast and forced colours paints the added row itself or its key.
+  const outside = styles.slice(0, styles.indexOf("@media (prefers-contrast: more)"));
+  for (const [, head, body] of outside.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const list = head!.replace(/\/\*[^]*?\*\//g, "").trim();
+    if (!/data-citation-selected\](?!\))/.test(list)) continue;
+    for (const selector of list.split(/\s*,\s*/)) {
+      if (/\.result-tile$|\.tile-button$|\.type-icon$/.test(selector)) continue;
+      throw new Error(`added-row style outside the tile: ${selector} { ${body} }`);
+    }
   }
-  // Under contrast the active fill is the Highlight pair, so the ring is HighlightText.
-  const contrast = tokens.slice(tokens.indexOf("@media (prefers-contrast: more)"));
-  expect(contrast).toMatch(/--row-active-text:\s*HighlightText/);
+  expect(styles).not.toMatch(/data-citation-selected[^{]*\.result-key/);
+  // High contrast inverts the tile on the active row instead of drawing a ring.
+  const contrast = styles.slice(styles.indexOf("@media (prefers-contrast: more)"));
+  expect(rules(contrast, "[data-active][data-citation-selected] .result-tile")).toMatch(/background:\s*var\(--row-active-text\)/);
+  expect(rules(gallery, ':root[data-gallery-theme="contrast"] [data-active][data-citation-selected] .result-tile')).toMatch(/background:\s*var\(--row-active-text\)/);
 });
 
-test("the Linux active row has a system fallback without color-mix and a 1 px accent edge", () => {
-  const linux = rules(tokens, ':root[data-platform="linux"]');
-  // Outside @supports: the plain system pair, never color-mix.
+/** WCAG relative luminance contrast of two #rrggbb colours. */
+function contrast(a: string, b: string): number {
+  const luminance = (hex: string) => {
+    const [r, g, b2] = [1, 3, 5].map((i) => {
+      const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r! + 0.7152 * g! + 0.0722 * b2!;
+  };
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi! + 0.05) / (lo! + 0.05);
+}
+
+test("the added tile's white check keeps 4.5:1 and the tile stands 3:1 off the surface, light and dark", () => {
+  const pair = (name: string) => {
+    const match = tokens.match(new RegExp(`${name}:\\s*light-dark\\((#[0-9a-f]{6}),\\s*(#[0-9a-f]{6})\\)`, "i"));
+    expect(match, name).not.toBeNull();
+    return { light: match![1]!, dark: match![2]! };
+  };
+  const tile = pair("--citation-tile");
+  const surface = pair("--surface");
+  const check = tokens.match(/--on-citation:\s*(#[0-9a-f]{3,6})/i)![1]!.replace(/^#fff$/i, "#ffffff");
+  for (const theme of ["light", "dark"] as const) {
+    expect(contrast(check, tile[theme]), `check on tile, ${theme}`).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(tile[theme], surface[theme]), `tile on surface, ${theme}`).toBeGreaterThanOrEqual(3);
+  }
+});
+
+test("the tile is a pointer-only control: no button, no Tab stop, hidden from the accessibility tree", async () => {
+  mockIPC(() => { throw new Error("Native commands must not run here"); }, { shouldMockEvents: true });
+  const state = galleryStates.find((candidate) => candidate.id === "many-results")!;
+  render(<App {...galleryProvider(state)} />);
+  await waitFor(() => expect(document.querySelectorAll("#results .result-tile").length).toBe(20));
+  for (const option of document.querySelectorAll('#results [role="option"]')) {
+    expect(option.querySelector("button, a, input, [tabindex]")).toBeNull();
+    expect(option.querySelector(".tile-button")!.getAttribute("aria-hidden")).toBe("true");
+  }
+  // Each of the seven types draws its own icon.
+  const icons = new Set([...document.querySelectorAll("#results .type-icon")].map((svg) => svg.innerHTML));
+  expect(icons.size).toBe(7);
+});
+
+test("no active row has an edge or ring outside contrast and forced colours", () => {
+  const outside = styles.slice(0, styles.indexOf("@media (prefers-contrast: more)"));
+  for (const [, head, body] of outside.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (!/\[data-active\]/.test(head!) || /data-citation-selected/.test(head!)) continue;
+    expect(body, head).not.toMatch(/border(-color)?:|box-shadow:\s*(?!none)|outline:/);
+  }
+  expect(tokens).not.toMatch(/--row-active-edge/);
+  // Linux falls back to the system pair without color-mix.
   const plain = tokens.slice(0, tokens.indexOf("@supports (background: color-mix"));
   const linuxPlain = rules(plain, ':root[data-platform="linux"]');
   expect(linuxPlain).toMatch(/--row-active-background:\s*Highlight;/);
-  expect(linuxPlain).toMatch(/--row-active-text:\s*HighlightText;/);
   expect(linuxPlain).not.toMatch(/:\s*color-mix/);
-  expect(linux).toMatch(/--row-active-edge:\s*var\(--accent\)/);
-  // The tint sits inside the color-mix @supports block.
-  const supports = tokens.slice(tokens.indexOf("@supports (background: color-mix"));
-  const tinted = rules(supports.slice(0, supports.indexOf("}\n}") + 3), ':root[data-platform="linux"]');
-  expect(tinted).toMatch(/--row-active-background:\s*color-mix\(in srgb, var\(--accent\) 15%/);
-  expect(rules(styles, '[role="option"][data-active]')).toMatch(/border-color:\s*var\(--row-active-edge\)/);
-  expect(rules(tokens, ":root")).toMatch(/--row-active-edge:\s*var\(--clear\)/);
 });
 
 test("the framed-box icon overlap moves only the search glyph, never the pin icon", async () => {
@@ -163,15 +210,46 @@ test("the framed-box icon overlap moves only the search glyph, never the pin ico
   }
 });
 
-test("the Windows search keeps the contrast-safe focus ring beside the accent underline", () => {
-  const focus = rules(styles, ':root[data-platform="windows"] #search:focus');
-  expect(focus).toMatch(/var\(--accent\)/);
-  expect(focus).not.toMatch(/outline(-style|-width)?:\s*(none|0)/);
-  // No platform rule anywhere removes the focus outline from the search box.
-  for (const [, head, body] of styles.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-    if (head!.includes("#search") && /:root\[data-platform="(windows|linux)"\]/.test(head!)) expect(body, head).not.toMatch(/outline(-style|-width)?:\s*(none|0)\b/);
+test("focus rings are keyboard-only, 2 px with a gap, in each platform's colour", () => {
+  expect(rules(styles, ":focus-visible")).toMatch(/outline:\s*var\(--focus-ring-width\) solid var\(--focus-ring-color\);\s*outline-offset:\s*var\(--focus-ring-offset\);\s*box-shadow:\s*var\(--focus-ring-shadow\)/);
+  // No ring is drawn on plain :focus or :focus-within, which a click also triggers.
+  for (const [, head, body] of styles.slice(0, styles.indexOf("@media (prefers-contrast: more)")).matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (/:focus(-within)?\b(?!-visible)/.test(head!) && !/\[data-input="pointer"\]/.test(head!)) expect(body, head).not.toMatch(/outline:\s*var/);
   }
-  expect(rules(styles, ":focus-visible")).toMatch(/outline:\s*var\(--focus-width\) solid var\(--focus\)/);
+  const base = rules(tokens, ":root");
+  expect(base).toMatch(/--focus-ring-color:\s*var\(--accent\)/); // macOS
+  expect(base).toMatch(/--focus-ring-width:\s*2px/);
+  expect(base).toMatch(/--focus-ring-offset:\s*1px/);
+  const windows = rules(tokens, ':root[data-platform="windows"]');
+  expect(windows).toMatch(/--focus-ring-color:\s*var\(--text\)/);
+  expect(windows).toMatch(/--focus-ring-shadow:\s*0 0 0 1px var\(--surface\)/);
+  expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--focus-ring-color:\s*color-mix\(in srgb, var\(--accent\) 50%, var\(--text\)\)/);
+  // The inner Windows stroke touches the outer one, as in Fluent: offset = stroke width.
+  expect(windows).not.toMatch(/--focus-ring-offset/);
+  expect(windows).toMatch(/--focus-ring-shadow:\s*0 0 0 1px/);
+  // Contrast and forced colours: a solid CanvasText ring on every platform.
+  for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
+    expect(rules(tokens.slice(tokens.indexOf(media)), ":root[data-platform]"), media).toMatch(/--focus-ring-color:\s*CanvasText/);
+  }
+});
+
+test("the format control shows its ring after Tab but not after a click", () => {
+  const ring = rules(styles, ':root:not([data-input="pointer"]) .format-picker:has(select:focus-visible)');
+  expect(ring).toMatch(/outline:\s*var\(--focus-ring-width\) solid var\(--focus-ring-color\)/);
+  expect(styles).not.toMatch(/(^|[},]\s*)\.format-picker:focus-within/m);
+});
+
+test("the search box never shows a ring, except with contrast or forced colours", () => {
+  const outside = styles.slice(0, styles.indexOf("@media (prefers-contrast: more)"));
+  expect(rules(outside, "#search:focus-visible")).toMatch(/outline:\s*none/);
+  const windows = rules(outside, ':root[data-platform="windows"] #search:focus');
+  expect(windows).toMatch(/outline:\s*none/);
+  expect(windows).toMatch(/border-bottom-color:\s*var\(--accent\)/);
+  for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
+    const block = styles.slice(styles.indexOf(media), styles.indexOf("\n}\n", styles.indexOf(media)));
+    expect(rules(block, "#search:focus-visible"), media).toMatch(/outline:\s*var\(--focus-width\) solid/);
+    expect(rules(block, ":root[data-platform] #search:focus"), media).toMatch(/outline:\s*var\(--focus-width\) solid/);
+  }
 });
 
 test("under forced colours an active added row differs from an active row in its computed style", async () => {
@@ -194,39 +272,36 @@ test("under forced colours an active added row differs from an active row in its
     fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
     await waitFor(() => expect(row(1).hasAttribute("data-citation-selected")).toBe(true));
     expect(row(1).hasAttribute("data-active")).toBe(true);
-    const activeAdded = getComputedStyle(row(1)).outlineColor;
+    const tileOf = (n: number) => row(n).querySelector<HTMLElement>(".result-tile")!;
+    const activeAdded = getComputedStyle(tileOf(1)).backgroundColor;
+    // The added tile keeps its check mark, the cue that is not colour.
+    expect(tileOf(1).querySelector(".add-glyph path")!.getAttribute("d")).toMatch(/^m5 10\.5/);
+    expect(getComputedStyle(tileOf(0)).backgroundColor).toBe(getComputedStyle(probeColor("CanvasText")).color);
     fireEvent.keyDown(box, { key: "ArrowDown" });
     await waitFor(() => expect(row(2).hasAttribute("data-active")).toBe(true));
     expect(row(2).hasAttribute("data-citation-selected")).toBe(false);
-    const activeOnly = getComputedStyle(row(2));
-    const system = (name: string) => {
-      const probe = document.createElement("span");
-      probe.style.color = name;
-      document.body.append(probe);
-      const value = getComputedStyle(probe).color;
-      probe.remove();
-      return value;
-    };
+    const activeOnly = getComputedStyle(tileOf(2)).backgroundColor;
+    expect(tileOf(2).querySelector(".add-glyph path")!.getAttribute("d")).toMatch(/^M10 5/);
+    const system = (name: string) => getComputedStyle(probeColor(name)).color;
     expect(system("HighlightText")).not.toBe(system("Highlight"));
-    // The ring on an active added row uses the text colour paired with the Highlight fill.
+    // The active added tile is the text colour paired with the Highlight fill.
     expect(activeAdded).toBe(system("HighlightText"));
-    // An active row that is not added has no such ring.
-    expect(activeOnly.outlineStyle === "" || activeOnly.outlineStyle === "none" || activeOnly.outlineColor !== activeAdded).toBe(true);
+    expect(activeOnly).toBe(system("Highlight"));
   } finally {
     sheet.remove();
+    document.querySelectorAll("[data-probe]").forEach((probe) => probe.remove());
   }
 });
 
-test("the frameless macOS search has no ring except with contrast or forced colours, and a quiet clear glyph", () => {
-  const mac = ':root:not([data-platform="windows"]):not([data-platform="linux"]) #search:focus-visible';
-  const outside = styles.slice(0, styles.indexOf("@media (prefers-contrast: more)"));
-  expect(rules(outside, mac)).toMatch(/outline:\s*none/);
-  for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
-    const block = styles.slice(styles.indexOf(media), styles.indexOf("\n}\n", styles.indexOf(media)));
-    expect(rules(block, mac), media).toMatch(/outline:\s*var\(--focus-width\) solid/);
-  }
-  // Every other control keeps the 2 px ring.
-  expect(rules(styles, ":focus-visible")).toMatch(/outline:\s*var\(--focus-width\) solid var\(--focus\)/);
+function probeColor(name: string): HTMLElement {
+  const probe = document.createElement("span");
+  probe.dataset.probe = "";
+  probe.style.color = name;
+  document.body.append(probe);
+  return probe;
+}
+
+test("the search has a quiet clear glyph, and contrast restores its ring", () => {
   expect(tokens).toMatch(/--focus-width:\s*2px/);
   const clear = rules(styles, "#search::-webkit-search-cancel-button");
   expect(clear).toMatch(/appearance:\s*none/);
@@ -238,7 +313,7 @@ test("the frameless macOS search has no ring except with contrast or forced colo
   const forced = styles.slice(styles.indexOf("@media (forced-colors: active)"));
   expect(rules(forced, "#search::-webkit-search-cancel-button")).toMatch(/background:\s*FieldText/);
   // The gallery's contrast preview restores the ring as prefers-contrast does.
-  expect(rules(gallery, ':root[data-gallery-theme="contrast"]:not([data-platform="windows"]):not([data-platform="linux"]) #search:focus-visible'))
+  expect(rules(gallery, ':root[data-gallery-theme="contrast"] #search:focus-visible'))
     .toMatch(/outline:\s*var\(--focus-width\) solid var\(--focus\)/);
 });
 
@@ -252,6 +327,36 @@ test("under forced colours the active row opts out of the backplate so Highlight
   const forcedTokens = tokens.slice(tokens.indexOf("@media (forced-colors: active)"));
   expect(forcedTokens).toMatch(/--row-active-background:\s*Highlight;/);
   expect(forcedTokens).toMatch(/--row-active-text:\s*HighlightText;/);
-  expect(rules(forced, '[role="option"][data-active][data-citation-selected]')).toMatch(/outline-color:\s*HighlightText/);
+  expect(rules(forced, '[role="option"][data-active][data-citation-selected] .result-tile')).toMatch(/background:\s*HighlightText/);
+  expect(rules(forced, ".result-tile")).toMatch(/forced-color-adjust:\s*none/);
   expect(rules(forced, ':root[data-platform="windows"] [role="option"][data-active]::before')).toMatch(/background:\s*HighlightText/);
 });
+
+// Contrast against the surface (WCAG 1.4.11) with each platform's default
+// accent: macOS system blue, Adwaita blue. A user's own accent may differ.
+const hex = (value: string) => [1, 3, 5].map((i) => parseInt(value.slice(i, i + 2), 16) / 255);
+const luminance = (rgb: number[]) => rgb.map((c) => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
+  .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
+const ratio = (a: number[], b: number[]) => { const [l, d] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (l! + .05) / (d! + .05); };
+const mix = (a: number[], b: number[], share: number) => a.map((c, i) => c * share + b[i]! * (1 - share));
+const pair = (token: string) => tokens.match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]{6}),\\s*(#[0-9a-f]{6})\\)`))!.slice(1, 3).map(hex);
+
+test("macOS and Linux focus rings reach 3:1 on the surface with the default accent", () => {
+  const [surface, text] = [pair("--surface"), pair("--text")];
+  const accents = { macos: ["#007aff", "#0a84ff"], linux: ["#3584e4", "#3584e4"] };
+  for (const mode of [0, 1]) {
+    expect(ratio(hex(accents.macos[mode]!), surface[mode]!), `macOS ${mode}`).toBeGreaterThanOrEqual(3);
+    // Linux: the accent mixed half toward the text colour, as the token says.
+    const ring = mix(hex(accents.linux[mode]!), text[mode]!, .5);
+    expect(ratio(ring, surface[mode]!), `Linux ${mode}`).toBeGreaterThanOrEqual(3);
+  }
+});
+
+test("the Linux active row stands out 3:1 from neighbouring rows with Adwaita's accent", () => {
+  // GTK's selection colour is the accent (Adwaita #3584e4); neighbours are the surface.
+  const surface = pair("--surface");
+  for (const mode of [0, 1]) expect(ratio(hex("#3584e4"), surface[mode]!), `mode ${mode}`).toBeGreaterThanOrEqual(3);
+  // libadwaita's 25% tint would not: the reason the full selection colour is used.
+  expect(ratio(mix(hex("#3584e4"), surface[0]!, .25), surface[0]!)).toBeLessThan(3);
+});
+

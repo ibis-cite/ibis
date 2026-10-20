@@ -14,7 +14,7 @@ comes from [ROADMAP.md](../ROADMAP.md); the rollout below separates remaining
 work from behavior already implemented. Native acceptance is recorded separately
 in [testing.md](testing.md), not established by this specification.
 
-## Seven rules
+## Eight rules
 
 1. **One anatomy everywhere.** Search, list, detail, citation tray and footer, in
    that order, in every form from a one-line bar to the large settings window.
@@ -29,6 +29,9 @@ in [testing.md](testing.md), not established by this specification.
    inserted, or why not. Colour is never the only signal.
 7. **Calm motion.** Movement only explains where something came from, and it
    switches off when the system asks for reduced motion.
+8. **No glow, no edge rings.** Selection is a fill, never an outline. No
+   coloured borders, outer glows or bright rims. A focus ring appears only when
+   the keyboard moved focus.
 
 ## Design language
 
@@ -45,7 +48,10 @@ in [testing.md](testing.md), not established by this specification.
 
 **Colour roles.** Selection and the main button use the system accent. Ibis
 scarlet (`#c23a1c` light, `#ff7a5c` dark) marks only the citation itself: the
-text that will be copied, the citation tray and the logo. Status uses Done
+text that will be copied, the citation tray, the tile of a row added to the
+citation and the logo. The added tile is filled with the deeper brand scarlet
+(`#d2401f`) in dark mode, so its white check keeps 4.5:1 and the tile still
+stands 3:1 off the surface. Status uses Done
 (copied, inserted), Look (skipped, needs a look) and Stop (unreachable, failed),
 always with words or an icon as well as colour.
 
@@ -59,7 +65,10 @@ Larger text setting scales the whole window by 1.15, not just the letters.
 instead of sliding. Hover never moves anything.
 
 **Icons.** Ibis's own set: 20 px, 1.5 px stroke, rounded ends, the same on every
-platform, so a source or a reference type always looks the same.
+platform, so a source or a reference type always looks the same. Seven type
+icons say what a reference is: article, book, chapter, thesis, web page, report
+and other (chosen from its CSL type). They never reuse an attachment drawing
+(the document or the globe), so a row never shows the same picture twice.
 
 **Per platform.** Only these change:
 
@@ -67,13 +76,32 @@ platform, so a source or a reference type always looks the same.
 |---|---|---|---|
 | Material | Translucent glass | Mica, content on a lighter layer | Flat |
 | Window radius | 12 pt, the native panel corner (#236) | 8 px (4 px controls) | 14 px |
-| Selected row | Filled accent, white text | Soft grey with an accent pill on the left | Accent tint |
+| Selected row | Filled accent, white text | Soft grey with an accent pill on the left | GTK's selection colour (filled accent) with its paired text |
+| Keyboard focus ring | 2 px accent, 1 px gap | 2 px in the text colour around a 1 px surface-coloured stroke (Fluent's focus visual) | 2 px, the accent mixed half toward the text colour, 1 px gap |
 | Search box | Frameless, large | Text box with an underline that turns accent on focus | Framed entry |
 | Shortcut labels | ⌘ ⌥ ⇧ | Ctrl Alt Shift | Ctrl Super Shift |
 | Copied | Pill near the top of the screen | Notice bottom-right | Toast at the bottom |
 
+The Linux selected row uses the full selection colour rather than a tint: focus
+stays in the search box while ↑ ↓ move the selection, so the fill is the only
+cue, and libadwaita's list tint (25 % accent, `$view_selected_color`) or a
+plain neutral fill reaches only about 1.1–1.3:1 against the rows beside it.
+The full accent reaches about 3.7:1 (light) and 4:1 (dark) with Adwaita blue.
+Adwaita's half-accent focus ring is mixed toward the text colour instead of
+made transparent for the same reason.
+
 High contrast and reduced transparency replace every material with the opaque
 system surface, as [native appearance groundwork](https://github.com/ibiscite/ibis/pull/232#issuecomment-6282577029) already does.
+
+On macOS the glass is AppKit's popover material (`NSVisualEffectView`) behind
+the page, under a light veil of the surface colour at 55%: web text cannot use
+AppKit's vibrant blending, and without the veil secondary text drops below
+4.5:1 over a bright or colourful wallpaper. Over the veil, the citation and
+status colours are one step deeper (scarlet `#982d16` light, `#ff9d87` dark) so
+they keep 4.5:1; the opaque surface keeps the usual scarlet. Fills, hairlines
+and key caps are translucent so the material shows through, and the window edge
+is a 1 px hairline (black 10% in light, white 10% in dark), never a white rim. The newer Liquid Glass material
+(`NSGlassEffectView`, macOS 26) is a later step (Rollout 9).
 
 ## What shows, and when
 
@@ -86,12 +114,13 @@ system surface, as [native appearance groundwork](https://github.com/ibiscite/ib
 | Filter chips | Once added | `#tag`, `y:2019-2022` or `a:name` followed by a space becomes a removable chip. Backspace in an empty box removes the last one. |
 | Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab cycles them. |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter or Tab picks the first. |
+| Row: type tile | Always | A 32 px tile at the row's start with the type icon on a quiet fill (24 px and no fill in Compact, so rows stay 40 px). Decorative: screen readers hear the type word instead. |
 | Row: title and year | Always | Year at the right edge, in the same place on every row. |
 | Row: authors and journal | Comfortable and Spacious | Tells apart references with the same first author and year. The journal is the container title (journal, book or proceedings), else the publisher. Spacious adds the item type as one word ("Article", "Book"). One line: authors are shortened as in a citation ("García", "García, Okafor", or "García et al." for three or more; screen readers hear every name), then the journal, each with an ellipsis (the key and library label shorten first, never below a few letters, and the type word stays whole; only when enlarged text leaves no room do they move under them); a match in the journal is always named, since it may be shortened. Compact shows the first author ("García et al.") after the title. |
 | Row: why it matched | Only when hidden | "In the abstract: …sleep…" or "Tagged: …" when the match is not in the title or authors. |
 | PDF or Web label | When a file is attached | Says what is attached ("PDF · 12 pp") and opens the preview. No empty column otherwise. |
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
-| Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows. |
+| Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows: a plus, or a check on a row already added. A row in the citation always shows a scarlet tile with a white check, the only scarlet on the row. A 32 px pointer target with its name in the tooltip ("Add García 2021 to citation"); it adds no Tab stop, because a listbox option holds no controls, and keyboards use Shift+Enter. |
 | Citation tray | Once a source is added | Page number per source and the exact text to be copied, in scarlet. |
 | Footer tip | One at a time | Tied to what the user is doing, retired once they have done it. Otherwise the footer shows library status. |
 | Library status | Always, quietly | A dot, the source and the count; the age only when it is news or a warning (see below). A sentence above the list only when something needs the user. |
@@ -231,11 +260,16 @@ is pressed again.
 
 **Accessibility.** Reduced motion uses fades only. Screen readers hear the
 result count and, per row, title, first author, year, journal or container
-(Comfortable and Spacious) and why it matched;
-"Copied" is announced politely. Every action has a key; focus rings are always
-visible (2 px, accent), except on the frameless macOS search field, where the
-caret and the active row are the cue, as in Spotlight. With increased contrast
-or forced colours, that field shows the ring too. Right-to-left titles align right within their row.
+(Comfortable and Spacious), its type in words and why it matched;
+"Copied" is announced politely. Every action has a key. Focus rings appear only for keyboard
+focus (`:focus-visible`), never after a click, in the platform's style (see the
+table above), and reach 3:1 against the surface with the platform's default
+accent. The search box never shows one: it always has focus, the caret is
+the cue, and on Windows its accent underline. Rows moved with ↑ ↓ show their
+fill, not a ring. With increased contrast or forced colours, every control and
+the search box show a solid 2 px ring and the active row a 3 px edge; a row
+in the citation keeps its check tile in system colours, so the check, not
+colour, says it was added. Right-to-left titles align right within their row.
 
 ## Rollout
 
