@@ -27,6 +27,14 @@ export const commands = {
 	 *  list that has since been replaced is refused.
 	 */
 	openFoundLibrary: (list: number, index: number) => __TAURI_INVOKE<null>("open_found_library", { list, index }),
+	/**
+	 *  Read these Zotero libraries together from now on, in this order; the
+	 *  result arrives as `library:changed`. An empty list or a repeated library
+	 *  is refused.
+	 */
+	useZoteroLibraries: (libraries: ZoteroLibrary[]) => __TAURI_INVOKE<null>("use_zotero_libraries", { libraries }),
+	/**  The group libraries Zotero knows, while Zotero runs. */
+	zoteroGroups: () => __TAURI_INVOKE<ZoteroGroup[]>("zotero_groups"),
 	/**  The library as it is now, for the interface when it starts. */
 	libraryStatus: () => __TAURI_INVOKE<LibraryStatus>("library_status"),
 	/**
@@ -118,6 +126,8 @@ export type LibraryStatus = {
 	state: LibraryState,
 	/**  Whether the requested library is Zotero rather than a file. */
 	zotero: boolean,
+	/**  The Zotero libraries requested, in order; empty for a file. */
+	zotero_libraries: ZoteroLibrary[],
 	/**  A successfully opened snapshot, including a valid empty library. */
 	has_snapshot: boolean,
 	/**  Requested file name only, including during opening and after failure. */
@@ -181,5 +191,18 @@ export type Sources = {
 	 */
 	cut_short: boolean,
 };
+
+/**  A Zotero group library the user can choose. */
+export type ZoteroGroup = {
+	id: number,
+	name: string,
+};
+
+/**  Which Zotero library to read. */
+export type ZoteroLibrary =
+/**  The personal library ("My Library"). */
+"user" |
+/**  A group library, by its numeric group ID. */
+{ group: number };
 
 export type ZoteroPresence = "available" | "access_off" | "absent";

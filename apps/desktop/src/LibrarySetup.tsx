@@ -41,7 +41,7 @@ export function LibrarySetup({ api, perform }: {
   const files = openFoundLibrary ? sources?.files ?? [] : [];
   const lookAgain = () => setSearch((n) => n + 1);
   const outcome = looking ? setupText.looking
-    : sources && files.length === 0 && zotero !== "available" ? setupText.nothingFound
+    : sources && files.length === 0 && zotero === "absent" ? setupText.nothingFound
     : sources ? setupText.found(files.length, zotero === "available") : "";
 
   return (

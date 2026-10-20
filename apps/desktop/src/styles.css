@@ -41,6 +41,7 @@ main {
 .result-authors { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-key { flex-shrink: 1; min-width: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--key-size); }
 .result-why { font-style: italic; }
+.result-library { flex-shrink: 0; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 [role="option"]:hover:not([data-active]):not([data-citation-selected]) { background: var(--hover-background); }
 /* Active and selected remain distinguishable even without colour. */
 [role="option"][data-active] { background: var(--active-background); border-color: var(--active-edge); box-shadow: inset var(--active-edge-width) 0 var(--accent); }
@@ -50,6 +51,7 @@ main {
 .empty-state p:first-child { color: var(--text); font-weight: var(--type-strong-weight); }
 .empty-hint { font-size: var(--metadata-size); }
 .library-setup .setup-choices { display: flex; gap: var(--metadata-gap); justify-content: center; flex-wrap: wrap; }
+.library-setup button[aria-disabled="true"] { color: var(--muted); cursor: default; }
 .found-files button { max-width: 100%; overflow-wrap: anywhere; }
 .found-files ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--metadata-gap); justify-items: center; }
 .found-folder { color: var(--muted); font-size: var(--metadata-size); }
@@ -132,3 +134,5 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 [role="menuitemcheckbox"] { display: flex; justify-content: space-between; gap: var(--space-4); min-height: var(--control-min-size); align-items: center; text-align: start; border: 0; background: var(--clear); }
 [role="menuitemcheckbox"]:hover, [role="menuitemcheckbox"]:focus-visible { background: var(--hover-background); }
 [role="menuitemcheckbox"][aria-checked="true"]::after { content: "✓"; }
+[role="menu"] [role="group"] { border-block: var(--border-width) solid var(--line); }
+[role="menuitemcheckbox"][aria-disabled="true"] { color: var(--muted); }
