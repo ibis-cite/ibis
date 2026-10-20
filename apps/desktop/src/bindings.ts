@@ -17,6 +17,17 @@ export const commands = {
 	 */
 	useZotero: () => __TAURI_INVOKE<void>("use_zotero"),
 	/**
+	 *  Find what setup can offer: whether Zotero is open, and `.bib` files in
+	 *  the documents, desktop and downloads folders.
+	 */
+	findSources: () => __TAURI_INVOKE<Sources>("find_sources"),
+	/**
+	 *  Open the file at `index` in list `list` from [`find_sources`] and
+	 *  remember it; the result arrives as `library:changed`. A choice from a
+	 *  list that has since been replaced is refused.
+	 */
+	openFoundLibrary: (list: number, index: number) => __TAURI_INVOKE<null>("open_found_library", { list, index }),
+	/**
 	 *  Read these Zotero libraries together from now on, in this order; the
 	 *  result arrives as `library:changed`. An empty list or a repeated library
 	 *  is refused.
@@ -28,9 +39,12 @@ export const commands = {
 	libraryStatus: () => __TAURI_INVOKE<LibraryStatus>("library_status"),
 	/**
 	 *  Search the open library. An empty query returns no results. Async so it
-	 *  runs off the main thread.
+	 *  runs off the main thread. `page` identifies the interface page and
+	 *  `request` increases with every search it sends; a search older than that
+	 *  page's newest one returns no results, which the interface ignores because
+	 *  it belongs to an outdated query.
 	 */
-	search: (query: string, limit: number) => __TAURI_INVOKE<SearchResult[]>("search", { query, limit }),
+	search: (query: string, limit: number, page: number, request: number) => __TAURI_INVOKE<SearchResult[]>("search", { query, limit, page, request }),
 	/**
 	 *  Copy the selected records as a citation to the clipboard. The format is
 	 *  remembered for next time.
@@ -82,6 +96,14 @@ export type Copied = {
 
 /**  How much each result row shows (ADR 0020). */
 export type Density = "compact" | "comfortable" | "spacious";
+
+/**  A `.bib` file found on this computer. */
+export type FoundFile = {
+	/**  The file name, such as `refs.bib`. */
+	name: string,
+	/**  The name of the folder holding it, without the rest of its path. */
+	folder: string,
+};
 
 /**  Key-based output syntax. */
 export type KeyFormat =
@@ -160,6 +182,19 @@ export type ShortcutStatus = {
 	error: string | null,
 };
 
+/**  What first-run setup can offer. */
+export type Sources = {
+	zotero: ZoteroPresence,
+	/**  The number to send back with a choice from `files`. */
+	list: number,
+	files: FoundFile[],
+	/**
+	 *  Some folders were too large to search fully, or more files were
+	 *  found than are listed.
+	 */
+	cut_short: boolean,
+};
+
 /**  A Zotero group library the user can choose. */
 export type ZoteroGroup = {
 	id: number,
@@ -172,3 +207,5 @@ export type ZoteroLibrary =
 "user" |
 /**  A group library, by its numeric group ID. */
 { group: number };
+
+export type ZoteroPresence = "available" | "access_off" | "absent";

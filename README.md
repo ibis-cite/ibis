@@ -4,7 +4,7 @@
 
 Ibis is free, open source and private by design: everything works offline, nothing is tracked, and your libraries are never changed.
 
-> **Status: early development, working towards the first preview (0.1).** The core engine and the `ibis` command line tool read BibTeX/BibLaTeX files. The desktop picker runs from source: a global shortcut (Ctrl+Shift+Y, or Control+Command+R on macOS) opens it, you search a `.bib` library or, while Zotero is open, your Zotero library and any group libraries you choose (More menu), automatically pick up changes and copy a citation in Pandoc, BibLaTeX, LaTeX or Typst syntax. Installable preview builds, reading Zotero while it is closed, formatted styles and direct insertion follow. See the [roadmap](ROADMAP.md).
+> **Status: early preview (0.1).** A global shortcut (Ctrl+Shift+Y, or Control+Command+R on macOS) opens the picker. Search a `.bib` library or, while Zotero is open, your Zotero library and any group libraries you choose (More menu), and copy a citation key (Pandoc, BibLaTeX, LaTeX, Typst) or a formatted citation in APA, Chicago, Harvard, IEEE or MLA. Builds are unsigned. First-run setup, more styles, reading Zotero while it is closed and direct insertion follow. See the [roadmap](ROADMAP.md).
 
 ## Planned for 1.0
 
@@ -30,6 +30,10 @@ There are two builds. Both are free and run on Windows, macOS and Linux.
 The two install as separate apps, so you can keep both. Each can update itself if you allow update checks when it first starts; updates are signed and checked before they install. The apps themselves are not signed by Apple or Microsoft yet, so your system may warn before opening them (the release page says what to click).
 
 **Version numbers** follow [semantic versioning](https://semver.org). Until 1.0 every release is a preview: `0.N.0` ships a milestone from the [roadmap](ROADMAP.md) and `0.N.1`, `0.N.2`, ... fix it. Tell us what works and what you miss through [a problem report or an idea](https://github.com/ibiscite/ibis/issues/new/choose).
+
+The menu bar or tray menu shows which build and version you are running. Send questions and feedback to [GitHub Discussions](https://github.com/ibiscite/ibis/discussions), and problems to [the issues](https://github.com/ibiscite/ibis/issues/new/choose).
+
+The first time the picker opens, it offers Zotero if Zotero is open and lists `.bib` files it finds in your Documents, Desktop and Downloads folders, by name only, so you can pick one; **Choose library…** opens any other file.
 
 ## Use with Zotero
 
