@@ -367,7 +367,7 @@ class MacOS:
 
     def look(self, pids, press=None):
         result = subprocess.run(["osascript", "-l", "JavaScript", "-e", MACOS_LOOK, press or "", *map(str, pids)],
-                                capture_output=True, text=True, timeout=60)
+                                capture_output=True, text=True, encoding="utf-8", errors="strict", timeout=60)
         if result.returncode:
             raise RuntimeError(f"System Events helper failed: {result.stderr.strip()[-500:]}")
         return look_result(result.stdout)
@@ -444,9 +444,10 @@ def powershell(script, **env):
     first line break inside a block. Values arrive as environment variables."""
     with tempfile.TemporaryDirectory(prefix="ibis update helper ") as folder:
         path = Path(folder) / "helper.ps1"
-        path.write_text(script, encoding="utf-8")
+        # JSON and paths must survive Windows' non-UTF-8 default code page.
+        path.write_text("[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)\n" + script, encoding="utf-8")
         result = subprocess.run(["pwsh", "-NoProfile", "-NonInteractive", "-File", str(path)],
-                                capture_output=True, text=True, timeout=120, env=dict(os.environ, **env))
+                                capture_output=True, text=True, encoding="utf-8", errors="strict", timeout=120, env=dict(os.environ, **env))
     if result.returncode:
         raise RuntimeError(f"PowerShell helper failed: {result.stderr.strip()[-500:]}")
     return result.stdout
@@ -692,6 +693,35 @@ class Tests(unittest.TestCase):
                     '{"pressed": false, "seen": [], "probe": "x"}'):
             with self.assertRaises(RuntimeError):
                 look_result(bad)
+
+    def test_native_helpers_preserve_utf8_when_the_default_encoding_is_cp1252(self):
+        expected = "Synthetic 合成 한국어 \u0081"
+        payload = json.dumps({"pressed": False, "seen": [expected]}, ensure_ascii=False).encode("utf-8")
+        run_child = subprocess.run
+        command = [sys.executable, "-c", f"import sys; sys.stdout.buffer.write(bytes.fromhex('{payload.hex()}'))"]
+        mac = MacOS.__new__(MacOS)
+        for helper in (lambda: look_result(powershell("Write-Output 'synthetic'")), lambda: mac.look([123])):
+            with self.subTest(helper=helper), patch("locale.getencoding", return_value="cp1252"), \
+                    patch("subprocess.run", side_effect=lambda _command, **kwargs: run_child(command, **kwargs)):
+                self.assertEqual(helper(), (False, [expected], None))
+
+    def test_powershell_sets_utf8_before_running_the_script(self):
+        def inspect_script(command, **_kwargs):
+            script = Path(command[-1]).read_text(encoding="utf-8")
+            self.assertTrue(script.startswith("[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)\n"))
+            self.assertTrue(script.endswith("Write-Output '合成'"))
+            return subprocess.CompletedProcess(command, 0, stdout="合成", stderr="")
+        with patch("subprocess.run", side_effect=inspect_script):
+            self.assertEqual(powershell("Write-Output '合成'"), "合成")
+
+    def test_malformed_native_helper_utf8_is_a_failure(self):
+        run_child = subprocess.run
+        command = [sys.executable, "-c", "import sys; sys.stdout.buffer.write(b'\\xff')"]
+        mac = MacOS.__new__(MacOS)
+        for helper in (lambda: powershell("synthetic"), lambda: mac.look([123])):
+            with self.subTest(helper=helper), patch("subprocess.run", side_effect=lambda _command, **kwargs: run_child(command, **kwargs)):
+                with self.assertRaises(UnicodeDecodeError):
+                    helper()
 
 
 def main():
