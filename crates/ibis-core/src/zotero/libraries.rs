@@ -84,10 +84,12 @@ fn group(entry: &Value) -> Option<Group> {
     Some(Group { id, name })
 }
 
-/// Direction overrides and zero-width characters, which could make a group
-/// name look like another or reorder the text around it.
+/// Direction overrides and isolates and invisible spaces, which could make
+/// a group name look like another or reorder the text around it. Zero-width
+/// joiners and direction marks stay: they are part of correct spelling in
+/// Persian, Arabic, Hebrew and many Indic scripts.
 fn invisible(c: char) -> bool {
-    matches!(c, '\u{061C}' | '\u{200B}'..='\u{200F}' | '\u{202A}'..='\u{202E}' | '\u{2060}'..='\u{2069}' | '\u{FEFF}')
+    matches!(c, '\u{200B}' | '\u{202A}'..='\u{202E}' | '\u{2060}'..='\u{2069}' | '\u{FEFF}')
 }
 
 /// What one check of several libraries saw: each library's version, or
@@ -331,7 +333,7 @@ mod tests {
         zotero.groups[1] = json!({ "id": 2, "data": { "name": "  Line\nbreak\u{7}  " } });
         zotero.groups[2] = json!({ "id": 3, "data": {} });
         zotero.groups[3] = json!({ "id": 4, "data": { "name": "x".repeat(500) } });
-        zotero.groups[4] = json!({ "id": 5, "data": { "name": "\u{202E}baL\u{200B} \u{2066}A\u{2069}" } });
+        zotero.groups[4] = json!({ "id": 5, "data": { "name": "\u{202E}baL\u{200B} \u{2066}A\u{2069} \u{645}\u{6CC}\u{200C}\u{62E}" } });
         let listed = groups(&mut zotero).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(listed.len(), GROUP_PAGE + 2);
         assert_eq!(
@@ -344,7 +346,7 @@ mod tests {
         assert_eq!(listed[1].name, "Line break");
         assert_eq!(listed[2].name, "Group 3");
         assert_eq!(listed[3].name.chars().count(), MAX_NAME);
-        assert_eq!(listed[4].name, "baL A");
+        assert_eq!(listed[4].name, "baL A \u{645}\u{6CC}\u{200C}\u{62E}");
         assert_eq!(zotero.asked.len(), 2);
     }
 
