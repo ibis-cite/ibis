@@ -2689,3 +2689,40 @@ test.each(["warning", "notice"])("a search started before a selected copy preser
     expect(calls).toContain("hide_picker");
   }
 });
+
+test.each([false, true])("retained stale freshness stays in accessible footer details with retry (Zotero=%s)", async (zotero) => {
+  const reason = zotero ? "Zotero is not running; keeping the last loaded references" : "The library file is unavailable; keeping the last loaded references";
+  const name = zotero ? "Zotero library" : "refs.bib";
+  const calls = backend({
+    library_status: () => ({ ...zoteroStatus(["user"]), state: "error", zotero, snapshot_zotero: zotero, name, snapshot_name: name, stale: true, error: reason }),
+    search: () => [result("kept", "Retained searchable reference")],
+    reload_library: () => null,
+  });
+  const { container } = render(<App />);
+  await screen.findByText("Retained searchable reference");
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(screen.getByRole("status", { name: "Library status" }).textContent).toContain("not updated");
+  expect(container.querySelector(".status-dot")?.getAttribute("data-health")).toBe("look");
+  expect(container.querySelector(".library-detail")?.textContent).toContain(reason);
+  fireEvent.click(screen.getByRole("button", { name: /^More/ }));
+  expect(screen.getByRole("menu").textContent).toContain(reason);
+  expect(screen.getByRole("group", { name: new RegExp(zotero ? "Open Zotero, then reload" : "Choose it again or reconnect") })).toBeTruthy();
+  await chooseFromMore("Reload");
+  await waitFor(() => expect(calls).toContain("reload_library"));
+});
+
+test("retained stale freshness does not hide settings or copy failures", async () => {
+  const notice = "Synthetic settings recovery notice";
+  backend({
+    library_status: () => ({ ...zoteroStatus(["user"]), state: "error", stale: true, error: "Zotero is not running; keeping the last loaded references", settings_notice: notice }),
+    search: () => [result("kept", "Retained reference with errors")],
+    copy_citation: () => { throw new Error("synthetic clipboard failure"); },
+  });
+  render(<App />);
+  await screen.findByText("Retained reference with errors");
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
+  expect(screen.getByRole("alert").textContent).toContain(notice);
+  fireEvent.click(screen.getByText("Retained reference with errors"));
+  await screen.findByText("Nothing was copied. Try again, or use Reload.");
+  expect(screen.getAllByRole("alert")).toHaveLength(2);
+});
