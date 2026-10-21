@@ -1,0 +1,140 @@
+{
+  "source": "717b1dbde3e34aa1f1f7f0fbd2e4719486592918",
+  "results": [
+    {
+      "platform": "macos",
+      "action": "repeat-more",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria4703130643-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria4703130643-_r_1_\" aria-activedescendant=\"react-aria4703130643-_r_m_\">"
+      },
+      "final": {
+        "search": true,
+        "active": "<input id=\"search\" placeholder=\"Search references…\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"results\" type=\"search\" value=\"memory\" aria-activedescendant=\"result-0\">",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "macos",
+      "action": "keys-while-closing",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria7694585867-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria7694585867-_r_1_\" aria-activedescendant=\"react-aria7694585867-_r_m_\">"
+      },
+      "final": {
+        "search": true,
+        "active": "<input id=\"search\" placeholder=\"Search references…\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"results\" type=\"search\" value=\"memory\" aria-activedescendant=\"result-0\">",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "macos",
+      "action": "plain-key",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria7741055019-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria7741055019-_r_1_\" aria-activedescendant=\"react-aria7741055019-_r_m_\">"
+      },
+      "final": {
+        "search": false,
+        "active": "<button class=\"toolbar-menu-button\" data-rac=\"\" type=\"button\" tabindex=\"0\" aria-haspopup=\"true\" aria-expanded=\"false\" id=\"react-aria7741055019-_r_0_\" data-react-aria-pressable=\"true\" aria-label=\"Copy as Pandoc\" data-hovered=\"true\" data-focused=\"true\" data-focus-visible=\"true\">Pandoc<svg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"m3 4.5 3 3 3-3\"></path></svg></button>",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "windows",
+      "action": "repeat-more",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria5366506376-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria5366506376-_r_1_\" aria-activedescendant=\"react-aria5366506376-_r_m_\">"
+      },
+      "final": {
+        "search": true,
+        "active": "<input id=\"search\" placeholder=\"Search references…\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"results\" type=\"search\" value=\"memory\" aria-activedescendant=\"result-0\">",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "windows",
+      "action": "keys-while-closing",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria1932980631-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria1932980631-_r_1_\" aria-activedescendant=\"react-aria1932980631-_r_m_\">"
+      },
+      "final": {
+        "search": true,
+        "active": "<input id=\"search\" placeholder=\"Search references…\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"results\" type=\"search\" value=\"memory\" aria-activedescendant=\"result-0\">",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "windows",
+      "action": "plain-key",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria7786523365-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria7786523365-_r_1_\" aria-activedescendant=\"react-aria7786523365-_r_m_\">"
+      },
+      "final": {
+        "search": false,
+        "active": "<button class=\"toolbar-menu-button\" data-rac=\"\" type=\"button\" tabindex=\"0\" aria-haspopup=\"true\" aria-expanded=\"false\" id=\"react-aria7786523365-_r_0_\" data-react-aria-pressable=\"true\" aria-label=\"Copy as Pandoc\" data-hovered=\"true\" data-focused=\"true\" data-focus-visible=\"true\">Pandoc<svg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"m3 4.5 3 3 3-3\"></path></svg></button>",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "linux",
+      "action": "repeat-more",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria3515093373-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria3515093373-_r_1_\" aria-activedescendant=\"react-aria3515093373-_r_m_\">"
+      },
+      "final": {
+        "search": true,
+        "active": "<input id=\"search\" placeholder=\"Search references…\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"results\" type=\"search\" value=\"memory\" aria-activedescendant=\"result-0\">",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "linux",
+      "action": "keys-while-closing",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria4385290481-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria4385290481-_r_1_\" aria-activedescendant=\"react-aria4385290481-_r_m_\">"
+      },
+      "final": {
+        "search": true,
+        "active": "<input id=\"search\" placeholder=\"Search references…\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"results\" type=\"search\" value=\"memory\" aria-activedescendant=\"result-0\">",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "linux",
+      "action": "plain-key",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria6088455954-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria6088455954-_r_1_\" aria-activedescendant=\"react-aria6088455954-_r_m_\">"
+      },
+      "final": {
+        "search": false,
+        "active": "<button class=\"toolbar-menu-button\" data-rac=\"\" type=\"button\" tabindex=\"0\" aria-haspopup=\"true\" aria-expanded=\"false\" id=\"react-aria6088455954-_r_0_\" data-react-aria-pressable=\"true\" aria-label=\"Copy as Pandoc\" data-hovered=\"true\" data-focused=\"true\" data-focus-visible=\"true\">Pandoc<svg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"m3 4.5 3 3 3-3\"></path></svg></button>",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    }
+  ]
+}
