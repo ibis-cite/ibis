@@ -106,6 +106,12 @@ test("menu role tokens exist, forced colours frame the button, and reduced motio
   expect(toolbarCss).toMatch(/prefers-reduced-motion: reduce[\s\S]*transition: none/);
 });
 
+test("the filter field shows its caret and no ring, except with contrast or forced colours", () => {
+  expect(toolbarCss).not.toMatch(/caret-color/);
+  expect(toolbarCss).toMatch(/\.toolbar-menu-filter input:focus-visible \{ outline: 0; box-shadow: none; \}/);
+  expect(toolbarCss).toMatch(/prefers-contrast: more\), \(forced-colors: active\) \{\s*\.toolbar-menu-filter input:focus-visible \{ outline: var\(--focus-ring-width\)/);
+});
+
 test("Space on an unavailable choice neither selects nor closes", async () => {
   const { trigger, onAction } = mount();
   fireEvent.click(trigger);
