@@ -65,6 +65,19 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
   return steps;
 }
 
+function selectionContained(root: HTMLElement, state: GalleryState): boolean {
+  const html = document.documentElement;
+  const main = root.querySelector("main");
+  // JSDOM has no layout; real large-tray captures must keep outer controls in view.
+  return !state.tray || !main?.getBoundingClientRect().width || (
+    main.scrollHeight <= main.clientHeight + 1 && html.scrollHeight <= innerHeight + 1
+    && [".search-bar", ".results-area", "footer"].every((selector) => {
+      const box = root.querySelector(selector)?.getBoundingClientRect();
+      return box && box.top >= 0 && box.bottom <= innerHeight + 1 && box.height >= 24;
+    })
+  );
+}
+
 /** The seeded settings and interactions are on screen, and nothing else is. */
 function seeded(root: HTMLElement, state: GalleryState): boolean {
   const html = document.documentElement;
@@ -77,7 +90,8 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
     && (pinButton(root)?.getAttribute("aria-pressed") === "true") === Boolean(state.pinned)
     && (root.querySelector('[role="menu"]') !== null) === Boolean(state.menuOpen)
     && (root.querySelector('[role="dialog"]') !== null) === Boolean(state.keys)
-    && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li`).length === (state.tray ?? 0);
+    && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li`).length === (state.tray ?? 0)
+    && selectionContained(root, state);
 }
 
 type GalleryDiagnosticStage = "frontend-mounted" | "effects-settled" | "rendered";

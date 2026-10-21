@@ -109,6 +109,40 @@ test("a gallery state with horizontal overflow is not accepted as rendered", asy
   }
 });
 
+test("selected-reference evidence rejects a picker whose outer scrollport overflows", async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
+  vi.stubGlobal("cancelAnimationFrame", (frame: number) => window.clearTimeout(frame));
+  let overflow = true;
+  const height = vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockImplementation(function (this: HTMLElement) {
+    return this.tagName === "MAIN" ? (overflow ? 700 : 320) : 0;
+  });
+  const client = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(320);
+  const geometry = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    if (this.tagName === "MAIN") return new DOMRect(0, 0, 720, 320);
+    if (this.tagName === "FOOTER") return new DOMRect(0, 280, 720, 40);
+    return new DOMRect(0, 0, 720, 80);
+  });
+  const state = galleryStates.find((candidate) => candidate.id === "tray")!;
+  const acknowledge = vi.fn(async () => undefined);
+  const container = document.createElement("div");
+  document.body.append(container);
+  let stop: () => void = () => undefined;
+  try {
+    await act(async () => { stop = renderGalleryState(container, state, acknowledge); });
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(acknowledge).not.toHaveBeenCalled();
+    overflow = false;
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(acknowledge).toHaveBeenCalledExactlyOnceWith("tray");
+  } finally {
+    await act(async () => stop());
+    container.remove();
+    height.mockRestore(); client.mockRestore(); geometry.mockRestore();
+  }
+});
+
 test("render acknowledgment waits for the synthetic search and its actual result rows", async () => {
   vi.useFakeTimers();
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
@@ -203,6 +237,10 @@ test.each(galleryStates.map((state) => state.id))("the rendered %s fixture ackno
     await act(async () => { stop = renderGalleryState(container, state, acknowledge); });
     await act(() => vi.advanceTimersByTimeAsync(1000));
     await act(() => vi.advanceTimersByTimeAsync(1000));
+    // Large seeds need real React commits between their many frame interactions.
+    if ((state.tray ?? 0) >= 20) {
+      for (let i = 0; i < state.tray! * 2 + 4; i++) await act(() => vi.advanceTimersByTimeAsync(16));
+    }
     expect(acknowledge).toHaveBeenCalledExactlyOnceWith(id);
   } finally {
     await act(async () => stop());
