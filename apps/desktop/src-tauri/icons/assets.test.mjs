@@ -38,6 +38,7 @@ test("bundle icons are the approved B/G1 sources and have their declared sizes",
   const symbolic = read("source/io.github.ibiscite.ibis-symbolic.svg").toString();
   expect(symbolic).toContain('viewBox="0 0 16 16"');
   expect(symbolic).toContain('stroke-width="1.75"');
+  expect(symbolic).not.toContain("non-scaling-stroke");
   expect(symbolic).not.toMatch(/gradient|r="2.1"/i);
 });
 
