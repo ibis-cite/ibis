@@ -1,0 +1,21 @@
+{
+  "lines": [
+    "Window: \"Ibis\", App: Ibis Synthetic Review.",
+    "1 Edit, Secondary Actions: Cancel, Pick",
+    "\t2 menu Secondary Actions: Cancel",
+    "\t\t3 Undo, ID: undo:",
+    "\t\t4 Redo, ID: redo:",
+    "\t\t5 Cut, ID: cut:",
+    "\t\t6 Copy, ID: copy:",
+    "\t\t7 Paste, ID: paste:",
+    "\t\t8 Select All, ID: selectAll:",
+    "\t\t9 AutoFill",
+    "\t\t\t10 menu Secondary Actions: Cancel",
+    "\t\t\t\t11 (disabled) Contact…",
+    "\t\t\t\t12 (disabled) Passwords…",
+    "\t\t\t\t13 (disabled) Credit Card…",
+    "\t\t14 Start Dictation…, ID: startDictation:",
+    "\t\t15 Emoji & Symbols, ID: orderFrontCharacterPalette:",
+    ""
+  ]
+}

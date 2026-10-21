@@ -1,0 +1,43 @@
+{
+  "source": "5148f9e15db43609770517b9d9c0d26bfa6035d4",
+  "os": "macOS 27.0.1 (26A434)",
+  "architecture": "arm64",
+  "renderer": "native WKWebView debug custom-protocol",
+  "viewport_points": [
+    720,
+    480
+  ],
+  "gallery": "many-results",
+  "captures": [
+    {
+      "file": "01-native-picker.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "bce8bb7b01cb7670f2be4b1c06c26201c879f4e4c03d79066e597a7cad7f9dea"
+    },
+    {
+      "file": "02-native-more-keyboard.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "b22e806c1eaa0c72912e4d4b71765dc4161f503d703b81b68e179aa5a79a8657"
+    },
+    {
+      "file": "03-native-shortcuts-dialog.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "51985a1ea58fa011980537df15162f0eff8f50d8fc6f652cf0db3efd791df68a"
+    },
+    {
+      "file": "06-valid-native-shortcut-escape-space.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "86feb6a617d513099ffbbc36b19e753c57a217578793a1776fb5e88ca001306f"
+    }
+  ],
+  "binary_sha256": "cbfdf36a570a28c357564a48c60157ac8f92fa4f79de92d91dca7f6021f81102",
+  "settings_unchanged": true
+}

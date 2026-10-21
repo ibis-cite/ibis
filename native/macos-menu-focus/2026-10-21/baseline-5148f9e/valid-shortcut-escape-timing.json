@@ -1,0 +1,26 @@
+[
+  {
+    "event": "shortcut-open-start",
+    "ms": 0
+  },
+  {
+    "event": "open-AX-returned",
+    "ms": 402
+  },
+  {
+    "event": "escape-start",
+    "ms": 5678
+  },
+  {
+    "event": "escape-key-finished",
+    "ms": 5696
+  },
+  {
+    "event": "closed-AX-returned",
+    "ms": 6189
+  },
+  {
+    "event": "space-AX-returned",
+    "ms": 6592
+  }
+]

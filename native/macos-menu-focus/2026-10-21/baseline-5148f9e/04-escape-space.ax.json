@@ -1,0 +1,12 @@
+{
+  "lines": [
+    "The following is a diff from the previous accessibility tree for Window: \"Ibis\" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.",
+    "Removed element IDs: 46, 54-55",
+    "~\t\t\t\t\t37 combo box (expanded, settable) Search references, Value: memory , Placeholder: Search references…, Secondary Actions: Collapse",
+    "~\t\t\t\t\t\t38 text (settable) memory ",
+    "+\t\t\t\t\t\t59 text ↵",
+    "+\t\t\t\t\t\t60 text Copy as Pandoc",
+    "The focused UI element is 48 text (selected) Memory study 1: a synthetic reference 2026",
+    "Example, Sample Journal of Synthetic Studies example1 Article"
+  ]
+}

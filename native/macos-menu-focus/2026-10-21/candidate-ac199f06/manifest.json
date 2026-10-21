@@ -1,0 +1,29 @@
+{
+  "source": "ac199f06e55c0d395713f96be2e6f4e85a4a246b",
+  "os": "macOS 27.0.1 (26A434)",
+  "architecture": "arm64",
+  "renderer": "native WKWebView debug custom-protocol",
+  "viewport_points": [
+    720,
+    480
+  ],
+  "gallery": "many-results",
+  "captures": [
+    {
+      "file": "01-native-more.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "e151f373be0d36dabf40e359779fcd8621abe014b313d4804ca8146973be1f9b"
+    },
+    {
+      "file": "02-native-shortcut-escape-space.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "1ac5039f4bff304cbfad65571a35aee11b4d5b2ca232785718f512f7ec04091e"
+    }
+  ],
+  "binary_sha256": "4d59d527b41717d33dcda47ebe32e824c8fb1dc6a93d0cd1e6a9aed81d530c00",
+  "settings_unchanged": true
+}

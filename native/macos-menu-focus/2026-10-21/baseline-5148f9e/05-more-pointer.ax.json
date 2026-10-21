@@ -1,0 +1,26 @@
+{
+  "lines": [
+    "The following is a diff from the previous accessibility tree for Window: \"Ibis\" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.",
+    "Removed element IDs: 36-45, 47-48, 50-53, 56-60",
+    "~\t\t\t34 container More",
+    "~\t\t\t\t35 button Dismiss",
+    "+\t\t\t\t36 menu More, Secondary Actions: Cancel",
+    "+\t\t\t\t\t37 container ⁨example.bib⁩ · 24 references. checked 3 hours ago, 3:08 PM",
+    "+\t\t\t\t\t\t38 text ⁨example.bib⁩ · 24 references. checked 3 hours ago, 3:08 PM",
+    "+\t\t\t\t\t\t39 Choose library…, Help: Choose a library",
+    "+\t\t\t\t\t\t40 Use Zotero, Help: Read your Zotero library while Zotero is open",
+    "+\t\t\t\t\t\t41 Reload, Help: Reload library",
+    "+\t\t\t\t\t42 Rows: Comfortable, Help: Show less or more of each reference",
+    "+\t\t\t\t\t43 container",
+    "+\t\t\t\t\t\t44 (settable, integer) Larger text, Value: 0",
+    "+\t\t\t\t\t\t45 (settable, integer) Start Ibis when you log in, Help: Keep the shortcut ready after you restart or log in, Value: 0",
+    "+\t\t\t\t\t46 container",
+    "+\t\t\t\t\t\t47 Keyboard shortcuts",
+    "+\t\t\t\t\t\t48 Quit Ibis",
+    "~\t\t\t\t49 button Dismiss",
+    "Selected:",
+    "\t36 menu More, Secondary Actions: Cancel",
+    "",
+    "Note: Pay special attention to the content selected by the user. If the user asks a question or refers to the content they are looking at on-screen, they might be referring to the selected content (but they might be referring to something else that's visible, too)."
+  ]
+}

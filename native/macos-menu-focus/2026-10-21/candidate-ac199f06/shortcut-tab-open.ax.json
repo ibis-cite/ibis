@@ -1,0 +1,33 @@
+{
+  "lines": [
+    "Window: \"Ibis\", App: Ibis Synthetic Candidate.",
+    "0 system dialog Ibis, Secondary Actions: Raise",
+    "\t1 scroll area",
+    "\t\t2 HTML content Description: Many results — Ibis picker states, URL: tauri://localhost/gallery.html?state=many-results",
+    "\t\t\t3 container More",
+    "\t\t\t\t4 button Dismiss",
+    "\t\t\t\t5 menu More, Secondary Actions: Cancel",
+    "\t\t\t\t\t6 container ⁨example.bib⁩ · 24 references. checked 3 hours ago, 3:14 PM",
+    "\t\t\t\t\t\t7 text ⁨example.bib⁩ · 24 references. checked 3 hours ago, 3:14 PM",
+    "\t\t\t\t\t\t8 (selected) Choose library…, Help: Choose a library",
+    "\t\t\t\t\t\t9 Use Zotero, Help: Read your Zotero library while Zotero is open",
+    "\t\t\t\t\t\t10 Reload, Help: Reload library",
+    "\t\t\t\t\t11 Rows: Comfortable, Help: Show less or more of each reference",
+    "\t\t\t\t\t12 container",
+    "\t\t\t\t\t\t13 (settable, integer) Larger text, Value: 0",
+    "\t\t\t\t\t\t14 (settable, integer) Start Ibis when you log in, Help: Keep the shortcut ready after you restart or log in, Value: 0",
+    "\t\t\t\t\t15 container",
+    "\t\t\t\t\t\t16 Keyboard shortcuts",
+    "\t\t\t\t\t\t17 Quit Ibis",
+    "\t\t\t\t18 button Dismiss",
+    "19 menu bar",
+    "\t20 Ibis Synthetic Candidate",
+    "\t21 File",
+    "\t22 Edit",
+    "\t23 View",
+    "\t24 Window",
+    "\t25 Help",
+    "",
+    "The focused UI element is 8 (selected) Choose library…, Help: Choose a library"
+  ]
+}

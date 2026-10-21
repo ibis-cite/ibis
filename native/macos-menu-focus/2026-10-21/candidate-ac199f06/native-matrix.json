@@ -1,0 +1,40 @@
+[
+  {
+    "mode": "pointer",
+    "close": "Tab",
+    "before": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory , Placeholder: Search references…, Secondary Actions: Collapse",
+    "after": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory p, Placeholder: Search references…, Secondary Actions: Collapse"
+  },
+  {
+    "mode": "shortcut",
+    "close": "Tab",
+    "before": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory p, Placeholder: Search references…, Secondary Actions: Collapse",
+    "after": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pk, Placeholder: Search references…, Secondary Actions: Collapse"
+  },
+  {
+    "mode": "pointer",
+    "close": "Reload",
+    "before": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pk, Placeholder: Search references…, Secondary Actions: Collapse",
+    "after": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pkr, Placeholder: Search references…, Secondary Actions: Collapse"
+  },
+  {
+    "mode": "shortcut",
+    "close": "Reload",
+    "before": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pkr, Placeholder: Search references…, Secondary Actions: Collapse",
+    "after": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pkrs, Placeholder: Search references…, Secondary Actions: Collapse"
+  },
+  {
+    "mode": "pointer",
+    "close": "Keyboard shortcuts → Escape",
+    "dialogFocus": "7 button Close",
+    "before": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pkrs, Placeholder: Search references…, Secondary Actions: Collapse",
+    "after": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pkrsd, Placeholder: Search references…, Secondary Actions: Collapse"
+  },
+  {
+    "mode": "shortcut",
+    "close": "Keyboard shortcuts → Escape",
+    "dialogFocus": "7 button Close",
+    "before": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pkrsd, Placeholder: Search references…, Secondary Actions: Collapse",
+    "after": "\t\t\t\t\t6 combo box (expanded, settable) Search references, Value: memory pkrsde, Placeholder: Search references…, Secondary Actions: Collapse"
+  }
+]
