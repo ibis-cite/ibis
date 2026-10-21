@@ -2151,6 +2151,43 @@ test("More reads like the hints beside it: its name first, then its keys", async
   expect(hints.at(-1)?.textContent).toContain("Shortcuts");
 });
 
+test("footer actions copy and open shortcuts without using a keyboard shortcut", async () => {
+  let copied: unknown;
+  backend({ search: () => [result("a", "First")], copy_citation: (args) => { copied = args.ids; return { text: "@a", warnings: [] }; } });
+  render(<App />);
+  await screen.findByText("First");
+  const copy = screen.getByRole("button", { name: "Copy as Pandoc", exact: true });
+  act(() => copy.focus());
+  expect(copy.getAttribute("aria-keyshortcuts")).toBe("Enter");
+  expect(copy.querySelector(".key-caps")?.getAttribute("aria-hidden")).toBe("true");
+  fireEvent.click(copy);
+  await waitFor(() => expect(copied).toEqual([{ source: "refs.bib", native_key: "a" }]));
+  const shortcuts = screen.getByRole("button", { name: "Shortcuts", exact: true });
+  act(() => shortcuts.focus());
+  fireEvent.click(shortcuts);
+  expect(await screen.findByRole("dialog", { name: "Keyboard shortcuts" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Close" }));
+  expect(document.activeElement).toBe(shortcuts);
+});
+
+test("alternate footer buttons use the current add, remove, clear and hide actions", async () => {
+  const calls = backend({ search: () => [result("a", "First")] });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "first" } });
+  fireEvent.keyDown(box, { key: "Alt", altKey: true });
+  fireEvent.click(screen.getByRole("button", { name: "Add to citation", exact: true }));
+  expect(await screen.findByRole("list", { name: "Selected references" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Remove from citation", exact: true }));
+  expect(screen.queryByRole("list", { name: "Selected references" })).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Clear search", exact: true }));
+  expect((box as HTMLInputElement).value).toBe("");
+  expect(document.activeElement).toBe(box);
+  fireEvent.click(screen.getByRole("button", { name: "Hide", exact: true }));
+  await waitFor(() => expect(calls).toContain("hide_picker"));
+});
+
 test.each([false, true])("Search hint layout survives pointer focus moving to More (Alt=%s)", async (alt) => {
   backend({ search: () => [result("a", "First")] });
   render(<App />);
