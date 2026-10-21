@@ -120,3 +120,4 @@ footer .out-line .out-keys { font-size: var(--footer-size); }
 :root[data-preview] main .out-chips[aria-label], :root[data-preview] main .out-tokens[aria-label] { flex: 0 1 auto; min-width: 0; max-height: none; overflow: clip; }
 :root[data-preview][data-platform="linux"] { --out-chip: var(--button-background); }
 :root[data-preview="c"] footer .enter-hints { flex: none; }
+:root[data-preview="c"][data-platform="linux"] .out-tokens li { background: color-mix(in srgb, var(--text) 10%, transparent); }

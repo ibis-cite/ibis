@@ -5,7 +5,7 @@ import { FormatSelect } from "./FormatSelect";
 
 /** The search bar: the search box, the copy format and the pin. It is also
  * the window's drag region; the editable box itself is not. */
-export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, pinned, onTogglePin, tokens }: {
+export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, pinned, onTogglePin, tokens, tokenField = false }: {
   inputRef: React.Ref<HTMLInputElement>;
   query: string;
   onQueryChange: (query: string) => void;
@@ -21,6 +21,8 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   onTogglePin: () => void;
   /** Preview prototype (gallery only): chosen references as tokens before the query. */
   tokens?: React.ReactNode;
+  /** Keeps the token wrapper for the whole page, so the search box is never remounted. */
+  tokenField?: boolean;
 }) {
   const glass = (
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -47,11 +49,11 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   );
   return (
     <header className="search-bar" data-tauri-drag-region title={pickerText.dragSearchBar}>
-      {!tokens && glass}
+      {!tokenField && glass}
       <label className="visually-hidden" htmlFor="search">
         {pickerText.searchLabel}
       </label>
-      {tokens ? <span className="out-field">{glass}{tokens}{input}</span> : input}
+      {tokenField ? <span className="out-field">{glass}{tokens}{input}</span> : input}
       <FormatSelect format={format} styles={styles} onChange={onFormatChange} />
       <button
         type="button"

@@ -715,6 +715,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         onFormatChange={chooseFormat}
         pinned={pinned}
         onTogglePin={togglePin}
+        tokenField={variant === "c"}
         tokens={variant === "c" && selected.size > 0 ? <SearchTokens selected={selectedList} onRemove={removeChosen} /> : undefined}
       />
       <div className="picker-content">
