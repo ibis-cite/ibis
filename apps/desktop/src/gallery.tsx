@@ -62,7 +62,8 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
   if (state.keys) steps.push(() => press(root.querySelector("main"), "?"));
   if (state.menuOpen) steps.push(() => root.querySelector<HTMLButtonElement>('footer button[aria-haspopup]')?.click());
   if (state.formatMenu) steps.push(() => root.querySelector<HTMLButtonElement>(".toolbar-menu-button")?.click());
-  if (state.scopeMenu) steps.push(() => root.querySelector<HTMLButtonElement>('.toolbar-menu-button[aria-label^="Search in"]')?.click());
+  // The scope menu is the last header menu; with Larger text it shares the format's button.
+  if (state.scopeMenu) steps.push(() => [...root.querySelectorAll<HTMLButtonElement>(".toolbar-menu-button")].at(-1)?.click());
   const filter = state.formatMenu;
   if (typeof filter === "string") steps.push(() => {
     const input = document.querySelector<HTMLInputElement>(".toolbar-menu-filter input");
