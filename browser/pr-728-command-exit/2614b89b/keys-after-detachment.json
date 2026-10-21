@@ -1,0 +1,50 @@
+{
+  "source": "2614b89b938e7a2e27ca7bcf0409535e0f55454e",
+  "results": [
+    {
+      "platform": "macos",
+      "action": "keys-while-closing",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria964982786-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria964982786-_r_1_\" aria-activedescendant=\"react-aria964982786-_r_m_\">"
+      },
+      "final": {
+        "search": false,
+        "active": "<button class=\"toolbar-menu-button\" data-rac=\"\" type=\"button\" tabindex=\"0\" aria-haspopup=\"true\" aria-expanded=\"false\" id=\"react-aria964982786-_r_0_\" data-react-aria-pressable=\"true\" aria-label=\"Copy as Pandoc\" data-hovered=\"true\" data-focused=\"true\" data-focus-visible=\"true\">Pandoc<svg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"m3 4.5 3 3 3-3\"></path></svg></button>",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "windows",
+      "action": "keys-while-closing",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria2775518514-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria2775518514-_r_1_\" aria-activedescendant=\"react-aria2775518514-_r_m_\">"
+      },
+      "final": {
+        "search": false,
+        "active": "<button class=\"toolbar-menu-button\" data-rac=\"\" type=\"button\" tabindex=\"0\" aria-haspopup=\"true\" aria-expanded=\"false\" id=\"react-aria2775518514-_r_0_\" data-react-aria-pressable=\"true\" aria-label=\"Copy as Pandoc\" data-hovered=\"true\" data-focused=\"true\" data-focus-visible=\"true\">Pandoc<svg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"m3 4.5 3 3 3-3\"></path></svg></button>",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    },
+    {
+      "platform": "linux",
+      "action": "keys-while-closing",
+      "closing": {
+        "exiting": true,
+        "active": "<input aria-label=\"Filter formats\" aria-autocomplete=\"list\" autocomplete=\"off\" placeholder=\"Filter formats\" autocorrect=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" tabindex=\"0\" id=\"react-aria8607810975-_r_b_\" class=\"react-aria-Input\" data-rac=\"\" type=\"search\" value=\"Typst\" title=\"\" aria-controls=\"react-aria8607810975-_r_1_\" aria-activedescendant=\"react-aria8607810975-_r_m_\">"
+      },
+      "final": {
+        "search": false,
+        "active": "<button class=\"toolbar-menu-button\" data-rac=\"\" type=\"button\" tabindex=\"0\" aria-haspopup=\"true\" aria-expanded=\"false\" id=\"react-aria8607810975-_r_0_\" data-react-aria-pressable=\"true\" aria-label=\"Copy as Pandoc\" data-hovered=\"true\" data-focused=\"true\" data-focus-visible=\"true\">Pandoc<svg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"m3 4.5 3 3 3-3\"></path></svg></button>",
+        "format": "false",
+        "more": false,
+        "inert": false
+      }
+    }
+  ]
+}
