@@ -1,0 +1,36 @@
+{
+  "source_commit": "1ef07233cdfebbe72a1441535eb71af71ec7875c",
+  "capture": "native WKWebView, isolated Ibis Codex Integration bundle/profile",
+  "os": "macOS27.0.1 arm64",
+  "theme": "dark",
+  "logical_window": [
+    720,
+    480
+  ],
+  "text_size": "Larger1.15",
+  "density": "Comfortable",
+  "synthetic_fixture": "fixtures/native-integration-edge-cases.bib",
+  "fixture_sha256": "3d78dbd0a3f889e99951e576617e9a3f80850d554fe08ef5736c72d7d807d6ee",
+  "binary_sha256": "bbaf68c60b84238727332e957c7a911b2aa2ea22bd58ec981a42233aa2d39cbd",
+  "assets": [
+    {
+      "path": "docs/images/ibis-native-1ef-edge-multilingual.png",
+      "sha256": "1ad940ef70745adab3cd9541709d871dc4e5b53fb4a02afc8d76203ee537e9d9"
+    },
+    {
+      "path": "docs/images/ibis-native-1ef-edge-apa-preview.png",
+      "sha256": "65c15acccd29a0bb54a9070623ee14637767c1a28a13886d32c21965fbf250a0"
+    }
+  ],
+  "observed": [
+    "Three synthetic records loaded; multilingual/literal HTML-like title rendered as text.",
+    "Very long title makes an oversized row; Down scrolls the next active result into view while search/footer remain reachable.",
+    "Missing author/year displays No date and supports selection.",
+    "Two selected APA references preview and actual clipboard paste/select-all agree: (Example, 2026; Synthetic Missing Author and Year, n.d.).",
+    "Selected references clear after successful copy."
+  ],
+  "limits": [
+    "Not native light/Windows/Linux, minimum-size native, IME, screen-reader, mixed-DPI, PDF or auto-paste acceptance.",
+    "Do not merge this evidence composition branch; copy relevant evidence paths into a future focused change."
+  ]
+}
