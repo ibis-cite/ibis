@@ -50,7 +50,6 @@ test("copy confirmation expires, but copy warnings remain until dismissed", asyn
   expect(screen.queryByLabelText("Copy warnings")).toBeNull();
 });
 
-/** Opens the More menu and picks an action from it, as a user would. */
 /** Picks a format in the header's format menu, as a click would. */
 function chooseFormat(value: string) {
   const trigger = screen.getByRole("button", { name: /^Copy as / });
@@ -65,6 +64,7 @@ function formatValue() {
   return key ?? `style:${Object.entries(STYLE_NAMES).find(([, name]) => name === shown)?.[0]}`;
 }
 
+/** Opens the More menu and picks an action from it, as a user would. */
 async function chooseFromMore(name: string, role: "menuitem" | "menuitemcheckbox" = "menuitem") {
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   fireEvent.click(await screen.findByRole(role, { name }));
@@ -1538,7 +1538,7 @@ test("a choice made while saved choices load is kept and saved, not replaced", a
     set_picker_preferences: ({ preferences, copyFormat }) => { saved.push(preferences); keys.push(copyFormat); return null; },
   });
   render(<App />);
-    chooseFormat("cite");
+  chooseFormat("cite");
   await act(async () => { finish(); await loaded; });
   await waitFor(() => expect(saved).toEqual([{ citation_style: null, density: "compact", larger_text: false }]));
   expect(formatValue()).toBe("cite");
@@ -2613,18 +2613,22 @@ test("a retired formatted preview sends its own revision and requires a fresh co
   let revision = "1";
   const attempts: unknown[] = [];
   const writes: string[] = [];
+  let copiedText: unknown;
   const calls = backend({
     library_status: () => ({ ...zoteroStatus(["user"]), revision }),
     search: () => [{ ...result("ITEM0001", `Formatted ${revision}`, "zotero:user"), revision }],
     picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
     csl_items: ({ expectedRevision }) => {
       if (expectedRevision !== revision) throw "library snapshot changed";
-      return JSON.stringify([{ id: "ITEM0001", type: "book", title: "Synthetic", author: [{ family: "Smith" }], issued: { "date-parts": [[2020]] } }]);
+      // Each revision has its own year, so the preview shows which one it formatted.
+      const year = revision === "1" ? 2020 : 2021;
+      return JSON.stringify([{ id: "ITEM0001", type: "book", title: "Synthetic", author: [{ family: "Smith" }], issued: { "date-parts": [[year]] } }]);
     },
-    copy_formatted: ({ expectedRevision }) => {
+    copy_formatted: ({ text, expectedRevision }) => {
       attempts.push(expectedRevision);
       if (expectedRevision !== revision) throw "library snapshot changed";
       writes.push(revision);
+      copiedText = text;
       return null;
     },
   });
@@ -2637,13 +2641,17 @@ test("a retired formatted preview sends its own revision and requires a fresh co
     fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
     await screen.findByText("The library changed. Search again and reselect the references before copying.");
     await screen.findByText("Formatted 2");
-    await within(preview).findByText("(Smith, 2020)");
+    // The preview is rebuilt for the new rows, and the retired one read the
+    // same text, so look up the current region and wait for revision 2's year.
+    await waitFor(() => within(screen.getByRole("region", { name: "Preview" })).getByText("(Smith, 2021)"));
+    expect(screen.queryByText("(Smith, 2020)")).toBeNull();
     expect(attempts).toEqual(["1"]);
     expect(writes).toEqual([]);
     expect(calls).not.toContain("hide_picker");
     fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
     await waitFor(() => expect(writes).toEqual(["2"]));
     expect(attempts).toEqual(["1", "2"]);
+    expect(copiedText).toBe("(Smith, 2021)");
   } finally {
     vi.unstubAllGlobals();
   }
@@ -2970,6 +2978,30 @@ test("a retained freshness warning does not hide an actual search failure", asyn
   render(<App />);
   await screen.findByText("Ibis could not search your library. Use Reload, then try again.");
   expect(screen.getAllByRole("alert")).toHaveLength(1);
+});
+
+test("replacing a format preview cancels its queued formatter request", async () => {
+  const formatter = await import("./format/formatted");
+  const signals: (AbortSignal | undefined)[] = [];
+  const format = vi.spyOn(formatter, "formatCitation").mockImplementation((_csl, _style, options) => {
+    signals.push(options?.signal);
+    return new Promise(() => undefined);
+  });
+  backend({
+    search: () => [result("a", "Synthetic preview")],
+    csl_items: () => "[]",
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+  });
+  try {
+    render(<App />);
+    await waitFor(() => expect(signals).toHaveLength(1));
+    chooseFormat("style:ieee");
+    await waitFor(() => expect(signals).toHaveLength(2));
+    expect(signals[0]?.aborted).toBe(true);
+    expect(signals[1]?.aborted).toBe(false);
+  } finally {
+    format.mockRestore();
+  }
 });
 
 test("format toolbar menu exposes both sections and saves a choice without copying", async () => {
