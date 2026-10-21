@@ -30,7 +30,7 @@ test("rows name a hidden match, shorten three or more authors and title the tile
   expect(hiddenMatch(["abstract", "note"])).toBe("abstract");
   expect(abbreviatedAuthors(record({ author_count: 2 }))).toBe(false);
   expect(abbreviatedAuthors(record({ author_count: 3 }))).toBe(true);
-  expect(abbreviatedAuthors(record({ author_count: 3, first_author: null }))).toBe(false);
+  expect(abbreviatedAuthors(record({ author_count: 3, first_author: undefined }))).toBe(false);
   expect(tileName(record())).toBe("García 2021");
   expect(tileName(record({ year: null }))).toBe("García");
   expect(tileName(record({ first_author: "  " }))).toBe("a");
