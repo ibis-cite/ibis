@@ -1,0 +1,1147 @@
+{
+  "schemaVersion": 1,
+  "issue": 636,
+  "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+  "source_runtime_modified": false,
+  "initial_conditions": "Search focused, pointer outside the page, hover transition settled, document/main/results at scroll position zero for both variants.",
+  "concept": "Move only the existing .format-preview DOM node after .results-area and before footer; preserve selected-reference tray location and all CSS.",
+  "browser": "Chromium 151.0.7922.34",
+  "platform_look": "macOS browser simulation on macOS host; not native",
+  "cases": [
+    {
+      "id": "720-light-normal",
+      "width": 720,
+      "height": 480,
+      "theme": "light",
+      "text": "normal"
+    },
+    {
+      "id": "720-dark-larger",
+      "width": 720,
+      "height": 480,
+      "theme": "dark",
+      "text": "large"
+    },
+    {
+      "id": "360-dark-normal",
+      "width": 360,
+      "height": 320,
+      "theme": "dark",
+      "text": "normal"
+    },
+    {
+      "id": "360-light-larger",
+      "width": 360,
+      "height": 320,
+      "theme": "light",
+      "text": "large"
+    }
+  ],
+  "provider": "Existing tray gallery fixture (two selected references, three results), temporarily extended with synthetic CSL JSON and APA preference to use actual App and formatter; existing provider does not offer formatted citations.",
+  "preview_text": "(Example & Sample, 2026; 架空 著者, 2026)",
+  "limits": [
+    "Visual concept and one-off measurement only; no production App/TS/CSS changes.",
+    "Browser platform look does not establish native appearance, window behavior, copy ownership, keyboard or assistive-technology acceptance.",
+    "Only two selected synthetic references, three results, APA and comfortable density; no many-result, long-preview, loading/stale/error, 200%, Windows/Linux or native claim.",
+    "Existing narrow breakpoint uses document scrolling; this comparison does not implement #639 containment or adaptive height.",
+    "More was opened for overlay measurement after scrolling footer into view; this is not pointer/keyboard acceptance."
+  ],
+  "assets": [
+    {
+      "file": "preview-placement-636-720-light-normal.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "capture": "Chromium browser paired concept, DOM relocation only; not implemented",
+      "case": "720-light-normal",
+      "view": "initial",
+      "format": "png",
+      "pixels": [
+        1488,
+        690
+      ],
+      "sha256": "ed9c035fcf2d40b3876e84fbd7278f0507fa75dbd2e259276ddc24cbfa2af0df"
+    },
+    {
+      "file": "preview-placement-636-720-dark-larger.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "capture": "Chromium browser paired concept, DOM relocation only; not implemented",
+      "case": "720-dark-larger",
+      "view": "initial",
+      "format": "png",
+      "pixels": [
+        1488,
+        690
+      ],
+      "sha256": "4897dd5d227475581ff07f6e90cb01b266fa22910516882d035b732e00add854"
+    },
+    {
+      "file": "preview-placement-636-360-dark-normal.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "capture": "Chromium browser paired concept, DOM relocation only; not implemented",
+      "case": "360-dark-normal",
+      "view": "initial",
+      "format": "png",
+      "pixels": [
+        768,
+        530
+      ],
+      "sha256": "e2e202a503873d1f9ce4e63189c06a25f729cba89a0fb72c887073e79af1561f"
+    },
+    {
+      "file": "preview-placement-636-360-light-larger.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "capture": "Chromium browser paired concept, DOM relocation only; not implemented",
+      "case": "360-light-larger",
+      "view": "initial",
+      "format": "png",
+      "pixels": [
+        768,
+        530
+      ],
+      "sha256": "bbf0d92e044b396a111d46b17f3a707bb2700d760c7246a52643a07ce1e924ec"
+    },
+    {
+      "file": "preview-placement-636-360-light-larger-at-preview.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "capture": "Chromium browser paired concept, DOM relocation only; not implemented",
+      "case": "360-light-larger",
+      "view": "at-preview",
+      "format": "png",
+      "pixels": [
+        768,
+        530
+      ],
+      "sha256": "9efb91929154df69692dd26ce07248c79070e420bc551f5a977bb4b04bbcad1e"
+    },
+    {
+      "file": "preview-placement-636-360-light-larger-more.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "capture": "Chromium browser paired concept, DOM relocation only; not implemented",
+      "case": "360-light-larger",
+      "view": "more",
+      "format": "png",
+      "pixels": [
+        768,
+        530
+      ],
+      "sha256": "ed7ac9fef3fdfce1993ec443f6fab93a85ba8d9a853ef94daeef8bb96d522331"
+    }
+  ],
+  "records": [
+    {
+      "case": "720-light-normal",
+      "placement": "top",
+      "initial": {
+        "viewport": {
+          "width": 720,
+          "height": 480
+        },
+        "scrollY": 0,
+        "documentHeight": 480,
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 480,
+          "bottom": 480,
+          "right": 720
+        },
+        "mainScrollTop": 0,
+        "mainOverflow": "auto",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 56,
+          "bottom": 56,
+          "right": 720
+        },
+        "tray": {
+          "x": 0,
+          "y": 56,
+          "width": 720,
+          "height": 49.375,
+          "bottom": 105.375,
+          "right": 720
+        },
+        "preview": {
+          "x": 0,
+          "y": 105.375,
+          "width": 720,
+          "height": 35,
+          "bottom": 140.375,
+          "right": 720
+        },
+        "previewFullyVisible": true,
+        "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+        "results": {
+          "x": 0,
+          "y": 140.375,
+          "width": 720,
+          "height": 287.65625,
+          "bottom": 428.03125,
+          "right": 720
+        },
+        "resultsOverflow": "auto",
+        "resultsClientHeight": 288,
+        "resultsScrollHeight": 288,
+        "visibleResultHeight": 287.65625,
+        "rows": [
+          {
+            "title": "Sleep and memory: an example reference",
+            "visibleHeight": 63.375,
+            "fullyVisible": true
+          },
+          {
+            "title": "多言語の文献と記憶の研究",
+            "visibleHeight": 63.375,
+            "fullyVisible": true
+          },
+          {
+            "title": "La mémoire et les langues du monde",
+            "visibleHeight": 63.375,
+            "fullyVisible": true
+          }
+        ],
+        "fullyVisibleRows": 3,
+        "partlyVisibleRows": 0,
+        "footer": {
+          "x": 0,
+          "y": 428.03125,
+          "width": 720,
+          "height": 51.96875,
+          "bottom": 480,
+          "right": 720
+        },
+        "footerFullyVisible": true,
+        "selectedKeys": [
+          "example2026",
+          "研究2026"
+        ],
+        "domOrder": [
+          "search-bar",
+          "notices",
+          "visually-hidden",
+          "Selected references",
+          "format-preview",
+          "results-area",
+          "footer"
+        ]
+      },
+      "atPreview": {
+        "scrollY": 0,
+        "mainScrollTop": 0,
+        "preview": {
+          "x": 0,
+          "y": 105.375,
+          "width": 720,
+          "height": 35,
+          "bottom": 140.375,
+          "right": 720
+        },
+        "previewFullyVisible": true,
+        "footerFullyVisible": true
+      },
+      "menu": {
+        "x": 480,
+        "y": 120.828125,
+        "width": 224,
+        "height": 313,
+        "bottom": 433.828125,
+        "right": 704,
+        "viewportFits": true,
+        "scrollY": 0,
+        "overlapsPreviewRegion": true
+      },
+      "errors": []
+    },
+    {
+      "case": "720-light-normal",
+      "placement": "bottom",
+      "initial": {
+        "viewport": {
+          "width": 720,
+          "height": 480
+        },
+        "scrollY": 0,
+        "documentHeight": 480,
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 480,
+          "bottom": 480,
+          "right": 720
+        },
+        "mainScrollTop": 0,
+        "mainOverflow": "auto",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 56,
+          "bottom": 56,
+          "right": 720
+        },
+        "tray": {
+          "x": 0,
+          "y": 56,
+          "width": 720,
+          "height": 49.375,
+          "bottom": 105.375,
+          "right": 720
+        },
+        "preview": {
+          "x": 0,
+          "y": 393.03125,
+          "width": 720,
+          "height": 35,
+          "bottom": 428.03125,
+          "right": 720
+        },
+        "previewFullyVisible": true,
+        "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+        "results": {
+          "x": 0,
+          "y": 105.375,
+          "width": 720,
+          "height": 287.65625,
+          "bottom": 393.03125,
+          "right": 720
+        },
+        "resultsOverflow": "auto",
+        "resultsClientHeight": 288,
+        "resultsScrollHeight": 288,
+        "visibleResultHeight": 287.65625,
+        "rows": [
+          {
+            "title": "Sleep and memory: an example reference",
+            "visibleHeight": 63.375,
+            "fullyVisible": true
+          },
+          {
+            "title": "多言語の文献と記憶の研究",
+            "visibleHeight": 63.375,
+            "fullyVisible": true
+          },
+          {
+            "title": "La mémoire et les langues du monde",
+            "visibleHeight": 63.375,
+            "fullyVisible": true
+          }
+        ],
+        "fullyVisibleRows": 3,
+        "partlyVisibleRows": 0,
+        "footer": {
+          "x": 0,
+          "y": 428.03125,
+          "width": 720,
+          "height": 51.96875,
+          "bottom": 480,
+          "right": 720
+        },
+        "footerFullyVisible": true,
+        "selectedKeys": [
+          "example2026",
+          "研究2026"
+        ],
+        "domOrder": [
+          "search-bar",
+          "notices",
+          "visually-hidden",
+          "Selected references",
+          "results-area",
+          "format-preview",
+          "footer"
+        ]
+      },
+      "atPreview": {
+        "scrollY": 0,
+        "mainScrollTop": 0,
+        "preview": {
+          "x": 0,
+          "y": 393.03125,
+          "width": 720,
+          "height": 35,
+          "bottom": 428.03125,
+          "right": 720
+        },
+        "previewFullyVisible": true,
+        "footerFullyVisible": true
+      },
+      "menu": {
+        "x": 480,
+        "y": 120.828125,
+        "width": 224,
+        "height": 313,
+        "bottom": 433.828125,
+        "right": 704,
+        "viewportFits": true,
+        "scrollY": 0,
+        "overlapsPreviewRegion": true
+      },
+      "errors": []
+    },
+    {
+      "case": "720-dark-larger",
+      "placement": "top",
+      "initial": {
+        "viewport": {
+          "width": 720,
+          "height": 480
+        },
+        "scrollY": 0,
+        "documentHeight": 480,
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 480,
+          "bottom": 480,
+          "right": 720
+        },
+        "mainScrollTop": 0,
+        "mainOverflow": "auto",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 64.390625,
+          "bottom": 64.390625,
+          "right": 720
+        },
+        "tray": {
+          "x": 0,
+          "y": 64.390625,
+          "width": 720,
+          "height": 54.9375,
+          "bottom": 119.328125,
+          "right": 720
+        },
+        "preview": {
+          "x": 0,
+          "y": 119.328125,
+          "width": 720,
+          "height": 41.375,
+          "bottom": 160.703125,
+          "right": 720
+        },
+        "previewFullyVisible": true,
+        "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+        "results": {
+          "x": 0,
+          "y": 160.703125,
+          "width": 720,
+          "height": 261.28125,
+          "bottom": 421.984375,
+          "right": 720
+        },
+        "resultsOverflow": "auto",
+        "resultsClientHeight": 261,
+        "resultsScrollHeight": 276,
+        "visibleResultHeight": 261.28125,
+        "rows": [
+          {
+            "title": "Sleep and memory: an example reference",
+            "visibleHeight": 72.140625,
+            "fullyVisible": true
+          },
+          {
+            "title": "多言語の文献と記憶の研究",
+            "visibleHeight": 72.140625,
+            "fullyVisible": true
+          },
+          {
+            "title": "La mémoire et les langues du monde",
+            "visibleHeight": 67.953125,
+            "fullyVisible": false
+          }
+        ],
+        "fullyVisibleRows": 2,
+        "partlyVisibleRows": 1,
+        "footer": {
+          "x": 0,
+          "y": 421.984375,
+          "width": 720,
+          "height": 58.015625,
+          "bottom": 480,
+          "right": 720
+        },
+        "footerFullyVisible": true,
+        "selectedKeys": [
+          "example2026",
+          "研究2026"
+        ],
+        "domOrder": [
+          "search-bar",
+          "notices",
+          "visually-hidden",
+          "Selected references",
+          "format-preview",
+          "results-area",
+          "footer"
+        ]
+      },
+      "atPreview": {
+        "scrollY": 0,
+        "mainScrollTop": 0,
+        "preview": {
+          "x": 0,
+          "y": 119.328125,
+          "width": 720,
+          "height": 41.375,
+          "bottom": 160.703125,
+          "right": 720
+        },
+        "previewFullyVisible": true,
+        "footerFullyVisible": true
+      },
+      "menu": {
+        "x": 444.015625,
+        "y": 71.5625,
+        "width": 257.59375,
+        "height": 356.9375,
+        "bottom": 428.5,
+        "right": 701.609375,
+        "viewportFits": true,
+        "scrollY": 0,
+        "overlapsPreviewRegion": true
+      },
+      "errors": []
+    },
+    {
+      "case": "720-dark-larger",
+      "placement": "bottom",
+      "initial": {
+        "viewport": {
+          "width": 720,
+          "height": 480
+        },
+        "scrollY": 0,
+        "documentHeight": 480,
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 480,
+          "bottom": 480,
+          "right": 720
+        },
+        "mainScrollTop": 0,
+        "mainOverflow": "auto",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 64.390625,
+          "bottom": 64.390625,
+          "right": 720
+        },
+        "tray": {
+          "x": 0,
+          "y": 64.390625,
+          "width": 720,
+          "height": 54.9375,
+          "bottom": 119.328125,
+          "right": 720
+        },
+        "preview": {
+          "x": 0,
+          "y": 380.609375,
+          "width": 720,
+          "height": 41.375,
+          "bottom": 421.984375,
+          "right": 720
+        },
+        "previewFullyVisible": true,
+        "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+        "results": {
+          "x": 0,
+          "y": 119.328125,
+          "width": 720,
+          "height": 261.28125,
+          "bottom": 380.609375,
+          "right": 720
+        },
+        "resultsOverflow": "auto",
+        "resultsClientHeight": 261,
+        "resultsScrollHeight": 276,
+        "visibleResultHeight": 261.28125,
+        "rows": [
+          {
+            "title": "Sleep and memory: an example reference",
+            "visibleHeight": 72.140625,
+            "fullyVisible": true
+          },
+          {
+            "title": "多言語の文献と記憶の研究",
+            "visibleHeight": 72.140625,
+            "fullyVisible": true
+          },
+          {
+            "title": "La mémoire et les langues du monde",
+            "visibleHeight": 67.953125,
+            "fullyVisible": false
+          }
+        ],
+        "fullyVisibleRows": 2,
+        "partlyVisibleRows": 1,
+        "footer": {
+          "x": 0,
+          "y": 421.984375,
+          "width": 720,
+          "height": 58.015625,
+          "bottom": 480,
+          "right": 720
+        },
+        "footerFullyVisible": true,
+        "selectedKeys": [
+          "example2026",
+          "研究2026"
+        ],
+        "domOrder": [
+          "search-bar",
+          "notices",
+          "visually-hidden",
+          "Selected references",
+          "results-area",
+          "format-preview",
+          "footer"
+        ]
+      },
+      "atPreview": {
+        "scrollY": 0,
+        "mainScrollTop": 0,
+        "preview": {
+          "x": 0,
+          "y": 380.609375,
+          "width": 720,
+          "height": 41.375,
+          "bottom": 421.984375,
+          "right": 720
+        },
+        "previewFullyVisible": true,
+        "footerFullyVisible": true
+      },
+      "menu": {
+        "x": 444.015625,
+        "y": 71.5625,
+        "width": 257.59375,
+        "height": 356.9375,
+        "bottom": 428.5,
+        "right": 701.609375,
+        "viewportFits": true,
+        "scrollY": 0,
+        "overlapsPreviewRegion": true
+      },
+      "errors": []
+    },
+    {
+      "case": "360-dark-normal",
+      "placement": "top",
+      "initial": {
+        "viewport": {
+          "width": 360,
+          "height": 320
+        },
+        "scrollY": 0,
+        "documentHeight": 601,
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 600.609375,
+          "bottom": 600.609375,
+          "right": 360
+        },
+        "mainScrollTop": 0,
+        "mainOverflow": "visible",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 89.390625,
+          "bottom": 89.390625,
+          "right": 360
+        },
+        "tray": {
+          "x": 0,
+          "y": 89.390625,
+          "width": 360,
+          "height": 49.375,
+          "bottom": 138.765625,
+          "right": 360
+        },
+        "preview": {
+          "x": 0,
+          "y": 138.765625,
+          "width": 360,
+          "height": 35,
+          "bottom": 173.765625,
+          "right": 360
+        },
+        "previewFullyVisible": true,
+        "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+        "results": {
+          "x": 0,
+          "y": 173.765625,
+          "width": 360,
+          "height": 353.484375,
+          "bottom": 527.25,
+          "right": 360
+        },
+        "resultsOverflow": "visible",
+        "resultsClientHeight": 353,
+        "resultsScrollHeight": 353,
+        "visibleResultHeight": 146.234375,
+        "rows": [
+          {
+            "title": "Sleep and memory: an example reference",
+            "visibleHeight": 105.65625,
+            "fullyVisible": false
+          },
+          {
+            "title": "多言語の文献と記憶の研究",
+            "visibleHeight": 0,
+            "fullyVisible": false
+          },
+          {
+            "title": "La mémoire et les langues du monde",
+            "visibleHeight": 0,
+            "fullyVisible": false
+          }
+        ],
+        "fullyVisibleRows": 0,
+        "partlyVisibleRows": 1,
+        "footer": {
+          "x": 0,
+          "y": 527.25,
+          "width": 360,
+          "height": 73.359375,
+          "bottom": 600.609375,
+          "right": 360
+        },
+        "footerFullyVisible": false,
+        "selectedKeys": [
+          "example2026",
+          "研究2026"
+        ],
+        "domOrder": [
+          "search-bar",
+          "notices",
+          "visually-hidden",
+          "Selected references",
+          "format-preview",
+          "results-area",
+          "footer"
+        ]
+      },
+      "atPreview": {
+        "scrollY": 0,
+        "mainScrollTop": 0,
+        "preview": {
+          "x": 0,
+          "y": 138.765625,
+          "width": 360,
+          "height": 35,
+          "bottom": 173.765625,
+          "right": 360
+        },
+        "previewFullyVisible": true,
+        "footerFullyVisible": false
+      },
+      "menu": {
+        "x": 120,
+        "y": 8,
+        "width": 224,
+        "height": 270.625,
+        "bottom": 278.625,
+        "right": 344,
+        "viewportFits": true,
+        "scrollY": 281,
+        "overlapsPreviewRegion": false
+      },
+      "errors": []
+    },
+    {
+      "case": "360-dark-normal",
+      "placement": "bottom",
+      "initial": {
+        "viewport": {
+          "width": 360,
+          "height": 320
+        },
+        "scrollY": 0,
+        "documentHeight": 601,
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 600.609375,
+          "bottom": 600.609375,
+          "right": 360
+        },
+        "mainScrollTop": 0,
+        "mainOverflow": "visible",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 89.390625,
+          "bottom": 89.390625,
+          "right": 360
+        },
+        "tray": {
+          "x": 0,
+          "y": 89.390625,
+          "width": 360,
+          "height": 49.375,
+          "bottom": 138.765625,
+          "right": 360
+        },
+        "preview": {
+          "x": 0,
+          "y": 492.25,
+          "width": 360,
+          "height": 35,
+          "bottom": 527.25,
+          "right": 360
+        },
+        "previewFullyVisible": false,
+        "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+        "results": {
+          "x": 0,
+          "y": 138.765625,
+          "width": 360,
+          "height": 353.484375,
+          "bottom": 492.25,
+          "right": 360
+        },
+        "resultsOverflow": "visible",
+        "resultsClientHeight": 353,
+        "resultsScrollHeight": 353,
+        "visibleResultHeight": 181.234375,
+        "rows": [
+          {
+            "title": "Sleep and memory: an example reference",
+            "visibleHeight": 118.375,
+            "fullyVisible": true
+          },
+          {
+            "title": "多言語の文献と記憶の研究",
+            "visibleHeight": 20.6875,
+            "fullyVisible": false
+          },
+          {
+            "title": "La mémoire et les langues du monde",
+            "visibleHeight": 0,
+            "fullyVisible": false
+          }
+        ],
+        "fullyVisibleRows": 1,
+        "partlyVisibleRows": 1,
+        "footer": {
+          "x": 0,
+          "y": 527.25,
+          "width": 360,
+          "height": 73.359375,
+          "bottom": 600.609375,
+          "right": 360
+        },
+        "footerFullyVisible": false,
+        "selectedKeys": [
+          "example2026",
+          "研究2026"
+        ],
+        "domOrder": [
+          "search-bar",
+          "notices",
+          "visually-hidden",
+          "Selected references",
+          "results-area",
+          "format-preview",
+          "footer"
+        ]
+      },
+      "atPreview": {
+        "scrollY": 281,
+        "mainScrollTop": 0,
+        "preview": {
+          "x": 0,
+          "y": 211.25,
+          "width": 360,
+          "height": 35,
+          "bottom": 246.25,
+          "right": 360
+        },
+        "previewFullyVisible": true,
+        "footerFullyVisible": true
+      },
+      "menu": {
+        "x": 120,
+        "y": 8,
+        "width": 224,
+        "height": 270.625,
+        "bottom": 278.625,
+        "right": 344,
+        "viewportFits": true,
+        "scrollY": 281,
+        "overlapsPreviewRegion": true
+      },
+      "errors": []
+    },
+    {
+      "case": "360-light-larger",
+      "placement": "top",
+      "initial": {
+        "viewport": {
+          "width": 360,
+          "height": 320
+        },
+        "scrollY": 0,
+        "documentHeight": 796,
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 795.84375,
+          "bottom": 795.84375,
+          "right": 360
+        },
+        "mainScrollTop": 0,
+        "mainOverflow": "visible",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 101.71875,
+          "bottom": 101.71875,
+          "right": 360
+        },
+        "tray": {
+          "x": 0,
+          "y": 101.71875,
+          "width": 360,
+          "height": 94.171875,
+          "bottom": 195.890625,
+          "right": 360
+        },
+        "preview": {
+          "x": 0,
+          "y": 195.890625,
+          "width": 360,
+          "height": 63.375,
+          "bottom": 259.265625,
+          "right": 360
+        },
+        "previewFullyVisible": true,
+        "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+        "results": {
+          "x": 0,
+          "y": 259.265625,
+          "width": 360,
+          "height": 426.1875,
+          "bottom": 685.453125,
+          "right": 360
+        },
+        "resultsOverflow": "visible",
+        "resultsClientHeight": 426,
+        "resultsScrollHeight": 426,
+        "visibleResultHeight": 60.734375,
+        "rows": [
+          {
+            "title": "Sleep and memory: an example reference",
+            "visibleHeight": 15.34375,
+            "fullyVisible": false
+          },
+          {
+            "title": "多言語の文献と記憶の研究",
+            "visibleHeight": 0,
+            "fullyVisible": false
+          },
+          {
+            "title": "La mémoire et les langues du monde",
+            "visibleHeight": 0,
+            "fullyVisible": false
+          }
+        ],
+        "fullyVisibleRows": 0,
+        "partlyVisibleRows": 1,
+        "footer": {
+          "x": 0,
+          "y": 685.453125,
+          "width": 360,
+          "height": 110.390625,
+          "bottom": 795.84375,
+          "right": 360
+        },
+        "footerFullyVisible": false,
+        "selectedKeys": [
+          "example2026",
+          "研究2026"
+        ],
+        "domOrder": [
+          "search-bar",
+          "notices",
+          "visually-hidden",
+          "Selected references",
+          "format-preview",
+          "results-area",
+          "footer"
+        ]
+      },
+      "atPreview": {
+        "scrollY": 0,
+        "mainScrollTop": 0,
+        "preview": {
+          "x": 0,
+          "y": 195.890625,
+          "width": 360,
+          "height": 63.375,
+          "bottom": 259.265625,
+          "right": 360
+        },
+        "previewFullyVisible": true,
+        "footerFullyVisible": false
+      },
+      "menu": {
+        "x": 84.015625,
+        "y": 9.203125,
+        "width": 257.59375,
+        "height": 259.125,
+        "bottom": 268.328125,
+        "right": 341.609375,
+        "viewportFits": true,
+        "scrollY": 447,
+        "overlapsPreviewRegion": false
+      },
+      "errors": []
+    },
+    {
+      "case": "360-light-larger",
+      "placement": "bottom",
+      "initial": {
+        "viewport": {
+          "width": 360,
+          "height": 320
+        },
+        "scrollY": 0,
+        "documentHeight": 796,
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 795.84375,
+          "bottom": 795.84375,
+          "right": 360
+        },
+        "mainScrollTop": 0,
+        "mainOverflow": "visible",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 101.71875,
+          "bottom": 101.71875,
+          "right": 360
+        },
+        "tray": {
+          "x": 0,
+          "y": 101.71875,
+          "width": 360,
+          "height": 94.171875,
+          "bottom": 195.890625,
+          "right": 360
+        },
+        "preview": {
+          "x": 0,
+          "y": 622.078125,
+          "width": 360,
+          "height": 63.375,
+          "bottom": 685.453125,
+          "right": 360
+        },
+        "previewFullyVisible": false,
+        "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+        "results": {
+          "x": 0,
+          "y": 195.890625,
+          "width": 360,
+          "height": 426.1875,
+          "bottom": 622.078125,
+          "right": 360
+        },
+        "resultsOverflow": "visible",
+        "resultsClientHeight": 426,
+        "resultsScrollHeight": 426,
+        "visibleResultHeight": 124.109375,
+        "rows": [
+          {
+            "title": "Sleep and memory: an example reference",
+            "visibleHeight": 78.71875,
+            "fullyVisible": false
+          },
+          {
+            "title": "多言語の文献と記憶の研究",
+            "visibleHeight": 0,
+            "fullyVisible": false
+          },
+          {
+            "title": "La mémoire et les langues du monde",
+            "visibleHeight": 0,
+            "fullyVisible": false
+          }
+        ],
+        "fullyVisibleRows": 0,
+        "partlyVisibleRows": 1,
+        "footer": {
+          "x": 0,
+          "y": 685.453125,
+          "width": 360,
+          "height": 110.390625,
+          "bottom": 795.84375,
+          "right": 360
+        },
+        "footerFullyVisible": false,
+        "selectedKeys": [
+          "example2026",
+          "研究2026"
+        ],
+        "domOrder": [
+          "search-bar",
+          "notices",
+          "visually-hidden",
+          "Selected references",
+          "results-area",
+          "format-preview",
+          "footer"
+        ]
+      },
+      "atPreview": {
+        "scrollY": 476,
+        "mainScrollTop": 0,
+        "preview": {
+          "x": 0,
+          "y": 146.078125,
+          "width": 360,
+          "height": 63.375,
+          "bottom": 209.453125,
+          "right": 360
+        },
+        "previewFullyVisible": true,
+        "footerFullyVisible": true
+      },
+      "menu": {
+        "x": 84.015625,
+        "y": 9.203125,
+        "width": 257.59375,
+        "height": 259.125,
+        "bottom": 268.328125,
+        "right": 341.609375,
+        "viewportFits": true,
+        "scrollY": 447,
+        "overlapsPreviewRegion": true
+      },
+      "errors": []
+    }
+  ]
+}
