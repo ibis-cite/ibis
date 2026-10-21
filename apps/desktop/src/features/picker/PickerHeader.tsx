@@ -5,7 +5,7 @@ import { FormatSelect } from "./FormatSelect";
 
 /** The search bar: the search box, the copy format and the pin. It is also
  * the window's drag region; the editable box itself is not. */
-export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, pinned, onTogglePin }: {
+export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, pinned, onTogglePin, tokens }: {
   inputRef: React.Ref<HTMLInputElement>;
   query: string;
   onQueryChange: (query: string) => void;
@@ -19,20 +19,20 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   onFormatChange: (choice: Choice) => void;
   pinned: boolean;
   onTogglePin: () => void;
+  /** Preview prototype (gallery only): chosen references as tokens before the query. */
+  tokens?: React.ReactNode;
 }) {
-  return (
-    <header className="search-bar" data-tauri-drag-region title={pickerText.dragSearchBar}>
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <circle cx="10.5" cy="10.5" r="6.5" />
-        <path d="m16 16 5 5" />
-      </svg>
-      <label className="visually-hidden" htmlFor="search">
-        {pickerText.searchLabel}
-      </label>
-      <input
+  const glass = (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m16 16 5 5" />
+    </svg>
+  );
+  const input = (
+    <input
         id="search"
         type="search"
-        placeholder={pickerText.searchPlaceholder}
+        placeholder={tokens ? "Add another…" : pickerText.searchPlaceholder}
         role="combobox"
         aria-autocomplete="list"
         aria-expanded={expanded}
@@ -44,6 +44,14 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
         onChange={(e) => onQueryChange(e.target.value)}
         onKeyDown={onSearchKeyDown}
       />
+  );
+  return (
+    <header className="search-bar" data-tauri-drag-region title={pickerText.dragSearchBar}>
+      {!tokens && glass}
+      <label className="visually-hidden" htmlFor="search">
+        {pickerText.searchLabel}
+      </label>
+      {tokens ? <span className="out-field">{glass}{tokens}{input}</span> : input}
       <FormatSelect format={format} styles={styles} onChange={onFormatChange} />
       <button
         type="button"

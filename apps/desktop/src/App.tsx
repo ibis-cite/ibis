@@ -14,6 +14,7 @@ import { composing, isKeysShortcut, isMenuShortcut, isQuitShortcut } from "./fea
 import { PickerHeader } from "./features/picker/PickerHeader";
 import { Notices, type Operation } from "./features/picker/Notices";
 import { FormatPreview, SelectionTray } from "./features/picker/SelectionTray";
+import { CitationShelf, DetailPane, OutputText, outputVariant, SearchTokens } from "./features/picker/prototype/CitationOutput";
 import { ResultList } from "./features/picker/ResultList";
 import { EmptyState } from "./features/picker/EmptyState";
 import { PickerFooter } from "./features/picker/PickerFooter";
@@ -634,6 +635,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // A formatted citation still being made, or one that failed, is not copied.
   const enterAction = chosen.length === 0 || shown === "stale" || (style && (shown === null || shown === "failed")) ? null
     : chosen.length > 1 ? keyText.copySeveralAs(chosen.length, choiceName(format)) : keyText.copyAs(choiceName(format));
+  // Preview prototype (gallery only): which placement, if any, replaces the tray and preview.
+  const variant = outputVariant();
+  const removeChosen = (r: SearchResult) => { toggle(r); input.current?.focus({ preventScroll: true }); };
+  const selectedList = [...selected.values()];
+  const enterHint = enterAction;
   const highlighted = current[active];
   const shiftEnterAction = highlighted
     ? (selected.has(idKey(highlighted.id)) ? keyText.removeFromCitation : keyText.addToCitation) : null;
@@ -641,7 +647,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
 
   return (
     <main
-      data-selection={selected.size > 0 || undefined}
+      data-selection={selected.size > 0 || variant !== null || undefined}
       onFocus={(e) => setSearchFocused(e.target === input.current)}
       onBlur={() => setSearchFocused(false)}
       onKeyDown={(e) => {
@@ -709,15 +715,17 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         onFormatChange={chooseFormat}
         pinned={pinned}
         onTogglePin={togglePin}
+        tokens={variant === "c" && selected.size > 0 ? <SearchTokens selected={selectedList} onRemove={removeChosen} /> : undefined}
       />
       <div className="picker-content">
       <Notices library={library} busy={busy} loadingMessage={loadingMessage} failures={failures} startAtLogin={startAtLogin}
         error={error} copyError={copyError} copied={copied} onDismissCopied={() => setCopied(null)} />
-      <SelectionTray announce={selectionChanged} selected={selected} removeLabel={removeLabel} onRemove={(r) => {
+      <SelectionTray announce={selectionChanged} selected={variant ? new Map() : selected} removeLabel={removeLabel} onRemove={(r) => {
         toggle(r);
         input.current?.focus({ preventScroll: true });
       }} />
-      {style && chosen.length > 0 && <FormatPreview style={style} shown={shown} focusable={selected.size > 0} />}
+      {!variant && style && chosen.length > 0 && <FormatPreview style={style} shown={shown} focusable={selected.size > 0} />}
+      <div className={variant === "a" ? "proto-split" : "proto-column"}>
       <div className="results-area">
         <div className="results-heading" aria-hidden="true">
           <span>{query ? pickerText.bestMatches : pickerText.references}</span><span>{results.length > 0 ? pickerText.resultCount(results.length) : ""}</span>
@@ -755,9 +763,13 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             } />
         )}
       </div>
+      {variant === "a" && results.length > 0 && <DetailPane format={format} chosen={chosen} selected={selectedList} focused={highlighted} shown={shown} onRemove={removeChosen} />}
+      </div>
+      {(variant === "b" || variant === "h") && <CitationShelf variant={variant} format={format} chosen={chosen} selected={selectedList} shown={shown} onRemove={removeChosen} />}
       </div>
       <PickerFooter library={library} groupName={groupName}
-        hints={{ enter: enterAction, shiftEnter: shiftEnterAction, escape: escapeAction }}
+        leading={variant === "c" && chosen.length > 0 ? <OutputText format={format} chosen={chosen} shown={shown} /> : undefined}
+        hints={{ enter: enterHint, shiftEnter: shiftEnterAction, escape: escapeAction }}
         altHeld={altHeld} searchFocused={searchFocused}
         moreButtonRef={moreButton} menuOpen={menuOpen}
         onMoreClick={() => (menuOpen ? closeMenu(true) : setMenuOpen(true))}

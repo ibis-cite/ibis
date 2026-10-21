@@ -27,6 +27,10 @@ export type GalleryState = {
   tray?: number;
   formatted?: boolean;
   keys?: boolean;
+  /** Preview prototype: the key syntax copied, and realistic synthetic CSL for the formatted preview. */
+  keyFormat?: "pandoc" | "autocite" | "typst";
+  citeData?: boolean;
+  formatFails?: boolean;
 };
 
 /**
@@ -122,6 +126,32 @@ const largeSelection = Array.from({ length: 50 }, (_, i) => reference(
   `synthetic_${String(i + 1).padStart(2, "0")}_${"long_key_".repeat(5)}`,
   `Selection study ${i + 1}: a synthetic reference`, "Example, Sample", "Journal of Synthetic Studies"));
 
+// Preview prototype (design/preview-prototype): realistic, wholly synthetic
+// references, so the formatted output reads like a real citation.
+type Paper = { key: string; title: string; authors: [string, string][]; year: number; container: string; type: string };
+const papers: Paper[] = [
+  { key: "garcia2021", title: "Sleep spindles predict overnight memory consolidation", authors: [["Lucía", "García"], ["Chidi", "Okafor"]], year: 2021, container: "Journal of Synthetic Sleep Research", type: "article-journal" },
+  { key: "lindqvist2019", title: "Targeted memory reactivation during slow-wave sleep", authors: [["Elin", "Lindqvist"], ["Sami", "Haddad"], ["Aiko", "Mori"]], year: 2019, container: "Proceedings of the Example Society for Memory", type: "paper-conference" },
+  { key: "nakamura2020", title: "Rapid eye movement sleep and emotional memory", authors: [["Ren", "Nakamura"], ["Ivan", "Petrov"]], year: 2020, container: "Annals of Imaginary Neuroscience", type: "article-journal" },
+  { key: "okafor2023", title: "Napping and recall: a synthetic meta-analysis", authors: [["Chidi", "Okafor"]], year: 2023, container: "Example University Press", type: "book" },
+  { key: "haddad2018", title: "Memory, sleep and the ageing brain", authors: [["Sami", "Haddad"], ["Lucía", "García"]], year: 2018, container: "Handbook of Synthetic Memory", type: "chapter" },
+  { key: "petrov2022", title: "Sleep deprivation and working memory in students", authors: [["Ivan", "Petrov"]], year: 2022, container: "Example Institute of Learning", type: "thesis" },
+  { key: "mori2017", title: "Memory replay in a synthetic hippocampus model", authors: [["Aiko", "Mori"], ["Elin", "Lindqvist"]], year: 2017, container: "Journal of Synthetic Sleep Research", type: "report" },
+  { key: "haddad2024", title: "دراسة تخيلية عن النوم والذاكرة", authors: [["سامي", "حداد"]], year: 2024, container: "مجلة الدراسات التخيلية", type: "article-journal" },
+];
+const paperResults: SearchResult[] = papers.map((p) => ({ revision: "gallery", id: { source: "synthetic-gallery", native_key: p.key }, key: p.key, title: p.title,
+  authors: p.authors.map(([, family]) => family).join(", "), year: p.year, matched: ["title"], first_author: p.authors[0]![1], author_count: p.authors.length,
+  container: p.container, item_type: p.type }));
+const paperCsl = (key: string) => {
+  const p = papers.find((candidate) => candidate.key === key);
+  return p ? { id: p.key, type: p.type, title: p.title, author: p.authors.map(([given, family]) => ({ given, family })),
+    issued: { "date-parts": [[p.year]] }, "container-title": p.container } : { id: key, type: "book", title: "Synthetic preview pressure", author: [{ family: key }], issued: { "date-parts": [[2026]] } };
+};
+const keySyntax = (format: string, keys: string[]) => format === "autocite" ? `\\autocite{${keys.join(",")}}`
+  : format === "typst" ? keys.map((key) => `@${key}`).join(" ") : `[${keys.map((key) => `@${key}`).join("; ")}]`;
+const preview = (id: string, label: string, extra: Partial<GalleryState>): GalleryState => ({ id, label, library: library({ references: 1204 }),
+  query: "sleep memory", results: paperResults, citeData: true, pinned: false, ...extra });
+
 export const galleryStates: readonly GalleryState[] = [
   { id: "first-run", label: "First run", library: library({ state: "none", name: null, snapshot_name: null, has_snapshot: false, zotero: false, references: 0 }) },
   { id: "loading", label: "Opening a library", library: library({ state: "loading", has_snapshot: false, zotero: false, snapshot_name: null, references: 0 }) },
@@ -161,6 +191,15 @@ export const galleryStates: readonly GalleryState[] = [
   { id: "compact", label: "Compact rows", library: library(), query: "memory", results: many, density: "compact", tray: 2 },
   { id: "spacious", label: "Spacious rows", library: library(), query: "memory", results: many, density: "spacious", tray: 2 },
   { id: "larger-text", label: "Larger text setting", library: library(), query: "memory", results: examples, largerTextSetting: true },
+  preview("out-one-apa", "Preview: one reference, APA", { formatted: true }),
+  preview("out-many-apa", "Preview: three references, APA", { formatted: true, tray: 3 }),
+  preview("out-one-pandoc", "Preview: one reference, Pandoc", { keyFormat: "pandoc" }),
+  preview("out-many-pandoc", "Preview: three references, Pandoc", { keyFormat: "pandoc", tray: 3 }),
+  preview("out-seven-apa", "Preview: seven references, APA", { formatted: true, tray: 7 }),
+  preview("out-error", "Preview: style could not format", { formatted: true, tray: 2, formatFails: true }),
+  preview("out-larger", "Preview: three references, Larger text", { formatted: true, tray: 3, largerTextSetting: true }),
+  preview("out-rtl", "Preview: right-to-left, APA", { formatted: true, tray: 2, direction: "rtl", query: "الذاكرة", results: [paperResults[7]!, ...paperResults.slice(0, 4)] }),
+  { id: "out-stress", label: "Preview: 50 long keys, APA", library: library({ references: 50 }), query: "selection", results: largeSelection, tray: 50, formatted: true, citeData: true },
 ];
 
 export function galleryProvider(state: GalleryState): { api: PickerApi; preview: PickerPreview } {
@@ -169,14 +208,20 @@ export function galleryProvider(state: GalleryState): { api: PickerApi; preview:
     api: {
       libraryStatus: async () => state.library,
       search: async () => ({ revision: state.library.revision, results: state.results ?? [] }),
-      copyCitation: async (ids) => ({ text: (state.tray ?? 0) >= 20 ? `[@${ids.map((id) => id.native_key).join("; @")}]` : "[@example2026]", warnings: [] }),
-      ...((state.tray ?? 0) >= 20 ? {
+      copyCitation: async (ids) => state.citeData ? { text: keySyntax(state.keyFormat ?? "pandoc", ids.map((id) => id.native_key)), warnings: [] } : ({ text: (state.tray ?? 0) >= 20 ? `[@${ids.map((id) => id.native_key).join("; @")}]` : "[@example2026]", warnings: [] }),
+      ...(state.citeData ? {
+        cslItems: async (ids: Parameters<NonNullable<PickerApi["cslItems"]>>[0]) => {
+          if (state.formatFails) throw new Error("synthetic formatting failure");
+          return JSON.stringify(ids.map((id) => paperCsl(id.native_key)));
+        },
+        copyFormatted: async () => null,
+      } : (state.tray ?? 0) >= 20 ? {
         cslItems: async (ids: Parameters<NonNullable<PickerApi["cslItems"]>>[0]) => JSON.stringify(ids.map((id) => ({
           id: id.native_key, type: "book", title: "Synthetic preview pressure", author: [{ family: id.native_key }], issued: { "date-parts": [[2026]] },
         }))),
         copyFormatted: async () => null,
       } : {}),
-      copyFormat: async () => "pandoc",
+      copyFormat: async () => state.keyFormat ?? "pandoc",
       pickerPreferences: async () => ({ citation_style: state.formatted ? "apa" : null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false }),
       setPickerPreferences: async () => null,
       shortcutStatus: async () => ({ shortcut: "Ctrl+Shift+Y", registered: true, error: null }),

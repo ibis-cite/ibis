@@ -12,7 +12,7 @@ export type KeyHints = { enter: string | null; shiftEnter: string | null; escape
 
 /** The footer: library status, what Enter (or, with Alt held, the other keys)
  * does now, and the More button with its menu. */
-export function PickerFooter({ library, groupName, hints, altHeld, searchFocused, moreButtonRef, menuOpen, onMoreClick, menu }: {
+export function PickerFooter({ library, groupName, hints, altHeld, searchFocused, moreButtonRef, menuOpen, onMoreClick, menu, leading }: {
   library: LibraryStatus | null | undefined;
   groupName: (id: number) => string;
   hints: KeyHints;
@@ -25,11 +25,14 @@ export function PickerFooter({ library, groupName, hints, altHeld, searchFocused
   onMoreClick: () => void;
   /** The More menu, while it is open. */
   menu: React.ReactNode;
+  /** Preview prototype (gallery only): replaces the library line with the output. */
+  leading?: React.ReactNode;
 }) {
   return (
     <footer>
       <section aria-label={pickerText.libraryRegion} className="library-bar">
-        <LibraryStatusLine library={library} groupName={groupName} />
+        {leading}
+        {leading ? <span className="visually-hidden"><LibraryStatusLine library={library} groupName={groupName} /></span> : <LibraryStatusLine library={library} groupName={groupName} />}
         <small className="enter-hints" aria-label={keyText.footer} role="group">
           {altHeld ? <>
             {hints.shiftEnter && <span className="search-hint" aria-hidden={!searchFocused}><kbd>{label(keysFor("add"))}</kbd> {hints.shiftEnter}</span>}

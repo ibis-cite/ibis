@@ -272,12 +272,13 @@ async function expectRenderedFixture(id: string): Promise<void> {
   }
 }
 
-test.each(galleryStates.filter((state) => (state.tray ?? 0) < 20).map((state) => state.id))(
+// Preview prototype states (out-*) are captured in the browser only.
+test.each(galleryStates.filter((state) => (state.tray ?? 0) < 20 && !state.id.startsWith("out-")).map((state) => state.id))(
   "the rendered %s fixture acknowledges exactly that state", expectRenderedFixture,
 );
 // Up to 100 committed interactions and full 50-row DOM checks exceed the default
 // wall-clock limit on CI. Keep these bounded separately from app latency budgets.
-test.each(galleryStates.filter((state) => (state.tray ?? 0) >= 20).map((state) => state.id))(
+test.each(galleryStates.filter((state) => (state.tray ?? 0) >= 20 && !state.id.startsWith("out-")).map((state) => state.id))(
   "the rendered %s fixture acknowledges exactly that state", { timeout: 15_000 }, expectRenderedFixture,
 );
 

@@ -16,6 +16,8 @@ import "./notice.css";
 import "./themes/depth-a.css";
 import "./themes/depth-b.css";
 import "./themes/depth-c.css";
+// Preview prototype (design/preview-prototype): toggled only here by ?preview=a|b|c|h.
+import "./features/picker/prototype/output-prototype.css";
 import { noticePlatform, renderNotice } from "./copyFeedback";
 
 function rendered(root: HTMLElement, state: GalleryState): boolean {
@@ -70,6 +72,8 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
 }
 
 function selectionContained(root: HTMLElement, state: GalleryState): boolean {
+  // The preview prototype moves the tray and preview; its frames are checked by eye.
+  if (document.documentElement.dataset.preview) return true;
   const main = root.querySelector("main");
   // Zero-size JSDOM geometry is not browser evidence.
   if (!state.tray || !main?.getBoundingClientRect().width) return true;
@@ -112,8 +116,11 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
     && (pinButton(root)?.getAttribute("aria-pressed") === "true") === Boolean(state.pinned)
     && (root.querySelector('[role="menu"]') !== null) === Boolean(state.menuOpen)
     && (root.querySelector('[role="dialog"]') !== null) === Boolean(state.keys)
-    && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li`).length === (state.tray ?? 0)
-    && (!state.formatted || root.querySelector(".format-preview .preview-text") !== null)
+    && (document.documentElement.dataset.preview
+      ? (!state.formatted || (document.documentElement.dataset.preview === "c" ? root.querySelector("footer .out-prose") !== null
+        : document.documentElement.dataset.preview === "h" || root.querySelector(".out-prose, .out-problem") !== null))
+      : root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li`).length === (state.tray ?? 0)
+        && (!state.formatted || root.querySelector(".format-preview .preview-text") !== null))
     && selectionContained(root, state);
 }
 
@@ -287,6 +294,8 @@ trackInputModality();
     // Variant C shows a synthetic stand-in for the native material behind the page.
     if (depth === "c") document.documentElement.dataset.galleryMaterial = "simulated";
   }
+  const preview = new URLSearchParams(window.location.search).get("preview");
+  if (preview === "a" || preview === "b" || preview === "c" || preview === "h") document.documentElement.dataset.preview = preview;
 }
 const root = document.getElementById("root");
 if (root && (import.meta.env.DEV || import.meta.env.MODE === "evidence")) {

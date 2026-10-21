@@ -1,0 +1,121 @@
+/* Preview prototype (design/preview-prototype), gallery only. Every rule sits
+   under :root[data-preview], which only gallery.tsx sets (?preview=a|b|c|h).
+   It builds on the soft-depth tokens (depth-b.css) when ?depth=b is on and
+   falls back to the shipped tokens otherwise. */
+
+.proto-column, .proto-split { display: contents; }
+:root[data-preview] .proto-column { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+:root[data-preview] .proto-column > .results-area { flex: 1; min-height: 0; overflow: auto; }
+/* The legacy tray band is never drawn in the prototype; its live region stays. */
+:root[data-preview] .picker-content > ul[aria-label="Selected references"] { display: none; }
+
+:root[data-preview] {
+  --out-surface: var(--depth-raised, var(--surface));
+  --out-recess: var(--depth-base, var(--button-background));
+  --out-chip: var(--depth-chip, var(--button-background));
+  --out-chip-hover: var(--button-hover-background);
+  --out-shadow: inset 0 1px 0 var(--depth-highlight, transparent), var(--depth-card-shadow, 0 0 0 1px var(--separator));
+  --out-radius: var(--depth-card-radius, var(--r-row));
+  --out-chip-radius: 999px;
+  --out-chip-h: 1.75rem;
+  /* The glyph sits centred over the tile column; text starts where row titles start. */
+  --out-lead: calc(var(--row-pad) + (var(--tile-size) - 1rem) / 2);
+  --out-gap: calc((var(--tile-size) - 1rem) / 2 + var(--row-gap));
+}
+:root[data-preview][data-platform="windows"] { --out-chip-radius: 4px; }
+:root[data-preview][data-platform="linux"] { --out-chip-radius: 999px; }
+
+/* ---------- The output line, shared by every placement ---------- */
+.out-line { display: flex; align-items: center; gap: var(--out-gap); min-height: 2.5rem; padding-inline: var(--out-lead) var(--row-pad); font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--text); }
+.out-glyph { flex: none; width: 1rem; height: 1rem; color: var(--citation); }
+.out-glyph[data-state="failed"] { color: var(--status-stop); }
+.out-glyph[data-state="stale"] { color: var(--status-look); }
+.out-glyph[data-state="pending"] { opacity: .45; }
+.out-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; unicode-bidi: isolate; text-align: start; }
+.out-prose { font-family: var(--font-family); }
+.out-prose i, .out-prose em { font-style: italic; }
+.out-keys { font-family: var(--font-mono); font-size: var(--type-citation-size); letter-spacing: -.01em; }
+.out-keys .p { color: var(--muted); }
+.out-keys .k { color: var(--text); }
+.out-pending, .out-problem { color: var(--muted); }
+.out-line[data-state="failed"] .out-problem, .out-line[data-state="stale"] .out-problem { color: var(--text); }
+.out-flag { flex: none; padding: 0 var(--space-2); border-radius: 999px; background: var(--out-recess); color: var(--muted); font-size: var(--type-label-size); line-height: 1.25rem; }
+.out-line[data-wrap] { align-items: flex-start; padding: var(--space-2) var(--space-3); }
+.out-line[data-wrap] .out-glyph { margin-top: .0625rem; }
+.out-line[data-wrap] .out-text { white-space: normal; overflow-wrap: anywhere; max-height: calc(6 * var(--type-meta-line)); overflow: auto; text-overflow: clip; }
+.out-line[data-wrap] { gap: var(--space-2); }
+
+/* ---------- Chips ---------- */
+.out-chips, .out-tokens { display: flex; flex-wrap: nowrap; gap: var(--space-1); list-style: none; margin: 0; padding: 2px 0; min-width: 0; overflow: clip; }
+.out-chips[data-measuring] { flex-wrap: wrap; }
+.out-chips[data-measuring] li[data-hidden] { display: inline-flex !important; }
+.out-chips[data-measuring] li[data-more] { display: inline-flex !important; }
+.out-chips[data-wrap] { flex-wrap: wrap; }
+.out-chips li[data-hidden] { display: none; }
+.out-chips li, .out-tokens li { flex: none; display: inline-flex; align-items: center; gap: 0; height: var(--out-chip-h); max-width: 14rem; padding-inline: var(--space-3) var(--space-1); border-radius: var(--out-chip-radius); background: var(--out-chip); color: var(--text); font-size: var(--type-meta-size); font-weight: 500; white-space: nowrap; }
+.chip-label { overflow: hidden; text-overflow: ellipsis; unicode-bidi: isolate; }
+.chip-remove { position: relative; display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; margin-inline-start: var(--space-1); padding: 0; border: 0; border-radius: 999px; background: var(--clear); color: var(--muted); }
+/* A 32 px target around the 20 px glyph (rule 4). */
+.chip-remove::before { content: ""; position: absolute; inset: -.375rem; }
+.chip-remove:hover { background: var(--out-chip-hover); color: var(--text); }
+.out-chips li[data-more] { padding: 0; background: var(--clear); }
+.chip-more { height: var(--out-chip-h); padding: 0 var(--space-2); border: 0; border-radius: var(--out-chip-radius); background: var(--clear); color: var(--muted); font-size: var(--type-meta-size); font-weight: 600; }
+.chip-more:hover { background: var(--out-chip-hover); color: var(--text); }
+:root[data-platform="windows"] .out-chips li, :root[data-platform="windows"] .out-tokens li { box-shadow: 0 0 0 1px var(--button-edge); }
+
+/* ---------- B: the citation shelf, just above the footer ---------- */
+.out-shelf { flex: none; display: flex; flex-direction: column; margin: 0 var(--inset) var(--space-1); background: var(--out-surface); border-radius: var(--out-radius); box-shadow: var(--out-shadow); }
+.out-shelf-tray { display: flex; align-items: center; gap: var(--space-2); min-height: 2.5rem; padding-inline: var(--row-pad); }
+.out-shelf-tray + .out-line { border-top: var(--border-width) solid var(--separator); margin-inline: 0; }
+:root[data-platform="linux"] .out-shelf { margin: 0; border-radius: 0; box-shadow: none; background: var(--clear); border-top: var(--border-width) solid var(--separator); }
+:root[data-platform="linux"] .out-shelf + footer, :root[data-platform="linux"] .picker-content:has(.out-shelf) + footer { border-top-color: var(--separator); }
+/* The footer under a shelf drops its own rule: the card already separates them. */
+:root[data-preview]:not([data-platform="linux"]) .picker-content:has(.out-shelf) + footer { border-top-color: var(--clear); }
+
+/* ---------- A: the detail pane ---------- */
+:root[data-preview="a"] .proto-split { display: flex; flex: 1; min-height: 0; }
+:root[data-preview="a"] .proto-split > .results-area { flex: 1 1 58%; min-width: 0; overflow: auto; }
+.out-pane { flex: 0 0 42%; min-width: 15rem; max-width: 26rem; display: flex; flex-direction: column; gap: var(--space-4); min-height: 0; overflow: auto; padding: var(--space-4) var(--space-4) var(--space-3); border-inline-start: var(--border-width) solid var(--separator); background: var(--depth-sheet, var(--surface)); }
+.out-focus-type { display: flex; align-items: center; gap: var(--space-2); color: var(--muted); font-size: var(--type-label-size); font-weight: 600; letter-spacing: .02em; }
+.out-focus-tile { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: var(--r-min); background: var(--tile-background); }
+.out-focus-tile svg { width: 1rem; height: 1rem; }
+.out-focus-title { margin: var(--space-2) 0 var(--space-3); font-size: var(--type-title-size); line-height: var(--type-title-line); font-weight: 600; letter-spacing: -.01em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.out-meta { display: grid; grid-template-columns: 4rem 1fr; gap: var(--space-1) var(--space-3); margin: 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); }
+.out-meta dt { color: var(--muted); }
+.out-meta dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.out-meta code { font-family: var(--font-mono); font-size: var(--type-label-size); }
+.out-pane h3 { margin: 0 0 var(--space-2); color: var(--muted); font-size: var(--type-label-size); font-weight: 600; letter-spacing: .02em; }
+.out-pane-output { margin-top: auto; }
+.out-pane-output .out-line { background: var(--out-recess); border-radius: var(--r-tile); }
+:root[data-platform="windows"] .out-pane { background: var(--clear); }
+
+/* ---------- C: tokens in the search field ---------- */
+.out-field { flex: 1; display: flex; align-items: center; gap: var(--space-1); min-width: 0; }
+.out-field > svg { margin-inline: var(--lead) calc(var(--lead-gap) - var(--search-gap) - var(--space-1)); }
+.out-field #search { min-width: 6rem; }
+:root[data-preview="c"][data-platform="windows"] .out-field, :root[data-preview="c"][data-platform="linux"] .out-field { height: var(--field-h); border-radius: var(--r-row); background: var(--field-background); padding-inline-end: var(--space-1); }
+:root[data-preview="c"][data-platform="windows"] .out-field { border: var(--border-width) solid var(--field-edge); box-shadow: inset 0 -2px 0 var(--accent); background: var(--surface); }
+:root[data-preview="c"][data-platform="windows"] .out-field > svg, :root[data-preview="c"][data-platform="linux"] .out-field > svg { position: static; margin-inline: var(--lead) calc(var(--lead-gap) - var(--search-gap) - var(--space-1)); }
+:root[data-preview="c"][data-platform="windows"] .out-field #search, :root[data-preview="c"][data-platform="linux"] .out-field #search { padding: 0; border: 0; background: var(--clear); box-shadow: none; height: auto; }
+:root[data-preview="c"][data-platform="macos"] .out-field #search { font-size: var(--type-search-size); }
+.out-tokens li { height: 1.75rem; }
+.out-tokens li[data-more] { padding-inline: var(--space-2); color: var(--muted); font-weight: 600; }
+
+/* Larger text: chips and lines grow with the text; nothing new wraps. */
+@media (forced-colors: active) {
+  .out-chips li, .out-tokens li, .out-shelf, .out-pane-output .out-line { border: 1px solid CanvasText; }
+  .out-glyph { color: CanvasText; }
+}
+
+/* The shipped tray styles address the list by its label; undo them here. */
+:root[data-preview] .out-chips[aria-label], :root[data-preview] .out-tokens[aria-label] { border: 0; padding: 2px 0; flex-wrap: nowrap; }
+:root[data-preview] .out-chips[data-wrap][aria-label], :root[data-preview] .out-chips[data-measuring][aria-label] { flex-wrap: wrap; }
+:root[data-preview] .out-chips[aria-label] li, :root[data-preview] .out-tokens[aria-label] li { border: 0; overflow-wrap: normal; }
+:root[data-preview] .out-chips[aria-label] li[data-more] { background: var(--clear); }
+:root[data-preview] .out-chips [data-hidden] { display: none; }
+:root[data-preview] .out-chips[data-measuring] [data-hidden] { display: inline-flex; }
+/* C: the output takes the footer's leading slot. */
+footer .out-line { flex: 1; min-width: 0; min-height: 0; padding-inline: 0; gap: var(--space-2); font-size: var(--footer-size); }
+footer .out-line .out-keys { font-size: var(--footer-size); }
+:root[data-preview] main .out-chips[aria-label], :root[data-preview] main .out-tokens[aria-label] { flex: 0 1 auto; min-width: 0; max-height: none; overflow: clip; }
+:root[data-preview][data-platform="linux"] { --out-chip: var(--button-background); }
