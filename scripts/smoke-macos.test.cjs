@@ -330,7 +330,7 @@ assert.deepEqual(aliased.invoke(), {nodes: aliased.states[0].names.map(name => (
     name, role: 'AXComboBox', value: 'smoke099999', focused: true})), visible: true, foreground: true});
 assert.deepEqual(aliased.reads, [{role: 1, value: 1, focused: 1}]);
 assert.deepEqual(aliased.phases(), {bootstrap_ms: 1, tree_ms: 1, properties_ms: 1,
-    visibility_ms: 1, helper_ms: 4, elements: 1});
+    visibility_ms: 1, helper_ms: 7, elements: 1});
 aliased.states[0].role = 'AXButton';
 aliased.states[0].value = 'new value';
 aliased.states[0].focused = false;
