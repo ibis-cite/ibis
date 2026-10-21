@@ -4,8 +4,6 @@
 gradient, full bleed and unmasked. `small.svg` widens the neck to 11 units and
 removes the eye. Both retain the original curves. The one-colour symbolic
 master uses a 16px grid and a 1.75px neck. Do not centre the bird geometrically.
-Its optical transform is flattened into the path coordinates so the stroke
-scales to 3.5px at 2×; do not use a non-scaling stroke.
 
 From the repository root, with the locked `cargo tauri` 2.12.3 and librsvg's
 `rsvg-convert` (available in Linux CI):
