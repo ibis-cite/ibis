@@ -152,7 +152,9 @@ test("the search text starts where row titles start, with the glyph over the til
   expect(rules(styles, '[role="option"]')).toMatch(/gap:\s*var\(--row-gap\)/);
   expect(rules(styles, ".results-area")).toMatch(/padding:\s*var\(--inset\)/);
   // The framed box's text start pays for its 1 px border.
-  expect(rules(styles, ':root[data-platform="windows"] #search')).toMatch(/padding:\s*0 var\(--space-1\) 0 calc\(var\(--lead\) \+ var\(--search-icon-width\) \+ var\(--lead-gap\) - var\(--border-width\)\)/);
+  expect(rules(styles, ':root[data-platform="windows"] #search')).toMatch(/padding-inline-start:\s*calc\(var\(--lead\) \+ var\(--search-icon-width\) \+ var\(--lead-gap\) - var\(--border-width\)\)/);
+  // Logical sides only, so a right-to-left picker mirrors.
+  expect(rules(styles, "footer")).toMatch(/padding-inline:\s*var\(--footer-padding\)/);
 });
 
 test("window radius follows each platform and macOS matches the native corner", () => {

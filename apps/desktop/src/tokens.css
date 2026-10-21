@@ -148,7 +148,7 @@
   --selection-gap: .4rem;
   --selection-padding: .6rem 1rem;
   --selection-label-padding: .5rem;
-  --footer-padding: 0 var(--inset) 0 calc(var(--inset) + var(--row-pad));
+  --footer-padding: calc(var(--inset) + var(--row-pad)) var(--inset); /* inline start, end */
   --footer-size: var(--type-label-size);
   --footer-gap: .4rem;
   --library-min-width: 14rem;

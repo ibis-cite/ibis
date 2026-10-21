@@ -47,7 +47,7 @@ main {
    the box starts at the inset and its text still starts at the row titles. */
 /* Only the search glyph (the header's direct child), never the pin icon inside its button. */
 :root[data-platform="windows"] .search-bar > svg, :root[data-platform="linux"] .search-bar > svg { position: relative; z-index: 1; margin-inline: var(--lead) calc(-1 * (var(--lead) + var(--search-icon-width) + var(--search-gap))); }
-:root[data-platform="windows"] #search, :root[data-platform="linux"] #search { padding: 0 var(--space-1) 0 calc(var(--lead) + var(--search-icon-width) + var(--lead-gap) - var(--border-width)); border-radius: var(--r-row); background: var(--field-background); }
+:root[data-platform="windows"] #search, :root[data-platform="linux"] #search { padding: 0 var(--space-1); padding-inline-start: calc(var(--lead) + var(--search-icon-width) + var(--lead-gap) - var(--border-width)); border-radius: var(--r-row); background: var(--field-background); }
 /* Windows: like a Fluent TextBox, focus turns the field solid with a 2 px accent
    underline and no ring (TextBox does not use the system focus visual). */
 :root[data-platform="windows"] #search { border: var(--border-width) solid var(--field-edge); border-bottom-color: var(--line); }
@@ -137,7 +137,7 @@ main {
 [aria-label="Selected references"] li { border: var(--border-width) solid var(--line); border-radius: var(--button-radius); padding-inline-start: var(--selection-label-padding); overflow-wrap: anywhere; max-width: 100%; }
 [aria-label="Selected references"] button { border: 0; background: var(--clear); font-size: var(--metadata-size); }
 
-footer { display: flex; align-items: center; border-top: var(--border-width) solid var(--line); padding: var(--footer-padding); font-size: var(--footer-size); min-height: var(--footer-height); }
+footer { display: flex; align-items: center; border-top: var(--border-width) solid var(--line); padding-block: 0; padding-inline: var(--footer-padding); font-size: var(--footer-size); min-height: var(--footer-height); }
 .library-bar { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--footer-gap); }
 /* One line that never pushes the keys aside: the age after the source and count
    is cut first, and the tooltip and More keep the whole detail. */
