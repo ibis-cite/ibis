@@ -29,7 +29,7 @@ Xcode 26 or later; never add a guessed compiled catalog.
 Two platform adaptations need the maintainer's final look. Windows uses the
 same curves in G1 on transparency, with an eye cutout, to satisfy the no-tile
 requirement; this is a proposed adaptation, not a recovered board-R master.
-Dark currently inherits G1: the board's darker endpoint colours were not
+Dark explicitly retains G1 and the white bird: the board's darker endpoint colours were not
 available in the public specification. Clear and Tinted are Apple's treatment
 of the layered source. No custom lighting, shadow or glow is baked into it.
 

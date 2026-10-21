@@ -52,6 +52,10 @@ test("both Linux packages install named app and symbolic icons, and macOS retain
     .toContain("Icon=io.github.ibiscite.ibis");
   const layered = JSON.parse(read("source/Ibis.icon/icon.json"));
   expect(layered.groups.map((group) => group.name)).toEqual(["Bird", "Eye"]);
+  expect(layered["fill-specializations"].find((entry) => entry.appearance === "dark").value)
+    .toEqual(layered["fill-specializations"].find((entry) => !entry.appearance).value);
+  expect(layered.groups[0].layers[0]["fill-specializations"])
+    .toContainEqual({ appearance: "dark", value: { solid: "srgb:1,1,1,1" } });
   for (const group of layered.groups) {
     for (const layer of group.layers) {
       expect(read(`source/Ibis.icon/Assets/${layer["image-name"]}`).toString()).toContain("<svg");
