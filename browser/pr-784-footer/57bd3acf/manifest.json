@@ -1,0 +1,11 @@
+{
+  "before": "47667263c7de94db5bd20daa909863f78cd45a4d",
+  "after": "57bd3acf8565979e0f0838043fbb65ca05701a41",
+  "browser": "Chromium151.0.7922.34",
+  "kind": "synthetic browser renders; matching navigator.platform and gallery appearance",
+  "pngCount": 72,
+  "format": "PNG",
+  "width": 720,
+  "height": 620,
+  "native": "unverified"
+}
