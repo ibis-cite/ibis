@@ -20,6 +20,8 @@ afterEach(async () => {
   // Event listeners are removed asynchronously after unmount; let that
   // finish before the mocked Tauri internals are cleared.
   await new Promise((resolve) => setTimeout(resolve, 0));
+  // Closing a React Aria scope also restores focus on the next frame.
+  await act(async () => { await new Promise(requestAnimationFrame); });
   clearMocks();
 });
 
@@ -51,7 +53,11 @@ test("copy confirmation expires, but copy warnings remain until dismissed", asyn
 /** Opens the More menu and picks an action from it, as a user would. */
 async function chooseFromMore(name: string, role: "menuitem" | "menuitemcheckbox" = "menuitem") {
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  fireEvent.click(await screen.findByRole(role, { name }));
+  const item = await screen.findByRole(role, { name });
+  // fireEvent.click omits the focus a real pointer/keyboard activation gives
+  // the row; the shortcuts dialog uses it to choose its return destination.
+  act(() => item.focus());
+  fireEvent.click(item);
 }
 
 function result(key: string, title: string, source = "refs.bib") {
@@ -1071,6 +1077,7 @@ test("resizing More keeps its focused action visible without undoing manual scro
   render(<App />);
   fireEvent.click(await screen.findByRole("button", { name: /^More/ }));
   const menu = await screen.findByRole("menu");
+  act(() => menu.focus());
   fireEvent.keyDown(document.activeElement!, { key: "End" });
   const last = document.activeElement as HTMLElement;
   expect(last.textContent).toContain("Quit Ibis");
@@ -1121,6 +1128,7 @@ test("Ctrl+K opens More with every action, Escape closes it before hiding the pi
   await waitFor(() => expect(calls).toContain("hide_picker"));
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   fireEvent.pointerDown(document.body);
+  fireEvent.click(document.body);
   expect(screen.queryByRole("menu")).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   fireEvent.keyDown(within(screen.getByRole("menu")).getAllByRole("menuitem")[0]!, { key: "Tab" });
@@ -1709,7 +1717,7 @@ test("a failed group list is reported and My Library stays available", async () 
   expect(within(group).getAllByRole("menuitemcheckbox").map((box) => box.textContent)).toEqual(["My Library"]);
 });
 
-test.each(["More", "Escape", "Tab", "outside click"])("closing More with %s dismisses its group-list error and reopening retries", async (closeWith) => {
+test.each(["Ctrl+K", "Escape", "Tab", "outside click"])("closing More with %s dismisses its group-list error and reopening retries", async (closeWith) => {
   let requests = 0;
   let rejectRetry: (error: Error) => void = () => undefined;
   backend({
@@ -1724,8 +1732,9 @@ test.each(["More", "Escape", "Tab", "outside click"])("closing More with %s dism
   const more = screen.getByRole("button", { name: /^More/ });
   fireEvent.click(more);
   await screen.findByText(/could not list your Zotero groups/);
-  if (closeWith === "More") fireEvent.click(more);
-  else if (closeWith === "outside click") fireEvent.pointerDown(screen.getByLabelText("Search references"));
+  // A click outside, on More itself too, lands on the menu's underlay, as in a native menu.
+  if (closeWith === "Ctrl+K") fireEvent.keyDown(screen.getByRole("menu"), { key: "k", ctrlKey: true });
+  else if (closeWith === "outside click") { fireEvent.pointerDown(document.body); fireEvent.click(document.body); }
   else fireEvent.keyDown(screen.getByRole("menu"), { key: closeWith });
   expect(screen.queryByRole("menu")).toBeNull();
   expect(screen.queryByText(/could not list your Zotero groups/)).toBeNull();
@@ -2137,15 +2146,15 @@ test.each([false, true])("Search hint layout survives pointer focus moving to Mo
   const text = searchHint.textContent;
   expect(text).toContain(alt ? "Add to citation" : "Copy as Pandoc");
   const more = screen.getByRole("button", { name: /^More/ });
-  fireEvent.pointerDown(more, { button: 0 });
-  // JSDOM does not perform the browser's pointer-down focus default.
-  act(() => more.focus());
+  // As a native menu button, More focuses itself and opens on pointer down.
+  fireEvent.pointerDown(more, { button: 0, pointerType: "mouse" });
+  expect(await screen.findByRole("menu")).toBeTruthy();
   expect(searchHint.isConnected).toBe(true);
   expect(searchHint.textContent).toBe(text);
   expect(searchHint.getAttribute("aria-hidden")).toBe("true");
-  fireEvent.pointerUp(more, { button: 0 });
-  fireEvent.click(more);
-  expect(await screen.findByRole("menu")).toBeTruthy();
+  fireEvent.pointerUp(more, { button: 0, pointerType: "mouse" });
+  fireEvent.click(more, { detail: 1 });
+  expect(screen.getByRole("menu")).toBeTruthy();
   fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
   expect(document.activeElement).toBe(more);
   act(() => box.focus());
@@ -2598,18 +2607,22 @@ test("a retired formatted preview sends its own revision and requires a fresh co
   let revision = "1";
   const attempts: unknown[] = [];
   const writes: string[] = [];
+  let copiedText: unknown;
   const calls = backend({
     library_status: () => ({ ...zoteroStatus(["user"]), revision }),
     search: () => [{ ...result("ITEM0001", `Formatted ${revision}`, "zotero:user"), revision }],
     picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
     csl_items: ({ expectedRevision }) => {
       if (expectedRevision !== revision) throw "library snapshot changed";
-      return JSON.stringify([{ id: "ITEM0001", type: "book", title: "Synthetic", author: [{ family: "Smith" }], issued: { "date-parts": [[2020]] } }]);
+      // Each revision has its own year, so the preview shows which one it formatted.
+      const year = revision === "1" ? 2020 : 2021;
+      return JSON.stringify([{ id: "ITEM0001", type: "book", title: "Synthetic", author: [{ family: "Smith" }], issued: { "date-parts": [[year]] } }]);
     },
-    copy_formatted: ({ expectedRevision }) => {
+    copy_formatted: ({ text, expectedRevision }) => {
       attempts.push(expectedRevision);
       if (expectedRevision !== revision) throw "library snapshot changed";
       writes.push(revision);
+      copiedText = text;
       return null;
     },
   });
@@ -2622,13 +2635,17 @@ test("a retired formatted preview sends its own revision and requires a fresh co
     fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
     await screen.findByText("The library changed. Search again and reselect the references before copying.");
     await screen.findByText("Formatted 2");
-    await within(preview).findByText("(Smith, 2020)");
+    // The preview is rebuilt for the new rows, and the retired one read the
+    // same text, so look up the current region and wait for revision 2's year.
+    await waitFor(() => within(screen.getByRole("region", { name: "Preview" })).getByText("(Smith, 2021)"));
+    expect(screen.queryByText("(Smith, 2020)")).toBeNull();
     expect(attempts).toEqual(["1"]);
     expect(writes).toEqual([]);
     expect(calls).not.toContain("hide_picker");
     fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
     await waitFor(() => expect(writes).toEqual(["2"]));
     expect(attempts).toEqual(["1", "2"]);
+    expect(copiedText).toBe("(Smith, 2021)");
   } finally {
     vi.unstubAllGlobals();
   }
