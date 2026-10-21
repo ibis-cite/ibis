@@ -370,6 +370,61 @@ test("the selection is kept by record identity across queries and copied in orde
   });
 });
 
+test.each([
+  { position: "first", count: 3, index: 0 },
+  { position: "middle", count: 3, index: 1 },
+  { position: "last", count: 3, index: 2 },
+  { position: "only", count: 1, index: 0 },
+].flatMap((entry) => ["pointer", "Enter", "Space"].map((activation) => ({ ...entry, activation }))))(
+  "removing the $position selected reference via $activation restores Search navigation", async ({ count, index, activation }) => {
+    // Duplicate native keys must remain distinct by source through removal/copy.
+    const records = [result("same", "First", "a.bib"), result("same", "Second", "b.bib"), result("last", "Last", "c.bib")];
+    const copies: Record<string, unknown>[] = [];
+    const calls = backend({
+      search: () => records,
+      copy_citation: (args) => {
+        copies.push(args);
+        return { text: `[@${(args.ids as api.RecordId[]).map((id) => id.native_key).join("; @")}]`, warnings: [] };
+      },
+    });
+    render(<App />);
+    await screen.findByText("First");
+    const box = screen.getByLabelText("Search references");
+    for (let i = 0; i < count; i++) {
+      if (i > 0) fireEvent.keyDown(box, { key: "ArrowDown" });
+      fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+    }
+    for (let i = 1; i < count; i++) fireEvent.keyDown(box, { key: "ArrowUp" });
+    const active = box.getAttribute("aria-activedescendant");
+    const tray = screen.getByRole("list", { name: "Selected references" });
+    const remove = within(tray).getAllByRole("button")[index]!;
+    act(() => remove.focus());
+    if (activation === "pointer") {
+      fireEvent.pointerDown(remove, { button: 0 });
+      fireEvent.pointerUp(remove, { button: 0 });
+      fireEvent.click(remove, { detail: 1 });
+    } else {
+      // JSDOM does not synthesize native button clicks from keyboard events.
+      const key = activation === "Space" ? " " : "Enter";
+      fireEvent.keyDown(remove, { key });
+      fireEvent.keyUp(remove, { key });
+      fireEvent.click(remove, { detail: 0 });
+    }
+    const remaining = records.slice(0, count).filter((_, i) => i !== index);
+    expect([...document.querySelectorAll('[aria-label="Selected references"] code')].map((node) => node.textContent)).toEqual(remaining.map((record) => record.key));
+    expect(box.getAttribute("aria-activedescendant")).toBe(active);
+    expect(calls).not.toContain("copy_citation");
+    expect(calls).not.toContain("hide_picker");
+    expect(document.activeElement).toBe(box);
+    fireEvent.keyDown(document.activeElement!, { key: "ArrowDown" });
+    expect(box.getAttribute("aria-activedescendant")).toBe("result-1");
+    fireEvent.keyDown(document.activeElement!, { key: "Enter" });
+    await waitFor(() => expect(copies).toHaveLength(1));
+    expect(copies[0]).toEqual({ ids: (remaining.length ? remaining : [records[1]!]).map((record) => record.id), format: "pandoc", expectedRevision: "1" });
+    expect(screen.queryByRole("list", { name: "Selected references" })).toBeNull();
+  },
+);
+
 test.each([20, 40, 50])("%i long-key selections retain order across queries and first/middle/last removal", async (count) => {
   const records = Array.from({ length: count }, (_, i) => result(`synthetic_${i}_${"long_key_".repeat(5)}`, `Selection reference ${i}`));
   const copies: Record<string, unknown>[] = [];
