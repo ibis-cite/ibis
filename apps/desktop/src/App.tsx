@@ -179,7 +179,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // Each completed copy owns only the interaction that started it. Map identity
   // also distinguishes removing and re-adding the same selected references.
   const snapshotRevision = library?.revision;
-  const activeChoice = choiceKey(results.slice(active, active + 1));
+  const highlightedChoice = choiceKey(results.slice(active, active + 1));
+  const latestHighlight = useRef(highlightedChoice);
+  latestHighlight.current = highlightedChoice;
+  // A selected citation owns its references independently of result highlighting.
+  const activeChoice = selected.size === 0 ? highlightedChoice : null;
   const copyContext = useRef({ selected, query, format, snapshotRevision, activeChoice });
   const before = copyContext.current;
   if (before.selected !== selected || before.query !== query || before.format !== format || before.snapshotRevision !== snapshotRevision || before.activeChoice !== activeChoice) {
@@ -565,7 +569,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     if (!ownsCompletion()) return;
     setCopied(outcome);
     const clearedSelection = new Map<string, SearchResult>();
-    const completedContext = { ...context, selected: clearedSelection };
+    const completedContext = { ...context, selected: clearedSelection, activeChoice: latestHighlight.current };
     copyContext.current = completedContext;
     setSelected(clearedSelection);
     // After a copy, reopening keeps the current search, not one cleared before it.

@@ -2656,3 +2656,36 @@ test.each([
   expect(calls).not.toContain("hide_picker");
   expect(calls).not.toContain("show_copied_notice");
 });
+
+test.each(["warning", "notice"])("a search started before a selected copy preserves its completion (%s)", async (feedback) => {
+  let releaseSearch: (value: unknown) => void = () => undefined;
+  let finishCopy: (value: unknown) => void = () => undefined;
+  const notices: unknown[] = [];
+  const calls = backend({
+    search: ({ query }) => query === "pending"
+      ? new Promise((resolve) => { releaseSearch = resolve; })
+      : [result("a", "Selected before search")],
+    copy_citation: () => new Promise((resolve) => { finishCopy = resolve; }),
+    show_copied_notice: ({ text }) => { notices.push(text); return null; },
+  });
+  render(<App />);
+  if (feedback === "warning") fireEvent.click(screen.getByRole("button", { name: "Pin Ibis" }));
+  fireEvent.click(await screen.findByText("Selected before search"), { shiftKey: true });
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "pending" } });
+  await waitFor(() => expect(calls.filter((call) => call === "search")).toHaveLength(2));
+  fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(calls).toContain("copy_citation"));
+  await act(async () => { releaseSearch([result("b", "Search finished later")]); });
+  await screen.findByText("Search finished later");
+  await act(async () => { finishCopy({ text: "selected copy", warnings: feedback === "warning" ? ["Keep selected warning"] : [] }); });
+  expect(screen.queryByRole("button", { name: "Remove a from the selection" })).toBeNull();
+  if (feedback === "warning") {
+    expect(screen.queryByText("Keep selected warning")).not.toBeNull();
+    expect(calls).not.toContain("hide_picker");
+    expect(notices).toEqual([]);
+  } else {
+    await waitFor(() => expect(notices).toEqual(["selected copy"]));
+    expect(calls).toContain("hide_picker");
+  }
+});
