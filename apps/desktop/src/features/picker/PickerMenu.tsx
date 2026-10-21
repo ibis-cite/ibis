@@ -2,7 +2,7 @@ import type { Density, LibraryStatus, LoginItem, ZoteroLibrary } from "../../api
 import { keyLabel, keysFor } from "../../keys";
 import { LibraryDetail } from "../../LibraryStatusLine";
 import { densityNames, keyText, loginItemText, pickerText } from "../../messages";
-import { isMac } from "../../platform";
+import { currentPlatform, isMac } from "../../platform";
 import { MenuItem, MoreMenu } from "./MoreMenu";
 
 const label = (accelerator: string) => keyLabel(accelerator, isMac);
@@ -53,7 +53,7 @@ export function PickerMenu({ onClose, library, libraryDetail, zotero, density, l
       <MenuItem label={pickerText.density(densityNames[density])} title={pickerText.densityTitle} onSelect={actions.density} />
       <MenuItem label={pickerText.largerText} checked={largerText} onSelect={actions.largerText} />
       {startAtLogin && (
-        <MenuItem label={loginItemText.label(startAtLogin.item.name)} title={loginItemText.title} checked={startAtLogin.item.enabled} onSelect={startAtLogin.toggle} />
+        <MenuItem label={loginItemText.label(currentPlatform())} title={loginItemText.title(currentPlatform())} checked={startAtLogin.item.enabled} onSelect={startAtLogin.toggle} />
       )}
       {/* Closing the window only hides it; this ends the app and frees the shortcut. */}
       <MenuItem label={keyText.title} keys={label(keysFor("keys"))} onSelect={actions.keys} />

@@ -379,7 +379,11 @@ Ibis offers to start at login: once during first-run setup, beside the
 shortcut it teaches, and always in More and the menu bar or tray menu. It is
 off until the person ticks it: Apple's App Review Guideline 2.4.5(iii) asks
 Mac apps for consent first, and Raycast, Alfred, PowerToys and 1Password offer
-it as a setting. A login start leaves the picker hidden until the shortcut is
+it as a setting. The menu item uses each system's own words, the same in More
+and the menu bar or tray: "Open at Login" on macOS (Apple's Login Items &
+Extensions), "Start when you sign in" on Windows (Microsoft says *sign in*),
+and "Start on Login" on Linux (GNOME capitalizes menu items; GNOME has no
+official term). A login start leaves the picker hidden until the shortcut is
 pressed. The tick is read from the system each time, never from
 `settings.json`, so turning Ibis off in the system's own startup settings shows
 at once; if the system refuses, the tick shows the real state and a sentence
