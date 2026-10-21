@@ -25,6 +25,7 @@ export type GalleryState = {
   pinned?: boolean;
   menuOpen?: boolean;
   tray?: number;
+  formatted?: boolean;
   keys?: boolean;
 };
 
@@ -153,6 +154,8 @@ export const galleryStates: readonly GalleryState[] = [
   { id: "menu-open", label: "More menu open", library: library(), query: "memory", results: examples, menuOpen: true },
   ...[20, 40, 50].map((count) => ({ id: `tray-${count}`, label: `${count} long keys selected`,
     library: library({ references: 50 }), query: "selection", results: largeSelection, tray: count, pinned: true })),
+  { id: "tray-preview", label: "50 selected with formatted preview", library: library({ references: 50 }), query: "selection",
+    results: largeSelection, tray: 50, pinned: true, formatted: true },
   { id: "tray", label: "Several references chosen", library: library(), query: "memory", results: examples, tray: 2 },
   { id: "keys", label: "All keys", library: library(), query: "memory", results: examples, keys: true },
   { id: "compact", label: "Compact rows", library: library(), query: "memory", results: many, density: "compact", tray: 2 },
@@ -174,7 +177,7 @@ export function galleryProvider(state: GalleryState): { api: PickerApi; preview:
         copyFormatted: async () => null,
       } : {}),
       copyFormat: async () => "pandoc",
-      pickerPreferences: async () => ({ citation_style: null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false }),
+      pickerPreferences: async () => ({ citation_style: state.formatted ? "apa" : null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false }),
       setPickerPreferences: async () => null,
       shortcutStatus: async () => ({ shortcut: "Ctrl+Shift+Y", registered: true, error: null }),
       chooseLibrary: async () => undefined,
