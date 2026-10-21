@@ -3086,3 +3086,15 @@ test.each(["Tab", "Reload"])("Format hands off to More so %s returns to Search",
   await waitFor(() => expect(document.activeElement).toBe(search));
   expect(search.value).toBe("sleep");
 });
+
+test.each(["k", "/", "q"])("hiding the picker cancels Format's pending Ctrl+%s command", async (key) => {
+  const calls = backend();
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: "Copy as Pandoc" }));
+  fireEvent.keyDown(screen.getByRole("searchbox"), { key, ctrlKey: true });
+  await act(async () => { await emit("picker:hidden"); });
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  expect(screen.queryByRole("menu")).toBeNull();
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(calls).not.toContain("quit");
+});

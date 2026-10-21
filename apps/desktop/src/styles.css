@@ -2,7 +2,6 @@
 @import "./nativeAppearance.css";
 
 /* Keep the format command boundary from adding a box to the search bar. */
-.format-menu { display: contents; }
 
 :root { color-scheme: light dark; font-synthesis: none; font-family: var(--font-family); color: var(--text); background: var(--surface); }
 
