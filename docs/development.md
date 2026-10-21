@@ -93,7 +93,7 @@ The subject is a Conventional Commit (`feat`, `fix`, `perf`, `docs`, `test`, `ci
 
 - **Code:** an independent review of the exact head commit by another session, preferably another model, posted as a comment that starts `Independent review of <full SHA> by <tool and model>` and gives the verdict, findings (each P1 and P2 with the commit that fixed it; P3s in one follow-up issue) and the checks run, in at most 150 words plus optional `<details>`. After a small fix the reviewer re-checks only the changed lines and names the new commit; a large fix or a design change needs a new full review. A rebase with an identical tree keeps the review.
 - **Documentation only, or tests and synthetic fixtures only:** the author's adversarial check (step 5 of the loop in AGENTS.md), recorded in a comment, replaces the independent review (ADR 0017).
-- **Merge** by squash only when all required checks pass on that commit. Never use `--admin` or another bypass. While a release is going out (a hold announced on the tracking issue), nobody merges to `main` until the release pull request has merged and the hold is lifted, because every merge rebuilds the release pull request.
+- **Merge** by squash only when all required checks pass on that commit. The squash commit's title is the pull request title plus ` (#N)`, and its message is short: `Closes #N`, the `Assisted-by:` trailer, and `Signed-off-by:` naming whoever actually signed the branch's commits, never someone else. Never use `--admin` or another bypass. While a release is going out (a hold announced on the tracking issue), nobody merges to `main` until the release pull request has merged and the hold is lifted, because every merge rebuilds the release pull request.
 
 ### Versions and releases
 
