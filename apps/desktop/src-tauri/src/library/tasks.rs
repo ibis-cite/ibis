@@ -178,9 +178,9 @@ pub(super) fn run_open(app: &AppHandle, request: u64, source: Source, reload: bo
         })
         .await;
         #[cfg(debug_assertions)]
-        let (loaded, load_ms) = loaded.unwrap_or_else(|_| (Err(LoadError::Stopped), 0.0));
+        let (loaded, load_ms) = loaded.unwrap_or((Err(LoadError::Stopped), 0.0));
         #[cfg(not(debug_assertions))]
-        let loaded = loaded.unwrap_or_else(|_| Err(LoadError::Stopped));
+        let loaded = loaded.unwrap_or(Err(LoadError::Stopped));
         #[cfg(debug_assertions)]
         let mut phases = LoadPhases {
             load_ms,
@@ -297,7 +297,7 @@ pub(crate) fn refresh_zotero(app: &AppHandle) {
         tauri::async_runtime::spawn(async move {
             let loaded = tauri::async_runtime::spawn_blocking(move || load_source(source, true, previous))
                 .await
-                .unwrap_or_else(|_| Err(LoadError::Stopped));
+                .unwrap_or(Err(LoadError::Stopped));
             if install_loaded(&app.state(), &app.state(), request, loaded).is_some() {
                 publish_current(&app);
                 watch_current(&app, request);
