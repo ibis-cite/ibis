@@ -121,6 +121,32 @@ test.each(["pointer", "key", "blur", "hidden"])("a later %s cancels a pending me
   expect(run).not.toHaveBeenCalled();
 });
 
+test.each(["k", "Escape", "Tab"])("%s during an exit stays inside the handoff", async (key) => {
+  // Hold a real React Aria exit through its Web Animations API boundary.
+  let release!: () => void;
+  const finished = new Promise<void>((resolve) => { release = resolve; });
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, "getAnimations");
+  Object.defineProperty(Element.prototype, "getAnimations", { configurable: true, value(this: HTMLElement) {
+    return this.hasAttribute("data-exiting") ? [{ playState: "running", finished }] : [];
+  } });
+  try {
+    const { menu, run, search } = mountCommand();
+    fireEvent.keyDown(menu, { key: "k", ctrlKey: true });
+    expect(menu.closest(".toolbar-menu-popover")?.hasAttribute("data-exiting")).toBe(true);
+    fireEvent.keyDown(menu, { key, ctrlKey: key === "k" });
+    expect(run).not.toHaveBeenCalled();
+    await act(async () => { release(); await finished; });
+    await waitFor(() => expect(menu.isConnected).toBe(false));
+    await act(async () => { await new Promise(requestAnimationFrame); });
+    expect(document.activeElement).toBe(search);
+    expect(run).toHaveBeenCalledTimes(key === "k" ? 1 : 0);
+  } finally {
+    release();
+    if (descriptor) Object.defineProperty(Element.prototype, "getAnimations", descriptor);
+    else Reflect.deleteProperty(Element.prototype, "getAnimations");
+  }
+});
+
 test("more than seven items filter with virtual focus and ignore composing shortcuts and picks", async () => {
   const { trigger, onAction } = mount([{ id: "many", label: "Formats", items: Array.from({ length: 8 }, (_, i) => ({ id: `f${i}`, label: `Format ${i}` })) }]);
   act(() => trigger.focus());

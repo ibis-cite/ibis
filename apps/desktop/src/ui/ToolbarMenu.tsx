@@ -83,12 +83,12 @@ export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, 
   return <span className="toolbar-menu-control" onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { composing.current = false; }}
     onKeyDownCapture={(event) => {
       if (composing.current || event.nativeEvent.isComposing || event.keyCode === 229) event.stopPropagation();
-      else if (open) {
+      else if (open || popover.current) {
         const command = onKeyCommand?.(event);
         if (command || event.key === "Escape" || event.key === "Tab") { event.preventDefault(); event.stopPropagation(); changeOpen(false, command); }
       }
     }}
-    onKeyDown={(event) => { if (open && !event.ctrlKey && !event.metaKey) event.stopPropagation(); }}>
+    onKeyDown={(event) => { if ((open || popover.current) && !event.ctrlKey && !event.metaKey) event.stopPropagation(); }}>
     <MenuTrigger isOpen={open} onOpenChange={changeOpen}>
       <Button ref={button} className="toolbar-menu-button" aria-label={`${label} ${value}`}>{value}<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m3 4.5 3 3 3-3" /></svg></Button>
       <Popover ref={popoverRef} className="menu-popover toolbar-menu-popover" placement="bottom end" offset={6}>
