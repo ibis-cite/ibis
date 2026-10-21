@@ -30,6 +30,6 @@ export function KeyHint({ label, keys, primary, platform, hidden }: {
   label: string; keys: string; primary?: boolean; platform?: Platform; hidden?: boolean;
 }) {
   return <span className="key-hint" data-primary={primary || undefined}>
-    <span className="key-hint-label">{label}</span><KeyCaps accelerator={keys} platform={platform} hidden={hidden} />
+    <span className="key-hint-label">{label}</span>{" "}<KeyCaps accelerator={keys} platform={platform} hidden={hidden} />
   </span>;
 }

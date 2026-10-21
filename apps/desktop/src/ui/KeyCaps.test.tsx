@@ -32,6 +32,6 @@ test("a hint names the action first and its keys after", () => {
   const hint = container.firstElementChild!;
   expect(hint.firstElementChild?.className).toBe("key-hint-label");
   expect(hint.lastElementChild?.className).toBe("key-caps");
-  expect(hint.textContent).toBe("Copy as PandocEnter");
+  expect(hint.textContent).toBe("Copy as Pandoc Enter");
   expect(hint.getAttribute("data-primary")).toBe("true");
 });

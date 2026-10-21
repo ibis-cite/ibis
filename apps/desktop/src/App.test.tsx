@@ -612,7 +612,7 @@ test("while a newer search is pending, no key, click or hint acts on the previou
   fireEvent.change(box, { target: { value: "pending" } });
   await waitFor(() => expect(pending.pending).toBeDefined());
   fireEvent.keyDown(box, { key: "Alt", altKey: true });
-  expect(footerKeys()).toBe("Esc Clear search");
+  expect(footerKeys()).toBe("Clear search Esc");
   fireEvent.keyUp(box, { key: "Alt" });
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
   // Neither Shift+click (add) nor a plain click (copy) acts on a stale row.
@@ -2319,7 +2319,7 @@ test("the footer offers Enter only when Enter in the search box would copy", asy
     await screen.findByText("Formatting…");
     expect(footerKeys()).not.toContain("Enter");
     await act(async () => release());
-    await waitFor(() => expect(footerKeys()).toContain("Enter Copy as APA"));
+    await waitFor(() => expect(footerKeys()).toContain("Copy as APA Enter"));
     // Nor is one that failed.
     fail = true;
     fireEvent.keyDown(box, { key: "ArrowDown" });

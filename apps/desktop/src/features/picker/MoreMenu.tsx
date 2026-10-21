@@ -1,5 +1,8 @@
 import type { ReactNode, Ref, RefObject } from "react";
+import { keyLabel } from "../../keys";
 import { pickerText } from "../../messages";
+import { isMac } from "../../platform";
+import { KeyHint } from "../../ui/KeyCaps";
 import { Menu } from "../../ui/Menu";
 
 export { MenuItem, MenuSection, MenuSeparator } from "../../ui/Menu";
@@ -11,14 +14,14 @@ export { MenuItem, MenuSection, MenuSeparator } from "../../ui/Menu";
 export function MoreMenu({ isOpen, onOpenChange, buttonRef, searchRef, keys, ariaKeys, children }: {
   isOpen: boolean; onOpenChange: (open: boolean) => void;
   buttonRef: Ref<HTMLButtonElement>; searchRef: RefObject<HTMLElement | null>;
-  /** The shortcut as shown, and as `aria-keyshortcuts` spells it. */
+  /** The shortcut in accelerator syntax, and as `aria-keyshortcuts` spells it. */
   keys: string; ariaKeys: string;
   children: ReactNode;
 }) {
   return <Menu id="more-menu" label={pickerText.more} isOpen={isOpen} onOpenChange={onOpenChange} placement="top end"
-    triggerRef={buttonRef} triggerClassName="quiet-button" triggerTitle={pickerText.moreTitle(keys)} triggerKeys={ariaKeys}
+    triggerRef={buttonRef} triggerClassName="quiet-button" triggerTitle={pickerText.moreTitle(keyLabel(keys, isMac))} triggerKeys={ariaKeys}
     tabFocusRef={searchRef}
-    trigger={<>{pickerText.more} <kbd aria-hidden="true">{keys}</kbd></>}>
+    trigger={<KeyHint label={pickerText.more} keys={keys} hidden />}>
     {children}
   </Menu>;
 }
