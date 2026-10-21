@@ -1,0 +1,3140 @@
+{
+  "label": "after",
+  "browser": "151.0.7922.34",
+  "rows": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 360,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 248,
+              "width": 234.421875,
+              "height": 64,
+              "top": 248,
+              "right": 274.421875,
+              "bottom": 312,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 252,
+              "width": 232.421875,
+              "height": 56,
+              "top": 252,
+              "right": 273.421875,
+              "bottom": 308,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 328,
+              "width": 206.3125,
+              "height": 64,
+              "top": 328,
+              "right": 246.3125,
+              "bottom": 392,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 332,
+              "width": 204.3125,
+              "height": 56,
+              "top": 332,
+              "right": 245.3125,
+              "bottom": 388,
+              "left": 41
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 168.859375,
+              "y": 416,
+              "width": 175.140625,
+              "height": 64,
+              "top": 416,
+              "right": 344,
+              "bottom": 480,
+              "left": 168.859375
+            },
+            "inner": {
+              "x": 176.859375,
+              "y": 420,
+              "width": 159.140625,
+              "height": 56,
+              "top": 420,
+              "right": 336,
+              "bottom": 476,
+              "left": 176.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 360,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 176,
+              "width": 234.421875,
+              "height": 88,
+              "top": 176,
+              "right": 274.421875,
+              "bottom": 264,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 192,
+              "width": 232.421875,
+              "height": 56,
+              "top": 192,
+              "right": 273.421875,
+              "bottom": 248,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 280,
+              "width": 206.3125,
+              "height": 88,
+              "top": 280,
+              "right": 246.3125,
+              "bottom": 368,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 296,
+              "width": 204.3125,
+              "height": 56,
+              "top": 296,
+              "right": 245.3125,
+              "bottom": 352,
+              "left": 41
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 168.859375,
+              "y": 392,
+              "width": 175.140625,
+              "height": 88,
+              "top": 392,
+              "right": 344,
+              "bottom": 480,
+              "left": 168.859375
+            },
+            "inner": {
+              "x": 176.859375,
+              "y": 408,
+              "width": 159.140625,
+              "height": 56,
+              "top": 408,
+              "right": 336,
+              "bottom": 464,
+              "left": 176.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 480,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 296.53125,
+              "width": 234.421875,
+              "height": 64,
+              "top": 296.53125,
+              "right": 274.421875,
+              "bottom": 360.53125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 300.53125,
+              "width": 232.421875,
+              "height": 56,
+              "top": 300.53125,
+              "right": 273.421875,
+              "bottom": 356.53125,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 376.53125,
+              "width": 206.3125,
+              "height": 64,
+              "top": 376.53125,
+              "right": 246.3125,
+              "bottom": 440.53125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 380.53125,
+              "width": 204.3125,
+              "height": 56,
+              "top": 380.53125,
+              "right": 245.3125,
+              "bottom": 436.53125,
+              "left": 41
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 288.859375,
+              "y": 464.53125,
+              "width": 175.140625,
+              "height": 64,
+              "top": 464.53125,
+              "right": 464,
+              "bottom": 528.53125,
+              "left": 288.859375
+            },
+            "inner": {
+              "x": 296.859375,
+              "y": 468.53125,
+              "width": 159.140625,
+              "height": 56,
+              "top": 468.53125,
+              "right": 456,
+              "bottom": 524.53125,
+              "left": 296.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 480,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 253.4375,
+              "width": 234.421875,
+              "height": 88,
+              "top": 253.4375,
+              "right": 274.421875,
+              "bottom": 341.4375,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 269.4375,
+              "width": 232.421875,
+              "height": 56,
+              "top": 269.4375,
+              "right": 273.421875,
+              "bottom": 325.4375,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 357.4375,
+              "width": 206.3125,
+              "height": 88,
+              "top": 357.4375,
+              "right": 246.3125,
+              "bottom": 445.4375,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 373.4375,
+              "width": 204.3125,
+              "height": 56,
+              "top": 373.4375,
+              "right": 245.3125,
+              "bottom": 429.4375,
+              "left": 41
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 288.859375,
+              "y": 469.4375,
+              "width": 175.140625,
+              "height": 88,
+              "top": 469.4375,
+              "right": 464,
+              "bottom": 557.4375,
+              "left": 288.859375
+            },
+            "inner": {
+              "x": 296.859375,
+              "y": 485.4375,
+              "width": 159.140625,
+              "height": 56,
+              "top": 485.4375,
+              "right": 456,
+              "bottom": 541.4375,
+              "left": 296.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 720,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 408,
+              "width": 234.421875,
+              "height": 64,
+              "top": 408,
+              "right": 274.421875,
+              "bottom": 472,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 412,
+              "width": 232.421875,
+              "height": 56,
+              "top": 412,
+              "right": 273.421875,
+              "bottom": 468,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 306.421875,
+              "y": 408,
+              "width": 206.3125,
+              "height": 64,
+              "top": 408,
+              "right": 512.734375,
+              "bottom": 472,
+              "left": 306.421875
+            },
+            "inner": {
+              "x": 307.421875,
+              "y": 412,
+              "width": 204.3125,
+              "height": 56,
+              "top": 412,
+              "right": 511.734375,
+              "bottom": 468,
+              "left": 307.421875
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 528.859375,
+              "y": 408,
+              "width": 175.140625,
+              "height": 64,
+              "top": 408,
+              "right": 704,
+              "bottom": 472,
+              "left": 528.859375
+            },
+            "inner": {
+              "x": 536.859375,
+              "y": 412,
+              "width": 159.140625,
+              "height": 56,
+              "top": 412,
+              "right": 696,
+              "bottom": 468,
+              "left": 536.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 720,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 387.203125,
+              "width": 234.421875,
+              "height": 88,
+              "top": 387.203125,
+              "right": 274.421875,
+              "bottom": 475.203125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 403.203125,
+              "width": 232.421875,
+              "height": 56,
+              "top": 403.203125,
+              "right": 273.421875,
+              "bottom": 459.203125,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 306.421875,
+              "y": 387.203125,
+              "width": 206.3125,
+              "height": 88,
+              "top": 387.203125,
+              "right": 512.734375,
+              "bottom": 475.203125,
+              "left": 306.421875
+            },
+            "inner": {
+              "x": 307.421875,
+              "y": 403.203125,
+              "width": 204.3125,
+              "height": 56,
+              "top": 403.203125,
+              "right": 511.734375,
+              "bottom": 459.203125,
+              "left": 307.421875
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 528.859375,
+              "y": 387.203125,
+              "width": 175.140625,
+              "height": 88,
+              "top": 387.203125,
+              "right": 704,
+              "bottom": 475.203125,
+              "left": 528.859375
+            },
+            "inner": {
+              "x": 536.859375,
+              "y": 403.203125,
+              "width": 159.140625,
+              "height": 56,
+              "top": 403.203125,
+              "right": 696,
+              "bottom": 459.203125,
+              "left": 536.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 360,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 248,
+              "width": 234.421875,
+              "height": 64,
+              "top": 248,
+              "right": 274.421875,
+              "bottom": 312,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 252,
+              "width": 232.421875,
+              "height": 56,
+              "top": 252,
+              "right": 273.421875,
+              "bottom": 308,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 328,
+              "width": 206.3125,
+              "height": 64,
+              "top": 328,
+              "right": 246.3125,
+              "bottom": 392,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 332,
+              "width": 204.3125,
+              "height": 56,
+              "top": 332,
+              "right": 245.3125,
+              "bottom": 388,
+              "left": 41
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 168.859375,
+              "y": 416,
+              "width": 175.140625,
+              "height": 64,
+              "top": 416,
+              "right": 344,
+              "bottom": 480,
+              "left": 168.859375
+            },
+            "inner": {
+              "x": 176.859375,
+              "y": 420,
+              "width": 159.140625,
+              "height": 56,
+              "top": 420,
+              "right": 336,
+              "bottom": 476,
+              "left": 176.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 360,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 176,
+              "width": 234.421875,
+              "height": 88,
+              "top": 176,
+              "right": 274.421875,
+              "bottom": 264,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 192,
+              "width": 232.421875,
+              "height": 56,
+              "top": 192,
+              "right": 273.421875,
+              "bottom": 248,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 280,
+              "width": 206.3125,
+              "height": 88,
+              "top": 280,
+              "right": 246.3125,
+              "bottom": 368,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 296,
+              "width": 204.3125,
+              "height": 56,
+              "top": 296,
+              "right": 245.3125,
+              "bottom": 352,
+              "left": 41
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 168.859375,
+              "y": 392,
+              "width": 175.140625,
+              "height": 88,
+              "top": 392,
+              "right": 344,
+              "bottom": 480,
+              "left": 168.859375
+            },
+            "inner": {
+              "x": 176.859375,
+              "y": 408,
+              "width": 159.140625,
+              "height": 56,
+              "top": 408,
+              "right": 336,
+              "bottom": 464,
+              "left": 176.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 480,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 296.53125,
+              "width": 234.421875,
+              "height": 64,
+              "top": 296.53125,
+              "right": 274.421875,
+              "bottom": 360.53125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 300.53125,
+              "width": 232.421875,
+              "height": 56,
+              "top": 300.53125,
+              "right": 273.421875,
+              "bottom": 356.53125,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 376.53125,
+              "width": 206.3125,
+              "height": 64,
+              "top": 376.53125,
+              "right": 246.3125,
+              "bottom": 440.53125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 380.53125,
+              "width": 204.3125,
+              "height": 56,
+              "top": 380.53125,
+              "right": 245.3125,
+              "bottom": 436.53125,
+              "left": 41
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 288.859375,
+              "y": 464.53125,
+              "width": 175.140625,
+              "height": 64,
+              "top": 464.53125,
+              "right": 464,
+              "bottom": 528.53125,
+              "left": 288.859375
+            },
+            "inner": {
+              "x": 296.859375,
+              "y": 468.53125,
+              "width": 159.140625,
+              "height": 56,
+              "top": 468.53125,
+              "right": 456,
+              "bottom": 524.53125,
+              "left": 296.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 480,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 253.4375,
+              "width": 234.421875,
+              "height": 88,
+              "top": 253.4375,
+              "right": 274.421875,
+              "bottom": 341.4375,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 269.4375,
+              "width": 232.421875,
+              "height": 56,
+              "top": 269.4375,
+              "right": 273.421875,
+              "bottom": 325.4375,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 357.4375,
+              "width": 206.3125,
+              "height": 88,
+              "top": 357.4375,
+              "right": 246.3125,
+              "bottom": 445.4375,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 373.4375,
+              "width": 204.3125,
+              "height": 56,
+              "top": 373.4375,
+              "right": 245.3125,
+              "bottom": 429.4375,
+              "left": 41
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 288.859375,
+              "y": 469.4375,
+              "width": 175.140625,
+              "height": 88,
+              "top": 469.4375,
+              "right": 464,
+              "bottom": 557.4375,
+              "left": 288.859375
+            },
+            "inner": {
+              "x": 296.859375,
+              "y": 485.4375,
+              "width": 159.140625,
+              "height": 56,
+              "top": 485.4375,
+              "right": 456,
+              "bottom": 541.4375,
+              "left": 296.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 720,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 408,
+              "width": 234.421875,
+              "height": 64,
+              "top": 408,
+              "right": 274.421875,
+              "bottom": 472,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 412,
+              "width": 232.421875,
+              "height": 56,
+              "top": 412,
+              "right": 273.421875,
+              "bottom": 468,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 306.421875,
+              "y": 408,
+              "width": 206.3125,
+              "height": 64,
+              "top": 408,
+              "right": 512.734375,
+              "bottom": 472,
+              "left": 306.421875
+            },
+            "inner": {
+              "x": 307.421875,
+              "y": 412,
+              "width": 204.3125,
+              "height": 56,
+              "top": 412,
+              "right": 511.734375,
+              "bottom": 468,
+              "left": 307.421875
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 528.859375,
+              "y": 408,
+              "width": 175.140625,
+              "height": 64,
+              "top": 408,
+              "right": 704,
+              "bottom": 472,
+              "left": 528.859375
+            },
+            "inner": {
+              "x": 536.859375,
+              "y": 412,
+              "width": 159.140625,
+              "height": 56,
+              "top": 412,
+              "right": 696,
+              "bottom": 468,
+              "left": 536.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 720,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 387.203125,
+              "width": 234.421875,
+              "height": 88,
+              "top": 387.203125,
+              "right": 274.421875,
+              "bottom": 475.203125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 403.203125,
+              "width": 232.421875,
+              "height": 56,
+              "top": 403.203125,
+              "right": 273.421875,
+              "bottom": 459.203125,
+              "left": 41
+            },
+            "scroll": 232,
+            "client": 232
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 306.421875,
+              "y": 387.203125,
+              "width": 206.3125,
+              "height": 88,
+              "top": 387.203125,
+              "right": 512.734375,
+              "bottom": 475.203125,
+              "left": 306.421875
+            },
+            "inner": {
+              "x": 307.421875,
+              "y": 403.203125,
+              "width": 204.3125,
+              "height": 56,
+              "top": 403.203125,
+              "right": 511.734375,
+              "bottom": 459.203125,
+              "left": 307.421875
+            },
+            "scroll": 204,
+            "client": 204
+          },
+          {
+            "name": "More ⌘K",
+            "box": {
+              "x": 528.859375,
+              "y": 387.203125,
+              "width": 175.140625,
+              "height": 88,
+              "top": 387.203125,
+              "right": 704,
+              "bottom": 475.203125,
+              "left": 528.859375
+            },
+            "inner": {
+              "x": 536.859375,
+              "y": 403.203125,
+              "width": 159.140625,
+              "height": 56,
+              "top": 403.203125,
+              "right": 696,
+              "bottom": 459.203125,
+              "left": 536.859375
+            },
+            "scroll": 173,
+            "client": 173
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 360,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 248,
+              "width": 321.265625,
+              "height": 64,
+              "top": 248,
+              "right": 353.265625,
+              "bottom": 312,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 252,
+              "width": 319.265625,
+              "height": 56,
+              "top": 252,
+              "right": 352.265625,
+              "bottom": 308,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 32,
+              "y": 328,
+              "width": 205.421875,
+              "height": 64,
+              "top": 328,
+              "right": 237.421875,
+              "bottom": 392,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 332,
+              "width": 203.421875,
+              "height": 56,
+              "top": 332,
+              "right": 236.421875,
+              "bottom": 388,
+              "left": 33
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 128.265625,
+              "y": 416,
+              "width": 223.734375,
+              "height": 64,
+              "top": 416,
+              "right": 352,
+              "bottom": 480,
+              "left": 128.265625
+            },
+            "inner": {
+              "x": 136.265625,
+              "y": 420,
+              "width": 207.734375,
+              "height": 56,
+              "top": 420,
+              "right": 344,
+              "bottom": 476,
+              "left": 136.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 360,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 176,
+              "width": 321.265625,
+              "height": 88,
+              "top": 176,
+              "right": 353.265625,
+              "bottom": 264,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 192,
+              "width": 319.265625,
+              "height": 56,
+              "top": 192,
+              "right": 352.265625,
+              "bottom": 248,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 32,
+              "y": 280,
+              "width": 205.421875,
+              "height": 88,
+              "top": 280,
+              "right": 237.421875,
+              "bottom": 368,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 296,
+              "width": 203.421875,
+              "height": 56,
+              "top": 296,
+              "right": 236.421875,
+              "bottom": 352,
+              "left": 33
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 128.265625,
+              "y": 392,
+              "width": 223.734375,
+              "height": 88,
+              "top": 392,
+              "right": 352,
+              "bottom": 480,
+              "left": 128.265625
+            },
+            "inner": {
+              "x": 136.265625,
+              "y": 408,
+              "width": 207.734375,
+              "height": 56,
+              "top": 408,
+              "right": 344,
+              "bottom": 464,
+              "left": 136.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 480,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 291.328125,
+              "width": 321.265625,
+              "height": 64,
+              "top": 291.328125,
+              "right": 353.265625,
+              "bottom": 355.328125,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 295.328125,
+              "width": 319.265625,
+              "height": 56,
+              "top": 295.328125,
+              "right": 352.265625,
+              "bottom": 351.328125,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 32,
+              "y": 371.328125,
+              "width": 205.421875,
+              "height": 64,
+              "top": 371.328125,
+              "right": 237.421875,
+              "bottom": 435.328125,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 375.328125,
+              "width": 203.421875,
+              "height": 56,
+              "top": 375.328125,
+              "right": 236.421875,
+              "bottom": 431.328125,
+              "left": 33
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 248.265625,
+              "y": 459.328125,
+              "width": 223.734375,
+              "height": 64,
+              "top": 459.328125,
+              "right": 472,
+              "bottom": 523.328125,
+              "left": 248.265625
+            },
+            "inner": {
+              "x": 256.265625,
+              "y": 463.328125,
+              "width": 207.734375,
+              "height": 56,
+              "top": 463.328125,
+              "right": 464,
+              "bottom": 519.328125,
+              "left": 256.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 480,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 247.828125,
+              "width": 321.265625,
+              "height": 88,
+              "top": 247.828125,
+              "right": 353.265625,
+              "bottom": 335.828125,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 263.828125,
+              "width": 319.265625,
+              "height": 56,
+              "top": 263.828125,
+              "right": 352.265625,
+              "bottom": 319.828125,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 32,
+              "y": 351.828125,
+              "width": 205.421875,
+              "height": 88,
+              "top": 351.828125,
+              "right": 237.421875,
+              "bottom": 439.828125,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 367.828125,
+              "width": 203.421875,
+              "height": 56,
+              "top": 367.828125,
+              "right": 236.421875,
+              "bottom": 423.828125,
+              "left": 33
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 248.265625,
+              "y": 463.828125,
+              "width": 223.734375,
+              "height": 88,
+              "top": 463.828125,
+              "right": 472,
+              "bottom": 551.828125,
+              "left": 248.265625
+            },
+            "inner": {
+              "x": 256.265625,
+              "y": 479.828125,
+              "width": 207.734375,
+              "height": 56,
+              "top": 479.828125,
+              "right": 464,
+              "bottom": 535.828125,
+              "left": 256.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 720,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 328,
+              "width": 321.265625,
+              "height": 64,
+              "top": 328,
+              "right": 353.265625,
+              "bottom": 392,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 332,
+              "width": 319.265625,
+              "height": 56,
+              "top": 332,
+              "right": 352.265625,
+              "bottom": 388,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 385.265625,
+              "y": 328,
+              "width": 205.421875,
+              "height": 64,
+              "top": 328,
+              "right": 590.6875,
+              "bottom": 392,
+              "left": 385.265625
+            },
+            "inner": {
+              "x": 386.265625,
+              "y": 332,
+              "width": 203.421875,
+              "height": 56,
+              "top": 332,
+              "right": 589.6875,
+              "bottom": 388,
+              "left": 386.265625
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 488.265625,
+              "y": 416,
+              "width": 223.734375,
+              "height": 64,
+              "top": 416,
+              "right": 712,
+              "bottom": 480,
+              "left": 488.265625
+            },
+            "inner": {
+              "x": 496.265625,
+              "y": 420,
+              "width": 207.734375,
+              "height": 56,
+              "top": 420,
+              "right": 704,
+              "bottom": 476,
+              "left": 496.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 720,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 294.5,
+              "width": 321.265625,
+              "height": 88,
+              "top": 294.5,
+              "right": 353.265625,
+              "bottom": 382.5,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 310.5,
+              "width": 319.265625,
+              "height": 56,
+              "top": 310.5,
+              "right": 352.265625,
+              "bottom": 366.5,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 385.265625,
+              "y": 294.5,
+              "width": 205.421875,
+              "height": 88,
+              "top": 294.5,
+              "right": 590.6875,
+              "bottom": 382.5,
+              "left": 385.265625
+            },
+            "inner": {
+              "x": 386.265625,
+              "y": 310.5,
+              "width": 203.421875,
+              "height": 56,
+              "top": 310.5,
+              "right": 589.6875,
+              "bottom": 366.5,
+              "left": 386.265625
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 488.265625,
+              "y": 406.5,
+              "width": 223.734375,
+              "height": 88,
+              "top": 406.5,
+              "right": 712,
+              "bottom": 494.5,
+              "left": 488.265625
+            },
+            "inner": {
+              "x": 496.265625,
+              "y": 422.5,
+              "width": 207.734375,
+              "height": 56,
+              "top": 422.5,
+              "right": 704,
+              "bottom": 478.5,
+              "left": 496.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 360,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 248,
+              "width": 321.265625,
+              "height": 64,
+              "top": 248,
+              "right": 353.265625,
+              "bottom": 312,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 252,
+              "width": 319.265625,
+              "height": 56,
+              "top": 252,
+              "right": 352.265625,
+              "bottom": 308,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 32,
+              "y": 328,
+              "width": 205.421875,
+              "height": 64,
+              "top": 328,
+              "right": 237.421875,
+              "bottom": 392,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 332,
+              "width": 203.421875,
+              "height": 56,
+              "top": 332,
+              "right": 236.421875,
+              "bottom": 388,
+              "left": 33
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 128.265625,
+              "y": 416,
+              "width": 223.734375,
+              "height": 64,
+              "top": 416,
+              "right": 352,
+              "bottom": 480,
+              "left": 128.265625
+            },
+            "inner": {
+              "x": 136.265625,
+              "y": 420,
+              "width": 207.734375,
+              "height": 56,
+              "top": 420,
+              "right": 344,
+              "bottom": 476,
+              "left": 136.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 360,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 176,
+              "width": 321.265625,
+              "height": 88,
+              "top": 176,
+              "right": 353.265625,
+              "bottom": 264,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 192,
+              "width": 319.265625,
+              "height": 56,
+              "top": 192,
+              "right": 352.265625,
+              "bottom": 248,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 32,
+              "y": 280,
+              "width": 205.421875,
+              "height": 88,
+              "top": 280,
+              "right": 237.421875,
+              "bottom": 368,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 296,
+              "width": 203.421875,
+              "height": 56,
+              "top": 296,
+              "right": 236.421875,
+              "bottom": 352,
+              "left": 33
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 128.265625,
+              "y": 392,
+              "width": 223.734375,
+              "height": 88,
+              "top": 392,
+              "right": 352,
+              "bottom": 480,
+              "left": 128.265625
+            },
+            "inner": {
+              "x": 136.265625,
+              "y": 408,
+              "width": 207.734375,
+              "height": 56,
+              "top": 408,
+              "right": 344,
+              "bottom": 464,
+              "left": 136.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 480,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 291.328125,
+              "width": 321.265625,
+              "height": 64,
+              "top": 291.328125,
+              "right": 353.265625,
+              "bottom": 355.328125,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 295.328125,
+              "width": 319.265625,
+              "height": 56,
+              "top": 295.328125,
+              "right": 352.265625,
+              "bottom": 351.328125,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 32,
+              "y": 371.328125,
+              "width": 205.421875,
+              "height": 64,
+              "top": 371.328125,
+              "right": 237.421875,
+              "bottom": 435.328125,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 375.328125,
+              "width": 203.421875,
+              "height": 56,
+              "top": 375.328125,
+              "right": 236.421875,
+              "bottom": 431.328125,
+              "left": 33
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 248.265625,
+              "y": 459.328125,
+              "width": 223.734375,
+              "height": 64,
+              "top": 459.328125,
+              "right": 472,
+              "bottom": 523.328125,
+              "left": 248.265625
+            },
+            "inner": {
+              "x": 256.265625,
+              "y": 463.328125,
+              "width": 207.734375,
+              "height": 56,
+              "top": 463.328125,
+              "right": 464,
+              "bottom": 519.328125,
+              "left": 256.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 480,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 247.828125,
+              "width": 321.265625,
+              "height": 88,
+              "top": 247.828125,
+              "right": 353.265625,
+              "bottom": 335.828125,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 263.828125,
+              "width": 319.265625,
+              "height": 56,
+              "top": 263.828125,
+              "right": 352.265625,
+              "bottom": 319.828125,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 32,
+              "y": 351.828125,
+              "width": 205.421875,
+              "height": 88,
+              "top": 351.828125,
+              "right": 237.421875,
+              "bottom": 439.828125,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 367.828125,
+              "width": 203.421875,
+              "height": 56,
+              "top": 367.828125,
+              "right": 236.421875,
+              "bottom": 423.828125,
+              "left": 33
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 248.265625,
+              "y": 463.828125,
+              "width": 223.734375,
+              "height": 88,
+              "top": 463.828125,
+              "right": 472,
+              "bottom": 551.828125,
+              "left": 248.265625
+            },
+            "inner": {
+              "x": 256.265625,
+              "y": 479.828125,
+              "width": 207.734375,
+              "height": 56,
+              "top": 479.828125,
+              "right": 464,
+              "bottom": 535.828125,
+              "left": 256.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 720,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 328,
+              "width": 321.265625,
+              "height": 64,
+              "top": 328,
+              "right": 353.265625,
+              "bottom": 392,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 332,
+              "width": 319.265625,
+              "height": 56,
+              "top": 332,
+              "right": 352.265625,
+              "bottom": 388,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 385.265625,
+              "y": 328,
+              "width": 205.421875,
+              "height": 64,
+              "top": 328,
+              "right": 590.6875,
+              "bottom": 392,
+              "left": 385.265625
+            },
+            "inner": {
+              "x": 386.265625,
+              "y": 332,
+              "width": 203.421875,
+              "height": 56,
+              "top": 332,
+              "right": 589.6875,
+              "bottom": 388,
+              "left": 386.265625
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 488.265625,
+              "y": 416,
+              "width": 223.734375,
+              "height": 64,
+              "top": 416,
+              "right": 712,
+              "bottom": 480,
+              "left": 488.265625
+            },
+            "inner": {
+              "x": 496.265625,
+              "y": 420,
+              "width": 207.734375,
+              "height": 56,
+              "top": 420,
+              "right": 704,
+              "bottom": 476,
+              "left": 496.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 720,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 32,
+              "y": 294.5,
+              "width": 321.265625,
+              "height": 88,
+              "top": 294.5,
+              "right": 353.265625,
+              "bottom": 382.5,
+              "left": 32
+            },
+            "inner": {
+              "x": 33,
+              "y": 310.5,
+              "width": 319.265625,
+              "height": 56,
+              "top": 310.5,
+              "right": 352.265625,
+              "bottom": 366.5,
+              "left": 33
+            },
+            "scroll": 319,
+            "client": 319
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 385.265625,
+              "y": 294.5,
+              "width": 205.421875,
+              "height": 88,
+              "top": 294.5,
+              "right": 590.6875,
+              "bottom": 382.5,
+              "left": 385.265625
+            },
+            "inner": {
+              "x": 386.265625,
+              "y": 310.5,
+              "width": 203.421875,
+              "height": 56,
+              "top": 310.5,
+              "right": 589.6875,
+              "bottom": 366.5,
+              "left": 386.265625
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More CtrlK",
+            "box": {
+              "x": 488.265625,
+              "y": 406.5,
+              "width": 223.734375,
+              "height": 88,
+              "top": 406.5,
+              "right": 712,
+              "bottom": 494.5,
+              "left": 488.265625
+            },
+            "inner": {
+              "x": 496.265625,
+              "y": 422.5,
+              "width": 207.734375,
+              "height": 56,
+              "top": 422.5,
+              "right": 704,
+              "bottom": 478.5,
+              "left": 496.265625
+            },
+            "scroll": 222,
+            "client": 222
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 360,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 210,
+              "width": 312,
+              "height": 102,
+              "top": 210,
+              "right": 352,
+              "bottom": 312,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 211,
+              "width": 310,
+              "height": 100,
+              "top": 211,
+              "right": 351,
+              "bottom": 311,
+              "left": 41
+            },
+            "scroll": 310,
+            "client": 310
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 328,
+              "width": 205.421875,
+              "height": 64,
+              "top": 328,
+              "right": 245.421875,
+              "bottom": 392,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 332,
+              "width": 203.421875,
+              "height": 56,
+              "top": 332,
+              "right": 244.421875,
+              "bottom": 388,
+              "left": 41
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 97.578125,
+              "y": 416,
+              "width": 246.421875,
+              "height": 64,
+              "top": 416,
+              "right": 344,
+              "bottom": 480,
+              "left": 97.578125
+            },
+            "inner": {
+              "x": 105.578125,
+              "y": 420,
+              "width": 230.421875,
+              "height": 56,
+              "top": 420,
+              "right": 336,
+              "bottom": 476,
+              "left": 105.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 360,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 162,
+              "width": 312,
+              "height": 102,
+              "top": 162,
+              "right": 352,
+              "bottom": 264,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 163,
+              "width": 310,
+              "height": 100,
+              "top": 163,
+              "right": 351,
+              "bottom": 263,
+              "left": 41
+            },
+            "scroll": 310,
+            "client": 310
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 280,
+              "width": 205.421875,
+              "height": 88,
+              "top": 280,
+              "right": 245.421875,
+              "bottom": 368,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 296,
+              "width": 203.421875,
+              "height": 56,
+              "top": 296,
+              "right": 244.421875,
+              "bottom": 352,
+              "left": 41
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 97.578125,
+              "y": 392,
+              "width": 246.421875,
+              "height": 88,
+              "top": 392,
+              "right": 344,
+              "bottom": 480,
+              "left": 97.578125
+            },
+            "inner": {
+              "x": 105.578125,
+              "y": 408,
+              "width": 230.421875,
+              "height": 56,
+              "top": 408,
+              "right": 336,
+              "bottom": 464,
+              "left": 105.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 480,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 296.53125,
+              "width": 343.953125,
+              "height": 64,
+              "top": 296.53125,
+              "right": 383.953125,
+              "bottom": 360.53125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 300.53125,
+              "width": 341.953125,
+              "height": 56,
+              "top": 300.53125,
+              "right": 382.953125,
+              "bottom": 356.53125,
+              "left": 41
+            },
+            "scroll": 342,
+            "client": 342
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 376.53125,
+              "width": 205.421875,
+              "height": 64,
+              "top": 376.53125,
+              "right": 245.421875,
+              "bottom": 440.53125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 380.53125,
+              "width": 203.421875,
+              "height": 56,
+              "top": 380.53125,
+              "right": 244.421875,
+              "bottom": 436.53125,
+              "left": 41
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 217.578125,
+              "y": 464.53125,
+              "width": 246.421875,
+              "height": 64,
+              "top": 464.53125,
+              "right": 464,
+              "bottom": 528.53125,
+              "left": 217.578125
+            },
+            "inner": {
+              "x": 225.578125,
+              "y": 468.53125,
+              "width": 230.421875,
+              "height": 56,
+              "top": 468.53125,
+              "right": 456,
+              "bottom": 524.53125,
+              "left": 225.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 480,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 253.4375,
+              "width": 343.953125,
+              "height": 88,
+              "top": 253.4375,
+              "right": 383.953125,
+              "bottom": 341.4375,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 269.4375,
+              "width": 341.953125,
+              "height": 56,
+              "top": 269.4375,
+              "right": 382.953125,
+              "bottom": 325.4375,
+              "left": 41
+            },
+            "scroll": 342,
+            "client": 342
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 357.4375,
+              "width": 205.421875,
+              "height": 88,
+              "top": 357.4375,
+              "right": 245.421875,
+              "bottom": 445.4375,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 373.4375,
+              "width": 203.421875,
+              "height": 56,
+              "top": 373.4375,
+              "right": 244.421875,
+              "bottom": 429.4375,
+              "left": 41
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 217.578125,
+              "y": 469.4375,
+              "width": 246.421875,
+              "height": 88,
+              "top": 469.4375,
+              "right": 464,
+              "bottom": 557.4375,
+              "left": 217.578125
+            },
+            "inner": {
+              "x": 225.578125,
+              "y": 485.4375,
+              "width": 230.421875,
+              "height": 56,
+              "top": 485.4375,
+              "right": 456,
+              "bottom": 541.4375,
+              "left": 225.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 720,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 328,
+              "width": 343.953125,
+              "height": 64,
+              "top": 328,
+              "right": 383.953125,
+              "bottom": 392,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 332,
+              "width": 341.953125,
+              "height": 56,
+              "top": 332,
+              "right": 382.953125,
+              "bottom": 388,
+              "left": 41
+            },
+            "scroll": 342,
+            "client": 342
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 415.953125,
+              "y": 328,
+              "width": 205.421875,
+              "height": 64,
+              "top": 328,
+              "right": 621.375,
+              "bottom": 392,
+              "left": 415.953125
+            },
+            "inner": {
+              "x": 416.953125,
+              "y": 332,
+              "width": 203.421875,
+              "height": 56,
+              "top": 332,
+              "right": 620.375,
+              "bottom": 388,
+              "left": 416.953125
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 457.578125,
+              "y": 416,
+              "width": 246.421875,
+              "height": 64,
+              "top": 416,
+              "right": 704,
+              "bottom": 480,
+              "left": 457.578125
+            },
+            "inner": {
+              "x": 465.578125,
+              "y": 420,
+              "width": 230.421875,
+              "height": 56,
+              "top": 420,
+              "right": 696,
+              "bottom": 476,
+              "left": 465.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 720,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 302.5,
+              "width": 343.953125,
+              "height": 88,
+              "top": 302.5,
+              "right": 383.953125,
+              "bottom": 390.5,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 318.5,
+              "width": 341.953125,
+              "height": 56,
+              "top": 318.5,
+              "right": 382.953125,
+              "bottom": 374.5,
+              "left": 41
+            },
+            "scroll": 342,
+            "client": 342
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 415.953125,
+              "y": 302.5,
+              "width": 205.421875,
+              "height": 88,
+              "top": 302.5,
+              "right": 621.375,
+              "bottom": 390.5,
+              "left": 415.953125
+            },
+            "inner": {
+              "x": 416.953125,
+              "y": 318.5,
+              "width": 203.421875,
+              "height": 56,
+              "top": 318.5,
+              "right": 620.375,
+              "bottom": 374.5,
+              "left": 416.953125
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 457.578125,
+              "y": 414.5,
+              "width": 246.421875,
+              "height": 88,
+              "top": 414.5,
+              "right": 704,
+              "bottom": 502.5,
+              "left": 457.578125
+            },
+            "inner": {
+              "x": 465.578125,
+              "y": 430.5,
+              "width": 230.421875,
+              "height": 56,
+              "top": 430.5,
+              "right": 696,
+              "bottom": 486.5,
+              "left": 465.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 360,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 210,
+              "width": 312,
+              "height": 102,
+              "top": 210,
+              "right": 352,
+              "bottom": 312,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 211,
+              "width": 310,
+              "height": 100,
+              "top": 211,
+              "right": 351,
+              "bottom": 311,
+              "left": 41
+            },
+            "scroll": 310,
+            "client": 310
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 328,
+              "width": 205.421875,
+              "height": 64,
+              "top": 328,
+              "right": 245.421875,
+              "bottom": 392,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 332,
+              "width": 203.421875,
+              "height": 56,
+              "top": 332,
+              "right": 244.421875,
+              "bottom": 388,
+              "left": 41
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 97.578125,
+              "y": 416,
+              "width": 246.421875,
+              "height": 64,
+              "top": 416,
+              "right": 344,
+              "bottom": 480,
+              "left": 97.578125
+            },
+            "inner": {
+              "x": 105.578125,
+              "y": 420,
+              "width": 230.421875,
+              "height": 56,
+              "top": 420,
+              "right": 336,
+              "bottom": 476,
+              "left": 105.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 360,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 162,
+              "width": 312,
+              "height": 102,
+              "top": 162,
+              "right": 352,
+              "bottom": 264,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 163,
+              "width": 310,
+              "height": 100,
+              "top": 163,
+              "right": 351,
+              "bottom": 263,
+              "left": 41
+            },
+            "scroll": 310,
+            "client": 310
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 280,
+              "width": 205.421875,
+              "height": 88,
+              "top": 280,
+              "right": 245.421875,
+              "bottom": 368,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 296,
+              "width": 203.421875,
+              "height": 56,
+              "top": 296,
+              "right": 244.421875,
+              "bottom": 352,
+              "left": 41
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 97.578125,
+              "y": 392,
+              "width": 246.421875,
+              "height": 88,
+              "top": 392,
+              "right": 344,
+              "bottom": 480,
+              "left": 97.578125
+            },
+            "inner": {
+              "x": 105.578125,
+              "y": 408,
+              "width": 230.421875,
+              "height": 56,
+              "top": 408,
+              "right": 336,
+              "bottom": 464,
+              "left": 105.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 480,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 296.53125,
+              "width": 343.953125,
+              "height": 64,
+              "top": 296.53125,
+              "right": 383.953125,
+              "bottom": 360.53125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 300.53125,
+              "width": 341.953125,
+              "height": 56,
+              "top": 300.53125,
+              "right": 382.953125,
+              "bottom": 356.53125,
+              "left": 41
+            },
+            "scroll": 342,
+            "client": 342
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 376.53125,
+              "width": 205.421875,
+              "height": 64,
+              "top": 376.53125,
+              "right": 245.421875,
+              "bottom": 440.53125,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 380.53125,
+              "width": 203.421875,
+              "height": 56,
+              "top": 380.53125,
+              "right": 244.421875,
+              "bottom": 436.53125,
+              "left": 41
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 217.578125,
+              "y": 464.53125,
+              "width": 246.421875,
+              "height": 64,
+              "top": 464.53125,
+              "right": 464,
+              "bottom": 528.53125,
+              "left": 217.578125
+            },
+            "inner": {
+              "x": 225.578125,
+              "y": 468.53125,
+              "width": 230.421875,
+              "height": 56,
+              "top": 468.53125,
+              "right": 456,
+              "bottom": 524.53125,
+              "left": 225.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 480,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 253.4375,
+              "width": 343.953125,
+              "height": 88,
+              "top": 253.4375,
+              "right": 383.953125,
+              "bottom": 341.4375,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 269.4375,
+              "width": 341.953125,
+              "height": 56,
+              "top": 269.4375,
+              "right": 382.953125,
+              "bottom": 325.4375,
+              "left": 41
+            },
+            "scroll": 342,
+            "client": 342
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 40,
+              "y": 357.4375,
+              "width": 205.421875,
+              "height": 88,
+              "top": 357.4375,
+              "right": 245.421875,
+              "bottom": 445.4375,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 373.4375,
+              "width": 203.421875,
+              "height": 56,
+              "top": 373.4375,
+              "right": 244.421875,
+              "bottom": 429.4375,
+              "left": 41
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 217.578125,
+              "y": 469.4375,
+              "width": 246.421875,
+              "height": 88,
+              "top": 469.4375,
+              "right": 464,
+              "bottom": 557.4375,
+              "left": 217.578125
+            },
+            "inner": {
+              "x": 225.578125,
+              "y": 485.4375,
+              "width": 230.421875,
+              "height": 56,
+              "top": 485.4375,
+              "right": 456,
+              "bottom": 541.4375,
+              "left": 225.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 720,
+      "coarse": false,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 328,
+              "width": 343.953125,
+              "height": 64,
+              "top": 328,
+              "right": 383.953125,
+              "bottom": 392,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 332,
+              "width": 341.953125,
+              "height": 56,
+              "top": 332,
+              "right": 382.953125,
+              "bottom": 388,
+              "left": 41
+            },
+            "scroll": 342,
+            "client": 342
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 415.953125,
+              "y": 328,
+              "width": 205.421875,
+              "height": 64,
+              "top": 328,
+              "right": 621.375,
+              "bottom": 392,
+              "left": 415.953125
+            },
+            "inner": {
+              "x": 416.953125,
+              "y": 332,
+              "width": 203.421875,
+              "height": 56,
+              "top": 332,
+              "right": 620.375,
+              "bottom": 388,
+              "left": 416.953125
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 457.578125,
+              "y": 416,
+              "width": 246.421875,
+              "height": 64,
+              "top": 416,
+              "right": 704,
+              "bottom": 480,
+              "left": 457.578125
+            },
+            "inner": {
+              "x": 465.578125,
+              "y": 420,
+              "width": 230.421875,
+              "height": 56,
+              "top": 420,
+              "right": 696,
+              "bottom": 476,
+              "left": 465.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 720,
+      "coarse": true,
+      "measured": {
+        "overflow": false,
+        "buttons": [
+          {
+            "name": "Add to citation",
+            "box": {
+              "x": 40,
+              "y": 302.5,
+              "width": 343.953125,
+              "height": 88,
+              "top": 302.5,
+              "right": 383.953125,
+              "bottom": 390.5,
+              "left": 40
+            },
+            "inner": {
+              "x": 41,
+              "y": 318.5,
+              "width": 341.953125,
+              "height": 56,
+              "top": 318.5,
+              "right": 382.953125,
+              "bottom": 374.5,
+              "left": 41
+            },
+            "scroll": 342,
+            "client": 342
+          },
+          {
+            "name": "Clear search",
+            "box": {
+              "x": 415.953125,
+              "y": 302.5,
+              "width": 205.421875,
+              "height": 88,
+              "top": 302.5,
+              "right": 621.375,
+              "bottom": 390.5,
+              "left": 415.953125
+            },
+            "inner": {
+              "x": 416.953125,
+              "y": 318.5,
+              "width": 203.421875,
+              "height": 56,
+              "top": 318.5,
+              "right": 620.375,
+              "bottom": 374.5,
+              "left": 416.953125
+            },
+            "scroll": 203,
+            "client": 203
+          },
+          {
+            "name": "More Ctrl+K",
+            "box": {
+              "x": 457.578125,
+              "y": 414.5,
+              "width": 246.421875,
+              "height": 88,
+              "top": 414.5,
+              "right": 704,
+              "bottom": 502.5,
+              "left": 457.578125
+            },
+            "inner": {
+              "x": 465.578125,
+              "y": 430.5,
+              "width": 230.421875,
+              "height": 56,
+              "top": 430.5,
+              "right": 696,
+              "bottom": 486.5,
+              "left": 465.578125
+            },
+            "scroll": 244,
+            "client": 244
+          }
+        ]
+      },
+      "passed": true
+    }
+  ],
+  "total": 36,
+  "passed": 36
+}

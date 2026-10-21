@@ -1,0 +1,11 @@
+{
+  "mainBaseline": "47667263c7de94db5bd20daa909863f78cd45a4d",
+  "overflowBefore": "57bd3acf8565979e0f0838043fbb65ca05701a41",
+  "source": "78b23364797aa0b4b88de0fbffa3a4ca40cbda7f",
+  "browser": "Chromium151.0.7922.34",
+  "newPNG": {
+    "720x620": 36,
+    "360x480": 12
+  },
+  "native": "unverified"
+}
