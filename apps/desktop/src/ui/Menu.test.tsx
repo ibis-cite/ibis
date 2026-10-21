@@ -15,7 +15,7 @@ function Harness({ onAction, toggle }: { onAction: (id: string) => void; toggle:
     <input ref={search} aria-label="Search" />
     <Menu label="Actions" trigger="Actions" isOpen={open} onOpenChange={setOpen} tabFocusRef={search}>
       <MenuSection id="plain">
-        <MenuItem id="open" label="Open" keys="Ctrl+O" onAction={() => onAction("open")} />
+        <MenuItem id="open" label="Open" keys="Ctrl+O" onAction={() => { onAction("open"); setOpen(false); search.current?.focus(); }} />
       </MenuSection>
       <MenuSeparator />
       <MenuSection id="toggles" label="Sources">
@@ -95,6 +95,33 @@ test("the last checked item stays focusable and unavailable; toggles keep the me
   expect(screen.queryByRole("menu")).toBeNull();
   expect(document.activeElement).toBe(search);
   expect(onAction).not.toHaveBeenCalled();
+});
+
+test("an action returns focus to Search through the menu's exit animation", async () => {
+  const { trigger, search, onAction } = mount();
+  act(() => trigger.focus());
+  fireEvent.click(trigger);
+  const menu = await screen.findByRole("menu");
+  let finishExit!: () => void;
+  const finished = new Promise<void>((resolve) => { finishExit = resolve; });
+  const popover = menu.closest(".menu-popover")!;
+  // JSDOM has no CSS animation lifecycle: keep the real popover mounted until
+  // its exit finishes, as the browser does for menu-exit in Menu.css.
+  Object.defineProperty(popover, "getAnimations", { value: () => popover.hasAttribute("data-exiting")
+    ? [{ playState: "running", finished }] : [] });
+  const open = screen.getByRole("menuitem", { name: "Open" });
+  act(() => open.focus());
+  // The live modal popover makes the rest of the page inert until it closes.
+  // Model its refusal of the action's first focus attempt (JSDOM has no inert).
+  const focus = vi.spyOn(search, "focus").mockImplementationOnce(() => {});
+  fireEvent.click(open);
+  expect(onAction).toHaveBeenCalledWith("open");
+  expect(popover.hasAttribute("data-exiting")).toBe(true);
+  await act(async () => { finishExit(); });
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  focus.mockRestore();
+  expect(screen.queryByRole("menu")).toBeNull();
+  expect(document.activeElement).toBe(search);
 });
 
 const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
