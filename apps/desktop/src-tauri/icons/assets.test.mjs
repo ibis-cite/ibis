@@ -32,6 +32,9 @@ test("bundle icons are the approved B/G1 sources and have their declared sizes",
   const small = read("source/small.svg").toString();
   expect(small).toContain('stroke-width="11"');
   expect(small).not.toContain('r="2.1"');
+  for (const name of ["windows.svg", "windows-small.svg"]) {
+    expect(read(`source/${name}`).toString()).toContain('viewBox="20 19 70 70"');
+  }
   const symbolic = read("source/io.github.ibiscite.ibis-symbolic.svg").toString();
   expect(symbolic).toContain('viewBox="0 0 16 16"');
   expect(symbolic).toContain('stroke-width="1.75"');

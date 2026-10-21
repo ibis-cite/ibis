@@ -29,7 +29,10 @@ Icon Composer orders groups front to back, so the eye is listed before the bird.
 
 Two platform adaptations need the maintainer's final look. Windows uses the
 same curves in G1 on transparency, with an eye cutout, to satisfy the no-tile
-requirement; this is a proposed adaptation, not a recovered board-R master.
+requirement. Its `viewBox="20 19 70 70"` fits the unchanged bird curves into
+the Windows slot with about one pixel of clearance at 16px, instead of keeping
+the plate's empty margins. This is a proposed adaptation, not a recovered
+board-R master.
 Dark explicitly retains G1 and the white bird: the board's darker endpoint colours were not
 available in the public specification. Clear and Tinted are Apple's treatment
 of the layered source. No custom lighting, shadow or glow is baked into it.
