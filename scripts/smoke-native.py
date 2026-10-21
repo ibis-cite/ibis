@@ -143,10 +143,13 @@ def menu_escape_focus(native, snapshot, shortcut, report):
     facts["shortcut_opened"] = True
     native.key("Escape")
     wait_for(lambda: not named(snapshot(), "Reload"), "Escape closes More", timeout=5)
-    closed = snapshot()
     facts["escape_closed"] = True
-    facts["escape_invoker_focused"] = any(node.get("focused") for node in named(closed, "More"))
-    facts["search_unchanged"] = values(closed) == original
+    def restored():
+        current = snapshot()
+        facts["escape_invoker_focused"] = any(node.get("focused") for node in named(current, "More"))
+        facts["search_unchanged"] = values(current) == original
+        return facts["escape_invoker_focused"]
+    wait_for(restored, "Escape restores More focus", timeout=5)
     native.key("space")
     def reopened():
         current = snapshot()
@@ -2178,7 +2181,7 @@ class ContractTests(unittest.TestCase):
             menu_action(native, "Search references")
 
     def test_menu_escape_checks_keyboard_ownership_without_recording_search_text(self):
-        for loses_focus in (False, True):
+        for failure in (None, "accessible-focus", "keyboard-ownership"):
             state = {"menu": False, "more": False, "value": "private synthetic query"}
             def snapshot():
                 return {"nodes": ([{"name": "Reload"}] if state["menu"] else [
@@ -2188,27 +2191,61 @@ class ContractTests(unittest.TestCase):
                 if chord == "ctrl+k":
                     state["menu"] = True
                 elif chord == "Escape":
-                    state.update(menu=False, more=not loses_focus)
+                    state.update(menu=False, more=failure != "accessible-focus")
                 elif chord == "space":
-                    state["menu"] = state["more"]
-                    if not state["more"]:
+                    state["menu"] = state["more"] and failure != "keyboard-ownership"
+                    if not state["menu"]:
                         state["value"] += " "
                 elif chord == "Tab":
                     state.update(menu=False, more=False)
             native, report = Mock(), {}
             native.key.side_effect = key
             with patch(__name__ + ".wait_for", side_effect=lambda predicate, *args, **kwargs: self.assertTrue(predicate())):
-                if loses_focus:
+                if failure:
                     with self.assertRaises(AssertionError):
                         menu_escape_focus(native, snapshot, "ctrl+k", report)
                     self.assertFalse(report["menu_escape_focus"]["space_reopened"])
-                    self.assertFalse(report["menu_escape_focus"]["search_unchanged"])
+                    self.assertEqual(report["menu_escape_focus"]["search_unchanged"], failure == "accessible-focus")
                 else:
                     menu_escape_focus(native, snapshot, "ctrl+k", report)
                     self.assertTrue(all(report["menu_escape_focus"].values()))
                     self.assertEqual(native.key.call_args_list, [call("ctrl+k"), call("Escape"), call("space"), call("Tab")])
             self.assertTrue(all(type(value) is bool for value in report["menu_escape_focus"].values()))
             self.assertNotIn(state["value"], json.dumps(report))
+
+    def test_menu_escape_waits_for_delayed_invoker_focus_before_space(self):
+        state = {"menu": False, "escaped": False, "reads": 0, "value": "synthetic query"}
+        def snapshot():
+            if state["escaped"] and not state["menu"]:
+                state["reads"] += 1
+            return {"nodes": ([{"name": "Reload"}] if state["menu"] else [
+                {"name": "More", "focused": state["escaped"] and state["reads"] >= 5},
+                {"name": "Search references", "value": state["value"], "focused": not state["escaped"]}])}
+        def key(chord):
+            if chord == "ctrl+k":
+                state["menu"] = True
+            elif chord == "Escape":
+                state.update(menu=False, escaped=True)
+            elif chord == "space":
+                if state["reads"] >= 5:
+                    state["menu"] = True
+                else:
+                    state["value"] += " "
+            elif chord == "Tab":
+                state.update(menu=False, escaped=False)
+        def wait(predicate, description, *, timeout):
+            self.assertEqual(timeout, 5)
+            for _ in range(10):
+                if predicate():
+                    return
+            self.fail(description)
+        native, report = Mock(), {}
+        native.key.side_effect = key
+        with patch(__name__ + ".wait_for", side_effect=wait):
+            menu_escape_focus(native, snapshot, "ctrl+k", report)
+        self.assertTrue(all(report["menu_escape_focus"].values()))
+        self.assertEqual(state["value"], "synthetic query")
+        self.assertEqual(native.key.call_args_list, [call("ctrl+k"), call("Escape"), call("space"), call("Tab")])
 
     def test_global_macos_hid_event_contracts_without_native_execution(self):
         subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,
