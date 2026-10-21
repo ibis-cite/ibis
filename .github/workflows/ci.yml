@@ -8,12 +8,17 @@ on:
     paths-ignore: ["**.md", "docs/**"]
   pull_request:
   workflow_dispatch:
+  # Weekly drift check of the pinned Nix inputs. That run also does the Linux
+  # checks but skips the native app build (see the changes job).
+  schedule:
+    - cron: "23 4 * * 1"
 
 # A newer push replaces the older run of the same branch or pull request. On
 # main, the newest commit contains every earlier merge, so its run tests them
 # all and the macOS and Windows runners are not kept busy by superseded states.
+# The weekly run has its own group so it never cancels a run for a main commit.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name == 'schedule' && 'schedule' || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -27,7 +32,8 @@ jobs:
   nix:
     name: Nix package (Linux)
     needs: changes
-    if: needs.changes.outputs.native == 'true'
+    # Not required. Pull requests run it only when packaging inputs change.
+    if: needs.changes.outputs.nix == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     defaults:
@@ -70,7 +76,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends xvfb xauth xdotool xclip xterm openbox x11-utils python3-pyatspi at-spi2-core
-          xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- /usr/bin/python3 scripts/smoke-native.py --app result/bin/ibis-desktop --output nix-evidence/runtime --budgets scripts/smoke-budgets.json
+          xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- /usr/bin/python3 scripts/smoke-native.py --app result/bin/ibis-desktop --output nix-evidence/runtime
 
       - name: Preserve Nix build and runtime evidence
         if: always()
@@ -89,10 +95,14 @@ jobs:
       pull-requests: read
     outputs:
       native: ${{ steps.classify.outputs.native }}
+      nix: ${{ steps.classify.outputs.nix }}
     steps:
       # A pull request that changes only documentation skips the native app
       # build. The Desktop jobs still run and pass in seconds, so the required
       # checks report. Pushes to main, and anything unclear, build in full.
+      # The Nix package is rebuilt only when its inputs change (a stale
+      # nix/pnpm-deps-hash fails on the pull request that causes it), weekly
+      # and on manual runs. The weekly run skips the native app build.
       - name: Decide whether the native app must be built
         id: classify
         env:
@@ -103,21 +113,32 @@ jobs:
           EXPECTED: ${{ github.event.pull_request.changed_files }}
         run: |
           native=true
+          nix=false
+          case "$EVENT" in
+            schedule) native=false nix=true ;;
+            workflow_dispatch) nix=true ;;
+            pull_request) nix=true ;;
+          esac
           if [ "$EVENT" = pull_request ] &&
             files=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | .filename, (.previous_filename // empty)') &&
             listed=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename' | wc -l) &&
             [ "$listed" -eq "$EXPECTED" ] && [ "$listed" -gt 0 ]; then
             native=false
+            nix=false
             while IFS= read -r file; do
               case "$file" in
                 fixtures/*) native=true ;;
                 *.md | docs/* | LICENSE* | .github/ISSUE_TEMPLATE/*) ;;
                 *) native=true ;;
               esac
+              case "$file" in
+                flake.nix | flake.lock | nix/* | Cargo.lock | apps/desktop/package.json | apps/desktop/pnpm-lock.yaml) nix=true ;;
+              esac
             done <<< "$files"
           fi
           echo "native=$native" >> "$GITHUB_OUTPUT"
-          echo "Build the native app: $native"
+          echo "nix=$nix" >> "$GITHUB_OUTPUT"
+          echo "Build the native app: $native; build the Nix package: $nix"
 
   test:
     name: Test (${{ matrix.os }})

@@ -97,5 +97,9 @@ data under X11; this does not establish Wayland or hardware-GPU behavior.
 
 The [CI workflow](../.github/workflows/ci.yml) preserves the exact source commit,
 derivation, output path, build log and graphical results in its `nix-package-*`
-artifact. Check the **Nix package (Linux)** job for the revision you are using;
-evaluation alone does not establish a successful build or runtime check.
+artifact. The job runs on pull requests that change `flake.nix`, `flake.lock`,
+`nix/`, `Cargo.lock` or the desktop `package.json`/`pnpm-lock.yaml`, weekly and on
+manual runs, so a commit on `main` may have no run of its own; evaluation alone
+does not establish a successful build or runtime check. The smoke test checks
+behaviour only: its performance budgets are calibrated for debug builds, so the
+release package is not held to them.
