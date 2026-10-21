@@ -269,7 +269,8 @@ open; after a failed update it says "not updated" and why.
 
 The picker's chrome: what sits around the result list, and how it lines up.
 Every number below comes from the tokens in **Space and size** and
-**Corners**; nothing here adds a new size.
+**Corners** and the role tokens of the design-system foundations (surfaces,
+text levels, `--r-control`, `--r-key`); nothing here adds a new size.
 
 **Edges.** Visible edges line up with the content; hit targets may overhang
 them. The leading edge is the tile column (`inset + row-pad`), the text column
@@ -298,7 +299,7 @@ in one bar shares a baseline.
   | Indicator | ⌃⌄ (`chevron.up.chevron.down`), 8 × 12 | `ChevronDown`, 12 px, 1 px stroke | `pan-down-symbolic`, 16 px |
   | Rest | No fill | Control fill, 1 px stroke with a darker bottom edge | No fill |
   | Hover / open | Quiet fill / pressed fill | Hover fill / pressed fill | Quiet fill / pressed fill |
-  | Height, radius | 28 px in a 32 px target, capsule | 32 px, 4 px | 32 px, 6 px |
+  | Height, radius (`--r-control`) | 28 px in a 32 px target, capsule | 32 px, 4 px | 32 px, 6 px |
   | Label | Regular weight | Regular weight | Bold, as libadwaita buttons are |
 
   The menu opens below the button, aligned to its trailing edge. Keyboard: Tab
@@ -307,9 +308,10 @@ in one bar shares a baseline.
   filters; a pick, Escape or Tab returns focus to the search box. While no
   library is chosen the header menus are hidden, because first-run setup asks
   the same question in its own words.
-- **Pin.** Always visible: tertiary colour at rest (the secondary colour at
-  55%), full strength on hover or while on, so the header never shows a hole
-  where it appears.
+- **Pin.** Always visible: `--text-tertiary` at rest, full strength on hover
+  or while on, so the header never shows a hole where it appears.
+- **Targets.** Every header control keeps a 32 px target (44 px under
+  `pointer: coarse`), even where it draws 28 px.
 
 **Footer.** Library status at the leading edge; at the trailing edge, key hints
 and More. One hint pattern everywhere outside menus: **the label first, then
@@ -329,17 +331,19 @@ baseline, each key cap 20 px high and centred on it.
   Changing shortcuts belongs to the settings design, not to this list.
 - **Library status** keeps its rules (see **Library status**): the dot is
   6 px, centred on the text's x-height, and starts on the leading edge.
-- **Key caps.** A 20 px fill (`--key-cap`), 5 px side padding, 12 px text,
-  never an outline. macOS joins the glyphs in one cap, as its menus write them
+- **Key caps.** A 20 px fill (`--key-cap` on the control fill), radius
+  `--r-key`, 5 px side padding, 12 px text in the UI font, never an outline
+  and never scarlet. macOS joins the glyphs in one cap, as its menus write them
   (⌘K, ⇧↵). Windows gives each key its own cap, 2 px apart, as PowerToys does
   (Ctrl K). GNOME gives each key its own cap with a "+" between, as GTK's
   shortcut labels do (Ctrl + K). In menus a shortcut is plain trailing text,
   as in each system's own menus, never a cap.
 
 **Empty states.** One template on every platform, centred like
-`ContentUnavailableView`, `AdwStatusPage` and Fluent's empty state: a title
-(15/20, semibold), one line at most 44 characters wide (13/18, secondary),
-then actions or hints 16 px below. It starts 48 px below the search band. The
+`ContentUnavailableView`, `AdwStatusPage` and Fluent's empty state: a 48 px
+symbolic icon in `--text-tertiary`, a title (15/20, semibold), one line at
+most 40 characters wide (13/18, secondary), then at most two actions, or key
+hints, 16 px below. No skeletons; a spinner only after 400 ms. It starts 48 px below the search band. The
 result heading ("Best matches", "20 results") appears only above rows: with
 no rows there is nothing to name.
 
@@ -359,8 +363,10 @@ No illustration and no tips beyond those keys.
 **First run.** A grouped form, as macOS System Settings, Windows Settings
 cards and libadwaita preference groups are: a title ("Choose a library to get
 started") and one secondary line saying what was found, then one group of
-labelled rows, each 48 px high with `row-pad` sides and its control at the
-trailing edge, separated by hairlines, radius `--r-row`.
+labelled rows on `--surface-raised`, each at least 48 px high (56 px with a
+second line) with `row-pad` sides and one control at the trailing edge,
+separated by hairlines, radius `--r-row`. These are the same rows the
+Settings window will use.
 
 1. **Library:** Use Zotero and Choose library…. Exactly one is the primary
    button (accent fill, paired text): Use Zotero when Zotero is open,
