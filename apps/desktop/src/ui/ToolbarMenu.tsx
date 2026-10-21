@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState, type RefObject, type ComponentPropsWithRef } from "react";
 import { Autocomplete, Button, Header, Input, Menu, MenuItem, MenuSection, MenuTrigger, Popover, SearchField, Text, useFilter } from "react-aria-components";
 import { MenuCheck } from "./Menu";
+import { platformOf } from "../platform";
 import "./ToolbarMenu.css";
+
+/** The pop-up indicator each system draws: ⌃⌄ (SF Symbol chevron.up.chevron.down)
+ * on macOS, Fluent's ChevronDown on Windows, pan-down-symbolic on GNOME. It never turns. */
+function MenuChevron() {
+  const platform = typeof navigator === "undefined" ? "linux" : platformOf(navigator.platform);
+  if (platform === "macos") return <svg className="menu-chevron" aria-hidden="true" width="8" height="12" viewBox="0 0 8 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="m1.5 4.25 2.5-2.5 2.5 2.5M1.5 7.75l2.5 2.5 2.5-2.5" /></svg>;
+  if (platform === "windows") return <svg className="menu-chevron" aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="m2 4.25 4 4 4-4" /></svg>;
+  return <svg className="menu-chevron" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m4.5 6.5 3.5 3.5 3.5-3.5" /></svg>;
+}
 
 /** A titled group of choices; without a label it has no heading. */
 export type ToolbarMenuSection = { id: string; label?: string; items: { id: string; label: string; sample?: string; prose?: boolean; disabled?: boolean }[] };
@@ -55,7 +65,7 @@ export function ToolbarMenu({ label, value, sections, selectedKey, buttonLabel, 
     }}
     onKeyDown={(event) => { if (open && !event.ctrlKey && !event.metaKey) event.stopPropagation(); }}>
     <MenuTrigger isOpen={open} onOpenChange={changeOpen}>
-      <Button className="toolbar-menu-button" aria-label={buttonLabel ?? `${label} ${value}`}><span className="toolbar-menu-value">{value}</span><svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m3 4.5 3 3 3-3" /></svg></Button>
+      <Button className="toolbar-menu-button" aria-label={buttonLabel ?? `${label} ${value}`}><span className="toolbar-menu-value">{value}</span><MenuChevron /></Button>
       <Popover className="menu-popover toolbar-menu-popover" placement="bottom end" offset={6} style={width ? { width } : undefined}>
         {filtered ? <Autocomplete filter={contains}><SearchField className="toolbar-menu-filter" aria-label={filterLabel} autoFocus><Input placeholder={filterLabel} /></SearchField>{menu}</Autocomplete> : menu}
       </Popover>

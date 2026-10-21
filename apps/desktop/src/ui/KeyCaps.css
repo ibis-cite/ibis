@@ -1,0 +1,10 @@
+/* One hint pattern (docs/design.md, Footer): label first, keys after, 6 px
+   between them, 16 px between hints. Caps are 20 px fills on every platform;
+   only how keys are split differs. */
+.key-hint { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--muted); }
+.key-hint[data-primary] { color: var(--text); }
+.key-caps { display: inline-flex; align-items: center; gap: 2px; }
+.key-cap-part { display: inline-flex; align-items: center; gap: 2px; }
+.key-caps kbd { margin: 0; min-width: 20px; height: 20px; line-height: 18px; padding: 0 5px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.key-hint[data-primary] kbd { color: var(--text); }
+.key-plus { color: var(--muted); font-size: 11px; padding-inline: 1px; }

@@ -1,6 +1,8 @@
 import type React from "react";
 import type { LibraryStatus } from "../../api";
-import { libraryMessages, pickerText } from "../../messages";
+import { keysFor } from "../../keys";
+import { keyText, libraryMessages, pickerText } from "../../messages";
+import { KeyHint } from "../../ui/KeyCaps";
 
 /** What the result list says when it has no rows: an empty library, no
  * matches and what to try next, a hint to type, or first-run setup. */
@@ -32,7 +34,13 @@ export function EmptyState({ library, query, narrowed, onChooseLibrary, onClearS
                 {narrowed && <button type="button" onClick={onSearchAll}>{pickerText.searchAllLibraries}</button>}
               </div>
             </>
-            : <><p>{pickerText.typeToFind}</p><p className="empty-hint">{pickerText.typeToFindHint}</p></>
+            : <><p>{pickerText.typeToFind}</p><p className="empty-hint">{pickerText.typeToFindHint}</p>
+              {/* The first keys to learn, in the footer's hint pattern; decorative,
+                  since the keys dialog and More say the same in words. */}
+              <p className="empty-keys" aria-hidden="true">
+                <KeyHint label={keyText.copyShort} keys={keysFor("copy")} />
+                <KeyHint label={keyText.addShort} keys={keysFor("add")} />
+              </p></>
       ) : library?.state === "none" ? setup : null}
     </div>
   );

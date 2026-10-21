@@ -289,3 +289,82 @@ main[data-selection] .results-area { flex: 1 0 var(--results-min-height); overfl
 @media (max-width: 460px) {
   .keys-scroll td:first-child { white-space: normal; }
 }
+
+/* ---- Chrome polish (design/chrome-polish-prototype; docs/design.md, Header,
+   Footer, Empty states, First run, Selection and focus) ---- */
+/* Visual edges line up with the content column; hit targets overhang it.
+   The pin's glyph and the More key cap end where row text ends:
+   W − inset − row-pad. A 32 px target with a 20 px glyph overhangs 6 px. */
+.search-bar { padding-inline-end: calc(var(--inset) + var(--row-pad) - 6px); }
+/* The pin is always there, faint at rest (tertiary), full strength on hover
+   or while on, so the header's trailing edge never shows a hole. */
+.pin-button { opacity: .55; }
+:root[data-platform="linux"] .library-setup button { font-weight: 600; }
+.search-bar .toolbar-menu-control:first-of-type { margin-inline-start: var(--space-1); }
+footer { padding-inline-end: calc(var(--inset) + var(--row-pad) - var(--space-2)); }
+.library-bar { gap: var(--space-4); }
+.enter-hints { gap: var(--space-1) var(--space-4); font-size: var(--hint-size); }
+.enter-hints kbd { margin: 0; }
+/* More is a hint that is also a button: same label and cap, a quiet fill on
+   hover and while open, 28 px tall in a 32 px row. */
+.more > button { display: inline-flex; align-items: center; min-height: 28px; padding: 0 var(--space-2); border: 0; border-radius: var(--r-tile); font-size: var(--hint-size); }
+.more > button:hover, .more > button[aria-expanded="true"] { background: var(--button-background); }
+.more > button kbd { margin: 0; }
+
+/* Empty states: one centred template on every platform (ContentUnavailableView,
+   AdwStatusPage, Fluent empty state): a 15/20 title, a 13/18 line at most
+   44ch wide, then actions or key hints 16 px below. */
+.empty-state { padding: var(--space-6) var(--space-4) var(--space-4); padding-top: 3rem; display: flex; flex-direction: column; align-items: center; }
+.empty-state > p { margin: 0; max-width: 44ch; }
+.empty-state > p:first-child { font-size: var(--title-size); line-height: var(--title-line-height); }
+.empty-state > p + p { margin-top: var(--space-1); }
+.empty-state .empty-keys { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-4); margin-top: var(--space-4); font-size: var(--hint-size); }
+.empty-actions { margin-top: var(--space-4); }
+
+/* First run: a grouped form. */
+.empty-state:has(.library-setup) { padding-top: var(--space-6); }
+.library-setup { width: min(100%, 27.5rem); display: flex; flex-direction: column; align-items: stretch; gap: var(--space-3); text-align: start; color: var(--text); }
+.setup-intro { text-align: center; }
+.setup-intro p { margin: 0; }
+.setup-title { font-size: var(--title-size); line-height: var(--title-line-height); font-weight: var(--type-strong-weight); }
+.setup-lede { margin-top: var(--space-1) !important; color: var(--muted); font-size: var(--metadata-size); }
+.setup-note { margin: 0; color: var(--muted); font-size: var(--metadata-size); }
+.setup-group { display: flex; flex-direction: column; border-radius: var(--r-row); background: var(--hover-background); border: var(--border-width) solid var(--separator); overflow: hidden; }
+.setup-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 3rem; padding: var(--space-2) var(--row-pad); font-size: var(--metadata-size); cursor: default; }
+.setup-row + .setup-row { border-top: var(--border-width) solid var(--separator); }
+.setup-label { min-width: 0; display: flex; flex-direction: column; overflow-wrap: anywhere; }
+.setup-found .found-folder { color: var(--muted); font-size: var(--hint-size); }
+.setup-control { display: inline-flex; align-items: center; gap: var(--space-2); flex: none; }
+.setup-control > button { min-height: 28px; padding: 0 var(--space-3); }
+.library-setup .link-button { align-self: center; background: none; border: 0; color: var(--accent); font-size: var(--metadata-size); min-height: var(--control-min-size); }
+.library-setup button[aria-disabled="true"] { color: var(--muted); }
+
+/* The one primary button: the system accent with its paired text. */
+.primary-button { background: var(--accent); color: var(--selected-text, #fff); border-color: transparent; }
+.primary-button:hover { background: color-mix(in srgb, var(--accent) 88%, black); }
+
+/* Segmented choice: a recessed track and a raised thumb; never a coloured
+   border (rule 8). Keyboard focus rings the button, not the track. */
+.segmented { gap: 2px; padding: 2px; border-radius: calc(var(--r-tile) + 2px); background: var(--button-background); }
+.segmented > button { min-height: 24px; padding: 0 var(--space-3); border: 0; border-radius: var(--r-tile); background: transparent; color: var(--text); font-size: var(--metadata-size); }
+.segmented > button:hover { background: var(--hover-background); }
+.segmented > button[aria-pressed="true"] { background: var(--surface); box-shadow: 0 0 0 .5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 12%); font-weight: 500; }
+:root[data-platform="windows"] .segmented > button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--button-edge), inset 0 -1px 0 var(--line); }
+:root[data-platform="linux"] .segmented > button[aria-pressed="true"] { box-shadow: 0 1px 3px rgb(0 0 0 / 12%); font-weight: 600; }
+@media (prefers-color-scheme: dark) { .segmented > button[aria-pressed="true"] { background: color-mix(in srgb, var(--text) 18%, var(--surface)); } }
+:root[data-gallery-theme="dark"] .segmented > button[aria-pressed="true"] { background: color-mix(in srgb, var(--text) 18%, var(--surface)); }
+
+/* Switch: each system's own proportions. */
+.switch { appearance: none; -webkit-appearance: none; margin: 0; position: relative; flex: none; width: 32px; height: 18px; border-radius: 9px; background: color-mix(in srgb, var(--text) 18%, transparent); cursor: default; transition: background-color var(--motion-feedback) var(--motion-ease); }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 25%); transition: transform var(--motion-feedback) var(--motion-ease); }
+.switch:checked { background: var(--accent); }
+.switch:checked::after { transform: translateX(14px); }
+:root[data-platform="windows"] .switch { width: 40px; height: 20px; border-radius: 10px; background: transparent; border: 1px solid var(--muted); }
+:root[data-platform="windows"] .switch::after { top: 3px; left: 3px; width: 12px; height: 12px; background: var(--muted); box-shadow: none; }
+:root[data-platform="windows"] .switch:checked { background: var(--accent); border-color: var(--accent); }
+:root[data-platform="windows"] .switch:checked::after { background: #fff; transform: translateX(20px); }
+:root[data-platform="linux"] .switch { width: 46px; height: 26px; border-radius: 13px; }
+:root[data-platform="linux"] .switch::after { top: 3px; left: 3px; width: 20px; height: 20px; }
+:root[data-platform="linux"] .switch:checked::after { transform: translateX(20px); }
+@media (prefers-reduced-motion: reduce) { .switch, .switch::after { transition: none; } }
+@media (forced-colors: active) { .switch { border: 1px solid ButtonText; } .switch::after { background: ButtonText; } .switch:checked { background: Highlight; } }

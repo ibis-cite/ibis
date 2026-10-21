@@ -5,7 +5,7 @@ import { HeaderMenus, type ScopeSource } from "./HeaderMenus";
 
 /** The search bar: the search box, the copy format, the library scope and the pin. It is also
  * the window's drag region; the editable box itself is not. */
-export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, sources, scope, onScopeChange, largerText, pinned, onTogglePin }: {
+export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, sources, scope, onScopeChange, largerText, menus = true, pinned, onTogglePin }: {
   inputRef: React.RefObject<HTMLInputElement | null>;
   query: string;
   onQueryChange: (query: string) => void;
@@ -23,6 +23,8 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   scope: string | null;
   onScopeChange: (scope: string | null) => void;
   largerText: boolean;
+  /** Hidden during first-run setup, which asks the same question in its own words. */
+  menus?: boolean;
   pinned: boolean;
   onTogglePin: () => void;
 }) {
@@ -50,8 +52,8 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
         onChange={(e) => onQueryChange(e.target.value)}
         onKeyDown={onSearchKeyDown}
       />
-      <HeaderMenus format={format} styles={styles} onFormatChange={onFormatChange} sources={sources} scope={scope}
-        onScopeChange={onScopeChange} largerText={largerText} searchRef={inputRef} />
+      {menus && <HeaderMenus format={format} styles={styles} onFormatChange={onFormatChange} sources={sources} scope={scope}
+        onScopeChange={onScopeChange} largerText={largerText} searchRef={inputRef} />}
       <button
         type="button"
         className="pin-button"

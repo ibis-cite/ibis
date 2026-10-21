@@ -26,7 +26,7 @@ export function PickerMenu({ isOpen, onOpenChange, buttonRef, searchRef, library
 }) {
   return (
     <MoreMenu isOpen={isOpen} onOpenChange={onOpenChange} buttonRef={buttonRef} searchRef={searchRef}
-      keys={label(keysFor("more"))} ariaKeys={ariaKeys(keysFor("more"), isMac)}>
+      keys={label(keysFor("more"))} ariaKeys={ariaKeys(keysFor("more"), isMac)} accelerator={keysFor("more")}>
       {/* Where the references come from and how fresh they are, read
           as the group's name when the menu is reached by keyboard. */}
       <MenuSection id="library" label={libraryDetail?.filter(Boolean).join(". ")}

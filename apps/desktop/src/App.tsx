@@ -718,7 +718,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         format={format}
         styles={Boolean(cslItems && copyFormatted)}
         onFormatChange={chooseFormat}
-        sources={sources} scope={searchScope} onScopeChange={setScope} largerText={largerText}
+        sources={sources} scope={searchScope} onScopeChange={setScope} largerText={largerText} menus={library?.state !== "none"}
         pinned={pinned}
         onTogglePin={togglePin}
       />
@@ -731,9 +731,10 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       }} />
       {style && chosen.length > 0 && <FormatPreview style={style} shown={shown} focusable={selected.size > 0} />}
       <div className="results-area">
-        <div className="results-heading" aria-hidden="true">
-          <span>{query ? pickerText.bestMatches : pickerText.references}</span><span>{results.length > 0 ? pickerText.resultCount(results.length) : ""}</span>
-        </div>
+        {/* A heading names rows; with none there is nothing to name. */}
+        {results.length > 0 && <div className="results-heading" aria-hidden="true">
+          <span>{query ? pickerText.bestMatches : pickerText.references}</span><span>{pickerText.resultCount(results.length)}</span>
+        </div>}
         <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>

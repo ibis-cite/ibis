@@ -1,11 +1,9 @@
 import type React from "react";
 import type { LibraryStatus } from "../../api";
-import { keyLabel, keysFor } from "../../keys";
+import { keysFor } from "../../keys";
 import { LibraryStatusLine } from "../../LibraryStatusLine";
 import { keyText, pickerText } from "../../messages";
-import { isMac } from "../../platform";
-
-const label = (accelerator: string) => keyLabel(accelerator, isMac);
+import { KeyHint } from "../../ui/KeyCaps";
 
 /** What the keys do now; null where a key does nothing. */
 export type KeyHints = { enter: string | null; shiftEnter: string | null; escape: string };
@@ -29,11 +27,11 @@ export function PickerFooter({ library, groupName, hints, altHeld, searchFocused
         <LibraryStatusLine library={library} groupName={groupName} />
         <small className="enter-hints" aria-label={keyText.footer} role="group">
           {altHeld ? <>
-            {hints.shiftEnter && <span className="search-hint" aria-hidden={!searchFocused}><kbd>{label(keysFor("add"))}</kbd> {hints.shiftEnter}</span>}
-            <span><kbd>{label(keysFor("escape"))}</kbd> {hints.escape}</span>
+            {hints.shiftEnter && <span className="search-hint" aria-hidden={!searchFocused}><KeyHint primary label={hints.shiftEnter} keys={keysFor("add")} /></span>}
+            <KeyHint label={hints.escape} keys={keysFor("escape")} />
           </> : <>
-            {hints.enter && <span className="search-hint" aria-hidden={!searchFocused}><kbd>{label(keysFor("copy"))}</kbd> {hints.enter}</span>}
-            <span><kbd>{label(keysFor("keys"))}</kbd> {keyText.allKeys}</span>
+            {hints.enter && <span className="search-hint" aria-hidden={!searchFocused}><KeyHint primary label={hints.enter} keys={keysFor("copy")} /></span>}
+            <KeyHint label={keyText.allKeys} keys={keysFor("keys")} />
           </>}
         </small>
         <span className="more">
