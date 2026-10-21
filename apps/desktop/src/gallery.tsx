@@ -12,6 +12,10 @@ import { trackInputModality } from "./inputModality";
 import "./styles.css";
 import "./gallery.css";
 import "./notice.css";
+// Depth prototype (design/depth-prototype): opt-in layers, toggled only here by ?depth=a|b|c.
+import "./themes/depth-a.css";
+import "./themes/depth-b.css";
+import "./themes/depth-c.css";
 import { noticePlatform, renderNotice } from "./copyFeedback";
 
 function rendered(root: HTMLElement, state: GalleryState): boolean {
@@ -276,6 +280,14 @@ function Gallery({ switches }: { switches: GallerySwitches }) {
 
 setPlatform();
 trackInputModality();
+{
+  const depth = new URLSearchParams(window.location.search).get("depth");
+  if (depth === "a" || depth === "b" || depth === "c") {
+    document.documentElement.dataset.depth = depth;
+    // Variant C shows a synthetic stand-in for the native material behind the page.
+    if (depth === "c") document.documentElement.dataset.galleryMaterial = "simulated";
+  }
+}
 const root = document.getElementById("root");
 if (root && (import.meta.env.DEV || import.meta.env.MODE === "evidence")) {
   const switches = gallerySwitches(window.location.search);

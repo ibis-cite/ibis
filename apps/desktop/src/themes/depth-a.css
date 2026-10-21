@@ -1,0 +1,39 @@
+/* Depth prototype, variant A: quiet layers (the subtlest).
+   Opt-in and gallery-only: applies under :root[data-depth="a"] (?depth=a).
+   Hierarchy through tint and hairlines only: no shadows, no highlights, no
+   blur, no new motion beyond a 120 ms colour fade. Layers, back to front:
+     window base (footer, tray shelf) < results and search on the surface.
+   Windows tints the base with Mica's colour; GNOME maps the layers onto
+   Adwaita's window_bg and view_bg. Contrast modes keep the flat look. */
+@supports (color: light-dark(white, black)) {
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) {
+      --depth-base: light-dark(#f4f4f6, #1e1e20);
+      --depth-sheet: var(--surface);
+      --depth-hairline: light-dark(rgb(0 0 0 / 7%), rgb(255 255 255 / 7%));
+      /* Chips and caps sit on the base tint, so in light mode they are the surface
+         itself: scarlet keys and secondary text keep 4.5:1 (a darker fill did not). */
+      --depth-chip: light-dark(var(--surface), rgb(255 255 255 / 7%));
+      --depth-cap-background: light-dark(rgb(255 255 255 / 80%), rgb(255 255 255 / 9%));
+    }
+    :root[data-depth="a"][data-platform="windows"]:not([data-gallery-theme="contrast"]) { --depth-base: light-dark(#f3f3f3, #202020); }
+    :root[data-depth="a"][data-platform="linux"]:not([data-gallery-theme="contrast"]) { --depth-base: light-dark(#fafafb, #222226); --depth-sheet: light-dark(#fff, #1d1d20); }
+
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]):not([data-native-appearance]) { background: var(--depth-base); }
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) :is(.search-bar, .results-area) { background: var(--depth-sheet); }
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) .search-bar { border-bottom-color: var(--depth-hairline); }
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) footer { border-top-color: var(--depth-hairline); }
+    /* The tray and preview are a recessed shelf on the base tint between hairlines. */
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) :is(.picker-content > ul, .picker-content > .format-preview) { background: var(--depth-base); border-bottom-color: var(--depth-hairline); }
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) .picker-content > ul li { border-color: var(--clear); background: var(--depth-chip); }
+    /* Key caps: a fill with a 1 px darker foot, the only hint of relief. */
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) kbd { background: var(--depth-cap-background); border-color: var(--clear); box-shadow: inset 0 -1px 0 var(--depth-hairline); }
+    /* The writing choice is a fill, never a coloured border (rule 8). */
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) .setup-writing button[aria-pressed="true"] { border-color: var(--clear); background: var(--button-hover-background); }
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) .library-setup .setup-choices { gap: var(--space-2); }
+    :root[data-depth="a"]:not([data-gallery-theme="contrast"]) .empty-state button { color: var(--text); }
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+  :root[data-depth="a"] [role="option"] { transition: background-color var(--motion-feedback) var(--motion-ease); }
+}

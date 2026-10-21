@@ -45,7 +45,7 @@ export class Unavailable extends Error {}
 
 function parse(argv) {
   const options = { output: path.join(repo, "target", "gallery-contact-sheet"), dist: path.join(repo, "apps", "desktop", "dist"),
-    build: true, scale: 1, state: [], platform: [], theme: [], text: [] };
+    build: true, scale: 1, state: [], platform: [], theme: [], text: [], param: [], viewport: VIEWPORT };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
     const value = () => {
@@ -58,6 +58,16 @@ function parse(argv) {
     else if (flag === "--no-build") options.build = false;
     else if (flag === "--scale") options.scale = Number(value());
     else if (flag === "--state") options.state.push(value());
+    // Prototype switches passed through to the gallery URL, such as --param depth=b --param preview=a.
+    else if (flag === "--param") {
+      const [name, setting] = value().split("=");
+      if (!/^(depth|preview)$/.test(name ?? "") || !/^[a-z]$/.test(setting ?? "")) throw new Error("--param is depth=<letter> or preview=<letter>");
+      options.param.push([name, setting]);
+    } else if (flag === "--viewport") {
+      const [width, height] = value().split("x").map(Number);
+      if (!(width >= 360 && width <= 2000 && height >= 240 && height <= 1400)) throw new Error("--viewport is WIDTHxHEIGHT");
+      options.viewport = { width, height };
+    }
     else if (flag.slice(2) in LOOKS) {
       const name = flag.slice(2);
       const chosen = value();
@@ -209,7 +219,7 @@ async function main() {
     const contexts = new Map();
     for (const { theme } of columns) {
       if (!contexts.has(theme)) {
-        contexts.set(theme, await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: options.scale, colorScheme: theme, reducedMotion: "reduce" }));
+        contexts.set(theme, await browser.newContext({ viewport: options.viewport, deviceScaleFactor: options.scale, colorScheme: theme, reducedMotion: "reduce" }));
       }
     }
     const render = async (job, timeout) => {
@@ -230,6 +240,7 @@ async function main() {
       page.on("pageerror", (error) => errors.push(error.message));
       page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
       const query = new URLSearchParams({ state: job.state.state, platform: job.platform, theme: job.theme, text: job.text });
+      for (const [name, setting] of options.param) query.set(name, setting);
       try {
         await page.goto(`${base}/gallery.html?${query}`);
         await page.waitForFunction((id) => document.documentElement.dataset.galleryRendered === id, job.state.state, { timeout });
@@ -267,10 +278,10 @@ async function main() {
       else await rm(path.join(output, job.text, `${job.platform}-${job.theme}`, `failure-${job.state.id}.png`), { force: true });
     }
     const browserName = `Chromium ${browser.version()}`;
-    const label = `Ibis picker states, ${source()}. Browser render in ${browserName}, synthetic data; not a native capture`;
+    const label = `Ibis picker states, ${source()}${options.param.map(([name, setting]) => `, ${name} ${setting}`).join("")}. Browser render in ${browserName}, synthetic data; not a native capture`;
     for (const text of options.text) await contactSheet(browser, output, text, columns, states, frames, label);
     await writeFile(path.join(output, "manifest.json"), `${JSON.stringify({ source: source(), browser: browserName,
-      viewport: VIEWPORT, scale: options.scale, rendered: [...frames.keys()].sort(), failed: failures }, null, 2)}\n`);
+      viewport: options.viewport, params: Object.fromEntries(options.param), scale: options.scale, rendered: [...frames.keys()].sort(), failed: failures }, null, 2)}\n`);
     console.log(`${frames.size} of ${jobs.length} frames rendered into ${output}`);
   } finally {
     server.close();
