@@ -1,6 +1,6 @@
 # UI Automation reads/invokes controls; SendInput exercises the actual shortcut
 # and typing path. Called by smoke-native.py, not a test-mode application API.
-param([string] $Action, [int] $AppId, [int] $EditorId, [string] $Text)
+param([string] $Action, [int] $AppId, [int] $EditorId, [string] $Text, [long] $PickerHandle)
 $ErrorActionPreference = 'Stop'
 [Console]::Error.WriteLine('NATIVE HELPER STAGE windows-encoding-start')
 # JSON crosses a pipe to Python; neither end may inherit an OEM/ANSI code page.
@@ -220,7 +220,14 @@ try {
       $true
     }
     'click' {
-      $window = Get-AppWindow $AppId
+      # Modal popovers intentionally hide Search from UIA. Reuse the picker
+      # identity established by snapshot, rechecking its OS ownership each time.
+      $handle = [IntPtr] $PickerHandle
+      if ($PickerHandle -le 0 -or ![IbisSmoke]::IsWindow($handle) -or [IbisSmoke]::OwnerPid($handle) -ne $AppId) {
+        throw 'Verified picker window identity was lost'
+      }
+      if (![IbisSmoke]::IsWindowVisible($handle)) { throw 'Verified picker window is hidden' }
+      $window = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
       if (!$window) { throw 'Native picker window unavailable' }
       $condition = [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::NameProperty, $Text)
       $namedElements = $window.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
