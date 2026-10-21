@@ -58,3 +58,32 @@ test("an empty Zotero library offers reload as well as choosing another library"
   expect(reload).toHaveBeenCalledOnce();
   expect(choose).toHaveBeenCalledOnce();
 });
+
+test.each(["🧑🏽‍🔬", "e\u0301"])("a long empty-library name keeps its extension, full accessible text and graphemes (%s)", (unit) => {
+  const name = `دراسة-研究-${unit.repeat(50)}-library.bib`;
+  const { container } = render(<EmptyState library={{ ...loaded, references: 0, snapshot_name: name }} query="" narrowed={false}
+    onChooseLibrary={vi.fn()} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+  const title = container.querySelector(".empty-title")!;
+  const visual = title.querySelector('[aria-hidden="true"]')!;
+  expect(visual).toBeTruthy();
+  expect(visual.textContent).toContain("…");
+  expect(visual.textContent).toMatch(/library\.bib$/);
+  expect([...new Intl.Segmenter().segment(visual.textContent!)].length).toBeLessThanOrEqual(57);
+  expect(visual.textContent?.replace("No references in دراسة-研究-", "").replace("-library.bib", "").replace("…", "").replaceAll(unit, "")).toBe("");
+  expect(title.querySelector(".visually-hidden")?.textContent).toBe(`No references in ${name}`);
+  expect(screen.getByRole("button", { name: "Choose library…" })).toBeTruthy();
+});
+
+test.each([null, ""])("a missing empty-library snapshot name keeps a meaningful title (%s)", (snapshot_name) => {
+  const { container } = render(<EmptyState library={{ ...loaded, references: 0, snapshot_name }} query="" narrowed={false}
+    onChooseLibrary={vi.fn()} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+  expect(container.querySelector(".empty-title")?.textContent).toBe("No references in this library");
+});
+
+test("markup in an empty-library name remains plain text", () => {
+  const name = '<img src=x onerror="alert(1)">.bib';
+  const { container } = render(<EmptyState library={{ ...loaded, references: 0, snapshot_name: name }} query="" narrowed={false}
+    onChooseLibrary={vi.fn()} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+  expect(container.querySelector(".empty-title")?.textContent).toBe(`No references in ${name}`);
+  expect(container.querySelector("img")).toBeNull();
+});
