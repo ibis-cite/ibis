@@ -12,6 +12,7 @@ const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
 const tokens = readFileSync(new FileURL("./tokens.css", import.meta.url), "utf8");
 const styles = readFileSync(new FileURL("./styles.css", import.meta.url), "utf8");
 const gallery = readFileSync(new FileURL("./gallery.css", import.meta.url), "utf8");
+const depth = readFileSync(new FileURL("./depth.css", import.meta.url), "utf8");
 const corners = readFileSync(new FileURL("../src-tauri/src/native_corners.rs", import.meta.url), "utf8");
 
 afterEach(() => { cleanup(); clearMocks(); delete document.documentElement.dataset.platform; });
@@ -471,5 +472,101 @@ test("buttons and key caps are fills without an outline except in contrast modes
   expect(rules(tokens, ":root")).toMatch(/--button-edge:\s*var\(--clear\)/);
   for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
     expect(rules(tokens.slice(tokens.indexOf(media)), ":root[data-platform]"), media).toMatch(/--button-edge:\s*(CanvasText|ButtonText)/);
+  }
+});
+
+/* Soft depth (depth.css, #749). */
+const layers = (platform?: string) => `:root[data-platform${platform ? `="${platform}"` : ""}]:not([data-gallery-theme="contrast"])`;
+/** The layer rules, before the motion section, without comments. */
+const layerRules = () => [...depth.slice(0, depth.indexOf("/* Motion")).replace(/\/\*[^]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+  .map(([, head, body]) => ({ head: head!.trim(), body: body! }));
+
+test("each platform has its own layers: lifted on macOS, Fluent on Windows, Adwaita-flat on GNOME", () => {
+  expect(styles).toMatch(/@import "\.\/nativeAppearance\.css";\n@import "\.\/depth\.css";/);
+  const shared = rules(depth, layers());
+  for (const token of ["--layer-base", "--layer-sheet", "--layer-raised", "--layer-highlight", "--band-shadow", "--card-shadow", "--card-radius", "--row-lift", "--cap-background", "--cap-shadow", "--chip-background"]) {
+    expect(shared, token).toMatch(new RegExp(`${token}:`));
+  }
+  const windows = rules(depth, layers("windows"));
+  expect(windows).toMatch(/--layer-base:\s*light-dark\(#f3f3f3, #202020\)/);
+  expect(windows).toMatch(/--card-radius:\s*var\(--r-win\)/);
+  expect(windows).toMatch(/--row-lift:\s*none/);
+  const linux = rules(depth, layers("linux"));
+  expect(linux).toMatch(/--layer-base:\s*light-dark\(#fafafb, #222226\)/);
+  expect(linux).toMatch(/--card-radius:\s*12px/);
+  for (const flat of ["--row-lift: none", "--cap-shadow: none", "--layer-highlight: transparent"]) expect(linux).toContain(flat);
+  // Windows and GNOME keep a flat search band; the list is a Fluent layer card.
+  expect(rules(depth, `${layers("windows")} .search-bar`)).toMatch(/box-shadow:\s*none/);
+  expect(rules(depth, `${layers("linux")} .search-bar`)).toMatch(/box-shadow:\s*none/);
+  expect(rules(depth, `${layers("windows")} #results:not(:empty)`)).toMatch(/box-shadow:\s*var\(--card-shadow\)/);
+});
+
+test("soft depth keeps today's look under increased contrast, forced colours and the contrast preview", () => {
+  expect(depth.trimStart()).toMatch(/^\/\*[^]*?\*\/\s*@supports \(color: light-dark\(white, black\)\) \{\s*@media \(prefers-contrast: no-preference\) and \(forced-colors: none\) \{/);
+  const heads = layerRules().map(({ head }) => head.replace(/^@supports[^{]*$|^@media[^{]*$/, "")).filter(Boolean);
+  expect(heads.length).toBeGreaterThan(10);
+  for (const head of heads) expect(head).toMatch(/^:root\[data-platform(="\w+")?\](\[data-native-appearance\])?:not\(\[data-gallery-theme="contrast"\]\)/);
+  document.documentElement.dataset.platform = "macos";
+  try {
+    expect(document.documentElement.matches(layers())).toBe(true);
+    document.documentElement.dataset.galleryTheme = "contrast";
+    expect(document.documentElement.matches(layers())).toBe(false);
+  } finally {
+    delete document.documentElement.dataset.galleryTheme;
+  }
+});
+
+test("soft depth changes colour, shadow and fill only, so the geometry chain stays", () => {
+  const changed: string[] = [];
+  for (const { head, body } of layerRules()) {
+    for (const [, property] of body.matchAll(/(?:^|;)\s*([\w-]+)\s*:/g)) {
+      if (/^(min-|max-)?(height|width)$|^padding|^font|^line-height|^inset|^border(-(top|bottom|left|right|block|inline))?(-width)?$/.test(property!)
+        && !head.includes(".setup-writing")) changed.push(`${head} { ${property} }`);
+    }
+  }
+  expect(changed).toEqual([]);
+});
+
+test("reduced motion turns the soft depth transitions off", () => {
+  const motion = depth.indexOf("@media (prefers-reduced-motion: no-preference) and (forced-colors: none) {");
+  expect(motion).toBeGreaterThan(0);
+  expect(depth.slice(0, motion).replace(/\/\*[^]*?\*\//g, "")).not.toMatch(/transition|transform\s*:/);
+  expect(depth).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*:root \{ --motion-highlight: 0ms; --motion-press: 0ms; \}/);
+});
+
+test("text keeps 4.5:1 on every soft depth layer, on each platform in both themes", () => {
+  type RGB = [number, number, number];
+  const parse = (value: string): [RGB, number] => {
+    const short = value.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/);
+    if (short) return [short.slice(1, 4).map((c) => parseInt(c + c, 16)) as RGB, 1];
+    const hex = value.match(/^#([0-9a-f]{6})$/);
+    if (hex) return [[0, 2, 4].map((i) => parseInt(hex[1]!.slice(i, i + 2), 16)) as RGB, 1];
+    const rgb = value.match(/^rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)%\)$/)!;
+    return [[+rgb[1]!, +rgb[2]!, +rgb[3]!], +rgb[4]! / 100];
+  };
+  const over = (top: string, under: RGB): RGB => { const [c, a] = parse(top); return c.map((v, i) => v * a + under[i]! * (1 - a)) as RGB; };
+  const luminance = (rgb: RGB) => rgb.map((c) => c / 255).map((c) => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
+    .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
+  const contrast = (a: RGB, b: RGB) => { const [l, d] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (l! + .05) / (d! + .05); };
+  const pair = (block: string, token: string) => block.match(new RegExp(`${token}:\\s*light-dark\\(([^,]+(?:\\([^)]*\\))?),\\s*([^;]+?)\\);`))?.slice(1, 3);
+  const mac = tokens.slice(tokens.indexOf(':root[data-platform="macos"]:not(.notice-window)'));
+  const shared = tokens.slice(tokens.indexOf("--surface: light-dark("));
+  for (const platform of ["macos", "windows", "linux"]) {
+    const own = rules(depth, layers(platform)), base = rules(depth, layers());
+    const layer = (token: string) => pair(own, token) ?? pair(base, token)!;
+    const ink = platform === "macos" ? mac : shared;
+    for (const mode of [0, 1]) {
+      const back = parse(layer("--layer-base")[mode]!)[0];
+      const raised = over(layer("--layer-raised")[mode]!, back);
+      for (const role of ["--text", "--muted"]) {
+        const color = parse(pair(ink, role)![mode]!)[0];
+        for (const [name, under] of [["base", back], ["raised", raised]] as const) {
+          expect(contrast(color, under), `${platform} ${role} on ${name}, mode ${mode}`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+      // Tray keys are scarlet on recessed chips.
+      const citation = parse(pair(tokens, "--citation")![mode]!)[0];
+      expect(contrast(citation, back), `${platform} citation on chip, mode ${mode}`).toBeGreaterThanOrEqual(4.5);
+    }
   }
 });

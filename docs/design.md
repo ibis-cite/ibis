@@ -32,7 +32,8 @@ in #223 and the issues named under [Rollout](#rollout), not on this page.
    switches off when the system asks for reduced motion.
 8. **No glow, no edge rings.** Selection is a fill, never an outline. No
    coloured borders, outer glows or bright rims. A focus ring appears only when
-   the keyboard moved focus.
+   the keyboard moved focus. Depth comes from soft neutral shadows and a 1 px
+   inner top highlight (see **Surfaces and layers**), which are neither.
 
 ## Design language
 
@@ -164,7 +165,7 @@ symbolic masters. How the assets are regenerated is in the
 |---|---|---|---|
 | Material | Standard material for the window; Liquid Glass only on the search bar (Rollout 9) | Desktop Acrylic | Flat, opaque |
 | Corners | See **Corners** above | | |
-| Selected row | Filled accent, white text | Soft grey with an accent pill on the left | GTK's selection colour (filled accent) with its paired text |
+| Selected row | Filled accent, white text, lifted by a soft neutral shadow | Soft grey with an accent pill on the left | GTK's selection colour (filled accent) with its paired text |
 | Keyboard focus ring | 2 px accent, 1 px gap | 2 px in the text colour around a 1 px surface-coloured stroke (Fluent's focus visual) | 2 px, the accent mixed half toward the text colour, 1 px gap |
 | Search box | Frameless, large; with Liquid Glass, a 40 px capsule that also holds format and pin | Text box with an underline that turns accent on focus | Framed entry |
 | Shortcut labels | ⌘ ⌥ ⇧ | Ctrl Alt Shift | Ctrl Super Shift |
@@ -202,12 +203,34 @@ list, preview and tray) from a control layer (search, format, pin).
   accent. Ibis sets no blur or opacity of its own, so the macOS 27 glass
   opacity setting, Reduce Transparency and Increase Contrast apply unchanged.
 - **Windows.** The picker is a transient, light-dismiss surface, which is what
-  Microsoft reserves Desktop Acrylic for. Content sits directly on it, with no
-  second layer. Mica is for long-lived windows such as settings. Both become the
+  Microsoft reserves Desktop Acrylic for. The result list sits on it as one
+  Fluent layer card; the search box and tray sit directly on it. Mica is for long-lived windows such as settings. Both become the
   solid surface when transparency effects are off or battery saver is on.
 - **Linux.** Flat and opaque on `window_bg`, with the search entry on
   `view_bg`. Ibis does not use the GNOME 51 blur API, since GNOME's own apps
   stay flat.
+
+**Surfaces and layers** (soft depth, `depth.css`). Layers stack back to front:
+the window base (footer and gutters), the results sheet, the search band and the
+tray and preview card. Each is one step above the one below; nothing uses blur,
+so nothing depends on what is behind the window. Only colour, shadow and fill
+change: rows, the search band and every alignment keep the geometry above.
+
+| | macOS | Windows 11 | Linux (GNOME) |
+|---|---|---|---|
+| Base · sheet | `#f2f2f4` / `#1c1c1e` · the surface | Mica's tint `#f3f3f3` / `#202020` · none | `window_bg` `#fafafb` / `#222226` for both |
+| Search band | Raised (`#fff` / `#2c2c2f`) with a 1 px inner top highlight and a soft shadow on the list | Flat; the text box on the control fill | Flat, with a separator |
+| Results | The sheet | One layer card: 8 px corners, a 1 px card stroke, `0 2px 4px` | Flat |
+| Tray and preview | One raised card at `--r-row`, inset by `--inset`, with a hairline and a soft shadow; chips are recessed into it | The same card at 8 px with the Fluent stroke | libadwaita's `.card`, 12 px |
+| Selected row | The accent fill lifted by a neutral shadow and a faint inner highlight | Fluent's subtle fill (black 4% / white 6%) and the accent pill | GTK's selection colour, flat |
+| Key caps, first-run buttons | Raised caps: a top highlight and a bottom shade | Fluent control elevation: a stroke with a darker bottom edge | The flat button fill |
+
+The writing choice is a recessed track with a raised thumb, not a coloured
+border. With a native material the material itself is the base and the sheet.
+Rows fade their fill and shadow over 140 ms and presses scale to .98; with
+reduced motion nothing moves. Increased contrast, forced colours and the
+gallery's contrast preview keep the flat, framed look. Shadows are never
+coloured, and no layer has a full rim.
 
 ## What shows, and when
 

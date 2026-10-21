@@ -6,6 +6,7 @@ const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
 const read = (name: string) => readFileSync(new FileURL(`./${name}`, import.meta.url), "utf8");
 const tokens = read("tokens.css");
 const native = read("nativeAppearance.css");
+const depth = read("depth.css");
 
 /** The macOS glass token block: one rule, inside its contrast guard. */
 function macBlock(): { guard: string; body: string } {
@@ -164,4 +165,32 @@ test("the frameless macOS buttons keep the pressed frame of the writing choice",
 test("menus stay opaque where the webview cannot blur behind them", () => {
   const fallback = native.slice(native.indexOf("@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))"));
   expect(fallback).toMatch(/\[role="menu"\], \.keys-dialog\)\s*\{\s*background:\s*var\(--surface\);/);
+});
+
+test("the lifted macOS row is a neutral shadow, never a ring or a glow (rule 8)", () => {
+  const shared = depth.match(/:root\[data-platform\]:not\(\[data-gallery-theme="contrast"\]\) \{([^{}]*)\}/)?.[1] ?? "";
+  const lift = shared.match(/--row-lift:\s*([^;]+);/)?.[1];
+  expect(lift, "--row-lift").toBeTruthy();
+  for (const [, r, g, b] of lift!.matchAll(/rgb\((\d+) (\d+) (\d+)/g)) expect([r, g, b].join(" ")).toMatch(/^(0 0 0|255 255 255)$/);
+  // No spread ring (0 0 0 Npx) and no coloured shadow.
+  for (const shadow of lift!.split(/,(?![^(]*\))/)) expect(shadow.trim()).not.toMatch(/^(inset )?0 0 0 [1-9]/);
+  expect(lift).not.toMatch(/accent|Highlight|--citation/i);
+});
+
+test("with a native material the base layer is the material itself, and the list sits on it", () => {
+  const base = depth.match(/([^{}\n]+)\{ background: var\(--layer-base\); \}/)?.[1]?.trim();
+  expect(base).toBe(':root[data-platform]:not([data-gallery-theme="contrast"]):not([data-native-appearance])');
+  const sheet = ':root[data-platform][data-native-appearance]:not([data-gallery-theme="contrast"])';
+  expect(depth).toContain(`${sheet} { --layer-sheet: var(--clear); }`);
+  const root = document.documentElement;
+  root.dataset.platform = "macos";
+  try {
+    expect(root.matches(base!)).toBe(true);
+    root.dataset.nativeAppearance = "vibrancy";
+    expect(root.matches(base!)).toBe(false);
+    expect(root.matches(sheet)).toBe(true);
+  } finally {
+    delete root.dataset.platform;
+    delete root.dataset.nativeAppearance;
+  }
 });
