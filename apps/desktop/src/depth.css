@@ -115,9 +115,12 @@
     :root[data-platform]:not([data-gallery-theme="contrast"]) .empty-state button { border-color: var(--clear); box-shadow: var(--cap-shadow); color: var(--text); }
     :root[data-platform]:not([data-gallery-theme="contrast"]) .empty-state button:not(:hover) { background: var(--cap-background); }
     /* The writing choice: a recessed track with a raised thumb, not a coloured
-       border (rule 8). The track hugs the centred buttons and its 2 px padding is
-       taken back by its margin, so nothing moves. */
-    :root[data-platform]:not([data-gallery-theme="contrast"]) .setup-writing .setup-choices { width: fit-content; padding: 2px; margin: -2px auto; border-radius: calc(var(--button-radius) + 2px); background: light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 30%)); }
+       border (rule 8). The track hugs the centred buttons and reaches 2 px past
+       them as a spread shadow, so nothing moves. */
+    :root[data-platform]:not([data-gallery-theme="contrast"]) .setup-writing .setup-choices {
+      --track: light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 30%));
+      width: fit-content; margin-inline: auto; border-radius: var(--button-radius); background: var(--track); box-shadow: 0 0 0 2px var(--track);
+    }
     :root[data-platform]:not([data-gallery-theme="contrast"]) .setup-writing .setup-choices button { background: var(--clear); box-shadow: none; border-color: var(--clear); }
     :root[data-platform]:not([data-gallery-theme="contrast"]) .setup-writing .setup-choices button[aria-pressed="true"] { background: var(--cap-background); box-shadow: var(--cap-shadow); }
   }

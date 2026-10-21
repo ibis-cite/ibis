@@ -528,15 +528,15 @@ test("soft depth changes colour, shadow and fill only, so the geometry chain sta
   // Only these, and each gives back what it takes: the net box is unchanged.
   expect(changed.sort()).toEqual([
     ".format-preview { padding-inline: calc(var(--copy-padding) - var(--space-1)) }",
-    ".setup-writing .setup-choices { margin: -2px auto }",
-    ".setup-writing .setup-choices { padding: 2px }",
+    ".setup-writing .setup-choices { margin-inline: auto }",
     ".setup-writing .setup-choices { width: fit-content }",
     ":is([aria-label=\"Selected references\"], .format-preview) { margin-inline: var(--space-1) }",
     "[aria-label=\"Selected references\"] { padding-inline: calc(1rem - var(--space-1)) }",
   ]);
   // The tray's 1rem is the inline half of --selection-padding, so the chips stay put.
   expect(tokens.match(/--selection-padding:\s*\S+\s+([^;]+);/)?.[1]).toBe("1rem");
-  // The writing track is centred (auto inline margins) and its padding is taken back by its margin.
+  // The writing track only shrinks to its centred buttons: auto inline margins
+  // keep them where justify-content put them, and its 2 px reach is a shadow.
   expect(rules(styles, ".library-setup .setup-choices")).toMatch(/justify-content:\s*center/);
 });
 
