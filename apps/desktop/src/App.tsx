@@ -778,6 +778,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           }}
           onKeyDown={(e) => {
             if (composing(e)) return;
+            // A held Remove activation must not act again after focus returns.
+            if (e.key === "Enter" && e.repeat) {
+              e.preventDefault();
+              return;
+            }
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
               e.preventDefault();
               const step = e.key === "ArrowDown" ? 1 : -1;
