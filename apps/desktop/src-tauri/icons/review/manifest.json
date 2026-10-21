@@ -1,8 +1,8 @@
 {
-  "sourceCommit": "102b7574b19a1e72b2ac1b694454a9aabfed2de4",
+  "sourceCommit": "01a2e375c38cfad97902b2ce4ca2a379b845c311",
   "host": "macOS27.0.1",
   "renderers": {
-    "Apple": "Icon Composer27.1 ictool CLI; official bundled .icon template, not native editor/Dock capture",
+    "Apple": "Icon Composer27.1 ictool CLI; unshipped prototype, not native editor/Dock capture; shipping macOS is ICNS-only (#663)",
     "vector": "librsvg2.63.2",
     "large": "locked Tauri CLI2.12.3 resvg"
   },
@@ -565,8 +565,8 @@
     },
     {
       "path": "contact-sheet.png",
-      "sha256": "ad05a28bb143345f24fff0804c7a7f27ba55471db9ea252871c8f50ee84bda88",
-      "bytes": 311042,
+      "sha256": "e5f74660f6a4d9e959ed6f6fab7a2e74b23a568c4f666759b5e634ded22738bc",
+      "bytes": 317919,
       "format": "PNG",
       "width": 1440,
       "height": 1330,
@@ -575,8 +575,8 @@
     },
     {
       "path": "apple-template.png",
-      "sha256": "096d422b11e2bf2306075d23a901088f1fc1bb1a23c65ae39247429e2b3b08d1",
-      "bytes": 279653,
+      "sha256": "0b252813e6acc4ab86cce6bac0f50cd9322b8609fa5e1346cdd35bb405ecf254",
+      "bytes": 281848,
       "format": "PNG",
       "width": 1340,
       "height": 1250,
@@ -585,17 +585,27 @@
     },
     {
       "path": "macos-appearances.png",
-      "sha256": "f653ea95094ebc2818cdb347f7b04bf2b1779bddeca4b16b661b101f1e8cb5a0",
-      "bytes": 539738,
+      "sha256": "d41af2ed9334c444cb5eb0b38919f94e88158dde4a99292833a63544b671d51d",
+      "bytes": 539548,
       "format": "PNG",
       "width": 2240,
       "height": 2680,
       "channels": 3,
       "crcAndDeflate": "passed"
+    },
+    {
+      "path": "macos-legacy.png",
+      "sha256": "a0808f03b4155e7659fbfd3e941234a451fc0d8c5184684acefd52d56300894d",
+      "bytes": 138090,
+      "format": "PNG",
+      "width": 1340,
+      "height": 1250,
+      "channels": 3,
+      "crcAndDeflate": "passed"
     }
   ],
   "missingAcceptance": [
-    "Darker board-G1 endpoints",
+    "Layered macOS delivery and darker board-G1 endpoints deferred to #663",
     "Native editor/template screenshot and legacy grid acceptance",
     "Windows adaptation last look and100/125/150% pixel alignment",
     "Native Dock/taskbar/tray captures and tray host scaling",
