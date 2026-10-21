@@ -318,3 +318,21 @@ fn cite_prints_keys_exactly_as_given() {
     let out = ibis(&["cite", "a\u{200f}b", "--format", "keys"]);
     assert_eq!(String::from_utf8_lossy(&out.stdout).trim_end(), "a\u{200f}b");
 }
+
+#[test]
+fn empty_page_values_are_refused() {
+    for format in ["pandoc", "autocite", "parencite", "textcite", "cite", "typst", "keys"] {
+        for value in ["k=", "k= ", "k=\u{a0}", "k=\u{2003}"] {
+            for json in [false, true] {
+                let mut args = vec!["cite", "k", "--format", format, "--page", value];
+                if json {
+                    args.push("--json");
+                }
+                let out = ibis(&args);
+                assert_eq!(out.status.code(), Some(1), "{format} {value:?} json={json}");
+                assert!(out.stdout.is_empty(), "{format} {value:?} json={json}");
+                assert!(String::from_utf8_lossy(&out.stderr).contains("--page needs KEY=PAGES"));
+            }
+        }
+    }
+}
