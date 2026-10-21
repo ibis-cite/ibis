@@ -194,3 +194,35 @@ test("with a native material the base layer is the material itself, and the list
     delete root.dataset.nativeAppearance;
   }
 });
+
+test("over vibrancy the raised layers, chips and caps are tints that keep 4.5:1, also on the opaque fallback", () => {
+  const body = depth.match(/:root\[data-platform="macos"\]\[data-native-appearance\]:not\(\[data-gallery-theme="contrast"\]\) \{([^{}]*)\}/)?.[1];
+  expect(body, "macOS native layers").toBeTruthy();
+  const [raised, chip, cap] = ["--layer-raised", "--chip-background", "--cap-background"].map((token) => rgba(body!, token));
+  // Translucent in both themes, so the material shows through.
+  for (const [name, pair] of [["raised", raised], ["chip", chip], ["cap", cap]] as const) {
+    for (const [, , , alpha] of pair!) expect(alpha, name).toBeLessThan(1);
+  }
+  const { body: mac } = macBlock();
+  const [veilLight, veilDark] = rgba(mac, "--vibrancy-tint");
+  const roles = vibrancyRoles();
+  type Layer = [number, number, number, number];
+  const over = (top: Layer, under: number[]) => top.slice(0, 3).map((c, i) => c * top[3] + under[i]! * (1 - top[3]));
+  const grey = (v: number) => [v, v, v];
+  // The material at its brightest and darkest, and the opaque surface it falls back to.
+  const surface = hexes(tokens.slice(tokens.indexOf("--surface: light-dark(")), "--surface");
+  const backdrops = [
+    [over(veilLight!, grey(141)), over(veilLight!, grey(255)), surface[0]!],
+    [over(veilDark!, grey(0)), over(veilDark!, grey(120)), surface[1]!],
+  ];
+  for (const mode of [0, 1]) {
+    const [muted, text, citation] = [hexes(mac, "--muted"), hexes(mac, "--text"), hexes(roles, "--citation")].map((pair) => pair[mode]!);
+    for (const backdrop of backdrops[mode]!) {
+      const card = over(raised![mode]!, backdrop);
+      for (const [name, ink, under] of [
+        ["text on raised", text, card], ["muted on raised", muted, card],
+        ["citation on chip", citation, over(chip![mode]!, card)], ["muted on cap", muted, over(cap![mode]!, card)],
+      ] as const) expect(contrast(ink!, under), `${name}, mode ${mode}, over ${backdrop.map(Math.round)}`).toBeGreaterThanOrEqual(4.5);
+    }
+  }
+});

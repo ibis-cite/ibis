@@ -519,19 +519,34 @@ test("soft depth keeps today's look under increased contrast, forced colours and
 test("soft depth changes colour, shadow and fill only, so the geometry chain stays", () => {
   const changed: string[] = [];
   for (const { head, body } of layerRules()) {
-    for (const [, property] of body.matchAll(/(?:^|;)\s*([\w-]+)\s*:/g)) {
-      if (/^(min-|max-)?(height|width)$|^padding|^font|^line-height|^inset|^border(-(top|bottom|left|right|block|inline))?(-width)?$/.test(property!)
-        && !head.includes(".setup-writing")) changed.push(`${head} { ${property} }`);
+    for (const [, property, value] of body.matchAll(/(?:^|;)\s*([\w-]+)\s*:\s*([^;]+)/g)) {
+      if (/^(min-|max-)?(height|width)$|^padding|^margin|^font|^line-height|^inset|^border(-(top|bottom|left|right|block|inline))?(-width)?$/.test(property!)) {
+        changed.push(`${head.replace(/^:root\[data-platform\]:not\(\[data-gallery-theme="contrast"\]\) /, "")} { ${property}: ${value!.trim()} }`);
+      }
     }
   }
-  expect(changed).toEqual([]);
+  // Only these, and each gives back what it takes: the net box is unchanged.
+  expect(changed.sort()).toEqual([
+    ".format-preview { padding-inline: calc(var(--copy-padding) - var(--space-1)) }",
+    ".setup-writing .setup-choices { margin: -2px auto }",
+    ".setup-writing .setup-choices { padding: 2px }",
+    ".setup-writing .setup-choices { width: fit-content }",
+    ":is([aria-label=\"Selected references\"], .format-preview) { margin-inline: var(--space-1) }",
+    "[aria-label=\"Selected references\"] { padding-inline: calc(1rem - var(--space-1)) }",
+  ]);
+  // The tray's 1rem is the inline half of --selection-padding, so the chips stay put.
+  expect(tokens.match(/--selection-padding:\s*\S+\s+([^;]+);/)?.[1]).toBe("1rem");
+  // The writing track is centred (auto inline margins) and its padding is taken back by its margin.
+  expect(rules(styles, ".library-setup .setup-choices")).toMatch(/justify-content:\s*center/);
 });
 
 test("reduced motion turns the soft depth transitions off", () => {
   const motion = depth.indexOf("@media (prefers-reduced-motion: no-preference) and (forced-colors: none) {");
   expect(motion).toBeGreaterThan(0);
   expect(depth.slice(0, motion).replace(/\/\*[^]*?\*\//g, "")).not.toMatch(/transition|transform\s*:/);
-  expect(depth).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*:root \{ --motion-highlight: 0ms; --motion-press: 0ms; \}/);
+  // The only motion block is gated on no-preference, so no reduced-motion override is needed.
+  expect(depth).not.toMatch(/prefers-reduced-motion:\s*reduce/);
+  expect(depth.slice(motion)).toMatch(/:is\(\[role="option"\], button\):active \{ transform: scale\(var\(--press-scale\)\); \}/);
 });
 
 test("text keeps 4.5:1 on every soft depth layer, on each platform in both themes", () => {

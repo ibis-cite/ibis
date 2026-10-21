@@ -19,6 +19,8 @@ const REDUCED_MS = 1;
 const FADES = new Set(["opacity", "color", "background-color", "background", "border-color", "outline-color"]);
 
 const REDUCED = /@media[^{]*prefers-reduced-motion:\s*reduce[^{]*\{/g;
+/** Blocks that apply only without reduced motion: nothing in them runs with it. */
+const GATED = /@media[^{]*prefers-reduced-motion:\s*no-preference[^{]*\{/g;
 
 /** The text of each block that opens at a match of `opener`, braces balanced. */
 function blocks(text: string, opener: RegExp): string[] {
@@ -62,22 +64,24 @@ function milliseconds(value: string, vars: Map<string, string>, depth = 0): numb
   return [...resolved.matchAll(/(?<![\w.-])(\d*\.?\d+)(ms|s)\b/g)].map((m) => Number(m[1]) * (m[2] === "s" ? 1000 : 1));
 }
 
-type Motion = { sheet: string; kind: "transition" | "animation"; property: string; value: string; reducedOnly: boolean };
+type Motion = { sheet: string; kind: "transition" | "animation"; property: string; value: string; reducedOnly: boolean; gated: boolean };
 
 /** Every transition or animation, one entry per comma-separated item. */
 function motions(sheet: string, text: string): Motion[] {
   const reducedText = blocks(text, REDUCED).join("\n");
   const found: Motion[] = [];
-  const scan = (body: string, reducedOnly: boolean) => {
+  const gatedText = blocks(text, GATED).join("\n");
+  const scan = (body: string, reducedOnly: boolean, gated = false) => {
     for (const m of body.matchAll(/(?<![\w-])(transition|animation)(-duration|-delay)?\s*:\s*([^;}]+)/g)) {
       const kind = m[1] as Motion["kind"];
       for (const item of (m[3] ?? "").split(/,(?![^(]*\))/)) {
         const property = kind === "transition" && !m[2] ? item.trim().split(/\s+/)[0] ?? "all" : "all";
-        found.push({ sheet, kind, property, value: item.trim(), reducedOnly });
+        found.push({ sheet, kind, property, value: item.trim(), reducedOnly, gated });
       }
     }
   };
-  scan(withoutReduced(text), false);
+  scan(blocks(text, GATED).reduce((rest, block) => rest.replace(block, ""), withoutReduced(text)), false);
+  scan(gatedText, false, true);
   scan(reducedText, true);
   return found;
 }
@@ -101,7 +105,7 @@ function problems(files: [string, string][]): string[] {
       const fades = motion.kind === "transition"
         ? FADES.has(motion.property)
         : animationName !== undefined && keyframeProperties(all, animationName).every((p) => FADES.has(p));
-      if (fades) continue;
+      if (fades || motion.gated) continue;
       const reducedTotal = milliseconds(motion.value, reduced).reduce((a, b) => a + b, 0);
       if (reducedTotal > REDUCED_MS) found.push(`${sheet}: "${motion.value}" still moves with reduced motion`);
     }
@@ -138,4 +142,6 @@ test("the motion check catches long and moving transitions", () => {
   expect(check("@keyframes slide { to { transform: none; } } .a { animation: slide 200ms; }")).toHaveLength(1);
   expect(check("@keyframes appear { to { opacity: 1; } } .a { animation: appear 120ms ease; }")).toEqual([]);
   expect(check("@media (prefers-reduced-motion: reduce) { .a { transition: transform 50ms; } }")).toHaveLength(1);
+  expect(check("@media (prefers-reduced-motion: no-preference) { .a { transition: transform 120ms; } }")).toEqual([]);
+  expect(check("@media (prefers-reduced-motion: no-preference) { .a { transition: transform 300ms; } }")).toHaveLength(1);
 });

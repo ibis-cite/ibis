@@ -221,12 +221,14 @@ change: rows, the search band and every alignment keep the geometry above.
 | Base · sheet | `#f2f2f4` / `#1c1c1e` · the surface | Mica's tint `#f3f3f3` / `#202020` · none | `window_bg` `#fafafb` / `#222226` for both |
 | Search band | Raised (`#fff` / `#2c2c2f`) with a 1 px inner top highlight and a soft shadow on the list | Flat; the text box on the control fill | Flat, with a separator |
 | Results | The sheet | One layer card: 8 px corners, a 1 px card stroke, `0 2px 4px` | Flat |
-| Tray and preview | One raised card at `--r-row`, inset by `--inset`, with a hairline and a soft shadow; chips are recessed into it | The same card at 8 px with the Fluent stroke | libadwaita's `.card`, 12 px |
+| Tray and preview | One raised card at `--r-row` under the band, its sides in by 4 px (its padding gives the 4 px back, so chips and text stay put), with a hairline and a soft shadow; chips are recessed into it | The same card at 8 px with the Fluent stroke | libadwaita's `.card`, 12 px |
 | Selected row | The accent fill lifted by a neutral shadow and a faint inner highlight | Fluent's subtle fill (black 4% / white 6%) and the accent pill | GTK's selection colour, flat |
 | Key caps, first-run buttons | Raised caps: a top highlight and a bottom shade | Fluent control elevation: a stroke with a darker bottom edge | The flat button fill |
 
 The writing choice is a recessed track with a raised thumb, not a coloured
-border. With a native material the material itself is the base and the sheet.
+border. With a native material the material itself is the base and the sheet,
+and on macOS the raised layers, chips and caps become tints of their colours
+(white 55% light, `#2c2c2f` at 50% dark) so the material shows through.
 Rows fade their fill and shadow over 140 ms and presses scale to .98; with
 reduced motion nothing moves. Increased contrast, forced colours and the
 gallery's contrast preview keep the flat, framed look. Shadows are never
