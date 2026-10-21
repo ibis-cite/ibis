@@ -1,0 +1,714 @@
+[
+  {
+    "engine": "chromium",
+    "version": "151.0.7922.34",
+    "closed": {
+      "active": {
+        "tag": "INPUT",
+        "id": "search",
+        "role": "combobox",
+        "label": null
+      },
+      "query": "memory"
+    },
+    "after": {
+      "active": {
+        "tag": "INPUT",
+        "id": "search",
+        "role": "combobox",
+        "label": null
+      },
+      "query": "memory ",
+      "menu": false,
+      "trace": [
+        {
+          "event": "document-keydown",
+          "ms": 555.7000000011176,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": "Meta",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "App-onKeyDown",
+          "ms": 555.9000000003725,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": "Meta",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "document-keydown",
+          "ms": 558,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": "k",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "App-onKeyDown",
+          "ms": 558.0999999996275,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": "k",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "focus-call",
+          "ms": 569.5999999996275,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          }
+        },
+        {
+          "event": "focusin",
+          "ms": 570,
+          "active": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          }
+        },
+        {
+          "event": "focus-return",
+          "ms": 570.4000000003725,
+          "active": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          }
+        },
+        {
+          "event": "focus-call",
+          "ms": 586.0999999996275,
+          "active": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "focusin",
+          "ms": 586.9000000003725,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "focus-return",
+          "ms": 587.5,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "document-keydown",
+          "ms": 686.9000000003725,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "key": "Escape",
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "Menu-onKeyDownCapture",
+          "ms": 687.0999999996275,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "key": "Escape",
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "focus-call",
+          "ms": 690.8000000007451,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": true,
+          "target": {
+            "tag": "BUTTON",
+            "id": "react-aria2806903039-_r_0_",
+            "role": null,
+            "label": null
+          }
+        },
+        {
+          "event": "focus-return",
+          "ms": 690.8000000007451,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria2806903039-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": true,
+          "target": {
+            "tag": "BUTTON",
+            "id": "react-aria2806903039-_r_0_",
+            "role": null,
+            "label": null
+          }
+        },
+        {
+          "event": "focus-call",
+          "ms": 784.0999999996275,
+          "active": {
+            "tag": "BODY",
+            "id": "",
+            "role": null,
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "focusin",
+          "ms": 784.2000000011176,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "focus-return",
+          "ms": 784.3000000007451,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "document-keydown",
+          "ms": 823,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": " ",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        }
+      ]
+    }
+  },
+  {
+    "engine": "webkit",
+    "version": "26.5",
+    "closed": {
+      "active": {
+        "tag": "INPUT",
+        "id": "search",
+        "role": "combobox",
+        "label": null
+      },
+      "query": "memory"
+    },
+    "after": {
+      "active": {
+        "tag": "INPUT",
+        "id": "search",
+        "role": "combobox",
+        "label": null
+      },
+      "query": "memory ",
+      "menu": false,
+      "trace": [
+        {
+          "event": "document-keydown",
+          "ms": 564,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": "Meta",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "App-onKeyDown",
+          "ms": 564,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": "Meta",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "document-keydown",
+          "ms": 566,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": "k",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "App-onKeyDown",
+          "ms": 566,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": "k",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "focus-call",
+          "ms": 587,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          }
+        },
+        {
+          "event": "focusin",
+          "ms": 588,
+          "active": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          }
+        },
+        {
+          "event": "focus-return",
+          "ms": 588,
+          "active": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          }
+        },
+        {
+          "event": "focus-call",
+          "ms": 652,
+          "active": {
+            "tag": "DIV",
+            "id": "more-menu",
+            "role": "menu",
+            "label": "More"
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "focusin",
+          "ms": 653,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "focus-return",
+          "ms": 653,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "document-keydown",
+          "ms": 678,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "key": "Escape",
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "Menu-onKeyDownCapture",
+          "ms": 679,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": false,
+          "key": "Escape",
+          "target": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          }
+        },
+        {
+          "event": "focus-call",
+          "ms": 683,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": true,
+          "target": {
+            "tag": "BUTTON",
+            "id": "react-aria637136538-_r_0_",
+            "role": null,
+            "label": null
+          }
+        },
+        {
+          "event": "focus-return",
+          "ms": 683,
+          "active": {
+            "tag": "DIV",
+            "id": "react-aria637136538-_r_b_",
+            "role": "menuitem",
+            "label": null
+          },
+          "popover": true,
+          "exiting": true,
+          "target": {
+            "tag": "BUTTON",
+            "id": "react-aria637136538-_r_0_",
+            "role": null,
+            "label": null
+          }
+        },
+        {
+          "event": "focus-call",
+          "ms": 776,
+          "active": {
+            "tag": "BODY",
+            "id": "",
+            "role": null,
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "focusin",
+          "ms": 777,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "focus-return",
+          "ms": 777,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        },
+        {
+          "event": "document-keydown",
+          "ms": 812,
+          "active": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          },
+          "popover": false,
+          "exiting": false,
+          "key": " ",
+          "target": {
+            "tag": "INPUT",
+            "id": "search",
+            "role": "combobox",
+            "label": null
+          }
+        }
+      ]
+    }
+  }
+]

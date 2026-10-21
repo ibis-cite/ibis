@@ -1,0 +1,9 @@
+# Headless diagnosis of the native finding
+
+This is a **headless browser diagnostic**, separate from the adjacent native captures. It serves the already-built evidence assets from exact runtime source `ac199f06e55c0d395713f96be2e6f4e85a4a246b` with the existing gallery server and already-installed Playwright Chromium 151.0.7922.34 / WebKit 26.5. No source, OS preferences or installed software changed.
+
+`trace.json` temporarily observes safe element tag/id/role/aria-label, keyboard handler path, focus calls and popover presence in each synthetic page. It wraps existing React DOM event handlers only to identify the invoked path. In both engines Escape reaches `Menu.onKeyDownCapture`, not App's fallback. More.focus is called while the popover is exiting and does not move focus. After detach, React Aria restores the originally active Search. The existing late restoration guard then leaves that external control alone.
+
+`control.json` repeats without the trace wrappers in normal and emulated reduced motion. All four unchanged cases fail: Escape leaves Search and Space appends a space. Four separate diagnostic-only cases focus the More invoker on the recognized shortcut immediately before the existing App handler opens the menu; all four preserve first-item focus, restore More after Escape, and reopen with Space without changing the query. That prelude is an experiment, not a shipped patch or native repaired-build pass.
+
+This corrects the initial interpretation that the gap was specific to WKWebView: it also reproduces in uninstrumented Chromium. Previous animated Escape tests opened from the already-focused invoker. The new failing App regression at `c66b522c165622ce3fa9509ae6d3ac73fcb61f67` starts from Search and models inert focus refusal through the existing animation lifecycle, failing because activeElement is Search. Runtime remains unchanged pending plan review.

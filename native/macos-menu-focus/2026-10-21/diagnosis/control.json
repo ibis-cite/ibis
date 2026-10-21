@@ -1,0 +1,82 @@
+[
+  {
+    "engine": "chromium",
+    "version": "151.0.7922.34",
+    "reducedMotion": "no-preference",
+    "anchorTrigger": false,
+    "firstItemFocused": true,
+    "moreFocused": false,
+    "query": "memory ",
+    "menu": false
+  },
+  {
+    "engine": "chromium",
+    "version": "151.0.7922.34",
+    "reducedMotion": "no-preference",
+    "anchorTrigger": true,
+    "firstItemFocused": true,
+    "moreFocused": true,
+    "query": "memory",
+    "menu": true
+  },
+  {
+    "engine": "chromium",
+    "version": "151.0.7922.34",
+    "reducedMotion": "reduce",
+    "anchorTrigger": false,
+    "firstItemFocused": true,
+    "moreFocused": false,
+    "query": "memory ",
+    "menu": false
+  },
+  {
+    "engine": "chromium",
+    "version": "151.0.7922.34",
+    "reducedMotion": "reduce",
+    "anchorTrigger": true,
+    "firstItemFocused": true,
+    "moreFocused": true,
+    "query": "memory",
+    "menu": true
+  },
+  {
+    "engine": "webkit",
+    "version": "26.5",
+    "reducedMotion": "no-preference",
+    "anchorTrigger": false,
+    "firstItemFocused": true,
+    "moreFocused": false,
+    "query": "memory ",
+    "menu": false
+  },
+  {
+    "engine": "webkit",
+    "version": "26.5",
+    "reducedMotion": "no-preference",
+    "anchorTrigger": true,
+    "firstItemFocused": true,
+    "moreFocused": true,
+    "query": "memory",
+    "menu": true
+  },
+  {
+    "engine": "webkit",
+    "version": "26.5",
+    "reducedMotion": "reduce",
+    "anchorTrigger": false,
+    "firstItemFocused": true,
+    "moreFocused": false,
+    "query": "memory ",
+    "menu": false
+  },
+  {
+    "engine": "webkit",
+    "version": "26.5",
+    "reducedMotion": "reduce",
+    "anchorTrigger": true,
+    "firstItemFocused": true,
+    "moreFocused": true,
+    "query": "memory",
+    "menu": true
+  }
+]
