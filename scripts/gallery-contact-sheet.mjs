@@ -36,7 +36,7 @@ const VARIANTS = [
 ];
 const MEDIA = { "high-contrast": { contrast: "more" } };
 // A frame that has not rendered by then is failed; the 50-reference preview
-// takes about 15 s while three other frames render beside it.
+// takes several seconds on a busy machine.
 const FRAME_TIMEOUT = 60_000;
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml",
   ".png": "image/png", ".woff2": "font/woff2", ".json": "application/json", ".ico": "image/x-icon" };

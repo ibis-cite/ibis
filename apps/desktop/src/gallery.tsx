@@ -45,11 +45,6 @@ function rendered(root: HTMLElement, state: GalleryState): boolean {
     && (document.querySelector(".gallery-notice .copied-notice code")?.textContent ?? null) === (state.notice ?? null);
 }
 
-// One seeded step at a time: a step taken while the preview is still formatting
-// queues another request behind it in the format worker, and fifty queued
-// requests exceed its time limit, so the preview fails instead of rendering.
-const previewPending = (root: HTMLElement) => root.querySelector('.format-preview > p[role="status"]') !== null;
-
 const pinButton = (root: HTMLElement) => root.querySelector<HTMLButtonElement>(`button[aria-label="${pickerText.pin}"]`);
 
 function press(target: Element | null, key: string, init: KeyboardEventInit = {}): void {
@@ -207,7 +202,7 @@ export function renderGalleryState(
       reportStage("effects-settled");
       settledReported = true;
     }
-    const ready = !failed && fontsReady && document.fonts?.status !== "loading" && pending === 0 && !previewPending(root) && rendered(root, state);
+    const ready = !failed && fontsReady && document.fonts?.status !== "loading" && pending === 0 && rendered(root, state);
     if (ready && step < steps.length) {
       steps[step++]!();
       stableFrames = 0;
