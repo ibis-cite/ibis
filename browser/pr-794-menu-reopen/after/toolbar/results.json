@@ -1,0 +1,392 @@
+{
+  "label": "after",
+  "browser": "151.0.7922.34",
+  "total": 24,
+  "passed": 24,
+  "rows": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "wasExiting": true,
+      "before": {
+        "tag": "INPUT",
+        "filterFocused": true,
+        "expanded": "true"
+      },
+      "filter": "Prose",
+      "count": 1,
+      "selected": "Prose",
+      "passed": true
+    }
+  ]
+}
