@@ -39,6 +39,8 @@ test("checks the branch name and its type, except for forks and bots", () => {
   assert.deepEqual(lint({ ...ok, branch: "patch-1", fork: true }).errors, []);
   assert.deepEqual(lint({ title: "chore(main): release 0.2.0", body: "", branch: "release-please--branches--main" }), { errors: [], warnings: [] });
   assert.deepEqual(lint({ title: "build(deps): bump x", body: "", branch: "dependabot/cargo/x-1.2" }), { errors: [], warnings: [] });
+  assert.deepEqual(lint({ title: 'Revert "fix: keep notes literal (#12)"', body: "Reverts ibiscite/ibis#12", branch: "revert-12-fix/11-notes" }), { errors: [], warnings: [] });
+  assert.ok(lint({ title: 'Revert "fix: x"', body: "", branch: "fix/11-notes" }).errors.length > 0);
 });
 
 test("needs exactly one issue link and warns when it differs from the branch", () => {

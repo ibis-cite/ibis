@@ -5,7 +5,7 @@
 //                                       from GITHUB_EVENT_PATH (no API, no token)
 //
 // Errors exit 1; warnings are printed and do not fail. Bot pull requests
-// (Release Please, Dependabot) are skipped.
+// (Release Please, Dependabot) and GitHub's Revert button are skipped.
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -14,6 +14,8 @@ const TYPES = "feat|fix|perf|docs|test|ci|build|refactor|chore|revert";
 const TITLE = new RegExp(`^(${TYPES})(\\([a-z0-9-]+\\))?!?: (\\S.*)$`);
 const BRANCH = new RegExp(`^(${TYPES})/(\\d+)-[a-z0-9][a-z0-9-]*$`);
 const BOT_BRANCH = /^(release-please--|dependabot\/)/;
+// GitHub's Revert button: `Revert "fix: …"` from `revert-<PR>-<branch>`; reverting a red main must never wait on lint.
+const REVERT = { title: /^Revert "/, branch: /^revert-\d+-/ };
 const LINK = /^[ \t]*(?:closes|fixes|resolves|part of) #(\d+)\b/gim;
 const SECTIONS = ["What and why", "How it works", "Verification"];
 const MAX_WORDS = 250;
@@ -35,6 +37,7 @@ export function lint({ title = "", body = "", branch = "", fork = false }) {
   const errors = [];
   const warnings = [];
   if (BOT_BRANCH.test(branch)) return { errors, warnings };
+  if (REVERT.branch.test(branch) && REVERT.title.test(title.trim())) return { errors, warnings };
   body = body ?? "";
 
   const t = title.trim().match(TITLE);
