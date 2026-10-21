@@ -9,12 +9,13 @@ on:
   pull_request:
   workflow_dispatch:
 
-# A newer push replaces the older run of the same branch or pull request. On
-# main, the newest commit contains every earlier merge, so its run tests them
-# all and the macOS and Windows runners are not kept busy by superseded states.
+# On a pull request, a newer push cancels the run in progress. On main, a run
+# that has started always finishes, so its caches are saved and its evidence is
+# collected; GitHub keeps only the newest waiting push and replaces older ones
+# before they start, so a burst of merges never runs every commit.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -388,7 +389,7 @@ jobs:
           if [ -n "$number" ]; then
             gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body "$body"
           else
-            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --label needs:triage --body "$body"
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --label type:task --label area:infra --body "$body"
           fi
 
       # Uploads still run after a job timeout (which counts as cancelled) so
@@ -405,7 +406,9 @@ jobs:
   screenshots:
     name: Collect picker screenshots
     needs: [changes, desktop]
-    if: ${{ !cancelled() && needs.changes.outputs.native == 'true' && (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) }}
+    # A failed Web interface skips every Desktop job, so there is nothing to
+    # publish. One failed Desktop platform still leaves the others to publish.
+    if: ${{ !cancelled() && needs.changes.outputs.native == 'true' && needs.desktop.result != 'skipped' && (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     # GitHub cannot restrict GITHUB_TOKEN to a branch. Keep write permission in
