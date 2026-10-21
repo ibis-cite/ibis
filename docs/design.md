@@ -167,7 +167,9 @@ symbolic masters. How the assets are regenerated is in the
 | Selected row | Filled accent, white text | Soft grey with an accent pill on the left | GTK's selection colour (filled accent) with its paired text |
 | Keyboard focus ring | 2 px accent, 1 px gap | 2 px in the text colour around a 1 px surface-coloured stroke (Fluent's focus visual) | 2 px, the accent mixed half toward the text colour, 1 px gap |
 | Search box | Frameless, large; with Liquid Glass, a 40 px capsule that also holds format and pin | Text box with an underline that turns accent on focus | Framed entry |
-| Shortcut labels | ⌘ ⌥ ⇧ | Ctrl Alt Shift | Ctrl Super Shift |
+| Shortcut labels | ⌘ ⌥ ⇧ ⌃, joined in one key cap (⌘K) | Ctrl Alt Shift, one cap per key (Ctrl K) | Ctrl Super Shift, one cap per key with "+" between (Ctrl + K) |
+| Header menus | Borderless pop-up button with ⌃⌄ | ComboBox with a chevron | Flat drop-down with `pan-down-symbolic` |
+| Switch | 32 × 18 | 40 × 20, outlined when off | 46 × 26 |
 | Copied | Pill near the top of the screen | Notice bottom-right | Toast at the bottom |
 
 On macOS, use WebKit's paired selected-content background and alternate-selected text when both are supported. `AccentColorText` can resolve to black even on saturated blue; keyword support alone does not establish a native pair or custom-accent following. Generic fallbacks remain for other engines, and increased contrast and forced colours retain their system Highlight pair.
@@ -214,9 +216,9 @@ list, preview and tray) from a control layer (search, format, pin).
 | Element | Visible | Why |
 |---|---|---|
 | Search box | Always | The largest element, focused on open. Its placeholder lists what can be searched. |
-| Format (for example "Pandoc ▾") | Always | What is pasted depends on it. One word, no icon. |
-| More (Ctrl/⌘ K) | Always | The one door to every other action; each shows its shortcut, so the menu is also the cheat sheet. |
-| Pin | Always, faint at rest | Tertiary text colour at rest, full strength on hover or while on, so it never moves or appears from nowhere. Its tooltip names the action ("Pin: keep Ibis open beside your document") and, once the key table assigns one, its key. The first time a click outside hides Ibis, a one-time footer tip explains the pin. |
+| Format (for example "Pandoc ⌃⌄" on macOS) | Once a library is chosen | What is pasted depends on it. One word, no icon; each platform's pop-up button (see **Header**). |
+| More (Ctrl/⌘ K) | Always | The one door to every other action; each shows its shortcut, so the menu is also the cheat sheet. In the footer it reads "More ⌘K", like the hints beside it (see **Footer**). |
+| Pin | Always, faint at rest | Tertiary colour at rest, full strength on hover or while on, so it never moves or appears from nowhere. Its tooltip names the action ("Pin: keep Ibis open beside your document") and, once the key table assigns one, its key. The first time a click outside hides Ibis, a one-time footer tip explains the pin. |
 | Filter chips | Once added | `#tag`, `y:2019-2022` or `a:name` followed by a space becomes a removable chip. Backspace in an empty box removes the last one. |
 | Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab cycles them. |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter or Tab picks the first. |
@@ -228,6 +230,7 @@ list, preview and tray) from a control layer (search, format, pin).
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
 | Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows: a plus, or a check on a row already added. A row in the citation always shows a scarlet tile with a white check, the only scarlet on the row. A 32 px pointer target with its name in the tooltip ("Add García 2021 to citation"); it adds no Tab stop, because a listbox option holds no controls, and keyboards use Shift+Enter. |
 | Citation tray | Once a source is added | Page number per source and the exact text to be copied, in scarlet. |
+| Footer key hints | Always | What Enter does now, Shortcuts and More, label first and keys after (see **Footer**). |
 | Footer tip | One at a time | Tied to what the user is doing, retired once they have done it. Otherwise the footer shows library status. |
 | Library status | Always, quietly | A dot, the source and the count; the age only when it is news or a warning (see below). A sentence above the list only when something needs the user. |
 
@@ -261,6 +264,131 @@ a date after a week) and tick every 30 seconds without redrawing the picker. The
 live region holds only the words before the age, so a ticking clock is never
 announced. The tray line has no time, because a native menu is not redrawn while
 open; after a failed update it says "not updated" and why.
+
+## Header, footer and empty states
+
+The picker's chrome: what sits around the result list, and how it lines up.
+Every number below comes from the tokens in **Space and size** and
+**Corners**; nothing here adds a new size.
+
+**Edges.** Visible edges line up with the content; hit targets may overhang
+them. The leading edge is the tile column (`inset + row-pad`), the text column
+starts at `text x`, and the trailing edge is where row text ends
+(`W − inset − row-pad`). The pin's glyph, the last key cap in the footer and
+the year column all end on that trailing edge; a 32 px target around a 20 px
+glyph overhangs it by 6 px. Controls in one bar share a centre line, and text
+in one bar shares a baseline.
+
+**Header.** In order: search glyph, query, clear button, the header menus
+(format, then library scope when there is one), pin.
+
+- **Clear (×).** Inside the field at its trailing end, only while there is a
+  query: a 16 px glyph in a 32 px target, secondary colour. macOS draws the
+  filled circle of its search fields (`xmark.circle.fill`); Windows and GNOME
+  draw the plain × of a Fluent text box and a GTK search entry.
+- **Header menus** are pop-up buttons: they show the current choice as their
+  label, and the menu marks it with a leading check. The label is the value,
+  in the text colour at 13 px; the indicator is secondary and never turns
+  when the menu opens. 4 px between the field and the first menu, and between
+  two menus.
+
+  | | macOS | Windows 11 | Linux (GNOME) |
+  |---|---|---|---|
+  | Native model | Pop-up button, borderless (toolbar) style | ComboBox | Drop-down (`GtkDropDown`), flat in a header |
+  | Indicator | ⌃⌄ (`chevron.up.chevron.down`), 8 × 12 | `ChevronDown`, 12 px, 1 px stroke | `pan-down-symbolic`, 16 px |
+  | Rest | No fill | Control fill, 1 px stroke with a darker bottom edge | No fill |
+  | Hover / open | Quiet fill / pressed fill | Hover fill / pressed fill | Quiet fill / pressed fill |
+  | Height, radius | 28 px in a 32 px target, capsule | 32 px, 4 px | 32 px, 6 px |
+  | Label | Regular weight | Regular weight | Bold, as libadwaita buttons are |
+
+  The menu opens below the button, aligned to its trailing edge. Keyboard: Tab
+  from the search box reaches the menus, then the pin; Space, Enter or ↓ opens
+  a menu (Alt+↓ too on Windows and Linux, as their combo boxes do); typing
+  filters; a pick, Escape or Tab returns focus to the search box. While no
+  library is chosen the header menus are hidden, because first-run setup asks
+  the same question in its own words.
+- **Pin.** Always visible: tertiary colour at rest (the secondary colour at
+  55%), full strength on hover or while on, so the header never shows a hole
+  where it appears.
+
+**Footer.** Library status at the leading edge; at the trailing edge, key hints
+and More. One hint pattern everywhere outside menus: **the label first, then
+its keys**, 6 px between them, 16 px between hints, all at 12 px on one
+baseline, each key cap 20 px high and centred on it.
+
+- **Order.** What Enter does now ("Copy as Pandoc ↵", the primary hint, in the
+  text colour), then "Shortcuts ⌘/", then "More ⌘K" (both secondary). The
+  hint that comes and goes is first, so the cluster's trailing end never moves.
+  With Alt held: "Add to citation ⇧↵", then the Escape step ("Clear search
+  Esc" or "Hide Esc"), then More.
+- **More** looks like the other hints but is a button: a quiet fill on hover
+  and while open, 28 px high in the 32 px row, radius `--r-tile`.
+- **Shortcuts** opens the keyboard shortcuts list. Its name matches each
+  system's own term (macOS and Windows both say "Keyboard shortcuts"); the
+  footer shortens it to one word, and More and the list's title say it in full.
+  Changing shortcuts belongs to the settings design, not to this list.
+- **Library status** keeps its rules (see **Library status**): the dot is
+  6 px, centred on the text's x-height, and starts on the leading edge.
+- **Key caps.** A 20 px fill (`--key-cap`), 5 px side padding, 12 px text,
+  never an outline. macOS joins the glyphs in one cap, as its menus write them
+  (⌘K, ⇧↵). Windows gives each key its own cap, 2 px apart, as PowerToys does
+  (Ctrl K). GNOME gives each key its own cap with a "+" between, as GTK's
+  shortcut labels do (Ctrl + K). In menus a shortcut is plain trailing text,
+  as in each system's own menus, never a cap.
+
+**Empty states.** One template on every platform, centred like
+`ContentUnavailableView`, `AdwStatusPage` and Fluent's empty state: a title
+(15/20, semibold), one line at most 44 characters wide (13/18, secondary),
+then actions or hints 16 px below. It starts 48 px below the search band. The
+result heading ("Best matches", "20 results") appears only above rows: with
+no rows there is nothing to name.
+
+| Case | Title | Line | Below |
+|---|---|---|---|
+| Nothing typed, library loaded | Type to find a reference | Search by title, author, year, citation key or DOI. | Two key hints: "Copy ↵" and "Add to citation ⇧↵" |
+| Nothing typed, with history (Rollout 6) | | | No template: "Recently cited" rows, ready for ↓ and Enter |
+| No matches | No matching references | Check the spelling, or try fewer words, an author's surname or a year. | Clear search; Search all libraries when some are left out |
+| Empty library | No references in thesis.bib | Choose a BibTeX or BibLaTeX export with references, then try again. (Zotero: add items in Zotero, then reload.) | Choose library… |
+
+Spotlight, Alfred and GNOME's search show nothing until something is typed;
+Raycast and the Windows 11 Start menu show recent items. Ibis does the second
+once it keeps a local history (Rollout 6, which can be turned off and cleared),
+and until then the first, with the two keys that make the first minute work.
+No illustration and no tips beyond those keys.
+
+**First run.** A grouped form, as macOS System Settings, Windows Settings
+cards and libadwaita preference groups are: a title ("Choose a library to get
+started") and one secondary line saying what was found, then one group of
+labelled rows, each 48 px high with `row-pad` sides and its control at the
+trailing edge, separated by hairlines, radius `--r-row`.
+
+1. **Library:** Use Zotero and Choose library…. Exactly one is the primary
+   button (accent fill, paired text): Use Zotero when Zotero is open,
+   otherwise Choose library…. Files found nearby follow as rows of their own,
+   name above folder, each with a Use button.
+2. **I write in:** a segmented choice, Markdown, LaTeX, Typst (and Word when
+   citation styles are available).
+3. **Open Ibis from any app:** the shortcut, in key caps.
+4. **Start Ibis when you log in:** a switch, off until turned on.
+
+"Look again" is a text button under the group. The footer shows "No library
+chosen", Shortcuts and More, so nothing else changes once a library opens.
+
+**Selection and focus.** One rule set for every control:
+
+| | Pointer over it | Chosen or current | Keyboard focus |
+|---|---|---|---|
+| Result row | Quiet tint | The platform's selected-row fill (see **Per platform**) | The same fill; never a ring |
+| Menu item | The menu highlight | Leading check | The menu highlight; never a ring |
+| Segmented choice | Quiet tint | A raised thumb on a recessed track; never a coloured border | Ring around the focused segment |
+| Pop-up button, More | Quiet fill | Pressed fill while its menu is open | Ring |
+| Buttons | One step darker fill | Primary: the accent fill | Ring |
+| Switch | No change | Accent track | Ring around the switch |
+| Search box | None | None | None (the caret; on Windows its underline) |
+
+The ring is the platform's focus ring from **Per platform**, only after
+keyboard movement (rule 8). Increased contrast and forced colours add their
+solid edges as described under **Accessibility**.
 
 ## Learning without a tutorial
 
@@ -381,12 +509,12 @@ menu and the menu bar or tray menu, and each takes effect at once.
 **Start Ibis when you log in.** The shortcut only works while Ibis runs, so
 Ibis offers to start at login: once during first-run setup, beside the
 shortcut it teaches, and always in More and the menu bar or tray menu. It is
-off until the person ticks it: Apple's App Review Guideline 2.4.5(iii) asks
+off until the person turns it on: Apple's App Review Guideline 2.4.5(iii) asks
 Mac apps for consent first, and Raycast, Alfred, PowerToys and 1Password offer
 it as a setting. A login start leaves the picker hidden until the shortcut is
-pressed. The tick is read from the system each time, never from
+pressed. The switch is read from the system each time, never from
 `settings.json`, so turning Ibis off in the system's own startup settings shows
-at once; if the system refuses, the tick shows the real state and a sentence
+at once; if the system refuses, the switch shows the real state and a sentence
 says where to change it. Ibis Nightly and development builds register under
 their own names. How each platform stores the entry is in
 `apps/desktop/src-tauri/src/login_item.rs` and [PRIVACY.md](../PRIVACY.md).
