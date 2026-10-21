@@ -427,6 +427,38 @@ test.each([
   },
 );
 
+test.each([false, true])("a held Enter after removal waits for a fresh press (Shift=%s)", async (shiftKey) => {
+  const copies: Record<string, unknown>[] = [];
+  backend({
+    search: () => [result("a", "First"), result("b", "Second")],
+    copy_citation: (args) => { copies.push(args); return { text: "copied", warnings: [] }; },
+  });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  fireEvent.keyDown(box, { key: "ArrowDown" });
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  fireEvent.keyDown(box, { key: "ArrowUp" });
+  const remove = screen.getByRole("button", { name: "Remove a from the selection" });
+  act(() => remove.focus());
+  fireEvent.keyDown(remove, { key: "Enter", shiftKey });
+  fireEvent.click(remove, { detail: 0 });
+  expect(document.activeElement).toBe(box);
+  await act(async () => { fireEvent.keyDown(box, { key: "Enter", repeat: true, shiftKey }); });
+  expect(copies).toEqual([]);
+  expect([...document.querySelectorAll('[aria-label="Selected references"] code')].map((node) => node.textContent)).toEqual(["b"]);
+  fireEvent.keyUp(box, { key: "Enter", shiftKey });
+  if (shiftKey) {
+    fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+    fireEvent.keyUp(box, { key: "Enter", shiftKey: true });
+    expect([...document.querySelectorAll('[aria-label="Selected references"] code')].map((node) => node.textContent)).toEqual(["b", "a"]);
+  }
+  fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(copies).toHaveLength(1));
+  expect(copies[0]!.ids).toEqual((shiftKey ? ["b", "a"] : ["b"]).map((key) => ({ source: "refs.bib", native_key: key })));
+});
+
 test("hovering Remove keeps focus and menu keys unchanged", async () => {
   const calls = backend({ search: () => [result("a", "First"), result("b", "Second")] });
   render(<App />);
