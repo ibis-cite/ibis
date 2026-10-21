@@ -1961,8 +1961,8 @@ test("the footer names the source and count, the age only when it matters, and t
     error: "Zotero is not running, or it is not accepting connections; keeping the last loaded references" };
   await emit("library:changed", status);
   await waitFor(() => expect(item.textContent).toBe("Zotero · not updated · checked 2 hours ago"));
-  expect(item.getAttribute("data-health")).toBe("stop");
-  expect(plain(item.getAttribute("title"))).toMatch(/^Zotero · 1,205 references\nMy Library, Lab group · checked 2 hours ago, .+ · Zotero could not be reached$/);
+  expect(item.getAttribute("data-health")).toBe("look");
+  expect(plain(item.getAttribute("title"))).toMatch(/^Zotero · 1,205 references\nMy Library, Lab group · checked 2 hours ago, .+ · 2 Zotero libraries could not be read\. Zotero is not running, or it is not accepting connections; keeping the last loaded references\. Open Zotero, then reload\.$/);
 });
 
 test("? lists every key in a modal dialog, but a ? typed in the search is text", async () => {
@@ -2725,4 +2725,14 @@ test("retained stale freshness does not hide settings or copy failures", async (
   fireEvent.click(screen.getByText("Retained reference with errors"));
   await screen.findByText("Nothing was copied. Try again, or use Reload.");
   expect(screen.getAllByRole("alert")).toHaveLength(2);
+});
+
+test("a retained freshness warning does not hide an actual search failure", async () => {
+  backend({
+    library_status: () => ({ ...zoteroStatus(["user"]), state: "error", stale: true, error: "Zotero is not running; keeping the last loaded references" }),
+    search: () => { throw new Error("synthetic search failure"); },
+  });
+  render(<App />);
+  await screen.findByText("Ibis could not search your library. Use Reload, then try again.");
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
 });
