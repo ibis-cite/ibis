@@ -24,6 +24,46 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
+  nix:
+    name: Nix inputs (bootstrap only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31.11.2
+        with:
+          enable_kvm: false
+          extra_nix_config: |
+            sandbox = true
+            max-jobs = 2
+            cores = 2
+
+      # Temporary bootstrap: compute inputs with the official fetcher, without
+      # claiming this draft can yet build or install the desktop app.
+      - name: Compute real input hashes
+        run: |
+          nix flake lock
+          nixpkgs=$(nix eval --impure --raw --expr '(builtins.getFlake (toString ./.)).inputs.nixpkgs.outPath')
+          nix run "$nixpkgs#nix-prefetch" -- --file "$nixpkgs" --expr \
+            '{ sha256 }: (pkgs.callPackage ./nix/package.nix { pnpmDepsHash = sha256; }).pnpmDeps' > pnpm-hash
+          nix hash convert --hash-algo sha256 --to sri "$(cat pnpm-hash)" > nix/pnpm-deps-hash
+
+      - name: Preserve generated inputs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: nix-inputs-${{ github.sha }}
+          path: |
+            flake.lock
+            nix/pnpm-deps-hash
+          if-no-files-found: error
+          retention-days: 14
+
   changes:
     name: Changed files
     runs-on: ubuntu-24.04
