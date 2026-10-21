@@ -39,7 +39,8 @@
       "pixels": [
         2321,
         800
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-before-large.png",
@@ -64,7 +65,8 @@
       "pixels": [
         2321,
         800
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-after-normal.png",
@@ -89,7 +91,8 @@
       "pixels": [
         2321,
         800
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-after-large.png",
@@ -114,7 +117,8 @@
       "pixels": [
         2321,
         800
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-before-light-360-large.png",
@@ -133,7 +137,8 @@
       "pixels": [
         360,
         480
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-before-light-360-large-more.png",
@@ -152,7 +157,8 @@
       "pixels": [
         360,
         480
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-before-dark-461-large.png",
@@ -171,7 +177,8 @@
       "pixels": [
         461,
         480
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-before-dark-461-large-more.png",
@@ -190,7 +197,8 @@
       "pixels": [
         461,
         480
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-after-light-360-large.png",
@@ -209,7 +217,8 @@
       "pixels": [
         360,
         480
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-after-light-360-large-more.png",
@@ -228,7 +237,8 @@
       "pixels": [
         360,
         480
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-after-dark-461-large.png",
@@ -247,7 +257,8 @@
       "pixels": [
         461,
         480
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-after-dark-461-large-more.png",
@@ -266,7 +277,8 @@
       "pixels": [
         461,
         480
-      ]
+      ],
+      "format": "png"
     },
     {
       "file": "retained-freshness-626-chromium-menu-360-200.png",
@@ -286,10 +298,11 @@
       "pixels": [
         360,
         320
-      ]
+      ],
+      "format": "png"
     },
     {
-      "file": "retained-freshness-626-native-macos-dark-larger-before.png",
+      "file": "retained-freshness-626-native-macos-dark-larger-before.jpg",
       "source_commit": "77ac0922dfa6a52acd8ee40220ed17af9357663b",
       "capture": "Native WKWebView Ibis app capture",
       "phase": "before",
@@ -303,12 +316,13 @@
       },
       "sha256": "76e73f3b5025d7122796bbdc1b3b88bdbf31c2471fa6d5dde1327be137a03083",
       "pixels": [
-        4718592,
-        4292935744
-      ]
+        720,
+        480
+      ],
+      "format": "jpeg"
     },
     {
-      "file": "retained-freshness-626-native-macos-dark-larger-after.png",
+      "file": "retained-freshness-626-native-macos-dark-larger-after.jpg",
       "source_commit": "1ef07233cdfebbe72a1441535eb71af71ec7875c",
       "capture": "Native WKWebView Ibis app capture",
       "phase": "after",
@@ -322,12 +336,13 @@
       },
       "sha256": "7e2f6d038b4c935fd3a60151f8fd563c854bf8f9b34aed1e444a337672ff8462",
       "pixels": [
-        4718592,
-        4292935744
-      ]
+        720,
+        480
+      ],
+      "format": "jpeg"
     },
     {
-      "file": "retained-freshness-626-native-macos-dark-larger-more.png",
+      "file": "retained-freshness-626-native-macos-dark-larger-more.jpg",
       "source_commit": "1ef07233cdfebbe72a1441535eb71af71ec7875c",
       "capture": "Native WKWebView Ibis app capture",
       "phase": "after-more-home",
@@ -341,12 +356,13 @@
       },
       "sha256": "408ebc1ab8e2c4cfa95bb28e66ddcc129dbb1f032babea07fcb29683b99bd3e8",
       "pixels": [
-        4718592,
-        4292935744
-      ]
+        720,
+        480
+      ],
+      "format": "jpeg"
     },
     {
-      "file": "retained-freshness-626-native-macos-dark-larger-more-end.png",
+      "file": "retained-freshness-626-native-macos-dark-larger-more-end.jpg",
       "source_commit": "1ef07233cdfebbe72a1441535eb71af71ec7875c",
       "capture": "Native WKWebView Ibis app capture",
       "phase": "after-more-end",
@@ -360,9 +376,10 @@
       },
       "sha256": "66f9306e4b1b635936804a41b66742b98679a88e488abc118925ec45a9afdef8",
       "pixels": [
-        4718592,
-        4292935744
-      ]
+        720,
+        480
+      ],
+      "format": "jpeg"
     }
   ],
   "browser_verification": {
