@@ -224,10 +224,11 @@ async function main() {
         await page.goto(`${base}/gallery.html?${query}`);
         await page.waitForFunction((id) => document.documentElement.dataset.galleryRendered === id, job.state.state, { timeout });
         if (job.state.hover) await page.hover(job.state.hover, { timeout: 5_000 });
-        // Let hover fades finish; endless ones (a spinner) never do and are skipped.
-        await page.evaluate(() => Promise.all(document.getAnimations()
+        // Let hover fades finish; endless ones (a spinner) never do and are skipped,
+        // and a paused one is waited for at most two seconds.
+        await page.evaluate(() => Promise.race([new Promise((resolve) => setTimeout(resolve, 2_000)), Promise.all(document.getAnimations()
           .filter((animation) => animation.effect?.getComputedTiming().endTime !== Infinity)
-          .map((animation) => animation.finished.catch(() => undefined))));
+          .map((animation) => animation.finished.catch(() => undefined)))]));
         if (errors.length > 0) throw new Error(errors.join("; "));
         const png = await page.screenshot({ path: path.join(dir, `${job.state.id}.png`) });
         frames.set(name, { png });
