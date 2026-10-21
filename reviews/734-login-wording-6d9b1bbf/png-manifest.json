@@ -1,0 +1,217 @@
+{
+  "browser": "Chromium 151.0.7922.34",
+  "capture": "browser render; synthetic data",
+  "before": "0dad8170a37faea541d9dfbb78b7af0ac8ac5c86",
+  "after": "6d9b1bbf411b1ecba6301e60256f41b201299973",
+  "validation": "PNG signature, IHDR dimensions, every chunk CRC and IEND verified from bytes",
+  "images": [
+    {
+      "path": "after/contact-sheet-normal.png",
+      "format": "PNG",
+      "width": 2313,
+      "height": 800,
+      "bytes": 238096,
+      "sha256": "e93ac70308f761c9b430683f9149daeecd6a584b29de71b703df0b7f6f3044f8"
+    },
+    {
+      "path": "after/normal/linux-dark/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 31416,
+      "sha256": "401592e55c82c4405ab4420822e158be7b577dc554b378d718eb3c681520b9fa"
+    },
+    {
+      "path": "after/normal/linux-dark/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 54204,
+      "sha256": "feccf279277deb3d4e75116fc8b2dc6b604898beb584103bdd8f1bbd320e9956"
+    },
+    {
+      "path": "after/normal/linux-light/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 31515,
+      "sha256": "30d653a3c21f09fab533f43fa83853494d75af9ebf75f4ca74878c9b5aa709db"
+    },
+    {
+      "path": "after/normal/linux-light/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 54471,
+      "sha256": "c32fb90c58bf5aefa379cabe79fba18570ac7f63c13568ce2a855d0e213a91af"
+    },
+    {
+      "path": "after/normal/macos-dark/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 33118,
+      "sha256": "d4f594e3367267a3da2d826bfeab5430b5fc49a69471fb36408c531d3c6320e1"
+    },
+    {
+      "path": "after/normal/macos-dark/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 57055,
+      "sha256": "683bd8d5688b17b4c718b780c678075e3639c837d3a956518b17427680b5ff92"
+    },
+    {
+      "path": "after/normal/macos-light/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 32949,
+      "sha256": "ee2b54e4585beaedc96c0a69f16ec2b553f64d5801a2ef18d106bc082afff478"
+    },
+    {
+      "path": "after/normal/macos-light/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 58369,
+      "sha256": "47db7722e1598eaa39058b2768c4ee3240f4ff0cf96c5bf5d1d74a8458abcc32"
+    },
+    {
+      "path": "after/normal/windows-dark/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 28919,
+      "sha256": "49f75eb4157e0953017d242511500c3fe73aed66684b67a360678a389404591b"
+    },
+    {
+      "path": "after/normal/windows-dark/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 48431,
+      "sha256": "6361b67533d2d50b0cc7b79c92320ac5aadffe20dd0c9bd7985aad5769327cf2"
+    },
+    {
+      "path": "after/normal/windows-light/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 28688,
+      "sha256": "60bbd5355b703de56e42faf94e97deeb8c54b8f0b69d592eedba5b2e1a238b6e"
+    },
+    {
+      "path": "after/normal/windows-light/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 48776,
+      "sha256": "b72146e10c3f2bf5496ac5ff60b45e29d42d67c4dcd15745caaa4fe984713e14"
+    },
+    {
+      "path": "before/contact-sheet-normal.png",
+      "format": "PNG",
+      "width": 2313,
+      "height": 800,
+      "bytes": 239859,
+      "sha256": "b4ec50f351b968d4db3db13249fbad77ebad7451df9f2f49ba253544c7db8d3d"
+    },
+    {
+      "path": "before/normal/linux-dark/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 31416,
+      "sha256": "401592e55c82c4405ab4420822e158be7b577dc554b378d718eb3c681520b9fa"
+    },
+    {
+      "path": "before/normal/linux-dark/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 54986,
+      "sha256": "abdf9f101a03af74c1cf03981a9ccc4d6e3b29535161864397e49e34c7368afc"
+    },
+    {
+      "path": "before/normal/linux-light/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 31515,
+      "sha256": "30d653a3c21f09fab533f43fa83853494d75af9ebf75f4ca74878c9b5aa709db"
+    },
+    {
+      "path": "before/normal/linux-light/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 55237,
+      "sha256": "4423f143c915532cdae2856e3a28d942bdff557ab5305d296c10d056f930954f"
+    },
+    {
+      "path": "before/normal/macos-dark/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 33118,
+      "sha256": "d4f594e3367267a3da2d826bfeab5430b5fc49a69471fb36408c531d3c6320e1"
+    },
+    {
+      "path": "before/normal/macos-dark/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 57932,
+      "sha256": "122cf0eeddfaa1c30ad3d3d6b06a052239be12b62d4ba2ed1d1448203fd0abe5"
+    },
+    {
+      "path": "before/normal/macos-light/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 32949,
+      "sha256": "ee2b54e4585beaedc96c0a69f16ec2b553f64d5801a2ef18d106bc082afff478"
+    },
+    {
+      "path": "before/normal/macos-light/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 59271,
+      "sha256": "af2486a15a4ffd0dd7cffddbdfb0defabf87fb0fa0b01e6867060c3a37c35746"
+    },
+    {
+      "path": "before/normal/windows-dark/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 28816,
+      "sha256": "a97e9a7b448ddb708897f2a0d1503fd1b8fa0c49ceb6ea7578f7a653d2a52af9"
+    },
+    {
+      "path": "before/normal/windows-dark/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 48567,
+      "sha256": "95d66af470928beec07b18bb4e587cebe9e7333de24623ec91041e891381c1b0"
+    },
+    {
+      "path": "before/normal/windows-light/first-run.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 28574,
+      "sha256": "9d09808f960e327f7bb2b185564ce67038c13a1b463af8420318dc6170361e64"
+    },
+    {
+      "path": "before/normal/windows-light/menu-open.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "bytes": 48892,
+      "sha256": "2cf0469980c2d50d898983effcf59d5b5386f5dbe600858bc663f133f134b0b2"
+    }
+  ]
+}
