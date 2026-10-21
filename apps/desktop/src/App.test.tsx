@@ -2331,7 +2331,7 @@ test("More shows whether Ibis starts at login as the system reports it, and foll
   });
   render(<App />);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  const item = await screen.findByRole("menuitemcheckbox", { name: "Start Ibis when you log in" });
+  const item = await screen.findByRole("menuitemcheckbox", { name: "Start on Login" });
   await waitFor(() => expect(item.getAttribute("aria-checked")).toBe("true"));
   fireEvent.click(item);
   await waitFor(() => expect(calls).toContain("set_login_item"));
@@ -2340,27 +2340,27 @@ test("More shows whether Ibis starts at login as the system reports it, and foll
   system = true;
   await act(async () => { await emit("picker:shown"); });
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  await waitFor(() => expect(screen.getByRole("menuitemcheckbox", { name: "Start Ibis when you log in" }).getAttribute("aria-checked")).toBe("true"));
+  await waitFor(() => expect(screen.getByRole("menuitemcheckbox", { name: "Start on Login" }).getAttribute("aria-checked")).toBe("true"));
   expect(screen.queryByRole("alert")).toBeNull();
 });
 
 test("a refused login item is explained kindly and never shown as on", async () => {
   backend({ set_login_item: () => ({ name: "Ibis", enabled: false, problem: "refused" }) });
   render(<App />);
-  await chooseFromMore("Start Ibis when you log in", "menuitemcheckbox");
+  await chooseFromMore("Start on Login", "menuitemcheckbox");
   const alert = await screen.findByText(/^The system did not let Ibis change this\. You can change it in /);
   expect(alert.getAttribute("role")).toBe("alert");
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  expect((await screen.findByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).getAttribute("aria-checked")).toBe("false");
+  expect((await screen.findByRole("menuitemcheckbox", { name: "Start on Login" })).getAttribute("aria-checked")).toBe("false");
 });
 
 test("a failed login item command restores the previous state and says so", async () => {
   backend({ set_login_item: () => { throw new Error("ipc"); } });
   render(<App />);
-  await chooseFromMore("Start Ibis when you log in", "menuitemcheckbox");
+  await chooseFromMore("Start on Login", "menuitemcheckbox");
   expect(await screen.findByText("Ibis could not change whether it starts when you log in. Try again.")).toBeTruthy();
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  expect((await screen.findByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).getAttribute("aria-checked")).toBe("false");
+  expect((await screen.findByRole("menuitemcheckbox", { name: "Start on Login" })).getAttribute("aria-checked")).toBe("false");
 });
 
 test("systems without login items, and pickers without the commands, offer no choice", async () => {
@@ -2369,7 +2369,7 @@ test("systems without login items, and pickers without the commands, offer no ch
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   await screen.findByRole("menuitemcheckbox", { name: "Larger text" });
   await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); });
-  expect(screen.queryByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).toBeNull();
+  expect(screen.queryByRole("menuitemcheckbox", { name: "Start on Login" })).toBeNull();
   expect(screen.queryByRole("alert")).toBeNull();
   cleanup();
   const { loginItem: _read, setLoginItem: _set, ...withoutLoginItem } = api;
@@ -2377,7 +2377,7 @@ test("systems without login items, and pickers without the commands, offer no ch
   render(<App api={withoutLoginItem} />);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   await screen.findByRole("menuitemcheckbox", { name: "Larger text" });
-  expect(screen.queryByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).toBeNull();
+  expect(screen.queryByRole("menuitemcheckbox", { name: "Start on Login" })).toBeNull();
 });
 
 test("first-run setup offers starting at login beside the shortcut, off until chosen", async () => {
@@ -2398,17 +2398,39 @@ test("first-run setup offers starting at login beside the shortcut, off until ch
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
 
-test("each system's login item problems name where to look", async () => {
+test("each system's login item is in its own words, and its problems name where to look", async () => {
   const { loginItemsPlace, loginItemText } = await import("./messages");
-  expect(loginItemsPlace("MacIntel")).toBe("System Settings > General > Login Items");
-  expect(loginItemsPlace("Win32")).toBe("Settings > Apps > Startup");
-  expect(loginItemsPlace("Linux x86_64")).toMatch(/startup applications/);
-  for (const problem of ["unsupported", "needs_approval", "refused", "unreadable"] as const) {
-    expect(loginItemText.problem(problem, "PLACE", "Ibis Nightly")).toMatch(/Ibis Nightly.*PLACE\.$/);
+  expect((["macos", "windows", "linux"] as const).map(loginItemText.label)).toEqual(["Open at Login", "Start when you sign in", "Start on Login"]);
+  expect(loginItemText.sentence("Ibis Nightly", "windows")).toBe("Start Ibis Nightly when you sign in");
+  expect(loginItemText.sentence("Ibis", "macos")).toBe("Start Ibis when you log in");
+  expect(loginItemsPlace("macos")).toBe("System Settings > General > Login Items");
+  expect(loginItemsPlace("windows")).toBe("Settings > Apps > Startup");
+  expect(loginItemsPlace("linux")).toMatch(/startup applications/);
+  for (const platform of ["macos", "windows", "linux"] as const) {
+    for (const problem of ["unsupported", "needs_approval", "refused", "unreadable"] as const) {
+      const message = loginItemText.problem(problem, platform, "Ibis Nightly");
+      const place = `${loginItemsPlace(platform)}.`;
+      expect(message.endsWith(place)).toBe(true);
+      expect(message.indexOf("Ibis Nightly")).toBeGreaterThanOrEqual(0);
+      expect(message.indexOf("Ibis Nightly")).toBeLessThan(message.length - place.length);
+      expect(message.includes("log in")).toBe(platform !== "windows" && /unsupported|unreadable/.test(problem));
+    }
   }
 });
 
-test("quick clicks end in the state of the last click, and the app's own name is shown", async () => {
+test("the More menu names starting at login as the page's platform does", async () => {
+  backend({ login_item: () => ({ name: "Ibis", enabled: false, problem: null }) });
+  document.documentElement.dataset.platform = "macos";
+  try {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /^More/ }));
+    expect(await screen.findByRole("menuitemcheckbox", { name: "Open at Login" })).toBeTruthy();
+  } finally {
+    delete document.documentElement.dataset.platform;
+  }
+});
+
+test("quick clicks end in the state of the last click", async () => {
   let system = false;
   const order: boolean[] = [];
   const pending: (() => void)[] = [];
@@ -2423,7 +2445,7 @@ test("quick clicks end in the state of the last click, and the app's own name is
   });
   render(<App />);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  const item = await screen.findByRole("menuitemcheckbox", { name: "Start Ibis Nightly when you log in" });
+  const item = await screen.findByRole("menuitemcheckbox", { name: "Start on Login" });
   fireEvent.click(item);
   await waitFor(() => expect(item.getAttribute("aria-checked")).toBe("true"));
   fireEvent.click(item);
@@ -2540,7 +2562,7 @@ test("a pre-event copy rejection recovers without copying or hiding until a fres
     search: () => [{ ...result("ITEM0001", `Snapshot ${revision}`, "zotero:user"), revision }],
     copy_citation: (args) => {
       attempts.push(args.expectedRevision);
-      if (args.expectedRevision !== revision) throw "library snapshot changed";
+      if (args.expectedRevision !== revision) throw { code: "snapshot_changed" };
       writes.push(revision);
       return { text: "fresh copy", warnings: [] };
     },
@@ -2586,7 +2608,7 @@ test.each(["resolve", "reject"])("an older recovery status cannot override a new
   const calls = backend({
     library_status: () => ++reads === 1 ? { ...zoteroStatus(["user"]), revision } : new Promise((resolve, fail) => { finish = resolve; reject = fail; }),
     search: () => [{ ...result("a", `Recovery ${revision}`), revision }],
-    copy_citation: () => { throw "library snapshot changed"; },
+    copy_citation: () => { throw { code: "snapshot_changed" }; },
   });
   render(<App />);
   fireEvent.click(await screen.findByText("Recovery 1"));
@@ -2613,14 +2635,14 @@ test("a retired formatted preview sends its own revision and requires a fresh co
     search: () => [{ ...result("ITEM0001", `Formatted ${revision}`, "zotero:user"), revision }],
     picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
     csl_items: ({ expectedRevision }) => {
-      if (expectedRevision !== revision) throw "library snapshot changed";
+      if (expectedRevision !== revision) throw { code: "snapshot_changed" };
       // Each revision has its own year, so the preview shows which one it formatted.
       const year = revision === "1" ? 2020 : 2021;
       return JSON.stringify([{ id: "ITEM0001", type: "book", title: "Synthetic", author: [{ family: "Smith" }], issued: { "date-parts": [[year]] } }]);
     },
     copy_formatted: ({ text, expectedRevision }) => {
       attempts.push(expectedRevision);
-      if (expectedRevision !== revision) throw "library snapshot changed";
+      if (expectedRevision !== revision) throw { code: "snapshot_changed" };
       writes.push(revision);
       copiedText = text;
       return null;
@@ -2824,7 +2846,7 @@ test.each(["selection", "copy feedback"])("an obsolete stale copy recovers data 
     await screen.findByText("Keep the newer warning");
   }
   revision = "2"; // Backend replaced the snapshot without delivering its event.
-  await act(async () => { rejectOld("library snapshot changed"); });
+  await act(async () => { rejectOld({ code: "snapshot_changed" }); });
   await screen.findByText("First revision 2");
   expect(reads).toBeGreaterThan(1);
   expect(screen.queryByText("The library changed. Search again and reselect the references before copying.")).toBeNull();
@@ -2881,7 +2903,7 @@ test.each([
   if (selectedCopy) fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(attempts).toEqual(["1", "2"]));
   revision = refreshedRevision;
-  await act(async () => { rejectOld("library snapshot changed"); });
+  await act(async () => { rejectOld({ code: "snapshot_changed" }); });
   await waitFor(() => expect(reads).toBe(2));
   await waitFor(() => expect(searches).toBe(3));
   if (changedResults) await waitFor(() => expect(screen.queryByText("Pending 2 b")).toBeNull());

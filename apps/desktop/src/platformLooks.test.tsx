@@ -548,3 +548,18 @@ test("the tray ends on a whole row of chips, and its fade spares the separator a
   const contrast = styles.slice(styles.indexOf("@media (prefers-contrast: more), (forced-colors: active) {"));
   expect(rules(contrast, fade)).toMatch(/-webkit-mask:\s*none;\s*mask:\s*none/);
 });
+
+test("a wrapped footer keeps breathing room above and below its lines", () => {
+  // The footer has no block padding of its own (its 40 px is a min-height), so
+  // the library bar carries it: 1 px divider + 3 + 32 px More + 4 = 40 px, and
+  // wrapped lines never touch the divider or the window's bottom corners.
+  expect(rules(styles, ".library-bar")).toMatch(/padding-block:\s*calc\(var\(--space-1\) - var\(--border-width\)\) var\(--space-1\)/);
+  expect(rules(styles, ".more > button")).toMatch(/min-height:\s*var\(--control-min-size\);\s*padding-block:\s*0/);
+  expect(rules(tokens, ":root")).toMatch(/--control-min-size:\s*2rem/);
+  expect(rules(tokens, ":root")).toMatch(/--footer-height:\s*2\.5rem/);
+});
+
+test("the thicker active-row edge in increased contrast does not move the row's text", () => {
+  const contrast = styles.slice(styles.indexOf("@media (prefers-contrast: more)"));
+  expect(rules(contrast, '[role="option"][data-active]')).toMatch(/padding-inline:\s*calc\(var\(--row-pad\) - var\(--contrast-border-width\)\)/);
+});
