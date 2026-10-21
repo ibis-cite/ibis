@@ -900,6 +900,33 @@ test("the design scale keeps text readable and every colour role legible in both
   }
 });
 
+test("resizing More keeps its focused action visible without undoing manual scrolling", async () => {
+  backend();
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: /^More/ }));
+  const menu = await screen.findByRole("menu");
+  fireEvent.keyDown(document.activeElement!, { key: "End" });
+  const last = document.activeElement as HTMLElement;
+  expect(last.textContent).toContain("Quit Ibis");
+  // JSDOM supplies no layout: model a fractional resized scrollport with Quit below it.
+  const menuBox = vi.spyOn(menu, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 8, 240, 191.531));
+  const itemBox = vi.spyOn(last, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 220.4, 240, 32));
+  const height = vi.spyOn(menu, "clientHeight", "get").mockReturnValue(190);
+  const border = vi.spyOn(menu, "clientTop", "get").mockReturnValue(1);
+  try {
+    fireEvent.scroll(menu);
+    expect(menu.scrollTop).toBe(0);
+    fireEvent.resize(window);
+    expect(menu.scrollTop).toBe(54);
+    expect(document.activeElement).toBe(last);
+  } finally {
+    menuBox.mockRestore();
+    itemBox.mockRestore();
+    height.mockRestore();
+    border.mockRestore();
+  }
+});
+
 test("Ctrl+K opens More with every action, Escape closes it before hiding the picker", async () => {
   const calls = backend({ hide_picker: () => null, reload_library: () => null });
   render(<App />);

@@ -21,16 +21,28 @@ export function MoreMenu({ children, onClose }: { children: React.ReactNode; onC
       node.style.setProperty("--more-menu-offset", `${offset}px`);
       node.style.maxHeight = `${Math.max(0, bottom - inset)}px`;
     };
+    const refit = () => {
+      fit();
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && node.contains(active)) {
+        const bounds = node.getBoundingClientRect();
+        const item = active.getBoundingClientRect();
+        const top = bounds.top + node.clientTop;
+        const bottom = top + node.clientHeight;
+        if (item.top < top) node.scrollTop += Math.floor(item.top - top);
+        else if (item.bottom > bottom) node.scrollTop += Math.ceil(item.bottom - bottom);
+      }
+    };
     fit();
     // Watch both content/text changes and the footer that positions the trigger.
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(fit);
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(refit);
     observer?.observe(node);
     if (node.parentElement?.parentElement) observer?.observe(node.parentElement.parentElement);
-    window.addEventListener("resize", fit);
+    window.addEventListener("resize", refit);
     document.addEventListener("scroll", fit, true);
     return () => {
       observer?.disconnect();
-      window.removeEventListener("resize", fit);
+      window.removeEventListener("resize", refit);
       document.removeEventListener("scroll", fit, true);
     };
   }, []);
