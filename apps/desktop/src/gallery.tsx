@@ -68,7 +68,11 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
 /** The seeded settings and interactions are on screen, and nothing else is. */
 function seeded(root: HTMLElement, state: GalleryState): boolean {
   const html = document.documentElement;
-  return html.dataset.density === (state.density ?? "comfortable")
+  const menu = root.querySelector<HTMLElement>('[role="menu"]');
+  const box = menu?.getBoundingClientRect();
+  // Real browser captures require a safe viewport inset; zero-size jsdom is no proof.
+  const menuFits = !box || box.width === 0 || (box.top >= 8 && box.left >= 8 && box.bottom <= innerHeight - 8 && box.right <= innerWidth - 8);
+  return menuFits && html.dataset.density === (state.density ?? "comfortable")
     && html.dataset.textSize === (state.largerTextSetting ? "larger" : "normal")
     && (pinButton(root)?.getAttribute("aria-pressed") === "true") === Boolean(state.pinned)
     && (root.querySelector('[role="menu"]') !== null) === Boolean(state.menuOpen)
