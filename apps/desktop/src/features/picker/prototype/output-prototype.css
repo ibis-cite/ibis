@@ -67,7 +67,7 @@
 .out-shelf { flex: none; display: flex; flex-direction: column; margin: 0 var(--inset) var(--space-1); background: var(--out-surface); border-radius: var(--out-radius); box-shadow: var(--out-shadow); }
 .out-shelf-tray { display: flex; align-items: center; gap: var(--space-2); min-height: 2.5rem; padding-inline: var(--row-pad); }
 .out-shelf-tray + .out-line { border-top: var(--border-width) solid var(--separator); margin-inline: 0; }
-:root[data-platform="linux"] .out-shelf { margin: 0; border-radius: 0; box-shadow: none; background: var(--clear); border-top: var(--border-width) solid var(--separator); }
+:root[data-platform="linux"] .out-shelf { margin: 0; padding-inline: var(--inset); border-radius: 0; box-shadow: none; background: var(--clear); border-top: var(--border-width) solid var(--separator); }
 :root[data-platform="linux"] .out-shelf + footer, :root[data-platform="linux"] .picker-content:has(.out-shelf) + footer { border-top-color: var(--separator); }
 /* The footer under a shelf drops its own rule: the card already separates them. */
 :root[data-preview]:not([data-platform="linux"]) .picker-content:has(.out-shelf) + footer { border-top-color: var(--clear); }
@@ -119,3 +119,4 @@ footer .out-line { flex: 1; min-width: 0; min-height: 0; padding-inline: 0; gap:
 footer .out-line .out-keys { font-size: var(--footer-size); }
 :root[data-preview] main .out-chips[aria-label], :root[data-preview] main .out-tokens[aria-label] { flex: 0 1 auto; min-width: 0; max-height: none; overflow: clip; }
 :root[data-preview][data-platform="linux"] { --out-chip: var(--button-background); }
+:root[data-preview="c"] footer .enter-hints { flex: none; }

@@ -76,7 +76,7 @@ export function OutputText({ format, chosen, shown, wrap = false }: { format: Ch
   return (
     <div className="out-line" data-wrap={wrap || undefined} data-state={state}>
       <Glyph state={state} />
-      <bdi className="out-text" dir="ltr">{body}</bdi>
+      <bdi className="out-text" dir="auto">{body}</bdi>
       {style && provisional(style as StyleId) && <span className="out-flag">Numbers may change</span>}
       {warnings > 0 && <span className="out-flag" data-look>{warnings === 1 ? "1 warning" : `${warnings} warnings`}</span>}
     </div>
