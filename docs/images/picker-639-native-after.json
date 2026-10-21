@@ -1,0 +1,83 @@
+{
+  "issue": 639,
+  "source_commit": "3a6b5a684a8276a952b1b8ea74ac938d2114c20b",
+  "base_main": "2f023182ae94843df58d332d89249f4c18abe64b",
+  "native_binary_sha256": "f1fc05ad5d3e1d4d1700c85aaeb70df00255d3c64e75025f58788819e820fccf",
+  "capture": "native owned Ibis WKWebView window via Computer; synthetic library/profile only",
+  "os": "macOS27.0.1 arm64",
+  "theme": "dark",
+  "text": "app Larger text1.15; not OS/browser200%",
+  "density": "Comfortable",
+  "window_logical_size": [
+    720,
+    480
+  ],
+  "library": {
+    "count": 100000,
+    "bytes": 9599999,
+    "source": "existing scripts/smoke-native.py fixture",
+    "sha256": "25631a47f2ae760fcf8e1beee7df44d5a31322240fc74e6b98d9cd6eb7ef43f0"
+  },
+  "pinned": true,
+  "format_in_images": "APA7",
+  "observed": "20/40/50 selections have bounded tray and formatted preview, search/header/footer remain visible, active result49 fully visible at50. Long50-reference actual formatter preview has an internal scrollbar.",
+  "copy_control": {
+    "source": "3a6b5a684a8276a952b1b8ea74ac938d2114c20b",
+    "selectedBeforeRemoval": 50,
+    "removed": [
+      0,
+      25,
+      49
+    ],
+    "remaining": 47,
+    "expected": "[@smoke000001; @smoke000002; @smoke000003; @smoke000004; @smoke000005; @smoke000006; @smoke000007; @smoke000008; @smoke000009; @smoke000010; @smoke000011; @smoke000012; @smoke000013; @smoke000014; @smoke000015; @smoke000016; @smoke000017; @smoke000018; @smoke000019; @smoke000020; @smoke000021; @smoke000022; @smoke000023; @smoke000024; @smoke000026; @smoke000027; @smoke000028; @smoke000029; @smoke000030; @smoke000031; @smoke000032; @smoke000033; @smoke000034; @smoke000035; @smoke000036; @smoke000037; @smoke000038; @smoke000039; @smoke000040; @smoke000041; @smoke000042; @smoke000043; @smoke000044; @smoke000045; @smoke000046; @smoke000047; @smoke000048]",
+    "actual": "[@smoke000001; @smoke000002; @smoke000003; @smoke000004; @smoke000005; @smoke000006; @smoke000007; @smoke000008; @smoke000009; @smoke000010; @smoke000011; @smoke000012; @smoke000013; @smoke000014; @smoke000015; @smoke000016; @smoke000017; @smoke000018; @smoke000019; @smoke000020; @smoke000021; @smoke000022; @smoke000023; @smoke000024; @smoke000026; @smoke000027; @smoke000028; @smoke000029; @smoke000030; @smoke000031; @smoke000032; @smoke000033; @smoke000034; @smoke000035; @smoke000036; @smoke000037; @smoke000038; @smoke000039; @smoke000040; @smoke000041; @smoke000042; @smoke000043; @smoke000044; @smoke000045; @smoke000046; @smoke000047; @smoke000048]",
+    "exactMatch": true,
+    "selectionCleared": true,
+    "captureMethod": "Native Ibis copy, GUI paste into owned search, Select All exposes complete selected text. AX value preview is limited to512 characters and was not used as full clipboard evidence."
+  },
+  "focus_finding": {
+    "issue": 646,
+    "observation": "Native keyboard-only removal via Search Tab Format Tab Pin Tab Remove Return unmounts focused button; AX focus falls to HTML content; Down has no effect until Search is focused. Also observed after indexed native first/middle/last activations. Handler is unchanged from base main; no introduced639 regression claimed."
+  },
+  "limits": [
+    "Before captures use Pandoc, while these after captures use completed APA for extra pressure; not a matched-format visual pair.",
+    "No native minimum-size, manual-resize,200% OS scaling or other-platform acceptance.",
+    "No physical pointer reachability claim for offscreen middle/last controls; those activations used native accessibility.",
+    "Committed checkpoint3a predates author follow-up containing-block fix for visually-hidden status at360x320; these720x480 observations remain labelled to3a.",
+    "No native formatted clipboard HTML/RTF assertion or autopaste claim.",
+    "App quit normally; process exited0; no installed user profile, personal library or OS appearance preference changed."
+  ],
+  "images": [
+    {
+      "file": "docs/images/picker-639-after-native-macos27-dark-larger-apa-20.jpg",
+      "selected": 20,
+      "encoding": "JPEG",
+      "dimensions_px": [
+        720,
+        480
+      ],
+      "sha256": "36d05b717da097dd66b90f43409c0bdf92e5940c567419fc202392e155dd0501"
+    },
+    {
+      "file": "docs/images/picker-639-after-native-macos27-dark-larger-apa-40.jpg",
+      "selected": 40,
+      "encoding": "JPEG",
+      "dimensions_px": [
+        720,
+        480
+      ],
+      "sha256": "f993a921807014ca3fe1530bf9542b82f553ac48f1e7712f7aca8839b67aaac4"
+    },
+    {
+      "file": "docs/images/picker-639-after-native-macos27-dark-larger-apa-50.jpg",
+      "selected": 50,
+      "encoding": "JPEG",
+      "dimensions_px": [
+        720,
+        480
+      ],
+      "sha256": "d4d4099db96c4165bcb0c03e2e4b3ae467ed1222e9748714900a5585deeb4aec"
+    }
+  ]
+}
