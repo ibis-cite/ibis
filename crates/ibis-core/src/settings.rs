@@ -293,7 +293,8 @@ pub fn save(path: &Path, settings: &Settings) -> Result<(), SettingsError> {
     if path.exists() {
         let backup = backup_path(path);
         fs::copy(path, &backup)?;
-        File::open(&backup)?.sync_all()?;
+        // Windows flushes only a handle opened for writing.
+        fs::OpenOptions::new().write(true).open(&backup)?.sync_all()?;
     }
     fs::rename(&temporary, path)?;
     sync_directory(path);
