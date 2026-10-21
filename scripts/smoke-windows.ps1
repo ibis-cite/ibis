@@ -223,7 +223,8 @@ try {
       # Modal popovers intentionally hide Search from UIA. Reuse the picker
       # identity established by snapshot, rechecking its OS ownership each time.
       $handle = [IntPtr] $PickerHandle
-      if ($PickerHandle -le 0 -or ![IbisSmoke]::IsWindow($handle) -or [IbisSmoke]::OwnerPid($handle) -ne $AppId) {
+      # UIA exposes HWND as signed Int32; zero, not the sign, means absent.
+      if ($PickerHandle -eq 0 -or ![IbisSmoke]::IsWindow($handle) -or [IbisSmoke]::OwnerPid($handle) -ne $AppId) {
         throw 'Verified picker window identity was lost'
       }
       if (![IbisSmoke]::IsWindowVisible($handle)) { throw 'Verified picker window is hidden' }

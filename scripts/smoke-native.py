@@ -724,7 +724,7 @@ class Scripted:
             # again. Only the HWND established by this process's snapshot fits.
             handle = getattr(self, "picker_handle", None)
             if (getattr(self, "picker_app_pid", None) != getattr(getattr(self, "app", None), "pid", None)
-                    or type(handle) is not int or handle <= 0):
+                    or type(handle) is not int or handle == 0):
                 raise RuntimeError("Verified native picker window identity unavailable")
             arguments.append(str(handle))
         try:
@@ -2447,10 +2447,12 @@ class ContractTests(unittest.TestCase):
         native.app = type("App", (), {"pid": 123})()
         native.picker_app_pid, native.picker_handle = 123, 456
         result = subprocess.CompletedProcess([], 0, '{"pressed":true}', "")
-        with patch("subprocess.run", return_value=result) as helper:
-            native.call("click", "Reload")
-            self.assertEqual(helper.call_args.args[0], ["synthetic-helper", "click", "123", "0", "Reload", "456"])
-        for owner, handle in ((124, 456), (123, 0), (123, True), (123, -1)):
+        for handle in (456, -2147483647):
+            with self.subTest(verified_handle=handle), patch("subprocess.run", return_value=result) as helper:
+                native.picker_handle = handle
+                native.call("click", "Reload")
+                self.assertEqual(helper.call_args.args[0], ["synthetic-helper", "click", "123", "0", "Reload", str(handle)])
+        for owner, handle in ((124, 456), (123, 0), (123, True), (123, 1.5)):
             with self.subTest(owner=owner, handle=handle), patch("subprocess.run") as helper:
                 native.picker_app_pid, native.picker_handle = owner, handle
                 with self.assertRaisesRegex(RuntimeError, "identity"):
@@ -2880,7 +2882,8 @@ Add-Type @'
 using System;
 public static class IbisSmoke {
  public static bool Valid=true, Visible=true; public static uint Owner=42;
- public static bool IsWindow(IntPtr handle) { return Valid && handle.ToInt64()==7; }
+ public static long Handle=7;
+ public static bool IsWindow(IntPtr handle) { return Valid && handle.ToInt64()==Handle; }
  public static bool IsWindowVisible(IntPtr handle) { return Visible; }
  public static uint OwnerPid(IntPtr handle) { return Owner; }
 }
@@ -2916,13 +2919,17 @@ public class ClickWindow {
 $AppId=42; $PickerHandle=7; $Text='Typst'; $script:window=[IbisClickContract.ClickWindow]::new()
 [IbisClickContract.AutomationElement]::Window=$script:window
 # This window has no Search control: only the opened modal menu's target.
-foreach ($pattern in @(1,2,3)) {
- $element=[IbisClickContract.ClickElement]::new(); $element.Supported=$pattern; $script:window.Elements=@($element)
- $result=& $operation
- if(!$result.pressed -or !$result.button_role -or $element.Action.Activations -ne 1 -or
-    $result.invoke_pattern -ne ($pattern -eq 1) -or $result.expand_collapse_pattern -ne ($pattern -eq 2) -or
-    $result.toggle_pattern -ne ($pattern -eq 3)) {throw 'Native pattern did not activate once'}
+foreach ($nativeHandle in @(7,-2147483647)) {
+ [IbisSmoke]::Handle=$nativeHandle; $PickerHandle=$nativeHandle
+ foreach ($pattern in @(1,2,3)) {
+  $element=[IbisClickContract.ClickElement]::new(); $element.Supported=$pattern; $script:window.Elements=@($element)
+  $result=& $operation
+  if(!$result.pressed -or !$result.button_role -or $element.Action.Activations -ne 1 -or
+     $result.invoke_pattern -ne ($pattern -eq 1) -or $result.expand_collapse_pattern -ne ($pattern -eq 2) -or
+     $result.toggle_pattern -ne ($pattern -eq 3)) {throw 'Native pattern did not activate once'}
+ }
 }
+[IbisSmoke]::Handle=7; $PickerHandle=7
 foreach ($failure in @('stale','foreign','hidden','missing-handle')) {
  $element=[IbisClickContract.ClickElement]::new(); $script:window.Elements=@($element)
  [IbisSmoke]::Valid=$failure -ne 'stale'; [IbisSmoke]::Visible=$failure -ne 'hidden'
