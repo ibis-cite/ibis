@@ -18,6 +18,18 @@ From a checkout, use `nix build .#ibis` and `nix run .#ibis`. To reproduce an
 application revision, replace `github:ibiscite/ibis` with
 `github:ibiscite/ibis/COMMIT`, using the full commit ID.
 
+## Which version is this?
+
+The default command selects current `main`, which can contain unreleased work.
+It does not select the Stable or Nightly download feed. `nix profile list` shows
+the **Locked flake URL**, including the exact installed commit. Ibis shows the
+version declared by that source; several development commits can share it.
+
+To choose a numbered release, use `github:ibiscite/ibis/TAG#ibis` once that release
+tag contains this flake. Earlier release tags cannot provide a package added
+after they were created. A full commit ID works for any revision containing the
+flake and stays pinned until you choose another revision.
+
 ## NixOS and Home Manager
 
 Add `inputs.ibis.url = "github:ibiscite/ibis";` to your configuration flake. Its
