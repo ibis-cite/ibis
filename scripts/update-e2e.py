@@ -456,9 +456,16 @@ class Windows:
         try:
             result = look_result(powershell(WINDOWS_LOOK, IBIS_PIDS=",".join(map(str, pids)), IBIS_PRESS=press or ""))
             pressed, _, probe = result
-            if press and (not isinstance(probe, dict) or type(probe.get("attempted")) is not bool
-                          or probe["attempted"] != pressed or probe.get("blocked", False) is not False):
-                raise RuntimeError("Windows update action metadata is unavailable or blocked")
+            if press:
+                flags = ("attempted", "blocked", "invoke_available", "enabled", "on_screen")
+                limits = {"pids": 20, "windows": 20, "elements": 4000, "offer_matches": 1, "action_matches": 1}
+                valid = (isinstance(probe, dict) and all(type(probe.get(key)) is bool for key in flags)
+                         and all(type(probe.get(key)) is int and 0 <= probe[key] <= limit for key, limit in limits.items())
+                         and probe.get("errors") == [] and not probe["blocked"] and probe["attempted"] == pressed)
+                if not valid or (pressed and (not all(probe[key] for key in ("invoke_available", "enabled", "on_screen"))
+                                              or any(probe[key] < 1 for key in limits) or probe.get("pressed_by") != "invoke")) \
+                        or (not pressed and (probe["action_matches"] != 0 or probe.get("pressed_by") is not None)):
+                    raise RuntimeError("Windows update action metadata is unavailable or blocked")
             return result
         except (RuntimeError, ValueError, subprocess.TimeoutExpired):
             if press:
@@ -608,6 +615,24 @@ def run(args):
 
 
 class Tests(unittest.TestCase):
+    @staticmethod
+    def windows_probe(pressed=False):
+        return {"attempted": pressed, "blocked": False, "pids": 1, "windows": int(pressed), "elements": int(pressed),
+                "offer_matches": int(pressed), "action_matches": int(pressed), "invoke_available": pressed,
+                "enabled": pressed, "on_screen": pressed, "errors": [], "pressed_by": "invoke" if pressed else None}
+
+    def test_windows_success_requires_complete_uncoerced_qualification_facts(self):
+        for field, value in (("offer_matches", True), ("action_matches", "1"), ("enabled", 1), ("on_screen", None),
+                             ("invoke_available", False), ("windows", 0), ("pressed_by", None), ("errors", ["synthetic"])):
+            probe = self.windows_probe(True)
+            probe[field] = value
+            with self.subTest(field=field), patch(__name__ + ".powershell", return_value=json.dumps({"pressed": True, "seen": [], "probe": probe})):
+                with self.assertRaises(AssertionError):
+                    Windows.__new__(Windows).look({42}, BUTTON)
+        with patch(__name__ + ".powershell", return_value='{"pressed":true,"seen":[],"probe":{"attempted":true}}'):
+            with self.assertRaises(AssertionError):
+                Windows.__new__(Windows).look({42}, BUTTON)
+
     def test_windows_fatal_activation_keeps_only_fixed_failure_facts(self):
         probe = {"attempted": True, "blocked": True, "invoke_available": False, "action_matches": 1,
                  "private": "synthetic payload", "enabled": "synthetic payload", "elements": -1}
@@ -739,7 +764,7 @@ function Contract-Result($pressed,$how) {
     def test_windows_absence_can_poll_but_success_returns_the_single_attempt(self):
         windows = Windows.__new__(Windows)
         for pressed in (False, True):
-            probe = {"attempted": pressed}
+            probe = self.windows_probe(pressed)
             payload = json.dumps({"pressed": pressed, "seen": [], "probe": probe})
             with patch(__name__ + ".powershell", return_value=payload):
                 self.assertEqual(windows.look({42}, BUTTON), (pressed, [], probe))
