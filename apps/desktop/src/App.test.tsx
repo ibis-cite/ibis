@@ -3060,3 +3060,22 @@ test("format filter IME and Escape preserve the query, and Ctrl+K switches layer
   expect(await screen.findByRole("menu", { name: /^More/ })).toBeTruthy();
   expect(screen.queryByRole("searchbox")).toBeNull();
 });
+
+test.each(["Tab", "Reload"])("Format hands off to More so %s returns to Search", async (action) => {
+  backend();
+  render(<App />);
+  const search = screen.getByLabelText("Search references") as HTMLInputElement;
+  fireEvent.change(search, { target: { value: "sleep" } });
+  const trigger = await screen.findByRole("button", { name: "Copy as Pandoc" });
+  fireEvent.click(trigger);
+  const filter = screen.getByRole("searchbox");
+  fireEvent.change(filter, { target: { value: "Typst" } });
+  fireEvent.keyDown(filter, { key: "k", ctrlKey: true });
+  const more = await screen.findByRole("menu", { name: /^More/ });
+  expect(trigger.getAttribute("aria-expanded")).toBe("false");
+  if (action === "Tab") fireEvent.keyDown(more, { key: "Tab" });
+  else fireEvent.click(await screen.findByRole("menuitem", { name: "Reload" }));
+  await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+  await waitFor(() => expect(document.activeElement).toBe(search));
+  expect(search.value).toBe("sleep");
+});
