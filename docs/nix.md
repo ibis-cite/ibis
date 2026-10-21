@@ -95,7 +95,7 @@ embedded launcher and rejects the original updater key/feed. CI separately runs
 the existing native smoke test against the installed wrapper with synthetic
 data under X11; this does not establish Wayland or hardware-GPU behavior.
 
-Validation status for #664: real Nix inputs were computed and preserved in
-[the bootstrap run](https://github.com/ibiscite/ibis/actions/runs/39544665070).
-Final evaluation, package build, profile installation and graphical runtime
-checks are pending; bootstrap success alone does not verify installation.
+The [CI workflow](../.github/workflows/ci.yml) preserves the exact source commit,
+derivation, output path, build log and graphical results in its `nix-package-*`
+artifact. Check the **Nix package (Linux)** job for the revision you are using;
+evaluation alone does not establish a successful build or runtime check.
