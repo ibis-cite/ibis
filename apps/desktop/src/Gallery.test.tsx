@@ -251,11 +251,18 @@ test.each(galleryStates.map((state) => state.id))("the rendered %s fixture ackno
   let stop: () => void = () => undefined;
   try {
     await act(async () => { stop = renderGalleryState(container, state, acknowledge); });
-    await act(() => vi.advanceTimersByTimeAsync(1000));
-    await act(() => vi.advanceTimersByTimeAsync(1000));
-    // Large seeds need real React commits between their many frame interactions.
     if ((state.tray ?? 0) >= 20) {
-      for (let i = 0; i < state.tray! * 2 + 4; i++) await act(() => vi.advanceTimersByTimeAsync(16));
+      // Include the initial results announcement, then commit every interaction
+      // separately. Bulk clock advances can seed against an uncommitted tree.
+      for (let i = 0; i < state.tray! * 2 + 32 && acknowledge.mock.calls.length === 0; i++) {
+        await act(() => vi.advanceTimersByTimeAsync(16));
+      }
+      expect(container.querySelectorAll('[aria-label="Selected references"] > li')).toHaveLength(state.tray!);
+      expect(container.querySelector("[data-active]")?.id).toBe(`result-${state.tray! - 1}`);
+      if (state.formatted) expect(container.querySelector(".format-preview .preview-text")?.textContent).toBe(text);
+    } else {
+      await act(() => vi.advanceTimersByTimeAsync(1000));
+      await act(() => vi.advanceTimersByTimeAsync(1000));
     }
     expect(acknowledge).toHaveBeenCalledExactlyOnceWith(id);
   } finally {
