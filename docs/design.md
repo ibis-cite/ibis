@@ -315,7 +315,7 @@ in one bar shares a baseline.
 
 **Footer.** Library status at the leading edge; at the trailing edge, key hints
 and More. One hint pattern everywhere outside menus: **the label first, then
-its keys**, 6 px between them, 16 px between hints, all at 12 px on one
+its keys**, 8 px between them, 16 px between hints, all at 12 px on one
 baseline, each key cap 20 px high and centred on it.
 
 - **Order.** What Enter does now ("Copy as Pandoc ↵", the primary hint, in the
@@ -334,7 +334,7 @@ baseline, each key cap 20 px high and centred on it.
 - **Key caps.** A 20 px fill (`--key-cap` on the control fill), radius
   `--r-key`, 5 px side padding, 12 px text in the UI font, never an outline
   and never scarlet. macOS joins the glyphs in one cap, as its menus write them
-  (⌘K, ⇧↵). Windows gives each key its own cap, 2 px apart, as PowerToys does
+  (⌘K, ⇧↵). Windows gives each key its own cap, 4 px apart, as PowerToys does
   (Ctrl K). GNOME gives each key its own cap with a "+" between, as GTK's
   shortcut labels do (Ctrl + K). In menus a shortcut is plain trailing text,
   as in each system's own menus, never a cap.
@@ -372,8 +372,11 @@ Settings window will use.
    button (accent fill, paired text): Use Zotero when Zotero is open,
    otherwise Choose library…. Files found nearby follow as rows of their own,
    name above folder, each with a Use button.
-2. **I write in:** a segmented choice, Markdown, LaTeX, Typst (and Word when
-   citation styles are available).
+2. **I write in:** a segmented choice, "Markdown (Pandoc)", "LaTeX", "Typst"
+   (and "Word" when citation styles are available). The copy format has one
+   name everywhere: the header menu, the footer ("Copy as Pandoc") and this
+   choice all say "Pandoc"; first run adds only the place people know,
+   Markdown, in front of it.
 3. **Open Ibis from any app:** the shortcut, in key caps.
 4. **Start Ibis when you log in:** a switch, off until turned on.
 
