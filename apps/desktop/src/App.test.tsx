@@ -2605,3 +2605,49 @@ test.each(["selection", "copy feedback"])("an obsolete stale copy recovers data 
     expect(attempts).toEqual(["1", "1"]);
   }
 });
+
+test.each(["2", "3"].flatMap((refreshedRevision) => [false, true].map((selectedCopy) => ({ refreshedRevision, selectedCopy }))))("an old recovery preserves a pending copy only for the same snapshot ($refreshedRevision, selected=$selectedCopy)", async ({ refreshedRevision, selectedCopy }) => {
+  let revision = "1";
+  let reads = 0;
+  let searches = 0;
+  let rejectOld: (reason: unknown) => void = () => undefined;
+  let finishNew: (value: unknown) => void = () => undefined;
+  const attempts: unknown[] = [];
+  const calls = backend({
+    library_status: () => { reads += 1; return { ...zoteroStatus(["user"]), revision, source_counts: { "zotero:user": 2 } }; },
+    search: () => {
+      searches += 1;
+      return ["a", "b"].map((key) => ({ ...result(key, `Pending ${revision} ${key}`, "zotero:user"), revision }));
+    },
+    copy_citation: ({ expectedRevision }) => {
+      attempts.push(expectedRevision);
+      return attempts.length === 1
+        ? new Promise((_resolve, reject) => { rejectOld = reject; })
+        : new Promise((resolve) => { finishNew = resolve; });
+    },
+  });
+  render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Pin Ibis" }));
+  fireEvent.click(await screen.findByText("Pending 1 a"), { shiftKey: true });
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(attempts).toEqual(["1"]));
+  revision = "2";
+  await act(async () => { await emit("library:changed", { ...zoteroStatus(["user"]), revision }); });
+  await screen.findByText("Pending 2 b");
+  fireEvent.click(screen.getByRole("button", { name: "Remove a from the selection" }));
+  fireEvent.click(screen.getByText("Pending 2 b"), { shiftKey: selectedCopy });
+  if (selectedCopy) fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(attempts).toEqual(["1", "2"]));
+  revision = refreshedRevision;
+  await act(async () => { rejectOld("library snapshot changed"); });
+  await waitFor(() => expect(reads).toBe(2));
+  await waitFor(() => expect(searches).toBe(3));
+  await screen.findByText(`Pending ${refreshedRevision} b`);
+  await act(async () => { finishNew({ text: "new valid copy", warnings: ["Keep newest warning"] }); });
+  expect(Boolean(screen.queryByText("Keep newest warning"))).toBe(refreshedRevision === "2");
+  expect(Boolean(screen.queryByRole("button", { name: "Remove b from the selection" }))).toBe(selectedCopy && refreshedRevision !== "2");
+  expect(screen.queryByText("The library changed. Search again and reselect the references before copying.")).toBeNull();
+  expect(calls).not.toContain("hide_picker");
+  expect(calls).not.toContain("show_copied_notice");
+});

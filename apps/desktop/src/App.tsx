@@ -178,10 +178,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   };
   // Each completed copy owns only the interaction that started it. Map identity
   // also distinguishes removing and re-adding the same selected references.
-  const copyContext = useRef({ selected, query, format, libraryVersion, active });
+  const snapshotRevision = library?.revision;
+  const copyContext = useRef({ selected, query, format, snapshotRevision, active });
   const before = copyContext.current;
-  if (before.selected !== selected || before.query !== query || before.format !== format || before.libraryVersion !== libraryVersion || before.active !== active) {
-    copyContext.current = { selected, query, format, libraryVersion, active };
+  if (before.selected !== selected || before.query !== query || before.format !== format || before.snapshotRevision !== snapshotRevision || before.active !== active) {
+    copyContext.current = { selected, query, format, snapshotRevision, active };
   }
   const copyRequest = useRef(0);
   const copyVisibility = useRef(0);
@@ -429,7 +430,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           setResultsRevision(revision);
           if (revision !== library?.revision) refreshSnapshot();
           setResultsQuery(query);
-          setActive(0);
+          // A same-snapshot refresh must not undo the user's newer row choice.
+          if (resultsQuery !== query || resultsRevision !== revision) setActive(0);
           setError(null);
           announcementTimer = window.setTimeout(() => {
             setAnnouncement(pickerText.resultCount(found.length));
