@@ -2606,7 +2606,10 @@ test.each(["selection", "copy feedback"])("an obsolete stale copy recovers data 
   }
 });
 
-test.each(["2", "3"].flatMap((refreshedRevision) => [false, true].map((selectedCopy) => ({ refreshedRevision, selectedCopy }))))("an old recovery preserves a pending copy only for the same snapshot ($refreshedRevision, selected=$selectedCopy)", async ({ refreshedRevision, selectedCopy }) => {
+test.each([
+  ...["2", "3"].flatMap((refreshedRevision) => [false, true].map((selectedCopy) => ({ refreshedRevision, selectedCopy, changedResults: false }))),
+  { refreshedRevision: "2", selectedCopy: false, changedResults: true },
+])("an old recovery preserves a pending copy only for the same snapshot and results ($refreshedRevision, selected=$selectedCopy, changed=$changedResults)", async ({ refreshedRevision, selectedCopy, changedResults }) => {
   let revision = "1";
   let reads = 0;
   let searches = 0;
@@ -2617,7 +2620,8 @@ test.each(["2", "3"].flatMap((refreshedRevision) => [false, true].map((selectedC
     library_status: () => { reads += 1; return { ...zoteroStatus(["user"]), revision, source_counts: { "zotero:user": 2 } }; },
     search: () => {
       searches += 1;
-      return ["a", "b"].map((key) => ({ ...result(key, `Pending ${revision} ${key}`, "zotero:user"), revision }));
+      const keys = changedResults ? (searches >= 3 ? ["a"] : ["b", "a"]) : ["a", "b"];
+      return keys.map((key) => ({ ...result(key, `Pending ${revision} ${key}`, "zotero:user"), revision }));
     },
     copy_citation: ({ expectedRevision }) => {
       attempts.push(expectedRevision);
@@ -2643,9 +2647,10 @@ test.each(["2", "3"].flatMap((refreshedRevision) => [false, true].map((selectedC
   await act(async () => { rejectOld("library snapshot changed"); });
   await waitFor(() => expect(reads).toBe(2));
   await waitFor(() => expect(searches).toBe(3));
-  await screen.findByText(`Pending ${refreshedRevision} b`);
+  if (changedResults) await waitFor(() => expect(screen.queryByText("Pending 2 b")).toBeNull());
+  else await screen.findByText(`Pending ${refreshedRevision} b`);
   await act(async () => { finishNew({ text: "new valid copy", warnings: ["Keep newest warning"] }); });
-  expect(Boolean(screen.queryByText("Keep newest warning"))).toBe(refreshedRevision === "2");
+  expect(Boolean(screen.queryByText("Keep newest warning"))).toBe(refreshedRevision === "2" && !changedResults);
   expect(Boolean(screen.queryByRole("button", { name: "Remove b from the selection" }))).toBe(selectedCopy && refreshedRevision !== "2");
   expect(screen.queryByText("The library changed. Search again and reselect the references before copying.")).toBeNull();
   expect(calls).not.toContain("hide_picker");

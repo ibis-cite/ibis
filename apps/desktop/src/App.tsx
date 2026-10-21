@@ -179,10 +179,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // Each completed copy owns only the interaction that started it. Map identity
   // also distinguishes removing and re-adding the same selected references.
   const snapshotRevision = library?.revision;
-  const copyContext = useRef({ selected, query, format, snapshotRevision, active });
+  const activeChoice = choiceKey(results.slice(active, active + 1));
+  const copyContext = useRef({ selected, query, format, snapshotRevision, activeChoice });
   const before = copyContext.current;
-  if (before.selected !== selected || before.query !== query || before.format !== format || before.snapshotRevision !== snapshotRevision || before.active !== active) {
-    copyContext.current = { selected, query, format, snapshotRevision, active };
+  if (before.selected !== selected || before.query !== query || before.format !== format || before.snapshotRevision !== snapshotRevision || before.activeChoice !== activeChoice) {
+    copyContext.current = { selected, query, format, snapshotRevision, activeChoice };
   }
   const copyRequest = useRef(0);
   const copyVisibility = useRef(0);
@@ -430,8 +431,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           setResultsRevision(revision);
           if (revision !== library?.revision) refreshSnapshot();
           setResultsQuery(query);
-          // A same-snapshot refresh must not undo the user's newer row choice.
-          if (resultsQuery !== query || resultsRevision !== revision) setActive(0);
+          // An unchanged reply must not undo the user's newer row choice.
+          const sameResults = resultsQuery === query && resultsRevision === revision && choiceKey(results) === choiceKey(found);
+          if (!sameResults) setActive(0);
           setError(null);
           announcementTimer = window.setTimeout(() => {
             setAnnouncement(pickerText.resultCount(found.length));
