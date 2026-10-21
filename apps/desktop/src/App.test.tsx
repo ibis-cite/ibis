@@ -129,7 +129,7 @@ test.each(["", "unmatched"])("result headings only name actual rows, preserving 
   if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
   await screen.findByText(query ? "No matching references" : "Type to find a reference");
   expect(document.querySelector(".results-heading")).toBeNull();
-  expect(screen.getByRole("status", { name: "Search results" }).textContent).toBe("0 results");
+  await waitFor(() => expect(screen.getByRole("status", { name: "Search results" }).textContent).toBe("0 results"));
 });
 
 test("errors from the backend are shown, not swallowed", async () => {
@@ -979,7 +979,8 @@ test.each(["", "sleep"])("an empty loaded library is explained even for query %s
   render(<App />);
   await waitFor(() => expect(screen.getByRole("status", { name: "Library status" }).textContent).toBe("empty 研究.bib · no references"));
   if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
-  await screen.findByText("No references found in empty 研究.bib. Choose a BibTeX or BibLaTeX export with references, then try again.");
+  await screen.findByText("No references in empty 研究.bib");
+  expect(screen.getByText("Choose a BibTeX or BibLaTeX export with references.")).toBeTruthy();
   expect(screen.queryByText("Type to find a reference")).toBeNull();
   expect(screen.queryByText("No matching references")).toBeNull();
   expect(screen.getByRole("button", { name: "Choose library…" })).toBeTruthy();

@@ -9,7 +9,7 @@ const loaded = galleryStates.find((state) => state.id === "no-results")!.library
 function mount(query = "", empty = false) {
   const choose = vi.fn(), clear = vi.fn(), searchAll = vi.fn();
   const { container } = render(<EmptyState library={empty ? { ...loaded, references: 0 } : loaded} query={query}
-    narrowed onChooseLibrary={choose} onClearSearch={clear} onSearchAll={searchAll} setup={<p>Setup preserved</p>} />);
+    narrowed onChooseLibrary={choose} onClearSearch={clear} onSearchAll={searchAll} onReload={vi.fn()} setup={<p>Setup preserved</p>} />);
   return { container, choose, clear, searchAll };
 }
 
@@ -46,5 +46,15 @@ test("an empty file gets a separate title and recovery line, keeping the chooser
   expect(container.querySelector(".empty-title")?.textContent).toBe("No references in example.bib");
   expect(container.querySelector(".empty-description")?.textContent).toBe("Choose a BibTeX or BibLaTeX export with references.");
   fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
+  expect(choose).toHaveBeenCalledOnce();
+});
+
+test("an empty Zotero library offers reload as well as choosing another library", () => {
+  const reload = vi.fn(), choose = vi.fn();
+  render(<EmptyState library={{ ...loaded, zotero: true, references: 0 }} query="" narrowed={false}
+    onChooseLibrary={choose} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={reload} setup={null} />);
+  fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+  fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
+  expect(reload).toHaveBeenCalledOnce();
   expect(choose).toHaveBeenCalledOnce();
 });

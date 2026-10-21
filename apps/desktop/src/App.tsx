@@ -719,9 +719,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       }} />
       {style && chosen.length > 0 && <FormatPreview style={style} shown={shown} focusable={selected.size > 0} />}
       <div className="results-area">
-        <div className="results-heading" aria-hidden="true">
-          <span>{query ? pickerText.bestMatches : pickerText.references}</span><span>{results.length > 0 ? pickerText.resultCount(results.length) : ""}</span>
-        </div>
+        {results.length > 0 && <div className="results-heading" aria-hidden="true">
+          <span>{query ? pickerText.bestMatches : pickerText.references}</span><span>{pickerText.resultCount(results.length)}</span>
+        </div>}
         <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>
@@ -747,6 +747,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             onChooseLibrary={() => void perform("choose", chooseLibrary)}
             onClearSearch={() => { setQuery(""); input.current?.focus(); }}
             onSearchAll={searchAllLibraries}
+            onReload={() => { input.current?.focus(); void perform("reload", reloadLibrary); }}
             setup={
               <LibrarySetup api={setupApi} perform={perform}
                 writing={{ format, formatted: Boolean(cslItems && copyFormatted), choose: chooseFormat }}

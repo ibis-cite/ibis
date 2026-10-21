@@ -71,7 +71,7 @@ test("the idle gallery is an explicitly empty query with a loaded nonempty libra
 test.each([
   ["first-run", "Choose a library to get started"],
   ["loading", "Opening example.bib…"],
-  ["empty", "No references found in empty.bib. Choose a BibTeX or BibLaTeX export with references, then try again."],
+  ["empty", "No references in empty.bib"],
   ["no-results", "No matching references"],
   ["invalid-settings", "settings.json could not be read. Ibis is using the backup. Changes are not being saved. Repair the synthetic settings file and restart Ibis."],
   ["damaged-library", "Some references could not be read. Export the library again to restore them."],
