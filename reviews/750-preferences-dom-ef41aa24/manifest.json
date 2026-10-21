@@ -1,0 +1,3396 @@
+{
+  "before": "47667263c7de94db5bd20daa909863f78cd45a4d",
+  "after": "ef41aa240d4aa769ad1a29664b40221478e2da17",
+  "browser": "151.0.7922.34",
+  "data": "synthetic",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "states": [
+    "first-run",
+    "loading",
+    "empty",
+    "no-results",
+    "many-results",
+    "long-titles",
+    "rtl",
+    "missing-file",
+    "invalid-settings",
+    "damaged-library",
+    "copy-confirmation",
+    "large-text",
+    "dark",
+    "high-contrast",
+    "zotero-updated",
+    "zotero-kept",
+    "copied-notice",
+    "file-kept-menu",
+    "pinned",
+    "menu-open",
+    "tray-20",
+    "tray-40",
+    "tray-50",
+    "tray-preview",
+    "tray",
+    "keys",
+    "compact",
+    "spacious",
+    "larger-text",
+    "toolbar-menu",
+    "toolbar-menu-filtered"
+  ],
+  "expected_cases": 372,
+  "completed_cases": 372,
+  "method": "Existing gallery renderer readiness gate; all catalog states x 3 looks x 2 themes x normal/larger text. Fixed Date and seeded Math.random in both pages, sorted DOM attributes; no DOM fields excluded. Actual body, document attributes and focused element compared.",
+  "results": [
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "1bee114c527420334d5bfc6d1fafa83fe2564e6ddb019ea4239e3b64dbe37a21",
+      "after_sha256": "1bee114c527420334d5bfc6d1fafa83fe2564e6ddb019ea4239e3b64dbe37a21"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "4fd2aad6bf9b8592fa8dfc4095c4fba0604111e29b296ef34972e0d7f5a0e456",
+      "after_sha256": "4fd2aad6bf9b8592fa8dfc4095c4fba0604111e29b296ef34972e0d7f5a0e456"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "bbcf7c9cb8e733939fde1ca18a167f576b6fda38609980dc00223e86a7a18724",
+      "after_sha256": "bbcf7c9cb8e733939fde1ca18a167f576b6fda38609980dc00223e86a7a18724"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "c8bc7d44787118388e282cbbee710c47b3cd7c845314dada54fa1d9015b9ac22",
+      "after_sha256": "c8bc7d44787118388e282cbbee710c47b3cd7c845314dada54fa1d9015b9ac22"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "674bf93965422555c62ed97e97f76eb7c7873b2e94368d6dba18b46cb016fab3",
+      "after_sha256": "674bf93965422555c62ed97e97f76eb7c7873b2e94368d6dba18b46cb016fab3"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "68f72aeb483d8ab88aedd67df7953042864f7c66aeb0e9b15b00b85f7b427659",
+      "after_sha256": "68f72aeb483d8ab88aedd67df7953042864f7c66aeb0e9b15b00b85f7b427659"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "7ac55f0c1a599311754b3a00664b6cba87fa8fc0cd73ac035c50bd85c41177bc",
+      "after_sha256": "7ac55f0c1a599311754b3a00664b6cba87fa8fc0cd73ac035c50bd85c41177bc"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "f3ed6f890124dac1cf84348e5ab7502248e42bde367aa5ade9b54f6ef7b2d7e0",
+      "after_sha256": "f3ed6f890124dac1cf84348e5ab7502248e42bde367aa5ade9b54f6ef7b2d7e0"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "3e2ee30bad39d8f97a84daab274d609998db78ddadd5b2041a95fa3d771064c2",
+      "after_sha256": "3e2ee30bad39d8f97a84daab274d609998db78ddadd5b2041a95fa3d771064c2"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "e0840aa03903551605b5d588bac8e213ebddbe4147c016587f6119a9bb101a03",
+      "after_sha256": "e0840aa03903551605b5d588bac8e213ebddbe4147c016587f6119a9bb101a03"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "f65b4685108217d071928cdfcd3470b4b45ff89e8071ec2844ad759af0869041",
+      "after_sha256": "f65b4685108217d071928cdfcd3470b4b45ff89e8071ec2844ad759af0869041"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "12bf6fe513bc758ed3b50423a30a5a131e7b7669eed2d9cedf4a24c7e0da7bbd",
+      "after_sha256": "12bf6fe513bc758ed3b50423a30a5a131e7b7669eed2d9cedf4a24c7e0da7bbd"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "6cd4c2396bd9f4650a32dcba5509e08c98241506c91cc789edf24bcb821b1a20",
+      "after_sha256": "6cd4c2396bd9f4650a32dcba5509e08c98241506c91cc789edf24bcb821b1a20"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "a7b6b1e15422653fd2fe713c942f75968a21bf46136307f75e6e6a93f149199c",
+      "after_sha256": "a7b6b1e15422653fd2fe713c942f75968a21bf46136307f75e6e6a93f149199c"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "2d21c307caead755c4e14fdf987eb48aee60dbc583e04ec64ad6347c95df75ff",
+      "after_sha256": "2d21c307caead755c4e14fdf987eb48aee60dbc583e04ec64ad6347c95df75ff"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "a0d013a561a844f257f483f9974b3fdc2c40aa739e28cea1440da1e2960d2615",
+      "after_sha256": "a0d013a561a844f257f483f9974b3fdc2c40aa739e28cea1440da1e2960d2615"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "fe7eb6ccc17d7cf7dbe1422d1f16174e118618b1adb237e507b18dc76e26f335",
+      "after_sha256": "fe7eb6ccc17d7cf7dbe1422d1f16174e118618b1adb237e507b18dc76e26f335"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "8d1152331c9dc88541c00a47f4c2483d370a1e425a734f4003b1eefd6508bdf1",
+      "after_sha256": "8d1152331c9dc88541c00a47f4c2483d370a1e425a734f4003b1eefd6508bdf1"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "57521bb61266f41812d57d51336896ab5e53b9c57accf487feff26c46deac3f4",
+      "after_sha256": "57521bb61266f41812d57d51336896ab5e53b9c57accf487feff26c46deac3f4"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "975ee80f078bfec3a1b0cb58bc722452a6468718c1883901fb2eb638ae6a44b7",
+      "after_sha256": "975ee80f078bfec3a1b0cb58bc722452a6468718c1883901fb2eb638ae6a44b7"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "f20dff6c2eed0e2147c8dc6edbc0fd26055500c99779c9adba700f3566267917",
+      "after_sha256": "f20dff6c2eed0e2147c8dc6edbc0fd26055500c99779c9adba700f3566267917"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "979aaaf2356839acfc28a8fccfb2c0bddf0df73ece230ccc426350d8383e2d97",
+      "after_sha256": "979aaaf2356839acfc28a8fccfb2c0bddf0df73ece230ccc426350d8383e2d97"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "b41229b885a7ce8a64b97d3bef368400fcef63c6607400d7d034ac40c25b56ce",
+      "after_sha256": "b41229b885a7ce8a64b97d3bef368400fcef63c6607400d7d034ac40c25b56ce"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "415164f075a35941ae93aadded73dfcb27a1a579f19c6d891475f59df5c44de3",
+      "after_sha256": "415164f075a35941ae93aadded73dfcb27a1a579f19c6d891475f59df5c44de3"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "2a809b65be2baeba78a578ce5aa865ba881b484241a72e9ba5605ff9c2050e80",
+      "after_sha256": "2a809b65be2baeba78a578ce5aa865ba881b484241a72e9ba5605ff9c2050e80"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "22fb2dbfb1c19a1f31068f1aa6d4eeb8b7295bfaba535a5a0a8cc40ea5159cf3",
+      "after_sha256": "22fb2dbfb1c19a1f31068f1aa6d4eeb8b7295bfaba535a5a0a8cc40ea5159cf3"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "6cfa108b2b4a2e9dd36032d053e4895287c37a807d9c87b5e6220cf82467c9e0",
+      "after_sha256": "6cfa108b2b4a2e9dd36032d053e4895287c37a807d9c87b5e6220cf82467c9e0"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "e044b713b69c903d8139c385738d47307471ee6a9fcc205688d2b4089952f0a0",
+      "after_sha256": "e044b713b69c903d8139c385738d47307471ee6a9fcc205688d2b4089952f0a0"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "dc531f978ca2577bb99115e9f7fc173874a95e94c0a681462a5b3b903728e38a",
+      "after_sha256": "dc531f978ca2577bb99115e9f7fc173874a95e94c0a681462a5b3b903728e38a"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "1fcad838cc468b86dcc4cd0ff90bf9a7100c2e04c893dfc02ba50cbe48669068",
+      "after_sha256": "1fcad838cc468b86dcc4cd0ff90bf9a7100c2e04c893dfc02ba50cbe48669068"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "2859fc04bcca2ed6a8bd93d1071baa76ea1afd34115ac89eb1a89fc99999608d",
+      "after_sha256": "2859fc04bcca2ed6a8bd93d1071baa76ea1afd34115ac89eb1a89fc99999608d"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "1787d2c6a6453239951f002c33396820dce613aaa2f4574c9264a95a6f9c1a53",
+      "after_sha256": "1787d2c6a6453239951f002c33396820dce613aaa2f4574c9264a95a6f9c1a53"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "be2bb5f7f8dd943f3380d18ea149527453f2a73e867be4ebc9969c8ec6a001a7",
+      "after_sha256": "be2bb5f7f8dd943f3380d18ea149527453f2a73e867be4ebc9969c8ec6a001a7"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "ec3455ecde379ee54139d7cae9141e2565ae0dfd656ea78847e8812c76a474bf",
+      "after_sha256": "ec3455ecde379ee54139d7cae9141e2565ae0dfd656ea78847e8812c76a474bf"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "f69c82f876cd5ef94420b0594a17ea621f2dbfa62cabb1a171644190d652086e",
+      "after_sha256": "f69c82f876cd5ef94420b0594a17ea621f2dbfa62cabb1a171644190d652086e"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "bbaeca6c8945e495a8bf42848d14b9c6901eece0e00752057bf8dad2dca77bd9",
+      "after_sha256": "bbaeca6c8945e495a8bf42848d14b9c6901eece0e00752057bf8dad2dca77bd9"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "77e8d6a69ffa080c76f589e953df5a53827b727b60e5234ab015424fe7e31a5d",
+      "after_sha256": "77e8d6a69ffa080c76f589e953df5a53827b727b60e5234ab015424fe7e31a5d"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "e9e92c7eac0d5162e26ff07971166e302e9efbfb50aa5b4bd267a0a7b6d0f715",
+      "after_sha256": "e9e92c7eac0d5162e26ff07971166e302e9efbfb50aa5b4bd267a0a7b6d0f715"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "1df636a50853dc7c93d7d0ffb10fbb1062a909264f312c667bba3d665c7ca0e6",
+      "after_sha256": "1df636a50853dc7c93d7d0ffb10fbb1062a909264f312c667bba3d665c7ca0e6"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "ce536da3d91018ad5952b468b64de83b8b04166d60fccf56b9560db4c84a8694",
+      "after_sha256": "ce536da3d91018ad5952b468b64de83b8b04166d60fccf56b9560db4c84a8694"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "95d5dc69419308a46b58f5cad0ce5fa1a36a8eef16ce3a46c41b11799c37ecb0",
+      "after_sha256": "95d5dc69419308a46b58f5cad0ce5fa1a36a8eef16ce3a46c41b11799c37ecb0"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "19b80224ff785720e50cf3f295f75eb8ce13afda46fa651489b3ed033a43694d",
+      "after_sha256": "19b80224ff785720e50cf3f295f75eb8ce13afda46fa651489b3ed033a43694d"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "bcff3464f75ac7b2da6dce0fa934ed92d4edeb21bbc12666742591c0c27a91fd",
+      "after_sha256": "bcff3464f75ac7b2da6dce0fa934ed92d4edeb21bbc12666742591c0c27a91fd"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "6cd4c2396bd9f4650a32dcba5509e08c98241506c91cc789edf24bcb821b1a20",
+      "after_sha256": "6cd4c2396bd9f4650a32dcba5509e08c98241506c91cc789edf24bcb821b1a20"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "ce3682e3298c34a240f4fb5ba1127f74b3eb3040f51fdb7058bffc3b149c0c68",
+      "after_sha256": "ce3682e3298c34a240f4fb5ba1127f74b3eb3040f51fdb7058bffc3b149c0c68"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "ccebecec30a994eafdbcbd8d7ac63b90f1d58900b9d5b6fdf79456bd07972108",
+      "after_sha256": "ccebecec30a994eafdbcbd8d7ac63b90f1d58900b9d5b6fdf79456bd07972108"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "0f7b3cba35b4fbddeca96fa683fc2eb7253fffcee77adbb02964907c362fec53",
+      "after_sha256": "0f7b3cba35b4fbddeca96fa683fc2eb7253fffcee77adbb02964907c362fec53"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "b5a3f54fad078b5d303667bd728509441776ac7516a918121e7db39be0b333c8",
+      "after_sha256": "b5a3f54fad078b5d303667bd728509441776ac7516a918121e7db39be0b333c8"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "a631e4f6ab3448a9229978d56f2b839e319f541f8dd6ddc399cf3cfc958e464e",
+      "after_sha256": "a631e4f6ab3448a9229978d56f2b839e319f541f8dd6ddc399cf3cfc958e464e"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "143e10c84808e8a62c23699ba762674e27de657b983c394bed5ce0d858147823",
+      "after_sha256": "143e10c84808e8a62c23699ba762674e27de657b983c394bed5ce0d858147823"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "9f7f33e742103416e60cbc1d20579bc38a9d0f04c476be148fa8e082eee23f18",
+      "after_sha256": "9f7f33e742103416e60cbc1d20579bc38a9d0f04c476be148fa8e082eee23f18"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "c7f1490c23c93a4c169b513368b46fb3071c0986a82fc81b3983da581e44ee65",
+      "after_sha256": "c7f1490c23c93a4c169b513368b46fb3071c0986a82fc81b3983da581e44ee65"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "3cd3c8e0075df45fa22df52d54d8800bb93b36f9396cbe653420d3b43a95d309",
+      "after_sha256": "3cd3c8e0075df45fa22df52d54d8800bb93b36f9396cbe653420d3b43a95d309"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "0301675bdf55f18e37b609886418bbf64ba29eb79f4d8127273fe745272be5b1",
+      "after_sha256": "0301675bdf55f18e37b609886418bbf64ba29eb79f4d8127273fe745272be5b1"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "9b5e098a936c04108aefb76e8282e3dd2c936c23f909177192d23d791baf5689",
+      "after_sha256": "9b5e098a936c04108aefb76e8282e3dd2c936c23f909177192d23d791baf5689"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "e43b3015d8e5232f815ee577bab23eb37e0f570abaee85e27de85334c82f6f02",
+      "after_sha256": "e43b3015d8e5232f815ee577bab23eb37e0f570abaee85e27de85334c82f6f02"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "9dc47f8e774e648bda760416de074d4545d92e2f96e4cf84d02a29abc74e82df",
+      "after_sha256": "9dc47f8e774e648bda760416de074d4545d92e2f96e4cf84d02a29abc74e82df"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "4e3a601a1e55c13333abe2146da784ee12f78b5de670d80035a405d7ae17c3e1",
+      "after_sha256": "4e3a601a1e55c13333abe2146da784ee12f78b5de670d80035a405d7ae17c3e1"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "44e742e5cf70a6e8a4c1165076c749e62a0935089ca2c58bfd96232ee8755fbe",
+      "after_sha256": "44e742e5cf70a6e8a4c1165076c749e62a0935089ca2c58bfd96232ee8755fbe"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "eb5386157ab0dc1e164dcbb0fa5c11384b18aa5bd226de353398e33b234b945b",
+      "after_sha256": "eb5386157ab0dc1e164dcbb0fa5c11384b18aa5bd226de353398e33b234b945b"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "2c6de9dd4787300288127c33a7433d3cf327125a7913af839a1ec4218eee1bcd",
+      "after_sha256": "2c6de9dd4787300288127c33a7433d3cf327125a7913af839a1ec4218eee1bcd"
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "82d2e46ebc4a98c09dffccbfaa044e59ccebd0cfc98c8818a02f1f909f7a55a9",
+      "after_sha256": "82d2e46ebc4a98c09dffccbfaa044e59ccebd0cfc98c8818a02f1f909f7a55a9"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "ac2cf8c2348fc97a49a56a44fbacb81155ae5adc7adf98fea41092630f5628d1",
+      "after_sha256": "ac2cf8c2348fc97a49a56a44fbacb81155ae5adc7adf98fea41092630f5628d1"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "3f533c2a17811cb863762a6924d9f95793fa639d1265d02b0a84f602dc9f69ae",
+      "after_sha256": "3f533c2a17811cb863762a6924d9f95793fa639d1265d02b0a84f602dc9f69ae"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "0fd67cb0f97a8ac33d8da314d760f8b4e611abcb289560481e2be5b8fe879479",
+      "after_sha256": "0fd67cb0f97a8ac33d8da314d760f8b4e611abcb289560481e2be5b8fe879479"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "64c9a29a9a022a5c6c9b86750dec3363f011bc351fb6567948b57bb964eb013d",
+      "after_sha256": "64c9a29a9a022a5c6c9b86750dec3363f011bc351fb6567948b57bb964eb013d"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "674bf93965422555c62ed97e97f76eb7c7873b2e94368d6dba18b46cb016fab3",
+      "after_sha256": "674bf93965422555c62ed97e97f76eb7c7873b2e94368d6dba18b46cb016fab3"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "bcd958888420c538e74c64be0ecef32d7403ff0e1952d7b209e19f01ef259f80",
+      "after_sha256": "bcd958888420c538e74c64be0ecef32d7403ff0e1952d7b209e19f01ef259f80"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "a2672a31e728ef7fb4102113cb16cd19b068dd8d441fe65c733cec9f8d0479e7",
+      "after_sha256": "a2672a31e728ef7fb4102113cb16cd19b068dd8d441fe65c733cec9f8d0479e7"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "ff5fab3edbd348b0f352a5403ab340d7f02580a97a7e55907318858e04197985",
+      "after_sha256": "ff5fab3edbd348b0f352a5403ab340d7f02580a97a7e55907318858e04197985"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "3e2ee30bad39d8f97a84daab274d609998db78ddadd5b2041a95fa3d771064c2",
+      "after_sha256": "3e2ee30bad39d8f97a84daab274d609998db78ddadd5b2041a95fa3d771064c2"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "f6f536b75389f8b83ba3dfc488397031a2867d40960eb9710287154a97fa5c49",
+      "after_sha256": "f6f536b75389f8b83ba3dfc488397031a2867d40960eb9710287154a97fa5c49"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "0cb045ae3c5900b0852123291ea3b8b50418fd1ec3e1afcb72fadd71f9fe8895",
+      "after_sha256": "0cb045ae3c5900b0852123291ea3b8b50418fd1ec3e1afcb72fadd71f9fe8895"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "5fa2a5d2a5668fe47a274a966c2810494a4fd89685c4cdf4bab07a4fb84dd548",
+      "after_sha256": "5fa2a5d2a5668fe47a274a966c2810494a4fd89685c4cdf4bab07a4fb84dd548"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "d2d892548cc0cfbf98bac52f40c114c632d2e0fb13cc34e5b0eebf50c13ca289",
+      "after_sha256": "d2d892548cc0cfbf98bac52f40c114c632d2e0fb13cc34e5b0eebf50c13ca289"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "269497ad57d628e2e6cee2ce5dd8e8cbaa99f5e9bf7aa4d9849ada18a80a44ea",
+      "after_sha256": "269497ad57d628e2e6cee2ce5dd8e8cbaa99f5e9bf7aa4d9849ada18a80a44ea"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "53e0c3ab44d04f1474b009ce08609f78af745b1790bdbb3398f65ae6a939eb11",
+      "after_sha256": "53e0c3ab44d04f1474b009ce08609f78af745b1790bdbb3398f65ae6a939eb11"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "1be694ae36238666ff8c1b760f5cd1f84c4f457a83bd17c63c1f43890f11cdf9",
+      "after_sha256": "1be694ae36238666ff8c1b760f5cd1f84c4f457a83bd17c63c1f43890f11cdf9"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "ea8b055c4b672f8b8e805d8105f150f0205fc822c0adae844bdd3c2318c5c14a",
+      "after_sha256": "ea8b055c4b672f8b8e805d8105f150f0205fc822c0adae844bdd3c2318c5c14a"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "ed2e6c51f26c0674b8dbd87ff153e03af9da8e849446a61b73eb324ce2384c3d",
+      "after_sha256": "ed2e6c51f26c0674b8dbd87ff153e03af9da8e849446a61b73eb324ce2384c3d"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "93c3e54c1268f030636383f7bbadfbdc7a34220f1699a4cc0c2a6c74cafd853a",
+      "after_sha256": "93c3e54c1268f030636383f7bbadfbdc7a34220f1699a4cc0c2a6c74cafd853a"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "3f7ee52751bde88b364ac8a8855bb138018e0d4b27c5c4c5863d0ceca6fee9dd",
+      "after_sha256": "3f7ee52751bde88b364ac8a8855bb138018e0d4b27c5c4c5863d0ceca6fee9dd"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "b9b593b9061583ffcdb189403985a66d5ddc38754fde7f3f80d4f9604a9881d6",
+      "after_sha256": "b9b593b9061583ffcdb189403985a66d5ddc38754fde7f3f80d4f9604a9881d6"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "c6d50fc4e98a608689f6b94d32481cbf7657cbc68ebbf71d2a986d5ea292899e",
+      "after_sha256": "c6d50fc4e98a608689f6b94d32481cbf7657cbc68ebbf71d2a986d5ea292899e"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "8b51ad65ac3261b5125a6d8a11c776d4fb3d99cf4513fe1ab374fd2ff68487f8",
+      "after_sha256": "8b51ad65ac3261b5125a6d8a11c776d4fb3d99cf4513fe1ab374fd2ff68487f8"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "ec4f4e08bd1af1ac096326988325380b20401bf11a6ccfc38d2d771a0202b2e5",
+      "after_sha256": "ec4f4e08bd1af1ac096326988325380b20401bf11a6ccfc38d2d771a0202b2e5"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "43e58e98f34d68e2c68b9fd0acad2ce2e5081d51154d17f56fb7259f95024f55",
+      "after_sha256": "43e58e98f34d68e2c68b9fd0acad2ce2e5081d51154d17f56fb7259f95024f55"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "f249cde93ef5934563d9736d7c6ecc9e01b7bebe3323e419f61a4453a082d0e9",
+      "after_sha256": "f249cde93ef5934563d9736d7c6ecc9e01b7bebe3323e419f61a4453a082d0e9"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "24867b914abb7573c136e30c724f5c6b0f40d7be7dfe07ba9f1b0c350bdcb82c",
+      "after_sha256": "24867b914abb7573c136e30c724f5c6b0f40d7be7dfe07ba9f1b0c350bdcb82c"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "fa9f41b34631021fe1273bfcf1a2524809c09780950c20a709c030e4f3bf78d3",
+      "after_sha256": "fa9f41b34631021fe1273bfcf1a2524809c09780950c20a709c030e4f3bf78d3"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "091c99deb069979c1f58804127bb3d13868f69e8935347961ba96d5c418209d1",
+      "after_sha256": "091c99deb069979c1f58804127bb3d13868f69e8935347961ba96d5c418209d1"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "edfd5df06db11b44306aee8d863a4959bbbfe98548f345e8ef8e2157f870c3ed",
+      "after_sha256": "edfd5df06db11b44306aee8d863a4959bbbfe98548f345e8ef8e2157f870c3ed"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "8677e84f9bdedef28c4ad33232e1633b1a30d03e6a3a099b2f9390500ae77aec",
+      "after_sha256": "8677e84f9bdedef28c4ad33232e1633b1a30d03e6a3a099b2f9390500ae77aec"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "f1be37ed745ef188a1d4e05fc18eb902026ef4a9e17a6e598d9d3d88241c7168",
+      "after_sha256": "f1be37ed745ef188a1d4e05fc18eb902026ef4a9e17a6e598d9d3d88241c7168"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "1fc07f73cd4cac31199d9c84d71f9e1c09acbd2d06ec7b297598095b38980bd0",
+      "after_sha256": "1fc07f73cd4cac31199d9c84d71f9e1c09acbd2d06ec7b297598095b38980bd0"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "b12158684be8ea1fcb708310d66018895ba45f1d64c90e8042b45f8ec5b4a4cf",
+      "after_sha256": "b12158684be8ea1fcb708310d66018895ba45f1d64c90e8042b45f8ec5b4a4cf"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "63da4bb89f017685bfddbe15fad4bea29eea4807bcb22ef7a3c8d3702462f612",
+      "after_sha256": "63da4bb89f017685bfddbe15fad4bea29eea4807bcb22ef7a3c8d3702462f612"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "bbaeca6c8945e495a8bf42848d14b9c6901eece0e00752057bf8dad2dca77bd9",
+      "after_sha256": "bbaeca6c8945e495a8bf42848d14b9c6901eece0e00752057bf8dad2dca77bd9"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "8dee89b4353bb47c98b3460ea3229065e34a2f657b92ea3cf2443ba0576a4449",
+      "after_sha256": "8dee89b4353bb47c98b3460ea3229065e34a2f657b92ea3cf2443ba0576a4449"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "24b4652d29324d13385e2e23e490ca96e8a7825d721a350a44cfb0f42a5daa0d",
+      "after_sha256": "24b4652d29324d13385e2e23e490ca96e8a7825d721a350a44cfb0f42a5daa0d"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "0d3712701338c144c8ca44eead6194c8cd8b016f4bc77a7afd3891354e10ec0a",
+      "after_sha256": "0d3712701338c144c8ca44eead6194c8cd8b016f4bc77a7afd3891354e10ec0a"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "ce536da3d91018ad5952b468b64de83b8b04166d60fccf56b9560db4c84a8694",
+      "after_sha256": "ce536da3d91018ad5952b468b64de83b8b04166d60fccf56b9560db4c84a8694"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "a2463b642083525e111efe81a32c27bcba86f20fab627af8751e6f242f2d9809",
+      "after_sha256": "a2463b642083525e111efe81a32c27bcba86f20fab627af8751e6f242f2d9809"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "8a53eaa0fcd6478d8708901ecbb2a7f90bff326f56a15c1ac1e884891f53007d",
+      "after_sha256": "8a53eaa0fcd6478d8708901ecbb2a7f90bff326f56a15c1ac1e884891f53007d"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "6b7c3d35f12fc209acf69fe86db37e2d8fbeb45a9c31e29076806b5dc92c13fb",
+      "after_sha256": "6b7c3d35f12fc209acf69fe86db37e2d8fbeb45a9c31e29076806b5dc92c13fb"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "d2d892548cc0cfbf98bac52f40c114c632d2e0fb13cc34e5b0eebf50c13ca289",
+      "after_sha256": "d2d892548cc0cfbf98bac52f40c114c632d2e0fb13cc34e5b0eebf50c13ca289"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "70b69b3bacb24b7bfa02206d551a5432057ad8e74fcb089600d5c6d415feeb7c",
+      "after_sha256": "70b69b3bacb24b7bfa02206d551a5432057ad8e74fcb089600d5c6d415feeb7c"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "67471c69957cc8f76ff4ef84807103336eeaf06e79a509ff8d03f0be7e7f2203",
+      "after_sha256": "67471c69957cc8f76ff4ef84807103336eeaf06e79a509ff8d03f0be7e7f2203"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "686ced75210d747cd0aa535a4b97ceb74719ff318ca9dcabd26785c09bf50421",
+      "after_sha256": "686ced75210d747cd0aa535a4b97ceb74719ff318ca9dcabd26785c09bf50421"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "99a9947e43c989ab31ba7ad989d6fdc9106046363abd9211944f57a9911703c6",
+      "after_sha256": "99a9947e43c989ab31ba7ad989d6fdc9106046363abd9211944f57a9911703c6"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "7bd20af48039b7f42f961f0bffd698f21bdbea45488745d32ebeeb207323b8df",
+      "after_sha256": "7bd20af48039b7f42f961f0bffd698f21bdbea45488745d32ebeeb207323b8df"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "f2b5daa6dbb59ebdd21d34ca524236837a71164b363c39982b035141289072e5",
+      "after_sha256": "f2b5daa6dbb59ebdd21d34ca524236837a71164b363c39982b035141289072e5"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "d9a0097d4c46eb75e7d3d24dc305d98cdb5a25e751972f6655489c66ed0833d2",
+      "after_sha256": "d9a0097d4c46eb75e7d3d24dc305d98cdb5a25e751972f6655489c66ed0833d2"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "b2321994ef2b13bd9163dd0226134b139f9dd030ea4f014561904d05a2e6c12e",
+      "after_sha256": "b2321994ef2b13bd9163dd0226134b139f9dd030ea4f014561904d05a2e6c12e"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "7372d5e053939a7eacd18fe89e55c693bb4ec7e0efcbd59555b23afba0f50d52",
+      "after_sha256": "7372d5e053939a7eacd18fe89e55c693bb4ec7e0efcbd59555b23afba0f50d52"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "eb5ca97ab92ebbad9407b54d79d6b49ddeb7af7f8f6e3245af120105a05878e3",
+      "after_sha256": "eb5ca97ab92ebbad9407b54d79d6b49ddeb7af7f8f6e3245af120105a05878e3"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "4efcdbfddbf5fc4b54710224154c93665fcdabec8c1fdb611e2bbf5d6f2d0cb0",
+      "after_sha256": "4efcdbfddbf5fc4b54710224154c93665fcdabec8c1fdb611e2bbf5d6f2d0cb0"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "c1d43acc58360c399a0e92b298dec78f7a0c07a5728308981864f3645541f035",
+      "after_sha256": "c1d43acc58360c399a0e92b298dec78f7a0c07a5728308981864f3645541f035"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "6253f2df14b1f591e318ad7ee3f72db38bd9ee22890385c7cc7f880c9b9cd526",
+      "after_sha256": "6253f2df14b1f591e318ad7ee3f72db38bd9ee22890385c7cc7f880c9b9cd526"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "80460febf559e5a89a3faeb31fbf12d522dfa9610b079f91c57a3bd378dbe7ae",
+      "after_sha256": "80460febf559e5a89a3faeb31fbf12d522dfa9610b079f91c57a3bd378dbe7ae"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "b3c1a4d6f71aadd32f3dabb74c94a026dd5c6bee0f2b0d6781f0f3306c50e138",
+      "after_sha256": "b3c1a4d6f71aadd32f3dabb74c94a026dd5c6bee0f2b0d6781f0f3306c50e138"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "f7ede2a5c4858b5dba4ffa8c38c82255aedeb0e579686ea1162f32b59a916bb3",
+      "after_sha256": "f7ede2a5c4858b5dba4ffa8c38c82255aedeb0e579686ea1162f32b59a916bb3"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "48c740d4a3912c04934dbe6fe83deb3654adfceb59ee8d87ed3b25957de7ab69",
+      "after_sha256": "48c740d4a3912c04934dbe6fe83deb3654adfceb59ee8d87ed3b25957de7ab69"
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "b26064979f516ec85ce04f229d5a886eea38e42896bcf6e79897258e247edb2c",
+      "after_sha256": "b26064979f516ec85ce04f229d5a886eea38e42896bcf6e79897258e247edb2c"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "fa970e66cc52a67e6a1bae31df2ab87e8781dc48838580f60d3b859321de937c",
+      "after_sha256": "fa970e66cc52a67e6a1bae31df2ab87e8781dc48838580f60d3b859321de937c"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "41329b157f2e7982047490a8a9927f3d77aa88d8e3f0205dbaee967cedf216a0",
+      "after_sha256": "41329b157f2e7982047490a8a9927f3d77aa88d8e3f0205dbaee967cedf216a0"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "eec200612102dd2202675cda5d51c92186116bc60e37de867dcf1d52b04425b0",
+      "after_sha256": "eec200612102dd2202675cda5d51c92186116bc60e37de867dcf1d52b04425b0"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "8bb68b967d10fb3ff58011652213e5400773d0244195b3bad2336b45287d66fc",
+      "after_sha256": "8bb68b967d10fb3ff58011652213e5400773d0244195b3bad2336b45287d66fc"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "116adb0287429a213e73baa14c6bf2409234e700cfab268b531788464d55ddb7",
+      "after_sha256": "116adb0287429a213e73baa14c6bf2409234e700cfab268b531788464d55ddb7"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "6434a5d2ca98f84d7f02b49f7ea878f15a38063bfc4fdd82776efab9e7986e4e",
+      "after_sha256": "6434a5d2ca98f84d7f02b49f7ea878f15a38063bfc4fdd82776efab9e7986e4e"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "5a3ec17419803a1528ebcc8d0a78b483308b92a8413678f5a67c9c9865854d28",
+      "after_sha256": "5a3ec17419803a1528ebcc8d0a78b483308b92a8413678f5a67c9c9865854d28"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "9d641addb911e8fb39952d402787d504dfa1c73134c099a7fbe9f2d4f3dcc589",
+      "after_sha256": "9d641addb911e8fb39952d402787d504dfa1c73134c099a7fbe9f2d4f3dcc589"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "13df3b55c38f664fcca9925124117659314dff41399904228fa52a5d32358323",
+      "after_sha256": "13df3b55c38f664fcca9925124117659314dff41399904228fa52a5d32358323"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "1bd83db09f5573a22276ef15a0cb1f276dff7a60a921b8fe0987d00fcf2ff95a",
+      "after_sha256": "1bd83db09f5573a22276ef15a0cb1f276dff7a60a921b8fe0987d00fcf2ff95a"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "c1305c95251c45d59801724ceafeded270bf6ae073ce6c7234c8ea0c3ac805bd",
+      "after_sha256": "c1305c95251c45d59801724ceafeded270bf6ae073ce6c7234c8ea0c3ac805bd"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "970ec52aaee999c8f402697c8a050e690a803c794508cef3d0e6d56f3fc9625e",
+      "after_sha256": "970ec52aaee999c8f402697c8a050e690a803c794508cef3d0e6d56f3fc9625e"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "a9b9f46b2e51a7650ac78a0da572540fd3359ab7c20f12c826db99b4a7cf9173",
+      "after_sha256": "a9b9f46b2e51a7650ac78a0da572540fd3359ab7c20f12c826db99b4a7cf9173"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "03469728bdb734da4ee8daa9131baddff51daf3d900c9df8c4dea42e33d5dd39",
+      "after_sha256": "03469728bdb734da4ee8daa9131baddff51daf3d900c9df8c4dea42e33d5dd39"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "85083f72bc01a8528eba592b47dca23a6f7a36868ce1ce075631de6793eb2be7",
+      "after_sha256": "85083f72bc01a8528eba592b47dca23a6f7a36868ce1ce075631de6793eb2be7"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "2b9453f04a3c6b8f258cebfee835a70e3cde9b025a0882a09167e517b16b2d10",
+      "after_sha256": "2b9453f04a3c6b8f258cebfee835a70e3cde9b025a0882a09167e517b16b2d10"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "3406c1f99b3c2c2fe31f310d93ac29d6f8905e5a36ea09013277e6ae672dff6b",
+      "after_sha256": "3406c1f99b3c2c2fe31f310d93ac29d6f8905e5a36ea09013277e6ae672dff6b"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "8844c92acaec2d47f35d04e5e3f3c6a36fc9fd1b7f54beb417e37ae26a9dc7e2",
+      "after_sha256": "8844c92acaec2d47f35d04e5e3f3c6a36fc9fd1b7f54beb417e37ae26a9dc7e2"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "404062407827103deaca91ccebb784f03cd067f7bf2602118b0326d03bbe02a0",
+      "after_sha256": "404062407827103deaca91ccebb784f03cd067f7bf2602118b0326d03bbe02a0"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "d42435a1a0d7a3d7acc00da3f652649c12071bc1f073def6b9c4437347ee5a73",
+      "after_sha256": "d42435a1a0d7a3d7acc00da3f652649c12071bc1f073def6b9c4437347ee5a73"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "f8052f92c1b59e5b3745731928af5cefe0f26ed89d11687da52844fa19ca2225",
+      "after_sha256": "f8052f92c1b59e5b3745731928af5cefe0f26ed89d11687da52844fa19ca2225"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "31a11a558a9753514f5cfc900d1fac5db8d846bb36bf09c891983207190b0447",
+      "after_sha256": "31a11a558a9753514f5cfc900d1fac5db8d846bb36bf09c891983207190b0447"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "32afb9177a3b828b3afe98aa60456b540df87d8238e99720a02a8c3b7ce8c53c",
+      "after_sha256": "32afb9177a3b828b3afe98aa60456b540df87d8238e99720a02a8c3b7ce8c53c"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "a79fc8963e93f15b7a5d4f557adb4a9976b91daa37c449142619f157f96f3caa",
+      "after_sha256": "a79fc8963e93f15b7a5d4f557adb4a9976b91daa37c449142619f157f96f3caa"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "b14255776bc8cdb9ace879c41a5140c1bc2d2eb7215c811d9210035c4a3fc773",
+      "after_sha256": "b14255776bc8cdb9ace879c41a5140c1bc2d2eb7215c811d9210035c4a3fc773"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "d8a69b208e75acc3905fa8b1d432d4d62d694ffd82722c1ec52fc671214621cb",
+      "after_sha256": "d8a69b208e75acc3905fa8b1d432d4d62d694ffd82722c1ec52fc671214621cb"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "d435fe40fa37ec2eb848d4d4fb3516b60f993a830f82a1b490ebbbdd22bd206d",
+      "after_sha256": "d435fe40fa37ec2eb848d4d4fb3516b60f993a830f82a1b490ebbbdd22bd206d"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "c49ae72170716515e619afec7f2975e914097b263a4457616b160c547b46ba96",
+      "after_sha256": "c49ae72170716515e619afec7f2975e914097b263a4457616b160c547b46ba96"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "f034edc440b1b481282213d7735532861371232664a288413eb402380e75aca1",
+      "after_sha256": "f034edc440b1b481282213d7735532861371232664a288413eb402380e75aca1"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "1f8f978424ce078cd9a9ccf647e08b5052d34def61d4908fbd5ebb7cdba0f853",
+      "after_sha256": "1f8f978424ce078cd9a9ccf647e08b5052d34def61d4908fbd5ebb7cdba0f853"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "3b8057f265a0327180631d4ce7f7dc1a333b5a2ff961dcb621eafde91d678605",
+      "after_sha256": "3b8057f265a0327180631d4ce7f7dc1a333b5a2ff961dcb621eafde91d678605"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "12e7252d9e9abe048b4a2f13d8cee22a5b6221ffa98f1305c56544af6ffb9dbc",
+      "after_sha256": "12e7252d9e9abe048b4a2f13d8cee22a5b6221ffa98f1305c56544af6ffb9dbc"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "b67de55e13e5d63263057cfad143b19d6a49b390f3448ece34a3eba30540be3f",
+      "after_sha256": "b67de55e13e5d63263057cfad143b19d6a49b390f3448ece34a3eba30540be3f"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "484230f7526b7aa0e9024650701203ca5cf6f388a864155bbbdf5747154be535",
+      "after_sha256": "484230f7526b7aa0e9024650701203ca5cf6f388a864155bbbdf5747154be535"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "172eb8836c17d5d61713fd984f6d5c3163ad4cddd8b7a63f25e4a0cfe4c046b5",
+      "after_sha256": "172eb8836c17d5d61713fd984f6d5c3163ad4cddd8b7a63f25e4a0cfe4c046b5"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "16c8f95de0220cb286aa8ff5671f99bc3f4aaad8a878be473cb4d1266b321120",
+      "after_sha256": "16c8f95de0220cb286aa8ff5671f99bc3f4aaad8a878be473cb4d1266b321120"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "8316cab539717f6502d82801d9f9325cd2772c8c2b446d58af295587aff08695",
+      "after_sha256": "8316cab539717f6502d82801d9f9325cd2772c8c2b446d58af295587aff08695"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "243ea8641db8a2d0ad0803d1dec0058ca997f997033bc60fccc9fe40a8c265c5",
+      "after_sha256": "243ea8641db8a2d0ad0803d1dec0058ca997f997033bc60fccc9fe40a8c265c5"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "e50521a08da8cbee1e7f0fdd5d5757d9a9088c3046faa75b6808fa5bf19583d1",
+      "after_sha256": "e50521a08da8cbee1e7f0fdd5d5757d9a9088c3046faa75b6808fa5bf19583d1"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "6ab5b5f1c95e75eda230d393ad482f789bcb8eb3caa3fb4b0508431aca9f8461",
+      "after_sha256": "6ab5b5f1c95e75eda230d393ad482f789bcb8eb3caa3fb4b0508431aca9f8461"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "d12b8b6e3b7c63728377e331ae679b92faea76bf01a19548cdcee82d6836a2a5",
+      "after_sha256": "d12b8b6e3b7c63728377e331ae679b92faea76bf01a19548cdcee82d6836a2a5"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "be59a9560bcf6124f6ffea0cf14576aca33ff6130373e34189ae189dea9d9e12",
+      "after_sha256": "be59a9560bcf6124f6ffea0cf14576aca33ff6130373e34189ae189dea9d9e12"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "1242f550e3804088c05e8023d3503926fa784e4c6aadb667a67a1c43018258dc",
+      "after_sha256": "1242f550e3804088c05e8023d3503926fa784e4c6aadb667a67a1c43018258dc"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "a9b9f46b2e51a7650ac78a0da572540fd3359ab7c20f12c826db99b4a7cf9173",
+      "after_sha256": "a9b9f46b2e51a7650ac78a0da572540fd3359ab7c20f12c826db99b4a7cf9173"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "e6960d4339a47edc0bdaed7da85933785d82d66b04fbd79752117f07e87bcbef",
+      "after_sha256": "e6960d4339a47edc0bdaed7da85933785d82d66b04fbd79752117f07e87bcbef"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "e32085f11eceea741fed44b8b9437cbe208831005e6fe4eade48fc4257c3afd6",
+      "after_sha256": "e32085f11eceea741fed44b8b9437cbe208831005e6fe4eade48fc4257c3afd6"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "9a9866a8d73b7561995bde94e7abe4c7ad5ece9dbf81c2a06c6fededc3e82412",
+      "after_sha256": "9a9866a8d73b7561995bde94e7abe4c7ad5ece9dbf81c2a06c6fededc3e82412"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "7391cf525cf98f0755a0a47f1aea970a28244fe900b7cbca00613a1a399af828",
+      "after_sha256": "7391cf525cf98f0755a0a47f1aea970a28244fe900b7cbca00613a1a399af828"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "727cae0067acd09b7c4ed6e7668ab151447c5bbf4473c7aa2fec32a88216e047",
+      "after_sha256": "727cae0067acd09b7c4ed6e7668ab151447c5bbf4473c7aa2fec32a88216e047"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "593bde77c8ecc2567baf26d3cd1a1af1e4aad76574d21bba7ab7c2fd26c6c2f4",
+      "after_sha256": "593bde77c8ecc2567baf26d3cd1a1af1e4aad76574d21bba7ab7c2fd26c6c2f4"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "0a9853b08687b2419460c09ee0530aea01deafed0e71649de2d08384cec80f09",
+      "after_sha256": "0a9853b08687b2419460c09ee0530aea01deafed0e71649de2d08384cec80f09"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "c87eba6c9f1791104efb3dd9400f5cb716568fd32252e0998c7d5d257acae642",
+      "after_sha256": "c87eba6c9f1791104efb3dd9400f5cb716568fd32252e0998c7d5d257acae642"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "d6ecf7acdfaca54f0ea09d1bdd36a47b5cb0b1bd7501f13a2e566a00b1eb6aac",
+      "after_sha256": "d6ecf7acdfaca54f0ea09d1bdd36a47b5cb0b1bd7501f13a2e566a00b1eb6aac"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "1fe3d9e537bff97291300862820579736cf9af504bd03adb63646cb6193d6a31",
+      "after_sha256": "1fe3d9e537bff97291300862820579736cf9af504bd03adb63646cb6193d6a31"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "acbca80ce0f67f93952febc9def35241d34ca91784e59a18f5c279f78cade377",
+      "after_sha256": "acbca80ce0f67f93952febc9def35241d34ca91784e59a18f5c279f78cade377"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "404c557f809bf8c5d28d4a4611968568ce40f5dbd99529864419e39fa08206cb",
+      "after_sha256": "404c557f809bf8c5d28d4a4611968568ce40f5dbd99529864419e39fa08206cb"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "c77c3496f3ceddf68bac7c9a82b3e949ebe7d63fe7e352c262d9b6a3dba91b95",
+      "after_sha256": "c77c3496f3ceddf68bac7c9a82b3e949ebe7d63fe7e352c262d9b6a3dba91b95"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "84503a65f708a10ca59cb8d105393d398dc46d3e36074d7c444130d890ca5324",
+      "after_sha256": "84503a65f708a10ca59cb8d105393d398dc46d3e36074d7c444130d890ca5324"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "89097fdbb576536a01d90fce980733af9dc7a05abd395f8554c5be5a627368d8",
+      "after_sha256": "89097fdbb576536a01d90fce980733af9dc7a05abd395f8554c5be5a627368d8"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "ff1aa1d0f5fb9d5c62f9d7dae454ddc50aaaaf1502b5318635f4b1e30d6df405",
+      "after_sha256": "ff1aa1d0f5fb9d5c62f9d7dae454ddc50aaaaf1502b5318635f4b1e30d6df405"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "65d3043a28a680423a7ce293d7c123f55cf154dec8af6bd36e75bff4b5315550",
+      "after_sha256": "65d3043a28a680423a7ce293d7c123f55cf154dec8af6bd36e75bff4b5315550"
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "8a73d8b1486457753dd469053068c4703e4abbf0dc61724d03f0a1a05dd2a01b",
+      "after_sha256": "8a73d8b1486457753dd469053068c4703e4abbf0dc61724d03f0a1a05dd2a01b"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "59020d99d7f7a9790023e9f8e1f345b0aae1fbc69c4b445596f86f0db714a173",
+      "after_sha256": "59020d99d7f7a9790023e9f8e1f345b0aae1fbc69c4b445596f86f0db714a173"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "bc5022f4d07a99c4a162d9d31e75b7a8f95895e7e013a789d5cfffe383e17145",
+      "after_sha256": "bc5022f4d07a99c4a162d9d31e75b7a8f95895e7e013a789d5cfffe383e17145"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "221de7c960e25f66808f5cb92609daf9d0717b92213bf106ba6870ac5f38627c",
+      "after_sha256": "221de7c960e25f66808f5cb92609daf9d0717b92213bf106ba6870ac5f38627c"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "f8c20bc6c3c6ce9dd389e56193452d5d3f4a0f52e6215bc6c78e18d02bb0e391",
+      "after_sha256": "f8c20bc6c3c6ce9dd389e56193452d5d3f4a0f52e6215bc6c78e18d02bb0e391"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "116adb0287429a213e73baa14c6bf2409234e700cfab268b531788464d55ddb7",
+      "after_sha256": "116adb0287429a213e73baa14c6bf2409234e700cfab268b531788464d55ddb7"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "cd1819539a08fe2305a57c78ce862119683e1e91c90765df8962912d1d6d2c07",
+      "after_sha256": "cd1819539a08fe2305a57c78ce862119683e1e91c90765df8962912d1d6d2c07"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "bd95be94bc496de8625cc2a5dadd670fb07411c71f924e5ac0be93429cde01bc",
+      "after_sha256": "bd95be94bc496de8625cc2a5dadd670fb07411c71f924e5ac0be93429cde01bc"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "9f1c279e9a0a9604b88c0fad68582e40c91be46030208eedea075232cdc61b79",
+      "after_sha256": "9f1c279e9a0a9604b88c0fad68582e40c91be46030208eedea075232cdc61b79"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "13df3b55c38f664fcca9925124117659314dff41399904228fa52a5d32358323",
+      "after_sha256": "13df3b55c38f664fcca9925124117659314dff41399904228fa52a5d32358323"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "381a8620af0f91e4edaf084111936fbacad28d5493c848d172b2a16a3ec6649b",
+      "after_sha256": "381a8620af0f91e4edaf084111936fbacad28d5493c848d172b2a16a3ec6649b"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "df2466a4d931e90fdd58679ba464e2225af5ded8739eb471cadb5337afd925d5",
+      "after_sha256": "df2466a4d931e90fdd58679ba464e2225af5ded8739eb471cadb5337afd925d5"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "3b8e4a34a17450f91c92384390b2190e68b4a3a9c0dd61d23199c4f672d43a46",
+      "after_sha256": "3b8e4a34a17450f91c92384390b2190e68b4a3a9c0dd61d23199c4f672d43a46"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "c13c3141c9e0e56c9d8146cc4cdbac791a096ce88d84a76a51c620791a350532",
+      "after_sha256": "c13c3141c9e0e56c9d8146cc4cdbac791a096ce88d84a76a51c620791a350532"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "2d7f45ae96046b1846fde83f6697d20f7a352ae4d38e7467be5e0d22ec1799a6",
+      "after_sha256": "2d7f45ae96046b1846fde83f6697d20f7a352ae4d38e7467be5e0d22ec1799a6"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "d900df1b515d8c5304e74c504952143e0298217832d77c5ebfc63ffd5203f650",
+      "after_sha256": "d900df1b515d8c5304e74c504952143e0298217832d77c5ebfc63ffd5203f650"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "9213e2b465cc3a794435c084843aecdc7802556f1c7e7b2fa78e41263e459f4f",
+      "after_sha256": "9213e2b465cc3a794435c084843aecdc7802556f1c7e7b2fa78e41263e459f4f"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "9b466de0ccf1d3c28506d4824671531732f04a9e00c557693681278ad591ca13",
+      "after_sha256": "9b466de0ccf1d3c28506d4824671531732f04a9e00c557693681278ad591ca13"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "ce62e8dc9e1c9e7339b5afc53b1dc032a18b4945a05027b2c5c03b9ad9124200",
+      "after_sha256": "ce62e8dc9e1c9e7339b5afc53b1dc032a18b4945a05027b2c5c03b9ad9124200"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "611f99db1576ba442ec170a5d51cacb7261387803e657700486182a138d983dd",
+      "after_sha256": "611f99db1576ba442ec170a5d51cacb7261387803e657700486182a138d983dd"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "ae9822492f389842b3f050c6bb263508d7d172bfd603d5057b215b8baec9be7e",
+      "after_sha256": "ae9822492f389842b3f050c6bb263508d7d172bfd603d5057b215b8baec9be7e"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "8645e5c70a6ad9064391dc5d6e7947b0b75e4dd3e4c27cbb4dba9006ae8883df",
+      "after_sha256": "8645e5c70a6ad9064391dc5d6e7947b0b75e4dd3e4c27cbb4dba9006ae8883df"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "1fc8ed008451924b549045d5c48f5778d5e06866af738f8450da1e1e697c657b",
+      "after_sha256": "1fc8ed008451924b549045d5c48f5778d5e06866af738f8450da1e1e697c657b"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "02cbf56d90ca5e24a704674afaa47fbaf4a251f1ebfa631bec34dda841612009",
+      "after_sha256": "02cbf56d90ca5e24a704674afaa47fbaf4a251f1ebfa631bec34dda841612009"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "89bede1b1f27949808c94cc7069698eedaff99843ee091641736d1fa6e0128a1",
+      "after_sha256": "89bede1b1f27949808c94cc7069698eedaff99843ee091641736d1fa6e0128a1"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "c15cbdc04aca858636bc4d83a8ae05a86597304ad548062d84e8e583c4bd7a97",
+      "after_sha256": "c15cbdc04aca858636bc4d83a8ae05a86597304ad548062d84e8e583c4bd7a97"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "3759ebdd356cdd99b02894e0919b01e826452f0b2ce1f73a3a84d17cd36fc8eb",
+      "after_sha256": "3759ebdd356cdd99b02894e0919b01e826452f0b2ce1f73a3a84d17cd36fc8eb"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "68ea4c6bb12604cc1cc9f02589980bf75097df0aaae386c23edf2049c14fbc81",
+      "after_sha256": "68ea4c6bb12604cc1cc9f02589980bf75097df0aaae386c23edf2049c14fbc81"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "502ca527f3895b0f05fb04c932e012004134e9c956f0956422ffebcb1892198d",
+      "after_sha256": "502ca527f3895b0f05fb04c932e012004134e9c956f0956422ffebcb1892198d"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "cce3dfec0ddb4a3acf08bd0a0385b295d3365711c98cc0082aec3ee734de1739",
+      "after_sha256": "cce3dfec0ddb4a3acf08bd0a0385b295d3365711c98cc0082aec3ee734de1739"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "0af0ec2f6d3758d175212b311d067accac01a2cd2b6f7fdf34a92d1e4550e50e",
+      "after_sha256": "0af0ec2f6d3758d175212b311d067accac01a2cd2b6f7fdf34a92d1e4550e50e"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "affa5062e7786527143027da7fa1e8b9d8d4fb50f853622f4cfb8c8450e68f7c",
+      "after_sha256": "affa5062e7786527143027da7fa1e8b9d8d4fb50f853622f4cfb8c8450e68f7c"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "70c2296c699e0591ec39b2697042364e954cad23105236f7347e5fe66d621e6a",
+      "after_sha256": "70c2296c699e0591ec39b2697042364e954cad23105236f7347e5fe66d621e6a"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "b699e2e035415c614eea794837000587daeea1374e8b831bcfe5cb191636fdf6",
+      "after_sha256": "b699e2e035415c614eea794837000587daeea1374e8b831bcfe5cb191636fdf6"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "bc847c6f4db5cdc90e526fab172c0c2a259b2f91ec26e593ba3bae471f092b61",
+      "after_sha256": "bc847c6f4db5cdc90e526fab172c0c2a259b2f91ec26e593ba3bae471f092b61"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "897ccd866b679e4ead4b2c2ed5510fed5c760a0c94fe4fcf29af9e722573d423",
+      "after_sha256": "897ccd866b679e4ead4b2c2ed5510fed5c760a0c94fe4fcf29af9e722573d423"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "16c8f95de0220cb286aa8ff5671f99bc3f4aaad8a878be473cb4d1266b321120",
+      "after_sha256": "16c8f95de0220cb286aa8ff5671f99bc3f4aaad8a878be473cb4d1266b321120"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "607930e0388864003493820bee1d280c677f629904264515cb30577384e190e5",
+      "after_sha256": "607930e0388864003493820bee1d280c677f629904264515cb30577384e190e5"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "89852123ff3fc692d116f2586b01d502dc08444c4d4810cda6a86c488a26188a",
+      "after_sha256": "89852123ff3fc692d116f2586b01d502dc08444c4d4810cda6a86c488a26188a"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "80d51600a079c509b19fc63557403265f81b6b852f3a53fc4f25d558ce35eab4",
+      "after_sha256": "80d51600a079c509b19fc63557403265f81b6b852f3a53fc4f25d558ce35eab4"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "6ab5b5f1c95e75eda230d393ad482f789bcb8eb3caa3fb4b0508431aca9f8461",
+      "after_sha256": "6ab5b5f1c95e75eda230d393ad482f789bcb8eb3caa3fb4b0508431aca9f8461"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "263984a3669fd191464dde24d89c169690c32369606e2f0889f9b4733fdb2bb5",
+      "after_sha256": "263984a3669fd191464dde24d89c169690c32369606e2f0889f9b4733fdb2bb5"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "658342db55ddc6d920ae7ce7379dfa747874e949304ca55d68ce7c188c0e92a7",
+      "after_sha256": "658342db55ddc6d920ae7ce7379dfa747874e949304ca55d68ce7c188c0e92a7"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "eadabf9f27eafba4663213129f5d51c4f31784f4e622dc0646ce94605376ff2c",
+      "after_sha256": "eadabf9f27eafba4663213129f5d51c4f31784f4e622dc0646ce94605376ff2c"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "c13c3141c9e0e56c9d8146cc4cdbac791a096ce88d84a76a51c620791a350532",
+      "after_sha256": "c13c3141c9e0e56c9d8146cc4cdbac791a096ce88d84a76a51c620791a350532"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "7179bed54297195ead233c1a22fde700894debad7d0645ac34faccaa8807b720",
+      "after_sha256": "7179bed54297195ead233c1a22fde700894debad7d0645ac34faccaa8807b720"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "b1d55dbbcb9688c3c4c07ac243a1f2513b8be16d71a82cd2e40fc1fbee6914d4",
+      "after_sha256": "b1d55dbbcb9688c3c4c07ac243a1f2513b8be16d71a82cd2e40fc1fbee6914d4"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "bb36e27452ea9dff65f05733bd7963001579c75dbe7648c80104782763a9332a",
+      "after_sha256": "bb36e27452ea9dff65f05733bd7963001579c75dbe7648c80104782763a9332a"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "5863dad4bb49867884150ba2be65dbc08b353e3e0533b1c5fce8ab407d398154",
+      "after_sha256": "5863dad4bb49867884150ba2be65dbc08b353e3e0533b1c5fce8ab407d398154"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "41300a6266af4ebd0d385bcf1720632e591bf0e33f32e5eb3bba92fc6b6f7821",
+      "after_sha256": "41300a6266af4ebd0d385bcf1720632e591bf0e33f32e5eb3bba92fc6b6f7821"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "ec2fbcdc95e087832de1edf88d5d2827624e41bf65d4d274fcfb349037b0f33f",
+      "after_sha256": "ec2fbcdc95e087832de1edf88d5d2827624e41bf65d4d274fcfb349037b0f33f"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "3d6fa770fe1d6039bafdd8083734b6c62717dc16fc7a2ca70218656b0f7fec2f",
+      "after_sha256": "3d6fa770fe1d6039bafdd8083734b6c62717dc16fc7a2ca70218656b0f7fec2f"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "519db7854246b377b442b980b2dff43d8befed4ea2c733cae32522395af97295",
+      "after_sha256": "519db7854246b377b442b980b2dff43d8befed4ea2c733cae32522395af97295"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "48bf51f1f32a6de8f03a7b1dce47f4953c82d508da1f2031b7f4bf44631dd51b",
+      "after_sha256": "48bf51f1f32a6de8f03a7b1dce47f4953c82d508da1f2031b7f4bf44631dd51b"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "e3a4950358d8016808bf8a95404c996478464b82776f4f72c9ceca817234f335",
+      "after_sha256": "e3a4950358d8016808bf8a95404c996478464b82776f4f72c9ceca817234f335"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "352864482569b282561d447b3564ebbdbd1ad0a5cdd544bf570360eaa38dcf1d",
+      "after_sha256": "352864482569b282561d447b3564ebbdbd1ad0a5cdd544bf570360eaa38dcf1d"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "8f237a049139ae3e16cee7481c627050f738b9ed0ff6732ac8b86a785bcc5284",
+      "after_sha256": "8f237a049139ae3e16cee7481c627050f738b9ed0ff6732ac8b86a785bcc5284"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "e53a0547c3ea43fe0cccf0d7883bd0ed06da58f8c47dca1568e9344252cc6506",
+      "after_sha256": "e53a0547c3ea43fe0cccf0d7883bd0ed06da58f8c47dca1568e9344252cc6506"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "1198b1940c23cdf8e736f0dea30a94c0a8415f257657eb88645f7a64652935c1",
+      "after_sha256": "1198b1940c23cdf8e736f0dea30a94c0a8415f257657eb88645f7a64652935c1"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "71cd0bc19432c5f09baa4a34a7762c7caf233d63929e7ed24324b36d0f3229e5",
+      "after_sha256": "71cd0bc19432c5f09baa4a34a7762c7caf233d63929e7ed24324b36d0f3229e5"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "d2b1d2deb5f826a5c2ca6139d4ffcd6267d4a3188b4b755c03bbdbdef4f8c0f1",
+      "after_sha256": "d2b1d2deb5f826a5c2ca6139d4ffcd6267d4a3188b4b755c03bbdbdef4f8c0f1"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "6f71229d2651733d6ce41cc02f9365d3c33ad164abef891f5ca6e91f9ac2f870",
+      "after_sha256": "6f71229d2651733d6ce41cc02f9365d3c33ad164abef891f5ca6e91f9ac2f870"
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "88553b10ca17b4defaf80d069d5f0aaa810bbe0b888a5e6940c95e5d4b9b57c7",
+      "after_sha256": "88553b10ca17b4defaf80d069d5f0aaa810bbe0b888a5e6940c95e5d4b9b57c7"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "4a622962d1b4007b3588527e4f44631f9fc52198f864f3dd2798e714eda64de5",
+      "after_sha256": "4a622962d1b4007b3588527e4f44631f9fc52198f864f3dd2798e714eda64de5"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "a47a2cf22f7d1de1256433c95a5322b43dbd73884f6582d4dc56fbf84c03b5e1",
+      "after_sha256": "a47a2cf22f7d1de1256433c95a5322b43dbd73884f6582d4dc56fbf84c03b5e1"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "ea4c232a4d90e569269579192303010805ffa78746b133cd33eff4617b543966",
+      "after_sha256": "ea4c232a4d90e569269579192303010805ffa78746b133cd33eff4617b543966"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "73e5474e5e7cddb4419df95671c1e3abca1b3296c99b5b5525202a19ca5e9978",
+      "after_sha256": "73e5474e5e7cddb4419df95671c1e3abca1b3296c99b5b5525202a19ca5e9978"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "c19758cd74b86dd3c536025a1bb6fb4fe67464ce8cbf99805afa87b9d54afd3a",
+      "after_sha256": "c19758cd74b86dd3c536025a1bb6fb4fe67464ce8cbf99805afa87b9d54afd3a"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "f6206b1396bf2f179d2c9ab69d3279b82de60f6f9c0cf7901e51d2152620ec52",
+      "after_sha256": "f6206b1396bf2f179d2c9ab69d3279b82de60f6f9c0cf7901e51d2152620ec52"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "59b3199408d9dbbe14525118af24ccda56195757e57365dc1fe5a99d93134e9a",
+      "after_sha256": "59b3199408d9dbbe14525118af24ccda56195757e57365dc1fe5a99d93134e9a"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "684b2b13ffe6b721e6908b253d1ce6d896f86161c3bdbfdc67f86abcb3496c75",
+      "after_sha256": "684b2b13ffe6b721e6908b253d1ce6d896f86161c3bdbfdc67f86abcb3496c75"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "89ef8859e0adcf1988a514028990ee42df070a0b99eaffea4675e3cf546df7bd",
+      "after_sha256": "89ef8859e0adcf1988a514028990ee42df070a0b99eaffea4675e3cf546df7bd"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "52b8790e66f9300a046226513690599ca03bdbf6a9edb5b5f1ddd9e82c4dbd62",
+      "after_sha256": "52b8790e66f9300a046226513690599ca03bdbf6a9edb5b5f1ddd9e82c4dbd62"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "621ca2a263999b693c3aa13b88eb0b1dd02cdd8aeb9daeba6ad22a5f4ba22933",
+      "after_sha256": "621ca2a263999b693c3aa13b88eb0b1dd02cdd8aeb9daeba6ad22a5f4ba22933"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "a18890298e03038acbf427c094aef8f4e1e433b4f8f43821544c1b37a45b8a99",
+      "after_sha256": "a18890298e03038acbf427c094aef8f4e1e433b4f8f43821544c1b37a45b8a99"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "8b1fddb5ddf88e68a16756decc3268556f25845d0f3ab3ff032a17dbdf2239c0",
+      "after_sha256": "8b1fddb5ddf88e68a16756decc3268556f25845d0f3ab3ff032a17dbdf2239c0"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "ed81642bc3ac09f229da10680d05a285af36bf834dd92c28ec70ba52dc3118ea",
+      "after_sha256": "ed81642bc3ac09f229da10680d05a285af36bf834dd92c28ec70ba52dc3118ea"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "ab754ba2fc8993343d2b210693c41fcad4e6af4cf31e30dc8b1e313783a2f2a6",
+      "after_sha256": "ab754ba2fc8993343d2b210693c41fcad4e6af4cf31e30dc8b1e313783a2f2a6"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "80c2c924b4aabb1c9654aabc513820cdb858b81cbe560015be8e211572ff1e3a",
+      "after_sha256": "80c2c924b4aabb1c9654aabc513820cdb858b81cbe560015be8e211572ff1e3a"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "c0451365c9b6c71b1958010cdb39aef02fc5d729f546245b4f1213fae38067d8",
+      "after_sha256": "c0451365c9b6c71b1958010cdb39aef02fc5d729f546245b4f1213fae38067d8"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "9ebca32bf4829ee020673a6257db12b409f4e639f061a6714fbf1318e096ab2e",
+      "after_sha256": "9ebca32bf4829ee020673a6257db12b409f4e639f061a6714fbf1318e096ab2e"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "78c82c7d02dd2296b8fd244c4a07e4b2d33a0b0b30457c90e8736d6a10857636",
+      "after_sha256": "78c82c7d02dd2296b8fd244c4a07e4b2d33a0b0b30457c90e8736d6a10857636"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "87ed5813cd7a992b0c795c9b22e5b46a109e0a7ffe5b546d0c7b34ed4203cba5",
+      "after_sha256": "87ed5813cd7a992b0c795c9b22e5b46a109e0a7ffe5b546d0c7b34ed4203cba5"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "9e7b628f0177a1c5f671845fe46360eaffaa23a625a9d779f7d8c51978969474",
+      "after_sha256": "9e7b628f0177a1c5f671845fe46360eaffaa23a625a9d779f7d8c51978969474"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "df56c5d324e7111c14ea9eac2887551629f62dfbfa9ad93fbc45af8be3ea1833",
+      "after_sha256": "df56c5d324e7111c14ea9eac2887551629f62dfbfa9ad93fbc45af8be3ea1833"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "073ed8decf891918185b2465b9d478e3f4439b98820add691886e254d5fef56d",
+      "after_sha256": "073ed8decf891918185b2465b9d478e3f4439b98820add691886e254d5fef56d"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "f85f9d79d94e55779c341f92fca26ef4e5a8f5e1c767976d4185ecfb98ac80f1",
+      "after_sha256": "f85f9d79d94e55779c341f92fca26ef4e5a8f5e1c767976d4185ecfb98ac80f1"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "a54a53467ffa54ab8f416c4bd41a0a2e32aa544b1613df6340b69383091b2a4a",
+      "after_sha256": "a54a53467ffa54ab8f416c4bd41a0a2e32aa544b1613df6340b69383091b2a4a"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "29331e9920f5eb722603dcd0f645a7e9507a35a22c3b83d7433cda5e7d2e09e8",
+      "after_sha256": "29331e9920f5eb722603dcd0f645a7e9507a35a22c3b83d7433cda5e7d2e09e8"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "dccc0bf832075f9956e17ca233b1eb260546531cb4c2579ce46a20f3e686fa3c",
+      "after_sha256": "dccc0bf832075f9956e17ca233b1eb260546531cb4c2579ce46a20f3e686fa3c"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "e65de909ef19153fb44204f30295d8db6ec74b755fb15269e4e97dad01ddc4bf",
+      "after_sha256": "e65de909ef19153fb44204f30295d8db6ec74b755fb15269e4e97dad01ddc4bf"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "0c5ae5c5c94274404a916b6d1965c1503f66e142708bc3ecff84271f2cf085eb",
+      "after_sha256": "0c5ae5c5c94274404a916b6d1965c1503f66e142708bc3ecff84271f2cf085eb"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "38214e3e51c293d145a2828c45c258b716cf025b9395c6ec521758d26dca9c52",
+      "after_sha256": "38214e3e51c293d145a2828c45c258b716cf025b9395c6ec521758d26dca9c52"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "9306143b4cb5a4b6684e71958e7cc8d15bca9c39154352ee93296c9a63ed166f",
+      "after_sha256": "9306143b4cb5a4b6684e71958e7cc8d15bca9c39154352ee93296c9a63ed166f"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "2d1a8073638ecd1638fd5baa6fe640347761bbf9872d911df18aae3aec13a422",
+      "after_sha256": "2d1a8073638ecd1638fd5baa6fe640347761bbf9872d911df18aae3aec13a422"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "9cd41110b80964278fb3efebd19454f83685560f960cb87b79384aed41be12b7",
+      "after_sha256": "9cd41110b80964278fb3efebd19454f83685560f960cb87b79384aed41be12b7"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "5340c0f02a535a01f15837f03a7a7e2e600caeadf98e2d1b1bc08f90d47f7e74",
+      "after_sha256": "5340c0f02a535a01f15837f03a7a7e2e600caeadf98e2d1b1bc08f90d47f7e74"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "95be0a26eef71420f8ddebe55c00e244579dc0db879dae1d049866571b51cc8b",
+      "after_sha256": "95be0a26eef71420f8ddebe55c00e244579dc0db879dae1d049866571b51cc8b"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "1b4c6bb04f125c7eb65c611dddebe667cfc5e6780eda88e4073588f9263497a5",
+      "after_sha256": "1b4c6bb04f125c7eb65c611dddebe667cfc5e6780eda88e4073588f9263497a5"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "ffda396b5dbcbd99879157c95edc6d1734d03a3e1e65ffc7ed44163b9b7f3f8a",
+      "after_sha256": "ffda396b5dbcbd99879157c95edc6d1734d03a3e1e65ffc7ed44163b9b7f3f8a"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "6279c7676117d4adf47c5e1bbb1fe3b80c96793cc65d93b1917d763f86171b91",
+      "after_sha256": "6279c7676117d4adf47c5e1bbb1fe3b80c96793cc65d93b1917d763f86171b91"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "beedc9fc24e225fcf3b6aba44e94c1072d0545a700826e4947c04a1111995502",
+      "after_sha256": "beedc9fc24e225fcf3b6aba44e94c1072d0545a700826e4947c04a1111995502"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "5aab4f285a31063730d188aa33a97b2eeef95ee3a4b61817016435d11d94d645",
+      "after_sha256": "5aab4f285a31063730d188aa33a97b2eeef95ee3a4b61817016435d11d94d645"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "d3281a20388c6b166533c42cc46520ebcfc32aa582f9f47acf016e522e197cc1",
+      "after_sha256": "d3281a20388c6b166533c42cc46520ebcfc32aa582f9f47acf016e522e197cc1"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "be8200150d82c520fb624d5c00a8c905f0b86cf8fe24e738cdcfc7baad19c66e",
+      "after_sha256": "be8200150d82c520fb624d5c00a8c905f0b86cf8fe24e738cdcfc7baad19c66e"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "852fc302933ad041e7d1fa04518eeb8bd99eb3403b579d3f5165f20864dc3a96",
+      "after_sha256": "852fc302933ad041e7d1fa04518eeb8bd99eb3403b579d3f5165f20864dc3a96"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "8b1fddb5ddf88e68a16756decc3268556f25845d0f3ab3ff032a17dbdf2239c0",
+      "after_sha256": "8b1fddb5ddf88e68a16756decc3268556f25845d0f3ab3ff032a17dbdf2239c0"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "a86b290305d80507d0b306a4371e4e0fb022007a737c06745a25f9f99a2c60bc",
+      "after_sha256": "a86b290305d80507d0b306a4371e4e0fb022007a737c06745a25f9f99a2c60bc"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "62a8087fd0e658a9e0e965102282b7d4080bd1e7514107c0a22e82c9bdd05bca",
+      "after_sha256": "62a8087fd0e658a9e0e965102282b7d4080bd1e7514107c0a22e82c9bdd05bca"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "933973764f12ff24721e4a06581240254ed00e7af82c47b3f9105f1ec08cdfdf",
+      "after_sha256": "933973764f12ff24721e4a06581240254ed00e7af82c47b3f9105f1ec08cdfdf"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "744699b7dc77ac26121f18ac3f7c874b71c498c2bc6efe2f379c8a46dfd31173",
+      "after_sha256": "744699b7dc77ac26121f18ac3f7c874b71c498c2bc6efe2f379c8a46dfd31173"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "312ccfe30a831a73d0aace1458ea1bb3a4c55042f2e961b07222c3be8b224251",
+      "after_sha256": "312ccfe30a831a73d0aace1458ea1bb3a4c55042f2e961b07222c3be8b224251"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "65cdf08933e4576213cffa5fe3c98f7d58c617da554c3325a061ab65ed1f786e",
+      "after_sha256": "65cdf08933e4576213cffa5fe3c98f7d58c617da554c3325a061ab65ed1f786e"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "4e25a40f48b7da3c9dc000d64843175c549e85cee9b2380dfab546482f781822",
+      "after_sha256": "4e25a40f48b7da3c9dc000d64843175c549e85cee9b2380dfab546482f781822"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "ed1fae3b455b143e04adc75befd41f596d23eaa7063b70e6cb05aa6d44421945",
+      "after_sha256": "ed1fae3b455b143e04adc75befd41f596d23eaa7063b70e6cb05aa6d44421945"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "c70902fc3799f4548945e9debbece94263b9c2b13749d84c183ecd4cc91823b4",
+      "after_sha256": "c70902fc3799f4548945e9debbece94263b9c2b13749d84c183ecd4cc91823b4"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "301d66408aa7cdc1a721dd32f70076bf155bb045a5d38d824cde4301e0425238",
+      "after_sha256": "301d66408aa7cdc1a721dd32f70076bf155bb045a5d38d824cde4301e0425238"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "cc2ffc3a09d584bec1e9730a6fcae940a1ff0dd936df901413dc86f56a9ca405",
+      "after_sha256": "cc2ffc3a09d584bec1e9730a6fcae940a1ff0dd936df901413dc86f56a9ca405"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "d7495c5d3b410a56355d0fad4544d2dd1a49ef3350dac4edf494a9b5857fc67d",
+      "after_sha256": "d7495c5d3b410a56355d0fad4544d2dd1a49ef3350dac4edf494a9b5857fc67d"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "022e6a5d6492ee676a39094c27e094936b4118e37741575147d77bae4feb57f7",
+      "after_sha256": "022e6a5d6492ee676a39094c27e094936b4118e37741575147d77bae4feb57f7"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "29af8e79dac0fbafb3671c2ad425e78208a13f1710b2a768c1261ddd9f3a4e28",
+      "after_sha256": "29af8e79dac0fbafb3671c2ad425e78208a13f1710b2a768c1261ddd9f3a4e28"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "05aeba9fa6e9b27f3b517d034f5a1bf641cbdc3b9a2866ad864975a86a108022",
+      "after_sha256": "05aeba9fa6e9b27f3b517d034f5a1bf641cbdc3b9a2866ad864975a86a108022"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "4e26aafc07749964a0f126cc414c3ce506cb7f6685a9edeed08fb6f235a10fdc",
+      "after_sha256": "4e26aafc07749964a0f126cc414c3ce506cb7f6685a9edeed08fb6f235a10fdc"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "3990fb0bb2835e8671e132915226c526c5475163a8a81ce6aea27957475f529f",
+      "after_sha256": "3990fb0bb2835e8671e132915226c526c5475163a8a81ce6aea27957475f529f"
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "0db2086fb860269cf78a7d2be2702fc62b9a22980958af5030f3ba87c365c3a8",
+      "after_sha256": "0db2086fb860269cf78a7d2be2702fc62b9a22980958af5030f3ba87c365c3a8"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "38820a5a402e833929c238d8690e782d27f57aa89b52002c7daa4e6d459bcdcf",
+      "after_sha256": "38820a5a402e833929c238d8690e782d27f57aa89b52002c7daa4e6d459bcdcf"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "699c7d35cafb598cdc76f4e27247d85d2a8e1a3e71e3b7213845bbef660bcc8f",
+      "after_sha256": "699c7d35cafb598cdc76f4e27247d85d2a8e1a3e71e3b7213845bbef660bcc8f"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "ff191a6ad5a6ae313af3940dc03cf2ae62fb727697eacd1f654d6135bfa7477b",
+      "after_sha256": "ff191a6ad5a6ae313af3940dc03cf2ae62fb727697eacd1f654d6135bfa7477b"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "c6d880f901e28e7a2605166276ab832ae76dcfdc65bce8ad3303da882e177354",
+      "after_sha256": "c6d880f901e28e7a2605166276ab832ae76dcfdc65bce8ad3303da882e177354"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "c19758cd74b86dd3c536025a1bb6fb4fe67464ce8cbf99805afa87b9d54afd3a",
+      "after_sha256": "c19758cd74b86dd3c536025a1bb6fb4fe67464ce8cbf99805afa87b9d54afd3a"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "61b2dfc73e600c0b69a8a95c0eefaa5581ea024e8cb527c00b1073093c9072df",
+      "after_sha256": "61b2dfc73e600c0b69a8a95c0eefaa5581ea024e8cb527c00b1073093c9072df"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "6464a9e9f2fb24447f1e6032bfe39c8f1bcc25cf4de0e0065d270c3b5edcb2c9",
+      "after_sha256": "6464a9e9f2fb24447f1e6032bfe39c8f1bcc25cf4de0e0065d270c3b5edcb2c9"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "27d202e882922d03f249339142175e40ca693dee3542317e3d56506c6e261464",
+      "after_sha256": "27d202e882922d03f249339142175e40ca693dee3542317e3d56506c6e261464"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "89ef8859e0adcf1988a514028990ee42df070a0b99eaffea4675e3cf546df7bd",
+      "after_sha256": "89ef8859e0adcf1988a514028990ee42df070a0b99eaffea4675e3cf546df7bd"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "d17b7266068ba51b93b136cd47912a0378060ad377d2e377d864efdef32ce269",
+      "after_sha256": "d17b7266068ba51b93b136cd47912a0378060ad377d2e377d864efdef32ce269"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "93b1714c155632dc82ade2422fb73914506a7528f55dcade848961d0410d0195",
+      "after_sha256": "93b1714c155632dc82ade2422fb73914506a7528f55dcade848961d0410d0195"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "9bcc3743694f26cfdc3370203c9a0a1b496608a1f45e51339d14ae984c63a2f1",
+      "after_sha256": "9bcc3743694f26cfdc3370203c9a0a1b496608a1f45e51339d14ae984c63a2f1"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "d0720fa16fb564672be52babdbd1e47409718bfcf82181a138b784d40150c5c7",
+      "after_sha256": "d0720fa16fb564672be52babdbd1e47409718bfcf82181a138b784d40150c5c7"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "7a2a5cbc1aee7b1d742833a9fb6b30a86f1261eccb90c240436caddb6e5f097a",
+      "after_sha256": "7a2a5cbc1aee7b1d742833a9fb6b30a86f1261eccb90c240436caddb6e5f097a"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "cf5840fe3cb41a65136f1ade4bbc095a8542c5891b31ebe0d40e1d60df6e6ec8",
+      "after_sha256": "cf5840fe3cb41a65136f1ade4bbc095a8542c5891b31ebe0d40e1d60df6e6ec8"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "242fcb890cfbc0cca073381c3c689666d65e1e02e2cf48fe4cf62873d90a2189",
+      "after_sha256": "242fcb890cfbc0cca073381c3c689666d65e1e02e2cf48fe4cf62873d90a2189"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "612b15b807d5c61944d1962f17badc8da4909dac9b16709570dd1f88d4e751c4",
+      "after_sha256": "612b15b807d5c61944d1962f17badc8da4909dac9b16709570dd1f88d4e751c4"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "a6e279e21f4eb0e290026047987888676f11ea32961d71f994f6a93ce2d31897",
+      "after_sha256": "a6e279e21f4eb0e290026047987888676f11ea32961d71f994f6a93ce2d31897"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "09a2c6298f0629250f79121cc949bf598ce593f675a8a00aba7c64b8070ee42d",
+      "after_sha256": "09a2c6298f0629250f79121cc949bf598ce593f675a8a00aba7c64b8070ee42d"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "649c6be28aa8f45637e98cdf34b3db23a08cec2fda918659daecf64808a62be0",
+      "after_sha256": "649c6be28aa8f45637e98cdf34b3db23a08cec2fda918659daecf64808a62be0"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "085be9e59f6ae125154a6da36812f19ff369a2582f85d23f2941833775c508a5",
+      "after_sha256": "085be9e59f6ae125154a6da36812f19ff369a2582f85d23f2941833775c508a5"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "667d71a9fdf74600da1349dc017d700919ad9d2b230f324113c65e4cb9fb1d72",
+      "after_sha256": "667d71a9fdf74600da1349dc017d700919ad9d2b230f324113c65e4cb9fb1d72"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "7d5d434129f902d924837f549578859ea4caabcd919b9fea08b80580e5c82c4f",
+      "after_sha256": "7d5d434129f902d924837f549578859ea4caabcd919b9fea08b80580e5c82c4f"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "adda2b6599568d518fe681123669d60fac3cf04b5bebd0e61283ef257918ae6c",
+      "after_sha256": "adda2b6599568d518fe681123669d60fac3cf04b5bebd0e61283ef257918ae6c"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "6c6b64bbc3a186a2285f89851e7c128a10861260946f0bcecd92fe8f3846768f",
+      "after_sha256": "6c6b64bbc3a186a2285f89851e7c128a10861260946f0bcecd92fe8f3846768f"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "08e749d08137c00e6224c3f04b20291c29f6de6ef32a1b4e46322146bafa994a",
+      "after_sha256": "08e749d08137c00e6224c3f04b20291c29f6de6ef32a1b4e46322146bafa994a"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "b77c2fd463019842d7d9d31e88824d598c188d28cfcb27f2b35bd077781bd10e",
+      "after_sha256": "b77c2fd463019842d7d9d31e88824d598c188d28cfcb27f2b35bd077781bd10e"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "5a321dc02df8edfa5f0687c83c36dc0266fb5f1843ad7da9f4ac369d16748cb2",
+      "after_sha256": "5a321dc02df8edfa5f0687c83c36dc0266fb5f1843ad7da9f4ac369d16748cb2"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "678b3dcf6c29c659482cb7a36c08d0f948c9fa0681bf6e7f9621ad99a60484d3",
+      "after_sha256": "678b3dcf6c29c659482cb7a36c08d0f948c9fa0681bf6e7f9621ad99a60484d3"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "a7dd344cb6ffa4a92cfe6706e9f47c3d4d40b7329f1310d93190e2a8d3526566",
+      "after_sha256": "a7dd344cb6ffa4a92cfe6706e9f47c3d4d40b7329f1310d93190e2a8d3526566"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "ea5f3612cfb9ffa303f46eaa4e4cdbb274b9a247ba47290a15d4dee1d6129a1c",
+      "after_sha256": "ea5f3612cfb9ffa303f46eaa4e4cdbb274b9a247ba47290a15d4dee1d6129a1c"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "compact",
+      "equal": true,
+      "before_sha256": "9512b7749532dde8d3d90443ef4dcbc5c4bb3389b6ef8d67d04216b26e43541d",
+      "after_sha256": "9512b7749532dde8d3d90443ef4dcbc5c4bb3389b6ef8d67d04216b26e43541d"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "copied-notice",
+      "equal": true,
+      "before_sha256": "8d2bca054cb27554ce7a8dff3a53658d9c0ce2aaf6f178677c3a44761795bc34",
+      "after_sha256": "8d2bca054cb27554ce7a8dff3a53658d9c0ce2aaf6f178677c3a44761795bc34"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "copy-confirmation",
+      "equal": true,
+      "before_sha256": "be95a9ce447e22ae6b456f38f0001b3373d259d4ceb44dd581ee54e5b4825c68",
+      "after_sha256": "be95a9ce447e22ae6b456f38f0001b3373d259d4ceb44dd581ee54e5b4825c68"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "damaged-library",
+      "equal": true,
+      "before_sha256": "f50d8e9a06ac2dbf05db6ab057baf2257ec5adf65295befba12b305ef85cca3d",
+      "after_sha256": "f50d8e9a06ac2dbf05db6ab057baf2257ec5adf65295befba12b305ef85cca3d"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "dark",
+      "equal": true,
+      "before_sha256": "1b4c6bb04f125c7eb65c611dddebe667cfc5e6780eda88e4073588f9263497a5",
+      "after_sha256": "1b4c6bb04f125c7eb65c611dddebe667cfc5e6780eda88e4073588f9263497a5"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "empty",
+      "equal": true,
+      "before_sha256": "28e8760182c71f3cdcedbd491bfe598e171ca897cc8d33dca7ea894f5086fa94",
+      "after_sha256": "28e8760182c71f3cdcedbd491bfe598e171ca897cc8d33dca7ea894f5086fa94"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "file-kept-menu",
+      "equal": true,
+      "before_sha256": "a52222f94f12e8fc2d4b14e7fc48756333883e10d0b9778d55f4164f75c053a2",
+      "after_sha256": "a52222f94f12e8fc2d4b14e7fc48756333883e10d0b9778d55f4164f75c053a2"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "first-run",
+      "equal": true,
+      "before_sha256": "fbe93445e7b80f2312da5cc8c771676663dd9b27a76f94e350d3b1c53e015974",
+      "after_sha256": "fbe93445e7b80f2312da5cc8c771676663dd9b27a76f94e350d3b1c53e015974"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "high-contrast",
+      "equal": true,
+      "before_sha256": "5aab4f285a31063730d188aa33a97b2eeef95ee3a4b61817016435d11d94d645",
+      "after_sha256": "5aab4f285a31063730d188aa33a97b2eeef95ee3a4b61817016435d11d94d645"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "invalid-settings",
+      "equal": true,
+      "before_sha256": "6ffce6aca1991e3fbd828b34785cba090fb0c9cf7985405650f8d4718844f9d2",
+      "after_sha256": "6ffce6aca1991e3fbd828b34785cba090fb0c9cf7985405650f8d4718844f9d2"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "keys",
+      "equal": true,
+      "before_sha256": "f909bb2826234210066423501ab9ee25fc0c9b9e979ff37971c563386d9cbb13",
+      "after_sha256": "f909bb2826234210066423501ab9ee25fc0c9b9e979ff37971c563386d9cbb13"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "large-text",
+      "equal": true,
+      "before_sha256": "c528e5a8314c311867e1795ae28ac51db23963fc32f2e37ca30b4fd77dbc0433",
+      "after_sha256": "c528e5a8314c311867e1795ae28ac51db23963fc32f2e37ca30b4fd77dbc0433"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "larger-text",
+      "equal": true,
+      "before_sha256": "d0720fa16fb564672be52babdbd1e47409718bfcf82181a138b784d40150c5c7",
+      "after_sha256": "d0720fa16fb564672be52babdbd1e47409718bfcf82181a138b784d40150c5c7"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "loading",
+      "equal": true,
+      "before_sha256": "20f598d245b8cd04fe9cd323cff611339c036e5aadf3bd290f372ef206deee31",
+      "after_sha256": "20f598d245b8cd04fe9cd323cff611339c036e5aadf3bd290f372ef206deee31"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "long-titles",
+      "equal": true,
+      "before_sha256": "9e01c66073f4f090693a89557951acc1f8cb86b86ab08485cef5e7657f728674",
+      "after_sha256": "9e01c66073f4f090693a89557951acc1f8cb86b86ab08485cef5e7657f728674"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "many-results",
+      "equal": true,
+      "before_sha256": "3ec75a11b207f5131aafdc81ba0df2d10eea36be527a908d7874a0283b8d75c6",
+      "after_sha256": "3ec75a11b207f5131aafdc81ba0df2d10eea36be527a908d7874a0283b8d75c6"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "menu-open",
+      "equal": true,
+      "before_sha256": "b5ea58710bd4cfecfea5017b92ad6fad33ec573436a0778b31e51b1acc8fce01",
+      "after_sha256": "b5ea58710bd4cfecfea5017b92ad6fad33ec573436a0778b31e51b1acc8fce01"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "missing-file",
+      "equal": true,
+      "before_sha256": "473f8541ca9945723a7b636145b9aa0451e0a26f70858a15f578e814f7eaef38",
+      "after_sha256": "473f8541ca9945723a7b636145b9aa0451e0a26f70858a15f578e814f7eaef38"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "no-results",
+      "equal": true,
+      "before_sha256": "0268425427dfd1acd87e1b4bc0b5a49396c95d265203dd49ac3ca8a98f66ff31",
+      "after_sha256": "0268425427dfd1acd87e1b4bc0b5a49396c95d265203dd49ac3ca8a98f66ff31"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "pinned",
+      "equal": true,
+      "before_sha256": "2e79488361421c3a23df867675c46c2cd391d6f97bc999df785d78c67bfec263",
+      "after_sha256": "2e79488361421c3a23df867675c46c2cd391d6f97bc999df785d78c67bfec263"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "rtl",
+      "equal": true,
+      "before_sha256": "4ec33fd2eef23b1ac43ea6ab409f263a904e994d44d93eaa9c983e70a79623dc",
+      "after_sha256": "4ec33fd2eef23b1ac43ea6ab409f263a904e994d44d93eaa9c983e70a79623dc"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "spacious",
+      "equal": true,
+      "before_sha256": "b973105399ac8e35726ab9bf1757f6eb845208efdc21e1d7abbf384e0b9e78e3",
+      "after_sha256": "b973105399ac8e35726ab9bf1757f6eb845208efdc21e1d7abbf384e0b9e78e3"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "toolbar-menu-filtered",
+      "equal": true,
+      "before_sha256": "0608e2ba17116f8742089e442fee1e82f1822479b74da5e1f080038a726851a2",
+      "after_sha256": "0608e2ba17116f8742089e442fee1e82f1822479b74da5e1f080038a726851a2"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "toolbar-menu",
+      "equal": true,
+      "before_sha256": "bfe4ab1557056123eaa4b45f287687049d3e435157f80873f59ed1c9038a9d83",
+      "after_sha256": "bfe4ab1557056123eaa4b45f287687049d3e435157f80873f59ed1c9038a9d83"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-20",
+      "equal": true,
+      "before_sha256": "7ea131c4d933139f385127ffd384b3957b1d121c7c4cae7bad48d49b9f0d7ec5",
+      "after_sha256": "7ea131c4d933139f385127ffd384b3957b1d121c7c4cae7bad48d49b9f0d7ec5"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-40",
+      "equal": true,
+      "before_sha256": "640d8245a50129f64efde874be99dc76fd068acb535f0faa7f6767c11e34764a",
+      "after_sha256": "640d8245a50129f64efde874be99dc76fd068acb535f0faa7f6767c11e34764a"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-50",
+      "equal": true,
+      "before_sha256": "e865263790aeb4d87a7fbe4ddf5aa8014514f8536c48cd1d2478ccea80a0ce07",
+      "after_sha256": "e865263790aeb4d87a7fbe4ddf5aa8014514f8536c48cd1d2478ccea80a0ce07"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-preview",
+      "equal": true,
+      "before_sha256": "dc8b53a664ac2f2fc294e063fc8dbe5aca907cf49b86f5c50495bddd1163bc88",
+      "after_sha256": "dc8b53a664ac2f2fc294e063fc8dbe5aca907cf49b86f5c50495bddd1163bc88"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray",
+      "equal": true,
+      "before_sha256": "a4c06a750ba58fd1d32b82a1eae57302e76f7a7455920bf65dc47c2ab6562d60",
+      "after_sha256": "a4c06a750ba58fd1d32b82a1eae57302e76f7a7455920bf65dc47c2ab6562d60"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "zotero-kept",
+      "equal": true,
+      "before_sha256": "160260b92470656bfa77eb6043f4882a688317daaaf6b6a16b07f39893b84c3d",
+      "after_sha256": "160260b92470656bfa77eb6043f4882a688317daaaf6b6a16b07f39893b84c3d"
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "zotero-updated",
+      "equal": true,
+      "before_sha256": "0407869bd6a0e61181a6575779495f2a10b67c5bf16a78c7e02146d1b6e58d05",
+      "after_sha256": "0407869bd6a0e61181a6575779495f2a10b67c5bf16a78c7e02146d1b6e58d05"
+    }
+  ]
+}
