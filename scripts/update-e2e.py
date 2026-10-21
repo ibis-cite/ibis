@@ -707,14 +707,13 @@ function Contract-Result($pressed,$how) {
  if($probe.attempted -ne ($expected -or $Scenario -eq 'uncertain')) {throw 'Incorrect attempt metadata'}
  if($probe.blocked -ne ($Scenario -notin @('pane','button','wrong-window','wrong-name','case-name','case-window','missing-window'))) {throw 'Unsafe observation can poll'}
  if($expected -and $how -ne 'invoke') {throw 'Incorrect invocation metadata'}
- Write-Output 'contract passed'
 }
 '''
-        # Replace only output to inspect activation counters before the child exits.
+        # Assert activation counters, retaining real serialization for the caller.
         helper = WINDOWS_LOOK.replace("Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes", "")
         helper = helper.replace("System.Windows.Automation.", "IbisUpdateContract.")
-        start, end = helper.index("function Answer("), helper.index("try {\n  $ids")
-        helper = helper[:start] + "function Answer($pressed,$how) { Contract-Result $pressed $how }\n" + helper[end:]
+        helper = helper.replace("function Answer($pressed, $how) {",
+                                "function Answer($pressed, $how) {\n  Contract-Result $pressed $how")
         with tempfile.TemporaryDirectory() as temporary:
             script = Path(temporary) / "update-contract.ps1"
             script.write_text(model + helper, encoding="utf-8")
@@ -725,7 +724,15 @@ function Contract-Result($pressed,$how) {
                     result = subprocess.run([shutil.which("pwsh"), "-NoProfile", "-File", str(script), scenario],
                                             capture_output=True, timeout=30)
                     self.assertEqual(result.returncode, 0, (result.stdout + result.stderr).decode("utf-8", errors="replace"))
-                    self.assertEqual(result.stdout.decode("utf-8").strip(), "contract passed")
+                    payload = result.stdout.decode("utf-8")
+                    pressed, _, probe = look_result(payload)
+                    with patch(__name__ + ".powershell", return_value=payload):
+                        if probe["blocked"]:
+                            with self.assertRaises(WindowsActivationFailure):
+                                Windows.__new__(Windows).look({42}, BUTTON)
+                        else:
+                            self.assertEqual(Windows.__new__(Windows).look({42}, BUTTON)[0], scenario in ("pane", "button"))
+                    self.assertEqual(pressed, scenario in ("pane", "button"))
 
     def test_windows_activation_uncertainty_is_fatal_instead_of_pollable(self):
         windows = Windows.__new__(Windows)
