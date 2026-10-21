@@ -1993,6 +1993,32 @@ test("the footer says what Enter will copy, and holding Alt shows the other keys
   expect(footerKeys()).not.toContain("Esc");
 });
 
+test.each([false, true])("Search hint layout survives pointer focus moving to More (Alt=%s)", async (alt) => {
+  backend({ search: () => [result("a", "First")] });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  if (alt) fireEvent.keyDown(box, { key: "Alt", altKey: true });
+  const hints = screen.getByRole("group", { name: "Keys" });
+  const searchHint = hints.firstElementChild!;
+  const text = searchHint.textContent;
+  expect(text).toContain(alt ? "Add to citation" : "Copy as Pandoc");
+  const more = screen.getByRole("button", { name: /^More/ });
+  fireEvent.pointerDown(more, { button: 0 });
+  // JSDOM does not perform the browser's pointer-down focus default.
+  act(() => more.focus());
+  expect(searchHint.isConnected).toBe(true);
+  expect(searchHint.textContent).toBe(text);
+  expect(searchHint.getAttribute("aria-hidden")).toBe("true");
+  fireEvent.pointerUp(more, { button: 0 });
+  fireEvent.click(more);
+  expect(await screen.findByRole("menu")).toBeTruthy();
+  fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+  expect(document.activeElement).toBe(more);
+  act(() => box.focus());
+  expect(searchHint.getAttribute("aria-hidden")).toBe("false");
+});
+
 test("the footer names the source and count, the age only when it matters, and the detail in More", async () => {
   const plain = (text: string | null | undefined) => text?.replace(/[\u2068\u2069]/g, "");
   let status: Record<string, unknown> = { state: "loaded", has_snapshot: true, zotero: true, snapshot_zotero: true, stale: false,
