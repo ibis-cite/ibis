@@ -41,8 +41,7 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico",
-      "icons/linux/512x512/io.github.ibiscite.ibis.png",
-      "icons/source/Ibis.icon"
+      "icons/linux/512x512/io.github.ibiscite.ibis.png"
     ],
     "macOS": {
       "signingIdentity": "-"

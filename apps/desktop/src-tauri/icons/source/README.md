@@ -20,11 +20,15 @@ The ICNS face is 824px in a 1024px canvas. Its 16/32px images use the small
 master (including the 16pt @2x entry). The Windows 16/24px images use the small
 master. The GNOME face has a 4px front profile on the 128px grid.
 
-`Ibis.icon` has three separate parts: the root gradient fill, the bird group,
-and the eye group. Xcode 27.1's `actool` compiles it to `Assets.car`; the locked
-Tauri CLI/bundler supports that path and discovers `CFBundleIconName` with
-`assetutil`. Older macOS keeps the explicit ICNS fallback. These tools require
-Xcode 26 or later; never add a guessed compiled catalog.
+macOS ships **ICNS only**, the fallback explicitly allowed by #579.
+`Ibis.icon` is retained as an **unshipped prototype** with three separate parts:
+the root gradient fill, the bird group and the eye group. The locked Tauri
+CLI/bundler has an `Assets.car` / `CFBundleIconName` path, but the actual app
+bundle at `492fb6f` failed with `actool: Bad file descriptor`. Focused controls
+also fail; the cause is unknown. Earlier direct compilations succeeded, which
+does not establish reliable shipping. The hosted preview path also defaults
+to Xcode 16.4, where the bundler skips the catalog. [#663](https://github.com/ibiscite/ibis/issues/663)
+tracks reliable layered delivery; no workflow or toolchain change is made here.
 Icon Composer orders groups front to back, so the eye is listed before the bird.
 
 For example, export a template view with the bundled Apple CLI (on macOS):
@@ -41,15 +45,16 @@ sizes 128, 32 and 16 for the review set. `../review/` holds the labelled sheets,
 source commit, file hashes and binary audit. Those are CLI exports composited on
 synthetic backgrounds, not native editor, Dock or taskbar screenshots.
 
-Two platform adaptations need the maintainer's final look. Windows uses the
+The Windows adaptation needs the maintainer's final look. Windows uses the
 same curves in G1 on transparency, with an eye cutout, to satisfy the no-tile
 requirement. Its `viewBox="20 19 70 70"` fits the unchanged bird curves into
 the Windows slot with about one pixel of clearance at 16px, instead of keeping
 the plate's empty margins. This is a proposed adaptation, not a recovered
 board-R master.
-Dark explicitly retains G1 and the white bird: the board's darker endpoint colours were not
-available in the public specification. Clear and Tinted are Apple's treatment
-of the layered source. No custom lighting, shadow or glow is baked into it.
+The unshipped layered prototype's Dark explicitly retains G1 and the white bird:
+the board's darker endpoint colours were not available in the public
+specification. Clear and Tinted are Apple's treatment of that prototype, not
+shipped appearances. No custom lighting, shadow or glow is baked into it.
 
 The Linux `deb.files` and `appimage.files` maps install the three named hicolor
 PNGs and symbolic SVG. The shared Debian desktop template (also used by the

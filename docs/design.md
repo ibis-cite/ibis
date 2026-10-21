@@ -152,9 +152,10 @@ and other (chosen from its CSL type). They never reuse an attachment drawing
 **App icon (#579).** Direction 1, the ibis, variation B (upright stance and
 shortened neck), gradient G1 (`#e5532d` to `#c0361a`). The desktop assets now
 come from the approved optical transform, with separate small and symbolic
-masters and an Icon Composer layered source. [Regeneration and delivery limits](../apps/desktop/src-tauri/icons/source/README.md)
-record the proposed Windows unplated adaptation, the missing darker-G1 board
-colours and native acceptance still needed. The maintainer's final rendered-size
+masters. macOS uses the issue's authorised ICNS-only fallback; the layered
+source is an unshipped prototype pending #663. [Regeneration and delivery limits](../apps/desktop/src-tauri/icons/source/README.md)
+record the proposed Windows unplated adaptation and native acceptance still
+needed. The maintainer's final rendered-size
 look remains required before merge.
 
 **Per platform.** Only these change:

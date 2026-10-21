@@ -24,7 +24,7 @@ test("bundle icons are the approved B/G1 sources and have their declared sizes",
   const sizes = { "32x32.png": 32, "128x128.png": 128, "128x128@2x.png": 256 };
   expect(config.bundle.icon).toEqual([
     ...Object.keys(sizes).map((name) => `icons/${name}`), "icons/icon.icns", "icons/icon.ico",
-    "icons/linux/512x512/io.github.ibiscite.ibis.png", "icons/source/Ibis.icon",
+    "icons/linux/512x512/io.github.ibiscite.ibis.png",
   ]);
   for (const [name, size] of Object.entries({ ...sizes, "source.png": 1024, "icon.png": 1024 })) {
     expect(pngSize(read(name))).toEqual([size, size]);
