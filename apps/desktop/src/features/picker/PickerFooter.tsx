@@ -1,8 +1,9 @@
 import type React from "react";
 import type { LibraryStatus } from "../../api";
-import { keysFor } from "../../keys";
+import { ariaKeys, keysFor } from "../../keys";
 import { LibraryStatusLine } from "../../LibraryStatusLine";
 import { keyText, pickerText } from "../../messages";
+import { isMac } from "../../platform";
 import { KeyHint } from "../../ui/KeyCaps";
 
 /** What the keys do now; null where a key does nothing. */
@@ -10,14 +11,13 @@ export type KeyHints = { enter: string | null; shiftEnter: string | null; escape
 
 /** The footer: library status, what Enter (or, with Alt held, the other keys)
  * does now, and the More button with its menu. */
-export function PickerFooter({ library, groupName, hints, altHeld, searchFocused, more }: {
+export function PickerFooter({ library, groupName, hints, altHeld, actions, more }: {
   library: LibraryStatus | null | undefined;
   groupName: (id: number) => string;
   hints: KeyHints;
   /** While Alt (⌥) is held, the footer shows the other keys instead of Enter. */
   altHeld: boolean;
-  /** Search-box keys are hidden from screen readers while focus is elsewhere. */
-  searchFocused: boolean;
+  actions: { copy: () => void; add: () => void; escape: () => void; keys: () => void };
   /** The More button and its menu. */
   more: React.ReactNode;
 }) {
@@ -27,11 +27,11 @@ export function PickerFooter({ library, groupName, hints, altHeld, searchFocused
         <LibraryStatusLine library={library} groupName={groupName} />
         <small className="enter-hints" aria-label={keyText.footer} role="group">
           {altHeld ? <>
-            {hints.shiftEnter && <span className="search-hint" aria-hidden={!searchFocused}><KeyHint label={hints.shiftEnter} keys={keysFor("add")} /></span>}
-            <KeyHint label={hints.escape} keys={keysFor("escape")} />
+            {hints.shiftEnter && <FooterAction label={hints.shiftEnter} keys={keysFor("add")} onAction={actions.add} />}
+            <FooterAction label={hints.escape} keys={keysFor("escape")} onAction={actions.escape} />
           </> : <>
-            {hints.enter && <span className="search-hint" aria-hidden={!searchFocused}><KeyHint label={hints.enter} keys={keysFor("copy")} primary /></span>}
-            <span className="shortcuts-hint"><KeyHint label={keyText.allKeys} keys={keysFor("keys")} /></span>
+            {hints.enter && <FooterAction label={hints.enter} keys={keysFor("copy")} primary onAction={actions.copy} />}
+            <FooterAction label={keyText.allKeys} keys={keysFor("keys")} className="shortcuts-hint" onAction={actions.keys} />
           </>}
         </small>
         <span className="more">
@@ -41,4 +41,13 @@ export function PickerFooter({ library, groupName, hints, altHeld, searchFocused
       </section>
     </footer>
   );
+}
+
+function FooterAction({ label, keys, primary, className = "", onAction }: {
+  label: string; keys: string; primary?: boolean; className?: string; onAction: () => void;
+}) {
+  return <button type="button" className={`quiet-button footer-action ${className}`} aria-label={label}
+    aria-keyshortcuts={ariaKeys(keys, isMac)} onClick={onAction}>
+    <KeyHint label={label} keys={keys} primary={primary} hidden />
+  </button>;
 }
