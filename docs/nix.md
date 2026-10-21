@@ -1,48 +1,89 @@
-# Nix installation
+# Install with Nix
 
-**Draft, not installable yet.** The package is being validated in #664. Its
-Nixpkgs revision and pnpm tool tarball are pinned, but the generated flake lock
-and pnpm dependency-store hash must be recorded before installation is offered.
-No Nix evaluation, package build or graphical runtime check has passed yet.
+The repository flake targets the desktop app on `x86_64-linux`. macOS, Windows
+and other Linux architectures are not offered. Enable Nix's `nix-command` and
+`flakes` features before using these commands. Building can take several minutes.
 
-The first target is `x86_64-linux`. macOS, Windows and other Linux architectures
-are not offered by this flake. The package contains the desktop app; its program
-is `ibis-desktop`, distinct from the developer CLI named `ibis`.
+```sh
+nix build github:ibiscite/ibis#ibis
+nix run github:ibiscite/ibis#ibis
+nix profile add github:ibiscite/ibis#ibis
+```
 
-The package uses the Nixpkgs Tauri and pnpm hooks with the repository's existing
-Cargo and pnpm locks. pnpm 11.25.0 matches `packageManager`; its official npm
-tarball was checked against npm's integrity value. The pinned Nixpkgs supplies
-Rust 1.99.0, which satisfies the workspace's Rust 1.90 minimum. Nix invokes its
-own compiler directly, so `rust-toolchain.toml` does not download another Rust
-toolchain during the build. Cargo and pnpm install dependencies offline in the
-sandbox after their fixed-output fetches have completed.
+The installed program is `ibis-desktop`; the developer CLI `ibis` is not included.
+After a profile install, Ibis also appears in your desktop's application menu
+when its Nix profile is included in the session's `XDG_DATA_DIRS`.
 
-Nix manages upgrades. This build removes the update key and feed through a
-package-only Tauri configuration merge, so the automatic-update question and
-manual in-app installer are unavailable. A build check inspects the executable
-for the launcher path and rejects the original key or feed.
+From a checkout, use `nix build .#ibis` and `nix run .#ibis`. To reproduce an
+application revision, replace `github:ibiscite/ibis` with
+`github:ibiscite/ibis/COMMIT`, using the full commit ID.
 
-The desktop launcher includes the GTK/WebKit environment and the dynamically
-loaded AppIndicator library. Starting at login uses that public wrapper through
-a compile-time package setting. An entry made by Ibis points to this package's
-store generation. For automatic changes of generation, prefer a declarative
-autostart entry managed alongside the package; its configuration will follow
-your NixOS or Home Manager rebuild. Do not configure both methods.
+## NixOS and Home Manager
 
-## Validation
+Add `inputs.ibis.url = "github:ibiscite/ibis";` to your configuration flake. Its
+lock file pins the application; Ibis's lock pins its own build tools and libraries.
+Pass `inputs` to NixOS through `specialArgs`, or to Home Manager through
+`extraSpecialArgs`. Then use this in a NixOS module:
 
-The temporary CI bootstrap in the existing CI workflow computes `flake.lock`
-and the pnpm store hash using Nixpkgs' `nix-prefetch` with `fetchPnpmDeps`.
-Generated inputs are preserved as a workflow artifact, then reviewed and
-committed. That job does not claim a working package. Once inputs are recorded,
-the final job will evaluate, build in the Nix sandbox and inspect the installed
-desktop entry, executable and icon separately from graphical runtime checks.
+```nix
+{ inputs, pkgs, ... }:
+{
+  environment.systemPackages = [
+    inputs.ibis.packages.${pkgs.stdenv.hostPlatform.system}.ibis
+  ];
+}
+```
 
-Graphical validation must use synthetic data and check launch, search/copy,
-tray, shortcut, login-entry launcher and absence of update actions. An X11 check
-does not establish Wayland shortcut support; see [compatibility.md](compatibility.md).
+For Home Manager, use the same package in `home.packages` instead of
+`environment.systemPackages`. Update with `nix flake update ibis`, then rebuild
+your NixOS or Home Manager configuration. For a profile installation, use
+`nix profile list` to find its name, then `nix profile upgrade NAME`.
 
-The packaging contracts come from the pinned upstream
-[Tauri hook](https://github.com/NixOS/nixpkgs/blob/02c087f3fe673c9e317f206a627cb6b910336dbe/doc/hooks/tauri.section.md),
-[pnpm fetcher](https://github.com/NixOS/nixpkgs/blob/02c087f3fe673c9e317f206a627cb6b910336dbe/pkgs/build-support/node/fetch-pnpm-deps/default.nix)
-and [pnpm packaging](https://github.com/NixOS/nixpkgs/blob/02c087f3fe673c9e317f206a627cb6b910336dbe/pkgs/development/tools/pnpm/generic.nix).
+Nix manages upgrades. This build has no in-app update question or installer:
+its package-only Tauri config removes the update key and feed. Existing settings
+and libraries remain in their normal locations.
+
+Ibis's **Start Ibis when you log in** uses the public Nix wrapper, preserving
+the GTK and tray-library environment. It records that store generation. For an
+autostart entry that follows configuration rebuilds, Home Manager can own it:
+
+```nix
+{ inputs, pkgs, lib, ... }:
+let ibis = inputs.ibis.packages.${pkgs.stdenv.hostPlatform.system}.ibis;
+in {
+  home.packages = [ ibis ];
+  xdg.configFile."autostart/io.github.ibiscite.ibis.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Ibis
+    Exec=${lib.getExe ibis} --at-login
+    Terminal=false
+  '';
+}
+```
+
+Use one autostart method. When Home Manager owns the entry, manage it in your
+configuration instead of toggling it in Ibis. Existing Linux shortcut and tray
+limitations still apply; see [compatibility.md](compatibility.md).
+
+## Build and validation
+
+The reusable expression is `nix/package.nix`. It uses the repository's Cargo
+and pnpm locks and pinned Nixpkgs
+[Tauri](https://github.com/NixOS/nixpkgs/blob/02c087f3fe673c9e317f206a627cb6b910336dbe/doc/hooks/tauri.section.md)
+and [pnpm hooks](https://github.com/NixOS/nixpkgs/blob/02c087f3fe673c9e317f206a627cb6b910336dbe/pkgs/build-support/node/fetch-pnpm-deps/default.nix).
+pnpm 11.25.0 matches `packageManager`; Rust 1.99.0 satisfies the workspace's 1.90
+minimum. Nix invokes its own compiler directly. Dependencies are fetched with
+fixed hashes, then Cargo and pnpm work offline inside the build sandbox.
+
+`nix flake check --no-build` evaluates the package. `nix build .#ibis` builds and
+runs its desktop Rust tests. `nix flake check` also validates the installed
+launcher, desktop entry and referenced icon. The build checks the executable's
+embedded launcher and rejects the original updater key/feed. CI separately runs
+the existing native smoke test against the installed wrapper with synthetic
+data under X11; this does not establish Wayland or hardware-GPU behavior.
+
+Validation status for #664: real Nix inputs were computed and preserved in
+[the bootstrap run](https://github.com/ibiscite/ibis/actions/runs/39544665070).
+Final evaluation, package build, profile installation and graphical runtime
+checks are pending; bootstrap success alone does not verify installation.

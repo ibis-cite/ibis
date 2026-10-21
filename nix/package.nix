@@ -14,7 +14,7 @@
   glib-networking,
   librsvg,
   libayatana-appindicator,
-  pnpmDepsHash,
+  pnpmDepsHash ? lib.fileContents ./pnpm-deps-hash,
 }:
 let
   # Match packageManager exactly; Nixpkgs supplies the packaging machinery.
@@ -32,7 +32,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     src = ../.;
     filter = path: type:
       lib.cleanSourceFilter path type
-      && !(builtins.elem (baseNameOf path) [ ".local" ".claude" "target" "node_modules" "dist" "gen" ]);
+      && !(builtins.elem (baseNameOf path) [ ".local" ".claude" ".env" "target" "node_modules" "dist" "gen" ]);
   };
   cargoLock.lockFile = ../Cargo.lock;
   pnpmDeps = fetchPnpmDeps {
@@ -44,6 +44,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   };
   pnpmRoot = "apps/desktop";
   buildAndTestSubdir = "apps/desktop";
+  cargoBuildFlags = [ "--locked" ];
   cargoTestFlags = [ "--package" "ibis-desktop" ];
   tauriBuildFlags = [ "--config" (builtins.toJSON (builtins.fromJSON (builtins.readFile ./tauri.conf.json))) ];
 

@@ -7,9 +7,7 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
-      ibis = pkgs.callPackage ./nix/package.nix {
-        pnpmDepsHash = throw "Draft: generate and commit the real pnpm dependency hash before building Ibis";
-      };
+      ibis = pkgs.callPackage ./nix/package.nix { };
     in {
       packages.${system} = { inherit ibis; default = ibis; };
       checks.${system}.package = pkgs.callPackage ./nix/checks.nix { inherit ibis; };

@@ -20,6 +20,8 @@ Ibis is free, open source and private by design: everything works offline, nothi
 
 There are two builds. Both are free and run on Windows, macOS and Linux.
 
+For the repository-owned Linux package, see [Install with Nix](docs/nix.md).
+
 | | **Ibis** (releases) | **Ibis Nightly** |
 |---|---|---|
 | What | Numbered previews, tested before release | The newest work from `main`, rebuilt after every change |
