@@ -73,7 +73,7 @@ python3 scripts/smoke-native.py --app target/debug/ibis-desktop \
 python scripts/smoke-native.py --app target/debug/ibis-desktop.exe --output screenshots/smoke-Windows --budgets scripts/smoke-budgets.json
 ```
 
-Exit 0 is a pass, 1 a failure and 2 unavailable, never a pass. `--self-test` tests the harness alone. Linux smoke blocks pull requests; macOS and Windows warn on pull requests and block on `main`, where a failure opens or updates an issue.
+Exit 0 is a pass, 1 a failure and 2 unavailable, never a pass. `--self-test` tests the harness alone. Linux smoke runs in the required `Desktop (ubuntu-24.04)` check and blocks pull requests. macOS and Windows smoke run in the separate `Native UI (…)` jobs on the app the Desktop job built: they are not required checks, so a failure turns that job red without blocking a merge, and on `main` it also opens or updates an issue.
 
 **First-run preferences.** `--first-run-preferences` (instead of `--budgets`) runs the first-run check (#486): choose a writing format, quit, restart and copy, and the copy must use the saved format without choosing it again. Quit must finish within ten seconds. What it does not cover is listed in #238.
 
@@ -87,7 +87,7 @@ Exit 0 is a pass, 1 a failure and 2 unavailable, never a pass. `--self-test` tes
 
 ## Picker screenshots
 
-**Native captures in CI.** CI launches the real app on each platform with the synthetic `real-world.bib` and captures the gallery states listed in `scripts/capture-gallery.py`. Download the `picker-combined-<commit SHA>-attempt-<n>` artifact (kept 14 days) and look at all three platforms. Screenshots have no automatic verdict, and Linux images come from Xvfb, not a real desktop.
+**Native captures in CI.** CI launches the real app on each platform with the synthetic `real-world.bib` and captures the gallery states listed in `scripts/capture-gallery.py`. Each state is captured as soon as the app acknowledges rendering it, after a 1 s settle for the native window to paint; a state that is not acknowledged within 23 s fails the capture. Download the `picker-combined-<commit SHA>-attempt-<n>` artifact (kept 14 days) and look at all three platforms. Screenshots have no automatic verdict, and Linux images come from Xvfb, not a real desktop.
 
 **Browser contact sheet.** `node scripts/gallery-contact-sheet.mjs` renders every gallery state in each platform look, light and dark, normal and Larger text, in Playwright's Chromium at the picker's 720×480. It writes PNGs and a `manifest.json` to `target/gallery-contact-sheet`. Narrow it with `--state`, `--platform`, `--theme` or `--text`. Frames are taken with the pointer outside the window, so hover styles show only in the `pin-hover` frame. `high-contrast` and `forced-colors` use Chromium's own contrast and forced-colours emulation; the native evidence app cannot emulate them, so it keeps the `data-gallery-theme="contrast"` CSS. It needs Playwright with Chromium installed and never downloads a browser. Exit 0 means every frame rendered, 1 that one did not, 2 that Chromium is unavailable. These show layout and colour, not native appearance, so label them "browser render". The same switches work by hand at `/gallery.html` under `pnpm -C apps/desktop dev` (`?platform=`, `?theme=`, `?text=`, `?density=`, `?state=`). The `toolbar-menu` states preview the shared menu component (#585) in the browser only.
 
