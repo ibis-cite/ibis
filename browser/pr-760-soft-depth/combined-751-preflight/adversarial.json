@@ -1,0 +1,1591 @@
+{
+  "source": "Uncommitted UI preflight: main2078154a plus751fcec761a plus760625f7e17; excludes docs and760platform unit-test additions; not a final merge tree",
+  "browser": "Chromium; synthetic browser render, not native",
+  "results": [
+    {
+      "name": "macos-light-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-system200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-system200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-system200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-system200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-system200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-system200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-system200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-system200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-system200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-system200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-system200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-system200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-system200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-system200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-system200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-system200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-system200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-system200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-system200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-system200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 352,
+        "trayScrollWidth": 352,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 712,
+        "trayScrollWidth": 712,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 36px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 351,
+        "trayScrollWidth": 351,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 711,
+        "trayScrollWidth": 711,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 41.4px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-system200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-system200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 344,
+        "trayScrollWidth": 344,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-system200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-system200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "trayWidth": 704,
+        "trayScrollWidth": 704,
+        "title": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "key": "synthetic_01_long_key_long_key_long_key_long_key_long_key_",
+        "removeName": "Remove synthetic_01_long_key_long_key_long_key_long_key_long_key_ from the selection",
+        "mask": "linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px), linear-gradient(rgb(0, 0, 0) calc(100% - 72px), rgba(0, 0, 0, 0.25) calc(100% - 1px))",
+        "more": true
+      },
+      "focused": {
+        "active": true,
+        "mask": "none",
+        "visible": true
+      },
+      "removed": true,
+      "contrast": true,
+      "forcedColors": true
+    }
+  ],
+  "failures": []
+}

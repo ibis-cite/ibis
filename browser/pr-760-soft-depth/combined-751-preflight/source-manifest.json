@@ -1,0 +1,48 @@
+{
+  "base": "2078154ab23e895a6a98b363e5245f8bc605af7f",
+  "tray": "fcec761a7c671451e1d28e14fd0bf176a2536191",
+  "depth": "625f7e17568f08cda40ae133d1e67a9db0316040",
+  "qualification": "UI-only preflight; excludes docs and depth platform unit-test additions; not final merge tree",
+  "files": [
+    {
+      "path": "apps/desktop/src/depth.css",
+      "sha256": "28af6b7cd525cfc66322bf2478ecb6018a7fd37a44ee20718dda30b3984ed442"
+    },
+    {
+      "path": "apps/desktop/src/features/picker/SelectionTray.test.tsx",
+      "sha256": "621ae717cc7eb6286e90a4622b821f37c907b5f2a4c9ee494a86974d9a50335f"
+    },
+    {
+      "path": "apps/desktop/src/features/picker/SelectionTray.tsx",
+      "sha256": "a27fc16b1394f60b875a5015ba5e8975c6852a7d3e7132c00c27da0d909e0db7"
+    },
+    {
+      "path": "apps/desktop/src/macosGlass.test.ts",
+      "sha256": "ce9bd4b77e3670143ac20771a8d3f6ebfdead7dcba0cd0800592c749d0325b8f"
+    },
+    {
+      "path": "apps/desktop/src/motion.test.ts",
+      "sha256": "984307e0336b656647a3527852241b0ed22011e45bf5d764a0e273f393723c4c"
+    },
+    {
+      "path": "apps/desktop/src/platformLooks.test.tsx",
+      "sha256": "064e0c2507742aa93f621df6a11c6b825841fd3b6ee8f7fe0fddb625834ef0ae"
+    },
+    {
+      "path": "apps/desktop/src/styles.css",
+      "sha256": "c8cdabca1b67f36b2358b5c05dc6e5be5d68c598e9154680663e19264939bd43"
+    },
+    {
+      "path": "apps/desktop/src/tokens.css",
+      "sha256": "b039e8a1f13f92b2e26c435a73690eb8e72018cfac5e9dd9ba7a75e7718be06c"
+    },
+    {
+      "path": "scripts/gallery-geometry.mjs",
+      "sha256": "2dc10c1ca961d31840fd65e631d5ede411c69610fee642f02523c82bec9bbbeb"
+    },
+    {
+      "path": "scripts/gallery-geometry.test.mjs",
+      "sha256": "247aaeadd4e439b291dcacc040dede8f257bd999aa92274cc92d09409a7096a9"
+    }
+  ]
+}
