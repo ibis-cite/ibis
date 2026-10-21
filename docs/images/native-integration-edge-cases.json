@@ -14,12 +14,22 @@
   "binary_sha256": "bbaf68c60b84238727332e957c7a911b2aa2ea22bd58ec981a42233aa2d39cbd",
   "assets": [
     {
-      "path": "docs/images/ibis-native-1ef-edge-multilingual.png",
-      "sha256": "1ad940ef70745adab3cd9541709d871dc4e5b53fb4a02afc8d76203ee537e9d9"
+      "path": "docs/images/ibis-native-1ef-edge-multilingual.jpg",
+      "sha256": "1ad940ef70745adab3cd9541709d871dc4e5b53fb4a02afc8d76203ee537e9d9",
+      "dimensions_px": [
+        720,
+        480
+      ],
+      "encoding": "JPEG"
     },
     {
-      "path": "docs/images/ibis-native-1ef-edge-apa-preview.png",
-      "sha256": "65c15acccd29a0bb54a9070623ee14637767c1a28a13886d32c21965fbf250a0"
+      "path": "docs/images/ibis-native-1ef-edge-apa-preview.jpg",
+      "sha256": "65c15acccd29a0bb54a9070623ee14637767c1a28a13886d32c21965fbf250a0",
+      "dimensions_px": [
+        720,
+        480
+      ],
+      "encoding": "JPEG"
     }
   ],
   "observed": [

@@ -24,31 +24,34 @@
   ],
   "images": [
     {
-      "file": "docs/images/picker-639-native-macos27-dark-larger-20.png",
+      "file": "docs/images/picker-639-native-macos27-dark-larger-20.jpg",
       "selected": 20,
       "dimensions_px": [
-        4718592,
-        4292935744
+        720,
+        480
       ],
-      "sha256": "848cffddd23d7df4c9aefb557563d3e96dca0cd20b83f0d758176df125c1eda1"
+      "sha256": "848cffddd23d7df4c9aefb557563d3e96dca0cd20b83f0d758176df125c1eda1",
+      "encoding": "JPEG"
     },
     {
-      "file": "docs/images/picker-639-native-macos27-dark-larger-40.png",
+      "file": "docs/images/picker-639-native-macos27-dark-larger-40.jpg",
       "selected": 40,
       "dimensions_px": [
-        4718592,
-        4292935744
+        720,
+        480
       ],
-      "sha256": "250161a89407c71d359f380eb09c8b4f26a58d0f97ad0bc6f6130e4a60461dd5"
+      "sha256": "250161a89407c71d359f380eb09c8b4f26a58d0f97ad0bc6f6130e4a60461dd5",
+      "encoding": "JPEG"
     },
     {
-      "file": "docs/images/picker-639-native-macos27-dark-larger-50.png",
+      "file": "docs/images/picker-639-native-macos27-dark-larger-50.jpg",
       "selected": 50,
       "dimensions_px": [
-        4718592,
-        4292935744
+        720,
+        480
       ],
-      "sha256": "9ed39820788a651f7e089dcb9f321548d5136a8fe0169b359a284c4093bdc75e"
+      "sha256": "9ed39820788a651f7e089dcb9f321548d5136a8fe0169b359a284c4093bdc75e",
+      "encoding": "JPEG"
     }
   ]
 }
