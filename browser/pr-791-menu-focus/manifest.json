@@ -1,0 +1,129 @@
+{
+  "browser": "Chromium 151.0.7922.34",
+  "kind": "synthetic browser capture",
+  "before": "6a4031a5cefa360ccc193f5c66202b6c643c1540",
+  "after": "5f76874f1d96af75c88c73514c13d8f98b904b0b",
+  "action": "More → Reload; popover fully removed and next frame completed",
+  "images": [
+    {
+      "source": "before",
+      "platform": "macos",
+      "theme": "light",
+      "name": "macos-light.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 109833
+    },
+    {
+      "source": "before",
+      "platform": "macos",
+      "theme": "dark",
+      "name": "macos-dark.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 108914
+    },
+    {
+      "source": "before",
+      "platform": "windows",
+      "theme": "light",
+      "name": "windows-light.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 90258
+    },
+    {
+      "source": "before",
+      "platform": "windows",
+      "theme": "dark",
+      "name": "windows-dark.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 90626
+    },
+    {
+      "source": "before",
+      "platform": "linux",
+      "theme": "light",
+      "name": "linux-light.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 106462
+    },
+    {
+      "source": "before",
+      "platform": "linux",
+      "theme": "dark",
+      "name": "linux-dark.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 105017
+    },
+    {
+      "source": "after",
+      "platform": "macos",
+      "theme": "light",
+      "name": "macos-light.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 110608
+    },
+    {
+      "source": "after",
+      "platform": "macos",
+      "theme": "dark",
+      "name": "macos-dark.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 109683
+    },
+    {
+      "source": "after",
+      "platform": "windows",
+      "theme": "light",
+      "name": "windows-light.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 90980
+    },
+    {
+      "source": "after",
+      "platform": "windows",
+      "theme": "dark",
+      "name": "windows-dark.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 91294
+    },
+    {
+      "source": "after",
+      "platform": "linux",
+      "theme": "light",
+      "name": "linux-light.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 107323
+    },
+    {
+      "source": "after",
+      "platform": "linux",
+      "theme": "dark",
+      "name": "linux-dark.png",
+      "format": "PNG",
+      "width": 760,
+      "height": 620,
+      "bytes": 105745
+    }
+  ]
+}
