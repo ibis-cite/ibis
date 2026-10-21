@@ -1395,6 +1395,118 @@ def main():
 
 
 class ContractTests(unittest.TestCase):
+    class CensusNode:
+        def __init__(self, pid=0, name="", children=(), value=None):
+            self.pid, self.name, self.children, self.value = pid, name, children, value
+            self.childCount = len(children)
+        def __getitem__(self, index):
+            return self.children[index]
+        def get_process_id(self):
+            return self.pid
+        def queryText(self):
+            if self.value is None:
+                raise NotImplementedError
+            return Mock(characterCount=len(self.value), getText=lambda start, end: self.value[start:end])
+
+    def census_commands(self, argv):
+        rows = {("ps", "-eo", "pid=,ppid="): "100 1\n200 100\n300 200\n999 1\n",
+                ("xprop", "-root", "_NET_CLIENT_LIST"): "_NET_CLIENT_LIST(WINDOW): window id # 0xa\n",
+                ("xdotool", "search", "--pid", "100"): "10\n",
+                ("xdotool", "search", "--pid", "200"): "11\n",
+                ("xdotool", "search", "--pid", "300"): "12\n"}
+        if argv[:2] == ["xprop", "-id"]:
+            owner = {"10": 100, "11": 200, "12": 300}[argv[2]]
+            text = f"_NET_WM_PID(CARDINAL) = {owner}\n_NET_WM_STATE(ATOM) = _NET_WM_STATE_HIDDEN\n"
+        elif argv[0] == "xwininfo":
+            state = {"10": "IsViewable", "11": "IsUnMapped", "12": "IsUnviewable"}[argv[2]]
+            text = f'window 0x1 "PRIVATE_TITLE"\n  Map State: {state}\n'
+        else:
+            text = rows[tuple(argv)]
+        return subprocess.CompletedProcess(argv, 0, text, "")
+
+    def census_fixture(self, count="3 references", *, runner=None, frames=None):
+        desktop = self.CensusNode(children=[self.CensusNode(100, "PRIVATE_TITLE", [
+            self.CensusNode(name="Search references"), self.CensusNode(value=count)]), self.CensusNode(999, "PRIVATE_OTHER")])
+        def bridge():
+            self.assertTrue(frames, "process/X facts must precede AT-SPI discovery")
+            return Mock(Registry=Mock(getDesktop=lambda _: desktop))
+        return linux_census(100, 55, lambda _: True, runner or self.census_commands, bridge, frames.append)
+
+    def test_linux_census_flushes_owned_unmapped_process_x_facts_before_atspi(self):
+        frames = []
+        facts = self.census_fixture(frames=frames)
+        self.assertFalse(frames[0]["atspi_attempted"])
+        self.assertEqual((frames[0]["exact_windows"], frames[0]["descendant_windows"]), (1, 2))
+        self.assertEqual(facts["descendant_pids"], [200, 300])
+        self.assertEqual(facts["map_states"]["descendant"]["IsUnMapped"], 1)
+        self.assertTrue(facts["named_search"] and facts["expected_count"] and facts["atspi_complete"])
+        self.assertNotIn("PRIVATE", json.dumps(frames))
+
+    def test_linux_census_does_not_accept_thirteen_as_three_references(self):
+        for text, expected in (("13 references", False), ("123 references", False), ("3 references", True),
+                               ("example.bib · 3 references · updated", True)):
+            with self.subTest(text=text):
+                self.assertEqual(self.census_fixture(text, frames=[])["expected_count"], expected)
+
+    def test_linux_census_missing_failed_and_empty_queries_are_distinct(self):
+        for result, available, complete, empty in ((None, False, False, 0),
+                (subprocess.CompletedProcess([], 1, "", "PRIVATE_ERROR"), True, False, 0),
+                (subprocess.CompletedProcess([], 1, "", ""), True, True, 3)):
+            def runner(argv):
+                return result if argv[0] == "xdotool" else self.census_commands(argv)
+            facts = self.census_fixture(runner=runner, frames=[])
+            self.assertEqual((facts["window_query_available"], facts["window_query_complete"], facts["window_queries_empty"]),
+                             (available, complete, empty))
+            self.assertNotIn("PRIVATE", json.dumps(facts))
+
+    def test_linux_census_rejects_private_or_wrong_identity_frames_and_retains_timeout_partial(self):
+        facts = self.census_fixture(frames=[])
+        native = Mock(app=Mock(pid=100), wm=Mock(pid=55))
+        for invalid in ({**facts, "PRIVATE_PATH": "PRIVATE_PAYLOAD"}, {**facts, "app_pid": 999},
+                        {**facts, "atspi_nodes": "PRIVATE_TEXT"}):
+            self.assertIsNone(linux_census_frame(json.dumps(invalid), 100, 55))
+        with patch("subprocess.run", side_effect=subprocess.TimeoutExpired([], 4, output=json.dumps(facts).encode(), stderr=b"PRIVATE_ERROR")):
+            result = linux_failure_census(native)
+        self.assertTrue(result["worker_timed_out"] and result["facts_valid"])
+        self.assertEqual(result["facts"], facts)
+        self.assertNotIn("PRIVATE", json.dumps(result))
+
+    def test_linux_census_commands_are_available_and_separately_time_bounded(self):
+        with patch("shutil.which", return_value=None), patch("subprocess.run") as command:
+            self.assertIsNone(linux_census_command(["missing"], time.monotonic() + 3))
+            command.assert_not_called()
+        with patch("shutil.which", return_value="synthetic-tool"), patch("subprocess.run") as command:
+            linux_census_command(["xprop", "-root", "_NET_CLIENT_LIST"], time.monotonic() + 3)
+            self.assertLessEqual(command.call_args.kwargs["timeout"], .3)
+            self.assertEqual(command.call_args.kwargs["env"]["LC_ALL"], "C")
+
+    def test_linux_census_errors_keep_the_original_failure_and_teardown(self):
+        for error in (RuntimeError("PRIVATE_COLLECTOR_ERROR"), subprocess.TimeoutExpired([], 4)):
+            native, app = Mock(), Mock(pid=100)
+            app.poll.return_value = None
+            class Native:
+                def __init__(self):
+                    self.wm = Mock(pid=55)
+                def close(self):
+                    native.close()
+            with tempfile.TemporaryDirectory() as temporary:
+                folder = Path(temporary)
+                executable, output = folder / "synthetic-app", folder / "output"
+                executable.touch()
+                with patch("sys.argv", ["smoke", "--app", str(executable), "--output", str(output)]), \
+                     patch("platform.system", return_value="Linux"), patch(__name__ + ".Linux", Native), \
+                     patch("subprocess.Popen", return_value=app), patch("builtins.print"), \
+                     patch(__name__ + ".wait_for", side_effect=AssertionError("Timed out: synthetic library startup")), \
+                     patch(__name__ + ".linux_failure_census", side_effect=error, create=True) as collector:
+                    self.assertEqual(main(), 1)
+                report = json.loads((output / "smoke.json").read_text())
+                collector.assert_called_once()
+                self.assertEqual(report["reason"], "Timed out: synthetic library startup")
+                self.assertTrue(report["linux_census"]["collector_failed"])
+                self.assertNotIn("PRIVATE", json.dumps(report))
+                app.terminate.assert_called_once()
+                native.close.assert_called_once()
+
     def preference_probe(self, failure=None, *, scripted_system=None):
         clock, launches, actions = [0.0], [], []
         # Exercise the Scripted Quit protocol while keeping settings in the
