@@ -203,10 +203,12 @@ test.each(["action", "Escape"])("rapid pointer reopening after %s keeps the menu
     fireEvent.pointerUp(trigger, { button: 0, pointerType: "mouse", pointerId: 1 });
     fireEvent.click(trigger);
     await act(async () => { await new Promise(requestAnimationFrame); });
-    expect(screen.getByRole("menu")).toBe(menu);
-    expect(menu.contains(document.activeElement) || document.activeElement === trigger).toBe(true);
+    const reopened = screen.getByRole("menu");
+    expect(reopened.closest(".menu-popover")).toBe(popover);
+    expect(document.activeElement).toBe(reopened);
+    expect(reopened.querySelector("[data-focused]")).toBeNull();
     fireEvent.keyDown(document.activeElement!, { key: "ArrowDown" });
-    expect(document.activeElement).toBe(item);
+    expect(document.activeElement).toBe(within(reopened).getByRole("menuitem", { name: "Open" }));
   } finally {
     focus.mockRestore();
     await act(async () => { finishExit(); });
