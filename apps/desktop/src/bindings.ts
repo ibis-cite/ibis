@@ -45,7 +45,7 @@ export const commands = {
 	 *  it belongs to an outdated query. `scope` contains exact loaded source IDs:
 	 *  omitted/null searches all, an empty list searches none. It never reloads sources.
 	 */
-	search: (query: string, limit: number, page: number, request: number, scope: string[] | null) => __TAURI_INVOKE<SearchResult[]>("search", { query, limit, page, request, scope }),
+	search: (query: string, limit: number, page: number, request: number, scope: string[] | null) => __TAURI_INVOKE<SearchReply>("search", { query, limit, page, request, scope }),
 	/**
 	 *  Copy the selected records as a citation to the clipboard. Format choices
 	 *  are saved separately when selected, even if no citation is copied.

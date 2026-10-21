@@ -1138,13 +1138,76 @@ mod tests {
     }
 
     #[test]
+    fn scoped_snapshot_replies_keep_revision_and_retained_source_counts_together() {
+        let chosen = ZoteroLibraries::new(vec![
+            ZoteroLibrary::User,
+            ZoteroLibrary::Group(7),
+            ZoteroLibrary::Group(8),
+        ])
+        .unwrap_or_else(|| panic!("valid synthetic libraries"));
+        let mut loaded = ibis_core::bibtex::load_str("zotero:user", "@misc{same,title={研究}}");
+        loaded
+            .references
+            .extend(ibis_core::bibtex::load_str("zotero:group:7", "@misc{same,title={研究}}").references);
+        let mut library = candidate(Source::Zotero(chosen), loaded);
+        library.revision = u64::MAX - 1;
+        let captured = status(&library);
+        let index = Arc::clone(&library.index);
+        let scope = vec!["zotero:group:7".into()];
+        let newest = AtomicU32::default();
+        let scoped = search_snapshot(&index, captured.revision.clone(), "研究", 20, 1, &newest, Some(&scope));
+        assert_eq!(scoped.revision, captured.revision);
+        assert_eq!(scoped.results.len(), 1);
+        assert_eq!(scoped.results[0].id.source, "zotero:group:7");
+        assert_eq!(scoped.results[0].revision, captured.revision);
+        let all = search_snapshot(&index, captured.revision.clone(), "研究", 20, 2, &newest, None);
+        assert_eq!(all.results.len(), 2);
+        for (request, scope) in [
+            (3, Vec::new()),
+            (4, vec!["zotero:group:8".into()]),
+            (5, vec!["unknown".into()]),
+        ] {
+            let empty = search_snapshot(
+                &index,
+                captured.revision.clone(),
+                "研究",
+                20,
+                request,
+                &newest,
+                Some(&scope),
+            );
+            assert!(empty.results.is_empty());
+            assert_eq!(empty.revision, captured.revision);
+        }
+        let late = search_snapshot(&index, captured.revision.clone(), "研究", 20, 1, &newest, None);
+        assert!(late.results.is_empty());
+        assert_eq!(late.revision, captured.revision);
+        library.requested = Some(Source::Zotero(ZoteroLibrary::Group(99).into()));
+        library.error = Some("synthetic reload failure".into());
+        let retained = status(&library);
+        assert_eq!(retained.revision, captured.revision);
+        assert_eq!(retained.source_counts, captured.source_counts);
+        assert_eq!(retained.source_counts.get("zotero:group:8"), Some(&0));
+        assert_eq!(retained.source_counts.values().sum::<usize>(), retained.references);
+        assert!(Arc::ptr_eq(&index, &library.index));
+    }
+
+    #[test]
     fn scoped_results_keep_the_desktop_result_cap() {
         let bib = (0..220)
             .map(|n| format!("@misc{{key{n},title={{研究}}}}\n"))
             .collect::<String>();
         let index = OwnedIndex::new(ibis_core::bibtex::load_str("file", &bib).references);
         let scope = vec!["file".into(), "file".into()];
-        let results = search_newest(&index, "synthetic", "研究", usize::MAX, 1, &AtomicU32::new(0), Some(&scope));
+        let results = search_newest(
+            &index,
+            "synthetic",
+            "研究",
+            usize::MAX,
+            1,
+            &AtomicU32::new(0),
+            Some(&scope),
+        );
         assert_eq!(results.len(), 200);
         assert!(results.iter().all(|r| r.id.source == "file"));
         assert_eq!(index.source_counts().get("file"), Some(&220));
@@ -1155,10 +1218,19 @@ mod tests {
         let refs = ibis_core::bibtex::load_str("t", "@article{a,title={Sleep},year={2020}}").references;
         let index = OwnedIndex::new(refs);
         let newest = AtomicU32::new(0);
-        assert_eq!(search_newest(&index, "synthetic", "sleep", 20, 2, &newest, None).len(), 1);
+        assert_eq!(
+            search_newest(&index, "synthetic", "sleep", 20, 2, &newest, None).len(),
+            1
+        );
         assert!(search_newest(&index, "synthetic", "sleep", 20, 1, &newest, None).is_empty());
-        assert_eq!(search_newest(&index, "synthetic", "sleep", 20, 2, &newest, None).len(), 1);
-        assert_eq!(search_newest(&index, "synthetic", "sleep", 20, 3, &newest, None).len(), 1);
+        assert_eq!(
+            search_newest(&index, "synthetic", "sleep", 20, 2, &newest, None).len(),
+            1
+        );
+        assert_eq!(
+            search_newest(&index, "synthetic", "sleep", 20, 3, &newest, None).len(),
+            1
+        );
     }
 
     #[test]
@@ -1957,9 +2029,25 @@ mod tests {
             .unwrap_or_else(|| panic!("synthetic request is current"));
         assert_ne!(replaced.revision, old_revision);
         // The index has changed, but no event has been published to JavaScript.
-        let late_reply = search_snapshot(&old_index, old_revision.clone(), "sleep", 20, 1, &AtomicU32::default(), None);
+        let late_reply = search_snapshot(
+            &old_index,
+            old_revision.clone(),
+            "sleep",
+            20,
+            1,
+            &AtomicU32::default(),
+            None,
+        );
         assert_eq!(late_reply.revision, old_revision);
-        let empty = search_snapshot(&old_index, old_revision.clone(), "no-match", 20, 2, &AtomicU32::default(), None);
+        let empty = search_snapshot(
+            &old_index,
+            old_revision.clone(),
+            "no-match",
+            20,
+            2,
+            &AtomicU32::default(),
+            None,
+        );
         assert!(empty.results.is_empty());
         assert_eq!(empty.revision, old_revision);
         let late = late_reply.results;
@@ -2038,7 +2126,15 @@ mod tests {
         let locked = library.lock().unwrap_or_else(|e| panic!("{e}"));
         assert!(locked.require_revision(&replaced.revision).is_err());
         assert!(locked.require_revision(&empty.revision).is_ok());
-        let reply = search_snapshot(&locked.index, empty.revision.clone(), "", 20, 3, &AtomicU32::default(), None);
+        let reply = search_snapshot(
+            &locked.index,
+            empty.revision.clone(),
+            "",
+            20,
+            3,
+            &AtomicU32::default(),
+            None,
+        );
         assert!(reply.results.is_empty());
         assert_eq!(reply.revision, empty.revision);
     }

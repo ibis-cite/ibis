@@ -70,8 +70,11 @@ security sandbox for computed module names. During
 incremental migration, toolbar-menu role overrides in `tokens.css` apply locally
 to its popover, preserving the existing More menu and keys dialog roles.
 
-Desktop search replies, including empty replies, and each result carry an opaque
-in-memory index revision, captured with its index under the library mutex. A replacement retires that revision; loading,
+Desktop search replies and each result carry an opaque in-memory index revision,
+captured with the index under the library mutex. Scope filtering and request
+cancellation preserve it even for empty replies. Per-source status counts still
+describe the retained snapshot, including chosen empty Zotero libraries.
+A replacement retires that revision; loading,
 failed reloads retaining the index, and unchanged Zotero checks keep it. Selected
 references and formatted previews retain the revision they came from. Key copy,
 CSL retrieval and formatted copy validate it under that same mutex before
