@@ -1,0 +1,1014 @@
+{
+  "schemaVersion": 1,
+  "issue": 636,
+  "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+  "data_branch_base": "235db855d2246051664301a9eac69722298bae49",
+  "source_runtime_modified": false,
+  "browser": "Chromium 151.0.7922.34",
+  "platform_look": "macOS browser look; no native capture",
+  "concept": "A/B styling only, identical actual preview DOM innerHTML and text, same top placement and selected tray. Temporary CSS and caption injected in browser only.",
+  "initial_conditions": "Search focused; pointer outside viewport; hover opacity settled; document/main/results at scroll zero.",
+  "candidates": {
+    "A": {
+      "name": "Quiet inline",
+      "css": "[data-preview-style] .format-preview .preview-text { color:var(--text); font-family:inherit; font-size:var(--type-body-size); line-height:var(--type-body-line); font-weight:400; }\n[data-preview-style] .concept-preview-caption { margin:0 0 var(--space-1); color:var(--muted); font-family:inherit; font-size:var(--heading-size); line-height:var(--type-label-line); font-weight:var(--heading-weight); letter-spacing:var(--heading-tracking); }\n[data-preview-style=\"A\"] .format-preview { padding:var(--space-2) var(--space-4); border-bottom:var(--border-width) solid var(--line); }"
+    },
+    "B": {
+      "name": "Subtly inset preview",
+      "css": "[data-preview-style] .format-preview .preview-text { color:var(--text); font-family:inherit; font-size:var(--type-body-size); line-height:var(--type-body-line); font-weight:400; }\n[data-preview-style] .concept-preview-caption { margin:0 0 var(--space-1); color:var(--muted); font-family:inherit; font-size:var(--heading-size); line-height:var(--type-label-line); font-weight:var(--heading-weight); letter-spacing:var(--heading-tracking); }\n[data-preview-style=\"B\"] .format-preview { margin:var(--space-2) var(--space-4); padding:var(--space-3); border:var(--border-width) solid var(--line); border-radius:var(--button-radius); background:var(--hover-background); }"
+    }
+  },
+  "provider": "Existing tray fixture and real App/formatter, with temporary synthetic CSL/APA adapter; long/markup cases also supply synthetic result fields matching the CSL data.",
+  "datasets": {
+    "ordinary": [
+      {
+        "id": "example2026",
+        "type": "article-journal",
+        "title": "Sleep and memory: an example reference",
+        "author": [
+          {
+            "family": "Example"
+          },
+          {
+            "family": "Sample"
+          }
+        ],
+        "issued": {
+          "date-parts": [
+            [
+              2026
+            ]
+          ]
+        },
+        "container-title": "Journal of Synthetic Studies"
+      },
+      {
+        "id": "研究2026",
+        "type": "book",
+        "title": "多言語の文献と記憶の研究",
+        "author": [
+          {
+            "literal": "架空 著者"
+          }
+        ],
+        "issued": {
+          "date-parts": [
+            [
+              2026
+            ]
+          ]
+        }
+      }
+    ],
+    "long": [
+      {
+        "id": "example2026",
+        "type": "report",
+        "title": "Long-term memory across languages: a synthetic longitudinal study",
+        "author": [
+          {
+            "literal": "Laboratory for Synthetic Sleep, Memory, and Multilingual Learning"
+          }
+        ],
+        "issued": {
+          "date-parts": [
+            [
+              2026
+            ]
+          ]
+        }
+      },
+      {
+        "id": "研究2026",
+        "type": "report",
+        "title": "Shared measures of learning and recall in a multilingual research network",
+        "author": [
+          {
+            "literal": "International Institute for Example Research Across Languages"
+          }
+        ],
+        "issued": {
+          "date-parts": [
+            [
+              2025
+            ]
+          ]
+        }
+      }
+    ],
+    "markup": [
+      {
+        "id": "example2026",
+        "type": "book",
+        "title": "Mémoire x<sup>2</sup>",
+        "issued": {
+          "date-parts": [
+            [
+              2026
+            ]
+          ]
+        }
+      },
+      {
+        "id": "研究2026",
+        "type": "book",
+        "title": "記憶と学習",
+        "issued": {
+          "date-parts": [
+            [
+              2026
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "ordinary-720-light-normal",
+      "data": "ordinary",
+      "width": 720,
+      "height": 480,
+      "theme": "light",
+      "text": "normal",
+      "showCurrent": true
+    },
+    {
+      "id": "long-720-dark-larger",
+      "data": "long",
+      "width": 720,
+      "height": 480,
+      "theme": "dark",
+      "text": "large"
+    },
+    {
+      "id": "ordinary-360-dark-normal",
+      "data": "ordinary",
+      "width": 360,
+      "height": 320,
+      "theme": "dark",
+      "text": "normal"
+    },
+    {
+      "id": "markup-360-light-larger",
+      "data": "markup",
+      "width": 360,
+      "height": 320,
+      "theme": "light",
+      "text": "large"
+    }
+  ],
+  "limits": [
+    "Styling concepts, not implemented or accepted defaults. No production source, font, dependency, harness, workflow or ADR changes.",
+    "Formatted text and innerHTML match baseline within each case; no clipboard copy performed.",
+    "No native appearance, keyboard/copy ownership or assistive-technology acceptance.",
+    "Narrow source still uses document scrolling before #639 containment; captions/panel spacing consume additional room.",
+    "Four representative contexts, comfortable density and APA only; no claim for all data/styles/stale/error/loading states or 200% scaling."
+  ],
+  "assets": [
+    {
+      "file": "preview-styling-636-ordinary-720-light-normal.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "kind": "Labelled whole-picker browser styling concept; not implemented",
+      "case": "ordinary-720-light-normal",
+      "columns": [
+        "current",
+        "A",
+        "B"
+      ],
+      "format": "png",
+      "pixels": [
+        2224,
+        695
+      ],
+      "sha256": "78b0321f151f0e8da8ed3befa47643c650850792fde83fa1b3d789fc00805e72"
+    },
+    {
+      "file": "preview-styling-636-long-720-dark-larger.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "kind": "Labelled whole-picker browser styling concept; not implemented",
+      "case": "long-720-dark-larger",
+      "columns": [
+        "A",
+        "B"
+      ],
+      "format": "png",
+      "pixels": [
+        1488,
+        695
+      ],
+      "sha256": "96380cd0f9b853626899bc221a3218773de641b14a2cca5531ae9edb2207250e"
+    },
+    {
+      "file": "preview-styling-636-ordinary-360-dark-normal.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "kind": "Labelled whole-picker browser styling concept; not implemented",
+      "case": "ordinary-360-dark-normal",
+      "columns": [
+        "A",
+        "B"
+      ],
+      "format": "png",
+      "pixels": [
+        768,
+        535
+      ],
+      "sha256": "f2bfeaff4cf521b28f55a911248c3317a27bcfc7223ba224c5a8faf720fe89a7"
+    },
+    {
+      "file": "preview-styling-636-markup-360-light-larger.png",
+      "source_commit": "65748554dd25119dfda05f562bd76bc15e8e16a8",
+      "kind": "Labelled whole-picker browser styling concept; not implemented",
+      "case": "markup-360-light-larger",
+      "columns": [
+        "A",
+        "B"
+      ],
+      "format": "png",
+      "pixels": [
+        768,
+        535
+      ],
+      "sha256": "edb322913f0cbdfb2a496b4e27c13f870e6bb0287e32e607081738a73e6dcf45"
+    }
+  ],
+  "records": [
+    {
+      "case": "ordinary-720-light-normal",
+      "variant": "current",
+      "previewHTML": "(Example &amp; Sample, 2026; 架空 著者, 2026)",
+      "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+      "previewRect": {
+        "x": 0,
+        "y": 105.375,
+        "width": 720,
+        "height": 35,
+        "bottom": 140.375,
+        "right": 720
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "normal",
+      "fontWeight": "400",
+      "color": "rgb(194, 58, 28)",
+      "background": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(0, 0, 0, 0.1)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "caption": null,
+      "resultsRect": {
+        "x": 0,
+        "y": 140.375,
+        "width": 720,
+        "height": 287.65625,
+        "bottom": 428.03125,
+        "right": 720
+      },
+      "visibleResultsHeight": 287.65625,
+      "documentHeight": 480,
+      "trayRect": {
+        "x": 0,
+        "y": 56,
+        "width": 720,
+        "height": 49.375,
+        "bottom": 105.375,
+        "right": 720
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "68f79b4303ec278a2d4a0ed4474ae99e23499cf71e13694ba07d480380cc26c1"
+    },
+    {
+      "case": "ordinary-720-light-normal",
+      "variant": "A",
+      "previewHTML": "(Example &amp; Sample, 2026; 架空 著者, 2026)",
+      "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+      "previewRect": {
+        "x": 0,
+        "y": 105.375,
+        "width": 720,
+        "height": 57,
+        "bottom": 162.375,
+        "right": 720
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "fontWeight": "400",
+      "color": "rgb(22, 24, 29)",
+      "background": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(0, 0, 0, 0.1)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "caption": "Preview",
+      "resultsRect": {
+        "x": 0,
+        "y": 162.375,
+        "width": 720,
+        "height": 265.65625,
+        "bottom": 428.03125,
+        "right": 720
+      },
+      "visibleResultsHeight": 265.65625,
+      "documentHeight": 480,
+      "trayRect": {
+        "x": 0,
+        "y": 56,
+        "width": 720,
+        "height": 49.375,
+        "bottom": 105.375,
+        "right": 720
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "68f79b4303ec278a2d4a0ed4474ae99e23499cf71e13694ba07d480380cc26c1"
+    },
+    {
+      "case": "ordinary-720-light-normal",
+      "variant": "B",
+      "previewHTML": "(Example &amp; Sample, 2026; 架空 著者, 2026)",
+      "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+      "previewRect": {
+        "x": 16,
+        "y": 113.375,
+        "width": 688,
+        "height": 66,
+        "bottom": 179.375,
+        "right": 704
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "fontWeight": "400",
+      "color": "rgb(22, 24, 29)",
+      "background": "rgba(0, 0, 0, 0.043)",
+      "border": "1px solid rgba(0, 0, 0, 0.1)",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "caption": "Preview",
+      "resultsRect": {
+        "x": 0,
+        "y": 187.375,
+        "width": 720,
+        "height": 240.65625,
+        "bottom": 428.03125,
+        "right": 720
+      },
+      "visibleResultsHeight": 240.65625,
+      "documentHeight": 480,
+      "trayRect": {
+        "x": 0,
+        "y": 56,
+        "width": 720,
+        "height": 49.375,
+        "bottom": 105.375,
+        "right": 720
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "68f79b4303ec278a2d4a0ed4474ae99e23499cf71e13694ba07d480380cc26c1"
+    },
+    {
+      "case": "long-720-dark-larger",
+      "variant": "current",
+      "previewHTML": "(International Institute for Example Research Across Languages, 2025; Laboratory for Synthetic Sleep, Memory, and Multilingual Learning, 2026)",
+      "previewText": "(International Institute for Example Research Across Languages, 2025; Laboratory for Synthetic Sleep, Memory, and Multilingual Learning, 2026)",
+      "previewRect": {
+        "x": 0,
+        "y": 119.328125,
+        "width": 720,
+        "height": 63.375,
+        "bottom": 182.703125,
+        "right": 720
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "18.4px",
+      "lineHeight": "normal",
+      "fontWeight": "400",
+      "color": "rgb(255, 122, 92)",
+      "background": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(255, 255, 255, 0.1)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "caption": null,
+      "resultsRect": {
+        "x": 0,
+        "y": 182.703125,
+        "width": 720,
+        "height": 239.28125,
+        "bottom": 421.984375,
+        "right": 720
+      },
+      "visibleResultsHeight": 239.28125,
+      "documentHeight": 480,
+      "trayRect": {
+        "x": 0,
+        "y": 64.390625,
+        "width": 720,
+        "height": 54.9375,
+        "bottom": 119.328125,
+        "right": 720
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "3453c1bcbfa88b8b892c7934e8b9a80cabe605482c29097561f550f476aa9fb2"
+    },
+    {
+      "case": "long-720-dark-larger",
+      "variant": "A",
+      "previewHTML": "(International Institute for Example Research Across Languages, 2025; Laboratory for Synthetic Sleep, Memory, and Multilingual Learning, 2026)",
+      "previewText": "(International Institute for Example Research Across Languages, 2025; Laboratory for Synthetic Sleep, Memory, and Multilingual Learning, 2026)",
+      "previewRect": {
+        "x": 0,
+        "y": 119.328125,
+        "width": 720,
+        "height": 88.375,
+        "bottom": 207.703125,
+        "right": 720
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "16.1px",
+      "lineHeight": "23px",
+      "fontWeight": "400",
+      "color": "rgb(245, 245, 247)",
+      "background": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(255, 255, 255, 0.1)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "caption": "Preview",
+      "resultsRect": {
+        "x": 0,
+        "y": 207.703125,
+        "width": 720,
+        "height": 214.28125,
+        "bottom": 421.984375,
+        "right": 720
+      },
+      "visibleResultsHeight": 214.28125,
+      "documentHeight": 480,
+      "trayRect": {
+        "x": 0,
+        "y": 64.390625,
+        "width": 720,
+        "height": 54.9375,
+        "bottom": 119.328125,
+        "right": 720
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "3453c1bcbfa88b8b892c7934e8b9a80cabe605482c29097561f550f476aa9fb2"
+    },
+    {
+      "case": "long-720-dark-larger",
+      "variant": "B",
+      "previewHTML": "(International Institute for Example Research Across Languages, 2025; Laboratory for Synthetic Sleep, Memory, and Multilingual Learning, 2026)",
+      "previewText": "(International Institute for Example Research Across Languages, 2025; Laboratory for Synthetic Sleep, Memory, and Multilingual Learning, 2026)",
+      "previewRect": {
+        "x": 18.390625,
+        "y": 128.515625,
+        "width": 683.21875,
+        "height": 98.59375,
+        "bottom": 227.109375,
+        "right": 701.609375
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "16.1px",
+      "lineHeight": "23px",
+      "fontWeight": "400",
+      "color": "rgb(245, 245, 247)",
+      "background": "rgba(255, 255, 255, 0.06)",
+      "border": "1px solid rgba(255, 255, 255, 0.1)",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "caption": "Preview",
+      "resultsRect": {
+        "x": 0,
+        "y": 236.296875,
+        "width": 720,
+        "height": 185.6875,
+        "bottom": 421.984375,
+        "right": 720
+      },
+      "visibleResultsHeight": 185.6875,
+      "documentHeight": 480,
+      "trayRect": {
+        "x": 0,
+        "y": 64.390625,
+        "width": 720,
+        "height": 54.9375,
+        "bottom": 119.328125,
+        "right": 720
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "3453c1bcbfa88b8b892c7934e8b9a80cabe605482c29097561f550f476aa9fb2"
+    },
+    {
+      "case": "ordinary-360-dark-normal",
+      "variant": "current",
+      "previewHTML": "(Example &amp; Sample, 2026; 架空 著者, 2026)",
+      "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+      "previewRect": {
+        "x": 0,
+        "y": 138.765625,
+        "width": 360,
+        "height": 35,
+        "bottom": 173.765625,
+        "right": 360
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "normal",
+      "fontWeight": "400",
+      "color": "rgb(255, 122, 92)",
+      "background": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(255, 255, 255, 0.1)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "caption": null,
+      "resultsRect": {
+        "x": 0,
+        "y": 173.765625,
+        "width": 360,
+        "height": 353.484375,
+        "bottom": 527.25,
+        "right": 360
+      },
+      "visibleResultsHeight": 146.234375,
+      "documentHeight": 601,
+      "trayRect": {
+        "x": 0,
+        "y": 89.390625,
+        "width": 360,
+        "height": 49.375,
+        "bottom": 138.765625,
+        "right": 360
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "68f79b4303ec278a2d4a0ed4474ae99e23499cf71e13694ba07d480380cc26c1"
+    },
+    {
+      "case": "ordinary-360-dark-normal",
+      "variant": "A",
+      "previewHTML": "(Example &amp; Sample, 2026; 架空 著者, 2026)",
+      "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+      "previewRect": {
+        "x": 0,
+        "y": 138.765625,
+        "width": 360,
+        "height": 57,
+        "bottom": 195.765625,
+        "right": 360
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "fontWeight": "400",
+      "color": "rgb(245, 245, 247)",
+      "background": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(255, 255, 255, 0.1)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "caption": "Preview",
+      "resultsRect": {
+        "x": 0,
+        "y": 195.765625,
+        "width": 360,
+        "height": 353.484375,
+        "bottom": 549.25,
+        "right": 360
+      },
+      "visibleResultsHeight": 124.234375,
+      "documentHeight": 623,
+      "trayRect": {
+        "x": 0,
+        "y": 89.390625,
+        "width": 360,
+        "height": 49.375,
+        "bottom": 138.765625,
+        "right": 360
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "68f79b4303ec278a2d4a0ed4474ae99e23499cf71e13694ba07d480380cc26c1"
+    },
+    {
+      "case": "ordinary-360-dark-normal",
+      "variant": "B",
+      "previewHTML": "(Example &amp; Sample, 2026; 架空 著者, 2026)",
+      "previewText": "(Example & Sample, 2026; 架空 著者, 2026)",
+      "previewRect": {
+        "x": 16,
+        "y": 146.765625,
+        "width": 328,
+        "height": 66,
+        "bottom": 212.765625,
+        "right": 344
+      },
+      "previewFullyVisible": true,
+      "previewTags": [],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "fontWeight": "400",
+      "color": "rgb(245, 245, 247)",
+      "background": "rgba(255, 255, 255, 0.06)",
+      "border": "1px solid rgba(255, 255, 255, 0.1)",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "caption": "Preview",
+      "resultsRect": {
+        "x": 0,
+        "y": 220.765625,
+        "width": 360,
+        "height": 353.484375,
+        "bottom": 574.25,
+        "right": 360
+      },
+      "visibleResultsHeight": 99.234375,
+      "documentHeight": 648,
+      "trayRect": {
+        "x": 0,
+        "y": 89.390625,
+        "width": 360,
+        "height": 49.375,
+        "bottom": 138.765625,
+        "right": 360
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "68f79b4303ec278a2d4a0ed4474ae99e23499cf71e13694ba07d480380cc26c1"
+    },
+    {
+      "case": "markup-360-light-larger",
+      "variant": "current",
+      "previewHTML": "(<i>Mémoire x<sup>2</sup></i>, 2026; 記憶と学習, 2026)",
+      "previewText": "(Mémoire x2, 2026; 記憶と学習, 2026)",
+      "previewRect": {
+        "x": 0,
+        "y": 195.890625,
+        "width": 360,
+        "height": 45.5,
+        "bottom": 241.390625,
+        "right": 360
+      },
+      "previewFullyVisible": true,
+      "previewTags": [
+        {
+          "tag": "I",
+          "text": "Mémoire x2",
+          "style": null,
+          "fontStyle": "italic",
+          "verticalAlign": "baseline"
+        },
+        {
+          "tag": "SUP",
+          "text": "2",
+          "style": null,
+          "fontStyle": "italic",
+          "verticalAlign": "super"
+        }
+      ],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "18.4px",
+      "lineHeight": "normal",
+      "fontWeight": "400",
+      "color": "rgb(194, 58, 28)",
+      "background": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(0, 0, 0, 0.1)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "caption": null,
+      "resultsRect": {
+        "x": 0,
+        "y": 241.390625,
+        "width": 360,
+        "height": 340.1875,
+        "bottom": 581.578125,
+        "right": 360
+      },
+      "visibleResultsHeight": 78.609375,
+      "documentHeight": 692,
+      "trayRect": {
+        "x": 0,
+        "y": 101.71875,
+        "width": 360,
+        "height": 94.171875,
+        "bottom": 195.890625,
+        "right": 360
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "f897c535f30efcffa0f8e510e2044f8330dc3009b6f73e1145d413aa788108d7"
+    },
+    {
+      "case": "markup-360-light-larger",
+      "variant": "A",
+      "previewHTML": "(<i>Mémoire x<sup>2</sup></i>, 2026; 記憶と学習, 2026)",
+      "previewText": "(Mémoire x2, 2026; 記憶と学習, 2026)",
+      "previewRect": {
+        "x": 0,
+        "y": 195.890625,
+        "width": 360,
+        "height": 69.734375,
+        "bottom": 265.625,
+        "right": 360
+      },
+      "previewFullyVisible": true,
+      "previewTags": [
+        {
+          "tag": "I",
+          "text": "Mémoire x2",
+          "style": null,
+          "fontStyle": "italic",
+          "verticalAlign": "baseline"
+        },
+        {
+          "tag": "SUP",
+          "text": "2",
+          "style": null,
+          "fontStyle": "italic",
+          "verticalAlign": "super"
+        }
+      ],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "16.1px",
+      "lineHeight": "23px",
+      "fontWeight": "400",
+      "color": "rgb(22, 24, 29)",
+      "background": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(0, 0, 0, 0.1)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "caption": "Preview",
+      "resultsRect": {
+        "x": 0,
+        "y": 265.625,
+        "width": 360,
+        "height": 340.1875,
+        "bottom": 605.8125,
+        "right": 360
+      },
+      "visibleResultsHeight": 54.375,
+      "documentHeight": 716,
+      "trayRect": {
+        "x": 0,
+        "y": 101.71875,
+        "width": 360,
+        "height": 94.171875,
+        "bottom": 195.890625,
+        "right": 360
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "f897c535f30efcffa0f8e510e2044f8330dc3009b6f73e1145d413aa788108d7"
+    },
+    {
+      "case": "markup-360-light-larger",
+      "variant": "B",
+      "previewHTML": "(<i>Mémoire x<sup>2</sup></i>, 2026; 記憶と学習, 2026)",
+      "previewText": "(Mémoire x2, 2026; 記憶と学習, 2026)",
+      "previewRect": {
+        "x": 18.390625,
+        "y": 205.078125,
+        "width": 323.21875,
+        "height": 79.953125,
+        "bottom": 285.03125,
+        "right": 341.609375
+      },
+      "previewFullyVisible": true,
+      "previewTags": [
+        {
+          "tag": "I",
+          "text": "Mémoire x2",
+          "style": null,
+          "fontStyle": "italic",
+          "verticalAlign": "baseline"
+        },
+        {
+          "tag": "SUP",
+          "text": "2",
+          "style": null,
+          "fontStyle": "italic",
+          "verticalAlign": "super"
+        }
+      ],
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", system-ui, sans-serif",
+      "fontSize": "16.1px",
+      "lineHeight": "23px",
+      "fontWeight": "400",
+      "color": "rgb(22, 24, 29)",
+      "background": "rgba(0, 0, 0, 0.043)",
+      "border": "1px solid rgba(0, 0, 0, 0.1)",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "caption": "Preview",
+      "resultsRect": {
+        "x": 0,
+        "y": 294.21875,
+        "width": 360,
+        "height": 340.1875,
+        "bottom": 634.40625,
+        "right": 360
+      },
+      "visibleResultsHeight": 25.78125,
+      "documentHeight": 745,
+      "trayRect": {
+        "x": 0,
+        "y": 101.71875,
+        "width": 360,
+        "height": 94.171875,
+        "bottom": 195.890625,
+        "right": 360
+      },
+      "selectedKeys": [
+        "example2026",
+        "研究2026"
+      ],
+      "domOrder": [
+        "search-bar",
+        "notices",
+        "visually-hidden",
+        "Selected references",
+        "format-preview",
+        "results-area",
+        "FOOTER"
+      ],
+      "scrollY": 0,
+      "mainScrollTop": 0,
+      "errors": [],
+      "previewHTML_sha256": "f897c535f30efcffa0f8e510e2044f8330dc3009b6f73e1145d413aa788108d7"
+    }
+  ]
+}
