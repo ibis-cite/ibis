@@ -220,7 +220,7 @@ list, preview and tray) from a control layer (search, format, pin).
 | More (Ctrl/⌘ K) | Always | The one door to every other action; each shows its shortcut, so the menu is also the cheat sheet. In the footer it reads "More ⌘K", like the hints beside it (see **Footer**). |
 | Pin | Always, faint at rest | Tertiary colour at rest, full strength on hover or while on, so it never moves or appears from nowhere. Its tooltip names the action ("Pin: keep Ibis open beside your document") and, once the key table assigns one, its key. The first time a click outside hides Ibis, a one-time footer tip explains the pin. |
 | Filter chips | Once added | `#tag`, `y:2019-2022` or `a:name` followed by a space becomes a removable chip. Backspace in an empty box removes the last one. |
-| Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Ctrl+Tab and Ctrl+Shift+Tab cycle them (Tab moves focus; see **Keyboard focus order**). |
+| Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab reaches the current browsing tab; ← and → choose another (see **Keyboard focus order**). |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter, or Tab while the suggestions are open, picks the first. |
 | Row: type tile | Always | A 32 px tile at the row's start with the type icon on a quiet fill (24 px and no fill in Compact, so rows stay 40 px). Decorative: screen readers hear the type word instead. |
 | Row: title and year | Always | Year at the right edge, in the same place on every row. |
@@ -330,22 +330,34 @@ in one bar shares a baseline.
 - **Targets.** Every header control keeps a 32 px target (44 px under
   `pointer: coarse`), even where it draws 28 px.
 
-**Keyboard focus order.** Three Tab stops, in this order, then back to the
-first; nothing holds focus:
+**Keyboard focus order.** Tab moves through the following stops, skipping
+hidden controls, then back to the first; Shift+Tab reverses the order and
+nothing holds focus:
 
 1. The search box. Tab leaves it, except while tag or author suggestions are
    open, when Tab picks the first (as a combo box's autocomplete does).
-   Browsing tabs use Ctrl+Tab and Ctrl+Shift+Tab, the tab-switching key on all
-   three systems, so Tab never has two meanings.
+   Escape closes suggestions without clearing the query; Tab then leaves the
+   box. Suggestions stay closed until the query changes.
 2. The header toolbar (`role="toolbar"`, named "Search options"): one stop;
    ← and → move between the format menu, the scope menu and the pin (WAI-ARIA
    toolbar pattern).
-3. More.
+3. The browsing tabs, only while visible: one stop on the current tab in a
+   `tablist` named "Browse references". Each `tab` has `aria-selected` and
+   names its result `tabpanel`; only the current tab has `tabindex="0"`.
+   ← and → focus and choose the previous or next tab, wrapping at the ends;
+   Home and End choose the first or last. These keys apply only while a tab
+   has focus, leaving text editing and attachment preview in the search box
+   unchanged. Tab leaves for More; Shift+Tab returns to the header toolbar.
+   Clicking or tapping a tab chooses the same view. There is no required
+   Ctrl+Tab shortcut: ordinary Tab followed by arrow keys is the keyboard
+   route on every platform, including when browser accelerators are consumed.
+4. More.
 
 The result list is not a stop: ↑ and ↓ in the search box move through it
 (`aria-activedescendant`). Inside an open menu, Tab closes the menu and moves
 to the next stop, as if focus were on its button; from More that next stop is
-the search box, as the key table already says.
+the search box. The [shared key table](../apps/desktop/src/keys.ts) lists the
+implemented keys; add these browsing-tab keys when the tabs are implemented.
 
 **Footer.** Library status at the leading edge; at the trailing edge, key hints
 and More. One hint pattern everywhere outside menus: **the label first, then
@@ -466,8 +478,9 @@ menu items keep their check; the pressed pop-up button keeps a 1 px
 Three layers, each reached from the one before by something on screen:
 
 - **First minute:** type, press Enter, paste. Clicking a row copies it.
-- **First week:** → previews the attachment and "Cite page" fills in the page;
-  Shift+Enter builds a citation with several sources; Ctrl+Tab shows recent items.
+- **First week:** → in the search box previews the attachment and "Cite page"
+  fills in the page; Shift+Enter builds a citation with several sources;
+  Tab reaches the browsing tabs, where ← and → choose recent items or PDFs.
 - **Power:** `#tag`, `y:`, `a:` filters; the format menu; Ctrl/⌘ K
   for every action; pin; per-app behaviour.
 
