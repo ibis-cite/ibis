@@ -1,0 +1,602 @@
+[
+  {
+    "file": "before/contact-sheet-normal.png",
+    "width": 2329,
+    "height": 1111,
+    "sha256": "735ca7f57b3b39a63931b85def39350fc2bbff942c7fa1f05c906f7807b4c276"
+  },
+  {
+    "file": "before/contact-sheet-large.png",
+    "width": 2329,
+    "height": 1111,
+    "sha256": "0e62ede3f073ca27cfccc4ad690cf4fa7be69cf5d88fd2635a3eebe57a9b403a"
+  },
+  {
+    "file": "before/normal/linux-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "401592e55c82c4405ab4420822e158be7b577dc554b378d718eb3c681520b9fa"
+  },
+  {
+    "file": "before/normal/linux-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "42328efee7f32adb5fe7dcbbb9f67dda34620724febb766586d4643a093a9921"
+  },
+  {
+    "file": "before/normal/linux-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "b626d05e0d2d1016e6176263667790c1240f9e0295c3caabeda7622a782b4f4a"
+  },
+  {
+    "file": "before/normal/linux-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "95971805bf3ea2d28ba76051650a463c312b138dc59c0e859ad049262d40b97b"
+  },
+  {
+    "file": "before/normal/linux-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "30d653a3c21f09fab533f43fa83853494d75af9ebf75f4ca74878c9b5aa709db"
+  },
+  {
+    "file": "before/normal/linux-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "a1bdd6cc32e768a04d138dab5e3b4f61a640893b2bbe2e0c2da850eeba7def93"
+  },
+  {
+    "file": "before/normal/linux-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "3da1015969d182f26edbe7b2ef18e0f9f0c53a1595f90bd0ede34265fe2b3474"
+  },
+  {
+    "file": "before/normal/linux-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "939ee6ca8ad48b37acb7af55be2fc09669dda6bc7f310b35ecf2c1bac26f5f09"
+  },
+  {
+    "file": "before/normal/windows-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "9d09808f960e327f7bb2b185564ce67038c13a1b463af8420318dc6170361e64"
+  },
+  {
+    "file": "before/normal/windows-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "5530853a5d714af96eae8ce028fa9363c572e1029be5db4dd8b5ec29c2aa37a0"
+  },
+  {
+    "file": "before/normal/windows-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "7ffd08bdda4448b689b02db2319a472c9b2f4f377ca97499eb2ffa746ff56c63"
+  },
+  {
+    "file": "before/normal/windows-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "17a4731b0a36788742ed794b8ecd2012f7d6a01db3625d6f16c5aaa4d0cf8d59"
+  },
+  {
+    "file": "before/normal/macos-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "ee2b54e4585beaedc96c0a69f16ec2b553f64d5801a2ef18d106bc082afff478"
+  },
+  {
+    "file": "before/normal/macos-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "b007ff5d0dd8dfa65977d2e2c97277da7134e2ddca1ac6900401b83b2cc039de"
+  },
+  {
+    "file": "before/normal/macos-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "ca60ef87319cd7adb7ac1ff6cc6a1fc9439f32be41554fd6a27f4531f6a45aca"
+  },
+  {
+    "file": "before/normal/macos-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "fc98a360a0ebedcf64c55168d1d179e65016360274ffbdd109ba2ef4d874972c"
+  },
+  {
+    "file": "before/normal/macos-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "d4f594e3367267a3da2d826bfeab5430b5fc49a69471fb36408c531d3c6320e1"
+  },
+  {
+    "file": "before/normal/macos-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "874ee6c3c1bffc3fc81b87c52374cedba4dcdbba67a369ca3a5b9f79c70aa4d4"
+  },
+  {
+    "file": "before/normal/macos-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "855846b1f4f7c6b36cf8211a9fbed3d1505910cfab89451fc8f993b7ea0966d8"
+  },
+  {
+    "file": "before/normal/macos-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "12e037a6afbeefb518bf66d5a2f9415f514739b275cafe45cec170227981d55e"
+  },
+  {
+    "file": "before/normal/windows-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "a97e9a7b448ddb708897f2a0d1503fd1b8fa0c49ceb6ea7578f7a653d2a52af9"
+  },
+  {
+    "file": "before/normal/windows-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "a5ee1666804ddeb556d4e4129ebadc5dea43aae9a908203ea825bf2f634e7ac3"
+  },
+  {
+    "file": "before/normal/windows-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "bb454f00043723bddd57ba5f49cc230c83f38ae064fc719b362f91aeb1b6e65e"
+  },
+  {
+    "file": "before/normal/windows-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "1d8aedc29a6d887d549fb89129b1b7e5b8ffa8eb20d20d0189a2366e1239b484"
+  },
+  {
+    "file": "before/large/linux-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "275f592d218f36c2d62af8d2925ad883db7e254de8492601575dc78d91a3c818"
+  },
+  {
+    "file": "before/large/linux-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "cafe3ab651e72e5a29fde134ce275a081596e1fb36d051709370b428f5445e2e"
+  },
+  {
+    "file": "before/large/linux-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "f9c27cb2e73a5cb38e25cbe09ee00dc35f089071c0b3f5905c33a49a87cf7176"
+  },
+  {
+    "file": "before/large/linux-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "f8afbe49c32a994c90f1bb4a7915ebd77fba4101c5b44816d8d38af3f2314915"
+  },
+  {
+    "file": "before/large/linux-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "40d65d255ec349b913ab325d77d49e7f99248daef52825a552a36b69658f168e"
+  },
+  {
+    "file": "before/large/linux-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "6ed282c2aecdfb110653ca0d27a6b6282ddc846dc4b0e909cbe09a6e16f99313"
+  },
+  {
+    "file": "before/large/linux-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "3a454a93d9ef60dbbff939b18f8210563d346a5de85d39bee17c28e75897e11e"
+  },
+  {
+    "file": "before/large/linux-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "05ce2a0696dd869f85bf64ff479d96a561267e941cd9abd655323903ce9d99c2"
+  },
+  {
+    "file": "before/large/windows-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "0e9c1c7deafb9159a3d3cb1340735b398b0bb772ee84abf5bd7551420e56a8e8"
+  },
+  {
+    "file": "before/large/windows-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "691a2b93b6429b11439f72f88afbdeeb7565d6db0237dd5dc2a21c315cc64a21"
+  },
+  {
+    "file": "before/large/windows-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "43e78d475502bbfa809448d87b09ff97fdd399eb6af6eeaa02dc5435eb399aa5"
+  },
+  {
+    "file": "before/large/windows-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "13548ea56d364a6272da955d92a58a24f910436f2659dd40d912806bef100aa6"
+  },
+  {
+    "file": "before/large/macos-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "a986c251291dd3b83f87bd348cabcef152ff61e9992e045133d208272c5c9ccb"
+  },
+  {
+    "file": "before/large/macos-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "7e5ef19d2754f76116d5f994048c200a8752e9a4ea93243d154a05069b8f2811"
+  },
+  {
+    "file": "before/large/macos-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "659ea32b5b3d1084da2cd87fe92360650e45a587049735babfa395aac4691c42"
+  },
+  {
+    "file": "before/large/macos-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "ae913703171c64f9c7ee852cf61d17769d36cac986d80172392a73a8daa8e375"
+  },
+  {
+    "file": "before/large/macos-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "62eb8aa26763ac41411de23a7349ee7f7b50cd4ac75d142fe92a62142e77eb24"
+  },
+  {
+    "file": "before/large/macos-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "9fdcec183c83befe48e86301681e4eca755979a2786678ecdd2ce3ba1e59ff1b"
+  },
+  {
+    "file": "before/large/macos-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "45b5803e56bd066d78db76df5ac2e43222027a29924ba80329e536f0e60da763"
+  },
+  {
+    "file": "before/large/macos-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "1abaa99e9656b155af03443006d5dc75ee7539964197e155a8103c392c42af09"
+  },
+  {
+    "file": "before/large/windows-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "161ff731a3141e2fbac7dfbee22bcfc2fa0a65abf493735c00c92d0c6659e279"
+  },
+  {
+    "file": "before/large/windows-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "7a32450bf19d90bc09761afe265fcd322a7298bbfee1b4ad363d6addc3e7a966"
+  },
+  {
+    "file": "before/large/windows-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "58f8fed4d35239e254fed124a4ebce11215070835d9db5745a7b17fa1230f463"
+  },
+  {
+    "file": "before/large/windows-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "33d35a9721769f8457c3e93ef22c04beea8877af845f8f6b14bc15dc3e192b39"
+  },
+  {
+    "file": "after/contact-sheet-normal.png",
+    "width": 2329,
+    "height": 1111,
+    "sha256": "cca9571f7bdf5ca3e61db1cada685418292c337044580871c523cc3d5a982d6a"
+  },
+  {
+    "file": "after/contact-sheet-large.png",
+    "width": 2329,
+    "height": 1111,
+    "sha256": "f264dc94faf2feb128a651b452f676cd2807977f5313e860c1ab2ecb28a6e2a7"
+  },
+  {
+    "file": "after/normal/linux-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "84088be4ec0e61db94d54ebcf94de663448809932804df00cda1cac799496722"
+  },
+  {
+    "file": "after/normal/linux-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "7f66814fcc140c34d9cfb208153dcf325a4a5248d6bf303ab1e9fcf98aa4bf41"
+  },
+  {
+    "file": "after/normal/linux-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "58d6d71b3fc766f4331a18f3afef0d46aa6a609179be86b194192f4af2bfa239"
+  },
+  {
+    "file": "after/normal/linux-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "c1d3e8ea03365dd70b5f61150fd259748a4d0e52d6a0f7051640c51c68159026"
+  },
+  {
+    "file": "after/normal/linux-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "7356a542a6324d4f398e8e12e75f73c1dd2ba17cf7c6c0729ce4cadcb850ecb8"
+  },
+  {
+    "file": "after/normal/linux-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "4d63d45f4c835d97b9107864b36ff7611b3e2111cd2d28ed971fe871e64df051"
+  },
+  {
+    "file": "after/normal/linux-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "48cafab26617480b2b22c3d9777784823db29c53455ad7e1b119854e11660776"
+  },
+  {
+    "file": "after/normal/linux-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "feaa4f86596c74a3c167a37afbd627e0a7c655fa24841ef0d5879222c100c25c"
+  },
+  {
+    "file": "after/normal/windows-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "da9a91d217128c1875263119c299da28797b14ebf968636c50ade8c724b6d510"
+  },
+  {
+    "file": "after/normal/windows-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "517262a68b62382ab5023b2e84c1d5f50ffba5e93aa38182d4fb0fe8cee5b133"
+  },
+  {
+    "file": "after/normal/windows-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "d4049b04a374c6057a750327a5bb827c2366086a31cc24601f5a6320a6fed3d3"
+  },
+  {
+    "file": "after/normal/windows-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "dd7b43f636d4c8177cb40af9941ba05b3503da15e8ffe874a6bd70d663a10fbc"
+  },
+  {
+    "file": "after/normal/macos-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "e7a0dfce2d42f2d9c4fbc5aba9607005f726413723c1d33b0e1aaa99ebc19b7f"
+  },
+  {
+    "file": "after/normal/macos-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "ff076a6244fec475643b818d1e9c097d0bb07c6402efcd338d2331f3d5e67d7c"
+  },
+  {
+    "file": "after/normal/macos-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "76916fc6f6a2db08434f70ac83eb7383e57797bf582a0f768fcf3ff89f59f600"
+  },
+  {
+    "file": "after/normal/macos-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "e9c9bc3baa745e4dfcbd4081ce059771480cde6876bb636160b04f7507442a6b"
+  },
+  {
+    "file": "after/normal/macos-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "7ff0f5f098bb3cea111a4b41d99ee92c369eb0cffcff7a4096094344089349ff"
+  },
+  {
+    "file": "after/normal/macos-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "d7d87372c06fba66f86fc972aad7304ebb867ac648990450334281c2f8ffcf0b"
+  },
+  {
+    "file": "after/normal/macos-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "e4ac00a5fc87d7404b2cfa7964eba7e6c5cc9f13f00a3318df0215452d915126"
+  },
+  {
+    "file": "after/normal/macos-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "d9bc8ec07b0d266c8fd165e8d081a0dbeb69c1bcb77ad3a243043e3580648aad"
+  },
+  {
+    "file": "after/normal/windows-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "7e92d64233e306e4da7a3f6cc760ae4ba86121a5a96efd58312f9804d970eb83"
+  },
+  {
+    "file": "after/normal/windows-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "ecdf6af291001867e2294efbbaf3440d71b9e1a9ca307c31d3c21a8a5e6d23a5"
+  },
+  {
+    "file": "after/normal/windows-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "3e2ebfa0ba7e7cf2f5f6211c6556cbbd93d4374caced5409e6baba6cd406368d"
+  },
+  {
+    "file": "after/normal/windows-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "6702be59af5ceade2720b143157d3db355e53e148b1857e48c918712da49aa9d"
+  },
+  {
+    "file": "after/large/linux-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "24b8967f4829bb9d7a11a423f1664ab1ac2a5aa50248f9241518187dce52c04b"
+  },
+  {
+    "file": "after/large/linux-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "bb54260bf2a1683942735316dfa09b2646739e7f9df476e8b1e07d0d440d586b"
+  },
+  {
+    "file": "after/large/linux-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "a300a7d6e3dfb0008cc76b4ec460a6d5042af7e234d9486b6eacf76325406c3f"
+  },
+  {
+    "file": "after/large/linux-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "d8d413150a1c63164f29b38f0145028a4c84b42280fa580ea7d4c66735134f96"
+  },
+  {
+    "file": "after/large/linux-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "f665e411af05dc56066beb87ac85a07c7950ce2054803383a20610fa63f4328b"
+  },
+  {
+    "file": "after/large/linux-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "84077156ffa3c488fd08e0235c90ff14cbb96e00a5b7c3e03b8a65d4ed134f55"
+  },
+  {
+    "file": "after/large/linux-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "57562139c7e852c2611ba2cff4db42a7c51c18d673ddeac8627c1c8f4cf61517"
+  },
+  {
+    "file": "after/large/linux-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "1d43390d4548865c9a9ef0fc45aa1611abd282c78be3b9962e4f00d119ed7ba1"
+  },
+  {
+    "file": "after/large/windows-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "babb93db08c1152450cd7a26f81e8467124a34381398fbec1c1ccb8b8535393a"
+  },
+  {
+    "file": "after/large/windows-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "8e749c13fc34cc49e9306a264d6752dc1b5380f0a326016180c74dd6291f6e93"
+  },
+  {
+    "file": "after/large/windows-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "bdeecc40362d2a797510c4d211c27770049cacf7131189a5037b0d4f0ed83e2c"
+  },
+  {
+    "file": "after/large/windows-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "acc94bf13cb98f90e2c68733313a6b29ef1d88592a9d75d7a7c463612f71a030"
+  },
+  {
+    "file": "after/large/macos-light/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "8157c19c62d264ba40f9018d96ba344f3b16fc125838e5d2fd9a5b3b6233fedb"
+  },
+  {
+    "file": "after/large/macos-light/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "b5d12caff1889851fb67f196e0aea3f6977990af347fa85b5d00d4a6e078debe"
+  },
+  {
+    "file": "after/large/macos-light/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "6c054fb76ce80b187039ddbffefc4708975ee52fe2225e981bdcd6856216c56f"
+  },
+  {
+    "file": "after/large/macos-light/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "1e1de477cce0c8626edff03998638d6f1357a6b13933b627d6238874bc5a456f"
+  },
+  {
+    "file": "after/large/macos-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "96bd83ca3d4f40624d5d56517d1af478fe6a19d97563359fe8fdd497c9919f46"
+  },
+  {
+    "file": "after/large/macos-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "f691cf91d2f277a5b740baede7074c304d5a05f5242f4aac2e81c973ea7bdb2d"
+  },
+  {
+    "file": "after/large/macos-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "fdfdbd98aa88156f369ab02111eb83df5d11b95ddffcb4da0b1ef2cde1a2ca68"
+  },
+  {
+    "file": "after/large/macos-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "2196a09601ffa02e49dfe0fa24f558deff925ff0c9a3aae8b6dac01f002b2cc2"
+  },
+  {
+    "file": "after/large/windows-dark/first-run.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "858d5a72a67c9436a0ad4d9f3bcd6d908a9ee898061e5930fab9debb1b9e9a68"
+  },
+  {
+    "file": "after/large/windows-dark/many-results.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "ce877d1232a56f7120d363ad8eb72b27eda7514ad2dac78c059378e278e3697b"
+  },
+  {
+    "file": "after/large/windows-dark/menu-open.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "844b2c257c7e196436a2c3d3bea1540a5cd82fd0482e8fa87ad86729aa0ae361"
+  },
+  {
+    "file": "after/large/windows-dark/tray-preview.png",
+    "width": 720,
+    "height": 480,
+    "sha256": "dab777e3bc1169ba54860f8431178fa46a12794794ff321b0a96f334f18de6b8"
+  }
+]
