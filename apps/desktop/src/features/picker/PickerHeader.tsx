@@ -1,12 +1,12 @@
 import type React from "react";
 import { pickerText } from "../../messages";
 import type { Choice } from "./choice";
-import { FormatSelect } from "./FormatSelect";
+import { FormatMenu } from "./FormatMenu";
 
 /** The search bar: the search box, the copy format and the pin. It is also
  * the window's drag region; the editable box itself is not. */
 export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, pinned, onTogglePin }: {
-  inputRef: React.Ref<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   query: string;
   onQueryChange: (query: string) => void;
   onSearchKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -15,6 +15,7 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   /** The id of the highlighted row, when there is one. */
   activeDescendant: string | undefined;
   format: Choice;
+  /** Whether formatted citation styles can be used now. */
   styles: boolean;
   onFormatChange: (choice: Choice) => void;
   pinned: boolean;
@@ -44,7 +45,7 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
         onChange={(e) => onQueryChange(e.target.value)}
         onKeyDown={onSearchKeyDown}
       />
-      <FormatSelect format={format} styles={styles} onChange={onFormatChange} />
+      <FormatMenu format={format} styles={styles} onChange={onFormatChange} searchRef={inputRef} />
       <button
         type="button"
         className="pin-button"
