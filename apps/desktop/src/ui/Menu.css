@@ -1,8 +1,9 @@
 /* In-window menus (More, format, library scope): one frame and one row, with
-   each platform's native menu metrics (docs/design.md, Corners and Menus;
+   each platform's native menu metrics; radius and padding come from the
+   geometry chain in tokens.css (docs/design.md, Corners and Menus;
    ADR 0021 §5). These are the look-layer tokens for menus. */
 .menu-popover {
-  --menu-radius: 12px; --menu-padding: 6px; --menu-item-radius: 6px; --menu-item-height: 28px;
+  --menu-radius: var(--r-menu); --menu-padding: var(--menu-pad); --menu-item-radius: var(--r-mi); --menu-item-height: 28px;
   --menu-background: Canvas; --menu-highlight: var(--selected-background); --menu-highlight-text: var(--selected-text);
   --menu-shadow: 0 12px 32px rgb(0 0 0 / 16%); --menu-enter-transform: none;
   --menu-open-duration: 90ms; --menu-open-ease: linear;
@@ -23,9 +24,9 @@
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root[data-platform="macos"] .menu-popover { --menu-background: Canvas; }
 }
-/* Fluent MenuFlyout: 8 px flyout, 4 px rows, 32 px high, sliding in from its button. */
+/* Fluent MenuFlyout: 8 px flyout and 4 px rows from the geometry chain, 32 px high, sliding in from its button. */
 :root[data-platform="windows"] .menu-popover {
-  --menu-radius: 8px; --menu-padding: 4px; --menu-item-radius: 4px; --menu-item-height: 32px;
+  --menu-item-height: 32px;
   --menu-highlight-text: var(--text); --menu-shadow: 0 8px 16px rgb(0 0 0 / 14%);
   --menu-enter-transform: translateY(-8px); --menu-open-duration: 200ms; --menu-open-ease: cubic-bezier(.2, .8, .2, 1);
 }
@@ -57,7 +58,7 @@
 /* The menu and its rows never show a focus ring: the highlight is a fill. */
 .menu-popover [role="menu"] { position: static; display: flex; flex-direction: column; min-width: 0; min-height: 0; outline: none; overflow: auto; }
 .menu-section { display: flex; flex-direction: column; }
-.menu-separator { height: 1px; margin: 4px 8px; border: 0; background: var(--line); }
+.menu-separator { height: 1px; margin: 4px 8px; border: 0; background: var(--separator); }
 /* A line above a section, aligned with the labels after the check column. */
 .menu-header { padding-inline-start: 22px; }
 .menu-item {

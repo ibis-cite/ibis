@@ -14,7 +14,15 @@
 
   /* Space and size on a 4 px grid. */
   --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem; --space-6: 1.5rem;
-  --search-bar-height: 3.5rem;
+  /* One geometry chain (docs/design.md, "Space and size" and "Corners"):
+     the look layers below set only --r-win, --inset and --r-min; every inner
+     radius and the search band follow from them. Radii are px (they follow the
+     native window corner); sizes are rem, so Larger text keeps edges aligned. */
+  --inset: var(--space-2);      /* window edge to the field, the list and the footer */
+  --field-h: 2.5rem;            /* the search field */
+  --row-pad: var(--space-3);    /* row side padding */
+  --row-gap: var(--space-3);    /* tile to text */
+  --search-bar-height: calc(var(--field-h) + 2 * var(--inset)); /* 56, 48 on Windows */
   --footer-height: 2.5rem;
   --control-min-size: 2rem;
   --icon-glyph-size: 1.25rem;
@@ -24,7 +32,15 @@
   --row-spacious: 4.75rem;     /* three lines */
   --row-height: var(--row-comfortable);
   --larger-text-scale: 1.15;
-  --window-radius: 12px; /* macOS: matches the native 12 pt corner (native_corners.rs); Windows and Linux below */
+  /* macOS: the native 12 pt panel corner (native_corners.rs). macOS 26 moves
+     it to 28 (#576), which gives rows 20 and tiles 8 through the chain. */
+  --r-win: 12px;
+  --r-min: 6px;
+  --r-row: max(var(--r-min), calc(var(--r-win) - var(--inset)));     /* rows, search field */
+  --r-tile: max(var(--r-min), calc(var(--r-row) - var(--row-pad)));  /* type tile */
+  --r-menu: 12px;
+  --menu-pad: 6px;
+  --r-mi: max(var(--r-min), calc(var(--r-menu) - var(--menu-pad)));  /* menu items */
   --status-dot-size: .5rem;
   --menu-min-width: 14rem;
   --menu-shadow: 0 .5rem 1.5rem rgb(0 0 0 / 20%);
@@ -66,13 +82,17 @@
   --surface: Canvas;
   --text: CanvasText;
   --muted: CanvasText;
-  --line: GrayText;
+  --line: GrayText;      /* control edges that need 3:1: fields, contrast modes */
+  --separator: var(--line); /* dividers between regions; quieter per look below */
   --active-edge: CanvasText;
   --accent: Highlight;
   --focus: CanvasText;
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --button-background: color-mix(in srgb, var(--text) 4%, var(--surface));
   --button-hover-background: color-mix(in srgb, var(--text) 8%, var(--surface));
+  /* Buttons and key caps are fills without an edge, as in native toolbars;
+     Windows adds Fluent's faint control stroke, contrast modes a solid one. */
+  --button-edge: var(--clear);
   --hover-background: color-mix(in srgb, var(--text) 3%, var(--surface));
   --selected-background: Highlight;
   --selected-text: HighlightText;
@@ -89,31 +109,30 @@
   --alert-color: CanvasText;
   --alert-border-width: 3px;
   --button-radius: 6px;
-  --result-radius: 9px;
   --key-radius: 5px;
-  --hint-radius: 3px;
+  --hint-radius: 4px;
   --button-padding: .35rem .55rem;
   --picker-height: 100dvh;
-  --search-gap: .9rem;
-  --search-padding: var(--space-1) var(--space-4);
-  --search-icon-width: 1.35rem;
+  /* Between the field and the header's controls. The search glyph sits over
+     the tile column and the query starts where row titles start:
+     inset + lead + icon + lead-gap = inset + row-pad + tile + row-gap. */
+  --search-gap: var(--space-1);
+  --search-icon-width: var(--icon-glyph-size);
+  --lead: calc(var(--row-pad) + (var(--tile-size) - var(--icon-glyph-size)) / 2);
+  --lead-gap: calc((var(--tile-size) - var(--icon-glyph-size)) / 2 + var(--row-gap));
   --search-min-width: 12rem;
   --search-icon-stroke: var(--icon-stroke);
   --search-size: var(--type-search-size);
   --search-tracking: -.025em;
-  --search-input-padding: .25rem 0;
   --search-focus-offset: 5px;
   --hidden-size: 1px;
   --hidden-margin: -1px;
   --hidden-clip: inset(50%);
   --results-min-height: 5rem;
-  --results-padding: .5rem;
-  --heading-padding: .55rem 1rem .45rem;
+  --heading-padding: var(--space-2) var(--row-pad) var(--space-1);
   --heading-size: var(--type-label-size);
   --heading-weight: var(--type-strong-weight);
   --heading-tracking: .02em;
-  --result-padding: .6rem 1rem;
-  --result-margin: .1rem 0;
   --title-size: var(--type-title-size);
   --title-weight: var(--type-strong-weight);
   --title-line-height: var(--type-title-line);
@@ -133,7 +152,7 @@
   --selection-gap: .4rem;
   --selection-padding: .6rem 1rem;
   --selection-label-padding: .5rem;
-  --footer-padding: .55rem 1rem;
+  --footer-padding: calc(var(--inset) + var(--row-pad)) var(--inset); /* inline start, end */
   --footer-size: var(--type-label-size);
   --footer-gap: .4rem;
   --library-min-width: 14rem;
@@ -141,22 +160,17 @@
   --icon-size: 1rem;
   --icon-padding: .15rem .4rem;
   --hint-size: var(--type-label-size);
-  --hint-padding: .1rem .25rem;
+  --key-cap: 1.25rem;
   --hint-margin: .2rem;
   --contrast-border-width: 3px;
   --forced-selected-offset: -4px;
   --forced-search-offset: -3px;
-  --compact-search-padding: var(--space-1) var(--space-3);
-  --search-active-border: var(--accent);
-  --field-padding: var(--space-2) var(--space-3);
   --field-background: var(--button-background);
-  --field-radius: var(--button-radius);
   --clear-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7 7 17'/%3E%3C/svg%3E");
   --field-edge: color-mix(in srgb, var(--line) 35%, var(--surface));
   /* The leading tile of a result row: 32 px, a quiet fill, 20 px icon. */
   --tile-size: 2rem;
-  --tile-radius: 7px;
-  --tile-button-inset: 0;
+  --tile-compact: 1.5rem; /* drawn in Compact, inside the same 32 px column */
   --tile-background: color-mix(in srgb, var(--text) 5%, transparent);
   --tile-active-background: color-mix(in srgb, var(--row-active-text) 22%, transparent);
   --on-citation: #fff;
@@ -200,15 +214,19 @@
 /* Per platform (docs/design.md): only radius, the selected row, the focus ring and the search box change. */
 :root[data-platform="windows"], :root[data-platform="linux"] { --search-size: 1rem; --search-tracking: 0; }
 :root[data-platform="windows"] {
-  --window-radius: 8px; --button-radius: 4px; --result-radius: 4px; --key-radius: 4px;
+  --r-win: 8px; --inset: var(--space-1); --r-min: 2px; --r-menu: 8px; --menu-pad: 4px;
+  --button-radius: 4px; --key-radius: 4px;
   --row-active-background: color-mix(in srgb, var(--text) 6%, var(--surface)); --row-active-text: var(--text); --row-active-muted: var(--muted);
-  --tile-radius: 4px; --tile-active-background: light-dark(#fff, rgb(255 255 255 / 10%));
+  --tile-active-background: light-dark(#fff, rgb(255 255 255 / 10%));
   /* Fluent's focus visual: an outer stroke in the text colour (black in light
      mode, white in dark) around an inner stroke in the surface colour. */
   --focus-ring-color: var(--text); --focus-ring-shadow: 0 0 0 1px var(--surface);
 }
 :root[data-platform="linux"] {
-  --window-radius: 14px; --field-radius: 9px;
+  /* Rows sit flat on the window, with the 6 px radius of Adwaita's sidebar
+     and popover rows: a boxed list cannot be concentric at an 8 px inset in a
+     14 px window. The chain gives 6 for rows and the entry, 4 for tiles. */
+  --r-win: 14px; --r-min: 4px;
   /* The selected row is GTK's selection colour with its paired text: the
      system Highlight pair, which WebKitGTK takes from the GTK theme. A tint
      like libadwaita's 25% accent ($view_selected_color) reaches only about
@@ -232,8 +250,8 @@
       --hover-background: light-dark(rgb(0 0 0 / 4.5%), rgb(255 255 255 / 6%));
       --button-background: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 8%));
       --button-hover-background: light-dark(rgb(0 0 0 / 9%), rgb(255 255 255 / 13%));
-      --search-active-border: var(--line);
-      --button-radius: 8px; --result-radius: 10px; --hint-radius: 5px; --key-radius: 5px; --menu-radius: 12px;
+      --separator: var(--line);
+      --button-radius: 8px; --hint-radius: 5px; --key-radius: 5px; --menu-radius: 12px;
       --menu-shadow: 0 1rem 2.5rem rgb(0 0 0 / 22%);
       --vibrancy-tint: light-dark(rgb(250 250 252 / 55%), rgb(30 30 34 / 55%));
       /* A hairline, as on a native panel: no white rim or glow (prototype round six). */
@@ -251,21 +269,29 @@
 }
 
 @supports (background: color-mix(in srgb, white 50%, black)) {
-  :root { --search-active-border: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+  /* Dividers: Adwaita's $border_color (the text colour at 15%) by default and
+     on Linux; Windows and macOS set their own hairlines. */
+  :root { --separator: color-mix(in srgb, currentColor 15%, transparent); }
   /* Linux: Adwaita's half-accent focus ring, mixed toward the text colour
      rather than transparency so it reaches 3:1 on the surface in both themes. */
   :root[data-platform="linux"] { --focus-ring-color: color-mix(in srgb, var(--accent) 50%, var(--text)); }
 }
 
+/* Windows: Fluent's DividerStrokeColorDefault and ControlStrokeColorDefault.
+   Before the contrast blocks, which must override it. */
+@supports (color: light-dark(white, black)) {
+  :root[data-platform="windows"] { --separator: light-dark(rgb(0 0 0 / 6%), rgb(255 255 255 / 8%)); --button-edge: light-dark(rgb(0 0 0 / 6%), rgb(255 255 255 / 7%)); }
+}
+
 @media (prefers-contrast: more) {
-  :root, :root[data-platform] { --focus-ring-color: CanvasText; --focus-ring-width: var(--focus-width); --focus-ring-offset: var(--focus-offset); --focus-ring-shadow: none; --selected-background: Highlight; --selected-text: HighlightText; --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; }
+  :root, :root[data-platform] { --separator: CanvasText; --button-edge: CanvasText; --focus-ring-color: CanvasText; --focus-ring-width: var(--focus-width); --focus-ring-offset: var(--focus-offset); --focus-ring-shadow: none; --selected-background: Highlight; --selected-text: HighlightText; --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; }
   :root { --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --active-edge: CanvasText; --focus: CanvasText; }
 }
 @media (forced-colors: active) {
-  :root, :root[data-platform] { --focus-ring-color: CanvasText; --focus-ring-width: var(--focus-width); --focus-ring-offset: var(--focus-offset); --focus-ring-shadow: none; --selected-background: Highlight; --selected-text: HighlightText; --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; }
+  :root, :root[data-platform] { --separator: CanvasText; --button-edge: ButtonText; --focus-ring-color: CanvasText; --focus-ring-width: var(--focus-width); --focus-ring-offset: var(--focus-offset); --focus-ring-shadow: none; --selected-background: Highlight; --selected-text: HighlightText; --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; }
   :root { --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --text: CanvasText; --muted: CanvasText; --line: ButtonText; --active-edge: CanvasText; --focus: CanvasText; }
 }
 
 /* Explicit contrast preview in the development states gallery. */
-:root[data-gallery-theme="contrast"], :root[data-gallery-theme="contrast"][data-platform] { --focus-ring-color: CanvasText; --focus-ring-width: var(--focus-width); --focus-ring-offset: var(--focus-offset); --focus-ring-shadow: none; }
+:root[data-gallery-theme="contrast"], :root[data-gallery-theme="contrast"][data-platform] { --separator: CanvasText; --button-edge: CanvasText; --focus-ring-color: CanvasText; --focus-ring-width: var(--focus-width); --focus-ring-offset: var(--focus-offset); --focus-ring-shadow: none; }
 :root[data-gallery-theme="contrast"] { --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --active-edge: CanvasText; --focus: CanvasText; }
