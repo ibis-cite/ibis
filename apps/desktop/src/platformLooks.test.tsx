@@ -594,13 +594,27 @@ test("soft depth changes colour, shadow and fill only, so the geometry chain sta
     ".setup-writing .setup-choices { margin-inline: auto }",
     ".setup-writing .setup-choices { width: fit-content }",
     ":is([aria-label=\"Selected references\"], .format-preview) { margin-inline: var(--space-1) }",
-    "[aria-label=\"Selected references\"] { padding-inline: calc(1rem - var(--space-1)) }",
+    "[aria-label=\"Selected references\"] { padding-inline: calc(var(--inset) + var(--row-pad) - var(--space-1)) }",
   ]);
-  // The tray's 1rem is the inline half of --selection-padding, so the chips stay put.
-  expect(tokens.match(/--selection-padding:\s*\S+\s+([^;]+);/)?.[1]).toBe("1rem");
   // The writing track only shrinks to its centred buttons: auto inline margins
   // keep them where justify-content put them, and its 2 px reach is a shadow.
   expect(rules(styles, ".library-setup .setup-choices")).toMatch(/justify-content:\s*center/);
+});
+
+test("the depth card keeps tray content at each platform's selection inset", () => {
+  const padding = rules(depth, `${layers()} [aria-label="Selected references"]`).match(/padding-inline:\s*([^;]+);/)?.[1];
+  expect(padding).toBeTruthy();
+  expect(tokens).toMatch(/--selection-padding:\s*var\(--space-2\) calc\(var\(--inset\) \+ var\(--row-pad\)\);/);
+  for (const platform of ["macos", "windows", "linux"]) {
+    const g = geometry(platform === "macos" ? undefined : platform);
+    const terms = padding!.replace(/var\((--[\w-]+)\)/g, (_, name: string) => `${g[name]}px`)
+      .replace(/([\d.]+)rem/g, (_, rem: string) => `${Number(rem) * 16}px`)
+      .replace(/^calc\((.*)\)$/, "$1");
+    expect(terms, platform).toMatch(/^\d+(?:\.\d+)?px(?: [+-] \d+(?:\.\d+)?px)*$/);
+    const inline = [...terms.matchAll(/([+-] )?(\d+(?:\.\d+)?)px/g)]
+      .reduce((sum, [, sign, value]) => sum + (sign === "- " ? -1 : 1) * Number(value), 0);
+    expect(g["--space-1"]! + inline, platform).toBe(g["--inset"]! + g["--row-pad"]!);
+  }
 });
 
 test("reduced motion turns the soft depth transitions off", () => {
