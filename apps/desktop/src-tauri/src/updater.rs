@@ -349,6 +349,11 @@ mod tests {
                             Err(error) => panic!("accept: {error}"),
                         }
                     };
+                    // Accepted sockets can inherit the listener mode on macOS.
+                    stream.set_nonblocking(false).unwrap_or_else(|e| panic!("{e}"));
+                    stream
+                        .set_write_timeout(Some(Duration::from_secs(2)))
+                        .unwrap_or_else(|e| panic!("{e}"));
                     stream
                         .set_read_timeout(Some(Duration::from_secs(2)))
                         .unwrap_or_else(|e| panic!("{e}"));
