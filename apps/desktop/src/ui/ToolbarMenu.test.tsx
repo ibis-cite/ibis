@@ -1,7 +1,7 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axe from "axe-core";
-import { createRef } from "react";
+import { createRef, StrictMode } from "react";
 import type { KeyboardEvent } from "react";
 import { ToolbarMenu, type ToolbarMenuSection } from "./ToolbarMenu";
 
@@ -60,21 +60,25 @@ test.each(["Escape", "Tab"])("%s closes just the menu and returns focus", async 
   expect(parentKeys).not.toHaveBeenCalled();
 });
 
-function mountCommand() {
+function mountCommand(strict = false) {
   const searchRef = createRef<HTMLInputElement>();
   let current = true;
-  const run = vi.fn(() => expect(document.activeElement).toBe(searchRef.current));
+  const run = vi.fn(() => {
+    expect(document.activeElement).toBe(searchRef.current);
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
   const commands = { onKeyCommand: (event: KeyboardEvent) => event.ctrlKey && event.key === "k"
     ? { run, isCurrent: () => current } : undefined };
-  render(<><input aria-label="Search references" ref={searchRef} /><ToolbarMenu label="Copy as" value="Pandoc"
+  const content = <><input aria-label="Search references" ref={searchRef} /><ToolbarMenu label="Copy as" value="Pandoc"
     sections={sections} selectedKey="pandoc" onAction={() => {}} filterLabel="Filter formats"
-    returnFocusRef={searchRef} {...commands} /></>);
+    returnFocusRef={searchRef} {...commands} /></>;
+  render(strict ? <StrictMode>{content}</StrictMode> : content);
   fireEvent.click(screen.getByRole("button", { name: "Copy as Pandoc" }));
-  return { run, invalidate: () => { current = false; }, menu: screen.getByRole("menu") };
+  return { run, invalidate: () => { current = false; }, menu: screen.getByRole("menu"), search: searchRef.current! };
 }
 
-test("a key command waits for menu removal and Search focus, then runs once", async () => {
-  const { menu, run } = mountCommand();
+test.each([false, true])("a key command waits for removal and Search, then runs once (StrictMode %s)", async (strict) => {
+  const { menu, run } = mountCommand(strict);
   fireEvent.keyDown(menu, { key: "k", ctrlKey: true });
   expect(run).not.toHaveBeenCalled();
   fireEvent.keyUp(document.body, { key: "k", ctrlKey: true });
@@ -82,6 +86,27 @@ test("a key command waits for menu removal and Search focus, then runs once", as
   expect(menu.isConnected).toBe(false);
   await act(async () => { await new Promise(requestAnimationFrame); });
   expect(run).toHaveBeenCalledTimes(1);
+});
+
+test("input during Search focus cancels the consumed command", async () => {
+  const { menu, search, run } = mountCommand();
+  search.addEventListener("focus", () => fireEvent.keyDown(document.body, { key: "Escape" }), { once: true });
+  fireEvent.keyDown(menu, { key: "k", ctrlKey: true });
+  await waitFor(() => expect(menu.isConnected).toBe(false));
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  expect(document.activeElement).toBe(search);
+  expect(run).not.toHaveBeenCalled();
+});
+
+test("a command does not run when Search cannot receive focus", async () => {
+  const { menu, search, run } = mountCommand();
+  const focus = vi.spyOn(search, "focus").mockImplementation(() => {});
+  try {
+    fireEvent.keyDown(menu, { key: "k", ctrlKey: true });
+    await waitFor(() => expect(menu.isConnected).toBe(false));
+    await act(async () => { await new Promise(requestAnimationFrame); });
+    expect(run).not.toHaveBeenCalled();
+  } finally { focus.mockRestore(); }
 });
 
 test.each(["pointer", "key", "blur", "hidden"])("a later %s cancels a pending menu command", async (action) => {
@@ -94,6 +119,32 @@ test.each(["pointer", "key", "blur", "hidden"])("a later %s cancels a pending me
   await waitFor(() => expect(menu.isConnected).toBe(false));
   await act(async () => { await new Promise(requestAnimationFrame); });
   expect(run).not.toHaveBeenCalled();
+});
+
+test.each(["k", "Escape", "Tab"])("%s during an exit stays inside the handoff", async (key) => {
+  // Hold a real React Aria exit through its Web Animations API boundary.
+  let release!: () => void;
+  const finished = new Promise<void>((resolve) => { release = resolve; });
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, "getAnimations");
+  Object.defineProperty(Element.prototype, "getAnimations", { configurable: true, value(this: HTMLElement) {
+    return this.hasAttribute("data-exiting") ? [{ playState: "running", finished }] : [];
+  } });
+  try {
+    const { menu, run, search } = mountCommand();
+    fireEvent.keyDown(menu, { key: "k", ctrlKey: true });
+    expect(menu.closest(".toolbar-menu-popover")?.hasAttribute("data-exiting")).toBe(true);
+    fireEvent.keyDown(menu, { key, ctrlKey: key === "k" });
+    expect(run).not.toHaveBeenCalled();
+    await act(async () => { release(); await finished; });
+    await waitFor(() => expect(menu.isConnected).toBe(false));
+    await act(async () => { await new Promise(requestAnimationFrame); });
+    expect(document.activeElement).toBe(search);
+    expect(run).toHaveBeenCalledTimes(key === "k" ? 1 : 0);
+  } finally {
+    release();
+    if (descriptor) Object.defineProperty(Element.prototype, "getAnimations", descriptor);
+    else Reflect.deleteProperty(Element.prototype, "getAnimations");
+  }
 });
 
 test("more than seven items filter with virtual focus and ignore composing shortcuts and picks", async () => {
