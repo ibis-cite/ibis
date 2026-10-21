@@ -318,10 +318,11 @@ const aliased = snapshotProbe();
 assert.deepEqual(aliased.invoke(), {nodes: aliased.states[0].names.map(name => ({
     name, role: 'AXComboBox', value: 'smoke099999', focused: true})), visible: true, foreground: true});
 assert.deepEqual(aliased.reads, [{role: 1, value: 1, focused: 1}]);
+aliased.states[0].role = 'AXButton';
 aliased.states[0].value = 'new value';
 aliased.states[0].focused = false;
 assert.deepEqual(aliased.invoke(), {nodes: aliased.states[0].names.map(name => ({
-    name, role: 'AXComboBox', value: 'new value', focused: false})), visible: true, foreground: false});
+    name, role: 'AXButton', value: 'new value', focused: false})), visible: true, foreground: false});
 assert.deepEqual(aliased.reads, [{role: 2, value: 2, focused: 2}]);
 const repeated = snapshotProbe([{names: ['Search references', 'Search references', 'Search references']}]);
 assert.equal(repeated.invoke().nodes.length, 1);
@@ -334,6 +335,14 @@ assert.deepEqual(unavailableState.reads, [{role: 1, value: 1, focused: 1}]);
 const separate = snapshotProbe([{}, {role: 'AXButton', value: 'other', focused: false}]);
 assert.deepEqual(separate.invoke().nodes.map(node => node.value), ['smoke099999', 'smoke099999', 'smoke099999', 'other', 'other', 'other']);
 assert.deepEqual(separate.reads, [{role: 1, value: 1, focused: 1}, {role: 1, value: 1, focused: 1}]);
+const unnamed = snapshotProbe([{names: ['', '', '']}]);
+assert.equal(unnamed.invoke().nodes[0].name, '');
+assert.deepEqual(unnamed.reads, [{role: 1, value: 1, focused: 1}]);
+for (const focused of [undefined, null, 1, 'true']) {
+    const nonBoolean = snapshotProbe([{focused}]).invoke();
+    assert.ok(nonBoolean.nodes.every(node => node.focused === false));
+    assert.equal(nonBoolean.foreground, false);
+}
 assert.throws(snapshotProbe(Array(4001).fill({})).invoke, /traversal bound/);
 
 console.log('Native HID event-plan contracts passed; no macOS execution claimed.');
