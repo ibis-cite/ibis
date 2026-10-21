@@ -63,12 +63,13 @@
     "Pointer activation or real Tab traversal to the requested control followed by Enter/Space",
     "After removal: Search focus, retained active identity/query/ordered survivors, no copy, main.scrollTop=0 and document scrollY=0",
     "Immediate ArrowUp navigation; More shortcut,Home/End focus,Escape restoration and menuTab return to Search",
-    "Exact ordered synthetic Pandoc copy and owned selection clear after deliberate Enter"
+    "18 large-fixture cases verify ID-derived ordered synthetic Pandoc text;6 only-item small-fixture cases verify its fixed example confirmation. Exact only-item requested IDs are covered by unit tests."
   ],
   "limits": [
     "No native WKWebView/WebView2/GTK pointer or screen-reader acceptance claim",
     "No formatted/native clipboard acceptance claim; existing pending-copy/ABA unit cases passed with unchanged transaction",
-    "Rotated representative combinations; not the full Cartesian product of every count/activation/position"
+    "Rotated representative combinations; not the full Cartesian product of every count/activation/position",
+    "Small tray copy provider returns fixed example text; its6 only-item browser cases prove focus/navigation, not requested-ID fidelity."
   ],
   "columns": [
     "platform_look",
