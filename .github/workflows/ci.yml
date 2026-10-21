@@ -51,8 +51,10 @@ jobs:
           nixpkgs=$(nix eval --impure --raw --expr '(builtins.getFlake (toString ./.)).inputs.nixpkgs.outPath')
           # nix-prefetch's own library also imports <nixpkgs/lib>.
           export NIX_PATH="nixpkgs=$nixpkgs"
+          # Its fetcher-discovery overlay predates fetchgit.getRevWithTag.
+          # This explicit hash-accepting function needs no fetcher discovery.
           nix run "$nixpkgs#nix-prefetch" -- --file "$nixpkgs" --expr \
-            '{ sha256 }: (pkgs.callPackage ./nix/package.nix { pnpmDepsHash = sha256; }).pnpmDeps' > pnpm-hash
+            '{ sha256 }: let clean = import <nixpkgs> { overlays = []; }; in (clean.callPackage ./nix/package.nix { pnpmDepsHash = sha256; }).pnpmDeps' > pnpm-hash
           nix hash convert --hash-algo sha256 --to sri "$(cat pnpm-hash)" > nix/pnpm-deps-hash
 
       - name: Preserve generated inputs
