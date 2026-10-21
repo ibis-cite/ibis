@@ -2099,31 +2099,47 @@ test.each(["Escape", "hidden"])("a click waiting for its preview never copies af
   expect(calls).not.toContain("show_copied_notice");
 });
 
+// Each visible hint as "label keys"; the label always comes first (docs/design.md, Footer).
 const footerKeys = () => [...screen.getByRole("group", { name: "Keys" }).children]
-  .filter((hint) => hint.getAttribute("aria-hidden") !== "true").map((hint) => hint.textContent).join("");
+  .filter((hint) => hint.getAttribute("aria-hidden") !== "true")
+  .map((hint) => `${hint.querySelector(".key-hint-label")?.textContent} ${hint.querySelector(".key-caps")?.textContent}`).join(" · ");
 
 test("the footer says what Enter will copy, and holding Alt shows the other keys", async () => {
   backend({ search: ({ query }) => (query ? [result("a", "First"), result("b", "Second")] : []) });
   render(<App />);
   const box = screen.getByLabelText("Search references");
   // Nothing to copy yet, so Enter is not advertised.
-  await waitFor(() => expect(footerKeys()).toBe("Ctrl+/ All keys"));
+  await waitFor(() => expect(footerKeys()).toBe("Shortcuts Ctrl+/"));
   fireEvent.change(box, { target: { value: "x" } });
   await screen.findByText("First");
-  expect(footerKeys()).toBe("Enter Copy as PandocCtrl+/ All keys");
+  expect(footerKeys()).toBe("Copy as Pandoc Enter · Shortcuts Ctrl+/");
   fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "typst" } });
-  expect(footerKeys()).toContain("Enter Copy as Typst");
+  expect(footerKeys()).toContain("Copy as Typst Enter");
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
   fireEvent.keyDown(box, { key: "ArrowDown" });
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
-  expect(footerKeys()).toContain("Enter Copy 2 as Typst");
+  expect(footerKeys()).toContain("Copy 2 as Typst Enter");
   fireEvent.keyDown(box, { key: "Alt", altKey: true });
-  expect(footerKeys()).toBe("Shift+Enter Remove from citationEsc Clear search");
+  expect(footerKeys()).toBe("Remove from citation Shift+Enter · Clear search Esc");
   fireEvent.keyUp(box, { key: "Alt" });
   expect(footerKeys()).toContain("Copy 2 as Typst");
   fireEvent.keyDown(box, { key: "Alt", altKey: true });
   fireEvent.blur(window);
   expect(footerKeys()).not.toContain("Esc");
+});
+
+test("More reads like the hints beside it: its name first, then its keys", async () => {
+  backend({ search: () => [result("a", "First")] });
+  render(<App />);
+  await screen.findByText("First");
+  const more = screen.getByRole("button", { name: /^More/ });
+  expect(more.querySelector(".key-hint-label")?.textContent).toBe("More");
+  expect(more.querySelector(".key-caps")?.textContent).toBe("Ctrl+K");
+  expect(more.querySelector(".key-caps")?.getAttribute("aria-hidden")).toBe("true");
+  // The hint that comes and goes is first, so More never moves.
+  const hints = [...screen.getByRole("group", { name: "Keys" }).children];
+  expect(hints[0]?.textContent).toContain("Copy as Pandoc");
+  expect(hints.at(-1)?.textContent).toContain("Shortcuts");
 });
 
 test.each([false, true])("Search hint layout survives pointer focus moving to More (Alt=%s)", async (alt) => {
@@ -2289,13 +2305,13 @@ test("the footer offers Enter only when Enter in the search box would copy", asy
     render(<App />);
     await screen.findByText("First");
     const box = screen.getByLabelText("Search references");
-    expect(footerKeys()).toContain("Enter Copy as Pandoc");
+    expect(footerKeys()).toContain("Copy as Pandoc Enter");
     // Another control has focus, so Enter would press it instead.
     const more = screen.getByRole("button", { name: /^More/ });
     act(() => more.focus());
     expect(footerKeys()).not.toContain("Enter");
     act(() => box.focus());
-    expect(footerKeys()).toContain("Enter Copy as Pandoc");
+    expect(footerKeys()).toContain("Copy as Pandoc Enter");
     // A formatted citation still being made is not offered.
     fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
     await screen.findByText("Formatting…");
