@@ -388,6 +388,16 @@ class MacOS:
         clean_settings(self.settings)
 
 
+class WindowsActivationFailure(AssertionError):
+    def __init__(self, probe):
+        super().__init__("Windows update activation failed or its outcome is unknown")
+        flags = {"attempted", "blocked", "invoke_available", "enabled", "on_screen"}
+        counts = {"pids", "windows", "elements", "offer_matches", "action_matches"}
+        self.probe = {key: value for key, value in (probe.items() if isinstance(probe, dict) else [])
+                      if (key in flags and type(value) is bool)
+                      or (key in counts and type(value) is int and 0 <= value <= 2147483647)}
+
+
 class Windows:
     """Installed for the current user by the setup executable; the updater
     runs the new setup executable, which starts the app again."""
@@ -442,6 +452,7 @@ class Windows:
                 "installed_version": self.installed_version(), "executable_changed": changed}
 
     def look(self, pids, press=None):
+        probe = None
         try:
             result = look_result(powershell(WINDOWS_LOOK, IBIS_PIDS=",".join(map(str, pids)), IBIS_PRESS=press or ""))
             pressed, _, probe = result
@@ -453,7 +464,7 @@ class Windows:
             if press:
                 # offered() retries those helper errors; AssertionError instead
                 # ends qualification when an activation may have happened.
-                raise AssertionError("Windows update activation failed or its outcome is unknown") from None
+                raise WindowsActivationFailure(probe) from None
             raise
 
     def close(self):
@@ -553,6 +564,8 @@ def run(args):
                 report["status"] = "passed"
             except Exception as error:
                 report["error"] = str(error) if isinstance(error, AssertionError) else f"{type(error).__name__}: {error}"
+                if isinstance(error, WindowsActivationFailure) and error.probe:
+                    seen["probe"] = error.probe
                 if seen["helper"]:
                     report["last_helper_problem"] = seen["helper"]
                 if seen["probe"] is not None:
@@ -595,6 +608,15 @@ def run(args):
 
 
 class Tests(unittest.TestCase):
+    def test_windows_fatal_activation_keeps_only_fixed_failure_facts(self):
+        probe = {"attempted": True, "blocked": True, "invoke_available": False, "action_matches": 1,
+                 "private": "synthetic payload", "enabled": "synthetic payload", "elements": -1}
+        with patch(__name__ + ".powershell", return_value=json.dumps({"pressed": False, "seen": [], "probe": probe})):
+            with self.assertRaises(AssertionError) as failure:
+                Windows.__new__(Windows).look({42}, BUTTON)
+        self.assertEqual(getattr(failure.exception, "probe", None),
+                         {"attempted": True, "blocked": True, "invoke_available": False, "action_matches": 1})
+
     @unittest.skipUnless(shutil.which("pwsh"), "PowerShell is required for the Windows update activation contract")
     def test_windows_offer_uses_exact_ownership_uniqueness_and_invocation_capability(self):
         # Execute the actual embedded helper with private provider models.
