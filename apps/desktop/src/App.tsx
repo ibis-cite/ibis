@@ -604,6 +604,11 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     const shared = [...selected.values()].some((other) => other.key === r.key && other.id.source !== r.id.source);
     return shared && library ? pickerText.removeReferenceIn(r.key, library) : pickerText.removeReference(r.key);
   };
+  const openMore = () => {
+    // React Aria records the invoker before mounting its modal focus scope.
+    moreButton.current?.focus();
+    setMenuOpen(true);
+  };
   const closeMenu = (refocus: boolean) => {
     setMenuOpen(false);
     if (refocus) moreButton.current?.focus();
@@ -663,7 +668,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         } else if (isMenuShortcut(e)) {
           e.preventDefault();
           if (menuOpen) closeMenu(true);
-          else setMenuOpen(true);
+          else openMore();
         } else if (isQuitShortcut(e)) {
           e.preventDefault();
           void perform("quit", quitAfterSaving);
@@ -760,7 +765,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         hints={{ enter: enterAction, shiftEnter: shiftEnterAction, escape: escapeAction }}
         altHeld={altHeld} searchFocused={searchFocused}
         more={
-          <PickerMenu isOpen={menuOpen} onOpenChange={(open) => (open ? setMenuOpen(true) : closeMenu(false))}
+          <PickerMenu isOpen={menuOpen} onOpenChange={(open) => (open ? openMore() : closeMenu(false))}
             buttonRef={moreButton} searchRef={input} library={library} libraryDetail={libraryDetail}
             zotero={library?.zotero && useZoteroLibraries ? {
               offered: ["user" as const, ...offeredGroups.map((id) => ({ group: id }))],
