@@ -1,0 +1,45 @@
+{
+  "source": "dfe54536a933d071d07a7fd061cd81d4e0bb8cf9",
+  "label": "native WKWebView, isolated synthetic gallery, bounded CUA keyboard path",
+  "os": "macOS 27.0.1 arm64",
+  "viewport_points": [
+    720,
+    480
+  ],
+  "checks": {
+    "synthetic_gallery_acknowledged": true,
+    "shortcut_opens_menu": true,
+    "shortcut_first_item_focused": true,
+    "escape_returns_to_more": true,
+    "escape_query_unchanged": true,
+    "space_reopens_menu": true,
+    "space_first_item_focused": true,
+    "tab_query_unchanged": true,
+    "tab_search_accepts_typing": true,
+    "owned_settings_unchanged": true
+  },
+  "binary_sha256": "a7b2aeea132dd3e3b956ccb3f8a226c37073912fdc08a5fbe44a6f483b3c71ea",
+  "captures": [
+    {
+      "file": "01-native-repaired-start.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "63bfee16043ebad8534007b747e62eb4fabfe7912c0bd5029bf80d520b91aed0"
+    },
+    {
+      "file": "02-native-escape-more-focus.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "038985b9e1cb981637345d25f8030646c8b25f58e343c8193b44f04027cdc66a"
+    },
+    {
+      "file": "03-native-tab-search-typing.jpg",
+      "format": "JPEG",
+      "width": 1440,
+      "height": 960,
+      "sha256": "eea4e36248535fef253f2242b9c6454c7378df460c93cdbfe1d0fc65092571aa"
+    }
+  ]
+}

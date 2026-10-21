@@ -1,0 +1,11 @@
+# Repaired invoker validation at dfe54536
+
+Exact source: `dfe54536a933d071d07a7fd061cd81d4e0bb8cf9`. The pre-open invoker repair is now tested in the actual native WKWebView, not just a browser render. The existing synthetic gallery runs with a separate app identity, disposable app directories, nonpersistent webview and explicit synthetic library. Its readiness acknowledgement and unchanged owned settings were checked.
+
+The bounded native path **passes**: Search → ⌘K opens More with its first item focused; Escape closes it and native AX explicitly reports More focused; Space reopens it; Tab returns to Search with the query unchanged; a marker key then edits Search. `native-result.json` contains only fixed Boolean check facts plus source/build/capture metadata. Three unmodified app-only JPEG captures show the synthetic start, More focus after Escape and Search typing after Tab. Relative action timings are in `native-timing.json`.
+
+This is one bounded CUA path with settled observations, not a full native smoke-suite pass. Root independently found a sampling race in the newly added smoke helper; its delayed-restoration regression and bounded focus wait are being repaired separately. No native rapid-reopen, reduced-motion, complete pointer/action/dialog matrix, real clipboard/library, global shortcut registration, persistence, screen-reader speech, display/Spaces/IME or OS appearance acceptance is claimed. Native appearance remains the gallery's light CSS preview; no OS settings changed.
+
+The separate **browser** matrix contains 128/128 passes on this source: Chromium's three platform looks and WebKit's macOS look, light/dark and normal/reduced motion, pointer/shortcut opening with Escape, Tab, Reload and shortcuts-dialog destinations. These browser renders do not establish native appearance. An initial temporary browser platform-override conflict was diagnosed and corrected before this successful matrix; it was not a product failure.
+
+Fast checks on this checkpoint: 427 interface tests, 228 focused tests, TypeScript, gallery build and macOS HID contracts passed. Native-smoke self-tests completed 98 total with four platform skips. Final main integration, guarded full check, independent exact-head review and hosted gates remain pending.

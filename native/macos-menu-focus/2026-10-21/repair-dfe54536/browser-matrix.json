@@ -1,0 +1,1288 @@
+{
+  "source": "dfe54536a933d071d07a7fd061cd81d4e0bb8cf9",
+  "label": "browser render; actual repaired source; native evidence separate",
+  "rows": [
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "pointer",
+      "close": "dialog",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Escape",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Tab",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "Reload",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "opening": "shortcut",
+      "close": "dialog",
+      "passed": true
+    }
+  ],
+  "total": 128,
+  "passed": 128
+}

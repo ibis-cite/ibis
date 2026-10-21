@@ -1,0 +1,30 @@
+[
+  {
+    "event": "Search-observed",
+    "ms": 519
+  },
+  {
+    "event": "shortcut-menu-observed",
+    "ms": 923
+  },
+  {
+    "event": "Escape-start",
+    "ms": 9688
+  },
+  {
+    "event": "Escape-observed",
+    "ms": 10208
+  },
+  {
+    "event": "Space-reopen-observed",
+    "ms": 20731
+  },
+  {
+    "event": "Tab-observed",
+    "ms": 21250
+  },
+  {
+    "event": "Search-typing-observed",
+    "ms": 21648
+  }
+]
