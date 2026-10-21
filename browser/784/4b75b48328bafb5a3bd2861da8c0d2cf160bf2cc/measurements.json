@@ -1,0 +1,491 @@
+{
+  "rows": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 480,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8
+      ],
+      "hintGap": null,
+      "moreGap": 16,
+      "moreSameLine": true,
+      "moreRowGap": -17.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 480,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": -95.46875,
+      "moreSameLine": false,
+      "moreRowGap": 28.765625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 720,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8,
+        8
+      ],
+      "hintGap": 16,
+      "moreGap": 16,
+      "moreSameLine": true,
+      "moreRowGap": -17.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": true,
+      "overflow": false
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "width": 720,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": 18.375,
+      "moreSameLine": true,
+      "moreRowGap": -19.515625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 480,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8
+      ],
+      "hintGap": null,
+      "moreGap": 16,
+      "moreSameLine": true,
+      "moreRowGap": -17.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 480,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": -95.46875,
+      "moreSameLine": false,
+      "moreRowGap": 28.765625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 720,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8,
+        8
+      ],
+      "hintGap": 16,
+      "moreGap": 16,
+      "moreSameLine": true,
+      "moreRowGap": -17.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": true,
+      "overflow": false
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "width": 720,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": 18.375,
+      "moreSameLine": true,
+      "moreRowGap": -19.515625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 480,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8
+      ],
+      "hintGap": null,
+      "moreGap": -110.1875,
+      "moreSameLine": false,
+      "moreRowGap": 24.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 480,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": -124.8125,
+      "moreSameLine": false,
+      "moreRowGap": 28.765625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 720,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8,
+        8
+      ],
+      "hintGap": 16,
+      "moreGap": 16,
+      "moreSameLine": true,
+      "moreRowGap": -17.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": true,
+      "overflow": false
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "width": 720,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": 18.375,
+      "moreSameLine": true,
+      "moreRowGap": -19.515625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 480,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8
+      ],
+      "hintGap": null,
+      "moreGap": -110.1875,
+      "moreSameLine": false,
+      "moreRowGap": 24.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 480,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": -124.8125,
+      "moreSameLine": false,
+      "moreRowGap": 28.765625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 720,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8,
+        8
+      ],
+      "hintGap": 16,
+      "moreGap": 16,
+      "moreSameLine": true,
+      "moreRowGap": -17.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": true,
+      "overflow": false
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "width": 720,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": 18.375,
+      "moreSameLine": true,
+      "moreRowGap": -19.515625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 480,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8
+      ],
+      "hintGap": null,
+      "moreGap": -121.75,
+      "moreSameLine": false,
+      "moreRowGap": 24.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 480,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": -137.96875,
+      "moreSameLine": false,
+      "moreRowGap": 28.765625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 720,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8,
+        8
+      ],
+      "hintGap": 16,
+      "moreGap": 16,
+      "moreSameLine": true,
+      "moreRowGap": -17.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": true,
+      "overflow": false
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "width": 720,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": 18.375,
+      "moreSameLine": true,
+      "moreRowGap": -19.515625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 480,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8
+      ],
+      "hintGap": null,
+      "moreGap": -121.75,
+      "moreSameLine": false,
+      "moreRowGap": 24.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 480,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": -137.96875,
+      "moreSameLine": false,
+      "moreRowGap": 28.765625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 720,
+      "text": "normal",
+      "scale": 1,
+      "labelGaps": [
+        8,
+        8
+      ],
+      "hintGap": 16,
+      "moreGap": 16,
+      "moreSameLine": true,
+      "moreRowGap": -17.5,
+      "moreFill": 28,
+      "moreTarget": 32,
+      "capHeight": 20,
+      "edgeDifference": 0,
+      "shortcutsVisible": true,
+      "overflow": false
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "width": 720,
+      "text": "large",
+      "scale": 1.15,
+      "labelGaps": [
+        9.1875
+      ],
+      "hintGap": null,
+      "moreGap": 18.375,
+      "moreSameLine": true,
+      "moreRowGap": -19.515625,
+      "moreFill": 32.1875,
+      "moreTarget": 36.796875,
+      "capHeight": 23,
+      "edgeDifference": 0.015625,
+      "shortcutsVisible": false,
+      "overflow": false
+    }
+  ],
+  "failures": []
+}
