@@ -80,6 +80,7 @@ export const pickerText = {
   keyFormats: "Key formats",
   formattedStyles: "Citation styles",
   filterFormats: "Filter formats",
+  filterLibraries: "Filter libraries",
   preview: "Preview",
   previewPending: "Formatting…",
   previewNotReady: "Nothing was copied yet: the citation is still being formatted. Press Enter again in a moment.",
@@ -377,4 +378,12 @@ export const copyFormatMenu: Record<KeyFormat, { label: string; sample: string }
   cite: { label: "\\cite", sample: "\\cite{key}" },
   typst: { label: "Typst", sample: "@key" },
   keys: { label: "Keys only", sample: "key" },
+};
+
+// The header's library scope menu (#569): which loaded source to search.
+export const scopeText = {
+  searchIn: "Search in",
+  all: "All libraries",
+  combined: (format: string, scope: string) => `Copy as ${format}, search in ${scope}`,
+  count: (n: number) => numbers.format(n),
 };

@@ -3,15 +3,22 @@ import { Autocomplete, Button, Header, Input, Menu, MenuItem, MenuSection, MenuT
 import { MenuCheck } from "./Menu";
 import "./ToolbarMenu.css";
 
-export type ToolbarMenuSection = { id: string; label: string; items: { id: string; label: string; sample?: string; prose?: boolean; disabled?: boolean }[] };
+/** A titled group of choices; without a label it has no heading. */
+export type ToolbarMenuSection = { id: string; label?: string; items: { id: string; label: string; sample?: string; prose?: boolean; disabled?: boolean }[] };
 type Props = {
-  label: string; value: string; sections: ToolbarMenuSection[]; selectedKey: string;
+  label: string; value: string; sections: ToolbarMenuSection[];
+  /** The chosen item, or one per independent choice (a combined menu). */
+  selectedKey: string | string[];
+  /** The button's accessible name, when it is not the label and value. */
+  buttonLabel?: string;
+  /** The popover's width in px, when not the usual 264 (never wider than the window). */
+  width?: number;
   isOpen?: boolean; onOpenChange?: (open: boolean) => void;
   filterLabel: string; onAction: (key: string) => void; returnFocusRef?: RefObject<HTMLElement | null>;
 };
 
 /** A reference-independent menu. React Aria owns selection, navigation and virtual focus. */
-export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, onAction, returnFocusRef, isOpen, onOpenChange }: Props) {
+export function ToolbarMenu({ label, value, sections, selectedKey, buttonLabel, width, filterLabel, onAction, returnFocusRef, isOpen, onOpenChange }: Props) {
   const [internalOpen, setOpen] = useState(false);
   const open = isOpen ?? internalOpen;
   const composing = useRef(false);
@@ -27,10 +34,13 @@ export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, 
   }
   // aria-disabled keeps unavailable choices in the arrow-key order (ADR 0021).
   // Controlled selection and the action guard prevent picking them.
-  const menu = <Menu className="toolbar-menu" aria-label={label} selectionMode="single" selectedKeys={[selectedKey]}
+  const selected = new Set(typeof selectedKey === "string" ? [selectedKey] : selectedKey);
+  // Each section selects on its own, so a combined menu keeps one choice per kind.
+  const menu = <Menu className="toolbar-menu" aria-label={label}
     onAction={(key) => { if (!sections.flatMap((section) => section.items).find((item) => item.id === key)?.disabled) onAction(String(key)); }}>
-    {sections.map((section) => <MenuSection key={section.id} id={section.id} className="menu-section">
-      <Header className="toolbar-menu-heading">{section.label}</Header>
+    {sections.map((section) => <MenuSection key={section.id} id={section.id} className="menu-section" aria-label={section.label || undefined}
+      selectionMode="single" selectedKeys={section.items.filter((item) => selected.has(item.id)).map((item) => item.id)}>
+      {section.label && <Header className="toolbar-menu-heading">{section.label}</Header>}
       {section.items.map((item) => <MenuItem className="menu-item" id={item.id} key={item.id} textValue={item.label} shouldCloseOnSelect={!item.disabled}
         render={(props) => <div {...props as ComponentPropsWithRef<"div">} aria-disabled={item.disabled || undefined} />}>
         {({ isSelected }) => <><MenuCheck checked={isSelected} />
@@ -45,8 +55,8 @@ export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, 
     }}
     onKeyDown={(event) => { if (open && !event.ctrlKey && !event.metaKey) event.stopPropagation(); }}>
     <MenuTrigger isOpen={open} onOpenChange={changeOpen}>
-      <Button className="toolbar-menu-button" aria-label={`${label} ${value}`}>{value}<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m3 4.5 3 3 3-3" /></svg></Button>
-      <Popover className="menu-popover toolbar-menu-popover" placement="bottom end" offset={6}>
+      <Button className="toolbar-menu-button" aria-label={buttonLabel ?? `${label} ${value}`}><span className="toolbar-menu-value">{value}</span><svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m3 4.5 3 3 3-3" /></svg></Button>
+      <Popover className="menu-popover toolbar-menu-popover" placement="bottom end" offset={6} style={width ? { width } : undefined}>
         {filtered ? <Autocomplete filter={contains}><SearchField className="toolbar-menu-filter" aria-label={filterLabel} autoFocus><Input placeholder={filterLabel} /></SearchField>{menu}</Autocomplete> : menu}
       </Popover>
     </MenuTrigger>

@@ -26,6 +26,8 @@ export type GalleryState = {
   menuOpen?: boolean;
   /** Opens the header format menu; a string is typed into its filter. */
   formatMenu?: true | string;
+  /** Opens the header library scope menu. */
+  scopeMenu?: boolean;
   tray?: number;
   formatted?: boolean;
   keys?: boolean;
@@ -89,6 +91,10 @@ if (typeof window !== "undefined") {
   const { platform } = gallerySwitches(window.location.search);
   if (platform) applyPlatformSwitch(platform);
 }
+
+// Three synthetic sources for the library scope menu (#569).
+const threeSources = library({ zotero: true, snapshot_zotero: true, zotero_libraries: ["user", { group: 7 }, { group: 9 }], name: "3 Zotero libraries",
+  snapshot_name: "3 Zotero libraries", source_counts: { "zotero:user": 12, "zotero:group:7": 8, "zotero:group:9": 4 } });
 
 function library(overrides: Partial<GalleryLibrary> = {}): GalleryLibrary {
   return { revision: "gallery", state: "loaded", name: "example.bib", snapshot_name: "example.bib", has_snapshot: true, zotero: false, zotero_libraries: [],
@@ -156,6 +162,8 @@ export const galleryStates: readonly GalleryState[] = [
   { id: "menu-open", label: "More menu open", library: library(), query: "memory", results: examples, menuOpen: true },
   { id: "format-menu", label: "Format menu open", library: library(), query: "memory", results: examples, formatMenu: true },
   { id: "format-menu-filtered", label: "Format menu filtered", library: library(), query: "memory", results: examples, formatMenu: "APA" },
+  { id: "library-menu", label: "Library scope menu open", library: threeSources, query: "memory", results: examples, scopeMenu: true },
+  { id: "narrow-header", label: "Format and scope in one button (Larger text)", library: threeSources, query: "memory", results: examples, largerTextSetting: true, formatMenu: true },
   ...[20, 40, 50].map((count) => ({ id: `tray-${count}`, label: `${count} long keys selected`,
     library: library({ references: 50 }), query: "selection", results: largeSelection, tray: count, pinned: true })),
   { id: "tray-preview", label: "50 selected with formatted preview", library: library({ references: 50 }), query: "selection",

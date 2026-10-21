@@ -6,6 +6,15 @@ import { copyFormatMenu, pickerText } from "../../messages";
 import { ToolbarMenu, type ToolbarMenuSection } from "../../ui/ToolbarMenu";
 import { choiceName, type Choice } from "./choice";
 
+/** The key formats, then the citation styles, each with what it pastes. */
+export function formatSections(styles: boolean): ToolbarMenuSection[] {
+  return [
+    { id: "key-formats", label: pickerText.keyFormats, items: COPY_FORMATS.map(({ value }) => ({ id: value, ...copyFormatMenu[value] })) },
+    { id: "citation-styles", label: pickerText.formattedStyles, items: FORMATTED_STYLES.map(({ id }) => (
+      { id: `style:${id}`, label: STYLE_NAMES[id], sample: STYLE_SAMPLES[id], prose: true, disabled: !styles })) },
+  ];
+}
+
 /** The copy format menu: key syntaxes and citation styles, each with a real
  * sample. Styles stay listed but unavailable while the engine is not offered.
  * Focus goes back to the search box after a pick, Escape or Tab. */
@@ -16,11 +25,6 @@ export function FormatMenu({ format, styles, onChange, searchRef }: {
   onChange: (choice: Choice) => void;
   searchRef: RefObject<HTMLElement | null>;
 }) {
-  const sections: ToolbarMenuSection[] = [
-    { id: "key-formats", label: pickerText.keyFormats, items: COPY_FORMATS.map(({ value }) => ({ id: value, ...copyFormatMenu[value] })) },
-    { id: "citation-styles", label: pickerText.formattedStyles, items: FORMATTED_STYLES.map(({ id }) => (
-      { id: `style:${id}`, label: STYLE_NAMES[id], sample: STYLE_SAMPLES[id], prose: true, disabled: !styles })) },
-  ];
-  return <ToolbarMenu label={pickerText.copyAs} value={choiceName(format)} sections={sections} selectedKey={format}
+  return <ToolbarMenu label={pickerText.copyAs} value={choiceName(format)} sections={formatSections(styles)} selectedKey={format}
     filterLabel={pickerText.filterFormats} onAction={(key) => onChange(key as Choice)} returnFocusRef={searchRef} />;
 }

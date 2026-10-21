@@ -3028,3 +3028,84 @@ test("format filter IME and Escape preserve the query, and Ctrl+K switches layer
   expect(await screen.findByRole("menu", { name: /^More/ })).toBeTruthy();
   expect(screen.queryByRole("searchbox")).toBeNull();
 });
+
+function twoLibraries(state = "loaded") {
+  return { ...zoteroStatus(["user", { group: 7 }]), state, references: 5, source_counts: { "zotero:group:7": 3, "zotero:user": 2 } };
+}
+
+test("the scope menu narrows the search to one loaded library and names it", async () => {
+  const scopes: unknown[] = [];
+  backend({
+    library_status: () => twoLibraries(),
+    zotero_groups: () => [{ id: 7, name: "Lab group" }],
+    search: ({ scope }) => { scopes.push(scope); return []; },
+  });
+  render(<App />);
+  const trigger = await screen.findByRole("button", { name: "Search in All libraries" });
+  await waitFor(() => expect(scopes.at(-1)).toBeNull());
+  fireEvent.click(trigger);
+  const items = await screen.findAllByRole("menuitemradio");
+  expect(items.map((item) => item.textContent)).toEqual(["All libraries5", "My Library2", "Lab group3"]);
+  expect(items[0]!.getAttribute("aria-checked")).toBe("true");
+  fireEvent.click(screen.getByRole("menuitemradio", { name: "Lab group" }));
+  await waitFor(() => expect(scopes.at(-1)).toEqual(["zotero:group:7"]));
+  expect(screen.getByRole("button", { name: "Search in Lab group" })).toBeTruthy();
+  await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText("Search references")));
+  // The format menu is separate and unchanged.
+  expect(screen.getByRole("button", { name: "Copy as Pandoc" })).toBeTruthy();
+});
+
+test("one source shows no scope menu, and a loading library shows no counts", async () => {
+  let status: Record<string, unknown> = { ...zoteroStatus(["user"]), source_counts: { "zotero:user": 2 } };
+  backend({ library_status: () => status, zotero_groups: () => [{ id: 7, name: "Lab group" }] });
+  render(<App />);
+  await screen.findByRole("button", { name: "Copy as Pandoc" });
+  expect(screen.queryByRole("button", { name: /^Search in/ })).toBeNull();
+  status = twoLibraries("reloading");
+  await emit("library:changed", status);
+  fireEvent.click(await screen.findByRole("button", { name: "Search in All libraries" }));
+  expect((await screen.findAllByRole("menuitemradio")).map((item) => item.textContent)).toEqual(["All libraries", "My Library", "Lab group"]);
+});
+
+test("a reload without the chosen library searches all of them again", async () => {
+  let status: Record<string, unknown> = twoLibraries();
+  const scopes: unknown[] = [];
+  backend({ library_status: () => status, zotero_groups: () => [{ id: 7, name: "Lab group" }], search: ({ scope }) => { scopes.push(scope); return []; } });
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: "Search in All libraries" }));
+  fireEvent.click(await screen.findByRole("menuitemradio", { name: "Lab group" }));
+  await waitFor(() => expect(scopes.at(-1)).toEqual(["zotero:group:7"]));
+  status = { ...zoteroStatus(["user", { group: 9 }]), revision: "2", source_counts: { "zotero:user": 2, "zotero:group:9": 1 } };
+  await emit("library:changed", status);
+  await waitFor(() => expect(scopes.at(-1)).toBeNull());
+  expect(screen.getByRole("button", { name: "Search in All libraries" })).toBeTruthy();
+});
+
+test.each(["narrow window", "Larger text"])("with a %s the format and scope share one button", async (why) => {
+  if (why === "narrow window") vi.stubGlobal("matchMedia", (media: string) => ({ media, matches: media === "(max-width: 519px)", addEventListener() {}, removeEventListener() {} }));
+  const scopes: unknown[] = [];
+  const saved: unknown[] = [];
+  backend({
+    library_status: () => twoLibraries(),
+    zotero_groups: () => [{ id: 7, name: "Lab group" }],
+    picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: why === "Larger text" }),
+    set_picker_preferences: ({ preferences }) => { saved.push(preferences); return null; },
+    set_copy_format: ({ format }) => { saved.push(format); return null; },
+    search: ({ scope }) => { scopes.push(scope); return []; },
+  });
+  try {
+    render(<App />);
+    const combined = await screen.findByRole("button", { name: "Copy as Pandoc, search in All libraries" });
+    expect(screen.queryByRole("button", { name: "Search in All libraries" })).toBeNull();
+    fireEvent.click(combined);
+    expect(await screen.findByRole("group", { name: "Search in" })).toBeTruthy();
+    expect(screen.getByRole("group", { name: "Key formats" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "Lab group" }));
+    await waitFor(() => expect(scopes.at(-1)).toEqual(["zotero:group:7"]));
+    fireEvent.click(screen.getByRole("button", { name: "Copy as Pandoc, search in Lab group" }));
+    fireEvent.click(await screen.findByRole("menuitemradio", { name: "Typst" }));
+    expect(await screen.findByRole("button", { name: "Copy as Typst, search in Lab group" })).toBeTruthy();
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});

@@ -147,6 +147,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // file to defaults.
   const [density, setDensity] = useState<Density>("comfortable");
   const [largerText, setLargerText] = useState(false);
+  // The loaded source to search, or null for all; kept for this session only (#569).
+  const [scope, setScope] = useState<string | null>(null);
+  const searchScope = scope !== null && library?.source_counts && scope in library.source_counts ? scope : null;
   const savedPreferences = useRef<PickerPreferences | null>(null);
   const pending = useRef<Partial<PickerPreferences>>({});
   const pendingKeyFormat = useRef<{ format: CopyFormat; saved: boolean } | null>(null);
@@ -354,7 +357,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     }
     let current = true;
     let announcementTimer: number | undefined;
-    search(query)
+    search(query, undefined, searchScope === null ? null : [searchScope])
       .then(({ revision, results: found }) => {
         if (current) {
           setResults(found);
@@ -382,7 +385,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       current = false;
       window.clearTimeout(announcementTimer);
     };
-  }, [query, library, libraryVersion]);
+  }, [query, library, libraryVersion, searchScope]);
+  // A reloaded library without the chosen source searches all of them again.
+  useEffect(() => { if (scope !== null && searchScope === null && library?.has_snapshot) setScope(null); }, [scope, searchScope, library]);
 
   // A restored search is selected once it is back in the box, so typing replaces it.
   useEffect(() => {
@@ -637,6 +642,13 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const shiftEnterAction = highlighted
     ? (selected.has(idKey(highlighted.id)) ? keyText.removeFromCitation : keyText.addToCitation) : null;
   const escapeAction = menuOpen ? keyText.closeMenu : query ? keyText.clearSearch : keyText.hide;
+  // The loaded sources, in the order they were chosen, for the scope menu.
+  const order = (library?.zotero_libraries ?? []).map((choice) => (typeof choice === "object" ? `zotero:group:${choice.group}` : "zotero:user"));
+  const rank = (id: string) => (order.includes(id) ? order.indexOf(id) : order.length);
+  const sources = Object.keys(library?.source_counts ?? {}).sort((a, b) => rank(a) - rank(b)).map((id) => ({
+    id, name: libraryOf(id) ?? library?.snapshot_name ?? id,
+    count: library?.state === "loaded" ? library.source_counts[id] ?? null : null,
+  }));
 
   return (
     <main
@@ -706,6 +718,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         format={format}
         styles={Boolean(cslItems && copyFormatted)}
         onFormatChange={chooseFormat}
+        sources={sources} scope={searchScope} onScopeChange={setScope} largerText={largerText}
         pinned={pinned}
         onTogglePin={togglePin}
       />

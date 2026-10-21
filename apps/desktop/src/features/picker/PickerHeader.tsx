@@ -1,11 +1,11 @@
 import type React from "react";
 import { pickerText } from "../../messages";
 import type { Choice } from "./choice";
-import { FormatMenu } from "./FormatMenu";
+import { HeaderMenus, type ScopeSource } from "./HeaderMenus";
 
-/** The search bar: the search box, the copy format and the pin. It is also
+/** The search bar: the search box, the copy format, the library scope and the pin. It is also
  * the window's drag region; the editable box itself is not. */
-export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, pinned, onTogglePin }: {
+export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, sources, scope, onScopeChange, largerText, pinned, onTogglePin }: {
   inputRef: React.RefObject<HTMLInputElement | null>;
   query: string;
   onQueryChange: (query: string) => void;
@@ -18,6 +18,11 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   /** Whether formatted citation styles can be used now. */
   styles: boolean;
   onFormatChange: (choice: Choice) => void;
+  /** The loaded sources, and the one searched (null for all). */
+  sources: ScopeSource[];
+  scope: string | null;
+  onScopeChange: (scope: string | null) => void;
+  largerText: boolean;
   pinned: boolean;
   onTogglePin: () => void;
 }) {
@@ -45,7 +50,8 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
         onChange={(e) => onQueryChange(e.target.value)}
         onKeyDown={onSearchKeyDown}
       />
-      <FormatMenu format={format} styles={styles} onChange={onFormatChange} searchRef={inputRef} />
+      <HeaderMenus format={format} styles={styles} onFormatChange={onFormatChange} sources={sources} scope={scope}
+        onScopeChange={onScopeChange} largerText={largerText} searchRef={inputRef} />
       <button
         type="button"
         className="pin-button"
