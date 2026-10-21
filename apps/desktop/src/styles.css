@@ -231,7 +231,7 @@ kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding
 .picker-content { display: contents; }
 main[data-selection] { height: var(--picker-height); min-height: 0; overflow: hidden; }
 main[data-selection] > .search-bar, main[data-selection] > footer { flex: none; }
-main[data-selection] > .picker-content { display: flex; flex: 1; flex-direction: column; min-height: 0; overflow: auto; overscroll-behavior: contain; container-type: size; }
+main[data-selection] > .picker-content { position: relative; display: flex; flex: 1; flex-direction: column; min-height: 0; overflow: auto; overscroll-behavior: contain; container-type: size; }
 main[data-selection] [aria-label="Selected references"], main[data-selection] .format-preview, main[data-selection] .notices { flex: none; max-height: 6rem; overflow: auto; }
 main[data-selection] .results-area { flex: 1 0 var(--results-min-height); overflow: auto; }
 /* Use the available middle height, not a guessed header/footer size. Under

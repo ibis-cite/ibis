@@ -109,13 +109,15 @@ test("a gallery state with horizontal overflow is not accepted as rendered", asy
   }
 });
 
-test.each(["overflow", "clipped", "covered"])("selected-reference evidence rejects %s content", async (fault) => {
+test.each(["overflow", "document-overflow", "clipped", "covered"])("selected-reference evidence rejects %s content", async (fault) => {
   vi.useFakeTimers();
+  vi.stubGlobal("innerHeight", 320);
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
   vi.stubGlobal("cancelAnimationFrame", (frame: number) => window.clearTimeout(frame));
   let overflow = true;
   const height = vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockImplementation(function (this: HTMLElement) {
-    return this.tagName === "MAIN" ? (overflow && fault === "overflow" ? 700 : 320) : 0;
+    return this.tagName === "MAIN" ? (overflow && fault === "overflow" ? 700 : 320)
+      : this.tagName === "HTML" && overflow && fault === "document-overflow" ? 700 : 0;
   });
   const client = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(320);
   const geometry = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
