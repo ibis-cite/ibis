@@ -1,0 +1,74 @@
+{
+  "issue": 639,
+  "source_commit": "8b93a8b29db17e3d8aa4caa0aee60448520e70c5",
+  "base_main": "2f023182ae94843df58d332d89249f4c18abe64b",
+  "native_binary_sha256": "92903b3715b108cc890ab20981e426e4d94c1b03e44fbaa137f922d0340d5e57",
+  "capture": "native owned Ibis WKWebView window via Computer; synthetic profile/library only",
+  "os": "macOS27.0.1 arm64",
+  "theme": "dark",
+  "text": "app Larger text1.15; not OS/browser200%",
+  "density": "Comfortable",
+  "window_logical_size": [
+    360,
+    320
+  ],
+  "size_method": "temporary build config starts native window at360x320 with repository minimums; no claim of successful edge-drag/manual-resize test",
+  "library_count": 100000,
+  "selected": 50,
+  "pinned": true,
+  "observed": [
+    "Built50 unmodified references000000..000049 across confirmed query groups; active49 fully visible in both key and completed APA modes with header and footer visible.",
+    "CmdK opened More; Home focused Choose library; End focused visible Quit. Escape closed menu and preserved selected50/query, returning focus to More.",
+    "Tab navigation reached Preview; immediate focus capture shows real citation text in bounded viewport. Native Down scrolling moved content; no exact inner-only scroll-range assertion.",
+    "App quit normally, process exit0."
+  ],
+  "limits": [
+    "Preview and active result are reachable in separate central scroll positions, not simultaneously visible at this minimum. This is containment evidence, not final B design acceptance.",
+    "The native PageDown key was unsupported by Computer tool (keyNotFound), so native PageDown was not run; browser author matrix covers that behavior separately.",
+    "No clipboard copy assertion in this360 run; prior720 native47-reference exact copy is separate source3a evidence.",
+    "No physical pointer hit-testing claim from indexed accessibility activations; no native other-platform,OS200%,manual resize,appearance preference or adaptive sizing claim.",
+    "Footer hint focus changes remain relevant to separate existing640; no promise that every footer coordinate is fixed across focus states."
+  ],
+  "images": [
+    {
+      "file": "docs/images/picker-639-after-native-macos27-dark-larger-360-pandoc-50.jpg",
+      "observed": "50 selected key references, Search focus, active49 visible",
+      "encoding": "JPEG",
+      "dimensions_px": [
+        360,
+        320
+      ],
+      "sha256": "7e95ff78c3c9cc904176f6911641c1e24484e664a4d86fc8fb434b88cfaef29b"
+    },
+    {
+      "file": "docs/images/picker-639-after-native-macos27-dark-larger-360-apa-50-active.jpg",
+      "observed": "50 selected real completed APA references, Search focus, active49 visible; preview accessible above within central scroll",
+      "encoding": "JPEG",
+      "dimensions_px": [
+        360,
+        320
+      ],
+      "sha256": "a1baf16a7b881a8f7f554a346b8257dd6281503cd1dc4ea49390509fa7872268"
+    },
+    {
+      "file": "docs/images/picker-639-after-native-macos27-dark-larger-360-more-end.jpg",
+      "observed": "More opened by CmdK, Home first/End last focused; Quit visible within360x320",
+      "encoding": "JPEG",
+      "dimensions_px": [
+        360,
+        320
+      ],
+      "sha256": "3dcf38a64ee6a153b8a0a610428e3374a56c0ebb079870d30a81e400da82b677"
+    },
+    {
+      "file": "docs/images/picker-639-after-native-macos27-dark-larger-360-preview-focused.jpg",
+      "observed": "Tab navigation reaches actual Preview region, visible on focus; full markup retained in AX, bounded inner scroll",
+      "encoding": "JPEG",
+      "dimensions_px": [
+        360,
+        320
+      ],
+      "sha256": "13b81f76715e5c5f6c4f76a66352c7e82ac9d9c2138f356bc7e264865143def2"
+    }
+  ]
+}
