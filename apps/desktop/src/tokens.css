@@ -152,6 +152,9 @@
   --selection-gap: .4rem;
   --selection-padding: .6rem 1rem;
   --selection-label-padding: .5rem;
+  /* One-line chips of one height, so the tray shows whole rows (#746). */
+  --chip-height: 1.75rem;
+  --tray-rows: 2;
   --footer-padding: calc(var(--inset) + var(--row-pad)) var(--inset); /* inline start, end */
   --footer-size: var(--type-label-size);
   --footer-gap: .4rem;

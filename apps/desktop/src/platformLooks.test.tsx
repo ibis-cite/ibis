@@ -473,3 +473,15 @@ test("buttons and key caps are fills without an outline except in contrast modes
     expect(rules(tokens.slice(tokens.indexOf(media)), ":root[data-platform]"), media).toMatch(/--button-edge:\s*(CanvasText|ButtonText)/);
   }
 });
+
+test("the tray ends on a whole row of chips, and its fade spares the separator and contrast modes (#746)", () => {
+  const tray = rules(styles, 'main[data-selection] [aria-label="Selected references"]');
+  expect(tray).toMatch(/max-height:\s*calc\(var\(--tray-rows\) \* \(var\(--chip-height\) \+ var\(--selection-gap\)\) \+ var\(--selection-gap\) \+ var\(--border-width\)\)/);
+  expect(tray).toMatch(/padding-block:\s*var\(--selection-gap\)/);
+  expect(tray).toMatch(/scroll-snap-type:\s*y mandatory/);
+  expect(rules(styles, '[aria-label="Selected references"] li')).toMatch(/height:\s*var\(--chip-height\)/);
+  const fade = 'main[data-selection] [aria-label="Selected references"][data-more]:not(:focus-within)';
+  expect(rules(styles, fade)).toMatch(/linear-gradient\(#000 0 0\) bottom \/ 100% var\(--border-width\) no-repeat/);
+  const contrast = styles.slice(styles.indexOf("@media (prefers-contrast: more), (forced-colors: active) {"));
+  expect(rules(contrast, fade)).toMatch(/-webkit-mask:\s*none;\s*mask:\s*none/);
+});
