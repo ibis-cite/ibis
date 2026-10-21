@@ -5,7 +5,7 @@
 //
 //   node scripts/gallery-contact-sheet.mjs [--output DIR] [--dist DIR] [--no-build]
 //       [--state ID]... [--platform macos|windows|linux]... [--theme light|dark]...
-//       [--text normal|large]... [--scale N]
+//       [--text normal|large]... [--scale N] [--depth a|b|c]
 //
 // It builds the evidence gallery (vite --mode evidence) unless --no-build, serves
 // it on 127.0.0.1 only, and writes one PNG per frame plus contact-sheet-<text>.png.
@@ -33,7 +33,7 @@ class Unavailable extends Error {}
 
 function parse(argv) {
   const options = { output: path.join(repo, "target", "gallery-contact-sheet"), dist: path.join(repo, "apps", "desktop", "dist"),
-    build: true, scale: 1, state: [], platform: [], theme: [], text: [] };
+    build: true, scale: 1, depth: null, state: [], platform: [], theme: [], text: [] };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
     const value = () => {
@@ -46,6 +46,10 @@ function parse(argv) {
     else if (flag === "--no-build") options.build = false;
     else if (flag === "--scale") options.scale = Number(value());
     else if (flag === "--state") options.state.push(value());
+    else if (flag === "--depth") {
+      options.depth = value();
+      if (!["a", "b", "c"].includes(options.depth)) throw new Error("--depth is one of a, b, c");
+    }
     else if (flag.slice(2) in LOOKS) {
       const name = flag.slice(2);
       const chosen = value();
@@ -205,6 +209,7 @@ async function main() {
         page.on("pageerror", (error) => errors.push(error.message));
         page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
         const query = new URLSearchParams({ state: job.state.id, platform: job.platform, theme: job.theme, text: job.text });
+        if (options.depth) query.set("depth", options.depth);
         try {
           await page.goto(`${base}/gallery.html?${query}`);
           await page.waitForFunction((id) => document.documentElement.dataset.galleryRendered === id, job.state.id, { timeout: 15_000 });
@@ -221,10 +226,10 @@ async function main() {
     };
     await Promise.all(Array.from({ length: 4 }, worker));
     const browserName = `Chromium ${browser.version()}`;
-    const label = `Ibis picker states, ${source()}. Browser render in ${browserName}, synthetic data; not a native capture`;
+    const label = `Ibis picker states, ${source()}${options.depth ? `, depth variant ${options.depth.toUpperCase()}` : ""}. Browser render in ${browserName}, synthetic data; not a native capture`;
     for (const text of options.text) await contactSheet(browser, output, text, columns, states, frames, label);
     await writeFile(path.join(output, "manifest.json"), `${JSON.stringify({ source: source(), browser: browserName,
-      viewport: VIEWPORT, scale: options.scale, rendered: [...frames.keys()].sort(), failed: failures }, null, 2)}\n`);
+      viewport: VIEWPORT, scale: options.scale, depth: options.depth, rendered: [...frames.keys()].sort(), failed: failures }, null, 2)}\n`);
     console.log(`${frames.size} of ${jobs.length} frames rendered into ${output}`);
   } finally {
     server.close();

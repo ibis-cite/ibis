@@ -1,0 +1,121 @@
+/* Depth prototype, variant B: soft depth (the recommended middle).
+   Opt-in and gallery-only: applies under :root[data-depth="b"], which only
+   gallery.tsx sets (?depth=b). Stacked layers, back to front:
+     window base (footer, gutters) < results sheet < search band < tray card.
+   Inner highlights on top edges, soft neutral (never coloured) shadows, a
+   lifted selection capsule, tactile key caps and 140 ms ease-out motion.
+   Windows keeps Fluent (Mica base, layered cards, its own selection); GNOME
+   keeps Adwaita flat (one card shadow, no highlights, no lift).
+   Increased contrast, forced colours, the gallery contrast preview and
+   webviews without light-dark() keep the flat look unchanged. */
+@supports (color: light-dark(white, black)) {
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) {
+      --depth-base: light-dark(#f2f2f4, #1c1c1e);
+      --depth-sheet: var(--surface);
+      --depth-raised: light-dark(#fff, #2c2c2f);
+      --depth-hairline: light-dark(rgb(0 0 0 / 8%), rgb(255 255 255 / 8%));
+      --depth-highlight: light-dark(rgb(255 255 255 / 100%), rgb(255 255 255 / 7%));
+      --depth-shade: light-dark(rgb(0 0 0 / 9%), rgb(0 0 0 / 45%));
+      --depth-band-shadow: 0 1px 0 var(--depth-hairline), 0 8px 16px -12px light-dark(rgb(0 0 0 / 22%), rgb(0 0 0 / 70%));
+      --depth-card-shadow: 0 0 0 1px var(--depth-hairline), 0 1px 2px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 30%)), 0 8px 20px -8px light-dark(rgb(0 0 0 / 16%), rgb(0 0 0 / 60%));
+      --depth-row-lift: inset 0 1px 0 rgb(255 255 255 / 22%), 0 1px 2px rgb(0 0 0 / 14%), 0 4px 10px -4px rgb(0 0 0 / 24%);
+      --depth-cap-background: light-dark(#fff, #3a3a3e);
+      --depth-cap: inset 0 1px 0 var(--depth-highlight), inset 0 -1px 0 var(--depth-shade), 0 .5px 1.5px light-dark(rgb(0 0 0 / 14%), rgb(0 0 0 / 50%));
+      /* Chips are recessed into the card (the base colour): a lighter fill dropped
+         the dark scarlet keys below 4.5:1. */
+      --depth-chip: var(--depth-base);
+      --depth-card-radius: var(--r-row);
+      --depth-motion: 140ms;
+      --depth-press: .98;
+    }
+    /* Windows 11: Mica base (#f3f3f3 / #202020), content on a layer card
+       (LayerFillColorDefault, CardStrokeColorDefault), 8 px overlay corners.
+       The selected row stays Fluent's subtle fill with its accent pill. */
+    :root[data-depth="b"][data-platform="windows"]:not([data-gallery-theme="contrast"]) {
+      --depth-base: light-dark(#f3f3f3, #202020);
+      --depth-raised: light-dark(rgb(255 255 255 / 70%), rgb(255 255 255 / 5%));
+      --depth-hairline: light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 20%));
+      --depth-card-shadow: 0 0 0 1px var(--depth-hairline), 0 2px 4px light-dark(rgb(0 0 0 / 4%), rgb(0 0 0 / 26%));
+      --depth-card-radius: var(--r-win);
+      --depth-cap-background: light-dark(rgb(255 255 255 / 70%), rgb(255 255 255 / 6%));
+      /* Fluent's ControlElevationBorder: a darker bottom stroke, no top light. */
+      --depth-cap: 0 0 0 1px light-dark(rgb(0 0 0 / 6%), rgb(255 255 255 / 7%)), inset 0 -1px 0 light-dark(rgb(0 0 0 / 14%), rgb(255 255 255 / 3%));
+      --row-active-background: light-dark(rgb(0 0 0 / 4%), rgb(255 255 255 / 6%));
+      --hover-background: light-dark(rgb(0 0 0 / 2.5%), rgb(255 255 255 / 4%));
+    }
+    /* GNOME: Adwaita window_bg / view_bg, libadwaita's .card shadow and 12 px
+       radius for the tray; rows, caps and the header stay flat. */
+    :root[data-depth="b"][data-platform="linux"]:not([data-gallery-theme="contrast"]) {
+      --depth-base: light-dark(#fafafb, #222226);
+      --depth-sheet: light-dark(#fafafb, #222226);
+      --depth-raised: light-dark(#fff, #2e2e32);
+      --depth-card-shadow: 0 0 0 1px light-dark(rgb(0 0 6 / 3%), rgb(0 0 6 / 9%)), 0 1px 3px 1px light-dark(rgb(0 0 6 / 7%), rgb(0 0 6 / 20%)), 0 2px 6px 2px light-dark(rgb(0 0 6 / 3%), rgb(0 0 6 / 10%));
+      --depth-card-radius: 12px;
+      --depth-row-lift: none;
+      --depth-cap-background: var(--button-background);
+      --depth-cap: none;
+    }
+
+    /* Window base. With a native material (vibrancy, Mica) the material is the base. */
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]):not([data-native-appearance]) { background: var(--depth-base); }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .results-area { background: var(--depth-sheet); }
+
+    /* Search band: the top layer, lit from above, casting a soft shadow on the list. */
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .search-bar {
+      position: relative; z-index: 1; background: var(--depth-raised);
+      border-bottom-color: var(--clear);
+      box-shadow: inset 0 1px 0 var(--depth-highlight), var(--depth-band-shadow);
+    }
+    :root[data-depth="b"][data-platform="windows"]:not([data-gallery-theme="contrast"]) .search-bar,
+    :root[data-depth="b"][data-platform="linux"]:not([data-gallery-theme="contrast"]) .search-bar { background: var(--clear); box-shadow: none; border-bottom-color: var(--clear); }
+    :root[data-depth="b"][data-platform="linux"]:not([data-gallery-theme="contrast"]) .search-bar { border-bottom-color: var(--separator); }
+    /* Windows: the Fluent text box keeps its own control elevation. */
+    :root[data-depth="b"][data-platform="windows"]:not([data-gallery-theme="contrast"]) #search { background: light-dark(rgb(255 255 255 / 70%), rgb(255 255 255 / 6%)); }
+
+    /* Windows: the list is a layer card on Mica; its heading sits on the base. */
+    :root[data-depth="b"][data-platform="windows"]:not([data-gallery-theme="contrast"]) .results-area { background: var(--clear); }
+    :root[data-depth="b"][data-platform="windows"]:not([data-gallery-theme="contrast"]) #results:not(:empty) {
+      background: var(--depth-raised); border-radius: var(--depth-card-radius); box-shadow: var(--depth-card-shadow); overflow: clip;
+    }
+
+    /* Tray and preview: one floating card, inset from the window edge. */
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .picker-content > ul,
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .picker-content > .format-preview {
+      position: relative; margin-inline: var(--inset); background: var(--depth-raised);
+      border-radius: var(--depth-card-radius); box-shadow: inset 0 1px 0 var(--depth-highlight), var(--depth-card-shadow);
+      border-bottom-color: var(--clear);
+    }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .picker-content > ul { margin-block-start: var(--inset); z-index: 1; }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .picker-content > .format-preview { margin-block-start: var(--inset); }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .picker-content > ul:has(+ .format-preview) {
+      border-end-start-radius: 0; border-end-end-radius: 0; border-bottom-color: var(--separator);
+      box-shadow: inset 0 1px 0 var(--depth-highlight), 0 0 0 1px var(--depth-hairline);
+    }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .picker-content > ul + .format-preview { margin-block-start: 0; border-start-start-radius: 0; border-start-end-radius: 0; box-shadow: var(--depth-card-shadow); }
+    /* Chips: quiet fills, no outline. */
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .picker-content > ul li { border-color: var(--clear); background: var(--depth-chip); }
+
+    /* The selected row: a lifted capsule. Fill plus a neutral shadow; no ring, no glow. */
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) [role="option"][data-active] { box-shadow: var(--depth-row-lift); }
+    :root[data-depth="b"][data-platform="windows"]:not([data-gallery-theme="contrast"]) [role="option"][data-active] { box-shadow: none; }
+    :root[data-depth="b"][data-platform="macos"]:not([data-gallery-theme="contrast"]) [data-active] .result-tile { box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%); }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]):not([data-platform="linux"]) [role="option"][data-citation-selected] .result-tile { box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), 0 1px 1.5px rgb(0 0 0 / 18%); }
+
+    /* Tactile key caps and raised buttons. */
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) kbd { background: var(--depth-cap-background); border-color: var(--clear); box-shadow: var(--depth-cap); }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .empty-state button { background: var(--depth-cap-background); border-color: var(--clear); box-shadow: var(--depth-cap); color: var(--text); }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .library-setup .setup-choices { gap: var(--space-2); }
+    /* The writing choice: a recessed track with a raised thumb, not a coloured border (rule 8). */
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .setup-writing .setup-choices { display: inline-flex; gap: 0; padding: 2px; border-radius: calc(var(--button-radius) + 2px); background: light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 30%)); }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .setup-writing .setup-choices button { background: var(--clear); box-shadow: none; border-color: var(--clear); }
+    :root[data-depth="b"]:not([data-gallery-theme="contrast"]) .setup-writing .setup-choices button[aria-pressed="true"] { background: var(--depth-cap-background); box-shadow: var(--depth-cap); }
+  }
+}
+
+/* Motion: highlight follows in 140 ms ease-out, presses scale to .98. None with reduced motion. */
+@media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+  :root[data-depth="b"] [role="option"] { transition: background-color var(--depth-motion, 140ms) var(--motion-ease), box-shadow var(--depth-motion, 140ms) var(--motion-ease), transform var(--motion-feedback) var(--motion-ease); }
+  :root[data-depth="b"] :is(button, kbd, .format-picker) { transition: background-color var(--motion-feedback) var(--motion-ease), box-shadow var(--motion-feedback) var(--motion-ease), transform var(--motion-feedback) var(--motion-ease); }
+  :root[data-depth="b"] :is([role="option"], button):active { transform: scale(var(--depth-press, .98)); }
+}

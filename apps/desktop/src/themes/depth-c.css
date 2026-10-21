@@ -1,0 +1,108 @@
+/* Depth prototype, variant C: glass (closest to Liquid Glass).
+   Opt-in and gallery-only: applies under :root[data-depth="c"] (?depth=c).
+   Translucent layered panes with backdrop blur and a specular top edge over
+   the window material. In the app the material is native (macOS vibrancy,
+   Windows Acrylic); CSS backdrop-filter can only blur page content, never the
+   desktop. The gallery paints a synthetic stand-in for that material
+   ([data-gallery-material="simulated"]) so the panes have something to show.
+   macOS: a glass search capsule, glass tray card, accent capsule with a
+   sheen. Windows: Acrylic tint, the Fluent text box and tray as acrylic
+   cards, the selected row as a light acrylic card with its pill. GNOME is not
+   offered glass (Adwaita stays flat), so C leaves Linux unchanged.
+   Reduced transparency, increased contrast and forced colours turn it off. */
+@supports (color: light-dark(white, black)) {
+  @media (prefers-contrast: no-preference) and (forced-colors: none) and (prefers-reduced-transparency: no-preference) {
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) {
+      --depth-veil: light-dark(rgb(248 248 251 / 58%), rgb(26 26 30 / 62%));
+      --depth-glass: light-dark(rgb(255 255 255 / 50%), rgb(255 255 255 / 7%));
+      --depth-glass-strong: light-dark(rgb(255 255 255 / 72%), rgb(255 255 255 / 11%));
+      --depth-specular: light-dark(rgb(255 255 255 / 95%), rgb(255 255 255 / 16%));
+      --depth-hairline: light-dark(rgb(0 0 0 / 7%), rgb(0 0 0 / 35%));
+      --depth-blur: blur(24px) saturate(180%);
+      --depth-pane-shadow: 0 0 0 .5px var(--depth-hairline), 0 1px 3px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 30%)), 0 12px 28px -12px light-dark(rgb(0 0 0 / 24%), rgb(0 0 0 / 70%));
+      --depth-row-lift: inset 0 1px 0 rgb(255 255 255 / 30%), 0 1px 2px rgb(0 0 0 / 14%), 0 6px 14px -6px rgb(0 0 0 / 28%);
+      --depth-sheen: linear-gradient(rgb(255 255 255 / 14%), rgb(255 255 255 / 0%) 55%);
+      --depth-cap: inset 0 1px 0 var(--depth-specular), inset 0 -1px 0 light-dark(rgb(0 0 0 / 8%), rgb(0 0 0 / 40%)), 0 .5px 1.5px light-dark(rgb(0 0 0 / 14%), rgb(0 0 0 / 50%));
+      --depth-card-radius: max(var(--r-row), 12px);
+      --depth-motion: 160ms;
+      /* Text over a translucent veil: the deeper glass roles (as tokens.css does
+         for macOS vibrancy), so text keeps 4.5:1 over a colourful backdrop. */
+      --text: light-dark(#16181d, #f5f5f7);
+      --muted: light-dark(#454a55, #c6c9d1);
+      --citation: light-dark(#982d16, #ff9d87);
+      --hover-background: light-dark(rgb(255 255 255 / 42%), rgb(255 255 255 / 6%));
+      --tile-background: light-dark(rgb(255 255 255 / 55%), rgb(255 255 255 / 8%));
+      --separator: light-dark(rgb(0 0 0 / 8%), rgb(255 255 255 / 9%));
+    }
+    :root[data-depth="c"][data-platform="windows"]:not([data-gallery-theme="contrast"]) {
+      /* Desktop Acrylic's tint (#f3f3f3 / #202020 at high luminosity opacity). */
+      --depth-veil: light-dark(rgb(243 243 243 / 62%), rgb(32 32 32 / 66%));
+      --depth-card-radius: var(--r-win);
+      --depth-pane-shadow: 0 0 0 1px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 25%)), 0 2px 4px light-dark(rgb(0 0 0 / 5%), rgb(0 0 0 / 28%));
+      --row-active-background: var(--depth-glass-strong);
+    }
+
+    /* The window: veil over the material (native in the app, synthetic in the gallery). */
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"])[data-gallery-material="simulated"] {
+      --depth-wallpaper:
+        radial-gradient(55% 75% at 12% 8%, light-dark(#9cc0ff, #1f3f80), transparent),
+        radial-gradient(50% 70% at 88% 22%, light-dark(#ffc3a1, #73361f), transparent),
+        radial-gradient(65% 65% at 55% 105%, light-dark(#c4b0ff, #3e2a7c), transparent),
+        light-dark(#e3e7ef, #15171c);
+      background: linear-gradient(var(--depth-veil), var(--depth-veil)), var(--depth-wallpaper);
+    }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) .results-area { background: var(--clear); }
+
+    /* macOS: the search band holds a glass capsule, drawn behind the field so the
+       geometry chain (glyph over tiles, query over titles) does not move. */
+    :root[data-depth="c"][data-platform="macos"]:not([data-gallery-theme="contrast"]) .search-bar { position: relative; isolation: isolate; border-bottom-color: var(--clear); }
+    :root[data-depth="c"][data-platform="macos"]:not([data-gallery-theme="contrast"]) .search-bar::before {
+      content: ""; position: absolute; z-index: -1; inset: calc(var(--inset) / 2); border-radius: 999px;
+      background: var(--depth-glass); -webkit-backdrop-filter: var(--depth-blur); backdrop-filter: var(--depth-blur);
+      box-shadow: inset 0 1px 0 var(--depth-specular), var(--depth-pane-shadow);
+    }
+    /* Windows: the Fluent text box is the acrylic control. */
+    :root[data-depth="c"][data-platform="windows"]:not([data-gallery-theme="contrast"]) #search {
+      background: var(--depth-glass-strong); -webkit-backdrop-filter: var(--depth-blur); backdrop-filter: var(--depth-blur);
+    }
+    :root[data-depth="c"][data-platform="windows"]:not([data-gallery-theme="contrast"]) .search-bar { border-bottom-color: var(--clear); }
+
+    /* Tray and preview: one glass card. */
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) :is(.picker-content > ul, .picker-content > .format-preview) {
+      position: relative; margin-inline: var(--inset); margin-block-start: var(--inset);
+      background: var(--depth-glass); -webkit-backdrop-filter: var(--depth-blur); backdrop-filter: var(--depth-blur);
+      border-radius: var(--depth-card-radius); border-bottom-color: var(--clear);
+      box-shadow: inset 0 1px 0 var(--depth-specular), var(--depth-pane-shadow);
+    }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) .picker-content > ul:has(+ .format-preview) {
+      z-index: 1; border-end-start-radius: 0; border-end-end-radius: 0; border-bottom-color: var(--separator);
+      box-shadow: inset 0 1px 0 var(--depth-specular), 0 0 0 .5px var(--depth-hairline);
+    }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) .picker-content > ul + .format-preview { margin-block-start: 0; border-start-start-radius: 0; border-start-end-radius: 0; box-shadow: var(--depth-pane-shadow); }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) .picker-content > ul li { border-color: var(--clear); background: light-dark(rgb(255 255 255 / 72%), rgb(0 0 0 / 22%)); }
+
+    /* The selected row: an accent capsule with a soft sheen and a neutral lift (no glow). */
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) [role="option"][data-active] { background-image: var(--depth-sheen); box-shadow: var(--depth-row-lift); }
+    :root[data-depth="c"][data-platform="windows"]:not([data-gallery-theme="contrast"]) [role="option"][data-active] { background-image: none; box-shadow: inset 0 1px 0 var(--depth-specular), var(--depth-pane-shadow); }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) [role="option"][data-citation-selected] .result-tile { box-shadow: inset 0 1px 0 rgb(255 255 255 / 28%), 0 1px 2px rgb(0 0 0 / 20%); }
+    :root[data-depth="c"][data-platform="macos"]:not([data-gallery-theme="contrast"]) [data-active] .result-tile { box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%); }
+
+    /* Glass key caps and buttons. */
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) :is(kbd, .empty-state button) { background: var(--depth-glass-strong); border-color: var(--clear); box-shadow: var(--depth-cap); color: var(--text); }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) .library-setup .setup-choices { gap: var(--space-2); }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) .setup-writing .setup-choices { display: inline-flex; gap: 0; padding: 2px; border-radius: calc(var(--button-radius) + 2px); background: light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 28%)); }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) .setup-writing .setup-choices button { background: var(--clear); box-shadow: none; border-color: var(--clear); }
+    :root[data-depth="c"]:not([data-platform="linux"]):not([data-gallery-theme="contrast"]) .setup-writing .setup-choices button[aria-pressed="true"] { background: var(--depth-glass-strong); box-shadow: var(--depth-cap); }
+  }
+}
+
+/* Without backdrop blur the panes would show text through them: keep them solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root[data-depth="c"] :is(.picker-content > ul, .picker-content > .format-preview) { background: var(--surface); }
+}
+
+@media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+  :root[data-depth="c"] [role="option"] { transition: background-color var(--depth-motion, 160ms) var(--motion-ease), box-shadow var(--depth-motion, 160ms) var(--motion-ease), transform var(--motion-feedback) var(--motion-ease); }
+  :root[data-depth="c"] :is(button, kbd) { transition: background-color var(--motion-feedback) var(--motion-ease), box-shadow var(--motion-feedback) var(--motion-ease), transform var(--motion-feedback) var(--motion-ease); }
+  :root[data-depth="c"] :is([role="option"], button):active { transform: scale(.98); }
+}
