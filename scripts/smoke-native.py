@@ -2695,6 +2695,7 @@ public static class IbisSmoke {
 '@
 [SnapshotFault]::Scenario=$Scenario
 $Action='snapshot'; $AppId=42; $Text='7'
+$completed=$false
 try {
  switch ($Scenario) {
   'discovery' {$Text='0'}
@@ -2706,12 +2707,21 @@ try {
   'case-operation' {$script:SnapshotPhase='provider'; $script:SnapshotOperation='NoDe-NaMe'; throw [SnapshotFault]::Marker}
  }
  $tree=Get-Tree
+ $completed=$true
  if ($Scenario -like 'success-*') {
   ConvertTo-Json -InputObject @{tree=$tree;reads=@([SnapshotFault]::Reads)} -Depth 10 -Compress
   exit 0
  }
  throw 'Expected snapshot rejection'
-} catch { & $fatal }
+} catch {
+ # A getter fault must abort immediately, not reach a later read or the sentinel.
+ if ([SnapshotFault]::Reads.Contains($Scenario) -and
+     ($completed -or [SnapshotFault]::Reads[-1] -cne $Scenario)) {
+  [Console]::Error.WriteLine('Native contract provider fault continued')
+  exit 3
+ }
+ & $fatal
+}
 '''
         cases = (
             ("ownership", "ownership", "RuntimeException", "unknown"),

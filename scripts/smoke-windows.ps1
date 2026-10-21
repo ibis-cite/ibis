@@ -89,7 +89,7 @@ function Get-Tree {
   if (!$window) { return @{nodes=@();visible=$false;foreground=$false} }
   $script:SnapshotPhase = 'provider'
   $script:SnapshotOperation = 'window-handle'
-  $handle = [IntPtr] $window.Current.NativeWindowHandle
+  $handle = [IntPtr] $window.get_Current().get_NativeWindowHandle()
   if ($handle -eq [IntPtr]::Zero) {
     # Right after launch the window can be listed before it has a handle.
     if (!$Text -or $Text -eq '0') { return @{tree_changed=$true} }
@@ -108,21 +108,22 @@ function Get-Tree {
   }
   $nodes = @()
   foreach ($element in $elements) {
+    # Dotted PowerShell getters suppress exceptions; explicit getters fail closed.
     $script:SnapshotOperation = 'node-current'
-    $current = $element.Current
+    $current = $element.get_Current()
     $value = ''
     $pattern = $null
     $script:SnapshotOperation = 'value-pattern'
     if ($element.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern, [ref] $pattern)) {
       $script:SnapshotOperation = 'value-read'
-      $value = $pattern.Current.Value
+      $value = $pattern.get_Current().get_Value()
     } else {
       $script:SnapshotOperation = 'text-pattern'
       if ($element.TryGetCurrentPattern([System.Windows.Automation.TextPattern]::Pattern, [ref] $pattern)) {
         # Root documents can include results, recovery paragraphs and the footer.
         # A silent 500-character prefix can omit the very message being asserted.
         $script:SnapshotOperation = 'text-read'
-        $value = $pattern.DocumentRange.GetText(16385)
+        $value = $pattern.get_DocumentRange().GetText(16385)
         if ($value.Length -gt 16384) {
           $script:SnapshotPhase = 'text-bound'
           throw 'Native accessibility document exceeded smoke text bound'
@@ -130,11 +131,11 @@ function Get-Tree {
       }
     }
     $script:SnapshotOperation = 'node-type'
-    $role = $current.ControlType.ProgrammaticName
+    $role = $current.get_ControlType().get_ProgrammaticName()
     $script:SnapshotOperation = 'node-name'
-    $name = $current.Name
+    $name = $current.get_Name()
     $script:SnapshotOperation = 'node-focus'
-    $focused = $current.HasKeyboardFocus
+    $focused = $current.get_HasKeyboardFocus()
     $nodes += @{role=$role;name=$name;value=$value;focused=$focused}
   }
   @{nodes=$nodes;visible=$visible;foreground=([IbisSmoke]::ForegroundPid() -eq $AppId);picker_handle=$handle.ToInt64()}
