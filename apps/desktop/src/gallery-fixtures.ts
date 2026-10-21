@@ -126,6 +126,7 @@ export const galleryStates: readonly GalleryState[] = [
   { id: "first-run", label: "First run", library: library({ state: "none", name: null, snapshot_name: null, has_snapshot: false, zotero: false, references: 0 }) },
   { id: "loading", label: "Opening a library", library: library({ state: "loading", has_snapshot: false, zotero: false, snapshot_name: null, references: 0 }) },
   { id: "empty", label: "Empty library", library: library({ name: "empty.bib", snapshot_name: "empty.bib", references: 0 }) },
+  { id: "idle", label: "Nothing typed", library: library(), query: "" },
   { id: "no-results", label: "No matching references", library: library(), query: "unmatched phrase" },
   { id: "many-results", label: "Many results", library: library(), query: "memory", results: many },
   { id: "long-titles", label: "Long and non-Latin titles", library: library(), query: "research", results: [
