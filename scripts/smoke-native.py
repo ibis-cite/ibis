@@ -262,14 +262,17 @@ def numeric_phase_facts(value, keys):
 def library_phase_diagnostics(paths):
     facts = []
     for path in paths:
-        with path.open(encoding="utf-8", errors="replace") as log:
-            lines = log.read(1024 * 1024).splitlines()
+        try:
+            with path.open(encoding="utf-8", errors="replace") as log:
+                lines = log.read(1024 * 1024).splitlines()
+        except OSError:
+            continue
         for line in lines:
             if not line.startswith("ibis-library-phases: ") or len(line) > 2048:
                 continue
             try:
                 value = numeric_phase_facts(json.loads(line.removeprefix("ibis-library-phases: ")), LIBRARY_PHASE_KEYS)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, RecursionError):
                 continue
             if value is not None:
                 facts.append(value)
@@ -2245,6 +2248,25 @@ class ContractTests(unittest.TestCase):
                 valid.update(accepted=accepted, load_ok=load_ok)
                 log.write_text("ibis-library-phases: " + json.dumps(valid), encoding="utf-8")
                 self.assertEqual(library_phase_diagnostics([log]), [valid])
+
+    def test_unavailable_phase_logs_never_replace_valid_diagnostics(self):
+        valid = dict.fromkeys(LIBRARY_PHASE_KEYS, 0)
+        line = "ibis-library-phases: " + json.dumps(valid)
+        with tempfile.TemporaryDirectory() as folder:
+            log, missing = Path(folder) / "synthetic.log", Path(folder) / "missing.log"
+            log.write_text(line, encoding="utf-8")
+            self.assertEqual(library_phase_diagnostics([missing, log, missing]), [valid])
+            with patch.object(Path, "open", side_effect=[PermissionError(), io.StringIO(line)]):
+                self.assertEqual(library_phase_diagnostics([missing, log]), [valid])
+
+    def test_nested_phase_json_is_discarded_before_a_valid_record(self):
+        valid = dict.fromkeys(LIBRARY_PHASE_KEYS, 0)
+        line = "ibis-library-phases: " + json.dumps(valid)
+        with tempfile.TemporaryDirectory() as folder:
+            log = Path(folder) / "synthetic.log"
+            log.write_text("ibis-library-phases: " + "[" * 1000 + "0" + "]" * 1000 + "\n" + line,
+                           encoding="utf-8")
+            self.assertEqual(library_phase_diagnostics([log]), [valid])
 
     def test_startup_phases_aggregate_only_fixed_probe_fields(self):
         phases = {}
