@@ -31,7 +31,7 @@ export function PickerFooter({ library, groupName, hints, altHeld, searchFocused
             <KeyHint label={hints.escape} keys={keysFor("escape")} />
           </> : <>
             {hints.enter && <span className="search-hint" aria-hidden={!searchFocused}><KeyHint label={hints.enter} keys={keysFor("copy")} primary /></span>}
-            <KeyHint label={keyText.allKeys} keys={keysFor("keys")} />
+            <span className="shortcuts-hint"><KeyHint label={keyText.allKeys} keys={keysFor("keys")} /></span>
           </>}
         </small>
         <span className="more">
