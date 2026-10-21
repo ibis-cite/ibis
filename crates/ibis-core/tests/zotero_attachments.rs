@@ -166,3 +166,83 @@ fn the_kind_serializes_as_kebab_case_and_is_absent_when_unknown() {
         "records saved before the field exists still load"
     );
 }
+
+#[test]
+fn unicode_mime_values_use_ascii_matching_and_a_byte_bound() {
+    for (mime, expected) in [
+        (json!("application/PDF; name=日本語"), Some(AttachmentKind::Pdf)),
+        (json!("text/HTML; charset=utf-8"), Some(AttachmentKind::WebPage)),
+        (json!("application/pdƒ"), Some(AttachmentKind::Other)),
+        (json!("applıcation/pdf"), Some(AttachmentKind::Other)),
+        (json!("application/ｐｄｆ"), Some(AttachmentKind::Other)),
+        (json!("\u{2003}\t ; charset=日本語"), None),
+        (json!("😀".repeat(64)), Some(AttachmentKind::Other)),
+        (json!("😀".repeat(65)), None),
+        (
+            json!(format!("application/{}", "é".repeat(122))),
+            Some(AttachmentKind::Other),
+        ),
+        (json!(format!("application/{}", "é".repeat(123))), None),
+        (Value::Null, None),
+        (json!(false), None),
+        (json!({"type": "application/pdf"}), None),
+    ] {
+        let item = json!({
+            "key": "SYN00301",
+            "links": {"attachment": {"attachmentType": mime}},
+            "data": {"itemType": "book"},
+            "csljson": {"type": "book", "title": "Synthetic Unicode metadata"}
+        });
+        for items in [vec![item.clone()], as_local_api(&[item])] {
+            let loaded = load_items(Library::Group(7), &items);
+            assert!(loaded.warnings.is_empty(), "{:?}", loaded.warnings);
+            assert_eq!(loaded.references.len(), 1);
+            assert_eq!(loaded.references[0].attachment, expected);
+            assert_eq!(loaded.references[0].id.source, "zotero:group:7");
+        }
+    }
+}
+
+#[test]
+fn attachment_kinds_use_the_existing_single_page_request() {
+    use ibis_core::zotero::api::{Response, Transport, TransportError, scan};
+
+    struct OnePage {
+        response: Option<Response>,
+        asked: Vec<String>,
+    }
+    impl Transport for OnePage {
+        fn get(&mut self, path: &str) -> Result<Response, TransportError> {
+            self.asked.push(path.to_owned());
+            self.response.take().ok_or(TransportError::Unreachable)
+        }
+    }
+
+    let mut items = fixture("attachments.json")[..2].to_vec();
+    items[0]["csljson"]["title"] = json!("日本 < b > 한국어");
+    for items in [items.clone(), as_local_api(&items)] {
+        let mut transport = OnePage {
+            response: Some(Response {
+                status: 200,
+                headers: vec![
+                    ("Zotero-API-Version".into(), "3".into()),
+                    ("Last-Modified-Version".into(), "8".into()),
+                    ("Total-Results".into(), "2".into()),
+                    ("Zotero-Server-ID".into(), "synthetic-server".into()),
+                ],
+                body: serde_json::to_vec(&items).unwrap_or_else(|error| panic!("{error}")),
+            }),
+            asked: Vec::new(),
+        };
+        let (loaded, _) = scan(&mut transport, Library::Group(7)).unwrap_or_else(|error| panic!("{error}"));
+        assert!(loaded.warnings.is_empty(), "{:?}", loaded.warnings);
+        assert_eq!(loaded.references.len(), 2);
+        assert_eq!(kind_of(&loaded.references, "SYN00001"), Some(AttachmentKind::Pdf));
+        assert_eq!(kind_of(&loaded.references, "SYN00002"), Some(AttachmentKind::WebPage));
+        assert_eq!(loaded.references[0].title_plain().as_deref(), Some("日本 < b > 한국어"));
+        assert_eq!(
+            transport.asked,
+            ["groups/7/items/top?format=json&include=data,csljson&limit=100&start=0"]
+        );
+    }
+}
