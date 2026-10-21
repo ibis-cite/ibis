@@ -2,6 +2,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axe from "axe-core";
 import { createRef } from "react";
+import type { KeyboardEvent } from "react";
 import { ToolbarMenu, type ToolbarMenuSection } from "./ToolbarMenu";
 
 const sections: ToolbarMenuSection[] = [{ id: "keys", label: "Key formats", items: [
@@ -59,6 +60,42 @@ test.each(["Escape", "Tab"])("%s closes just the menu and returns focus", async 
   expect(parentKeys).not.toHaveBeenCalled();
 });
 
+function mountCommand() {
+  const searchRef = createRef<HTMLInputElement>();
+  let current = true;
+  const run = vi.fn(() => expect(document.activeElement).toBe(searchRef.current));
+  const commands = { onKeyCommand: (event: KeyboardEvent) => event.ctrlKey && event.key === "k"
+    ? { run, isCurrent: () => current } : undefined };
+  render(<><input aria-label="Search references" ref={searchRef} /><ToolbarMenu label="Copy as" value="Pandoc"
+    sections={sections} selectedKey="pandoc" onAction={() => {}} filterLabel="Filter formats"
+    returnFocusRef={searchRef} {...commands} /></>);
+  fireEvent.click(screen.getByRole("button", { name: "Copy as Pandoc" }));
+  return { run, invalidate: () => { current = false; }, menu: screen.getByRole("menu") };
+}
+
+test("a key command waits for menu removal and Search focus, then runs once", async () => {
+  const { menu, run } = mountCommand();
+  fireEvent.keyDown(menu, { key: "k", ctrlKey: true });
+  expect(run).not.toHaveBeenCalled();
+  fireEvent.keyUp(document.body, { key: "k", ctrlKey: true });
+  await waitFor(() => expect(run).toHaveBeenCalledTimes(1));
+  expect(menu.isConnected).toBe(false);
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  expect(run).toHaveBeenCalledTimes(1);
+});
+
+test.each(["pointer", "key", "blur", "hidden"])("a later %s cancels a pending menu command", async (action) => {
+  const { menu, run, invalidate } = mountCommand();
+  fireEvent.keyDown(menu, { key: "k", ctrlKey: true });
+  if (action === "pointer") fireEvent.pointerDown(document.body);
+  else if (action === "key") fireEvent.keyDown(document.body, { key: "Escape" });
+  else if (action === "blur") fireEvent(window, new Event("blur"));
+  else invalidate(); // The caller's picker-hidden epoch changed.
+  await waitFor(() => expect(menu.isConnected).toBe(false));
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  expect(run).not.toHaveBeenCalled();
+});
+
 test("more than seven items filter with virtual focus and ignore composing shortcuts and picks", async () => {
   const { trigger, onAction } = mount([{ id: "many", label: "Formats", items: Array.from({ length: 8 }, (_, i) => ({ id: `f${i}`, label: `Format ${i}` })) }]);
   act(() => trigger.focus());
@@ -105,6 +142,7 @@ test("menu role tokens exist, forced colours frame the button, and reduced motio
   expect(menuCss).toMatch(/prefers-reduced-motion: reduce[\s\S]*--menu-enter-transform: none; --menu-open-duration: 100ms/);
   expect(toolbarCss).toMatch(/prefers-reduced-motion: reduce[\s\S]*transition: none/);
 });
+
 
 test("Space on an unavailable choice neither selects nor closes", async () => {
   const { trigger, onAction } = mount();
