@@ -1,0 +1,6642 @@
+{
+  "kind": "synthetic Chromium browser render, not native acceptance",
+  "source": "851a1cf00446e7798308faac88e0330ad891c5a6",
+  "baseline": "e46da9bd854b95389553aec61a005a0f8515da68",
+  "browser": "installed Chromium 151",
+  "method": "Existing Vite gallery renderer with a synthetic empty Zotero state and instrumented fixture-only callbacks; baseline uses a read-only load override for the prior EmptyState component. No repository source was changed by the probe.",
+  "dimensions": "three platform looks x light/dark x widths 720/360 x system text 100/200% x LTR/RTL x fine/coarse = 96 after profiles",
+  "result": {
+    "after_passed": 96,
+    "after_failed": 0,
+    "baseline_title_height_px": 1240,
+    "repaired_title_height_px": 160,
+    "baseline_last_action_bottom_px": 1952,
+    "repaired_last_action_bottom_px": 872
+  },
+  "checks": [
+    "No horizontal overflow",
+    "Full title text exposed once in browser accessibility tree; visible abbreviation hidden from it",
+    "Fine targets at least 32 px, coarse targets at least 44 px, with no overlap",
+    "Pointer Reload invokes exactly one existing callback",
+    "Focused Choose library activated with Enter invokes exactly one existing callback"
+  ],
+  "limits": [
+    "Not native WebView/screen-reader speech evidence",
+    "This bounded title audit does not finish idle KeyHint dependency or full issue captures",
+    "At 360 px and 200% text the page scrolls vertically; recovery remains reachable",
+    "No Cargo/full check or final independent review claimed"
+  ],
+  "images": [
+    {
+      "file": "linux-360-system200-rtl-coarse-before.png",
+      "format": "PNG",
+      "width": 360,
+      "height": 2202,
+      "sha256": "d57470180b59bbb9ecf19f2dea5ddc94a359afad457f763e0f392c3d846792f5"
+    },
+    {
+      "file": "linux-360-system200-rtl-coarse-after.png",
+      "format": "PNG",
+      "width": 360,
+      "height": 1122,
+      "sha256": "7166c9b35378ba3fb62d91794e7e3ba20b97e8bdffa593dd73516866d9d74ff6"
+    }
+  ],
+  "baseline_profile": {
+    "platform": "linux",
+    "width": 360,
+    "large": true,
+    "direction": "rtl",
+    "theme": "light",
+    "main": {
+      "x": 0,
+      "y": 0,
+      "right": 360,
+      "bottom": 2202,
+      "width": 360,
+      "height": 2202,
+      "scroll": 360,
+      "client": 360
+    },
+    "state": {
+      "x": 16,
+      "y": 200,
+      "right": 344,
+      "bottom": 2016,
+      "width": 328,
+      "height": 1816,
+      "scroll": 328,
+      "client": 328
+    },
+    "title": {
+      "x": 48,
+      "y": 400,
+      "right": 312,
+      "bottom": 1640,
+      "width": 264,
+      "height": 1240,
+      "scroll": 264,
+      "client": 264
+    },
+    "actions": [
+      {
+        "label": "Reload",
+        "x": 107.359375,
+        "y": 1760,
+        "right": 252.65625,
+        "bottom": 1848,
+        "width": 145.296875,
+        "height": 88,
+        "scroll": 143,
+        "client": 143
+      },
+      {
+        "label": "Choose library…",
+        "x": 48,
+        "y": 1864,
+        "right": 312,
+        "bottom": 1952,
+        "width": 264,
+        "height": 88,
+        "scroll": 262,
+        "client": 262
+      }
+    ],
+    "coarse": true,
+    "accessibleFullTitle": true,
+    "recovery": {
+      "reload": 1,
+      "choose": 1
+    }
+  },
+  "after_profiles": [
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 290,
+        "width": 704,
+        "height": 226,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 226,
+          "right": 322.609375,
+          "bottom": 258,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 226,
+          "right": 473.03125,
+          "bottom": 258,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 290,
+        "width": 704,
+        "height": 226,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 226,
+          "right": 322.609375,
+          "bottom": 258,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 226,
+          "right": 473.03125,
+          "bottom": 258,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 302,
+        "width": 704,
+        "height": 238,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 226,
+          "right": 322.609375,
+          "bottom": 270,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 226,
+          "right": 473.03125,
+          "bottom": 270,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 302,
+        "width": 704,
+        "height": 238,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 226,
+          "right": 322.609375,
+          "bottom": 270,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 226,
+          "right": 473.03125,
+          "bottom": 270,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 290,
+        "width": 704,
+        "height": 226,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 226,
+          "right": 473.625,
+          "bottom": 258,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 226,
+          "right": 389.984375,
+          "bottom": 258,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 290,
+        "width": 704,
+        "height": 226,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 226,
+          "right": 473.625,
+          "bottom": 258,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 226,
+          "right": 389.984375,
+          "bottom": 258,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 302,
+        "width": 704,
+        "height": 238,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 226,
+          "right": 473.625,
+          "bottom": 270,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 226,
+          "right": 389.984375,
+          "bottom": 270,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 302,
+        "width": 704,
+        "height": 238,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 226,
+          "right": 473.625,
+          "bottom": 270,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 226,
+          "right": 389.984375,
+          "bottom": 270,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 704,
+        "bottom": 692,
+        "width": 688,
+        "height": 492,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 672,
+        "bottom": 480,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 564,
+          "right": 291.625,
+          "bottom": 628,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 564,
+          "right": 573.671875,
+          "bottom": 628,
+          "width": 266.046875,
+          "height": 64,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 704,
+        "bottom": 692,
+        "width": 688,
+        "height": 492,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 672,
+        "bottom": 480,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 564,
+          "right": 291.625,
+          "bottom": 628,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 564,
+          "right": 573.671875,
+          "bottom": 628,
+          "width": 266.046875,
+          "height": 64,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 704,
+        "bottom": 716,
+        "width": 688,
+        "height": 516,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 672,
+        "bottom": 480,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 564,
+          "right": 291.625,
+          "bottom": 652,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 564,
+          "right": 573.671875,
+          "bottom": 652,
+          "width": 266.046875,
+          "height": 88,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 704,
+        "bottom": 716,
+        "width": 688,
+        "height": 516,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 672,
+        "bottom": 480,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 564,
+          "right": 291.625,
+          "bottom": 652,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 564,
+          "right": 573.671875,
+          "bottom": 652,
+          "width": 266.046875,
+          "height": 88,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 704,
+        "bottom": 692,
+        "width": 688,
+        "height": 492,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 672,
+        "bottom": 480,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 564,
+          "right": 574.84375,
+          "bottom": 628,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 564,
+          "right": 413.546875,
+          "bottom": 628,
+          "width": 268.390625,
+          "height": 64,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 704,
+        "bottom": 692,
+        "width": 688,
+        "height": 492,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 672,
+        "bottom": 480,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 564,
+          "right": 574.84375,
+          "bottom": 628,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 564,
+          "right": 413.546875,
+          "bottom": 628,
+          "width": 268.390625,
+          "height": 64,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 704,
+        "bottom": 716,
+        "width": 688,
+        "height": 516,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 672,
+        "bottom": 480,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 564,
+          "right": 574.84375,
+          "bottom": 652,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 564,
+          "right": 413.546875,
+          "bottom": 652,
+          "width": 268.390625,
+          "height": 88,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 704,
+        "bottom": 716,
+        "width": 688,
+        "height": 516,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 672,
+        "bottom": 480,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 564,
+          "right": 574.84375,
+          "bottom": 652,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 564,
+          "right": 413.546875,
+          "bottom": 652,
+          "width": 268.390625,
+          "height": 88,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 346,
+        "width": 344,
+        "height": 246,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 282,
+          "right": 142.609375,
+          "bottom": 314,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 282,
+          "right": 293.03125,
+          "bottom": 314,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 346,
+        "width": 344,
+        "height": 246,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 282,
+          "right": 142.609375,
+          "bottom": 314,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 282,
+          "right": 293.03125,
+          "bottom": 314,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 358,
+        "width": 344,
+        "height": 258,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 282,
+          "right": 142.609375,
+          "bottom": 326,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 282,
+          "right": 293.03125,
+          "bottom": 326,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 358,
+        "width": 344,
+        "height": 258,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 282,
+          "right": 142.609375,
+          "bottom": 326,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 282,
+          "right": 293.03125,
+          "bottom": 326,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 346,
+        "width": 344,
+        "height": 246,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 282,
+          "right": 293.625,
+          "bottom": 314,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 282,
+          "right": 209.984375,
+          "bottom": 314,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 346,
+        "width": 344,
+        "height": 246,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 282,
+          "right": 293.625,
+          "bottom": 314,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 282,
+          "right": 209.984375,
+          "bottom": 314,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 358,
+        "width": 344,
+        "height": 258,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 282,
+          "right": 293.625,
+          "bottom": 326,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 282,
+          "right": 209.984375,
+          "bottom": 326,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 358,
+        "width": 344,
+        "height": 258,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 282,
+          "right": 293.625,
+          "bottom": 326,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 282,
+          "right": 209.984375,
+          "bottom": 326,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1088,
+        "width": 360,
+        "height": 1088,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 902,
+        "width": 328,
+        "height": 702,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 680,
+          "right": 252.640625,
+          "bottom": 744,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 760,
+          "right": 312,
+          "bottom": 838,
+          "width": 264,
+          "height": 78,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1088,
+        "width": 360,
+        "height": 1088,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 902,
+        "width": 328,
+        "height": 702,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 680,
+          "right": 252.640625,
+          "bottom": 744,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 760,
+          "right": 312,
+          "bottom": 838,
+          "width": 264,
+          "height": 78,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1122,
+        "width": 360,
+        "height": 1122,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 936,
+        "width": 328,
+        "height": 736,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 680,
+          "right": 252.640625,
+          "bottom": 768,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 784,
+          "right": 312,
+          "bottom": 872,
+          "width": 264,
+          "height": 88,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1122,
+        "width": 360,
+        "height": 1122,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 936,
+        "width": 328,
+        "height": 736,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 680,
+          "right": 252.640625,
+          "bottom": 768,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 784,
+          "right": 312,
+          "bottom": 872,
+          "width": 264,
+          "height": 88,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1088,
+        "width": 360,
+        "height": 1088,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 902,
+        "width": 328,
+        "height": 702,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 680,
+          "right": 252.65625,
+          "bottom": 744,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 760,
+          "right": 312,
+          "bottom": 838,
+          "width": 264,
+          "height": 78,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1088,
+        "width": 360,
+        "height": 1088,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 902,
+        "width": 328,
+        "height": 702,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 680,
+          "right": 252.65625,
+          "bottom": 744,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 760,
+          "right": 312,
+          "bottom": 838,
+          "width": 264,
+          "height": 78,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1122,
+        "width": 360,
+        "height": 1122,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 936,
+        "width": 328,
+        "height": 736,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 680,
+          "right": 252.65625,
+          "bottom": 768,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 784,
+          "right": 312,
+          "bottom": 872,
+          "width": 264,
+          "height": 88,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1122,
+        "width": 360,
+        "height": 1122,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 936,
+        "width": 328,
+        "height": 736,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 680,
+          "right": 252.65625,
+          "bottom": 768,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 784,
+          "right": 312,
+          "bottom": 872,
+          "width": 264,
+          "height": 88,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 4,
+        "y": 52,
+        "right": 716,
+        "bottom": 282,
+        "width": 712,
+        "height": 230,
+        "scroll": 712,
+        "client": 712
+      },
+      "title": {
+        "x": 20,
+        "y": 156,
+        "right": 700,
+        "bottom": 176,
+        "width": 680,
+        "height": 20,
+        "scroll": 680,
+        "client": 680
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 218,
+          "right": 322.609375,
+          "bottom": 250,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 218,
+          "right": 473.03125,
+          "bottom": 250,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 4,
+        "y": 52,
+        "right": 716,
+        "bottom": 282,
+        "width": 712,
+        "height": 230,
+        "scroll": 712,
+        "client": 712
+      },
+      "title": {
+        "x": 20,
+        "y": 156,
+        "right": 700,
+        "bottom": 176,
+        "width": 680,
+        "height": 20,
+        "scroll": 680,
+        "client": 680
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 218,
+          "right": 322.609375,
+          "bottom": 250,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 218,
+          "right": 473.03125,
+          "bottom": 250,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 4,
+        "y": 52,
+        "right": 716,
+        "bottom": 294,
+        "width": 712,
+        "height": 242,
+        "scroll": 712,
+        "client": 712
+      },
+      "title": {
+        "x": 20,
+        "y": 156,
+        "right": 700,
+        "bottom": 176,
+        "width": 680,
+        "height": 20,
+        "scroll": 680,
+        "client": 680
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 218,
+          "right": 322.609375,
+          "bottom": 262,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 218,
+          "right": 473.03125,
+          "bottom": 262,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 4,
+        "y": 52,
+        "right": 716,
+        "bottom": 294,
+        "width": 712,
+        "height": 242,
+        "scroll": 712,
+        "client": 712
+      },
+      "title": {
+        "x": 20,
+        "y": 156,
+        "right": 700,
+        "bottom": 176,
+        "width": 680,
+        "height": 20,
+        "scroll": 680,
+        "client": 680
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 218,
+          "right": 322.609375,
+          "bottom": 262,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 218,
+          "right": 473.03125,
+          "bottom": 262,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 4,
+        "y": 52,
+        "right": 716,
+        "bottom": 282,
+        "width": 712,
+        "height": 230,
+        "scroll": 712,
+        "client": 712
+      },
+      "title": {
+        "x": 20,
+        "y": 156,
+        "right": 700,
+        "bottom": 176,
+        "width": 680,
+        "height": 20,
+        "scroll": 680,
+        "client": 680
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 218,
+          "right": 473.625,
+          "bottom": 250,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 218,
+          "right": 389.984375,
+          "bottom": 250,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 4,
+        "y": 52,
+        "right": 716,
+        "bottom": 282,
+        "width": 712,
+        "height": 230,
+        "scroll": 712,
+        "client": 712
+      },
+      "title": {
+        "x": 20,
+        "y": 156,
+        "right": 700,
+        "bottom": 176,
+        "width": 680,
+        "height": 20,
+        "scroll": 680,
+        "client": 680
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 218,
+          "right": 473.625,
+          "bottom": 250,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 218,
+          "right": 389.984375,
+          "bottom": 250,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 4,
+        "y": 52,
+        "right": 716,
+        "bottom": 294,
+        "width": 712,
+        "height": 242,
+        "scroll": 712,
+        "client": 712
+      },
+      "title": {
+        "x": 20,
+        "y": 156,
+        "right": 700,
+        "bottom": 176,
+        "width": 680,
+        "height": 20,
+        "scroll": 680,
+        "client": 680
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 218,
+          "right": 473.625,
+          "bottom": 262,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 218,
+          "right": 389.984375,
+          "bottom": 262,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 4,
+        "y": 52,
+        "right": 716,
+        "bottom": 294,
+        "width": 712,
+        "height": 242,
+        "scroll": 712,
+        "client": 712
+      },
+      "title": {
+        "x": 20,
+        "y": 156,
+        "right": 700,
+        "bottom": 176,
+        "width": 680,
+        "height": 20,
+        "scroll": 680,
+        "client": 680
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 218,
+          "right": 473.625,
+          "bottom": 262,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 218,
+          "right": 389.984375,
+          "bottom": 262,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 104,
+        "right": 712,
+        "bottom": 604,
+        "width": 704,
+        "height": 500,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 40,
+        "y": 312,
+        "right": 680,
+        "bottom": 392,
+        "width": 640,
+        "height": 80,
+        "scroll": 640,
+        "client": 640
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 476,
+          "right": 291.625,
+          "bottom": 540,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 476,
+          "right": 573.671875,
+          "bottom": 540,
+          "width": 266.046875,
+          "height": 64,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 104,
+        "right": 712,
+        "bottom": 604,
+        "width": 704,
+        "height": 500,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 40,
+        "y": 312,
+        "right": 680,
+        "bottom": 392,
+        "width": 640,
+        "height": 80,
+        "scroll": 640,
+        "client": 640
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 476,
+          "right": 291.625,
+          "bottom": 540,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 476,
+          "right": 573.671875,
+          "bottom": 540,
+          "width": 266.046875,
+          "height": 64,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 104,
+        "right": 712,
+        "bottom": 628,
+        "width": 704,
+        "height": 524,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 40,
+        "y": 312,
+        "right": 680,
+        "bottom": 392,
+        "width": 640,
+        "height": 80,
+        "scroll": 640,
+        "client": 640
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 476,
+          "right": 291.625,
+          "bottom": 564,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 476,
+          "right": 573.671875,
+          "bottom": 564,
+          "width": 266.046875,
+          "height": 88,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 104,
+        "right": 712,
+        "bottom": 628,
+        "width": 704,
+        "height": 524,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 40,
+        "y": 312,
+        "right": 680,
+        "bottom": 392,
+        "width": 640,
+        "height": 80,
+        "scroll": 640,
+        "client": 640
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 476,
+          "right": 291.625,
+          "bottom": 564,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 476,
+          "right": 573.671875,
+          "bottom": 564,
+          "width": 266.046875,
+          "height": 88,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 104,
+        "right": 712,
+        "bottom": 604,
+        "width": 704,
+        "height": 500,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 40,
+        "y": 312,
+        "right": 680,
+        "bottom": 392,
+        "width": 640,
+        "height": 80,
+        "scroll": 640,
+        "client": 640
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 476,
+          "right": 574.84375,
+          "bottom": 540,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 476,
+          "right": 413.546875,
+          "bottom": 540,
+          "width": 268.390625,
+          "height": 64,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 104,
+        "right": 712,
+        "bottom": 604,
+        "width": 704,
+        "height": 500,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 40,
+        "y": 312,
+        "right": 680,
+        "bottom": 392,
+        "width": 640,
+        "height": 80,
+        "scroll": 640,
+        "client": 640
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 476,
+          "right": 574.84375,
+          "bottom": 540,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 476,
+          "right": 413.546875,
+          "bottom": 540,
+          "width": 268.390625,
+          "height": 64,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 104,
+        "right": 712,
+        "bottom": 628,
+        "width": 704,
+        "height": 524,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 40,
+        "y": 312,
+        "right": 680,
+        "bottom": 392,
+        "width": 640,
+        "height": 80,
+        "scroll": 640,
+        "client": 640
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 476,
+          "right": 574.84375,
+          "bottom": 564,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 476,
+          "right": 413.546875,
+          "bottom": 564,
+          "width": 268.390625,
+          "height": 88,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 104,
+        "right": 712,
+        "bottom": 628,
+        "width": 704,
+        "height": 524,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 40,
+        "y": 312,
+        "right": 680,
+        "bottom": 392,
+        "width": 640,
+        "height": 80,
+        "scroll": 640,
+        "client": 640
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 476,
+          "right": 574.84375,
+          "bottom": 564,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 476,
+          "right": 413.546875,
+          "bottom": 564,
+          "width": 268.390625,
+          "height": 88,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 4,
+        "y": 88,
+        "right": 356,
+        "bottom": 338,
+        "width": 352,
+        "height": 250,
+        "scroll": 352,
+        "client": 352
+      },
+      "title": {
+        "x": 20,
+        "y": 192,
+        "right": 340,
+        "bottom": 232,
+        "width": 320,
+        "height": 40,
+        "scroll": 320,
+        "client": 320
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 274,
+          "right": 142.609375,
+          "bottom": 306,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 274,
+          "right": 293.03125,
+          "bottom": 306,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 4,
+        "y": 88,
+        "right": 356,
+        "bottom": 338,
+        "width": 352,
+        "height": 250,
+        "scroll": 352,
+        "client": 352
+      },
+      "title": {
+        "x": 20,
+        "y": 192,
+        "right": 340,
+        "bottom": 232,
+        "width": 320,
+        "height": 40,
+        "scroll": 320,
+        "client": 320
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 274,
+          "right": 142.609375,
+          "bottom": 306,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 274,
+          "right": 293.03125,
+          "bottom": 306,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 4,
+        "y": 88,
+        "right": 356,
+        "bottom": 350,
+        "width": 352,
+        "height": 262,
+        "scroll": 352,
+        "client": 352
+      },
+      "title": {
+        "x": 20,
+        "y": 192,
+        "right": 340,
+        "bottom": 232,
+        "width": 320,
+        "height": 40,
+        "scroll": 320,
+        "client": 320
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 274,
+          "right": 142.609375,
+          "bottom": 318,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 274,
+          "right": 293.03125,
+          "bottom": 318,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 4,
+        "y": 88,
+        "right": 356,
+        "bottom": 350,
+        "width": 352,
+        "height": 262,
+        "scroll": 352,
+        "client": 352
+      },
+      "title": {
+        "x": 20,
+        "y": 192,
+        "right": 340,
+        "bottom": 232,
+        "width": 320,
+        "height": 40,
+        "scroll": 320,
+        "client": 320
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 274,
+          "right": 142.609375,
+          "bottom": 318,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 274,
+          "right": 293.03125,
+          "bottom": 318,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 4,
+        "y": 88,
+        "right": 356,
+        "bottom": 338,
+        "width": 352,
+        "height": 250,
+        "scroll": 352,
+        "client": 352
+      },
+      "title": {
+        "x": 20,
+        "y": 192,
+        "right": 340,
+        "bottom": 232,
+        "width": 320,
+        "height": 40,
+        "scroll": 320,
+        "client": 320
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 274,
+          "right": 293.625,
+          "bottom": 306,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 274,
+          "right": 209.984375,
+          "bottom": 306,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 4,
+        "y": 88,
+        "right": 356,
+        "bottom": 338,
+        "width": 352,
+        "height": 250,
+        "scroll": 352,
+        "client": 352
+      },
+      "title": {
+        "x": 20,
+        "y": 192,
+        "right": 340,
+        "bottom": 232,
+        "width": 320,
+        "height": 40,
+        "scroll": 320,
+        "client": 320
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 274,
+          "right": 293.625,
+          "bottom": 306,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 274,
+          "right": 209.984375,
+          "bottom": 306,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 4,
+        "y": 88,
+        "right": 356,
+        "bottom": 350,
+        "width": 352,
+        "height": 262,
+        "scroll": 352,
+        "client": 352
+      },
+      "title": {
+        "x": 20,
+        "y": 192,
+        "right": 340,
+        "bottom": 232,
+        "width": 320,
+        "height": 40,
+        "scroll": 320,
+        "client": 320
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 274,
+          "right": 293.625,
+          "bottom": 318,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 274,
+          "right": 209.984375,
+          "bottom": 318,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 4,
+        "y": 88,
+        "right": 356,
+        "bottom": 350,
+        "width": 352,
+        "height": 262,
+        "scroll": 352,
+        "client": 352
+      },
+      "title": {
+        "x": 20,
+        "y": 192,
+        "right": 340,
+        "bottom": 232,
+        "width": 320,
+        "height": 40,
+        "scroll": 320,
+        "client": 320
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 274,
+          "right": 293.625,
+          "bottom": 318,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 274,
+          "right": 209.984375,
+          "bottom": 318,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1050,
+        "width": 360,
+        "height": 1050,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 176,
+        "right": 352,
+        "bottom": 872,
+        "width": 344,
+        "height": 696,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 40,
+        "y": 384,
+        "right": 320,
+        "bottom": 544,
+        "width": 280,
+        "height": 160,
+        "scroll": 280,
+        "client": 280
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 664,
+          "right": 252.640625,
+          "bottom": 728,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 46.96875,
+          "y": 744,
+          "right": 313.015625,
+          "bottom": 808,
+          "width": 266.046875,
+          "height": 64,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1050,
+        "width": 360,
+        "height": 1050,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 176,
+        "right": 352,
+        "bottom": 872,
+        "width": 344,
+        "height": 696,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 40,
+        "y": 384,
+        "right": 320,
+        "bottom": 544,
+        "width": 280,
+        "height": 160,
+        "scroll": 280,
+        "client": 280
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 664,
+          "right": 252.640625,
+          "bottom": 728,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 46.96875,
+          "y": 744,
+          "right": 313.015625,
+          "bottom": 808,
+          "width": 266.046875,
+          "height": 64,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1098,
+        "width": 360,
+        "height": 1098,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 176,
+        "right": 352,
+        "bottom": 920,
+        "width": 344,
+        "height": 744,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 40,
+        "y": 384,
+        "right": 320,
+        "bottom": 544,
+        "width": 280,
+        "height": 160,
+        "scroll": 280,
+        "client": 280
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 664,
+          "right": 252.640625,
+          "bottom": 752,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 46.96875,
+          "y": 768,
+          "right": 313.015625,
+          "bottom": 856,
+          "width": 266.046875,
+          "height": 88,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1098,
+        "width": 360,
+        "height": 1098,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 176,
+        "right": 352,
+        "bottom": 920,
+        "width": 344,
+        "height": 744,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 40,
+        "y": 384,
+        "right": 320,
+        "bottom": 544,
+        "width": 280,
+        "height": 160,
+        "scroll": 280,
+        "client": 280
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 664,
+          "right": 252.640625,
+          "bottom": 752,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 46.96875,
+          "y": 768,
+          "right": 313.015625,
+          "bottom": 856,
+          "width": 266.046875,
+          "height": 88,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1050,
+        "width": 360,
+        "height": 1050,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 176,
+        "right": 352,
+        "bottom": 872,
+        "width": 344,
+        "height": 696,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 40,
+        "y": 384,
+        "right": 320,
+        "bottom": 544,
+        "width": 280,
+        "height": 160,
+        "scroll": 280,
+        "client": 280
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 664,
+          "right": 252.65625,
+          "bottom": 728,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 45.8125,
+          "y": 744,
+          "right": 314.203125,
+          "bottom": 808,
+          "width": 268.390625,
+          "height": 64,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1050,
+        "width": 360,
+        "height": 1050,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 176,
+        "right": 352,
+        "bottom": 872,
+        "width": 344,
+        "height": 696,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 40,
+        "y": 384,
+        "right": 320,
+        "bottom": 544,
+        "width": 280,
+        "height": 160,
+        "scroll": 280,
+        "client": 280
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 664,
+          "right": 252.65625,
+          "bottom": 728,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 45.8125,
+          "y": 744,
+          "right": 314.203125,
+          "bottom": 808,
+          "width": 268.390625,
+          "height": 64,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1098,
+        "width": 360,
+        "height": 1098,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 176,
+        "right": 352,
+        "bottom": 920,
+        "width": 344,
+        "height": 744,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 40,
+        "y": 384,
+        "right": 320,
+        "bottom": 544,
+        "width": 280,
+        "height": 160,
+        "scroll": 280,
+        "client": 280
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 664,
+          "right": 252.65625,
+          "bottom": 752,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 45.8125,
+          "y": 768,
+          "right": 314.203125,
+          "bottom": 856,
+          "width": 268.390625,
+          "height": 88,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1098,
+        "width": 360,
+        "height": 1098,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 176,
+        "right": 352,
+        "bottom": 920,
+        "width": 344,
+        "height": 744,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 40,
+        "y": 384,
+        "right": 320,
+        "bottom": 544,
+        "width": 280,
+        "height": 160,
+        "scroll": 280,
+        "client": 280
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 664,
+          "right": 252.65625,
+          "bottom": 752,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 45.8125,
+          "y": 768,
+          "right": 314.203125,
+          "bottom": 856,
+          "width": 268.390625,
+          "height": 88,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 290,
+        "width": 704,
+        "height": 226,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 226,
+          "right": 322.609375,
+          "bottom": 258,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 226,
+          "right": 473.03125,
+          "bottom": 258,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 290,
+        "width": 704,
+        "height": 226,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 226,
+          "right": 322.609375,
+          "bottom": 258,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 226,
+          "right": 473.03125,
+          "bottom": 258,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 302,
+        "width": 704,
+        "height": 238,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 226,
+          "right": 322.609375,
+          "bottom": 270,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 226,
+          "right": 473.03125,
+          "bottom": 270,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 302,
+        "width": 704,
+        "height": 238,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 246.96875,
+          "y": 226,
+          "right": 322.609375,
+          "bottom": 270,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 330.609375,
+          "y": 226,
+          "right": 473.03125,
+          "bottom": 270,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 290,
+        "width": 704,
+        "height": 226,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 226,
+          "right": 473.625,
+          "bottom": 258,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 226,
+          "right": 389.984375,
+          "bottom": 258,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 290,
+        "width": 704,
+        "height": 226,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 226,
+          "right": 473.625,
+          "bottom": 258,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 226,
+          "right": 389.984375,
+          "bottom": 258,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 302,
+        "width": 704,
+        "height": 238,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 226,
+          "right": 473.625,
+          "bottom": 270,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 226,
+          "right": 389.984375,
+          "bottom": 270,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 8,
+        "y": 64,
+        "right": 712,
+        "bottom": 302,
+        "width": 704,
+        "height": 238,
+        "scroll": 704,
+        "client": 704
+      },
+      "title": {
+        "x": 24,
+        "y": 164,
+        "right": 696,
+        "bottom": 184,
+        "width": 672,
+        "height": 20,
+        "scroll": 672,
+        "client": 672
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 397.984375,
+          "y": 226,
+          "right": 473.625,
+          "bottom": 270,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 246.390625,
+          "y": 226,
+          "right": 389.984375,
+          "bottom": 270,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 128,
+        "right": 704,
+        "bottom": 620,
+        "width": 688,
+        "height": 492,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 328,
+        "right": 672,
+        "bottom": 408,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 492,
+          "right": 291.625,
+          "bottom": 556,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 492,
+          "right": 573.671875,
+          "bottom": 556,
+          "width": 266.046875,
+          "height": 64,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 128,
+        "right": 704,
+        "bottom": 620,
+        "width": 688,
+        "height": 492,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 328,
+        "right": 672,
+        "bottom": 408,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 492,
+          "right": 291.625,
+          "bottom": 556,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 492,
+          "right": 573.671875,
+          "bottom": 556,
+          "width": 266.046875,
+          "height": 64,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 128,
+        "right": 704,
+        "bottom": 644,
+        "width": 688,
+        "height": 516,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 328,
+        "right": 672,
+        "bottom": 408,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 492,
+          "right": 291.625,
+          "bottom": 580,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 492,
+          "right": 573.671875,
+          "bottom": 580,
+          "width": 266.046875,
+          "height": 88,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 128,
+        "right": 704,
+        "bottom": 644,
+        "width": 688,
+        "height": 516,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 328,
+        "right": 672,
+        "bottom": 408,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 146.328125,
+          "y": 492,
+          "right": 291.625,
+          "bottom": 580,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 307.625,
+          "y": 492,
+          "right": 573.671875,
+          "bottom": 580,
+          "width": 266.046875,
+          "height": 88,
+          "scroll": 264,
+          "client": 264
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 128,
+        "right": 704,
+        "bottom": 620,
+        "width": 688,
+        "height": 492,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 328,
+        "right": 672,
+        "bottom": 408,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 492,
+          "right": 574.84375,
+          "bottom": 556,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 492,
+          "right": 413.546875,
+          "bottom": 556,
+          "width": 268.390625,
+          "height": 64,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 128,
+        "right": 704,
+        "bottom": 620,
+        "width": 688,
+        "height": 492,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 328,
+        "right": 672,
+        "bottom": 408,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 492,
+          "right": 574.84375,
+          "bottom": 556,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 492,
+          "right": 413.546875,
+          "bottom": 556,
+          "width": 268.390625,
+          "height": 64,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 128,
+        "right": 704,
+        "bottom": 644,
+        "width": 688,
+        "height": 516,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 328,
+        "right": 672,
+        "bottom": 408,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 492,
+          "right": 574.84375,
+          "bottom": 580,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 492,
+          "right": 413.546875,
+          "bottom": 580,
+          "width": 268.390625,
+          "height": 88,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 480,
+        "width": 720,
+        "height": 480,
+        "scroll": 720,
+        "client": 720
+      },
+      "state": {
+        "x": 16,
+        "y": 128,
+        "right": 704,
+        "bottom": 644,
+        "width": 688,
+        "height": 516,
+        "scroll": 688,
+        "client": 688
+      },
+      "title": {
+        "x": 48,
+        "y": 328,
+        "right": 672,
+        "bottom": 408,
+        "width": 624,
+        "height": 80,
+        "scroll": 624,
+        "client": 624
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 429.546875,
+          "y": 492,
+          "right": 574.84375,
+          "bottom": 580,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 145.15625,
+          "y": 492,
+          "right": 413.546875,
+          "bottom": 580,
+          "width": 268.390625,
+          "height": 88,
+          "scroll": 266,
+          "client": 266
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 346,
+        "width": 344,
+        "height": 246,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 282,
+          "right": 142.609375,
+          "bottom": 314,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 282,
+          "right": 293.03125,
+          "bottom": 314,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 346,
+        "width": 344,
+        "height": 246,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 282,
+          "right": 142.609375,
+          "bottom": 314,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 282,
+          "right": 293.03125,
+          "bottom": 314,
+          "width": 142.421875,
+          "height": 32,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 358,
+        "width": 344,
+        "height": 258,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 282,
+          "right": 142.609375,
+          "bottom": 326,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 282,
+          "right": 293.03125,
+          "bottom": 326,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": false,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 358,
+        "width": 344,
+        "height": 258,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 66.96875,
+          "y": 282,
+          "right": 142.609375,
+          "bottom": 326,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 150.609375,
+          "y": 282,
+          "right": 293.03125,
+          "bottom": 326,
+          "width": 142.421875,
+          "height": 44,
+          "scroll": 140,
+          "client": 140
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 346,
+        "width": 344,
+        "height": 246,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 282,
+          "right": 293.625,
+          "bottom": 314,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 282,
+          "right": 209.984375,
+          "bottom": 314,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 346,
+        "width": 344,
+        "height": 246,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 282,
+          "right": 293.625,
+          "bottom": 314,
+          "width": 75.640625,
+          "height": 32,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 282,
+          "right": 209.984375,
+          "bottom": 314,
+          "width": 143.59375,
+          "height": 32,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 358,
+        "width": 344,
+        "height": 258,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 282,
+          "right": 293.625,
+          "bottom": 326,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 282,
+          "right": 209.984375,
+          "bottom": 326,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": false,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 480,
+        "width": 360,
+        "height": 480,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 8,
+        "y": 100,
+        "right": 352,
+        "bottom": 358,
+        "width": 344,
+        "height": 258,
+        "scroll": 344,
+        "client": 344
+      },
+      "title": {
+        "x": 24,
+        "y": 200,
+        "right": 336,
+        "bottom": 240,
+        "width": 312,
+        "height": 40,
+        "scroll": 312,
+        "client": 312
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 217.984375,
+          "y": 282,
+          "right": 293.625,
+          "bottom": 326,
+          "width": 75.640625,
+          "height": 44,
+          "scroll": 74,
+          "client": 74
+        },
+        {
+          "label": "Choose library…",
+          "x": 66.390625,
+          "y": 282,
+          "right": 209.984375,
+          "bottom": 326,
+          "width": 143.59375,
+          "height": 44,
+          "scroll": 142,
+          "client": 142
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1088,
+        "width": 360,
+        "height": 1088,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 902,
+        "width": 328,
+        "height": 702,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 680,
+          "right": 252.640625,
+          "bottom": 744,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 760,
+          "right": 312,
+          "bottom": 838,
+          "width": 264,
+          "height": 78,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1088,
+        "width": 360,
+        "height": 1088,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 902,
+        "width": 328,
+        "height": 702,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 680,
+          "right": 252.640625,
+          "bottom": 744,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 760,
+          "right": 312,
+          "bottom": 838,
+          "width": 264,
+          "height": 78,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1122,
+        "width": 360,
+        "height": 1122,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 936,
+        "width": 328,
+        "height": 736,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 680,
+          "right": 252.640625,
+          "bottom": 768,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 784,
+          "right": 312,
+          "bottom": 872,
+          "width": 264,
+          "height": 88,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": true,
+      "direction": "ltr",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1122,
+        "width": 360,
+        "height": 1122,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 936,
+        "width": 328,
+        "height": 736,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.34375,
+          "y": 680,
+          "right": 252.640625,
+          "bottom": 768,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 784,
+          "right": 312,
+          "bottom": 872,
+          "width": 264,
+          "height": 88,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1088,
+        "width": 360,
+        "height": 1088,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 902,
+        "width": 328,
+        "height": 702,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 680,
+          "right": 252.65625,
+          "bottom": 744,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 760,
+          "right": 312,
+          "bottom": 838,
+          "width": 264,
+          "height": 78,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1088,
+        "width": 360,
+        "height": 1088,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 902,
+        "width": 328,
+        "height": 702,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 680,
+          "right": 252.65625,
+          "bottom": 744,
+          "width": 145.296875,
+          "height": 64,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 760,
+          "right": 312,
+          "bottom": 838,
+          "width": 264,
+          "height": 78,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": false,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "light",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1122,
+        "width": 360,
+        "height": 1122,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 936,
+        "width": 328,
+        "height": 736,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 680,
+          "right": 252.65625,
+          "bottom": 768,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 784,
+          "right": 312,
+          "bottom": 872,
+          "width": 264,
+          "height": 88,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "large": true,
+      "direction": "rtl",
+      "theme": "dark",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "right": 360,
+        "bottom": 1122,
+        "width": 360,
+        "height": 1122,
+        "scroll": 360,
+        "client": 360
+      },
+      "state": {
+        "x": 16,
+        "y": 200,
+        "right": 344,
+        "bottom": 936,
+        "width": 328,
+        "height": 736,
+        "scroll": 328,
+        "client": 328
+      },
+      "title": {
+        "x": 48,
+        "y": 400,
+        "right": 312,
+        "bottom": 560,
+        "width": 264,
+        "height": 160,
+        "scroll": 264,
+        "client": 264
+      },
+      "actions": [
+        {
+          "label": "Reload",
+          "x": 107.359375,
+          "y": 680,
+          "right": 252.65625,
+          "bottom": 768,
+          "width": 145.296875,
+          "height": 88,
+          "scroll": 143,
+          "client": 143
+        },
+        {
+          "label": "Choose library…",
+          "x": 48,
+          "y": 784,
+          "right": 312,
+          "bottom": 872,
+          "width": 264,
+          "height": 88,
+          "scroll": 262,
+          "client": 262
+        }
+      ],
+      "coarse": true,
+      "accessibleFullTitle": true,
+      "recovery": {
+        "reload": 1,
+        "choose": 1
+      },
+      "targetsOverlap": false
+    }
+  ]
+}
