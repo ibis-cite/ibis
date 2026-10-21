@@ -120,15 +120,7 @@ CI takes a few minutes per pull request. Most delay comes from waiting, so work 
 
   Keep failed output for diagnosis. Remove the verification worktree after inspecting the result. This is POSIX shell; on Windows, run it in Git Bash.
 
-- **Stack instead of waiting.** Start the next issue on a branch based on the previous one (one level at most: never build on a chain of unmerged branches). After the previous pull request is squash-merged, move the branch onto `main` and confirm the content did not change:
-
-  ```sh
-  tree=$(git rev-parse next-branch^{tree})
-  git fetch origin
-  git rebase --onto origin/main previous-branch next-branch
-  test "$(git rev-parse next-branch^{tree})" = "$tree" && echo unchanged
-  ```
-
+- **Branch from `main`, never from another branch.** While a pull request waits, start an unrelated issue in its own worktree. Stacked branches merged by squash have silently reverted changes on `main`. After merging `main` into a branch, `git diff origin/main` must show only that branch's change.
 - **Review in parallel.** Run the one independent review of the final diff while CI runs, and save findings in the pull request (fixed, P3s in one follow-up issue, or rejected with a reason).
 - **Independent work in parallel.** Issues that touch different files can be worked on at the same time, each in its own worktree and branch. Two writers never share a checkout. Shared files (`Cargo.toml`, `Cargo.lock`, `apps/desktop/src-tauri/src/main.rs`, `ROADMAP.md`) are changed by one branch at a time.
 
