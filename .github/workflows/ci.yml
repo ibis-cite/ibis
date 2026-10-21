@@ -315,6 +315,7 @@ jobs:
           name: native-app-${{ github.sha }}-${{ runner.os }}
           path: target/debug/ibis-desktop${{ runner.os == 'Windows' && '.exe' || '' }}
           if-no-files-found: error
+          overwrite: true
           retention-days: 1
 
       # Uploads still run after a job timeout (which counts as cancelled) so
@@ -343,6 +344,8 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
+      # Only to read whether this system's Desktop job failed.
+      actions: read
       # Only to open or update the issue when native UI smoke fails on main.
       issues: write
     env:
@@ -370,9 +373,24 @@ jobs:
           name: native-app-${{ github.sha }}-${{ runner.os }}
           path: target/debug
 
-      - name: Note a missing app
+      # A missing app is only expected when this system's Desktop job failed
+      # (that required check is already red); otherwise nothing was tested.
+      - name: Check why the app is missing
+        id: missing
         if: steps.app.outcome != 'success'
-        run: echo "::warning::Desktop ($RUNNER_OS) did not build the app, so native UI was not exercised; see that job."
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DESKTOP: Desktop (${{ matrix.os }})
+          JOBS: repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs?per_page=100
+        run: |
+          conclusion=$(gh api "$JOBS" --jq ".jobs[] | select(.name == \"$DESKTOP\") | .conclusion")
+          case "$conclusion" in
+            failure | cancelled | timed_out)
+              echo "::warning::$DESKTOP ended '$conclusion' and built no app, so native UI was not exercised." ;;
+            *)
+              echo "::error::$DESKTOP ended '${conclusion:-unknown}' but its app could not be downloaded; native UI was not exercised."
+              exit 1 ;;
+          esac
 
       - name: Prepare the app
         if: steps.app.outcome == 'success'
@@ -383,6 +401,7 @@ jobs:
       # Add to the Desktop job's screenshots and logs so evidence publication
       # still sees one artifact per system.
       - name: Download the Desktop screenshots
+        id: shots
         if: steps.app.outcome == 'success'
         continue-on-error: true
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -445,7 +464,7 @@ jobs:
           python3 scripts/check-native-appearance-macos.py --app target/debug/ibis-desktop --output screenshots/appearance-macOS
 
       - name: Report native UI failures on main
-        if: ${{ !cancelled() && github.event_name != 'pull_request' && (steps.native_macos.outcome == 'failure' || steps.native_panel.outcome == 'failure' || steps.native_windows.outcome == 'failure') }}
+        if: ${{ !cancelled() && github.event_name != 'pull_request' && (steps.missing.outcome == 'failure' || steps.native_macos.outcome == 'failure' || steps.native_panel.outcome == 'failure' || steps.native_windows.outcome == 'failure') }}
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -459,12 +478,25 @@ jobs:
             gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --label needs:triage --body "$body"
           fi
 
-      # Replaces the Desktop job's artifact with the same files plus these.
+      # Replaces the Desktop job's artifact with the same files plus these,
+      # but only when those files were downloaded first.
       - name: Keep screenshots and logs
-        if: always() && steps.app.outcome == 'success'
+        if: always() && steps.shots.outcome == 'success'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: picker-${{ github.sha }}-${{ runner.os }}
+          path: screenshots/*
+          if-no-files-found: warn
+          overwrite: true
+          retention-days: 14
+
+      # Without them, keep this job's files apart so Desktop's are never
+      # replaced; evidence publication does not read this name.
+      - name: Keep screenshots and logs separately
+        if: always() && steps.app.outcome == 'success' && steps.shots.outcome != 'success'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: native-ui-${{ github.sha }}-${{ runner.os }}
           path: screenshots/*
           if-no-files-found: warn
           overwrite: true
