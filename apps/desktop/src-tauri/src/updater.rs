@@ -20,6 +20,7 @@ use crate::preferences::SettingsFile;
 /// Automatic checks wait a little after start, then repeat this often.
 const FIRST_CHECK: Duration = Duration::from_secs(30);
 const CHECK_EVERY: Duration = Duration::from_secs(6 * 60 * 60);
+// Bound the small manifest request without shortening package downloads.
 const CHECK_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// What the first-launch question and the menu item explain.
@@ -130,8 +131,11 @@ pub(crate) fn user_agent<R: tauri::Runtime>(app: &AppHandle<R>) -> String {
     format!("Ibis/{}", app.package_info().version)
 }
 
-fn updater<R: tauri::Runtime>(app: &AppHandle<R>, _timeout: Duration) -> tauri_plugin_updater::Result<Updater> {
-    app.updater_builder().header("User-Agent", user_agent(app))?.build()
+fn updater<R: tauri::Runtime>(app: &AppHandle<R>, timeout: Duration) -> tauri_plugin_updater::Result<Updater> {
+    app.updater_builder()
+        .header("User-Agent", user_agent(app))?
+        .timeout(timeout)
+        .build()
 }
 
 async fn check(app: &AppHandle, asked: bool) {
@@ -328,10 +332,23 @@ mod tests {
                 "http://{}/latest.json",
                 listener.local_addr().unwrap_or_else(|e| panic!("{e}"))
             );
+            listener.set_nonblocking(true).unwrap_or_else(|e| panic!("{e}"));
             let (release, held) = std::sync::mpsc::channel();
             let server = std::thread::spawn(move || {
                 for attempt in 0..2 {
-                    let (mut stream, _) = listener.accept().unwrap_or_else(|e| panic!("{e}"));
+                    let deadline = std::time::Instant::now() + Duration::from_secs(3);
+                    let (mut stream, _) = loop {
+                        match listener.accept() {
+                            Ok(connection) => break connection,
+                            Err(error)
+                                if error.kind() == std::io::ErrorKind::WouldBlock
+                                    && std::time::Instant::now() < deadline =>
+                            {
+                                std::thread::sleep(Duration::from_millis(5));
+                            }
+                            Err(error) => panic!("accept: {error}"),
+                        }
+                    };
                     stream
                         .set_read_timeout(Some(Duration::from_secs(2)))
                         .unwrap_or_else(|e| panic!("{e}"));
@@ -474,6 +491,7 @@ mod tests {
                 // Each published entry names its package type, so a .deb or
                 // .rpm install is never offered the AppImage.
                 .target("linux-x86_64-appimage")
+                .timeout(CHECK_TIMEOUT)
                 .no_proxy()
                 .build()
                 .unwrap_or_else(|e| panic!("{e}"));
