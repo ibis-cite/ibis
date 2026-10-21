@@ -1,5 +1,6 @@
 import { isTauri } from "@tauri-apps/api/core";
 import type { Copied, Density, LibraryStatus, SearchResult } from "./api";
+import type { Sources } from "./bindings";
 import type { PickerApi, PickerPreview } from "./App";
 import type { Platform } from "./nativeAppearance";
 
@@ -31,6 +32,8 @@ export type GalleryState = {
   tray?: number;
   formatted?: boolean;
   keys?: boolean;
+  /** What first-run setup finds on this computer (synthetic names only). */
+  sources?: Sources;
 };
 
 /**
@@ -132,6 +135,9 @@ const largeSelection = Array.from({ length: 50 }, (_, i) => reference(
 
 export const galleryStates: readonly GalleryState[] = [
   { id: "first-run", label: "First run", library: library({ state: "none", name: null, snapshot_name: null, has_snapshot: false, zotero: false, references: 0 }) },
+  { id: "first-run-found", label: "First run, Zotero and files found", library: library({ state: "none", name: null, snapshot_name: null, has_snapshot: false, zotero: false, references: 0 }),
+    sources: { zotero: "available", list: 1, files: [{ name: "thesis.bib", folder: "Documents" }, { name: "example.bib", folder: "Projects" }], cut_short: false } },
+  { id: "idle", label: "Library loaded, nothing typed", library: library() },
   { id: "loading", label: "Opening a library", library: library({ state: "loading", has_snapshot: false, zotero: false, snapshot_name: null, references: 0 }) },
   { id: "empty", label: "Empty library", library: library({ name: "empty.bib", snapshot_name: "empty.bib", references: 0 }) },
   { id: "no-results", label: "No matching references", library: library(), query: "unmatched phrase" },
@@ -188,6 +194,7 @@ export function galleryProvider(state: GalleryState): { api: PickerApi; preview:
         }))),
         copyFormatted: async () => null,
       } : {}),
+      ...(state.sources ? { findSources: async () => state.sources!, openFoundLibrary: async () => null } : {}),
       copyFormat: async () => "pandoc",
       pickerPreferences: async () => ({ citation_style: state.formatted ? "apa" : null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false }),
       setPickerPreferences: async () => null,
