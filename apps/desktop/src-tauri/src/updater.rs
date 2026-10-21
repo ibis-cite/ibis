@@ -20,6 +20,7 @@ use crate::preferences::SettingsFile;
 /// Automatic checks wait a little after start, then repeat this often.
 const FIRST_CHECK: Duration = Duration::from_secs(30);
 const CHECK_EVERY: Duration = Duration::from_secs(6 * 60 * 60);
+const CHECK_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// What the first-launch question and the menu item explain.
 pub(crate) const QUESTION: &str = "Ibis can check GitHub for a newer version a few times a day. \
@@ -129,7 +130,7 @@ pub(crate) fn user_agent<R: tauri::Runtime>(app: &AppHandle<R>) -> String {
     format!("Ibis/{}", app.package_info().version)
 }
 
-fn updater<R: tauri::Runtime>(app: &AppHandle<R>) -> tauri_plugin_updater::Result<Updater> {
+fn updater<R: tauri::Runtime>(app: &AppHandle<R>, _timeout: Duration) -> tauri_plugin_updater::Result<Updater> {
     app.updater_builder().header("User-Agent", user_agent(app))?.build()
 }
 
@@ -144,7 +145,7 @@ async fn check(app: &AppHandle, asked: bool) {
         }
         return;
     }
-    let found = match updater(app) {
+    let found = match updater(app, CHECK_TIMEOUT) {
         Ok(updater) => updater.check().await.map_err(|e| failure_kind(&e)),
         Err(e) => Err(failure_kind(&e)),
     };
@@ -316,6 +317,64 @@ mod tests {
         assert!(short.ends_with('…'));
     }
 
+    #[test]
+    fn stalled_manifest_headers_and_body_time_out_and_allow_a_later_check() {
+        use std::io::{BufRead, BufReader, Write};
+        use tauri_plugin_updater::Error;
+
+        for partial_body in [false, true] {
+            let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap_or_else(|e| panic!("{e}"));
+            let endpoint = format!(
+                "http://{}/latest.json",
+                listener.local_addr().unwrap_or_else(|e| panic!("{e}"))
+            );
+            let (release, held) = std::sync::mpsc::channel();
+            let server = std::thread::spawn(move || {
+                for attempt in 0..2 {
+                    let (mut stream, _) = listener.accept().unwrap_or_else(|e| panic!("{e}"));
+                    stream
+                        .set_read_timeout(Some(Duration::from_secs(2)))
+                        .unwrap_or_else(|e| panic!("{e}"));
+                    let mut request = BufReader::new(&stream);
+                    let mut line = String::new();
+                    while request.read_line(&mut line).unwrap_or_else(|e| panic!("{e}")) > 2 {
+                        line.clear();
+                    }
+                    if attempt == 0 {
+                        if partial_body {
+                            stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 100\r\n\r\n{\"version\":").unwrap_or_else(|e| panic!("{e}"));
+                        }
+                        // A bounded server hold makes the pre-fix failure finite.
+                        let _ = held.recv_timeout(Duration::from_secs(2));
+                    } else {
+                        stream
+                            .write_all(b"HTTP/1.1 204 No Content\r\nConnection: close\r\n\r\n")
+                            .unwrap_or_else(|e| panic!("{e}"));
+                    }
+                }
+            });
+            let mut context = tauri::test::mock_context(tauri::test::noop_assets());
+            context.config_mut().plugins.0.insert(
+                "updater".into(),
+                json!({ "pubkey": "synthetic", "endpoints": [endpoint], "dangerousInsecureTransportProtocol": true }),
+            );
+            let app = tauri::test::mock_builder()
+                .plugin(tauri_plugin_updater::Builder::new().build())
+                .build(context)
+                .unwrap_or_else(|e| panic!("{e}"));
+            let client = updater(app.handle(), Duration::from_millis(200)).unwrap_or_else(|e| panic!("{e}"));
+            let stalled = tauri::async_runtime::block_on(client.check());
+            let _ = release.send(());
+            let recovered = tauri::async_runtime::block_on(client.check());
+            server.join().unwrap_or_else(|_| panic!("server thread panicked"));
+            assert!(
+                matches!(&stalled, Err(Error::Reqwest(error)) if error.is_timeout()),
+                "partial_body={partial_body}: expected request timeout"
+            );
+            assert!(matches!(recovered, Ok(None)), "later check must complete");
+        }
+    }
+
     /// A real check and download against a local server: the manifest shape the
     /// release workflow publishes, a matching signature, and refusals.
     #[test]
@@ -425,6 +484,10 @@ mod tests {
                     .unwrap_or_else(|e| panic!("{e}"))
                     .unwrap_or_else(|| panic!("the newer synthetic version was not offered"));
                 assert_eq!(update.version, "9.9.9-nightly.209912312359");
+                assert_eq!(
+                    update.timeout, None,
+                    "manifest budget must not limit the package download"
+                );
                 assert!(offer_text("0.1.0", &update).contains("Synthetic notes."));
                 update.download(|_, _| {}, || {}).await
             })
