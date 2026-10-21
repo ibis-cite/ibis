@@ -27,7 +27,7 @@ export const operationFailures = {
 
 /** Where people turn login items on and off on each system. */
 export function loginItemsPlace(platform: Platform): string {
-  if (platform === "macos") return "System Settings > General > Login Items & Extensions";
+  if (platform === "macos") return "System Settings > General > Login Items";
   if (platform === "windows") return "Settings > Apps > Startup";
   return "your desktop's startup applications settings";
 }

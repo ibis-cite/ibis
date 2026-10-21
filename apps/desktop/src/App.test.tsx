@@ -2394,7 +2394,7 @@ test("each system's login item is in its own words, and its problems name where 
   expect((["macos", "windows", "linux"] as const).map(loginItemText.label)).toEqual(["Open at Login", "Start when you sign in", "Start on Login"]);
   expect(loginItemText.sentence("Ibis Nightly", "windows")).toBe("Start Ibis Nightly when you sign in");
   expect(loginItemText.sentence("Ibis", "macos")).toBe("Start Ibis when you log in");
-  expect(loginItemsPlace("macos")).toBe("System Settings > General > Login Items & Extensions");
+  expect(loginItemsPlace("macos")).toBe("System Settings > General > Login Items");
   expect(loginItemsPlace("windows")).toBe("Settings > Apps > Startup");
   expect(loginItemsPlace("linux")).toMatch(/startup applications/);
   for (const platform of ["macos", "windows", "linux"] as const) {

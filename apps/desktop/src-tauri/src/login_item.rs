@@ -436,7 +436,7 @@ pub(crate) fn problem_message(problem: LoginItemProblem, name: &str) -> String {
 
 fn problem_for(problem: LoginItemProblem, name: &str, system: &str) -> String {
     let (place, when) = match system {
-        "macos" => ("System Settings > General > Login Items & Extensions", "log in"),
+        "macos" => ("System Settings > General > Login Items", "log in"),
         "windows" => ("Settings > Apps > Startup", "sign in"),
         _ => ("your desktop's startup applications settings", "log in"),
     };
@@ -727,7 +727,7 @@ mod tests {
         );
         assert_eq!(menu_label(), label_for(system()));
         let mac = problem_for(LoginItemProblem::NeedsApproval, "Ibis", "macos");
-        assert!(mac.ends_with("Login Items & Extensions."), "{mac}");
+        assert!(mac.ends_with("General > Login Items."), "{mac}");
         let windows = problem_for(LoginItemProblem::Unreadable, "Ibis", "windows");
         assert_eq!(
             windows,
