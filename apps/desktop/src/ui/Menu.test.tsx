@@ -1,10 +1,18 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import axe from "axe-core";
 import { useRef, useState } from "react";
 import { Menu, MenuItem, MenuSection, MenuSeparator } from "./Menu";
 
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); delete document.documentElement.dataset.platform; });
+afterEach(async () => {
+  cleanup();
+  // React Aria restores focus on a frame after unmount; finish it before the
+  // next test mounts a new scope.
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  delete document.documentElement.dataset.platform;
+});
 
 function Harness({ onAction, toggle }: { onAction: (id: string) => void; toggle: (id: string) => void }) {
   const [open, setOpen] = useState(false);
@@ -53,7 +61,7 @@ test.each(["macos", "windows", "linux"])("%s: a pointer opens with nothing highl
   }
   fireEvent.keyDown(document.activeElement!, { key: "Escape" });
   expect(screen.queryByRole("menu")).toBeNull();
-  expect(document.activeElement).toBe(trigger);
+  await waitFor(() => expect(document.activeElement).toBe(trigger));
 
   act(() => search.focus());
   fireEvent.keyDown(search, { key: "k", ctrlKey: true });
@@ -79,7 +87,8 @@ test("every row has a leading check column; toggles are checkbox items and the s
 test("the last checked item stays focusable and unavailable; toggles keep the menu open; Tab goes to the search box", async () => {
   const { trigger, search, toggle, onAction } = mount();
   fireEvent.click(trigger);
-  await screen.findByRole("menu");
+  const menu = await screen.findByRole("menu");
+  act(() => menu.focus());
   const first = screen.getByRole("menuitemcheckbox", { name: "First" });
   expect(first.getAttribute("aria-disabled")).toBe("true");
   fireEvent.keyDown(document.activeElement!, { key: "End" });
@@ -93,15 +102,11 @@ test("the last checked item stays focusable and unavailable; toggles keep the me
   expect(screen.getByRole("menuitemcheckbox", { name: "First" }).getAttribute("aria-disabled")).toBeNull();
   fireEvent.keyDown(document.activeElement!, { key: "Tab" });
   expect(screen.queryByRole("menu")).toBeNull();
-  expect(document.activeElement).toBe(search);
+  await waitFor(() => expect(document.activeElement).toBe(search));
   expect(onAction).not.toHaveBeenCalled();
 });
 
-test("an action returns focus to Search through the menu's exit animation", async () => {
-  const { trigger, search, onAction } = mount();
-  act(() => trigger.focus());
-  fireEvent.click(trigger);
-  const menu = await screen.findByRole("menu");
+function holdExit(menu: HTMLElement) {
   let finishExit!: () => void;
   const finished = new Promise<void>((resolve) => { finishExit = resolve; });
   const popover = menu.closest(".menu-popover")!;
@@ -109,19 +114,66 @@ test("an action returns focus to Search through the menu's exit animation", asyn
   // its exit finishes, as the browser does for menu-exit in Menu.css.
   Object.defineProperty(popover, "getAnimations", { value: () => popover.hasAttribute("data-exiting")
     ? [{ playState: "running", finished }] : [] });
+  return { popover, finish: async () => {
+    await act(async () => { finishExit(); });
+    await act(async () => { await new Promise(requestAnimationFrame); });
+  } };
+}
+
+test.each(["pointer", "keyboard"])("%s action returns focus to Search through the menu's exit animation", async (activation) => {
+  const { trigger, search, onAction } = mount();
+  act(() => trigger.focus());
+  fireEvent.click(trigger);
+  const exit = holdExit(await screen.findByRole("menu"));
   const open = screen.getByRole("menuitem", { name: "Open" });
   act(() => open.focus());
   // The live modal popover makes the rest of the page inert until it closes.
   // Model its refusal of the action's first focus attempt (JSDOM has no inert).
-  const focus = vi.spyOn(search, "focus").mockImplementationOnce(() => {});
-  fireEvent.click(open);
+  const focusSearch = search.focus.bind(search);
+  const focus = vi.spyOn(search, "focus").mockImplementation(() => {
+    if (!exit.popover.isConnected) focusSearch();
+  });
+  if (activation === "pointer") fireEvent.click(open);
+  else {
+    fireEvent.keyDown(open, { key: "Enter" });
+    fireEvent.keyUp(open, { key: "Enter" });
+  }
   expect(onAction).toHaveBeenCalledWith("open");
-  expect(popover.hasAttribute("data-exiting")).toBe(true);
-  await act(async () => { finishExit(); });
-  await act(async () => { await new Promise(requestAnimationFrame); });
+  expect(exit.popover.hasAttribute("data-exiting")).toBe(true);
+  await exit.finish();
   focus.mockRestore();
   expect(screen.queryByRole("menu")).toBeNull();
   expect(document.activeElement).toBe(search);
+});
+
+test.each(["Escape", "Tab"])("%s restores its destination after an animated exit", async (key) => {
+  const { trigger, search } = mount();
+  act(() => trigger.focus());
+  fireEvent.click(trigger);
+  const menu = await screen.findByRole("menu");
+  const exit = holdExit(menu);
+  act(() => menu.focus());
+  fireEvent.keyDown(menu, { key });
+  await exit.finish();
+  expect(document.activeElement).toBe(key === "Escape" ? trigger : search);
+});
+
+test.each(["focus", "pointer", "keyboard"])("later %s intent supersedes the action's focus destination", async (intent) => {
+  const { trigger, search } = mount();
+  fireEvent.click(trigger);
+  const exit = holdExit(await screen.findByRole("menu"));
+  fireEvent.click(screen.getByRole("menuitem", { name: "Open" }));
+  // A dialog/control can take focus, or the user can choose the trigger again.
+  const target = intent === "focus" ? document.createElement("button") : trigger;
+  if (intent === "focus") document.body.append(target);
+  else if (intent === "pointer") fireEvent.pointerDown(target);
+  else fireEvent.keyDown(target, { key: "Shift" });
+  act(() => target.focus());
+  await exit.finish();
+  if (intent === "pointer") expect(screen.getByRole("menu").contains(document.activeElement)).toBe(true);
+  else expect(document.activeElement).toBe(target);
+  expect(document.activeElement).not.toBe(search);
+  if (intent === "focus") target.remove();
 });
 
 const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
