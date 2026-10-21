@@ -2400,7 +2400,10 @@ test("each system's login item is in its own words, and its problems name where 
   for (const platform of ["macos", "windows", "linux"] as const) {
     for (const problem of ["unsupported", "needs_approval", "refused", "unreadable"] as const) {
       const message = loginItemText.problem(problem, platform, "Ibis Nightly");
-      expect(message).toMatch(new RegExp(`Ibis Nightly.*${loginItemsPlace(platform).replace(/[.>&]/g, "\\$&")}\\.$`));
+      const place = `${loginItemsPlace(platform)}.`;
+      expect(message.endsWith(place)).toBe(true);
+      expect(message.indexOf("Ibis Nightly")).toBeGreaterThanOrEqual(0);
+      expect(message.indexOf("Ibis Nightly")).toBeLessThan(message.length - place.length);
       expect(message.includes("log in")).toBe(platform !== "windows" && /unsupported|unreadable/.test(problem));
     }
   }
