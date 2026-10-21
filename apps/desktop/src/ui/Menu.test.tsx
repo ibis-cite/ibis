@@ -163,17 +163,21 @@ test.each(["focus", "pointer", "keyboard"])("later %s intent supersedes the acti
   fireEvent.click(trigger);
   const exit = holdExit(await screen.findByRole("menu"));
   fireEvent.click(screen.getByRole("menuitem", { name: "Open" }));
-  // A dialog/control can take focus, or the user can choose the trigger again.
-  const target = intent === "focus" ? document.createElement("button") : trigger;
-  if (intent === "focus") document.body.append(target);
-  else if (intent === "pointer") fireEvent.pointerDown(target);
-  else fireEvent.keyDown(target, { key: "Shift" });
+  // A dialog or pointer-chosen control can take focus. A later key can also
+  // leave focus on the trigger without reopening the menu.
+  const target = intent === "keyboard" ? trigger : document.createElement("button");
+  if (intent !== "keyboard") document.body.append(target);
+  if (intent === "pointer") {
+    fireEvent.pointerDown(target, { button: 0, pointerType: "mouse", pointerId: 1 });
+    fireEvent.pointerUp(target, { button: 0, pointerType: "mouse", pointerId: 1 });
+    fireEvent.click(target);
+  }
+  else if (intent === "keyboard") fireEvent.keyDown(target, { key: "Shift" });
   act(() => target.focus());
   await exit.finish();
-  if (intent === "pointer") expect(screen.getByRole("menu").contains(document.activeElement)).toBe(true);
-  else expect(document.activeElement).toBe(target);
+  expect(document.activeElement).toBe(target);
   expect(document.activeElement).not.toBe(search);
-  if (intent === "focus") target.remove();
+  if (intent !== "keyboard") target.remove();
 });
 
 const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
