@@ -54,6 +54,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # A manual run that would silently do nothing fails here instead.
+  inputs:
+    name: Check the run options
+    if: github.event_name == 'workflow_dispatch' && inputs.update_test && (github.ref != 'refs/heads/main' || inputs.publish)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Refuse conflicting options
+        run: |
+          echo "::error::\"Only rerun the update test\" runs only on main and cannot be combined with publishing. Run it on main with publishing unchecked."
+          exit 1
+
   build:
     name: Build (${{ matrix.name }})
     # The update test alone builds and publishes nothing; every later
@@ -655,7 +667,8 @@ jobs:
           name: previous-nightly
           path: previous/*
           if-no-files-found: error
-          retention-days: 3
+          # As long as the packages, so the daily update test can use both.
+          retention-days: 14
 
       # The nightly tag moves to each new main commit. It never matches v*, so
       # it starts no release build, and Release Please ignores it.
@@ -722,6 +735,8 @@ jobs:
       contents: read
       # Only to download the artifacts of the run that published the nightly.
       actions: read
+      # Only to open or update the issue when the daily run fails.
+      issues: write
     strategy:
       fail-fast: false
       matrix:
@@ -735,18 +750,21 @@ jobs:
     steps:
       # The nightly tag names the commit of the newest nightly. The first run
       # at that commit that kept files published it: it kept the nightly it
-      # replaced (for 3 days) and its own packages (14 days).
+      # replaced and its own packages (both for 14 days).
       - name: Find the run that published the nightly
         id: source
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           TARGET: ${{ matrix.target }}
+          EVENT: ${{ github.event_name }}
         run: |
           set -euo pipefail
           sha=$(gh api "repos/$REPO/git/ref/tags/nightly" --jq .object.sha)
+          # Assigned first, so an API error fails the step instead of an empty loop.
+          runs=$(gh api "repos/$REPO/actions/workflows/preview.yml/runs?branch=main&head_sha=$sha" --jq '.workflow_runs | reverse | .[].id')
           run=""
-          for id in $(gh api "repos/$REPO/actions/workflows/preview.yml/runs?branch=main&head_sha=$sha" --jq '.workflow_runs | reverse | .[].id'); do
+          for id in $runs; do
             names=$(gh api "repos/$REPO/actions/runs/$id/artifacts?per_page=100" --jq '.artifacts[] | select(.expired | not) | .name')
             if grep -qx previous-nightly <<< "$names" && grep -qx "ibis-$TARGET" <<< "$names"; then run=$id; break; fi
           done
@@ -754,8 +772,11 @@ jobs:
           if [ -n "$run" ]; then
             echo "run=$run" >> "$GITHUB_OUTPUT"
             echo "Testing the nightly from ${sha:0:12}, published by run $run"
-          else
+          elif [ "$EVENT" = workflow_dispatch ]; then
             echo "::notice::Update test skipped: the run that published nightly ${sha:0:12} kept no unexpired previous nightly."
+          else
+            echo "::error::The run that published nightly ${sha:0:12} kept no unexpired previous nightly, so nothing was tested."
+            exit 1
           fi
 
       - name: Checkout the nightly's commit
@@ -843,3 +864,20 @@ jobs:
           path: update-e2e/*
           if-no-files-found: warn
           retention-days: 14
+
+      # A red scheduled run notifies nobody by itself.
+      - name: Report a failed daily update test
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NAME: ${{ matrix.name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Installed-update test failing on main ($NAME)"
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "in:title \"$title\"" --json number --jq '.[0].number // empty')
+          body="Failed on the newest nightly: $RUN_URL"
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --label needs:triage --body "$body"
+          fi
