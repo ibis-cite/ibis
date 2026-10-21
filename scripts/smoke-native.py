@@ -128,6 +128,42 @@ def search_focused(snapshot):
     return any(n.get("focused") for n in named(snapshot, "Search references"))
 
 
+def menu_escape_focus(native, snapshot, shortcut, report):
+    """Prove the invoker owns Escape, using Space as the actual keyboard check."""
+    def values(state):
+        return [node.get("value") for node in named(state, "Search references")]
+    original = values(snapshot())
+    if not any(isinstance(value, str) for value in original):
+        raise RuntimeError("Native search value unavailable for menu focus check")
+    facts = {key: False for key in ("shortcut_opened", "escape_closed", "escape_invoker_focused",
+                                   "space_reopened", "search_unchanged", "tab_search_focused")}
+    report["menu_escape_focus"] = facts
+    native.key(shortcut)
+    wait_for(lambda: bool(named(snapshot(), "Reload")), "shortcut opens More", timeout=5)
+    facts["shortcut_opened"] = True
+    native.key("Escape")
+    wait_for(lambda: not named(snapshot(), "Reload"), "Escape closes More", timeout=5)
+    closed = snapshot()
+    facts["escape_closed"] = True
+    facts["escape_invoker_focused"] = any(node.get("focused") for node in named(closed, "More"))
+    facts["search_unchanged"] = values(closed) == original
+    native.key("space")
+    def reopened():
+        current = snapshot()
+        facts["space_reopened"] = bool(named(current, "Reload"))
+        # A successful modal open hides Search from the accessibility tree.
+        if not facts["space_reopened"]:
+            facts["search_unchanged"] = facts["search_unchanged"] and values(current) == original
+        return facts["space_reopened"]
+    wait_for(reopened, "Space reopens More after Escape", timeout=5)
+    native.key("Tab")
+    wait_for(lambda: not named(snapshot(), "Reload"), "Tab closes More", timeout=5)
+    returned = snapshot()
+    facts["tab_search_focused"] = search_focused(returned)
+    facts["search_unchanged"] = facts["search_unchanged"] and values(returned) == original
+    assert all(facts.values()), "Native menu keyboard ownership failed"
+
+
 def control_activation_facts(state):
     keys = {"pressed", "button_role", "menu_item_role", "toggle_role",
             "invoke_pattern", "expand_collapse_pattern", "toggle_pattern"}
@@ -1202,6 +1238,8 @@ def main():
             check("second launch exits and activates existing picker", second_instance)
             check("native typing and accessible result count", lambda: query("smoke000001", "1 result"))
             assert "Ibis smoke reference 000001" in strings(snapshot()), "Expected native result missing"
+            check("shortcut menu Escape returns to invoker", lambda: menu_escape_focus(
+                native, snapshot, "super+k" if system == "Darwin" else "ctrl+k", report))
 
             def copy():
                 # Installed release builds never report the non-activating panel as the
@@ -2138,6 +2176,39 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(native.click.call_args_list, [call("More"), call("Reload")])
         with self.assertRaises(ValueError):
             menu_action(native, "Search references")
+
+    def test_menu_escape_checks_keyboard_ownership_without_recording_search_text(self):
+        for loses_focus in (False, True):
+            state = {"menu": False, "more": False, "value": "private synthetic query"}
+            def snapshot():
+                return {"nodes": ([{"name": "Reload"}] if state["menu"] else [
+                    {"name": "More", "focused": state["more"]},
+                    {"name": "Search references", "value": state["value"], "focused": not state["more"]}])}
+            def key(chord):
+                if chord == "ctrl+k":
+                    state["menu"] = True
+                elif chord == "Escape":
+                    state.update(menu=False, more=not loses_focus)
+                elif chord == "space":
+                    state["menu"] = state["more"]
+                    if not state["more"]:
+                        state["value"] += " "
+                elif chord == "Tab":
+                    state.update(menu=False, more=False)
+            native, report = Mock(), {}
+            native.key.side_effect = key
+            with patch(__name__ + ".wait_for", side_effect=lambda predicate, *args, **kwargs: self.assertTrue(predicate())):
+                if loses_focus:
+                    with self.assertRaises(AssertionError):
+                        menu_escape_focus(native, snapshot, "ctrl+k", report)
+                    self.assertFalse(report["menu_escape_focus"]["space_reopened"])
+                    self.assertFalse(report["menu_escape_focus"]["search_unchanged"])
+                else:
+                    menu_escape_focus(native, snapshot, "ctrl+k", report)
+                    self.assertTrue(all(report["menu_escape_focus"].values()))
+                    self.assertEqual(native.key.call_args_list, [call("ctrl+k"), call("Escape"), call("space"), call("Tab")])
+            self.assertTrue(all(type(value) is bool for value in report["menu_escape_focus"].values()))
+            self.assertNotIn(state["value"], json.dumps(report))
 
     def test_global_macos_hid_event_contracts_without_native_execution(self):
         subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,
