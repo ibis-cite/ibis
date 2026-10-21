@@ -37,6 +37,9 @@ MLA). More styles and direct insertion into other applications are future work.
 6. Core search normalizes case and accents, matches query terms and ranks the
    results. Rust returns record identities, display fields and matched fields;
    React displays them. The UI requests 20 results; Rust caps the limit at 200.
+   `App.tsx` holds the picker's state; the parts it draws (header, notices,
+   selection tray, result rows, footer and More menu) are props-only components
+   in [features/picker](../apps/desktop/src/features/picker/).
 
 The search effect's `current` flag ignores replies for superseded queries.
 `resultsQuery` records which query produced the visible results and also guards
@@ -81,7 +84,10 @@ existing licence and advisory policy.
    escaping helper when output is wrong.
 5. For a bundled style, `api.cslItems` calls `copy::csl_items`, which exports the
    chosen snapshot's records as CSL-JSON. [formatted.ts](../apps/desktop/src/format/formatted.ts)
-   sends them to the formatting worker for the preview. `api.copyFormatted`
+   sends them to the formatting worker for the preview; the worker's
+   [client](../apps/desktop/src/format/client.ts) sends one request at a time,
+   drops previews replaced before they start, and stops a worker that makes no
+   progress for 5 s. `api.copyFormatted`
    passes that completed preview's text, HTML and snapshot revision to
    `copy_formatted`, which validates the revision and writes HTML with a
    plain-text alternative. The desktop picker does not write RTF.
