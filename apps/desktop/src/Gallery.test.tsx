@@ -59,6 +59,15 @@ test("the gallery keeps a seeded copy confirmation available for evidence captur
 
 const { applyPlatformSwitch, galleryProvider, galleryStates, gallerySwitches, withSwitches } = await import("./gallery-fixtures");
 
+test("the idle gallery is an explicitly empty query with a loaded nonempty library", () => {
+  const idle = galleryStates.find((state) => state.id === "idle");
+  expect(idle).toBeTruthy();
+  expect(idle?.query).toBe("");
+  expect(idle?.library.state).toBe("loaded");
+  expect(idle?.library.references).toBeGreaterThan(0);
+  expect(idle?.results ?? []).toEqual([]);
+});
+
 test.each([
   ["first-run", "Choose a library to get started"],
   ["loading", "Opening example.bib…"],

@@ -123,6 +123,15 @@ test("typing a query shows results from the search command", async () => {
   expect(screen.getByText("smith2020")).toBeTruthy();
 });
 
+test.each(["", "unmatched"])("result headings only name actual rows, preserving empty announcements (query=%s)", async (query) => {
+  backend();
+  render(<App />);
+  if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
+  await screen.findByText(query ? "No matching references" : "Type to find a reference");
+  expect(document.querySelector(".results-heading")).toBeNull();
+  expect(screen.getByRole("status", { name: "Search results" }).textContent).toBe("0 results");
+});
+
 test("errors from the backend are shown, not swallowed", async () => {
   backend({
     search: () => {
