@@ -8,7 +8,7 @@ import * as api from "./api";
 import capability from "../src-tauri/capabilities/default.json";
 import config from "../src-tauri/tauri.conf.json";
 import { copyFormatMenu, copyFormatNames } from "./messages";
-import { STYLE_NAMES, STYLE_TITLES, type StyleId } from "./format/styles";
+import { STYLE_NAMES, type StyleId } from "./format/styles";
 
 // Vitest can load these existing runtime builtins without a Node-types dependency.
 const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
@@ -55,7 +55,7 @@ test("copy confirmation expires, but copy warnings remain until dismissed", asyn
 function chooseFormat(value: string) {
   const trigger = screen.getByRole("button", { name: /^Copy as / });
   if (trigger.getAttribute("aria-expanded") !== "true") fireEvent.click(trigger);
-  const name = value.startsWith("style:") ? STYLE_TITLES[value.slice(6) as StyleId] : copyFormatMenu[value as keyof typeof copyFormatMenu].label;
+  const name = value.startsWith("style:") ? STYLE_NAMES[value.slice(6) as StyleId] : copyFormatMenu[value as keyof typeof copyFormatMenu].label;
   fireEvent.click(screen.getByRole("menuitemradio", { name }));
 }
 /** The format the header's format menu shows, as its value. */
