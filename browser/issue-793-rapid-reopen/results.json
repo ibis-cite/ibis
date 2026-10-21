@@ -1,0 +1,174 @@
+{
+  "browser": "Chromium 151.0.7922.34",
+  "kind": "synthetic real-App gallery; browser OS looks, not native",
+  "baseline": "6a4031a5cefa360ccc193f5c66202b6c643c1540",
+  "comparedRuntime": "5f76874f1d96af75c88c73514c13d8f98b904b0b",
+  "baselineComparison": [
+    {
+      "source": "baseline",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "afterReopen": {
+        "activeTag": "BODY",
+        "rootInert": true,
+        "menuOpen": true
+      },
+      "afterArrowDown": {
+        "activeTag": "BODY"
+      }
+    },
+    {
+      "source": "comparedRuntime",
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "afterReopen": {
+        "activeTag": "BODY",
+        "rootInert": true,
+        "menuOpen": true
+      },
+      "afterArrowDown": {
+        "activeTag": "BODY"
+      }
+    }
+  ],
+  "matrix": {
+    "total": 12,
+    "enteredDuringExit": 12,
+    "results": [
+      {
+        "platform": "macos",
+        "theme": "light",
+        "reducedMotion": "no-preference",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "macos",
+        "theme": "light",
+        "reducedMotion": "reduce",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "macos",
+        "theme": "dark",
+        "reducedMotion": "no-preference",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "macos",
+        "theme": "dark",
+        "reducedMotion": "reduce",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "windows",
+        "theme": "light",
+        "reducedMotion": "no-preference",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "windows",
+        "theme": "light",
+        "reducedMotion": "reduce",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "windows",
+        "theme": "dark",
+        "reducedMotion": "no-preference",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "windows",
+        "theme": "dark",
+        "reducedMotion": "reduce",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "linux",
+        "theme": "light",
+        "reducedMotion": "no-preference",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "linux",
+        "theme": "light",
+        "reducedMotion": "reduce",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "linux",
+        "theme": "dark",
+        "reducedMotion": "no-preference",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      },
+      {
+        "platform": "linux",
+        "theme": "dark",
+        "reducedMotion": "reduce",
+        "wasExiting": true,
+        "focused": {
+          "role": null,
+          "search": false
+        },
+        "arrowFocus": null
+      }
+    ]
+  }
+}
