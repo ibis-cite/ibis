@@ -2174,6 +2174,37 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(performance["ceilings"], {"startup_ms": 150, "first_result_ms": 15, "memory_bytes": 2000})
         self.assertEqual([sample["startup_ms"] for sample in performance["samples"]], [100, 200, 50])
 
+    def test_phase_facts_reject_private_extra_fields_and_nonfinite_or_negative_numbers(self):
+        valid = dict.fromkeys(PROBE_PHASE_KEYS, 1)
+        self.assertEqual(numeric_phase_facts(valid, PROBE_PHASE_KEYS), valid)
+        for bad in (True, -1, float('inf'), float('nan'), "private"):
+            self.assertIsNone(numeric_phase_facts(dict(valid, tree_ms=bad), PROBE_PHASE_KEYS))
+        self.assertIsNone(numeric_phase_facts(dict(valid, path="private"), PROBE_PHASE_KEYS))
+        self.assertIsNone(numeric_phase_facts({}, PROBE_PHASE_KEYS))
+
+    def test_library_phase_logs_are_fixed_numeric_and_bounded(self):
+        valid = dict.fromkeys(LIBRARY_PHASE_KEYS, 0)
+        valid.update(load_ms=12.5, installed=1, success=1)
+        with tempfile.TemporaryDirectory() as folder:
+            log = Path(folder) / "synthetic.log"
+            log.write_text("private error\nibis-library-phases: " + json.dumps(dict(valid, path="private")) +
+                           "\nibis-library-phases: not-json\n" +
+                           ("ibis-library-phases: " + json.dumps(valid) + "\n") * 100, encoding="utf-8")
+            self.assertEqual(library_phase_diagnostics([log]), [valid] * 64)
+            for installed, success in ((0, 0), (0, 1), (1, 0)):
+                valid.update(installed=installed, success=success)
+                log.write_text("ibis-library-phases: " + json.dumps(valid), encoding="utf-8")
+                self.assertEqual(library_phase_diagnostics([log]), [valid])
+
+    def test_startup_phases_aggregate_only_fixed_probe_fields(self):
+        phases = {}
+        current = {"nodes": [{"name": "100,000 references"}],
+                   "probe_phases": dict.fromkeys(PROBE_PHASE_KEYS, 2)}
+        with patch("time.monotonic", return_value=1):
+            measure_startup(lambda: None, lambda: current, phases)
+        self.assertEqual(phases["probe_samples"], 1)
+        self.assertEqual(phases["probe_phases"], current["probe_phases"])
+
     def test_startup_phases_separate_launch_and_native_probes_without_extra_reads(self):
         clock, phases = self.CopyClock(), {}
         def launch():
