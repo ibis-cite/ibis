@@ -8,9 +8,10 @@ body { margin: 0; }
 button, input, select { font: inherit; color: inherit; }
 button, select {
   background: var(--button-background);
-  border: var(--border-width) solid var(--line);
+  border: var(--border-width) solid var(--button-edge);
   border-radius: var(--button-radius);
   padding: var(--button-padding);
+  min-height: var(--control-min-size);
 }
 button:hover { background: var(--button-hover-background); }
 /* No glow, no edge rings (docs/design.md rule 8): the one ring is keyboard
@@ -25,14 +26,13 @@ main {
   overflow: auto;
 }
 
-.search-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--search-gap); min-height: var(--search-bar-height); padding: var(--inset); padding-block-end: calc(var(--inset) - var(--border-width)); border-bottom: var(--border-width) solid var(--line); cursor: move; user-select: none; }
+.search-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--search-gap); min-height: var(--search-bar-height); padding: var(--inset); padding-block-end: calc(var(--inset) - var(--border-width)); border-bottom: var(--border-width) solid var(--separator); cursor: move; user-select: none; }
 .search-bar svg { width: var(--search-icon-width); stroke-width: var(--search-icon-stroke); flex-shrink: 0; color: var(--muted); pointer-events: none; }
 /* The search glyph is centred over the tile column and the query starts where
    row titles start (docs/design.md, "Edges line up"). */
 .search-bar > svg { margin-inline: var(--lead) calc(var(--lead-gap) - var(--search-gap)); }
-.search-bar:focus-within { border-bottom-color: var(--search-active-border); }
 /* Reserve readable query space before wrapping controls, at every text size. */
-#search { flex: 1; width: auto; min-width: min(var(--search-min-width), calc(100% - var(--lead) - var(--search-icon-width) - var(--lead-gap))); height: var(--field-h); font-size: var(--search-size); letter-spacing: var(--search-tracking); background: var(--clear); border: 0; padding: 0; outline-offset: var(--search-focus-offset); cursor: text; user-select: text; }
+#search { flex: 1; width: auto; min-width: min(var(--search-min-width), calc(100% - var(--lead) - var(--search-icon-width) - var(--lead-gap))); height: var(--field-h); font-size: var(--search-size); line-height: var(--search-line); letter-spacing: var(--search-tracking); background: var(--clear); border: 0; padding: 0; outline-offset: var(--search-focus-offset); cursor: text; user-select: text; }
 #search::placeholder { color: var(--muted); }
 /* The search box never shows a ring: it always has focus, and the caret is the
    cue (Windows adds its accent underline). Contrast and forced colours restore
@@ -51,13 +51,13 @@ main {
 /* Windows: like a Fluent TextBox, focus turns the field solid with a 2 px accent
    underline and no ring (TextBox does not use the system focus visual). */
 :root[data-platform="windows"] #search { border: var(--border-width) solid var(--field-edge); border-bottom-color: var(--line); }
-:root[data-platform="windows"] #search:focus { outline: none; background: var(--surface); border-bottom-color: var(--accent); box-shadow: inset 0 calc(-1 * var(--border-width)) var(--accent); }
+:root[data-platform="windows"] #search:focus { outline: none; background: var(--field-active-background); border-bottom-color: var(--accent); box-shadow: inset 0 calc(-1 * var(--border-width)) var(--accent); }
 /* Linux: a framed entry. */
 :root[data-platform="linux"] #search { border: var(--border-width) solid var(--clear); }
 .visually-hidden { position: absolute; width: var(--hidden-size); height: var(--hidden-size); padding: 0; margin: var(--hidden-margin); overflow: hidden; clip-path: var(--hidden-clip); white-space: nowrap; }
 
 .results-area { flex: 1; min-height: var(--results-min-height); overflow: auto; padding: var(--inset); scrollbar-width: thin; }
-.results-heading { display: flex; justify-content: space-between; padding: var(--heading-padding); color: var(--muted); font-size: var(--heading-size); font-weight: var(--heading-weight); letter-spacing: var(--heading-tracking); }
+.results-heading { display: flex; justify-content: space-between; padding: var(--heading-padding); color: var(--muted); font-size: var(--heading-size); line-height: var(--type-label-line); font-weight: var(--heading-weight); letter-spacing: var(--heading-tracking); }
 #results { list-style: none; padding: 0; margin: 0; }
 /* Rows are exactly --row-height and touch; the clear border (an edge only in
    increased contrast) is taken from the side padding so titles stay aligned. */
@@ -128,16 +128,16 @@ main {
 .notices { padding: var(--notice-padding); overflow-wrap: anywhere; }
 .notices p { margin: var(--notice-margin); }
 .copy-notice code, .format-preview .preview-text, [aria-label="Selected references"] code { color: var(--citation); }
-.copy-notice { border-bottom: var(--border-width) solid var(--line); padding-bottom: var(--copy-padding); }
-.format-preview { border-bottom: var(--border-width) solid var(--line); padding: var(--copy-padding); overflow-wrap: anywhere; }
+.copy-notice { border-bottom: var(--border-width) solid var(--separator); padding-bottom: var(--copy-padding); }
+.format-preview { border-bottom: var(--border-width) solid var(--separator); padding: var(--copy-padding); overflow-wrap: anywhere; }
 .format-preview .provisional { color: var(--muted); font-size: var(--metadata-size); margin: var(--metadata-gap) 0 0; }
 .dismiss { float: right; margin: var(--dismiss-margin); }
 [role="alert"] { border-inline-start: var(--alert-border-width) solid var(--alert-color); padding-inline-start: var(--alert-padding); }
-[aria-label="Selected references"] { display: flex; flex-wrap: wrap; gap: var(--selection-gap); list-style: none; padding: var(--selection-padding); margin: 0; border-bottom: var(--border-width) solid var(--line); }
+[aria-label="Selected references"] { display: flex; flex-wrap: wrap; gap: var(--selection-gap); list-style: none; padding: var(--selection-padding); margin: 0; border-bottom: var(--border-width) solid var(--separator); }
 [aria-label="Selected references"] li { border: var(--border-width) solid var(--line); border-radius: var(--button-radius); padding-inline-start: var(--selection-label-padding); overflow-wrap: anywhere; max-width: 100%; }
 [aria-label="Selected references"] button { border: 0; background: var(--clear); font-size: var(--metadata-size); }
 
-footer { display: flex; align-items: center; border-top: var(--border-width) solid var(--line); padding-block: 0; padding-inline: var(--footer-padding); font-size: var(--footer-size); min-height: var(--footer-height); }
+footer { display: flex; align-items: center; border-top: var(--border-width) solid var(--separator); padding-block: 0; padding-inline: var(--footer-padding); font-size: var(--footer-size); min-height: var(--footer-height); }
 /* The bar carries the footer's block padding: one line is the 32 px More
    button with 4 px above (counting the divider) and below, so the footer stays
    40 px, and wrapped lines never touch the divider or the window's corners. */
@@ -186,16 +186,11 @@ main:hover .pin-button, .pin-button:focus-visible { opacity: 1; }
 /* More stays at the far end even when the footer wraps, so its menu opens inward. */
 .more { position: relative; margin-inline-start: auto; }
 .more > button { min-height: var(--control-min-size); padding-block: 0; }
-/* The menu keeps 8 px from the window edge even where the inset is 4 px (Windows). */
-.more > [role="menu"] { inset-inline-end: calc(var(--space-2) - var(--inset)); }
-[role="menu"] { position: absolute; bottom: calc(100% + var(--space-1)); inset-inline-end: 0; z-index: 1; min-width: min(var(--menu-min-width), calc(100vw - 2 * var(--space-4))); max-width: calc(100vw - 2 * var(--space-4)); overflow-wrap: anywhere; display: flex; flex-direction: column; padding: var(--space-1); background: var(--surface); color: var(--text); border: var(--border-width) solid var(--line); border-radius: var(--button-radius); box-shadow: var(--menu-shadow); }
-.more [role="menu"] { transform: translateY(calc(-1 * var(--more-menu-offset, 0px))); overflow-y: auto; }
-[role="menuitem"] { display: flex; justify-content: space-between; gap: var(--space-4); min-height: var(--control-min-size); align-items: center; text-align: start; border: 0; background: var(--clear); }
-[role="menuitem"]:hover, [role="menuitem"]:focus-visible { background: var(--hover-background); }
-[role="menuitem"] kbd { color: var(--muted); }
 .quiet-button, .icon-button { background: var(--clear); border-color: var(--clear); color: var(--muted); }
 .icon-button { font-size: var(--icon-size); padding: var(--icon-padding); }
-kbd { font: inherit; font-size: var(--hint-size); display: inline-block; padding: var(--hint-padding); border: var(--border-width) solid var(--line); border-radius: var(--hint-radius); margin-inline-start: var(--hint-margin); }
+/* Key caps are filled, never outlined boxes (PowerToys, Raycast, GNOME): a
+   20 px cap on the button fill; contrast modes give it an edge. */
+kbd { font: inherit; font-size: var(--hint-size); font-weight: 500; display: inline-block; min-width: var(--key-cap); height: var(--key-cap); line-height: calc(var(--key-cap) - 2 * var(--border-width)); padding: 0 var(--space-1); text-align: center; background: var(--button-background); border: var(--border-width) solid var(--button-edge); border-radius: var(--hint-radius); margin-inline-start: var(--hint-margin); }
 
 @media (prefers-contrast: more) {
 
@@ -266,15 +261,8 @@ main[data-selection] .results-area { flex: 1 0 var(--results-min-height); overfl
 :root[data-density="compact"] .result-meta { display: none; }
 :root[data-density="spacious"] { --row-height: var(--row-spacious); }
 :root[data-text-size="larger"] { font-size: calc(100% * var(--larger-text-scale)); }
-[role="menuitemcheckbox"] { display: flex; justify-content: space-between; gap: var(--space-4); min-height: var(--control-min-size); align-items: center; text-align: start; border: 0; background: var(--clear); }
-[role="menuitemcheckbox"]:hover, [role="menuitemcheckbox"]:focus-visible { background: var(--hover-background); }
-[role="menuitemcheckbox"][aria-checked="true"]::after { content: "✓"; }
-[role="menu"] [role="group"] { border-block: var(--border-width) solid var(--line); }
-/* The library line opens More: it never widens the menu and is read as the group's name. */
-[role="menu"] > .menu-library { border-block-start: 0; }
 .menu-detail { width: 0; min-width: 100%; margin: 0; padding: var(--space-1) var(--space-2) var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); color: var(--muted); font-size: var(--hint-size); overflow-wrap: break-word; }
 .menu-detail-title { color: var(--text); font-weight: var(--type-strong-weight); }
-[role="menuitemcheckbox"][aria-disabled="true"] { color: var(--muted); }
 
 /* Rows that tell similar references apart (#492). Comfortable and Spacious
    rows show shortened authors and the container on one line; Spacious adds

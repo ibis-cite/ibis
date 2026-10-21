@@ -183,7 +183,10 @@ test.each(["windows"])("meta text on the %s grey row stays at 4.5:1 in both them
   const hex = (value: string) => [1, 3, 5].map((i) => parseInt(value.slice(i, i + 2), 16) / 255);
   const luminance = (rgb: number[]) => rgb.map((c) => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
     .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
-  const pair = (token: string) => tokens.match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]{6}),\\s*(#[0-9a-f]{6})\\)`))!.slice(1, 3).map(hex);
+  // The look's own neutrals when it has them, otherwise the shared ones.
+  const look = tokens.slice(tokens.indexOf(`:root[data-platform="${platform}"]:not([data-gallery-theme="contrast"]) {`));
+  const pair = (token: string) => (look.slice(0, look.indexOf("}")).match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]{6}),\\s*(#[0-9a-f]{6})\\)`))
+    ?? tokens.match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]{6}),\\s*(#[0-9a-f]{6})\\)`)))!.slice(1, 3).map(hex);
   const tint = Number(rules(tokens, `:root[data-platform="${platform}"]`).match(/--row-active-background:\s*color-mix\(in srgb, var\(--text\) (\d+)%/)?.[1]) / 100;
   const [surface, text, muted] = [pair("--surface"), pair("--text"), pair("--muted")];
   for (const mode of [0, 1]) {
@@ -440,6 +443,99 @@ test("the Linux active row stands out 3:1 from neighbouring rows with Adwaita's 
   expect(ratio(mix(hex("#3584e4"), surface[0]!, .25), surface[0]!)).toBeLessThan(3);
 });
 
+
+test("Windows and GNOME use their own type and neutrals, never under contrast modes", () => {
+  expect(rules(tokens, ':root[data-platform="windows"]')).toMatch(/--font-family:\s*"Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif/);
+  expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--font-family:\s*system-ui, "Adwaita Sans", Cantarell, sans-serif/);
+  for (const [platform, surface] of [["windows", "#f3f3f3, #202020"], ["linux", "#fafafb, #222226"]] as const) {
+    const head = `:root[data-platform="${platform}"]:not([data-gallery-theme="contrast"]) {`;
+    const at = tokens.indexOf(head);
+    expect(at, platform).toBeGreaterThan(0);
+    expect(tokens.slice(at, tokens.indexOf("}", at))).toContain(`--surface: light-dark(${surface})`);
+    // Inside the no-preference guard, so increased contrast and forced colours keep Canvas.
+    const before = tokens.slice(0, at);
+    expect(before.lastIndexOf("@media (prefers-contrast: no-preference) and (forced-colors: none)"), platform).toBeGreaterThan(before.lastIndexOf("}\n}"));
+  }
+});
+
+test("secondary text keeps 4.5:1 on each look's surface", () => {
+  const hex = (value: string) => [1, 3, 5].map((i) => parseInt(value.slice(i, i + 2), 16) / 255);
+  const luminance = (rgb: number[]) => rgb.map((c) => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
+    .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
+  const contrast = (a: string, b: string) => { const [l, d] = [luminance(hex(a)), luminance(hex(b))].sort((x, y) => y - x); return (l! + .05) / (d! + .05); };
+  const value = (block: string, token: string) => block.match(new RegExp(`${token}:\\s*light-dark\\((#[0-9a-f]{6}),\\s*(#[0-9a-f]{6})\\)`))?.slice(1, 3);
+  const base = tokens.slice(tokens.indexOf("@supports (color: light-dark(white, black))"));
+  for (const platform of ["windows", "linux"]) {
+    const at = tokens.indexOf(`:root[data-platform="${platform}"]:not([data-gallery-theme="contrast"]) {`);
+    const block = tokens.slice(at, tokens.indexOf("}", at));
+    const surface = value(block, "--surface")!, text = value(block, "--text")!, muted = value(block, "--muted") ?? value(base, "--muted")!;
+    for (const mode of [0, 1]) {
+      expect(contrast(muted[mode]!, surface[mode]!), `${platform} muted`).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(text[mode]!, surface[mode]!), `${platform} text`).toBeGreaterThanOrEqual(7);
+    }
+  }
+});
+
+test("every spacing token sits on the 4 px grid", () => {
+  // Row heights, type, 1 px borders and hidden-element offsets, radii and the gallery's own frame are exempt.
+  const exempt = new Set<string>();
+  const off: string[] = [];
+  for (const [, name, value] of tokens.matchAll(/(--[\w-]*(?:padding|margin|gap|space|inset|-h|height|cap|compact|size)[\w-]*):\s*([^;]+);/g)) {
+    if (/^--(type|gallery|row-|heading-size|title-size|metadata-size|key-size|hint-size|footer-size|search-size|search-line|larger)/.test(name!) || exempt.has(name!)) continue;
+    for (const [, digits, unit] of value!.matchAll(/(-?[\d.]+)(rem|px)\b/g)) {
+      const number = Number(digits);
+      const px = unit === "rem" ? number * 16 : number;
+      if (Math.abs(px) !== 1 && px % 4 !== 0) off.push(`${name}: ${value}`);
+    }
+  }
+  expect(off).toEqual([]);
+});
+
+test("unused tokens are gone and the spec's line heights apply", () => {
+  for (const name of ["--forced-selected-offset", "--key-padding", "--key-radius", "--space-6"]) expect(tokens, name).not.toContain(`${name}:`);
+  expect(rules(styles, ".results-heading")).toMatch(/line-height:\s*var\(--type-label-line\)/);
+  expect(rules(styles, "#search")).toMatch(/line-height:\s*var\(--search-line\)/);
+});
+
+test("every button is at least 32 px, with on-grid padding", () => {
+  const button = rules(styles, "button");
+  expect(button).toMatch(/min-height:\s*var\(--control-min-size\)/);
+  expect(tokens).toMatch(/--control-min-size:\s*2rem/);
+  expect(tokens).toMatch(/--button-padding:\s*0 var\(--space-3\)/);
+});
+
+test("dividers are quiet separators, distinct from 3:1 control edges", () => {
+  for (const selector of [".search-bar", "footer", ".copy-notice", ".format-preview", '[aria-label="Selected references"]']) {
+    expect(rules(styles, selector), selector).toMatch(/border-(top|bottom):\s*var\(--border-width\) solid var\(--separator\)/);
+  }
+  // Windows: Fluent's divider stroke; elsewhere Adwaita's text colour at 15%; macOS its 10% hairline.
+  expect(tokens).toMatch(/:root\[data-platform="windows"\] \{[^}]*--separator:\s*light-dark\(rgb\(0 0 0 \/ 6%\), rgb\(255 255 255 \/ 8%\)\)/);
+  expect(tokens).toMatch(/:root \{ --separator:\s*color-mix\(in srgb, currentColor 15%, transparent\); \}/);
+  // Contrast modes give every divider and edge the full system colour, and
+  // override the Windows look, which therefore comes first.
+  for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
+    expect(rules(tokens.slice(tokens.indexOf(media)), ":root[data-platform]"), media).toMatch(/--separator:\s*CanvasText/);
+    expect(tokens.indexOf('--separator: light-dark(rgb(0 0 0 / 6%)'), media).toBeLessThan(tokens.indexOf(media));
+  }
+});
+
+test("the search box draws one underline: the header rule never changes on focus", () => {
+  const plain = styles.slice(0, styles.indexOf("@media (prefers-contrast: more)"));
+  expect(plain).not.toMatch(/\.search-bar:focus-within/);
+  expect(tokens).not.toMatch(/--search-active-border/);
+});
+
+test("buttons and key caps are fills without an outline except in contrast modes", () => {
+  expect(rules(styles, "button")).toMatch(/border:\s*var\(--border-width\) solid var\(--button-edge\)/);
+  const kbd = rules(styles, "kbd");
+  expect(kbd).toMatch(/background:\s*var\(--button-background\)/);
+  expect(kbd).toMatch(/border:\s*var\(--border-width\) solid var\(--button-edge\)/);
+  expect(kbd).toMatch(/height:\s*var\(--key-cap\)/);
+  expect(rules(tokens, ":root")).toMatch(/--button-edge:\s*var\(--clear\)/);
+  for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
+    expect(rules(tokens.slice(tokens.indexOf(media)), ":root[data-platform]"), media).toMatch(/--button-edge:\s*(CanvasText|ButtonText)/);
+  }
+});
 
 test("a wrapped footer keeps breathing room above and below its lines", () => {
   // The footer has no block padding of its own (its 40 px is a min-height), so

@@ -13,6 +13,7 @@ cargo test -p ibis-desktop      # desktop crate tests (plain cargo test skips th
 pnpm -C apps/desktop test       # interface tests
 cargo run -p ibis -- --help     # command line tool
 cargo insta review              # review changed snapshots (cargo install cargo-insta)
+node scripts/pr-lint.mjs --title "…" --branch "…" --body-file pr.md   # check a pull request before opening it
 ```
 
 ## Authority
@@ -22,6 +23,16 @@ The maintainer delegates engineering, security, testing, CI and documentation de
 Ask the maintainer **only** about: licensing, new network use, repository or organization settings, anything that costs money or creates accounts, what goes into or out of a release, and anything needing the maintainer's own hands. Ask once, in plain words, with a recommendation and a one-word answer such as yes/no; label the issue `status:needs-maintainer` and list it under "Waiting on the maintainer" in the tracking issue. Do not ask again for authorization already given. Product defaults users notice (for example the shortcut) are chosen from evidence and stated in the tracking issue so the maintainer can overrule them. Engineering choices are resolved from evidence and the recorded scope, not asked.
 
 Without this authorization (for example an outside contributor's agent), do not commit, push, tag, release or publish unless your user asks for that exact action.
+
+## Roles
+
+Any agent (Claude, Codex or another tool) or human can fill any role; the rules are the same for all of them.
+
+- **Lead** (one at a time): keeps the tracking issue's Now, Queue and Decisions, hands one issue to each worker, makes sure every pull request gets its review, merges under the merge rule, and asks the maintainer the reserved questions. The lead says on the tracking issue when it takes over or hands over.
+- **Worker**: takes one issue at a time and follows the loop below in its own worktree and branch.
+- **Reviewer**: a session that did not write the change. It reviews the exact head commit and posts the result.
+
+Run at most four workers at once. More than that slows CI and the machine without speeding up merges.
 
 ## The loop
 
@@ -34,13 +45,25 @@ Without this authorization (for example an outside contributor's agent), do not 
 7. **Review and merge.** Code needs an independent review of the exact head commit by another session, preferably another model, with every P1 and P2 fixed (filing them as issues does not count). Documentation-only, or tests and synthetic fixtures only, need only your recorded step 5 (ADR 0017). Squash-merge when all required checks pass on that commit. Never use `--admin` or another bypass. While a release is going out (a hold announced on the tracking issue), nobody merges to `main` until the release pull request has merged and the hold is lifted.
 8. **Close the loop.** Check `main` is green, add one line to the tracking issue ("users can now …; next …"), push everything and update **Now** before you stop or switch machines.
 
+## Pausing and resuming
+
+All state lives on GitHub, so any agent can stop at any point and any other can continue.
+
+- **Before you stop**, push every branch; unfinished work goes up as a draft pull request whose body says what is left. Then update **Now** on the tracking issue with one line per open pull request (what it does, and what it waits on). Leave nothing that only exists on one machine or in one assistant's memory.
+- **To resume**, read this file, the tracking issue (Now, Queue, Waiting on the maintainer, any release hold) and the open pull requests, then run `git fetch origin --prune`. Finish open pull requests before you start new issues: first fix red checks, then answer reviews, then merge. Do not trust any earlier summary over GitHub's current state.
+- **Start prompt** (works for any agent): "You are the lead (or a worker) for Ibis. Read AGENTS.md and follow it, starting with Pausing and resuming: resume from the tracking issue, work the Queue with parallel workers within the Limits, and before you stop update Now on the tracking issue."
+
+## What only the maintainer does
+
+Answer the reserved questions under Authority (labelled `status:needs-maintainer` and listed on the tracking issue), change repository settings, and use their own hands where nothing else can, for example signing, accounts and native checks on their own machines. Everything else is the agents' job.
+
 ## Limits
 
-- The Queue is split into lanes that never touch the same files; one writer per lane, at most two draft pull requests, one level of stacking. Ready pull requests waiting for review don't count, so never wait idle: take the next item. If five ready pull requests wait for review, finish their reviews before starting more.
+- The Queue is split into lanes that never touch the same files; one writer per lane, at most two draft pull requests each, and no stacking: every branch starts from `main`, because stacked squash merges have silently reverted changes on `main`. After merging `main` into a branch, check `git diff origin/main` shows only your change. Ready pull requests waiting for review don't count, so never wait idle: take the next item. If five ready pull requests wait for review, finish their reviews before starting more.
 - A check that fails twice for the same reason: stop retrying, diagnose, record the result in the issue.
 - No new workflows, harnesses, ADRs or dependencies unless the issue asks for them. Prefer maintained libraries to new code and fewer dependencies to more. Dependencies must pass `cargo deny check`; before adding one, confirm on its registry page and repository that the exact name exists and is maintained (AI tools suggest look-alike names).
 - Hard-to-reverse decisions (license, persisted data formats, public CLI or API contracts, network use, security boundaries) need an ADR.
-- When an agent repeats a mistake, add a check to `scripts/check.mjs` (preferred) or one line here; remove lines that no longer matter.
+- When an agent repeats a mistake, add a check to `scripts/check.mjs` or `scripts/pr-lint.mjs` (preferred) or one line here; remove lines that no longer matter.
 
 ## Code, privacy and security
 

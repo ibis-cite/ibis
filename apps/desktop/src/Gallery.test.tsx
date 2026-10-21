@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { App, type PickerApi } from "./App";
-import { galleryHref, renderGalleryState } from "./gallery";
+import { galleryHref, galleryThemeFor, renderGalleryState } from "./gallery";
 import { libraryMessages } from "./messages";
 import { platformOf } from "./nativeAppearance";
 
@@ -136,7 +136,7 @@ test.each(["overflow", "document-overflow", "clipped", "covered"])("selected-ref
   document.body.append(container);
   let stop: () => void = () => undefined;
   const originalHit = document.elementFromPoint;
-  document.elementFromPoint = (_x, y) => container.querySelector(y < 80 ? "#search" : y >= 280 ? 'footer button[aria-haspopup="menu"]'
+  document.elementFromPoint = (_x, y) => container.querySelector(y < 80 ? "#search" : y >= 280 ? 'footer button[aria-haspopup]'
     : overflow && fault === "covered" ? "footer" : "[data-active]");
   try {
     await act(async () => { stop = renderGalleryState(container, state, acknowledge); });
@@ -322,6 +322,13 @@ test("a state's own theme, density and text setting win over the switches", () =
   expect(withSwitches(galleryStates.find((state) => state.id === "pinned")!, {}).largerTextSetting).toBeUndefined();
 });
 
+test("the high-contrast state uses the real contrast rules when the browser applies them", () => {
+  expect(galleryThemeFor("contrast", false)).toBe("contrast");
+  expect(galleryThemeFor("contrast", true)).toBeUndefined();
+  expect(galleryThemeFor("dark", true)).toBe("dark");
+  expect(galleryThemeFor(undefined, false)).toBe("light");
+});
+
 test.each(["macos", "windows", "linux"] as const)("the %s platform switch is what the picker reads as the platform", (platform) => {
   const target = {} as Navigator;
   applyPlatformSwitch(platform, target);
@@ -349,7 +356,7 @@ async function renderUntilAcknowledged(id: string, provider = galleryProvider(ga
 
 test.each([
   ["pinned", (root: HTMLElement) => root.querySelector('button[aria-label="Pin Ibis"]')?.getAttribute("aria-pressed") === "true"],
-  ["menu-open", (root: HTMLElement) => root.querySelector('[role="menu"]') !== null],
+  ["menu-open", () => document.querySelector('[role="menu"]') !== null],
   ["keys", (root: HTMLElement) => root.querySelector('[role="dialog"]') !== null],
   ["tray", (root: HTMLElement) => [...root.querySelectorAll('ul[aria-label="Selected references"] code')].map((key) => key.textContent).join() === "example2026,研究2026"],
   ["compact", () => document.documentElement.dataset.density === "compact"],
