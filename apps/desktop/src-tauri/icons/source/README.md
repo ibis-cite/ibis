@@ -25,6 +25,7 @@ and the eye group. Xcode 27.1's `actool` compiles it to `Assets.car`; the locked
 Tauri CLI/bundler supports that path and discovers `CFBundleIconName` with
 `assetutil`. Older macOS keeps the explicit ICNS fallback. These tools require
 Xcode 26 or later; never add a guessed compiled catalog.
+Icon Composer orders groups front to back, so the eye is listed before the bird.
 
 Two platform adaptations need the maintainer's final look. Windows uses the
 same curves in G1 on transparency, with an eye cutout, to satisfy the no-tile

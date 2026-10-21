@@ -1,24 +1,6 @@
 {
   "groups": [
     {
-      "name": "Bird",
-      "layers": [
-        {
-          "name": "Bird",
-          "image-name": "bird.svg",
-          "glass": false,
-          "fill-specializations": [
-            {
-              "appearance": "dark",
-              "value": {
-                "solid": "srgb:1,1,1,1"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
       "name": "Eye",
       "layers": [
         {
@@ -30,6 +12,24 @@
               "appearance": "dark",
               "value": {
                 "solid": "srgb:0.7529411765,0.2117647059,0.1019607843,1"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bird",
+      "layers": [
+        {
+          "name": "Bird",
+          "image-name": "bird.svg",
+          "glass": false,
+          "fill-specializations": [
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:1,1,1,1"
               }
             }
           ]
