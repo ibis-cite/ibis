@@ -87,3 +87,20 @@ test("markup in an empty-library name remains plain text", () => {
   expect(container.querySelector(".empty-title")?.textContent).toBe(`No references in ${name}`);
   expect(container.querySelector("img")).toBeNull();
 });
+
+test("a webview without Segmenter can import and render the complete name", async () => {
+  const legacyIntl = Object.create(Intl) as typeof Intl;
+  Object.defineProperty(legacyIntl, "Segmenter", { value: undefined });
+  vi.stubGlobal("Intl", legacyIntl);
+  try {
+    vi.resetModules();
+    const { EmptyState: LegacyEmptyState } = await import("./EmptyState");
+    const name = `${"🧑🏽‍🔬e\u0301".repeat(50)}.bib`;
+    const { container } = render(<LegacyEmptyState library={{ ...loaded, references: 0, snapshot_name: name }} query="" narrowed={false}
+      onChooseLibrary={vi.fn()} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+    expect(container.querySelector(".empty-title")?.textContent).toBe(`No references in ${name}`);
+    expect(screen.getByRole("button", { name: "Choose library…" })).toBeTruthy();
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});

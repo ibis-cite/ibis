@@ -2,13 +2,13 @@ import type React from "react";
 import type { LibraryStatus } from "../../api";
 import { libraryMessages, pickerText } from "../../messages";
 
-const graphemes = new Intl.Segmenter();
-
 /** Keep the start and extension without letting an unusually long name
- * push the recovery actions down the page. Never split a grapheme. */
+ * push the recovery actions down the page. Older webviews keep the full
+ * name rather than guessing where a grapheme can be split. */
 function shortName(name: string | null): string | null {
   if (!name) return null;
-  const parts = Array.from(graphemes.segment(name), ({ segment }) => segment);
+  if (typeof Intl.Segmenter !== "function") return name;
+  const parts = Array.from(new Intl.Segmenter().segment(name), ({ segment }) => segment);
   return parts.length > 40 ? `${parts.slice(0, 20).join("")}…${parts.slice(-19).join("")}` : name;
 }
 
