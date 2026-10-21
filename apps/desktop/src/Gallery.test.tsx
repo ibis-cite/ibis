@@ -235,7 +235,7 @@ test("render acknowledgment waits for startup effects even after the first-run U
   }
 });
 
-test.each(galleryStates.map((state) => state.id))("the rendered %s fixture acknowledges exactly that state", async (id) => {
+async function expectRenderedFixture(id: string): Promise<void> {
   vi.useFakeTimers();
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
   vi.stubGlobal("cancelAnimationFrame", (frame: number) => window.clearTimeout(frame));
@@ -270,8 +270,16 @@ test.each(galleryStates.map((state) => state.id))("the rendered %s fixture ackno
     container.remove();
     formatting?.mockRestore();
   }
-});
+}
 
+test.each(galleryStates.filter((state) => (state.tray ?? 0) < 20).map((state) => state.id))(
+  "the rendered %s fixture acknowledges exactly that state", expectRenderedFixture,
+);
+// Up to 100 committed interactions and full 50-row DOM checks exceed the default
+// wall-clock limit on CI. Keep these bounded separately from app latency budgets.
+test.each(galleryStates.filter((state) => (state.tray ?? 0) >= 20).map((state) => state.id))(
+  "the rendered %s fixture acknowledges exactly that state", { timeout: 15_000 }, expectRenderedFixture,
+);
 
 test("gallery readiness follows the shared library summary used by the picker", async () => {
   vi.useFakeTimers();
