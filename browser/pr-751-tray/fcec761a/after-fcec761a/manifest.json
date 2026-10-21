@@ -1,0 +1,24 @@
+{
+  "source": "fcec761a7c67",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "normal/linux-dark/many-results",
+    "normal/linux-dark/tray-preview",
+    "normal/linux-light/many-results",
+    "normal/linux-light/tray-preview",
+    "normal/macos-dark/many-results",
+    "normal/macos-dark/tray-preview",
+    "normal/macos-light/many-results",
+    "normal/macos-light/tray-preview",
+    "normal/windows-dark/many-results",
+    "normal/windows-dark/tray-preview",
+    "normal/windows-light/many-results",
+    "normal/windows-light/tray-preview"
+  ],
+  "failed": []
+}
