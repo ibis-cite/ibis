@@ -2557,3 +2557,51 @@ test("a delayed hide cannot show an old notice over a newer selection", async ()
   expect(screen.queryByRole("button", { name: "Remove b from the selection" })).not.toBeNull();
   expect(calls).not.toContain("show_copied_notice");
 });
+
+test.each(["selection", "copy feedback"])("an obsolete stale copy recovers data without replacing a newer %s", async (change) => {
+  let revision = "1";
+  let rejectOld: (reason: unknown) => void = () => undefined;
+  let reads = 0;
+  const attempts: unknown[] = [];
+  const calls = backend({
+    library_status: () => { reads += 1; return { ...zoteroStatus(["user"]), revision }; },
+    search: () => [
+      { ...result("a", `First revision ${revision}`), revision },
+      { ...result("b", `Second revision ${revision}`), revision },
+    ],
+    copy_citation: (args) => {
+      attempts.push(args.expectedRevision);
+      if (attempts.length === 1) return new Promise((_resolve, reject) => { rejectOld = reject; });
+      return { text: "newer copy", warnings: ["Keep the newer warning"] };
+    },
+  });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  if (change === "copy feedback") fireEvent.click(screen.getByRole("button", { name: "Pin Ibis" }));
+  fireEvent.click(await screen.findByText("First revision 1"), { shiftKey: true });
+  fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(attempts).toHaveLength(1));
+  if (change === "selection") fireEvent.click(screen.getByText("Second revision 1"), { shiftKey: true });
+  else {
+    fireEvent.keyDown(box, { key: "Enter" });
+    await screen.findByText("Keep the newer warning");
+  }
+  revision = "2"; // Backend replaced the snapshot without delivering its event.
+  await act(async () => { rejectOld("library snapshot changed"); });
+  await screen.findByText("First revision 2");
+  expect(reads).toBeGreaterThan(1);
+  expect(screen.queryByText("The library changed. Search again and reselect the references before copying.")).toBeNull();
+  expect(calls).not.toContain("hide_picker");
+  expect(calls).not.toContain("show_copied_notice");
+  if (change === "selection") {
+    expect(screen.queryByRole("button", { name: "Remove a from the selection" })).not.toBeNull();
+    expect(screen.queryByRole("button", { name: "Remove b from the selection" })).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Remove a from the selection" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove b from the selection" }));
+    fireEvent.click(screen.getByText("Second revision 2"));
+    await waitFor(() => expect(attempts).toEqual(["1", "2"]));
+  } else {
+    expect(screen.queryByText("Keep the newer warning")).not.toBeNull();
+    expect(attempts).toEqual(["1", "1"]);
+  }
+});

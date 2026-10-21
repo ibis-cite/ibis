@@ -553,7 +553,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       }
     } catch (error) {
       const stale = nativeApi.isSnapshotChanged(error);
-      setCopyError(stale ? pickerText.snapshotChanged : pickerText.copyError);
+      if (ownsCompletion()) setCopyError(stale ? pickerText.snapshotChanged : pickerText.copyError);
+      // A retired request can reveal a replacement after the user has moved on.
       if (stale) refreshSnapshot();
       return;
     }
