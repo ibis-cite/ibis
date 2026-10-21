@@ -9,6 +9,7 @@
   nodejs_22,
   pkg-config,
   jq,
+  cacert,
   wrapGAppsHook3,
   webkitgtk_4_1,
   glib-networking,
@@ -51,6 +52,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
   nativeBuildInputs = [ cargo-tauri.hook nodejs_22 pnpm pnpmConfigHook pkg-config jq wrapGAppsHook3 ];
   buildInputs = [ webkitgtk_4_1 glib-networking librsvg libayatana-appindicator ];
   env.IBIS_PACKAGE_LAUNCHER = "${builtins.placeholder "out"}/bin/ibis-desktop";
+  # The loopback updater tests still construct a TLS client, which eagerly loads
+  # CA roots. The sandbox has no host trust store; use the pinned PEM test bundle.
+  preCheck = ''
+    export SSL_CERT_FILE="${cacert}/etc/ssl/certs/ca-no-trust-rules-bundle.crt"
+  '';
   postBuild = ''
     binary=target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/ibis-desktop
     grep -aFq "$IBIS_PACKAGE_LAUNCHER" "$binary"
