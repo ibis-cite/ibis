@@ -872,7 +872,10 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           {[...selected.entries()].map(([key, r]) => (
             <li key={key}>
               <code>{r.key}</code>{" "}
-              <button type="button" onClick={() => toggle(r)} aria-label={removeLabel(r)}>
+              <button type="button" onClick={() => {
+                toggle(r);
+                input.current?.focus({ preventScroll: true });
+              }} aria-label={removeLabel(r)}>
                 {pickerText.remove}
               </button>
             </li>

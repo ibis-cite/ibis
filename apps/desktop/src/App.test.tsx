@@ -388,8 +388,9 @@ test.each([
       },
     });
     render(<App />);
-    await screen.findByText("First");
     const box = screen.getByLabelText("Search references");
+    fireEvent.change(box, { target: { value: "focus" } });
+    await screen.findByText("First");
     for (let i = 0; i < count; i++) {
       if (i > 0) fireEvent.keyDown(box, { key: "ArrowDown" });
       fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
@@ -416,6 +417,7 @@ test.each([
     expect(calls).not.toContain("copy_citation");
     expect(calls).not.toContain("hide_picker");
     expect(document.activeElement).toBe(box);
+    expect((box as HTMLInputElement).value).toBe("focus");
     fireEvent.keyDown(document.activeElement!, { key: "ArrowDown" });
     expect(box.getAttribute("aria-activedescendant")).toBe("result-1");
     fireEvent.keyDown(document.activeElement!, { key: "Enter" });
@@ -424,6 +426,27 @@ test.each([
     expect(screen.queryByRole("list", { name: "Selected references" })).toBeNull();
   },
 );
+
+test("hovering Remove keeps focus and menu keys unchanged", async () => {
+  const calls = backend({ search: () => [result("a", "First"), result("b", "Second")] });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+  const remove = screen.getByRole("button", { name: "Remove a from the selection" });
+  const more = screen.getByRole("button", { name: /^More/ });
+  act(() => more.focus());
+  fireEvent.mouseEnter(remove);
+  fireEvent.mouseMove(remove);
+  expect(document.activeElement).toBe(more);
+  fireEvent.keyDown(more, { key: "k", ctrlKey: true });
+  const menu = await screen.findByRole("menu");
+  fireEvent.keyDown(menu, { key: "Escape" });
+  expect(document.activeElement).toBe(more);
+  expect(screen.getByRole("button", { name: "Remove a from the selection" })).toBe(remove);
+  expect(calls).not.toContain("copy_citation");
+  expect(calls).not.toContain("hide_picker");
+});
 
 test.each([20, 40, 50])("%i long-key selections retain order across queries and first/middle/last removal", async (count) => {
   const records = Array.from({ length: count }, (_, i) => result(`synthetic_${i}_${"long_key_".repeat(5)}`, `Selection reference ${i}`));
