@@ -27,6 +27,20 @@ Tauri CLI/bundler supports that path and discovers `CFBundleIconName` with
 Xcode 26 or later; never add a guessed compiled catalog.
 Icon Composer orders groups front to back, so the eye is listed before the bird.
 
+For example, export a template view with the bundled Apple CLI (on macOS):
+
+```sh
+"/Applications/Xcode.app/Contents/Applications/Icon Composer.app/Contents/Executables/ictool" \
+  apps/desktop/src-tauri/icons/source/Ibis.icon --export-image \
+  --output-file /tmp/ibis-default-1024.png --platform macOS \
+  --rendition Default --width 1024 --height 1024 --scale 1
+```
+
+Repeat with `Dark`, `ClearLight`, `ClearDark`, `TintedLight`, `TintedDark` and
+sizes 128, 32 and 16 for the review set. `../review/` holds the labelled sheets,
+source commit, file hashes and binary audit. Those are CLI exports composited on
+synthetic backgrounds, not native editor, Dock or taskbar screenshots.
+
 Two platform adaptations need the maintainer's final look. Windows uses the
 same curves in G1 on transparency, with an eye cutout, to satisfy the no-tile
 requirement. Its `viewBox="20 19 70 70"` fits the unchanged bird curves into
