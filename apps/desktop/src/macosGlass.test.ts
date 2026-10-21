@@ -52,7 +52,7 @@ test("macOS fills and hairlines are translucent so the native material shows thr
   for (const token of ["--line", "--hover-background", "--button-background", "--button-hover-background"]) {
     for (const [, , , alpha] of rgba(body, token)) expect(alpha, token).toBeLessThan(.2);
   }
-  expect(body).toMatch(/--search-active-border:\s*var\(--line\)/);
+  expect(body).toMatch(/--separator:\s*var\(--line\)/);
 });
 
 test("only native success shows the material, under a veil; reduced transparency stays opaque", () => {
@@ -66,7 +66,7 @@ test("only native success shows the material, under a veil; reduced transparency
   expect(native.slice(fallback)).toMatch(/:root\[data-native-appearance\] \{ background: var\(--surface\); \}/);
   // The panel edge and glass menus exist only while the material is applied.
   expect(native).toMatch(/\[data-native-appearance="vibrancy"\][^{]*body::after/);
-  expect(native).toMatch(/\[data-native-appearance="vibrancy"\][^{]*\[role="menu"\][^{]*\{[^}]*backdrop-filter/);
+  expect(native).toMatch(/\[data-native-appearance="vibrancy"\][^{]*\.menu-popover[^{]*\{[^}]*backdrop-filter/);
 });
 
 test("secondary text keeps 4.5:1 over the veiled material, on the brightest and darkest backdrops", () => {
@@ -143,7 +143,7 @@ test("the frameless macOS buttons keep the pressed frame of the writing choice",
   const mac = native.slice(start + native.slice(start).indexOf("{") + 1, native.lastIndexOf("}"));
   const sheet = document.createElement("style");
   // jsdom does not resolve custom properties in border colours: substitute them.
-  const values: Record<string, string> = { "--clear": "transparent", "--accent": "rgb(10, 122, 255)", "--line": "rgb(1, 2, 3)", "--border-width": "1px" };
+  const values: Record<string, string> = { "--clear": "transparent", "--button-edge": "transparent", "--accent": "rgb(10, 122, 255)", "--line": "rgb(1, 2, 3)", "--border-width": "1px" };
   sheet.textContent = (mac.replace(/@supports[^{]*\{[^{}]*\{[^{}]*\}\s*\}/g, "") + styles)
     .replace(/var\((--[\w-]+)\)/g, (whole, name: string) => values[name] ?? whole);
   document.head.append(sheet);
@@ -163,5 +163,5 @@ test("the frameless macOS buttons keep the pressed frame of the writing choice",
 
 test("menus stay opaque where the webview cannot blur behind them", () => {
   const fallback = native.slice(native.indexOf("@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))"));
-  expect(fallback).toMatch(/\[role="menu"\], \.keys-dialog\)\s*\{\s*background:\s*var\(--surface\);/);
+  expect(fallback).toMatch(/\.menu-popover, \.keys-dialog\)\s*\{\s*background:\s*var\(--surface\);/);
 });
