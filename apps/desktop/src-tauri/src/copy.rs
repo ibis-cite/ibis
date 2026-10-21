@@ -9,7 +9,7 @@ use serde::Serialize;
 use tauri::{AppHandle, State};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
-use crate::library::Library;
+use crate::library::{CommandError, Library};
 use crate::preferences::SettingsFile;
 
 #[derive(Serialize, specta::Type)]
@@ -61,10 +61,12 @@ pub(crate) fn prepare_snapshot<T>(
     library: &Mutex<Library>,
     expected: &str,
     prepare: impl FnOnce(&Library) -> Result<T, String>,
-) -> Result<T, String> {
-    let locked = library.lock().map_err(|_| "library state is unavailable".to_string())?;
+) -> Result<T, CommandError> {
+    let locked = library
+        .lock()
+        .map_err(|_| CommandError::from("library state is unavailable"))?;
     locked.require_revision(expected)?;
-    prepare(&locked)
+    Ok(prepare(&locked)?)
 }
 
 /// Prepare preview and copy through the same checked snapshot and formatter.
@@ -73,7 +75,7 @@ fn prepare_citation(
     expected: &str,
     ids: &[RecordId],
     format: KeyFormat,
-) -> Result<Copied, String> {
+) -> Result<Copied, CommandError> {
     prepare_snapshot(library, expected, |locked| {
         render_citation(locked.index.references(), ids, format)
     })
@@ -88,7 +90,7 @@ pub(crate) fn citation_text(
     format: KeyFormat,
     expected_revision: String,
     library: State<'_, Mutex<Library>>,
-) -> Result<Copied, String> {
+) -> Result<Copied, CommandError> {
     prepare_citation(&library, &expected_revision, &ids, format)
 }
 
@@ -102,7 +104,7 @@ pub(crate) fn copy_citation(
     expected_revision: String,
     app: AppHandle,
     library: State<'_, Mutex<Library>>,
-) -> Result<Copied, String> {
+) -> Result<Copied, CommandError> {
     let rendered = prepare_citation(&library, &expected_revision, &ids, format)?;
     app.clipboard()
         .write_text(rendered.text.clone())
@@ -120,7 +122,7 @@ pub(crate) fn csl_items(
     ids: Vec<RecordId>,
     expected_revision: String,
     library: State<'_, Mutex<Library>>,
-) -> Result<String, String> {
+) -> Result<String, CommandError> {
     prepare_snapshot(&library, &expected_revision, |locked| {
         csl_json(locked.index.references(), &ids)
     })
@@ -154,7 +156,7 @@ pub(crate) fn copy_formatted(
     expected_revision: String,
     app: AppHandle,
     library: State<'_, Mutex<Library>>,
-) -> Result<(), String> {
+) -> Result<(), CommandError> {
     write_formatted(&library, &expected_revision, text, html, |text, html| {
         app.clipboard()
             .write_html(html, Some(text))
@@ -168,12 +170,12 @@ pub(crate) fn write_formatted(
     text: String,
     html: String,
     write: impl FnOnce(String, String) -> Result<(), String>,
-) -> Result<(), String> {
+) -> Result<(), CommandError> {
     if text.len() + html.len() > MAX_FORMATTED {
         return Err("the formatted text is too large to copy".into());
     }
     prepare_snapshot(library, expected, |_| Ok(()))?;
-    write(text, html)
+    Ok(write(text, html)?)
 }
 
 /// The format the picker starts with: the last one chosen, or Pandoc.
@@ -259,14 +261,12 @@ mod tests {
         ids[0].source = "missing".into();
         for (format, _) in FORMATS {
             assert_eq!(
-                prepare_citation(&library, "retired", &ids, format).err().as_deref(),
-                Some("library snapshot changed")
+                prepare_citation(&library, "retired", &ids, format).err(),
+                Some(CommandError::SnapshotChanged)
             );
             assert_eq!(
-                prepare_citation(&Mutex::new(Library::default()), "0", &ids, format)
-                    .err()
-                    .as_deref(),
-                Some("library snapshot changed")
+                prepare_citation(&Mutex::new(Library::default()), "0", &ids, format).err(),
+                Some(CommandError::SnapshotChanged)
             );
         }
     }
@@ -280,14 +280,12 @@ mod tests {
         };
         for (format, _) in FORMATS {
             assert_eq!(
-                prepare_citation(&library, "0", &[], format).err().as_deref(),
-                Some("no references selected")
+                prepare_citation(&library, "0", &[], format).err(),
+                Some(CommandError::from("no references selected"))
             );
             assert_eq!(
-                prepare_citation(&library, "0", std::slice::from_ref(&missing), format)
-                    .err()
-                    .as_deref(),
-                Some("a selected reference is no longer in the library")
+                prepare_citation(&library, "0", std::slice::from_ref(&missing), format).err(),
+                Some(CommandError::from("a selected reference is no longer in the library"))
             );
         }
         for key in [None, Some("invalid key"), Some("bad{key}")] {
@@ -340,7 +338,7 @@ mod tests {
                         assert_eq!(preview.text, copied.text);
                         assert_eq!(preview.warnings, copied.warnings);
                     }
-                    (Err(preview), Err(copied)) => assert_eq!(preview, copied),
+                    (Err(preview), Err(copied)) => assert_eq!(preview, CommandError::from(copied)),
                     _ => panic!("preview and copy validation diverged"),
                 }
             }
@@ -356,10 +354,8 @@ mod tests {
         });
         assert!(poisoned.is_err());
         assert_eq!(
-            prepare_citation(&library, "0", &ids, KeyFormat::Pandoc)
-                .err()
-                .as_deref(),
-            Some("library state is unavailable")
+            prepare_citation(&library, "0", &ids, KeyFormat::Pandoc).err(),
+            Some(CommandError::from("library state is unavailable"))
         );
     }
 
