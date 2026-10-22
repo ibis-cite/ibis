@@ -8,8 +8,10 @@ export type Operation = keyof typeof operationFailures;
 
 /** Problems and confirmations above the results: library and settings
  * problems, failed actions, search and copy errors, and what was copied. */
-export function Notices({ library, failures, startAtLogin, error, copyError, copied, onDismissCopied }: {
+export function Notices({ library, busy, loadingMessage, failures, startAtLogin, error, copyError, copied, onDismissCopied }: {
   library: LibraryStatus | null | undefined;
+  busy: boolean;
+  loadingMessage: string;
   failures: Partial<Record<Operation, boolean>>;
   startAtLogin: LoginItem | null;
   error: string | null;
@@ -20,6 +22,7 @@ export function Notices({ library, failures, startAtLogin, error, copyError, cop
   return (
     <div className="notices">
       {library?.settings_notice && <p role="alert">{library.settings_notice}</p>}
+      {busy && <p role="status">{loadingMessage}</p>}
       {library?.error && !hasRetainedFreshnessProblem(library) && <p role="alert">{libraryMessages.openError(library.name, library.error, library.zotero)}</p>}
       {(Object.keys(failures) as Operation[]).filter((operation) => failures[operation]).map((operation) => (
         <p role="alert" key={operation}>{operationFailures[operation]}</p>
