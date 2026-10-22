@@ -1,11 +1,14 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import styles from "../../styles.css?raw";
 import type { Density, SearchResult } from "../../api";
 import { rowText } from "../../messages";
 import { ResultList } from "./ResultList";
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+
+const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
+const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
+const styles = readFileSync(new FileURL("../../styles.css", import.meta.url), "utf8");
 
 const rows: SearchResult[] = Array.from({ length: 10 }, (_, i) => ({
   revision: "1", id: { source: "refs.bib", native_key: `k${i}` }, key: `k${i}`, title: `Title ${i}`, authors: "Author", year: 2020,
