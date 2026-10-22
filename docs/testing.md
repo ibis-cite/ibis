@@ -41,6 +41,12 @@ cargo insta review                             # review changed snapshots
 
 `node scripts/check.mjs` runs the default workspace and every desktop crate test. CI also tests the core and command line with the Rust 1.90 minimum and the core in release mode. Pandoc comparisons are skipped when Pandoc is missing; `IBIS_REQUIRE_PANDOC=1` makes them required. Review changed snapshots like code.
 
+Script discovery includes `*.test.mjs`, `*.test.cjs`, `test_*.py` and `*.test.py`.
+`node scripts/check.mjs --script-tests` runs only those suites after UI dependencies
+are installed. Native CI uses `--platform-script-tests`, omitting only the UI
+import-boundary suite that needs those packages; Web CI and local full checks
+retain it. Existing embedded native self-tests and runtime checks still run.
+
 ## Focused harnesses
 
 **Core scale.** `cargo test -p ibis-core --release --locked --lib owned_index_100000_reference_measurement -- --ignored --nocapture` measures indexing and search over 100,000 synthetic multilingual records. It measures the core only, not parsing, the interface or a pass threshold. Calibration is in [#9](https://github.com/ibiscite/ibis/issues/9#issuecomment-6282578839).
