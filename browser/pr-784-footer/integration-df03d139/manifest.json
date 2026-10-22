@@ -23,11 +23,33 @@
   },
   "typecheck": "passed",
   "galleryBuild": "passed",
-  "full": "interrupted for requested pause during script checks; no full pass claimed",
+  "full": {
+    "status": "passed",
+    "exit": 0,
+    "guardedExactCommit": true,
+    "freshDetachedCheckout": true,
+    "freshCargoTarget": true,
+    "cleanBefore": true,
+    "cleanAfter": true,
+    "cargoBuildJobs": 2,
+    "rustTestThreads": 1,
+    "debug": 0,
+    "desktopTests": {
+      "passed": 145,
+      "ignored": 1
+    },
+    "uiTests": {
+      "passed": 434,
+      "total": 434
+    },
+    "dependencyStage": "normal frozen install passed in offline mode against matching restored installation; no fresh download claimed"
+  },
   "native": "not run",
   "prospectiveMenuMerge": {
     "source": "bad53073995de43896d836cd0adad6a644c3351c",
     "exit": 0,
     "tree": "f2001b62e2b9b5eefebaee1389e6b72e19b6d793"
-  }
+  },
+  "independentReview": "https://github.com/ibiscite/ibis/pull/784#issuecomment-6330506841",
+  "fullEvidence": "https://github.com/ibiscite/ibis/pull/784#issuecomment-6330621924"
 }
