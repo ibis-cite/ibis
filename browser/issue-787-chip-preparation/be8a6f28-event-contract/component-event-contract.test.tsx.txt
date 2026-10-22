@@ -1,0 +1,63 @@
+import { afterEach, expect, test, vi } from "vitest";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { ChipGroup } from "./ChipGroup";
+import { composing, isKeysShortcut, isMenuShortcut, isQuitShortcut } from "../features/picker/shortcuts";
+
+afterEach(async () => {
+  cleanup();
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  vi.unstubAllGlobals();
+});
+
+const items = ["first", "second", "third"].map((id) => ({ id: `${id}\0shared`, label: id, textValue: id, removeLabel: `Remove ${id}` }));
+function mount(mac: boolean) {
+  vi.stubGlobal("ResizeObserver", class { observe() {} unobserve() {} disconnect() {} });
+  const commands = vi.fn();
+  const removed = vi.fn();
+  render(<main onKeyDown={(event) => {
+    if (composing(event)) return;
+    if (isKeysShortcut(event, mac)) commands("keys");
+    else if (event.key === "Escape") commands("escape");
+    else if (isMenuShortcut(event, mac)) commands("more");
+    else if (isQuitShortcut(event, mac)) commands("quit");
+  }}><ChipGroup label="Chosen" items={items} onRemove={removed} fallbackFocusRef={{ current: null }} /></main>);
+  const row = screen.getByRole("row", { name: "first" });
+  act(() => row.focus());
+  return { commands, removed, row };
+}
+
+const commands = [
+  { key: "k", code: "KeyK", expected: "more", command: true },
+  { key: "/", code: "Slash", expected: "keys", command: true },
+  { key: "q", code: "KeyQ", expected: "quit", command: true },
+  { key: "?", code: "Slash", expected: "keys", command: false, shiftKey: true },
+  { key: "Escape", code: "Escape", expected: "escape", command: false },
+];
+test.each([false, true].flatMap((mac) => commands.map((command) => ({ ...command, mac }))))(
+  "focused chips preserve picker $expected command (mac=$mac)", ({ key, code, expected, command, shiftKey, mac }) => {
+    const { commands, removed, row } = mount(mac);
+    fireEvent.keyDown(row, { key, code, shiftKey, ctrlKey: command && !mac, metaKey: command && mac });
+    expect(commands).toHaveBeenCalledExactlyOnceWith(expected);
+    expect(removed).not.toHaveBeenCalled();
+  },
+);
+
+test.each(commands)("composition prevents picker $expected and chip removal together", ({ key, code, command, shiftKey }) => {
+  const { commands, removed, row } = mount(false);
+  fireEvent.compositionStart(row);
+  fireEvent.keyDown(row, { key, code, shiftKey, ctrlKey: command });
+  fireEvent.keyDown(row, { key: "Backspace" });
+  fireEvent.compositionEnd(row);
+  expect(commands).not.toHaveBeenCalled();
+  expect(removed).not.toHaveBeenCalled();
+});
+
+test("chip arrows, Delete and Enter never become picker commands", () => {
+  const { commands, removed, row } = mount(false);
+  fireEvent.keyDown(row, { key: "ArrowRight" });
+  expect(document.activeElement).toBe(screen.getByRole("row", { name: "second" }));
+  fireEvent.keyDown(document.activeElement!, { key: "Delete" });
+  expect(removed).toHaveBeenCalledExactlyOnceWith(new Set([items[1]!.id]));
+  fireEvent.keyDown(document.activeElement!, { key: "Enter" });
+  expect(commands).not.toHaveBeenCalled();
+});

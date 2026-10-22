@@ -1,0 +1,29 @@
+{
+  "sourceCommit": "be8a6f28c194f7b3aa7f2dece9b2962abb02fcaa",
+  "date": "2026-10-22",
+  "purpose": "Prepare chip integration tests without changing frozen source branches",
+  "runtime": {
+    "vitest": "5.0.5",
+    "reactAriaComponents": "1.22.1",
+    "environment": "jsdom"
+  },
+  "command": "pnpm exec vitest run src/ui/ChipGroup.integration-probe.test.tsx",
+  "result": {
+    "exitCode": 0,
+    "testFilesPassed": 1,
+    "testsPassed": 16,
+    "testsFailed": 0
+  },
+  "probeSHA256": "a279d129dea5d854891a94b3bd2e98c3a4318115d8485ddb5e6efa729b2977bf",
+  "checks": [
+    "Ten focused-row command cases: More, Keys via command slash, Quit, Keys via bare question mark, Escape; each with Control and Meta command profiles",
+    "Five composition cases block both the parent picker command and Backspace removal",
+    "ArrowRight focuses the next row; Delete supplies only the focused opaque ID; chip navigation/removal/Enter do not become picker commands"
+  ],
+  "qualification": [
+    "Uses the actual frozen ChipGroup and existing picker shortcut helpers in a small synthetic parent",
+    "No production shelf, disclosure, copy lifecycle, browser, native, full-check or new operating-system acceptance is claimed",
+    "Saved-preview and pin shortcuts await their actual-main integration and are not claimed here",
+    "The text fixture is the exact temporary test source that passed; no test was added to a frozen source branch"
+  ]
+}
