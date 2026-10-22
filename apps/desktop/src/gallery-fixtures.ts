@@ -177,7 +177,7 @@ export function galleryProvider(state: GalleryState): { api: PickerApi; preview:
         copyFormatted: async () => null,
       } : {}),
       copyFormat: async () => "pandoc",
-      pickerPreferences: async () => ({ citation_style: state.formatted ? "apa" : null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false }),
+      pickerPreferences: async () => ({ citation_style: state.formatted ? "apa" : null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false, show_paste_preview: true }),
       setPickerPreferences: async () => null,
       shortcutStatus: async () => ({ shortcut: "Ctrl+Shift+Y", registered: true, error: null }),
       chooseLibrary: async () => undefined,

@@ -90,7 +90,7 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
     show_copied_notice: () => null,
     set_pinned: () => null,
     copy_format: () => "pandoc",
-    picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: false }),
+    picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: false, show_paste_preview: true }),
     set_picker_preferences: () => null,
     login_item: () => ({ name: "Ibis", enabled: false, problem: null }),
     set_login_item: ({ enabled }) => ({ name: "Ibis", enabled, problem: null }),
@@ -1193,7 +1193,7 @@ test("rows with the same first author and year are told apart by their container
   const garcia = { authors: "García, Okafor", first_author: "García", author_count: 2, year: 2021 };
   let density = "comfortable";
   backend({
-    picker_preferences: () => ({ citation_style: null, density, larger_text: false }),
+    picker_preferences: () => ({ citation_style: null, density, larger_text: false, show_paste_preview: true }),
     search: () => [
       { ...result("a", "Sleep spindles"), ...garcia, container: "Journal of Sleep \u202eResearch", matched: ["title"] },
       { ...result("b", "Sleep spindles: a replication"), ...garcia, container: "Sleep", item_type: "book", matched: ["container", "abstract"] },
@@ -1378,7 +1378,7 @@ test.each([[30_000, true, "first"], [61_000, true, ""], [61_000, false, "first"]
 test("a saved citation style, density and text size come back at start", async () => {
   backend({
     copy_format: () => "typst",
-    picker_preferences: () => ({ citation_style: "apa", density: "compact", larger_text: true }),
+    picker_preferences: () => ({ citation_style: "apa", density: "compact", larger_text: true, show_paste_preview: true }),
   });
   render(<App />);
   await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
@@ -1482,7 +1482,7 @@ test.each(["menu", "shortcut"])("%s Quit waits for the initial read, then saves 
   let atQuit: unknown = null;
   const calls = backend({
     copy_format: async () => { await reading; return "typst"; },
-    picker_preferences: async () => { await reading; return { citation_style: "apa", density: "comfortable", larger_text: false }; },
+    picker_preferences: async () => { await reading; return { citation_style: "apa", density: "comfortable", larger_text: false, show_paste_preview: true }; },
     set_picker_preferences: ({ preferences, copyFormat }) => {
       rememberedStyle = (preferences as { citation_style: unknown }).citation_style;
       if (copyFormat) rememberedKey = copyFormat as string;
@@ -1538,6 +1538,7 @@ test("format, density and text size choices are saved without losing each other"
   const saved: unknown[] = [];
   backend({
     copy_format: () => "typst",
+    picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: false, show_paste_preview: false }),
     set_picker_preferences: ({ preferences }) => { saved.push(preferences); return null; },
   });
   render(<App />);
@@ -1549,10 +1550,10 @@ test("format, density and text size choices are saved without losing each other"
   fireEvent.change(select, { target: { value: "pandoc" } });
   await waitFor(() => expect(saved).toHaveLength(4));
   expect(saved).toEqual([
-    { citation_style: "ieee", density: "comfortable", larger_text: false },
-    { citation_style: "ieee", density: "spacious", larger_text: false },
-    { citation_style: "ieee", density: "spacious", larger_text: true },
-    { citation_style: null, density: "spacious", larger_text: true },
+    { citation_style: "ieee", density: "comfortable", larger_text: false, show_paste_preview: false },
+    { citation_style: "ieee", density: "spacious", larger_text: false, show_paste_preview: false },
+    { citation_style: "ieee", density: "spacious", larger_text: true, show_paste_preview: false },
+    { citation_style: null, density: "spacious", larger_text: true, show_paste_preview: false },
   ]);
   expect(document.documentElement.dataset.density).toBe("spacious");
 });
@@ -1564,14 +1565,14 @@ test("a choice made while saved choices load is kept and saved, not replaced", a
   const keys: unknown[] = [];
   backend({
     copy_format: async () => { await loaded; return "typst"; },
-    picker_preferences: async () => { await loaded; return { citation_style: "apa", density: "compact", larger_text: false }; },
+    picker_preferences: async () => { await loaded; return { citation_style: "apa", density: "compact", larger_text: false, show_paste_preview: false }; },
     set_picker_preferences: ({ preferences, copyFormat }) => { saved.push(preferences); keys.push(copyFormat); return null; },
   });
   render(<App />);
   const select = screen.getByLabelText("Copy as") as HTMLSelectElement;
   fireEvent.change(select, { target: { value: "cite" } });
   await act(async () => { finish(); await loaded; });
-  await waitFor(() => expect(saved).toEqual([{ citation_style: null, density: "compact", larger_text: false }]));
+  await waitFor(() => expect(saved).toEqual([{ citation_style: null, density: "compact", larger_text: false, show_paste_preview: false }]));
   expect(select.value).toBe("cite");
   expect(keys).toEqual(["cite"]);
 });
@@ -2050,7 +2051,7 @@ test("a click on a row waits for its formatted preview before copying it", async
   vi.stubGlobal("Worker", InlineWorker);
   const copies: unknown[] = [];
   backend({
-    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false, show_paste_preview: true }),
     search: () => [result("a", "First"), result("b", "Second")],
     csl_items: ({ ids }) => JSON.stringify((ids as { native_key: string }[]).map((id) => ({
       id: id.native_key, type: "article-journal", title: id.native_key === "a" ? "First" : "Second",
@@ -2121,7 +2122,7 @@ test.each(["Escape", "hidden"])("a click waiting for its preview never copies af
   let release: () => void = () => undefined;
   const ready = new Promise<void>((resolve) => { release = resolve; });
   const calls = backend({
-    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false, show_paste_preview: true }),
     search: () => [result("a", "First"), result("b", "Second")],
     csl_items: ({ ids }) => ready.then(() => JSON.stringify((ids as { native_key: string }[]).map((id) => ({
         id: id.native_key, type: "article-journal", title: id.native_key,
@@ -2560,7 +2561,7 @@ test.each(["style:ieee", "pandoc", "style:apa"])("changing format cancels a clic
   const ready = new Promise<void>((resolve) => { release = resolve; });
   const output: unknown[] = [];
   const calls = backend({
-    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false, show_paste_preview: true }),
     search: () => [result("a", "First"), result("b", "Second")],
     csl_items: ({ ids }) => ready.then(() => JSON.stringify((ids as { native_key: string }[]).map((id) => ({
       id: id.native_key, type: "article-journal", title: id.native_key,
@@ -2727,7 +2728,7 @@ test("a retired formatted preview sends its own revision and requires a fresh co
   const calls = backend({
     library_status: () => ({ ...zoteroStatus(["user"]), revision }),
     search: () => [{ ...result("ITEM0001", `Formatted ${revision}`, "zotero:user"), revision }],
-    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false, show_paste_preview: true }),
     csl_items: ({ expectedRevision }) => {
       if (expectedRevision !== revision) throw { code: "snapshot_changed" };
       // Each revision has its own year, so the preview shows which one it formatted.

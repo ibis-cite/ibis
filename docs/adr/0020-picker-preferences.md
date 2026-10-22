@@ -1,24 +1,26 @@
 # 0020. Remember picker preferences in settings format 2
 
-Status: accepted (2026-10-20); adds fields to settings format 2 (ADR 0018), as ADR 0019 did
+Status: accepted (2026-10-20); extended for the agreed preview toggle (#787, 2026-10-22); adds fields to settings format 2 (ADR 0018), as ADR 0019 did
 
 ## Context
 
-The picker design (#223, step 4) lets people choose a citation style (#21), a row density and larger text. These choices should still apply after a restart. ADR 0016 requires an ADR for any change to `settings.json`. ADR 0019 set the precedent that optional fields can be added within format 2, because older builds ignore fields they do not know.
+The picker design (#223, step 4) lets people choose a citation style (#21), a row density and larger text. The agreed citation shelf (#787) also lets them hide its output with "Show what will be pasted" or Cmd/Ctrl+I. These choices should still apply after a restart. ADR 0016 requires an ADR for any change to `settings.json`. ADR 0019 set the precedent that optional fields can be added within format 2, because older builds ignore fields they do not know.
 
 ## Decision
 
-Settings format 2 gains three optional fields. When a field is absent, the default applies, and a default is never written.
+Settings format 2 has four optional picker fields. When a field is absent or `null`, the default applies, and a default is never written by the picker.
 
 | Field | Value | Absent means |
 | --- | --- | --- |
 | `citation_style` | `"apa"`, `"chicago-author-date"`, `"harvard-cite-them-right"`, `"ieee"` or `"modern-language-association"` | Copy citation keys in `copy_format` |
 | `density` | `"compact"`, `"comfortable"` or `"spacious"` | `"comfortable"` |
 | `larger_text` | `true` or `false` | `false` |
+| `show_paste_preview` | `true` or `false` | `true` |
 
 - A style ID names one of the styles bundled with Ibis. An unknown value makes the file invalid, just like an unknown `copy_format`. The file is reported, the backup is used, and nothing is guessed.
 - When `citation_style` is set, the picker formats with that style. When the person picks a key format, the field is removed. `copy_format` keeps the last key format either way, so switching back restores it.
-- The picker reads all three through one command and writes all three through another. Every other field is kept, using the same locked read, change and save as copies.
+- The picker reads these through one command and writes them through another. Every other field is kept, using the same locked read, change and save as copies.
+- Hiding the preview writes `show_paste_preview: false`; showing it removes that field. The choice controls the output line and wide pane only: citation chips, the chosen format and copy readiness remain unchanged.
 
 Display choice and remembered window position are not part of this decision. They need per-display data and get their own ADR.
 
