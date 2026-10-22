@@ -618,7 +618,7 @@ test("while a newer search is pending, no key, click or hint acts on the previou
   fireEvent.change(box, { target: { value: "pending" } });
   await waitFor(() => expect(pending.pending).toBeDefined());
   fireEvent.keyDown(box, { key: "Alt", altKey: true });
-  expect(footerKeys()).toBe("Esc Clear search");
+  expect(footerKeys()).toBe("Clear search Esc");
   fireEvent.keyUp(box, { key: "Alt" });
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
   // Neither Shift+click (add) nor a plain click (copy) acts on a stale row.
@@ -1097,6 +1097,43 @@ test("resizing More keeps its focused action visible without undoing manual scro
     itemBox.mockRestore();
     height.mockRestore();
     border.mockRestore();
+  }
+});
+
+test("Search shortcut opening gives Escape an invoker through the animated exit", async () => {
+  backend();
+  render(<App />);
+  const search = screen.getByLabelText("Search references");
+  const more = screen.getByRole("button", { name: /^More/ });
+  await waitFor(() => expect(screen.getByRole("region", { name: "Library" }).textContent).toMatch(/reference/));
+  act(() => search.focus());
+  let popover: Element | undefined;
+  const focusMore = more.focus.bind(more);
+  // A real modal popover makes its invoker inert. JSDOM needs that refusal
+  // modelled so a close-time focus call cannot hide the restoration race.
+  const focus = vi.spyOn(more, "focus").mockImplementation(() => {
+    if (!popover?.isConnected) focusMore();
+  });
+  let finishExit!: () => void;
+  try {
+    fireEvent.keyDown(search, { key: "k", ctrlKey: true });
+    const menu = await screen.findByRole("menu");
+    popover = menu.closest(".menu-popover")!;
+    const finished = new Promise<void>((resolve) => { finishExit = resolve; });
+    Object.defineProperty(popover, "getAnimations", { value: () => popover?.hasAttribute("data-exiting")
+      ? [{ playState: "running", finished }] : [] });
+    expect(document.activeElement).toBe(within(menu).getAllByRole("menuitem")[0]);
+    fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+    expect(popover.hasAttribute("data-exiting")).toBe(true);
+    await act(async () => { finishExit(); });
+    await act(async () => { await new Promise(requestAnimationFrame); });
+    expect(document.activeElement).toBe(more);
+    fireEvent.keyDown(document.activeElement!, { key: " " });
+    fireEvent.keyUp(document.activeElement!, { key: " " });
+    expect(await screen.findByRole("menu")).toBeTruthy();
+  } finally {
+    finishExit?.();
+    focus.mockRestore();
   }
 });
 
@@ -2108,31 +2145,88 @@ test.each(["Escape", "hidden"])("a click waiting for its preview never copies af
   expect(calls).not.toContain("show_copied_notice");
 });
 
+// Each visible hint as "label keys"; the label always comes first (docs/design.md, Footer).
 const footerKeys = () => [...screen.getByRole("group", { name: "Keys" }).children]
-  .filter((hint) => hint.getAttribute("aria-hidden") !== "true").map((hint) => hint.textContent).join("");
+  .filter((hint) => hint.getAttribute("aria-hidden") !== "true")
+  .map((hint) => `${hint.querySelector(".key-hint-label")?.textContent} ${hint.querySelector(".key-caps")?.textContent}`).join(" · ");
 
 test("the footer says what Enter will copy, and holding Alt shows the other keys", async () => {
   backend({ search: ({ query }) => (query ? [result("a", "First"), result("b", "Second")] : []) });
   render(<App />);
   const box = screen.getByLabelText("Search references");
   // Nothing to copy yet, so Enter is not advertised.
-  await waitFor(() => expect(footerKeys()).toBe("Ctrl+/ All keys"));
+  await waitFor(() => expect(footerKeys()).toBe("Shortcuts Ctrl+/"));
   fireEvent.change(box, { target: { value: "x" } });
   await screen.findByText("First");
-  expect(footerKeys()).toBe("Enter Copy as PandocCtrl+/ All keys");
+  expect(footerKeys()).toBe("Copy as Pandoc Enter · Shortcuts Ctrl+/");
   fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "typst" } });
-  expect(footerKeys()).toContain("Enter Copy as Typst");
+  expect(footerKeys()).toContain("Copy as Typst Enter");
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
   fireEvent.keyDown(box, { key: "ArrowDown" });
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
-  expect(footerKeys()).toContain("Enter Copy 2 as Typst");
+  expect(footerKeys()).toContain("Copy 2 as Typst Enter");
   fireEvent.keyDown(box, { key: "Alt", altKey: true });
-  expect(footerKeys()).toBe("Shift+Enter Remove from citationEsc Clear search");
+  expect(footerKeys()).toBe("Remove from citation Shift+Enter · Clear search Esc");
   fireEvent.keyUp(box, { key: "Alt" });
   expect(footerKeys()).toContain("Copy 2 as Typst");
   fireEvent.keyDown(box, { key: "Alt", altKey: true });
   fireEvent.blur(window);
   expect(footerKeys()).not.toContain("Esc");
+});
+
+test("More reads like the hints beside it: its name first, then its keys", async () => {
+  backend({ search: () => [result("a", "First")] });
+  render(<App />);
+  await screen.findByText("First");
+  const more = screen.getByRole("button", { name: /^More/ });
+  expect(more.querySelector(".key-hint-label")?.textContent).toBe("More");
+  expect(more.querySelector(".key-caps")?.textContent).toBe("Ctrl+K");
+  expect(more.querySelector(".key-caps")?.getAttribute("aria-hidden")).toBe("true");
+  // The hint that comes and goes is first, so More never moves.
+  const hints = [...screen.getByRole("group", { name: "Keys" }).children];
+  expect(hints[0]?.textContent).toContain("Copy as Pandoc");
+  expect(hints.at(-1)?.textContent).toContain("Shortcuts");
+});
+
+test("footer actions copy and open shortcuts without using a keyboard shortcut", async () => {
+  let copied: unknown;
+  backend({ search: () => [result("a", "First")], copy_citation: (args) => { copied = args.ids; return { text: "@a", warnings: [] }; } });
+  render(<App />);
+  await screen.findByText("First");
+  const copy = screen.getByRole("button", { name: "Copy as Pandoc" });
+  fireEvent.pointerDown(copy, { button: 0, pointerType: "mouse" });
+  act(() => copy.focus());
+  // Search blurs before pointer-up; the same action must survive to click.
+  expect(screen.getByRole("button", { name: "Copy as Pandoc" })).toBe(copy);
+  expect(copy.getAttribute("aria-keyshortcuts")).toBe("Enter");
+  expect(copy.querySelector(".key-caps")?.getAttribute("aria-hidden")).toBe("true");
+  fireEvent.pointerUp(copy, { button: 0, pointerType: "mouse" });
+  fireEvent.click(copy);
+  await waitFor(() => expect(copied).toEqual([{ source: "refs.bib", native_key: "a" }]));
+  const shortcuts = screen.getByRole("button", { name: "Shortcuts" });
+  act(() => shortcuts.focus());
+  fireEvent.click(shortcuts);
+  expect(await screen.findByRole("dialog", { name: "Keyboard shortcuts" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Close" }));
+  expect(document.activeElement).toBe(shortcuts);
+});
+
+test("alternate footer buttons use the current add, remove, clear and hide actions", async () => {
+  const calls = backend({ search: () => [result("a", "First")] });
+  render(<App />);
+  await screen.findByText("First");
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "first" } });
+  fireEvent.keyDown(box, { key: "Alt", altKey: true });
+  fireEvent.click(await screen.findByRole("button", { name: "Add to citation" }));
+  expect(await screen.findByRole("list", { name: "Selected references" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Remove from citation" }));
+  expect(screen.queryByRole("list", { name: "Selected references" })).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+  expect((box as HTMLInputElement).value).toBe("");
+  expect(document.activeElement).toBe(box);
+  fireEvent.click(screen.getByRole("button", { name: "Hide Ibis" }));
+  await waitFor(() => expect(calls).toContain("hide_picker"));
 });
 
 test.each([false, true])("Search hint layout survives pointer focus moving to More (Alt=%s)", async (alt) => {
@@ -2151,14 +2245,14 @@ test.each([false, true])("Search hint layout survives pointer focus moving to Mo
   expect(await screen.findByRole("menu")).toBeTruthy();
   expect(searchHint.isConnected).toBe(true);
   expect(searchHint.textContent).toBe(text);
-  expect(searchHint.getAttribute("aria-hidden")).toBe("true");
+  expect(searchHint.hasAttribute("aria-hidden")).toBe(false);
   fireEvent.pointerUp(more, { button: 0, pointerType: "mouse" });
   fireEvent.click(more, { detail: 1 });
   expect(screen.getByRole("menu")).toBeTruthy();
   fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
   expect(document.activeElement).toBe(more);
   act(() => box.focus());
-  expect(searchHint.getAttribute("aria-hidden")).toBe("false");
+  expect(searchHint.hasAttribute("aria-hidden")).toBe(false);
 });
 
 test("the footer names the source and count, the age only when it matters, and the detail in More", async () => {
@@ -2279,7 +2373,7 @@ test("when nothing matches in some Zotero libraries, the picker offers to search
   expect(screen.queryByRole("button", { name: "Search all Zotero libraries" })).toBeNull();
 });
 
-test("the footer offers Enter only when Enter in the search box would copy", async () => {
+test("the footer offers Copy only when its current output is ready, even outside Search", async () => {
   const { InlineWorker } = await import("./format/inline-worker");
   vi.stubGlobal("Worker", InlineWorker);
   let release: () => void = () => undefined;
@@ -2298,19 +2392,19 @@ test("the footer offers Enter only when Enter in the search box would copy", asy
     render(<App />);
     await screen.findByText("First");
     const box = screen.getByLabelText("Search references");
-    expect(footerKeys()).toContain("Enter Copy as Pandoc");
-    // Another control has focus, so Enter would press it instead.
+    expect(footerKeys()).toContain("Copy as Pandoc Enter");
+    // Copy remains a reachable button when another control takes focus.
     const more = screen.getByRole("button", { name: /^More/ });
     act(() => more.focus());
-    expect(footerKeys()).not.toContain("Enter");
+    expect(screen.getByRole("button", { name: "Copy as Pandoc" })).toBeTruthy();
     act(() => box.focus());
-    expect(footerKeys()).toContain("Enter Copy as Pandoc");
+    expect(footerKeys()).toContain("Copy as Pandoc Enter");
     // A formatted citation still being made is not offered.
     fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
     await screen.findByText("Formatting…");
     expect(footerKeys()).not.toContain("Enter");
     await act(async () => release());
-    await waitFor(() => expect(footerKeys()).toContain("Enter Copy as APA"));
+    await waitFor(() => expect(footerKeys()).toContain("Copy as APA Enter"));
     // Nor is one that failed.
     fail = true;
     fireEvent.keyDown(box, { key: "ArrowDown" });
@@ -2331,7 +2425,7 @@ test("More shows whether Ibis starts at login as the system reports it, and foll
   });
   render(<App />);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  const item = await screen.findByRole("menuitemcheckbox", { name: "Start Ibis when you log in" });
+  const item = await screen.findByRole("menuitemcheckbox", { name: "Start on Login" });
   await waitFor(() => expect(item.getAttribute("aria-checked")).toBe("true"));
   fireEvent.click(item);
   await waitFor(() => expect(calls).toContain("set_login_item"));
@@ -2340,27 +2434,27 @@ test("More shows whether Ibis starts at login as the system reports it, and foll
   system = true;
   await act(async () => { await emit("picker:shown"); });
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  await waitFor(() => expect(screen.getByRole("menuitemcheckbox", { name: "Start Ibis when you log in" }).getAttribute("aria-checked")).toBe("true"));
+  await waitFor(() => expect(screen.getByRole("menuitemcheckbox", { name: "Start on Login" }).getAttribute("aria-checked")).toBe("true"));
   expect(screen.queryByRole("alert")).toBeNull();
 });
 
 test("a refused login item is explained kindly and never shown as on", async () => {
   backend({ set_login_item: () => ({ name: "Ibis", enabled: false, problem: "refused" }) });
   render(<App />);
-  await chooseFromMore("Start Ibis when you log in", "menuitemcheckbox");
+  await chooseFromMore("Start on Login", "menuitemcheckbox");
   const alert = await screen.findByText(/^The system did not let Ibis change this\. You can change it in /);
   expect(alert.getAttribute("role")).toBe("alert");
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  expect((await screen.findByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).getAttribute("aria-checked")).toBe("false");
+  expect((await screen.findByRole("menuitemcheckbox", { name: "Start on Login" })).getAttribute("aria-checked")).toBe("false");
 });
 
 test("a failed login item command restores the previous state and says so", async () => {
   backend({ set_login_item: () => { throw new Error("ipc"); } });
   render(<App />);
-  await chooseFromMore("Start Ibis when you log in", "menuitemcheckbox");
+  await chooseFromMore("Start on Login", "menuitemcheckbox");
   expect(await screen.findByText("Ibis could not change whether it starts when you log in. Try again.")).toBeTruthy();
   if (!screen.queryByRole("menu")) fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  expect((await screen.findByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).getAttribute("aria-checked")).toBe("false");
+  expect((await screen.findByRole("menuitemcheckbox", { name: "Start on Login" })).getAttribute("aria-checked")).toBe("false");
 });
 
 test("systems without login items, and pickers without the commands, offer no choice", async () => {
@@ -2369,7 +2463,7 @@ test("systems without login items, and pickers without the commands, offer no ch
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   await screen.findByRole("menuitemcheckbox", { name: "Larger text" });
   await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); });
-  expect(screen.queryByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).toBeNull();
+  expect(screen.queryByRole("menuitemcheckbox", { name: "Start on Login" })).toBeNull();
   expect(screen.queryByRole("alert")).toBeNull();
   cleanup();
   const { loginItem: _read, setLoginItem: _set, ...withoutLoginItem } = api;
@@ -2377,7 +2471,7 @@ test("systems without login items, and pickers without the commands, offer no ch
   render(<App api={withoutLoginItem} />);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   await screen.findByRole("menuitemcheckbox", { name: "Larger text" });
-  expect(screen.queryByRole("menuitemcheckbox", { name: "Start Ibis when you log in" })).toBeNull();
+  expect(screen.queryByRole("menuitemcheckbox", { name: "Start on Login" })).toBeNull();
 });
 
 test("first-run setup offers starting at login beside the shortcut, off until chosen", async () => {
@@ -2398,17 +2492,39 @@ test("first-run setup offers starting at login beside the shortcut, off until ch
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
 
-test("each system's login item problems name where to look", async () => {
+test("each system's login item is in its own words, and its problems name where to look", async () => {
   const { loginItemsPlace, loginItemText } = await import("./messages");
-  expect(loginItemsPlace("MacIntel")).toBe("System Settings > General > Login Items");
-  expect(loginItemsPlace("Win32")).toBe("Settings > Apps > Startup");
-  expect(loginItemsPlace("Linux x86_64")).toMatch(/startup applications/);
-  for (const problem of ["unsupported", "needs_approval", "refused", "unreadable"] as const) {
-    expect(loginItemText.problem(problem, "PLACE", "Ibis Nightly")).toMatch(/Ibis Nightly.*PLACE\.$/);
+  expect((["macos", "windows", "linux"] as const).map(loginItemText.label)).toEqual(["Open at Login", "Start when you sign in", "Start on Login"]);
+  expect(loginItemText.sentence("Ibis Nightly", "windows")).toBe("Start Ibis Nightly when you sign in");
+  expect(loginItemText.sentence("Ibis", "macos")).toBe("Start Ibis when you log in");
+  expect(loginItemsPlace("macos")).toBe("System Settings > General > Login Items");
+  expect(loginItemsPlace("windows")).toBe("Settings > Apps > Startup");
+  expect(loginItemsPlace("linux")).toMatch(/startup applications/);
+  for (const platform of ["macos", "windows", "linux"] as const) {
+    for (const problem of ["unsupported", "needs_approval", "refused", "unreadable"] as const) {
+      const message = loginItemText.problem(problem, platform, "Ibis Nightly");
+      const place = `${loginItemsPlace(platform)}.`;
+      expect(message.endsWith(place)).toBe(true);
+      expect(message.indexOf("Ibis Nightly")).toBeGreaterThanOrEqual(0);
+      expect(message.indexOf("Ibis Nightly")).toBeLessThan(message.length - place.length);
+      expect(message.includes("log in")).toBe(platform !== "windows" && /unsupported|unreadable/.test(problem));
+    }
   }
 });
 
-test("quick clicks end in the state of the last click, and the app's own name is shown", async () => {
+test("the More menu names starting at login as the page's platform does", async () => {
+  backend({ login_item: () => ({ name: "Ibis", enabled: false, problem: null }) });
+  document.documentElement.dataset.platform = "macos";
+  try {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /^More/ }));
+    expect(await screen.findByRole("menuitemcheckbox", { name: "Open at Login" })).toBeTruthy();
+  } finally {
+    delete document.documentElement.dataset.platform;
+  }
+});
+
+test("quick clicks end in the state of the last click", async () => {
   let system = false;
   const order: boolean[] = [];
   const pending: (() => void)[] = [];
@@ -2423,7 +2539,7 @@ test("quick clicks end in the state of the last click, and the app's own name is
   });
   render(<App />);
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
-  const item = await screen.findByRole("menuitemcheckbox", { name: "Start Ibis Nightly when you log in" });
+  const item = await screen.findByRole("menuitemcheckbox", { name: "Start on Login" });
   fireEvent.click(item);
   await waitFor(() => expect(item.getAttribute("aria-checked")).toBe("true"));
   fireEvent.click(item);
@@ -2540,7 +2656,7 @@ test("a pre-event copy rejection recovers without copying or hiding until a fres
     search: () => [{ ...result("ITEM0001", `Snapshot ${revision}`, "zotero:user"), revision }],
     copy_citation: (args) => {
       attempts.push(args.expectedRevision);
-      if (args.expectedRevision !== revision) throw "library snapshot changed";
+      if (args.expectedRevision !== revision) throw { code: "snapshot_changed" };
       writes.push(revision);
       return { text: "fresh copy", warnings: [] };
     },
@@ -2586,7 +2702,7 @@ test.each(["resolve", "reject"])("an older recovery status cannot override a new
   const calls = backend({
     library_status: () => ++reads === 1 ? { ...zoteroStatus(["user"]), revision } : new Promise((resolve, fail) => { finish = resolve; reject = fail; }),
     search: () => [{ ...result("a", `Recovery ${revision}`), revision }],
-    copy_citation: () => { throw "library snapshot changed"; },
+    copy_citation: () => { throw { code: "snapshot_changed" }; },
   });
   render(<App />);
   fireEvent.click(await screen.findByText("Recovery 1"));
@@ -2613,14 +2729,14 @@ test("a retired formatted preview sends its own revision and requires a fresh co
     search: () => [{ ...result("ITEM0001", `Formatted ${revision}`, "zotero:user"), revision }],
     picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false }),
     csl_items: ({ expectedRevision }) => {
-      if (expectedRevision !== revision) throw "library snapshot changed";
+      if (expectedRevision !== revision) throw { code: "snapshot_changed" };
       // Each revision has its own year, so the preview shows which one it formatted.
       const year = revision === "1" ? 2020 : 2021;
       return JSON.stringify([{ id: "ITEM0001", type: "book", title: "Synthetic", author: [{ family: "Smith" }], issued: { "date-parts": [[year]] } }]);
     },
     copy_formatted: ({ text, expectedRevision }) => {
       attempts.push(expectedRevision);
-      if (expectedRevision !== revision) throw "library snapshot changed";
+      if (expectedRevision !== revision) throw { code: "snapshot_changed" };
       writes.push(revision);
       copiedText = text;
       return null;
@@ -2824,7 +2940,7 @@ test.each(["selection", "copy feedback"])("an obsolete stale copy recovers data 
     await screen.findByText("Keep the newer warning");
   }
   revision = "2"; // Backend replaced the snapshot without delivering its event.
-  await act(async () => { rejectOld("library snapshot changed"); });
+  await act(async () => { rejectOld({ code: "snapshot_changed" }); });
   await screen.findByText("First revision 2");
   expect(reads).toBeGreaterThan(1);
   expect(screen.queryByText("The library changed. Search again and reselect the references before copying.")).toBeNull();
@@ -2881,7 +2997,7 @@ test.each([
   if (selectedCopy) fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(attempts).toEqual(["1", "2"]));
   revision = refreshedRevision;
-  await act(async () => { rejectOld("library snapshot changed"); });
+  await act(async () => { rejectOld({ code: "snapshot_changed" }); });
   await waitFor(() => expect(reads).toBe(2));
   await waitFor(() => expect(searches).toBe(3));
   if (changedResults) await waitFor(() => expect(screen.queryByText("Pending 2 b")).toBeNull());
