@@ -1,0 +1,276 @@
+{
+  "source": "a53001eeeb220e00610d98085d9466f34579d716",
+  "qualification": "Synthetic Chromium; not native platform evidence",
+  "results": [
+    {
+      "id": "macos-tray-20",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 294,
+          "bottom": 352,
+          "viewportTop": 56,
+          "viewportBottom": 352
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 20 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More ⌘K",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    },
+    {
+      "id": "macos-tray-40",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 294,
+          "bottom": 352,
+          "viewportTop": 56,
+          "viewportBottom": 352
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 40 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More ⌘K",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    },
+    {
+      "id": "macos-tray-50",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 294,
+          "bottom": 352,
+          "viewportTop": 56,
+          "viewportBottom": 352
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 50 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More ⌘K",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    },
+    {
+      "id": "windows-tray-20",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 296,
+          "bottom": 354,
+          "viewportTop": 48,
+          "viewportBottom": 354
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 20 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More CtrlK",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    },
+    {
+      "id": "windows-tray-40",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 296,
+          "bottom": 354,
+          "viewportTop": 48,
+          "viewportBottom": 354
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 40 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More CtrlK",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    },
+    {
+      "id": "windows-tray-50",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 296,
+          "bottom": 354,
+          "viewportTop": 48,
+          "viewportBottom": 354
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 50 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More CtrlK",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    },
+    {
+      "id": "linux-tray-20",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 301,
+          "bottom": 359,
+          "viewportTop": 56,
+          "viewportBottom": 359
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 20 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More Ctrl+K",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    },
+    {
+      "id": "linux-tray-40",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 301,
+          "bottom": 359,
+          "viewportTop": 56,
+          "viewportBottom": 359
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 40 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More Ctrl+K",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    },
+    {
+      "id": "linux-tray-50",
+      "pass": true,
+      "measured": {
+        "height": 40,
+        "active": {
+          "top": 301,
+          "bottom": 359,
+          "viewportTop": 56,
+          "viewportBottom": 359
+        },
+        "buttons": [
+          {
+            "name": "Kept open; click to stop",
+            "hit": true
+          },
+          {
+            "name": "Copy 50 as Pandoc",
+            "hit": true
+          },
+          {
+            "name": "More Ctrl+K",
+            "hit": true
+          }
+        ]
+      },
+      "menuAndShortcut": true,
+      "copy": true,
+      "errors": []
+    }
+  ]
+}
