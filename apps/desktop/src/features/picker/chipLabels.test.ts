@@ -74,3 +74,20 @@ test("empty metadata falls back through the key, native key, title and a named r
   expect(chipLabels([{ ...empty, title: "Synthetic title" }])).toEqual(["Synthetic title"]);
   expect(chipLabels([empty, empty])).toEqual(["Untitled reference a", "Untitled reference b"]);
 });
+
+test("generated year letters do not duplicate natural authors or missing-metadata keys", () => {
+  const records = [record("a", "Example", 2026), record("b", "Example", 2026),
+    record("natural", "Example 2026a", null), record("Example 2026b", "", null)];
+  expect(chipLabels(records)).toEqual(["Example 2026a", "Example 2026b", "Example 2026a a", "Example 2026b a"]);
+  expect(chipLabels([records[2]!, records[0]!, records[1]!, records[3]!]))
+    .toEqual(["Example 2026a a", "Example 2026a", "Example 2026b", "Example 2026b a"]);
+});
+
+test("cross-group repairs skip reserved natural labels and stay deterministic", () => {
+  const records = [record("a", "Example", 2026), record("b", "Example", 2026),
+    record("natural", "Example 2026a", null), record("next", "Example 2026a a", null), record("Example 2026a b", "", null)];
+  const expected = ["Example 2026a", "Example 2026b", "Example 2026a c", "Example 2026a a", "Example 2026a b"];
+  expect(chipLabels(records)).toEqual(expected);
+  expect(chipLabels(records)).toEqual(expected);
+  expect(new Set(chipLabels(records)).size).toBe(records.length);
+});

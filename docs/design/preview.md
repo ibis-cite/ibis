@@ -60,7 +60,9 @@ layer from `design/depth-prototype` (variant B). The footer pattern
   author shortens, as in "Garc… 2021a"; never the year or its letter. The full
   author, year and key remain in the tooltip and accessible name. Missing dates
   keep the letter as a separate trailing part; missing author and year use the
-  key, then native key or title, then "Untitled reference".
+  key, then native key or title, then "Untitled reference". If a natural label
+  itself equals a generated label, append a separate letter to the natural
+  label, skipping letters that would duplicate any other final label.
 - "+N" opens a popover with every chosen reference, remove buttons and
   reordering (Alt+↑↓, drag), with the chip keyboard model (← → between chips,
   Backspace and Delete remove).

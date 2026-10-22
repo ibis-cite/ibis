@@ -30,11 +30,29 @@ export function chipLabelParts(records: readonly LabelSource[]): ChipLabel[] {
   const counts = new Map<string, number>();
   for (const label of labels) counts.set(label.text, (counts.get(label.text) ?? 0) + 1);
   const seen = new Map<string, number>();
-  return labels.map(({ author, year, text }) => {
+  const parts = labels.map(({ author, year, text }) => {
     const index = seen.get(text) ?? 0;
     seen.set(text, index + 1);
     const suffix = (counts.get(text) ?? 0) > 1 ? letter(index) : "";
     return { author, year, letter: suffix, text: joined(author, year + suffix) };
+  });
+  // A natural author or fallback key can itself look like a generated label.
+  // Keep year letters stable; repair the natural label without taking another
+  // record's natural or generated display text.
+  const reserved = new Set([...labels.map(({ text }) => text), ...parts.map(({ text }) => text)]);
+  const used = new Set(parts.filter(({ letter }) => letter).map(({ text }) => text));
+  return parts.map((part) => {
+    if (part.letter) return part;
+    if (!used.has(part.text)) { used.add(part.text); return part; }
+    let index = 0;
+    let suffix: string;
+    let text: string;
+    do {
+      suffix = letter(index++);
+      text = `${part.text} ${suffix}`;
+    } while (reserved.has(text) || used.has(text));
+    used.add(text);
+    return { ...part, letter: suffix, text };
   });
 }
 
