@@ -2768,10 +2768,44 @@ class ContractTests(unittest.TestCase):
                 })
                 self.assertEqual([entry.args[0] for entry in output.call_args_list], expected)
                 self.assertTrue(all(entry.kwargs.get("file") is sys.stderr for entry in output.call_args_list))
+        with patch("subprocess.run", side_effect=error), patch("builtins.print", side_effect=OSError("sink")):
+            with self.assertRaises(subprocess.TimeoutExpired) as caught:
+                self.test_global_macos_hid_event_contracts_without_native_execution()
+            self.assertIs(caught.exception, error)
+        for result in (subprocess.CompletedProcess(["node"], 0), subprocess.CalledProcessError(1, ["node"])):
+            with patch("subprocess.run", side_effect=result if isinstance(result, Exception) else None,
+                       return_value=result) as helper, patch("builtins.print") as output:
+                if isinstance(result, Exception):
+                    with self.assertRaises(subprocess.CalledProcessError) as caught:
+                        self.test_global_macos_hid_event_contracts_without_native_execution()
+                    self.assertIs(caught.exception, result)
+                else:
+                    self.test_global_macos_hid_event_contracts_without_native_execution()
+                self.assertEqual(helper.call_count, 1)
+                output.assert_not_called()
 
     def test_global_macos_hid_event_contracts_without_native_execution(self):
-        subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
+        try:
+            subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
+        except subprocess.TimeoutExpired as error:
+            allowed = {f"MACOS HID CONTRACT {phase}" for phase in (
+                "start", "source-ready", "fullscreen-cases", "key-plan-cases", "permission-cases",
+                "click-cases", "unicode-bridge-cases", "picker-key-cases", "snapshot-cases", "complete",
+            )}
+            seen = set()
+            for captured in (error.stdout, error.stderr):
+                if not isinstance(captured, (bytes, str)):
+                    continue
+                captured = captured[:4096].decode("utf-8", errors="replace") if isinstance(captured, bytes) else captured[:4096]
+                for line in captured.splitlines():
+                    if line in allowed and line not in seen:
+                        seen.add(line)
+                        try:
+                            print(line, file=sys.stderr)
+                        except OSError:
+                            pass  # A failed diagnostic must not replace the original timeout.
+            raise
 
     def test_macos_click_reacquires_a_missing_control_and_stops_after_one_press(self):
         native = Scripted.__new__(Scripted)
