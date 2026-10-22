@@ -3630,3 +3630,54 @@ test.each([{ repeat: true }, { isComposing: true }, { keyCode: 229 }, { altKey: 
     expect(calls).not.toContain("quit");
   },
 );
+
+test.each(["search", "other", "pointer"])("a smaller results viewport follows only the keyboard-owned active row (%s)", async (owner) => {
+  const observations: { callback: () => void; nodes: Set<Element> }[] = [];
+  vi.stubGlobal("ResizeObserver", class {
+    nodes = new Set<Element>();
+    constructor(callback: () => void) { observations.push({ callback, nodes: this.nodes }); }
+    observe(node: Element) { this.nodes.add(node); }
+    unobserve(node: Element) { this.nodes.delete(node); }
+    disconnect() { this.nodes.clear(); }
+  });
+  const scroll = vi.fn();
+  const originalScroll = Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView = scroll;
+  try {
+    backend({ search: () => Array.from({ length: 20 }, (_, i) => result(`r${i}`, `Reference ${i}`)) });
+    render(<App />);
+    await screen.findByText("Reference 19");
+    const box = screen.getByLabelText("Search references");
+    act(() => box.focus());
+    for (let i = 0; i < 19; i++) fireEvent.keyDown(box, { key: "ArrowDown" });
+    const options = screen.getAllByRole("option");
+    if (owner === "pointer") {
+      fireEvent.mouseMove(options[0]!, { screenX: 10, screenY: 10 });
+      fireEvent.mouseMove(options[18]!, { screenX: 11, screenY: 10 });
+    } else if (owner === "other") act(() => screen.getByRole("button", { name: /^More/ }).focus());
+    const active = screen.getByRole("option", { selected: true });
+    const viewport = active.closest<HTMLElement>(".results-area")!;
+    viewport.style.overflowY = "auto";
+    let height = 303;
+    Object.defineProperty(viewport, "clientHeight", { configurable: true, get: () => height });
+    Object.defineProperty(viewport, "clientTop", { configurable: true, value: 0 });
+    const viewportRect = vi.spyOn(viewport, "getBoundingClientRect").mockImplementation(() => new DOMRect(0, 56, 720, height));
+    const activeRect = vi.spyOn(active, "getBoundingClientRect").mockImplementation(() => new DOMRect(0, 301 - viewport.scrollTop, 720, 58));
+    try {
+      scroll.mockClear();
+      // Pin grows the footer while the active index and selected count stay put.
+      await act(async () => { toggleKeepOpen(); });
+      height = 263;
+      act(() => { for (const observation of observations) if (observation.nodes.has(viewport)) observation.callback(); });
+      if (owner === "search") {
+        expect(viewport.scrollTop).toBe(40);
+        expect(active.getBoundingClientRect().bottom).toBeLessThanOrEqual(viewport.getBoundingClientRect().bottom);
+      } else expect(viewport.scrollTop).toBe(0);
+      expect(scroll).not.toHaveBeenCalled();
+      expect(document.activeElement).toBe(owner === "other" ? screen.getByRole("button", { name: /^More/ }) : box);
+    } finally { viewportRect.mockRestore(); activeRect.mockRestore(); }
+  } finally {
+    Element.prototype.scrollIntoView = originalScroll;
+    vi.unstubAllGlobals();
+  }
+});

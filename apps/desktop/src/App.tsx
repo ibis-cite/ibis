@@ -326,17 +326,46 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // A row chosen by the pointer is already under it; scrolling would move it away.
   // Selection/preview reflow follows the highlight only while Search has focus.
   const previousActive = useRef(active);
+  const keyboardFollow = useRef(true);
+  const resultsViewport = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const moved = previousActive.current !== active;
     previousActive.current = active;
     if (pointer.fromPointer.current) {
+      keyboardFollow.current = false;
       pointer.fromPointer.current = false;
       return;
     }
+    if (moved) keyboardFollow.current = true;
     if (!moved && (selected.size === 0 || document.activeElement !== input.current)) return;
     document.getElementById(`result-${active}`)?.scrollIntoView?.({ block: "nearest" });
   }, [active, pointer.fromPointer, selected.size,
     selected.size > 0 ? formatted : null, selected.size > 0 ? format : null, selected.size > 0 ? searchFocused : null]);
+
+  // Footer wrapping, preview visibility and text/window changes resize the
+  // scrollport without changing the active index. Scroll only local viewports.
+  useEffect(() => {
+    const viewport = resultsViewport.current;
+    if (!viewport) return;
+    const ports = [viewport, viewport.parentElement].filter((port): port is HTMLElement => port !== null);
+    const reveal = () => {
+      if (!keyboardFollow.current || document.activeElement !== input.current) return;
+      const row = document.getElementById(`result-${active}`);
+      if (!row) return;
+      for (const port of ports) {
+        if (port.clientHeight <= 0 || getComputedStyle(port).overflowY === "visible") continue;
+        const top = port.getBoundingClientRect().top + port.clientTop;
+        const bottom = top + port.clientHeight;
+        const item = row.getBoundingClientRect();
+        if (item.bottom > bottom) port.scrollTop += Math.ceil(item.bottom - bottom);
+        else if (item.top < top) port.scrollTop += Math.floor(item.top - top);
+      }
+    };
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(reveal);
+    for (const port of ports) observer?.observe(port);
+    window.addEventListener("resize", reveal);
+    return () => { observer?.disconnect(); window.removeEventListener("resize", reveal); };
+  }, [active]);
 
   // Success is brief; warnings stay available until explicitly dismissed.
   useEffect(() => {
@@ -659,6 +688,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           }
           if (e.key === "ArrowDown" || e.key === "ArrowUp") {
             e.preventDefault();
+            keyboardFollow.current = true;
             const step = e.key === "ArrowDown" ? 1 : -1;
             setActive((i) => Math.min(Math.max(i + step, 0), Math.max(results.length - 1, 0)));
           } else if (e.key === "Enter" && e.shiftKey) {
@@ -694,7 +724,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         error={error} copyError={copyError} copied={copied}
         showCopiedText={displayedOutput == null || typeof displayedOutput === "string" || displayedOutput.text !== copied?.text}
         onDismissCopied={() => setCopied(null)} />
-      <div className="results-area">
+      <div className="results-area" ref={resultsViewport}>
         {library?.has_snapshot && results.length > 0 && !busy && <div className="results-heading" aria-hidden="true">
           <span>{query ? pickerText.bestMatches : pickerText.references}</span><span>{pickerText.resultCount(results.length)}</span>
         </div>}
