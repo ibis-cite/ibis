@@ -544,6 +544,22 @@ const layers = (platform?: string) => `:root[data-platform${platform ? `="${plat
 const layerRules = () => [...depth.slice(0, depth.indexOf("/* Motion")).replace(/\/\*[^]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
   .map(([, head, body]) => ({ head: head!.trim(), body: body! }));
 
+test("depth preserves suggested, alternative and writing-choice fills", () => {
+  document.documentElement.dataset.platform = "macos";
+  const empty = document.createElement("div");
+  empty.className = "empty-state";
+  // Role hooks supplied by the empty-state and first-run slices (#801/#756).
+  empty.innerHTML = '<button class="suggested-action">Choose</button><button class="empty-alternative">Alternative</button><button>Secondary</button><section class="setup-writing"><div class="setup-choices"><button class="writing-choice" aria-pressed="true">Selected</button><button class="writing-choice" aria-pressed="false">Other</button></div></section>';
+  document.body.append(empty);
+  try {
+    const fillRules = layerRules().filter(({ body }) => /(^|;)\s*(background(?:-color)?|color)\s*:/.test(body));
+    for (const button of empty.querySelectorAll(".suggested-action, .empty-alternative, .writing-choice")) {
+      expect(fillRules.filter(({ head }) => button.matches(head)).map(({ head }) => head), button.textContent!).toEqual([]);
+    }
+    expect(fillRules.some(({ head }) => empty.querySelector("button:not([class])")!.matches(head))).toBe(true);
+  } finally { empty.remove(); }
+});
+
 test("each platform has its own layers: lifted on macOS, Fluent on Windows, Adwaita-flat on GNOME", () => {
   expect(styles).toMatch(/@import "\.\/nativeAppearance\.css";\n@import "\.\/depth\.css";/);
   const shared = rules(depth, layers());

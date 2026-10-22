@@ -233,10 +233,11 @@ change: rows, the search band and every alignment keep the geometry above.
 | Results | The sheet | One layer card: 8 px corners, a 1 px card stroke, `0 2px 4px` | Flat |
 | Tray and preview | One raised card at `--r-row` under the band, its sides in by 4 px (its padding gives the 4 px back, so chips and text stay put), with a hairline and a soft shadow; chips are recessed into it | The same card at 8 px with the Fluent stroke | libadwaita's `.card`, 12 px |
 | Selected row | The accent fill lifted by a neutral shadow and a faint inner highlight | Fluent's subtle fill (black 4% / white 6%) and the accent pill | GTK's selection colour, flat |
-| Key caps, first-run buttons | Raised caps: a top highlight and a bottom shade | Fluent control elevation: a stroke with a darker bottom edge | The flat button fill |
+| Key caps, neutral first-run buttons | Raised caps: a top highlight and a bottom shade | Fluent control elevation: a stroke with a darker bottom edge | The flat button fill |
 
-The writing choice is a recessed track with a raised thumb, not a coloured
-border. With a native material the material itself is the base and the sheet,
+The writing choice has a recessed track. Suggested actions, alternatives and
+writing choices retain their own fills and paired text colours. With a native
+material the material itself is the base and the sheet,
 and on macOS the raised layers, chips and caps become tints of their colours
 (white 55% light, `#2c2c2f` at 50% dark) so the material shows through.
 Rows fade their fill and shadow over 140 ms and presses scale to .98; with
