@@ -633,7 +633,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           return {
             isCurrent: () => visibility === copyVisibility.current && hiddenAt.current === null,
             run: () => {
-              if (command === "more") setMenuOpen(true);
+              if (command === "more") openMore();
               else if (command === "keys") openKeys();
               else void perform("quit", quitAfterSaving);
             },
