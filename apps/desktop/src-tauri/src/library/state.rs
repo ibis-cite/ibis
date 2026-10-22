@@ -397,6 +397,24 @@ mod tests {
     }
 
     #[test]
+    fn a_retained_refresh_failure_does_not_claim_an_unsaved_choice() {
+        let library = Mutex::new(candidate(
+            PathBuf::from("synthetic/retained.bib"),
+            ibis_core::bibtex::load_str("synthetic", ""),
+        ));
+        let requests = LoadRequests::default();
+        let (request, _, _) = begin_open(&library, &requests, PathBuf::from("other/attempted.bib"))
+            .unwrap_or_else(|| panic!("open"));
+        let rejected = install(&library, &requests, request, Err(SourceError::Unavailable.into()))
+            .unwrap_or_else(|| panic!("rejected choice"));
+        assert!(rejected.note.is_none());
+        let failed = install_automatic(&library, &requests, request, Err(SourceError::WatchUnavailable.into()))
+            .unwrap_or_else(|| panic!("retained refresh"));
+        assert!(failed.note.as_deref().is_some_and(|note| note.contains("retained.bib")));
+        assert_eq!(library_line(&failed), library_line(&rejected));
+    }
+
+    #[test]
     fn retained_source_failures_and_empty_recovery_preserve_the_choice_and_existing_note() {
         let retained = PathBuf::from("synthetic/retained.bib");
         let original_note = "the library choice could not be saved";
