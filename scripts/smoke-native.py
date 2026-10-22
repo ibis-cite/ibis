@@ -129,14 +129,18 @@ def search_focused(snapshot):
 
 
 def menu_escape_focus(native, snapshot, shortcut, report):
-    """Prove the invoker owns Escape, using Space as the actual keyboard check."""
+    """Prove Escape/Tab destinations with real keys, not only accessibility focus."""
     def values(state):
-        return [node.get("value") for node in named(state, "Search references")]
-    original = values(snapshot())
-    if not any(isinstance(value, str) for value in original):
+        return [node["value"] for node in named(state, "Search references")
+                if node.get("role", "").lower().replace(" ", "") in EDITABLE_ROLES
+                and isinstance(node.get("value"), str)]
+    initial = snapshot()
+    assert initial["visible"] and initial["foreground"], "Native picker unavailable before menu check"
+    original = values(initial)
+    if not original or len(set(original)) != 1:
         raise RuntimeError("Native search value unavailable for menu focus check")
     facts = {key: False for key in ("shortcut_opened", "escape_closed", "escape_invoker_focused",
-                                   "space_reopened", "search_unchanged", "tab_search_focused")}
+                                   "space_reopened", "search_unchanged", "tab_search_typed", "search_restored")}
     report["menu_escape_focus"] = facts
     native.key(shortcut)
     wait_for(lambda: bool(named(snapshot(), "Reload")), "shortcut opens More", timeout=5)
@@ -161,10 +165,38 @@ def menu_escape_focus(native, snapshot, shortcut, report):
     wait_for(reopened, "Space reopens More after Escape", timeout=5)
     native.key("Tab")
     wait_for(lambda: not named(snapshot(), "Reload"), "Tab closes More", timeout=5)
-    wait_for(lambda: search_focused(snapshot()), "Tab restores Search focus", timeout=5)
-    returned = snapshot()
-    facts["tab_search_focused"] = search_focused(returned)
-    facts["search_unchanged"] = facts["search_unchanged"] and values(returned) == original
+
+    def picker():
+        current = snapshot()  # The caller also verifies the owned app is alive.
+        assert current["visible"] and current["foreground"] and not named(current, "Reload"), "Native picker unavailable after Tab"
+        return current
+
+    def available():
+        current = picker()
+        assert values(current), "Native Search unavailable after Tab"
+        return current
+
+    def ready():
+        current = picker()
+        # AT-SPI/UIA can expose the combobox's active option as focused while
+        # DOM keyboard focus remains on Search. This is only a settling cue;
+        # actual typing/readback below must prove ownership, even for AX focus.
+        return bool(values(current)) and (search_focused(current) or any(node.get("focused") and
+            node.get("role", "").lower().replace(" ", "") in ("listitem", "controltype.listitem")
+            for node in current["nodes"]))
+
+    wait_for(ready, "Tab settles before native typing", timeout=5)
+    facts["search_unchanged"] = facts["search_unchanged"] and values(available()) == original
+    assert facts["search_unchanged"], "Menu changed the native query"
+    select_all = "super+a" if shortcut == "super+k" else "ctrl+a"
+    probe = "ibis tab probe" if original[0] != "ibis tab probe" else "ibis tab probe alternate"
+    for text, fact in ((probe, "tab_search_typed"), (original[0], "search_restored")):
+        available()
+        native.key(select_all)
+        available()
+        native.text(text)
+        wait_for(lambda: values(picker()) == [text] * len(original), "native Tab query readback", timeout=5)
+        facts[fact] = True
     assert all(facts.values()), "Native menu keyboard ownership failed"
 
 
@@ -1467,6 +1499,9 @@ def main():
             assert "Ibis smoke reference 000001" in strings(snapshot()), "Expected native result missing"
             check("shortcut menu Escape returns to invoker", lambda: menu_escape_focus(
                 native, snapshot, "super+k" if system == "Darwin" else "ctrl+k", report))
+            # Restoring the query can schedule another search; do not copy the
+            # temporary probe's results while that request is still pending.
+            wait_for_query(snapshot, "smoke000001", "Ibis smoke reference 000001", report, settled=True)
 
             def copy():
                 # Installed release builds never report the non-activating panel as the
@@ -2542,98 +2577,125 @@ class ContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             menu_action(native, "Search references")
 
-    def test_menu_escape_checks_keyboard_ownership_without_recording_search_text(self):
-        for failure in (None, "accessible-focus", "keyboard-ownership"):
-            state = {"menu": False, "more": False, "value": "private synthetic query"}
-            def snapshot():
-                return {"nodes": ([{"name": "Reload"}] if state["menu"] else [
-                    {"name": "More", "focused": state["more"]},
-                    {"name": "Search references", "value": state["value"], "focused": not state["more"]}])}
-            def key(chord):
-                if chord == "ctrl+k":
-                    state["menu"] = True
-                elif chord == "Escape":
-                    state.update(menu=False, more=failure != "accessible-focus")
-                elif chord == "space":
-                    state["menu"] = state["more"] and failure != "keyboard-ownership"
-                    if not state["menu"]:
-                        state["value"] += " "
-                elif chord == "Tab":
-                    state.update(menu=False, more=False)
-            native, report = Mock(), {}
-            native.key.side_effect = key
-            with patch(__name__ + ".wait_for", side_effect=lambda predicate, *args, **kwargs: self.assertTrue(predicate())):
-                if failure:
-                    with self.assertRaises(AssertionError):
-                        menu_escape_focus(native, snapshot, "ctrl+k", report)
-                    self.assertFalse(report["menu_escape_focus"]["space_reopened"])
-                    self.assertEqual(report["menu_escape_focus"]["search_unchanged"], failure == "accessible-focus")
-                else:
-                    menu_escape_focus(native, snapshot, "ctrl+k", report)
-                    self.assertTrue(all(report["menu_escape_focus"].values()))
-                    self.assertEqual(native.key.call_args_list, [call("ctrl+k"), call("Escape"), call("space"), call("Tab")])
-            self.assertTrue(all(type(value) is bool for value in report["menu_escape_focus"].values()))
-            self.assertNotIn(state["value"], json.dumps(report))
+    class MenuKeyboardModel:
+        """Native keys own the input; accessibility can focus its active option."""
+        def __init__(self, platform="Linux", failure=None, delay=1):
+            self.platform, self.failure, self.delay = platform, failure, delay
+            self.original = self.value = "private synthetic query"
+            self.menu, self.more, self.search = False, False, True
+            self.escaped_reads = self.tab_reads = None
+            self.pending, self.delivery_reads = None, 0
+            self.selected = False
+            self.events = []
 
-    def test_menu_escape_waits_for_delayed_invoker_focus_before_space(self):
-        state = {"menu": False, "escaped": False, "reads": 0, "value": "synthetic query"}
-        def snapshot():
-            if state["escaped"] and not state["menu"]:
-                state["reads"] += 1
-            return {"nodes": ([{"name": "Reload"}] if state["menu"] else [
-                {"name": "More", "focused": state["escaped"] and state["reads"] >= 5},
-                {"name": "Search references", "value": state["value"], "focused": not state["escaped"]}])}
-        def key(chord):
-            if chord == "ctrl+k":
-                state["menu"] = True
+        def snapshot(self):
+            if self.escaped_reads is not None:
+                self.escaped_reads += 1
+                self.more = self.escaped_reads >= self.delay and self.failure != "invoker"
+            if self.tab_reads is not None:
+                self.tab_reads += 1
+                self.search = self.tab_reads >= self.delay
+            if self.pending is not None:
+                self.delivery_reads += 1
+                if self.delivery_reads >= self.delay:
+                    self.value, self.pending = self.pending, None
+            roles = {"Linux": ("combo box", "list item"),
+                     "Windows": ("ControlType.ComboBox", "ControlType.ListItem"),
+                     "Darwin": ("AXTextField", "AXRow")}
+            search_role, result_role = roles[self.platform]
+            current = {"visible": True, "foreground": True, "nodes": (
+                [{"name": "Reload", "role": "menu item", "focused": True}] if self.menu else [
+                    {"name": "More", "role": "button", "focused": self.more},
+                    {"name": "Search references", "role": search_role, "value": self.value,
+                     "focused": self.search and self.platform == "Darwin"},
+                    {"name": "synthetic result", "role": result_role,
+                     "focused": self.search and self.platform != "Darwin"}])}
+            if self.tab_reads is not None:
+                if self.failure in ("visible", "foreground"):
+                    current[self.failure] = False
+                if (self.failure == "missing-search" or (self.failure == "delayed-search" and self.tab_reads < self.delay)
+                        or (self.failure == "delivery-tree" and self.pending is not None)):
+                    current["nodes"] = [n for n in current["nodes"] if n["name"] != "Search references"]
+            return current
+
+        def key(self, chord):
+            self.events.append(("key", chord))
+            if chord in ("ctrl+k", "super+k"):
+                self.menu, self.search = True, False
             elif chord == "Escape":
-                state.update(menu=False, escaped=True)
+                self.menu, self.escaped_reads = False, 0
             elif chord == "space":
-                if state["reads"] >= 5:
-                    state["menu"] = True
-                else:
-                    state["value"] += " "
+                self.menu = self.more and self.failure != "space"
+                self.escaped_reads, self.more = None, False
+                if not self.menu:
+                    self.value += " "
             elif chord == "Tab":
-                state.update(menu=False, escaped=False)
-        def wait(predicate, description, *, timeout):
-            self.assertEqual(timeout, 5)
-            for _ in range(10):
-                if predicate():
-                    return
-            self.fail(description)
-        native, report = Mock(), {}
-        native.key.side_effect = key
-        with patch(__name__ + ".wait_for", side_effect=wait):
-            menu_escape_focus(native, snapshot, "ctrl+k", report)
-        self.assertTrue(all(report["menu_escape_focus"].values()))
-        self.assertEqual(state["value"], "synthetic query")
-        self.assertEqual(native.key.call_args_list, [call("ctrl+k"), call("Escape"), call("space"), call("Tab")])
+                self.menu = self.failure == "menu"
+                self.tab_reads = 0
+                if self.failure == "query":
+                    self.value += " "
+            elif chord in ("ctrl+a", "super+a"):
+                self.selected = self.search
+                if self.failure == "after-select":
+                    self.failure = "foreground"
 
-    def test_menu_escape_waits_for_search_focus_after_tab(self):
-        state = {"menu": False, "more": False, "tab_reads": None}
-        def snapshot():
-            if state["tab_reads"] is not None:
-                state["tab_reads"] += 1
-            settled = state["tab_reads"] is None or state["tab_reads"] >= 5
-            return {"nodes": ([{"name": "Reload"}] if state["menu"] else [
-                {"name": "More", "focused": state["more"]},
-                {"name": "Search references", "value": "synthetic query", "focused": not state["more"] and settled}])}
-        def key(chord):
-            state.update(menu=chord in ("ctrl+k", "space"), more=chord == "Escape")
-            if chord == "Tab":
-                state["tab_reads"] = 0
+        def text(self, text):
+            self.events.append(("text", text))
+            if not self.search or self.failure == "typing" or (self.failure == "restore" and text == self.original):
+                return
+            self.pending = text if self.selected else self.value + text
+            self.delivery_reads = 0
+            self.selected = False
+
+    def menu_keyboard_check(self, native, report):
         def wait(predicate, description, *, timeout):
             self.assertEqual(timeout, 5)
             for _ in range(10):
                 if predicate():
                     return
-            self.fail(description)
-        native, report = Mock(), {}
-        native.key.side_effect = key
+            raise AssertionError("Timed out: " + description)
         with patch(__name__ + ".wait_for", side_effect=wait):
-            menu_escape_focus(native, snapshot, "ctrl+k", report)
-        self.assertGreaterEqual(state["tab_reads"], 5)
-        self.assertTrue(all(report["menu_escape_focus"].values()))
+            menu_escape_focus(native, native.snapshot, "super+k" if native.platform == "Darwin" else "ctrl+k", report)
+
+    def test_menu_tab_proves_typing_with_virtualized_or_direct_accessibility_focus(self):
+        for platform, query in (("Linux", "private synthetic query"), ("Windows", "synthetic 引用"),
+                                ("Darwin", ""), ("Linux", "ibis tab probe")):
+            with self.subTest(platform=platform, empty=not query):
+                native, report = self.MenuKeyboardModel(platform, delay=5), {}
+                native.original = native.value = query
+                self.menu_keyboard_check(native, report)
+                self.assertTrue(all(report["menu_escape_focus"].values()))
+                self.assertEqual(native.value, native.original)
+                self.assertGreaterEqual(native.tab_reads, 5)
+                self.assertEqual(len([event for event in native.events if event[0] == "text"]), 2)
+                self.assertTrue(all(type(value) is bool for value in report["menu_escape_focus"].values()))
+                if native.original:
+                    self.assertNotIn(native.original, json.dumps(report))
+
+    def test_menu_keyboard_checks_reject_wrong_delivery_and_do_not_repair_changed_queries(self):
+        for failure in ("invoker", "space", "query", "menu", "visible", "foreground", "after-select", "missing-search", "typing", "restore"):
+            with self.subTest(failure=failure):
+                native, report = self.MenuKeyboardModel(failure=failure), {}
+                with self.assertRaises(AssertionError):
+                    self.menu_keyboard_check(native, report)
+                facts = report["menu_escape_focus"]
+                self.assertFalse(all(facts.values()))
+                if failure not in ("typing", "restore"):
+                    self.assertFalse(any(event[0] == "text" for event in native.events))
+                if failure == "typing":
+                    self.assertFalse(facts["tab_search_typed"])
+                if failure == "restore":
+                    self.assertTrue(facts["tab_search_typed"])
+                    self.assertFalse(facts["search_restored"])
+                self.assertNotIn(native.original, json.dumps(report))
+
+    def test_menu_tab_waits_for_the_search_tree_before_keyboard_delivery(self):
+        for transition in ("delayed-search", "delivery-tree"):
+            with self.subTest(transition=transition):
+                native, report = self.MenuKeyboardModel(failure=transition, delay=5), {}
+                self.menu_keyboard_check(native, report)
+                self.assertTrue(all(report["menu_escape_focus"].values()))
+                self.assertEqual(native.value, native.original)
 
     def test_global_macos_hid_event_contracts_without_native_execution(self):
         subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,
