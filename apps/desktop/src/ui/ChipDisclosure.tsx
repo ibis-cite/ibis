@@ -3,8 +3,9 @@ import { Button, Dialog, DialogTrigger, Popover } from "react-aria-components";
 import "./ChipDisclosure.css";
 
 /** The selected-chip overflow: React Aria owns its dialog, placement and focus. */
-export function ChipDisclosure({ label, triggerLabel, trigger, triggerRef, isOpen, onOpenChange, children }: {
+export function ChipDisclosure({ label, triggerLabel, trigger, triggerRef, contentRef, isOpen, onOpenChange, children }: {
   label: string; triggerLabel: string; trigger: ReactNode; triggerRef?: Ref<HTMLButtonElement>;
+  contentRef?: Ref<HTMLDivElement>;
   isOpen: boolean; onOpenChange: (open: boolean) => void; children: ReactNode;
 }) {
   const composing = useRef(false);
@@ -12,7 +13,7 @@ export function ChipDisclosure({ label, triggerLabel, trigger, triggerRef, isOpe
   return <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
     <Button ref={triggerRef} aria-label={triggerLabel} className="chip-disclosure-trigger">{trigger}</Button>
     <Popover className="chip-disclosure" placement="top end">
-      <div
+      <div ref={contentRef}
         onCompositionStartCapture={() => { composing.current = true; }}
         onCompositionEndCapture={() => { composing.current = false; }}
         onKeyDownCapture={(event) => {

@@ -1,4 +1,4 @@
-import { Button, GridList, GridListItem, useDragAndDrop } from "react-aria-components";
+import { Button, DropIndicator, GridList, GridListItem, useDragAndDrop } from "react-aria-components";
 import { useRef } from "react";
 import type { SearchResult } from "../../api";
 import { chipLabelParts, type ChipLabel } from "./chipLabels";
@@ -31,6 +31,7 @@ export function SelectedChipList({ label, selected, removeLabel, reorderLabel, o
   const { dragAndDropHooks } = useDragAndDrop({
     getItems: (keys) => [...keys].map(() => ({ "application/x-ibis-selected-chip": "selected" })),
     getAllowedDropOperations: () => ["move"],
+    renderDropIndicator: (target) => <DropIndicator target={target} className="selected-chip-drop" />,
     onReorder: ({ keys, target }) => {
       if (target.dropPosition !== "on") onReorder(new Set([...keys].map(String)), String(target.key), target.dropPosition);
     },
@@ -42,7 +43,7 @@ export function SelectedChipList({ label, selected, removeLabel, reorderLabel, o
       const move = event.altKey && (event.key === "ArrowUp" || event.key === "ArrowDown");
       if (!remove && !move) return;
       event.stopPropagation(); event.preventDefault();
-      if (event.repeat || event.ctrlKey || event.metaKey || event.shiftKey || (remove && event.altKey)) return;
+      if ((move && event.repeat) || event.ctrlKey || event.metaKey || event.shiftKey || (remove && event.altKey)) return;
       const index = items.findIndex(({ id }) => rows.current.get(id)?.contains(event.target as Node));
       const item = items[index];
       if (!item) return;
@@ -54,11 +55,11 @@ export function SelectedChipList({ label, selected, removeLabel, reorderLabel, o
     }}>
     <GridList aria-label={label} className="selected-chip-list" items={items} selectionMode="none"
     layout="grid" orientation="horizontal" autoFocus="first" dragAndDropHooks={dragAndDropHooks}>
-    {(item) => <GridListItem id={item.id} textValue={item.name} aria-label={item.name} className="chip selected-chip-item"
+    {(item) => <GridListItem id={item.id} textValue={item.name} aria-label={item.name} className="selected-chip-item" data-chip-item=""
       ref={(node) => { if (node) rows.current.set(item.id, node); else rows.current.delete(item.id); }}>
       <Button slot="drag" className="chip-drag" aria-label={reorderLabel(item.record)}>↕</Button>
       <SelectedChipLabel label={item.label} title={item.name} />
-      <Button className="chip-remove" aria-label={removeLabel(item.record)} onPress={() => onRemove(new Set([item.id]))} />
+      <Button className="chip-group-remove" aria-label={removeLabel(item.record)} onPress={() => onRemove(new Set([item.id]))}><span aria-hidden="true">×</span></Button>
     </GridListItem>}
     </GridList>
   </div>;

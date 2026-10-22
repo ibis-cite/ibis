@@ -1,10 +1,13 @@
-import { useLayoutEffect, useRef, useState, type Ref } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type Ref, type RefObject } from "react";
 import type { SearchResult } from "../../api";
 import { provisional, type FormattedCitation } from "../../format/formatted";
 import { render } from "../../format/markup";
 import type { StyleId } from "../../format/styles";
 import { pickerText } from "../../messages";
-import { chipLabels } from "./chipLabels";
+import { ChipDisclosure } from "../../ui/ChipDisclosure";
+import { ChipGroup } from "../../ui/ChipGroup";
+import { SelectedChipLabel, SelectedChipList } from "./SelectedChipList";
+import { chipLabelParts } from "./chipLabels";
 import "./CitationShelf.css";
 
 /** The shelf shows at most this many chips; the rest fold into "+N"
@@ -14,12 +17,14 @@ export const SHELF_CHIPS = 6;
 /** What Enter pastes, above the footer's Copy action (docs/design/preview.md):
  * a line of chips for the references chosen with Shift+Enter, then the exact
  * output on one line. Results above never move when a reference is added. */
-export function CitationShelf({ announce, selected, removeLabel, onRemove, style, keys, shown, focusable, outputRef }: {
+export function CitationShelf({ announce, selected, removeLabel, onRemove, onReorder, fallbackFocusRef, style, keys, shown, focusable, outputRef }: {
   /** False until the selection first changes, so opening the picker is silent. */
   announce: boolean;
   selected: Map<string, SearchResult>;
   removeLabel: (r: SearchResult) => string;
-  onRemove: (r: SearchResult) => void;
+  onRemove: (ids: ReadonlySet<string>) => void;
+  onReorder: (ids: ReadonlySet<string>, target: string, position: "before" | "after") => void;
+  fallbackFocusRef: RefObject<HTMLElement | null>;
   /** The citation style, when one is chosen. */
   style: StyleId | null;
   /** True for a citation-key syntax, which is shown in monospace. */
@@ -31,47 +36,82 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, style
   outputRef?: Ref<HTMLElement>;
 }) {
   const records = [...selected.values()];
-  const keysOf = [...selected.keys()];
-  const labels = chipLabels(records);
-  // More than SHELF_CHIPS fold into "+N", which shows every chip on a few
-  // scrolling lines, so each chosen reference can always be removed here.
+  const ids = [...selected.keys()];
+  const labels = chipLabelParts(records);
   const [expanded, setExpanded] = useState(false);
   const [visibleChips, setVisibleChips] = useState(SHELF_CHIPS);
-  const chips = useRef<HTMLUListElement>(null);
-  const more = useRef<HTMLLIElement>(null);
+  const strip = useRef<HTMLDivElement>(null);
+  const chips = useRef<HTMLDivElement>(null);
+  const measure = useRef<HTMLDivElement>(null);
+  const more = useRef<HTMLButtonElement>(null);
+  const popup = useRef<HTMLDivElement>(null);
+  const foldedFocus = useRef(false);
+  const emptyFocus = useRef(false);
+  const popupReturn = useRef<string | null | undefined>(undefined);
+  useEffect(() => { if (selected.size === 0) setExpanded(false); }, [selected.size]);
   useLayoutEffect(() => {
-    const list = chips.current;
-    if (!list) return;
+    const band = strip.current;
+    const sizing = measure.current;
+    if (!band || !sizing) return;
     const fit = () => {
-      const first = list.querySelector<HTMLElement>(".chip");
-      if (!first || list.clientWidth <= 0) return;
-      const style = getComputedStyle(list);
-      const minimum = parseFloat(getComputedStyle(first).minWidth);
-      if (!(minimum > 0)) return;
+      const threshold = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--chip-count-only-width"));
+      const countOnly = window.innerWidth < threshold;
+      if (band.clientWidth <= 0 && !countOnly) return;
+      const style = getComputedStyle(band);
       const gap = parseFloat(style.columnGap) || 0;
-      const available = list.clientWidth - (parseFloat(style.paddingInlineStart) || 0) - (parseFloat(style.paddingInlineEnd) || 0);
-      const capacity = Math.min(selected.size, SHELF_CHIPS);
-      let next = SHELF_CHIPS;
-      if (selected.size > SHELF_CHIPS || capacity * minimum + (capacity - 1) * gap > available) {
-        const button = more.current?.querySelector("button");
-        // First create the overflow control, then reserve its actual text width.
-        next = button ? Math.max(0, Math.min(capacity, Math.floor((available - button.getBoundingClientRect().width) / (minimum + gap)))) : Math.max(0, capacity - 1);
-        if (!expanded && [...list.querySelectorAll(".chip")].slice(next).some((chip) => chip.contains(document.activeElement))) button?.focus();
+      const available = band.clientWidth - (parseFloat(style.paddingInlineStart) || 0) - (parseFloat(style.paddingInlineEnd) || 0);
+      const calibration = [...sizing.children] as HTMLElement[];
+      const minimum = calibration[0]?.getBoundingClientRect().width ?? 0;
+      const target = calibration[1]?.getBoundingClientRect().width ?? 0;
+      const sizingStyle = getComputedStyle(sizing);
+      const pad = (parseFloat(sizingStyle.paddingInlineStart) || 0) + 2 * (parseFloat(sizingStyle.borderInlineStartWidth) || 0);
+      const widths = calibration.slice(2).map((year) => Math.max(minimum, year.getBoundingClientRect().width + target + pad + gap));
+      const capacity = Math.min(records.length, SHELF_CHIPS);
+      let next = countOnly ? 0 : capacity;
+      if (!countOnly && !(minimum > 0)) return;
+      for (; next > 0; next--) {
+        const overflow = records.length > next || expanded;
+        if (overflow && !more.current) { next--; break; }
+        const width = widths.slice(0, next).reduce((sum, width) => sum + width, 0) + Math.max(0, next - 1) * gap
+          + (overflow ? more.current!.getBoundingClientRect().width + gap : 0);
+        if (width <= available) break;
       }
+      const hidden = [...(chips.current?.querySelectorAll<HTMLElement>("[data-chip-item]") ?? [])].slice(next);
+      if (!expanded && hidden.some((chip) => chip.contains(document.activeElement))) foldedFocus.current = true;
       setVisibleChips(next);
     };
     fit();
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(fit);
-    observer?.observe(list);
-    if (more.current) observer?.observe(more.current);
+    observer?.observe(band); observer?.observe(sizing);
     window.addEventListener("resize", fit);
     return () => { observer?.disconnect(); window.removeEventListener("resize", fit); };
   }, [selected, expanded, visibleChips]);
-  if (expanded && selected.size === 0) setExpanded(false);
+  useLayoutEffect(() => {
+    if (foldedFocus.current && more.current) {
+      foldedFocus.current = false;
+      if (document.activeElement === document.body || strip.current?.contains(document.activeElement)) more.current.focus();
+    }
+    if (selected.size === 0 && emptyFocus.current) {
+      emptyFocus.current = false;
+      if (document.activeElement === document.body || strip.current?.contains(document.activeElement) || popup.current?.contains(document.activeElement)) fallbackFocusRef.current?.focus({ preventScroll: true });
+    }
+    if (!expanded && popupReturn.current !== undefined) {
+      const id = popupReturn.current; popupReturn.current = undefined;
+      if (document.activeElement === document.body || popup.current?.contains(document.activeElement)) {
+        const rows = [...(chips.current?.querySelectorAll<HTMLElement>("[data-chip-item]") ?? [])];
+        (rows.find((row) => row.dataset.key === id) ?? rows[0] ?? fallbackFocusRef.current)?.focus({ preventScroll: true });
+      }
+    }
+  }, [selected.size, visibleChips, expanded, fallbackFocusRef]);
+  const remove = (keys: ReadonlySet<string>) => {
+    emptyFocus.current = ids.every((id) => keys.has(id)) && Boolean(strip.current?.contains(document.activeElement) || popup.current?.contains(document.activeElement));
+    onRemove(keys);
+  };
   const folded = Math.max(0, records.length - visibleChips);
-  // Keep the first chips measurable even if none fit; hidden chips are neither
-  // exposed nor focusable. Expanding still renders every record in source order.
-  const shownChips = expanded ? records : records.slice(0, SHELF_CHIPS);
+  const items = records.slice(0, visibleChips).map((record, index) => {
+    const name = [labels[index]!.text, record.authors || record.first_author, record.key, record.title].filter(Boolean).join(" · ");
+    return { id: ids[index]!, label: <SelectedChipLabel label={labels[index]!} title={name} />, textValue: name, title: name, removeLabel: removeLabel(record) };
+  });
   return (
     <>
       <p className="visually-hidden" role="status" aria-label={pickerText.citationSelection} aria-live="polite" aria-atomic="true">
@@ -80,22 +120,23 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, style
       {(records.length > 0 || shown !== undefined) && (
         <div className="shelf">
           {records.length > 0 && (
-            <ul ref={chips} className="shelf-chips" aria-label={pickerText.selectedReferences} data-expanded={(folded > 0 && expanded) || undefined}>
-              {shownChips.map((r, i) => (
-                <li key={keysOf[i]} className="chip" title={r.key} hidden={!expanded && i >= visibleChips}>
-                  <bdi className="chip-label">{labels[i]}</bdi>
-                  <button type="button" className="chip-remove" onClick={() => onRemove(r)} aria-label={removeLabel(r)} />
-                </li>
-              ))}
-              {folded > 0 && (
-                <li ref={more} className="chip-more">
-                  <button type="button" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}
-                    aria-label={expanded ? pickerText.fewerChosen : pickerText.allChosen(records.length)}>
-                    {expanded ? pickerText.fewerChosenShort : pickerText.moreChosen(folded)}
-                  </button>
-                </li>
-              )}
-            </ul>
+            <div ref={strip} className="shelf-chips">
+              <div ref={measure} className="shelf-chip-measure" aria-hidden="true">
+                <span className="shelf-chip-minimum" /><span className="shelf-chip-target" />
+                {labels.slice(0, SHELF_CHIPS).map((label, index) => <bdi key={ids[index]}>{label.year}{label.letter}</bdi>)}
+              </div>
+              {items.length > 0 && <ChipGroup label={pickerText.selectedReferences} items={items} listRef={chips}
+                onRemove={remove} fallbackFocusRef={fallbackFocusRef} />}
+              {(folded > 0 || expanded) && <ChipDisclosure label={pickerText.selectedReferences} triggerLabel={pickerText.allChosen(records.length)}
+                trigger={visibleChips === 0 || folded === 0 ? pickerText.chosenCount(records.length) : pickerText.moreChosen(folded)}
+                triggerRef={more} contentRef={popup} isOpen={expanded} onOpenChange={(open) => {
+                  if (!open && folded === 0 && popup.current?.contains(document.activeElement)) popupReturn.current = (document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")?.dataset.key ?? null;
+                  setExpanded(open);
+                }}>
+                <SelectedChipList label={pickerText.selectedReferences} selected={selected} removeLabel={removeLabel}
+                  reorderLabel={(record) => pickerText.reorderReference(record.key)} onRemove={remove} onReorder={onReorder} />
+              </ChipDisclosure>}
+            </div>
           )}
           {shown !== undefined && (
             <section ref={outputRef} aria-label={pickerText.preview} className="shelf-output" data-keys={keys || undefined}

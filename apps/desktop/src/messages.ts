@@ -107,8 +107,8 @@ export const pickerText = {
   /** The shelf's last chip, for references beyond the ones it shows. */
   moreChosen: (n: number) => `+${n}`,
   allChosen: (n: number) => `Show all ${n} selected references`,
-  fewerChosen: "Show fewer selected references",
-  fewerChosenShort: "Fewer",
+  chosenCount: (n: number) => `${n} ${n === 1 ? "reference" : "references"} ›`,
+  reorderReference: (key: string) => `Reorder ${key}`,
   dismiss: "Dismiss",
   dismissWarnings: "Dismiss copy warnings",
   copyWarnings: "Copy warnings",

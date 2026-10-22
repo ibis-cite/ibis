@@ -14,6 +14,7 @@ import { composing, isKeysShortcut, isMenuShortcut, isPinShortcut, isPreviewShor
 import { PickerHeader } from "./features/picker/PickerHeader";
 import { Notices, type Operation } from "./features/picker/Notices";
 import { CitationShelf } from "./features/picker/CitationShelf";
+import { reorderSelection } from "./features/picker/selectionOrder";
 import { ResultList } from "./features/picker/ResultList";
 import { EmptyState } from "./features/picker/EmptyState";
 import { PickerFooter } from "./features/picker/PickerFooter";
@@ -752,10 +753,16 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         {!busy && emptyState}
       </div>
       </div>
-      <CitationShelf announce={selectionChanged} selected={selected} removeLabel={removeLabel} onRemove={(r) => {
-        toggle(r);
-        input.current?.focus({ preventScroll: true });
-      }} style={style} keys={keyFormat !== null}
+      <CitationShelf announce={selectionChanged} selected={selected} removeLabel={removeLabel} fallbackFocusRef={input}
+        onRemove={(ids) => {
+          setSelectionChanged(true);
+          setSelected((latest) => {
+            const next = new Map(latest);
+            for (const id of ids) next.delete(id);
+            return next.size === latest.size ? latest : next;
+          });
+        }} onReorder={(ids, target, position) => setSelected((latest) => reorderSelection(latest, ids, target, position))}
+        style={style} keys={keyFormat !== null}
         shown={displayedOutput} focusable={selected.size > 0} outputRef={outputRef} />
       <PickerFooter library={library} groupName={groupName}
         pinned={pinned} onUnpin={() => { togglePin(); input.current?.focus(); }}

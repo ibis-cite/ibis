@@ -1,10 +1,12 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { useState } from "react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { useRef, useState } from "react";
 import type { SearchResult } from "../../api";
+import { idKey } from "./choice";
+import { reorderSelection } from "./selectionOrder";
 import { CitationShelf } from "./CitationShelf";
 
-afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(async () => { cleanup(); await act(async () => { await new Promise(requestAnimationFrame); }); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 function record(key: string, first_author = "García", year: number | null = 2021): SearchResult {
   return {
@@ -14,113 +16,113 @@ function record(key: string, first_author = "García", year: number | null = 202
 }
 
 function chosen(records: SearchResult[]) {
-  return new Map(records.map((r) => [r.key, r]));
+  return new Map(records.map((r) => [idKey(r.id), r]));
 }
 
 const shelf = (props: Partial<Parameters<typeof CitationShelf>[0]>) => (
-  <CitationShelf announce={false} selected={new Map()} removeLabel={(r) => `Remove ${r.key}`} onRemove={() => undefined}
+  <CitationShelf announce={false} selected={new Map()} removeLabel={(r) => `Remove ${r.key}`} onRemove={() => undefined} onReorder={() => undefined} fallbackFocusRef={{ current: null }}
     style={null} keys shown={undefined} focusable={false} {...props} />
 );
 
-test("six chips show, the rest fold into +N, and +N shows every chip so each can be removed", () => {
-  const records = Array.from({ length: 9 }, (_, i) => record(`k${i}`, `Author${i}`));
-  const onRemove = vi.fn();
-  render(shelf({ selected: chosen(records), onRemove }));
-  const list = screen.getByRole("list", { name: "Selected references" });
-  expect(within(list).getAllByRole("button", { name: /^Remove/ })).toHaveLength(6);
-  const more = within(list).getByRole("button", { name: "Show all 9 selected references" });
-  expect(more.textContent).toBe("+3");
-  expect(more.getAttribute("aria-expanded")).toBe("false");
-  fireEvent.click(more);
-  expect(within(list).getAllByRole("button", { name: /^Remove/ })).toHaveLength(9);
-  fireEvent.click(within(list).getByRole("button", { name: "Remove k8" }));
-  expect(onRemove).toHaveBeenCalledWith(records[8]);
-  // Each chip names its whole key to the pointer.
-  expect(within(list).getByText("Author8 2021").closest("li")?.getAttribute("title")).toBe("k8");
-});
-
-test("50 choices fit narrow and 200% text rows, keeping hidden source identities removable", () => {
-  let scale = 1;
-  let width = 344;
-  const observers: { callback: () => void; disconnect: ReturnType<typeof vi.fn> }[] = [];
+function layout() {
+  let width = 344; let scale = 1;
+  const observations: { callback: () => void; nodes: Set<Element> }[] = [];
+  vi.stubGlobal("innerWidth", 720);
   vi.stubGlobal("ResizeObserver", class {
-    disconnect = vi.fn();
-    observe = vi.fn();
-    constructor(callback: () => void) {
-      let active = false;
-      this.observe = vi.fn(() => { active = true; });
-      this.disconnect = vi.fn(() => { active = false; });
-      observers.push({ callback: () => { if (active) callback(); }, disconnect: this.disconnect });
-    }
+    nodes = new Set<Element>();
+    constructor(callback: () => void) { observations.push({ callback, nodes: this.nodes }); }
+    observe(node: Element) { this.nodes.add(node); }
+    unobserve(node: Element) { this.nodes.delete(node); }
+    disconnect() { this.nodes.clear(); }
   });
   vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (this: HTMLElement) { return this.classList.contains("shelf-chips") ? width : 0; });
   const computed = window.getComputedStyle;
   vi.spyOn(window, "getComputedStyle").mockImplementation((element) => {
-    if (!element.matches(".chip, .shelf-chips")) return computed(element);
+    if (element === document.documentElement) {
+      const style = document.createElement("div").style;
+      style.setProperty("--chip-count-only-width", "460px"); return style;
+    }
+    if (!element.matches(".chip-group-item, .shelf-chips")) return computed(element);
     const style = document.createElement("div").style;
-    style.minWidth = `${80 * scale}px`;
-    style.columnGap = `${4 * scale}px`;
+    style.minWidth = `${80 * scale}px`; style.columnGap = `${4 * scale}px`;
     style.paddingInlineStart = style.paddingInlineEnd = `${12 * scale}px`;
     return style;
   });
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
-    return new DOMRect(0, 0, this.matches(".chip-more button") ? 40 * scale : 0, 24 * scale);
+    const width = this.matches(".chip-disclosure-trigger") ? 40 : this.matches(".shelf-chip-minimum") ? 80 : this.matches(".shelf-chip-measure bdi") ? 35 : this.matches(".shelf-chip-target, .chip-group-remove") ? 32 : 0;
+    return new DOMRect(0, 0, width * scale, 24 * scale);
   });
-  const records = Array.from({ length: 50 }, (_, i) => ({ ...record(`shared${i % 25}`, `Author${i}`),
-    id: { source: i < 25 ? "first.bib" : "second.bib", native_key: `entry${i}` } }));
+  return { resize(next: number, larger = 1) {
+    width = next; scale = larger;
+    act(() => { for (const observation of observations) if ([...observation.nodes].some((node) => node.classList.contains("shelf-chips"))) observation.callback(); });
+  } };
+}
+
+test("six chips stay inline and +N discloses every source-qualified reference in a separate popover", async () => {
+  const geometry = layout(); geometry.resize(1000);
+  const records = Array.from({ length: 9 }, (_, i) => record(`k${i}`, `Author${i}`));
   const onRemove = vi.fn();
-  function Picker() {
-    const [selected, setSelected] = useState(new Map(records.map((r, i) => [`identity${i}`, r])));
-    return shelf({ selected, removeLabel: (r) => `Remove ${r.id.source}/${r.id.native_key}`, onRemove: (r) => {
-      onRemove(r); setSelected((previous) => new Map([...previous].filter(([, value]) => value !== r)));
-    } });
-  }
-  const view = render(<Picker />);
-  const list = screen.getByRole("list", { name: "Selected references" });
-  const removeButtons = () => within(list).getAllByRole("button", { name: /^Remove/ });
-  expect(removeButtons()).toHaveLength(3);
-  expect(within(list).getByRole("button", { name: "Show all 50 selected references" }).textContent).toBe("+47");
-  scale = 2; width = 328;
-  act(() => { for (const observer of [...observers]) observer.callback(); });
-  expect(removeButtons()).toHaveLength(1);
-  const more = within(list).getByRole("button", { name: "Show all 50 selected references" });
+  render(shelf({ selected: chosen(records), onRemove }));
+  const inline = screen.getByRole("grid", { name: "Selected references" });
+  expect(within(inline).getAllByRole("row")).toHaveLength(6);
+  const more = screen.getByRole("button", { name: "Show all 9 selected references" });
+  expect(more.textContent).toBe("+3");
+  act(() => more.focus()); fireEvent.click(more);
+  const dialog = await screen.findByRole("dialog", { name: "Selected references" });
+  expect(within(dialog).getAllByRole("row")).toHaveLength(9);
+  expect(inline.querySelectorAll("[data-chip-item]")).toHaveLength(6);
+  fireEvent.click(within(dialog).getByRole("button", { name: "Remove k8" }));
+  expect(onRemove).toHaveBeenCalledWith(new Set([idKey(records[8]!.id)]));
+  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  await waitFor(() => expect(document.activeElement).toBe(more));
+});
+
+test("measured fitting reserves overflow width at 200% text and moves newly folded focus to +N", async () => {
+  const geometry = layout();
+  const records = Array.from({ length: 50 }, (_, i) => record(`k${i}`, `Author${i}`));
+  render(shelf({ selected: chosen(records) }));
+  const inline = screen.getByRole("grid", { name: "Selected references" });
+  expect(within(inline).getAllByRole("row")).toHaveLength(3);
+  expect(screen.getByRole("button", { name: "Show all 50 selected references" }).textContent).toBe("+47");
+  act(() => within(inline).getAllByRole("row")[2]!.focus());
+  geometry.resize(328, 2);
+  expect(within(inline).getAllByRole("row")).toHaveLength(1);
+  const more = screen.getByRole("button", { name: "Show all 50 selected references" });
   expect(more.textContent).toBe("+49");
+  expect(document.activeElement).toBe(more);
   fireEvent.click(more);
-  expect(removeButtons().map((button) => button.getAttribute("aria-label"))).toEqual(records.map((r) => `Remove ${r.id.source}/${r.id.native_key}`));
-  fireEvent.click(within(list).getByRole("button", { name: "Remove second.bib/entry49" }));
-  expect(onRemove).toHaveBeenCalledWith(records[49]);
-  expect(removeButtons()).toHaveLength(49);
-  expect(within(list).getByRole("button", { name: "Remove first.bib/entry24" })).toBeTruthy();
-  fireEvent.click(within(list).getByRole("button", { name: "Show fewer selected references" }));
-  expect(within(list).getByRole("button", { name: "Show all 49 selected references" }).textContent).toBe("+48");
-  scale = 1; width = 1000;
-  act(() => { for (const observer of [...observers]) observer.callback(); });
-  expect(removeButtons()).toHaveLength(6);
-  expect(within(list).getByRole("button", { name: "Show all 49 selected references" }).textContent).toBe("+43");
-  removeButtons()[5]!.focus();
-  width = 344;
-  act(() => { for (const observer of [...observers]) observer.callback(); });
-  expect(removeButtons()).toHaveLength(3);
-  expect(document.activeElement).toBe(within(list).getByRole("button", { name: "Show all 49 selected references" }));
-  width = 1000;
-  act(() => { for (const observer of [...observers]) observer.callback(); });
-  fireEvent.click(within(list).getByRole("button", { name: "Show all 49 selected references" }));
-  scale = 2; width = 328;
-  act(() => { for (const observer of [...observers]) observer.callback(); });
-  for (let remaining = 49; remaining > 6; remaining--) fireEvent.click(removeButtons().at(-1)!);
-  expect(list.hasAttribute("data-expanded")).toBe(true);
-  fireEvent.click(within(list).getByRole("button", { name: "Show fewer selected references" }));
-  expect(removeButtons()).toHaveLength(1);
-  expect(within(list).getByRole("button", { name: "Show all 6 selected references" }).textContent).toBe("+5");
-  scale = 1; width = 1000;
-  act(() => { for (const observer of [...observers]) observer.callback(); });
-  expect(within(list).queryByRole("button", { name: "Show all 6 selected references" })).toBeNull();
-  removeButtons()[5]!.focus();
-  width = 344;
-  act(() => { for (const observer of [...observers]) observer.callback(); });
-  expect(document.activeElement).toBe(within(list).getByRole("button", { name: "Show all 6 selected references" }));
-  view.unmount();
-  expect(observers.every((observer) => observer.disconnect.mock.calls.length > 0)).toBe(true);
+  const dialog = await screen.findByRole("dialog", { name: "Selected references" });
+  expect(within(dialog).getAllByRole("row")).toHaveLength(50);
+});
+
+test("under the count-only width no hidden inline chips remain in the keyboard collection", async () => {
+  layout(); vi.stubGlobal("innerWidth", 360);
+  render(shelf({ selected: chosen([record("a"), record("b"), record("c")]) }));
+  expect(screen.queryByRole("grid")).toBeNull();
+  const count = screen.getByRole("button", { name: "Show all 3 selected references" });
+  expect(count.textContent).toBe("3 references ›");
+  fireEvent.click(count);
+  const dialog = await screen.findByRole("dialog", { name: "Selected references" });
+  expect(within(dialog).getAllByRole("row")).toHaveLength(3);
+});
+
+test.each([false, true])("final removal returns owned inline/overflow focus to Search (overflow=%s)", async (overflow) => {
+  layout(); if (overflow) vi.stubGlobal("innerWidth", 360);
+  function Picker() {
+    const [selected, setSelected] = useState(chosen([record("a")]));
+    const search = useRef<HTMLInputElement>(null);
+    return <><input ref={search} aria-label="Search" />{shelf({ selected, fallbackFocusRef: search,
+      onRemove: (ids) => setSelected((latest) => new Map([...latest].filter(([id]) => !ids.has(id)))),
+      onReorder: (ids, target, position) => setSelected((latest) => reorderSelection(latest, ids, target, position)),
+    })}</>;
+  }
+  render(<Picker />);
+  if (overflow) fireEvent.click(screen.getByRole("button", { name: "Show all 1 selected references" }));
+  const chip = await screen.findByRole("row"); act(() => chip.focus());
+  fireEvent.keyDown(chip, { key: "Delete" });
+  await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Search" })));
+  expect(screen.queryByRole("row")).toBeNull();
 });
 
 test("the output is one line in text colours: keys in monospace, failures and pending in words", () => {
@@ -142,4 +144,23 @@ test("the output is one line in text colours: keys in monospace, failures and pe
 test("nothing chosen and nothing to show draws no shelf", () => {
   const { container } = render(shelf({}));
   expect(container.querySelector(".shelf")).toBeNull();
+});
+
+test("removing overflow down to one inline row keeps the open collection and its focused identity", async () => {
+  const geometry = layout(); geometry.resize(1000);
+  const records = Array.from({ length: 9 }, (_, i) => record(`k${i}`, `Author${i}`));
+  function Picker() {
+    const [selected, setSelected] = useState(chosen(records));
+    return shelf({ selected, onRemove: (ids) => setSelected((latest) => new Map([...latest].filter(([id]) => !ids.has(id)))) });
+  }
+  render(<Picker />);
+  const trigger = screen.getByRole("button", { name: "Show all 9 selected references" });
+  act(() => trigger.focus()); fireEvent.click(trigger);
+  const dialog = await screen.findByRole("dialog", { name: "Selected references" });
+  for (let i = 0; i < 3; i++) fireEvent.click(within(dialog).getByRole("button", { name: `Remove k${i}` }));
+  expect(screen.getByRole("dialog", { name: "Selected references" })).toBe(dialog);
+  expect(within(dialog).getAllByRole("row")).toHaveLength(6);
+  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  await waitFor(() => expect((document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")?.dataset.key).toBe(idKey(records[3]!.id)));
 });

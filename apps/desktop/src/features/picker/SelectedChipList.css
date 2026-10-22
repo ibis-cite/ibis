@@ -1,6 +1,13 @@
-.selected-chip-list { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-.selected-chip-item { max-width: 100%; }
+.selected-chip-list { --chip-group-target: var(--control-min-size); display: flex; flex-wrap: wrap; gap: max(var(--space-1), calc(var(--chip-group-target) - var(--chip-height))) var(--space-1); }
+.selected-chip-item { display: inline-flex; align-items: center; max-width: 100%; height: var(--chip-height); padding-inline-start: var(--space-2); border: var(--border-width) solid var(--button-edge); color: var(--text); font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 500; }
+.selected-chip-item[data-focus-visible] { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); }
+.selected-chip-item[data-dragging] { border-style: dashed; background: var(--fill-control-pressed); }
+.selected-chip-drop { flex: none; width: var(--focus-ring-width); height: var(--chip-height); margin-inline: calc((var(--space-1) + var(--focus-ring-width)) / -2); background: var(--clear); }
+.selected-chip-drop[data-drop-target] { background: var(--accent-text); }
 .selected-chip-item .chip-label { display: inline-flex; gap: var(--space-1); }
 .chip-author { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chip-year { flex: none; white-space: nowrap; }
 .chip-drag { flex: none; width: var(--chip-height); min-height: var(--chip-height); padding: 0; border: 0; background: var(--clear); color: var(--muted); }
+@media (pointer: coarse) {
+  .selected-chip-list { --chip-group-target: var(--touch-target); }
+}

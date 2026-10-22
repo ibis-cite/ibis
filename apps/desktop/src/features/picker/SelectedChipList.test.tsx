@@ -16,7 +16,7 @@ const record = (source: string, native_key: string): SearchResult => ({
   first_author: "Example", author_count: 1, year: 2026, matched: ["title"], container: null, item_type: "book",
 });
 const records = [record("first.bib", "a"), record("second.bib", "b"), record("first.bib", "c")];
-const [a, b] = records.map((item) => idKey(item.id)) as [string, string];
+const [a, b, c] = records.map((item) => idKey(item.id)) as [string, string, string];
 function mount() {
   vi.stubGlobal("ResizeObserver", class { observe() {} unobserve() {} disconnect() {} });
   Element.prototype.scrollIntoView = vi.fn();
@@ -68,12 +68,14 @@ test("Delete removes the focused identity and React Aria keeps focus in the rema
   const second = row(grid, "2026b"); act(() => second.focus());
   fireEvent.keyDown(second, { key: "Delete" });
   expect(removed).toHaveBeenCalledWith(new Set([b]));
-  await waitFor(() => expect(grid.contains(document.activeElement)).toBe(true));
+  await waitFor(() => expect((document.activeElement as HTMLElement).closest<HTMLElement>('[role="row"]')?.dataset.key).toBe(c));
   expect(within(grid).getByRole("button", { name: "Remove first.bib/c" })).toBeTruthy();
+  fireEvent.keyDown(document.activeElement!, { key: "Delete", repeat: true });
+  expect(removed).toHaveBeenLastCalledWith(new Set([c]));
   expect(parentKeys).not.toHaveBeenCalled();
 });
 
-test("composition, 229, repeat and modified keys cannot remove or reorder a different record", () => {
+test("composition, 229 and modified keys cannot remove or reorder a different record", () => {
   const { grid, removed, reordered, parentKeys } = mount();
   const second = row(grid, "2026b"); act(() => second.focus());
   fireEvent.compositionStart(second);
@@ -81,11 +83,24 @@ test("composition, 229, repeat and modified keys cannot remove or reorder a diff
   fireEvent.compositionEnd(second);
   fireEvent.keyDown(second, { key: "Delete", isComposing: true });
   fireEvent.keyDown(second, { key: "Delete", keyCode: 229 });
-  fireEvent.keyDown(second, { key: "Delete", repeat: true });
+  fireEvent.keyDown(second, { key: "ArrowUp", altKey: true, repeat: true });
   fireEvent.keyDown(second, { key: "Delete", ctrlKey: true });
   fireEvent.keyDown(second, { key: "ArrowUp", altKey: true, shiftKey: true });
   expect(removed).not.toHaveBeenCalled(); expect(reordered).not.toHaveBeenCalled();
   expect(parentKeys).not.toHaveBeenCalled();
   fireEvent.keyDown(second, { key: "Backspace" });
   expect(removed).toHaveBeenCalledWith(new Set([b]));
+});
+
+test("React Aria keyboard dragging delivers source-qualified reorder keys", async () => {
+  const { grid, reordered } = mount();
+  const handle = within(grid).getByRole("button", { name: "Reorder second.bib/b" });
+  act(() => handle.focus());
+  fireEvent.keyDown(handle, { key: "Enter" }); fireEvent.keyUp(handle, { key: "Enter" });
+  const beforeFirst = await screen.findByRole("button", { name: /^Insert before Example 2026a/ });
+  act(() => beforeFirst.focus());
+  expect(beforeFirst.closest(".selected-chip-drop")?.hasAttribute("data-drop-target")).toBe(true);
+  fireEvent.keyDown(beforeFirst, { key: "Enter" }); fireEvent.keyUp(beforeFirst, { key: "Enter" });
+  await waitFor(() => expect(reordered).toHaveBeenCalledWith(new Set([b]), a, "before"));
+  expect(within(grid).getAllByRole("row")[0]?.getAttribute("data-key")).toBe(b);
 });
