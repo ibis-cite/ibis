@@ -1415,7 +1415,7 @@ test.each(["pandoc", "autocite", "parencite", "textcite", "cite", "typst", "keys
     set_picker_preferences: ({ copyFormat }) => { if (copyFormat) remembered = copyFormat as string; return null; },
   });
   const first = render(<App />);
-  const select = screen.getByLabelText("Copy as") as HTMLSelectElement;
+  const select = await screen.findByLabelText("Copy as") as HTMLSelectElement;
   await waitFor(() => expect(select.value).toBe("typst"));
   fireEvent.change(select, { target: { value: choice } });
   await waitFor(() => expect(remembered).toBe(choice));
@@ -1442,7 +1442,7 @@ test("rapid A-B-A choices keep the last failed choice for retry without replayin
     },
   });
   render(<App />);
-  const select = screen.getByLabelText("Copy as") as HTMLSelectElement;
+  const select = await screen.findByLabelText("Copy as") as HTMLSelectElement;
   await waitFor(() => expect(select.value).toBe("typst"));
   fireEvent.change(select, { target: { value: "cite" } });
   await waitFor(() => expect(keys).toEqual(["cite"]));
@@ -1475,7 +1475,7 @@ test.each(["menu", "shortcut"])("%s Quit drains ordered format choices before ex
     set_picker_preferences: async ({ copyFormat }) => { keys.push(copyFormat); await (keys.length === 1 ? first : last); return null; },
   });
   render(<App />);
-  const select = screen.getByLabelText("Copy as") as HTMLSelectElement;
+  const select = await screen.findByLabelText("Copy as") as HTMLSelectElement;
   await waitFor(() => expect(select.value).toBe("typst"));
   fireEvent.change(select, { target: { value: "cite" } });
   await waitFor(() => expect(keys).toEqual(["cite"]));
@@ -1507,7 +1507,7 @@ test.each(["menu", "shortcut"])("%s Quit waits for the initial read, then saves 
     quit: () => { atQuit = { copy_format: rememberedKey, citation_style: rememberedStyle }; return null; },
   });
   render(<App />);
-  fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "cite" } });
+  fireEvent.change(await screen.findByLabelText("Copy as"), { target: { value: "cite" } });
   try {
     if (route === "menu") await chooseFromMore("Quit Ibis");
     else await act(async () => { fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "q", ctrlKey: true }); });
@@ -1557,7 +1557,7 @@ test("format, density and text size choices are saved without losing each other"
     set_picker_preferences: ({ preferences }) => { saved.push(preferences); return null; },
   });
   render(<App />);
-  const select = screen.getByLabelText("Copy as") as HTMLSelectElement;
+  const select = await screen.findByLabelText("Copy as") as HTMLSelectElement;
   await waitFor(() => expect(select.value).toBe("typst"));
   fireEvent.change(select, { target: { value: "style:ieee" } });
   await chooseFromMore("Rows: Comfortable");
@@ -1584,7 +1584,7 @@ test("a choice made while saved choices load is kept and saved, not replaced", a
     set_picker_preferences: ({ preferences, copyFormat }) => { saved.push(preferences); keys.push(copyFormat); return null; },
   });
   render(<App />);
-  const select = screen.getByLabelText("Copy as") as HTMLSelectElement;
+  const select = await screen.findByLabelText("Copy as") as HTMLSelectElement;
   fireEvent.change(select, { target: { value: "cite" } });
   await act(async () => { finish(); await loaded; });
   await waitFor(() => expect(saved).toEqual([{ citation_style: null, density: "compact", larger_text: false }]));
@@ -2588,7 +2588,7 @@ test.each(["style:ieee", "pandoc", "style:apa"])("changing format cancels a clic
     copy_citation: (args) => { output.push(args); return { text: "[@b]", warnings: [] }; },
   });
   render(<App />);
-  const control = screen.getByLabelText("Copy as") as HTMLSelectElement;
+  const control = await screen.findByLabelText("Copy as") as HTMLSelectElement;
   await waitFor(() => expect(control.value).toBe("style:apa"));
   fireEvent.click(await screen.findByText("Second"));
   // Returning to APA must not revive the earlier click either.

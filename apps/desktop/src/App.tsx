@@ -626,7 +626,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         expanded={results.length > 0}
         activeDescendant={results[active] ? `result-${active}` : undefined}
         format={format}
-        showFormat={Boolean(library?.has_snapshot)}
+        showFormat={library === null || Boolean(library?.has_snapshot)}
         styles={Boolean(cslItems && copyFormatted)}
         onFormatChange={chooseFormat}
         pinned={pinned}
@@ -641,9 +641,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       }} />
       {style && chosen.length > 0 && <FormatPreview style={style} shown={shown} focusable={selected.size > 0} />}
       <div className="results-area">
-        <div className="results-heading" aria-hidden="true">
+        {library?.has_snapshot && <div className="results-heading" aria-hidden="true">
           <span>{query ? pickerText.bestMatches : pickerText.references}</span><span>{results.length > 0 ? pickerText.resultCount(results.length) : ""}</span>
-        </div>
+        </div>}
         <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>
