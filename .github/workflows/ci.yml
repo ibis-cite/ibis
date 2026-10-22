@@ -117,6 +117,7 @@ jobs:
 
       - name: Decide which app checks must run
         id: classify
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}

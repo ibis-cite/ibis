@@ -11,6 +11,15 @@ const full = { native: true, web: true, nix: true };
 const row = (filename, previous_filename = null) => ({ filename, previous_filename, status: previous_filename ? "renamed" : "modified" });
 const pr = (files, expected = files.length) => classify("pull_request", expected, files);
 
+function workflowStep() {
+  const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
+  const step = workflow.match(/id: classify\n([\s\S]*?)\n  test:/)[1];
+  const shell = step.match(/^        shell: (\S+)$/m)?.[1];
+  assert.ok(shell === undefined || shell === "bash");
+  // GitHub adds pipefail only for an explicitly selected bash shell.
+  return { command: step.match(/        run: \|\n([\s\S]*)/)[1].replace(/^          /gm, ""), args: shell === "bash" ? ["-e", "-o", "pipefail"] : ["-e"] };
+}
+
 test("interface-only changes retain web checks without native jobs", () => {
   for (const path of ["apps/desktop/src/App.tsx", "apps/desktop/src/features/picker/PickerFooter.css", "apps/desktop/src/messages.ts", "apps/desktop/src/icon.svg", "apps/desktop/index.html", "apps/desktop/gallery.html", "scripts/gallery-contact-sheet.mjs", "scripts/gallery-geometry.mjs", "scripts/gallery-geometry.test.mjs"]) {
     assert.deepEqual(pr([row(path), row("docs/design.md")]), { native: false, web: true, nix: false }, path);
@@ -85,8 +94,7 @@ test("workflow retains web validation and gates native-only Windows bootstrap", 
 test("the real workflow shell falls back on failed reads or changing refs", { skip: process.platform === "win32" }, (t) => {
   const dir = mkdtempSync(join(tmpdir(), "ibis-ci-refs-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
-  const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
-  const command = workflow.match(/id: classify[\s\S]*?        run: \|\n([\s\S]*?)\n  test:/)[1].replace(/^          /gm, "");
+  const { command, args } = workflowStep();
   const fakeApi = `gh() {
     if [[ "$*" == *"/files"* ]]; then
       printf '%s\\n' "$METADATA"
@@ -99,12 +107,25 @@ test("the real workflow shell falls back on failed reads or changing refs", { sk
   }`;
   for (const scenario of ["valid", "changedrefs", "failedhead", "failedfiles", "partial", "malformed"]) {
     rmSync(join(dir, "read"), { force: true });
-    const result = spawnSync("bash", ["-e", "-o", "pipefail", "-c", `${fakeApi}\n${command}`], {
+    const result = spawnSync("bash", [...args, "-c", `${fakeApi}\n${command}`], {
       cwd: fileURLToPath(new URL("..", import.meta.url)), encoding: "utf8", timeout: 5000,
       env: { ...process.env, EVENT: "pull_request", EXPECTED: scenario === "partial" ? "2" : "1", EXPECTED_REFS: `${"a".repeat(40)}:${"b".repeat(40)}`, RUNNER_TEMP: dir, GITHUB_OUTPUT: join(dir, "output"), SCENARIO: scenario, METADATA: scenario === "malformed" ? "invalid-private-資料" : JSON.stringify(row("apps/desktop/src/App.tsx")) },
     });
     assert.equal(result.status, 0, scenario);
     assert.equal(result.stdout, scenario === "valid" ? "native=false\nweb=true\nnix=false\n" : "native=true\nweb=true\nnix=true\n", scenario);
     assert.equal(result.stderr, "", scenario);
+  }
+});
+
+test("a classifier crash fails the configured workflow shell, even after partial output", { skip: process.platform === "win32" }, (t) => {
+  const dir = mkdtempSync(join(tmpdir(), "ibis-ci-crash-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const { command, args } = workflowStep();
+  for (const partial of ["", "native=false\\nweb=false\\nnix=false\\n"]) {
+    const result = spawnSync("bash", [...args, "-c", `node() { printf '%b' "$PARTIAL"; return 17; }\n${command}`], {
+      cwd: fileURLToPath(new URL("..", import.meta.url)), encoding: "utf8", timeout: 5000,
+      env: { ...process.env, EVENT: "merge_group", RUNNER_TEMP: dir, GITHUB_OUTPUT: join(dir, "output"), PARTIAL: partial },
+    });
+    assert.equal(result.status, 17);
   }
 });
