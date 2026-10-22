@@ -11,7 +11,7 @@ export function ChipDisclosure({ label, triggerLabel, trigger, triggerRef, conte
   const composing = useRef(false);
   useEffect(() => { if (!isOpen) composing.current = false; }, [isOpen]);
   return <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
-    <Button ref={triggerRef} aria-label={triggerLabel} className="chip-disclosure-trigger">{trigger}</Button>
+    <Button ref={triggerRef} data-chip-disclosure="" aria-label={triggerLabel} className="chip-disclosure-trigger">{trigger}</Button>
     <Popover className="chip-disclosure" placement="top end">
       <div ref={contentRef}
         onCompositionStartCapture={() => { composing.current = true; }}

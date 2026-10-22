@@ -43,6 +43,7 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
   const chips = useRef<HTMLDivElement>(null);
   const measure = useRef<HTMLDivElement>(null);
   const more = useRef<HTMLButtonElement>(null);
+  const overflowSizes = useRef<HTMLDivElement>(null);
   const popup = useRef<HTMLDivElement>(null);
   const foldedFocus = useRef(false);
   const emptyFocus = useRef(false);
@@ -72,11 +73,13 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
       const capacity = Math.min(records.length, SHELF_CHIPS);
       let next = countOnly ? 0 : capacity;
       if (!countOnly && !(minimum > 0)) return;
+      // Each candidate has its own inert measurement. The currently rendered
+      // +N/count label cannot feed back into the next fitted count.
+      const overflowWidths = [...(overflowSizes.current?.children ?? [])].map((node) => node.getBoundingClientRect().width);
       for (; next > 0; next--) {
         const overflow = records.length > next || expanded;
-        if (overflow && !more.current) { next--; break; }
         const width = widths.slice(0, next).reduce((sum, width) => sum + width, 0) + Math.max(0, next - 1) * gap
-          + (overflow ? more.current!.getBoundingClientRect().width + gap : 0);
+          + (overflow ? (overflowWidths[next] ?? 0) + gap : 0);
         if (width <= available) break;
       }
       const hidden = [...(chips.current?.querySelectorAll<HTMLElement>("[data-chip-item]") ?? [])].slice(next);
@@ -87,9 +90,10 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
     fit();
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(fit);
     observer?.observe(band); observer?.observe(sizing);
+    for (const node of overflowSizes.current?.children ?? []) observer?.observe(node);
     window.addEventListener("resize", fit);
     return () => { observer?.disconnect(); window.removeEventListener("resize", fit); };
-  }, [selected, expanded, visibleChips]);
+  }, [selected, expanded]);
   useLayoutEffect(() => {
     if (foldedFocus.current && more.current) {
       foldedFocus.current = false;
@@ -132,6 +136,13 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
                 {labels.slice(0, SHELF_CHIPS).map((label, index) => <span className="shelf-label-measure" key={ids[index]}>
                   <span className="shelf-author-measure">{label.author}</span><bdi>{label.year}{label.letter}</bdi>
                 </span>)}
+              </div>
+              <div ref={overflowSizes} className="chip-fit-measure" aria-hidden="true" inert>
+                {Array.from({ length: Math.min(records.length, SHELF_CHIPS) + 1 }, (_, visible) => (
+                  <button key={visible} className="chip-disclosure-trigger" type="button" tabIndex={-1}>
+                    {visible === 0 || visible === records.length ? pickerText.chosenCount(records.length) : pickerText.moreChosen(records.length - visible)}
+                  </button>
+                ))}
               </div>
               {visibleChips > 0 && <SelectedChipList label={pickerText.selectedReferences} selected={selected} visibleCount={visibleChips} listRef={chips}
                 locale={document.documentElement.dir === "rtl" ? "ar-AE" : undefined} removeLabel={removeLabel}

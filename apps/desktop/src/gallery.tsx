@@ -64,7 +64,7 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
   }
   if (state.pinned) steps.push(() => press(search(), "P", { code: "KeyP", shiftKey: true, ...(navigator.platform.includes("Mac") ? { metaKey: true } : { ctrlKey: true }) }));
   if (state.chipsOpen) steps.push(() => {
-    const trigger = root.querySelector<HTMLButtonElement>(".chip-disclosure-trigger"); trigger?.focus(); trigger?.click();
+    const trigger = root.querySelector<HTMLButtonElement>("[data-chip-disclosure]"); trigger?.focus(); trigger?.click();
   });
   if (state.keys) steps.push(() => press(root.querySelector("main"), "?"));
   if (state.menuOpen) steps.push(() => root.querySelector<HTMLButtonElement>('footer button[aria-haspopup]')?.click());
@@ -120,7 +120,7 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
   const html = document.documentElement;
   const chosen = state.tray ?? 0;
   const inline = root.querySelectorAll('.shelf [data-chip-list] > [data-chip-item]').length;
-  const overflow = root.querySelector(".shelf-chips .chip-disclosure-trigger");
+  const overflow = root.querySelector(".shelf-chips [data-chip-disclosure]");
   const disclosed = document.querySelector<HTMLElement>('.chip-disclosure [role="dialog"]');
   const threshold = parseFloat(getComputedStyle(html).getPropertyValue("--chip-count-only-width"));
   const chipsReady = chosen === 0 ? !root.querySelector(".shelf-chips")

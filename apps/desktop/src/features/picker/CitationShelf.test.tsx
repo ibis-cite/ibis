@@ -24,7 +24,7 @@ const shelf = (props: Partial<Parameters<typeof CitationShelf>[0]>) => (
     style={null} keys shown={undefined} focusable={false} {...props} />
 );
 
-function layout() {
+function layout(countOnlyWidth = 40) {
   let width = 420; let scale = 1;
   const observations: { callback: () => void; nodes: Set<Element> }[] = [];
   vi.stubGlobal("innerWidth", 720);
@@ -49,7 +49,7 @@ function layout() {
     return style;
   });
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
-    const width = this.matches(".chip-disclosure-trigger") ? 40 : this.matches(".shelf-chip-minimum") ? 80 : this.matches(".shelf-author-measure") ? 42 : this.matches(".shelf-chip-measure bdi") ? 35 : this.matches(".shelf-chip-target, .chip-group-remove") ? 32 : 0;
+    const width = this.matches(".chip-disclosure-trigger") ? (this.textContent?.includes("references") ? countOnlyWidth : 40) : this.matches(".shelf-chip-minimum") ? 80 : this.matches(".shelf-author-measure") ? 42 : this.matches(".shelf-chip-measure bdi") ? 35 : this.matches(".shelf-chip-target, .chip-group-remove") ? 32 : 0;
     return new DOMRect(0, 0, width * scale, 24 * scale);
   });
   return { resize(next: number, larger = 1) {
@@ -108,6 +108,16 @@ test("under the count-only width no hidden inline chips remain in the keyboard c
   expect(within(dialog).getAllByRole("row")).toHaveLength(3);
 });
 
+test("growing from count-only measures the inline +N independently of the longer count label", () => {
+  const geometry = layout(240); vi.stubGlobal("innerWidth", 360);
+  render(shelf({ selected: chosen(Array.from({ length: 50 }, (_, i) => record(`k${i}`))) }));
+  expect(screen.queryByRole("grid")).toBeNull();
+  expect(screen.getByRole("button", { name: "Show all 50 selected references" }).textContent).toBe("50 references ›");
+  vi.stubGlobal("innerWidth", 720); geometry.resize(200);
+  expect(within(screen.getByRole("grid", { name: "Selected references" })).getAllByRole("row")).toHaveLength(1);
+  expect(screen.getByRole("button", { name: "Show all 50 selected references" }).textContent).toBe("+49");
+});
+
 test.each([false, true])("final removal returns owned inline/overflow focus to Search (overflow=%s)", async (overflow) => {
   layout(); if (overflow) vi.stubGlobal("innerWidth", 360);
   function Picker() {
@@ -148,7 +158,7 @@ test("proportional overflow digits cannot cycle the fitted count, and growth res
   vi.stubGlobal("innerWidth", 720);
   vi.stubGlobal("ResizeObserver", class {
     constructor(callback: () => void) { observers.push(callback); }
-    observe = vi.fn(); disconnect = vi.fn();
+    observe = vi.fn(); unobserve = vi.fn(); disconnect = vi.fn();
   });
   vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (this: HTMLElement) {
     return this.matches(".shelf-chips") ? width : 0;
