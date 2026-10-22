@@ -7,13 +7,13 @@
       "tabs": [
         {
           "identity": "[\"first.bib\",\"shared\"]",
-          "id": "react-aria5403848489-_r_0_-[\"first.bib\",\"shared\"]",
+          "id": "react-aria7598709286-_r_0_-[\"first.bib\",\"shared\"]",
           "role": "row",
           "label": "García 2021 ([\"first.bib\",\"shared\"])"
         },
         {
           "identity": null,
-          "id": "react-aria5403848489-_r_7_",
+          "id": "react-aria7598709286-_r_7_",
           "role": null,
           "label": "Remove [\"first.bib\",\"shared\"]"
         },
@@ -32,26 +32,26 @@
       ],
       "next": {
         "identity": "[\"second.bib\",\"shared\"]",
-        "id": "react-aria5403848489-_r_0_-[\"second.bib\",\"shared\"]",
+        "id": "react-aria7598709286-_r_0_-[\"second.bib\",\"shared\"]",
         "role": "row",
         "label": "García 2021 ([\"second.bib\",\"shared\"])"
       },
       "composingDidNotRemove": true,
       "removedMiddle": {
         "identity": "[\"first.bib\",\"quoted\\\"\\n]\"]",
-        "id": "react-aria5403848489-_r_0_-[\"first.bib\",\"quoted\\\"\\n]\"]",
+        "id": "react-aria7598709286-_r_0_-[\"first.bib\",\"quoted\\\"\\n]\"]",
         "role": "row",
         "label": "العربية 2020 ([\"first.bib\",\"quoted\\\"\\n]\"])"
       },
       "removedEnd": {
         "identity": "[\"first.bib\",\"shared\"]",
-        "id": "react-aria5403848489-_r_0_-[\"first.bib\",\"shared\"]",
+        "id": "react-aria7598709286-_r_0_-[\"first.bib\",\"shared\"]",
         "role": "row",
         "label": "García 2021 ([\"first.bib\",\"shared\"])"
       },
       "removedLast": {
         "identity": null,
-        "id": "react-aria5403848489-_r_0_",
+        "id": "react-aria7598709286-_r_0_",
         "role": "group",
         "label": "Chosen"
       },
@@ -72,13 +72,13 @@
       "tabs": [
         {
           "identity": "[\"first.bib\",\"shared\"]",
-          "id": "react-aria9788841989-_r_0_-[\"first.bib\",\"shared\"]",
+          "id": "react-aria3044331272-_r_0_-[\"first.bib\",\"shared\"]",
           "role": "row",
           "label": "García 2021 ([\"first.bib\",\"shared\"])"
         },
         {
           "identity": null,
-          "id": "react-aria9788841989-_r_7_",
+          "id": "react-aria3044331272-_r_7_",
           "role": null,
           "label": "Remove [\"first.bib\",\"shared\"]"
         },
@@ -97,26 +97,26 @@
       ],
       "next": {
         "identity": "[\"second.bib\",\"shared\"]",
-        "id": "react-aria9788841989-_r_0_-[\"second.bib\",\"shared\"]",
+        "id": "react-aria3044331272-_r_0_-[\"second.bib\",\"shared\"]",
         "role": "row",
         "label": "García 2021 ([\"second.bib\",\"shared\"])"
       },
       "composingDidNotRemove": true,
       "removedMiddle": {
         "identity": "[\"first.bib\",\"quoted\\\"\\n]\"]",
-        "id": "react-aria9788841989-_r_0_-[\"first.bib\",\"quoted\\\"\\n]\"]",
+        "id": "react-aria3044331272-_r_0_-[\"first.bib\",\"quoted\\\"\\n]\"]",
         "role": "row",
         "label": "العربية 2020 ([\"first.bib\",\"quoted\\\"\\n]\"])"
       },
       "removedEnd": {
         "identity": "[\"first.bib\",\"shared\"]",
-        "id": "react-aria9788841989-_r_0_-[\"first.bib\",\"shared\"]",
+        "id": "react-aria3044331272-_r_0_-[\"first.bib\",\"shared\"]",
         "role": "row",
         "label": "García 2021 ([\"first.bib\",\"shared\"])"
       },
       "removedLast": {
         "identity": null,
-        "id": "react-aria9788841989-_r_0_",
+        "id": "react-aria3044331272-_r_0_",
         "role": "group",
         "label": "Chosen"
       },
@@ -135,6 +135,10 @@
     {
       "qualification": "Negative context probe: DOM dir=rtl with en-US React Aria context",
       "next": "[\"first.bib\",\"quoted\\\"\\n]\"]"
+    },
+    {
+      "qualification": "Application idKey compatibility probe using the raw NUL-delimited identity",
+      "next": "second.bib\u0000shared"
     }
   ],
   "package_integrity": {
@@ -147,6 +151,7 @@
     "middle_focus_next": true,
     "end_focus_previous": true,
     "final_focus_empty_group": true,
-    "css_direction_alone_does_not_mirror_arrows": true
+    "css_direction_alone_does_not_mirror_arrows": true,
+    "raw_nul_delimited_identity_navigation": true
   }
 }
