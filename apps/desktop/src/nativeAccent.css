@@ -1,0 +1,21 @@
+/* Private inputs are unset until a validated native snapshot arrives. These
+   guards preserve all system pairs, including the gallery contrast preview. */
+:root { --native-accent-fill: initial; --native-accent-on: initial; --native-accent-light: initial; --native-accent-dark: initial; }
+@supports (color: light-dark(white, black)) {
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    :root[data-native-accent="true"]:not([data-gallery-theme]):not(.notice-window) {
+      --accent: var(--native-accent-fill);
+      --accent-text: light-dark(var(--native-accent-light), var(--native-accent-dark));
+      --text-on-accent: var(--native-accent-on);
+      --selected-background: var(--accent); --selected-text: var(--text-on-accent);
+    }
+    :root[data-native-accent="true"][data-platform="macos"]:not([data-gallery-theme]):not(.notice-window) {
+      --selected-background: var(--accent); --selected-text: var(--text-on-accent);
+      --focus-ring-color: var(--accent-text);
+    }
+  }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  :root, :root[data-platform] { --accent: Highlight; --accent-text: CanvasText; --text-on-accent: HighlightText; }
+}
+:root[data-gallery-theme="contrast"], :root[data-gallery-theme="contrast"][data-platform] { --accent: Highlight; --accent-text: CanvasText; --text-on-accent: HighlightText; }
