@@ -98,7 +98,9 @@ test("the required Web job renders the full browser gallery and keeps every fail
   assert.ok(step, "all gallery looks and states run inside the required Web job");
   assert.match(step, /if: env.WEB == 'true'/);
   assert.match(step, /shell: bash/);
-  assert.match(web, /container:\n      image: mcr\.microsoft\.com\/playwright:v1\.62\.1-noble@sha256:[a-f0-9]{64}/);
+  assert.match(web, /container:\n      image: mcr\.microsoft\.com\/playwright\/python:v1\.62\.0-noble@sha256:[a-f0-9]{64}/);
+  assert.ok(web.indexOf("- name: Set up Node.js") < web.indexOf("- name: Set up pnpm"), "the image supplies Python; Node/npm must precede pnpm");
+  assert.match(web, /cache_dependency_path: apps\/desktop\/pnpm-lock\.yaml/);
   assert.match(workflow, /needs: \[changes, test, web, desktop, fidelity, dependencies\]/);
   const command = step.match(/        run: \|\n([\s\S]*)/)[1].replace(/^          /gm, "");
   assert.doesNotMatch(command, /apt-get|install-deps|--with-deps/, "the preinstalled image needs no system-package installer");
@@ -114,7 +116,7 @@ test("the required Web job renders the full browser gallery and keeps every fail
     });
     assert.equal(result.status, expected, result.stderr);
     const log = readFileSync(calls, "utf8").trim().split("\n");
-    assert.match(log[0], /--ignore-scripts .*playwright@1\.62\.1$/);
+    assert.match(log[0], /--ignore-scripts .*playwright@1\.62\.0$/);
     assert.equal(log.length, install ? 1 : 2);
     if (!install) assert.equal(log[1], "node scripts/gallery-contact-sheet.mjs --no-build", "no look, text or state filter can omit a frame");
   }
