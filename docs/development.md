@@ -96,6 +96,8 @@ Version numbers, release and nightly titles, tags and download links follow [REL
 
 `node scripts/check.mjs` must pass locally. It checks GitHub Actions expressions with actionlint before the Rust and desktop checks, and runs every desktop crate test (`cargo test -p ibis-desktop`), which plain `cargo test` skips because the desktop crate is not a default workspace member. A failing check exits 1; a missing tool reports incomplete (exit 2) on every platform. It does not run the web builds that CI's Web interface job checks (`pnpm build`, and `pnpm exec vite build --mode evidence` for the screenshot gallery); run those in `apps/desktop` when you change the build setup.
 
+Interface-only pull requests run script tests, TypeScript, interface tests and both web builds, without native app builds or GUI checks. `scripts/ci-paths.mjs` lists those browser inputs; native, build and unknown paths retain native validation. Both names of a rename count. Missing, incomplete or changed API metadata enables every check. Documentation keeps its existing fast path; main and the merge queue always validate the complete app.
+
 ## Working quickly and safely
 
 - **Verify the exact commit.** Run the full check in a clean checkout of the commit. Use a fresh target directory as well: sharing a target across checkouts can reuse stale project test binaries (#387).
@@ -194,7 +196,7 @@ Choose a library from the picker or from the menu bar (tray) item. The choice an
 { "schema_version": 2, "shortcut": "CommandOrControl+Shift+Y", "library": { "bibtex": "/path/to/refs.bib" }, "copy_format": "pandoc", "citation_style": "apa", "density": "compact", "larger_text": true, "update_checks": false }
 ```
 
-Every field is optional. `citation_style`, `density` and `larger_text` remember the picker's style, row density and text size (ADR 0020); each is written only once chosen. A file from an earlier version (format 1, where `library` was a bare path) is read as before and upgraded on the next save, with the old file kept as `settings.json.bak` until the save after that; an older Ibis refuses the upgraded file rather than overwriting it (ADR 0018). On Windows, write the library path with forward slashes or doubled backslashes, as JSON requires. Edits made while the app runs are kept, and a file that cannot be read is reported and never overwritten.
+Every field is optional. `citation_style`, `density`, `larger_text` and `show_paste_preview` remember the picker's style, row density, text size and output visibility (ADR 0020); defaults stay unwritten. The preview is on unless `show_paste_preview` is `false`. A file from an earlier version (format 1, where `library` was a bare path) is read as before and upgraded on the next save, with the old file kept as `settings.json.bak` until the save after that; an older Ibis refuses the upgraded file rather than overwriting it (ADR 0018). On Windows, write the library path with forward slashes or doubled backslashes, as JSON requires. Edits made while the app runs are kept, and a file that cannot be read is reported and never overwritten.
 
 `citation_style` accepts `apa`, `chicago-author-date`, `harvard-cite-them-right`,
 `ieee` or `modern-language-association`; omitted or `null` uses `copy_format`.
