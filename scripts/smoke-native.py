@@ -3879,7 +3879,7 @@ $traceFunction=$ast.Find({param($node) $node -is [System.Management.Automation.L
 . ([scriptblock]::Create($traceFunction.Extent.Text))
 $script:ForegroundClock=[Diagnostics.Stopwatch]::StartNew()
 $Action='snapshot'; $AppId=$PID+2; $EditorId=$PID+1; $EditorStarted=100; $script:EditorTicks=100
-function Get-Process { [CmdletBinding()] param([int] $Id) [pscustomobject]@{StartTime=[DateTime]::new($script:EditorTicks)} }
+function Get-Process { [CmdletBinding()] param([int] $Id) [pscustomobject]@{StartTime=[DateTime]::new($script:EditorTicks,[DateTimeKind]::Utc)} }
 $originalError=[Console]::Error; $traceLog=[IO.StringWriter]::new(); [Console]::SetError($traceLog)
 try {
  [IbisSmoke]::Valid=$true; [IbisSmoke]::Visible=$false; [IbisSmoke]::Owner=$AppId
