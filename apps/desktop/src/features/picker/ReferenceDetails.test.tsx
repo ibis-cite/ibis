@@ -39,6 +39,13 @@ test("missing metadata uses the key and no-date label without empty separators",
   expect(document.querySelector(".reference-details")!.textContent).not.toContain("·");
 });
 
+test("whitespace-only metadata uses the key without blank paragraphs or separators", () => {
+  render(<ReferenceDetails reference={{ ...reference, title: " \n\t", authors: " \u00a0", container: "\t " }} />);
+  expect(screen.getByRole("heading", { name: reference.key })).toBeTruthy();
+  expect(document.querySelector(".reference-publication")!.textContent).toBe("2021");
+  expect([...document.querySelectorAll(".reference-details p")].every((p) => p.textContent!.trim())).toBe(true);
+});
+
 test("hostile and mixed-direction metadata remains isolated literal text", () => {
   const title = "العربية <img src=x onerror=alert(1)> " + "🔬".repeat(4096);
   render(<ReferenceDetails reference={{ ...reference, title, authors: "עברית & Latin", key: "مفتاح2021", year: 0 }} />);
