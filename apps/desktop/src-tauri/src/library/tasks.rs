@@ -13,7 +13,7 @@ use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_dialog::DialogExt;
 
 use crate::diagnostics::{NativeIssue, application_message, report};
-use crate::picker::{DialogKind, own_dialog, show_picker};
+use crate::picker::{ChooserOpen, show_picker};
 use crate::preferences::SettingsFile;
 use crate::tray::{LibraryMenuItem, library_line};
 
@@ -63,7 +63,7 @@ pub(super) fn publish_current_with(library: &Mutex<Library>, emit: impl FnOnce(L
     if let Ok(library) = library.lock() {
         // The interface note names the retained source. Log only the original
         // allowlisted messages, never the filename added for that interface.
-        if let Some(note) = &library.note {
+        if let Some(note) = &library.choice_save_warning {
             application_message(note);
         }
         if let Some(error) = library.retained_error {
@@ -236,7 +236,8 @@ fn run_open(app: &AppHandle, request: u64, source: Source, reload: bool, intent:
                 if app.state::<LoadRequests>().0.load(Ordering::SeqCst) == request && library.error.is_none() {
                     let saved = app.state::<SettingsFile>().update(|s| s.library = Some(chosen));
                     if let Err(e) = saved {
-                        library.note = Some(format!("the library opened but could not be saved for next time: {e}"));
+                        library.choice_save_warning =
+                            Some(format!("the library opened but could not be saved for next time: {e}"));
                         show_note = true;
                     }
                 }
@@ -272,7 +273,7 @@ pub(crate) fn choose_library_file(app: &AppHandle) {
     // The dialog belongs to the picker: show the picker (the request may come
     // from the tray), attach the dialog to it, and keep the picker open while
     // the dialog has the focus.
-    let Some(owner) = own_dialog(app, DialogKind::Chooser) else {
+    let Some(owner) = app.state::<ChooserOpen>().begin() else {
         return;
     };
     show_picker(app);
@@ -367,6 +368,9 @@ pub(crate) fn current_status(app: &AppHandle) -> LibraryStatus {
             source_counts: BTreeMap::new(),
             warnings: 0,
             error: Some("library state is unavailable".to_string()),
+            error_reason: None,
+            kept_references: false,
+            choice_not_saved: false,
             note: None,
             settings_notice: None,
             snapshot_zotero: false,
@@ -404,7 +408,7 @@ mod tests {
         let source = Source::Zotero(ZoteroLibrary::Group(7).into());
         let mut opened = candidate(source.clone(), ibis_core::bibtex::load_str("synthetic", "@misc{first}"));
         let note = "the library opened but could not be saved for next time: synthetic";
-        opened.note = Some(note.to_string());
+        opened.choice_save_warning = Some(note.to_string());
         let library = Mutex::new(opened);
         let requests = LoadRequests::default();
         let (check, _, _) = begin_check(&library, &requests).unwrap_or_else(|| panic!("quiet check"));
@@ -424,6 +428,7 @@ mod tests {
             .unwrap_or_else(|| panic!("recovery is current"));
         assert_eq!(retried, source);
         assert_eq!(recovered.references, 2);
+        assert!(recovered.choice_not_saved);
         assert_eq!(recovered.note.as_deref(), Some(note));
 
         let (request, _, _) = begin_open(&library, &requests, source.clone()).unwrap_or_else(|| panic!("reload"));
@@ -431,6 +436,7 @@ mod tests {
             .install(&library, &requests, request, changed())
             .unwrap_or_else(|| panic!("explicit reload is current"));
         assert_eq!(reloaded.references, 2);
+        assert!(!reloaded.choice_not_saved);
         assert!(reloaded.note.is_none(), "explicit Reload retains its existing behavior");
     }
 
