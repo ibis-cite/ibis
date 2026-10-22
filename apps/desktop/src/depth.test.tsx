@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { App } from "./App";
 import { galleryProvider, galleryStates } from "./gallery-fixtures";
 import { EmptyState } from "./features/picker/EmptyState";
@@ -101,7 +101,8 @@ test.each(["macos", "windows", "linux"])("%s paints one real shelf and preserves
 test.each(["macos", "windows", "linux"])("%s keeps neutral labels readable without replacing action, writing-choice or disabled roles", async (platform) => {
   document.documentElement.dataset.platform = platform;
   render(<App {...galleryProvider(state("first-run-found"))} />);
-  await waitFor(() => expect(document.querySelectorAll(".writing-choice").length).toBeGreaterThan(1));
+  await screen.findByText("research.bib");
+  expect(document.querySelectorAll(".writing-choice").length).toBeGreaterThan(1);
   for (const button of document.querySelectorAll(".suggested-action, .writing-choice")) expect(matchingPaint(button)).toEqual([]);
   const track = document.querySelector(".setup-writing .setup-choices")!;
   expect(matchingPaint(track).some((rule) => rule.style.getPropertyValue("color") === "var(--text)")).toBe(true);
