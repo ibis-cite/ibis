@@ -675,6 +675,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         </p>
       )}
       <PickerHeader
+        pinned={pinned} onTogglePin={() => { togglePin(); input.current?.focus(); }}
         inputRef={input}
         query={query}
         onQueryChange={(value) => {
@@ -760,9 +761,8 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       }} style={style} keys={keyFormat !== null}
         shown={displayedOutput} focusable={selected.size > 0} outputRef={outputRef} />
       <PickerFooter library={library} groupName={groupName}
-        pinned={pinned} onUnpin={() => { togglePin(); input.current?.focus(); }}
         hints={{ enter: enterAction, shiftEnter: shiftEnterAction, escape: escapeAction }}
-        altHeld={altHeld} actions={{ copy: () => { void copy(); }, add: toggleHighlighted, escape: escapeStep }}
+        altHeld={altHeld} actions={{ copy: () => { void copy(); }, add: toggleHighlighted, escape: escapeStep, keys: openKeys }}
         more={
           <PickerMenu isOpen={menuOpen} onOpenChange={(open) => (open ? openMore() : closeMenu(false))}
             buttonRef={moreButton} searchRef={input} library={library} libraryDetail={libraryDetail}
@@ -772,7 +772,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               name: (choice) => (typeof choice === "object" ? groupName(choice.group) : pickerText.myLibrary),
               toggle: toggleLibrary,
             } : null}
-            density={density} largerText={largerText} pinned={pinned} showPastePreview={showPastePreview}
+            density={density} largerText={largerText} showPastePreview={showPastePreview}
             startAtLogin={loginItemOffered && startAtLogin ? { item: startAtLogin, toggle: toggleStartAtLogin } : null}
             actions={{
               choose: () => runFromMenu("choose", chooseLibrary),
@@ -780,7 +780,6 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               reload: () => runFromMenu("reload", reloadLibrary),
               density: changeDensity,
               largerText: toggleLargerText,
-              pin: togglePin,
               preview: togglePastePreview,
               keys: openKeys,
               quit: () => runFromMenu("quit", quitAfterSaving),

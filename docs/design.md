@@ -183,7 +183,7 @@ symbolic masters. How the assets are regenerated is in the
 | Switch | 38 × 22, the regular `NSSwitch` size | 40 × 20, outlined when off | 46 × 26 |
 | Copied | Pill near the top of the screen | Notice bottom-right | Toast at the bottom |
 
-On macOS, use WebKit's paired selected-content background and alternate-selected text when both are supported. `AccentColorText` can resolve to black even on saturated blue; keyword support alone does not establish a native pair or custom-accent following. Generic fallbacks remain for other engines, and increased contrast and forced colours retain their system Highlight pair.
+On macOS, use WebKit's paired selected-content background and alternate-selected text when both are supported. `AccentColorText` can resolve to black even on saturated blue; keyword support alone does not establish a native pair or custom-accent following. Other engines use each OS’s default accent: macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF and Adwaita #3584E4 / #78AEED (light / dark). Windows and Adwaita use dark text on their bright defaults in dark mode. Native keywords still win; increased contrast and forced colours retain their system Highlight pair.
 
 The Linux selected row uses the full selection colour rather than a tint: focus
 stays in the search box while ↑ ↓ move the selection, so the fill is the only
@@ -229,7 +229,7 @@ list, preview and tray) from a control layer (search and format).
 | Search box | Always | The largest element, focused on open. Its placeholder lists what can be searched. |
 | Format (for example "Pandoc ⌃⌄" on macOS) | Once a library is chosen | What is pasted depends on it. One word, no icon; each platform's pop-up button (see **Header**). "Key formats" and "Citation styles" show real samples and a leading check; unavailable styles stay focusable; typing filters. |
 | More (Ctrl/⌘ K) | Always | The one door to every other action; each shows its shortcut, so the menu is also the cheat sheet. In the footer it reads "More ⌘K", like the hints beside it (see **Footer**). |
-| Keep Window Open | In More | Checkable, with ⌘⇧P on macOS and Ctrl+Shift+P elsewhere. Only while kept open, a visible footer pin offers “Kept open; click to stop”. The first outside-click tip is planned for 0.3 (#571/#572), naming the action and shortcut. |
+| Keep Window Open | Always in the header | Neutral pin toggle, with ⌘⇧P on macOS and Ctrl+Shift+P elsewhere. The filled glyph and neutral selected fill show that it is kept open. The first outside-click tip is planned for 0.3 (#571/#572), naming the action and shortcut. |
 | Filter chips | Once added | `#tag`, `y:2019-2022` or `a:name` followed by a space becomes a removable chip. Backspace in an empty box removes the last one. |
 | Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab reaches the current browsing tab; ← and → choose another (see **Keyboard focus order**). |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter, or Tab while the suggestions are open, picks the first. |
@@ -241,7 +241,7 @@ list, preview and tray) from a control layer (search and format).
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
 | Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows: a plus, or a check on a row already added. A row in the citation always shows a scarlet tile with a white check, the only scarlet on the row. A 32 px pointer target with its name in the tooltip ("Add García 2021 to citation"); it adds no Tab stop, because a listbox option holds no controls, and keyboards use Shift+Enter. |
 | Citation shelf | Once a reference is highlighted or added | One quiet card above the footer's Copy action ([design/preview.md](design/preview.md)): the chosen references as author-year chips (at most six, then "+N", which shows them all), then the exact text Enter pastes on one line, in text colours with one scarlet quote mark. Results never move when a reference is added. Page numbers come later (#24). |
-| Footer key hints | Always | What Enter does now and More, label first and keys after (see **Footer**). |
+| Footer key hints | Always | What Enter does now, Shortcuts and More, label first and keys after (see **Footer**). |
 | Footer tip | One at a time | Tied to what the user is doing, retired once they have done it. Otherwise the footer shows library status. |
 | Library status | Always, quietly | A dot, the source and the count; the age only when it is news or a warning (see below). A sentence above the list only when something needs the user. |
 
@@ -294,13 +294,13 @@ new, from the design-system foundations, and are defined here:
 **Edges.** Visible edges line up with the content; hit targets may overhang
 them. The leading edge is the tile column (`inset + row-pad`), the text column
 starts at `text x`, and the trailing edge is where row text ends
-(`W − inset − row-pad`). The last header selector, the last key cap in the footer and
+(`W − inset − row-pad`). The header pin glyph, the last key cap in the footer and
 the year column all end on that trailing edge; a 32 px target around a 20 px
 glyph overhangs it by 6 px. Controls in one bar share a centre line, and text
 in one bar shares a baseline.
 
 **Header.** In order: search glyph, query, clear button, the header menus
-(format, then library scope when there is one). No pin or empty slot follows them.
+(format, then library scope when there is one), then Keep Window Open.
 
 - **Clear (×).** Inside the field at its trailing end, only while there is a
   query: a 16 px glyph in a 32 px target, secondary colour. Its name is
@@ -335,9 +335,13 @@ in one bar shares a baseline.
   `aria-expanded`; items are `menuitemradio` with `aria-checked`. While no
   library is chosen the header menus are hidden, because first-run setup asks
   the same question in its own words.
-- **Keep Window Open.** A checkable action in More, with ⌘⇧P on macOS and
-  Ctrl+Shift+P elsewhere. While on, a pin in the footer status area is a
-  button named “Kept open; click to stop”; it unpins and returns focus to search.
+- **Keep Window Open.** Always visible after the header menus, with ⌘⇧P on
+  macOS and Ctrl+Shift+P elsewhere. A neutral icon toggle named "Keep Window
+  Open", with `aria-pressed`: outline glyph at rest, filled glyph on the
+  selected-control fill while kept open. Text colours, never accent; only
+  keyboard focus draws a ring. Clicking it returns focus to Search. The
+  tooltip while selected says "Kept open; click to stop". No duplicate in
+  More or the footer.
 - **Targets.** Every header control keeps a 32 px target (44 px under
   `pointer: coarse`), even where it draws 28 px.
 
@@ -349,21 +353,20 @@ nothing holds focus:
    open, when Tab picks the first (as a combo box's autocomplete does).
    Escape closes suggestions without clearing the query; Tab then leaves the
    box. Suggestions stay closed until the query changes.
-2. The header toolbar (`role="toolbar"`, named "Search options"): one stop;
-   ← and → move between the format menu and the scope menu (WAI-ARIA
-   toolbar pattern).
+2. The header format menu, then Keep Window Open. A future library-scope
+   menu precedes Keep Window Open.
 3. The browsing tabs, only while visible: one stop on the current tab in a
    `tablist` named "Browse references". Each `tab` has `aria-selected` and
    names its result `tabpanel`; only the current tab has `tabindex="0"`.
    ← and → focus and choose the previous or next tab, wrapping at the ends;
    Home and End choose the first or last. These keys apply only while a tab
    has focus, leaving text editing and attachment preview in the search box
-   unchanged. Tab leaves for the footer pin when present, then More;
-   Shift+Tab returns to the header toolbar.
+   unchanged. Tab leaves for the footer actions;
+   Shift+Tab returns to Keep Window Open.
    Clicking or tapping a tab chooses the same view. There is no required
    Ctrl+Tab shortcut: ordinary Tab followed by arrow keys is the keyboard
    route on every platform, including when browser accelerators are consumed.
-4. The footer unpin button, only while kept open, then More.
+4. The footer actions, then More.
 
 The result list is not a stop: ↑ and ↓ in the search box move through it
 (`aria-activedescendant`). Inside an open menu, Tab closes the menu and moves
@@ -377,12 +380,12 @@ its keys**, 8 px between them, 16 px between hints, all at 12 px on one
 baseline, each key cap 20 px high and centred on it.
 
 - **Order.** What Enter does now ("Copy as Pandoc ↵", the primary hint, in the
-  text colour), then "More ⌘K" (secondary). The
+  text colour), then "Shortcuts ⌘/", then "More ⌘K" (both secondary). The
   hint that comes and goes is first, so the cluster's trailing end never moves.
   With Alt held: "Add to citation ⇧↵", then the Escape step ("Clear search
   Esc" or "Hide Esc"), then More.
 - **Actions** are quiet buttons, including Copy, the alternate Add/Remove and
-  Escape step and More. Their labels match their accessible names;
+  Escape step, Shortcuts and More. Their labels match their accessible names;
   decorative caps are hidden from screen readers and `aria-keyshortcuts`
   names the keys. They invoke the same guarded actions as the keyboard.
   The quiet fill is drawn 28 px high in the 40 px footer, with a
@@ -390,17 +393,20 @@ baseline, each key cap 20 px high and centred on it.
   Targets wrap without overlap; the footer grows when needed. More has
   `aria-haspopup="menu"`, `aria-expanded` and `aria-keyshortcuts`; its caps
   are hidden from screen readers.
-- **Keyboard shortcuts** stays in More, and ⌘/ or Ctrl+/ and ? still open the
-  list. Changing shortcuts belongs to the settings design.
+- **Shortcuts** opens the keyboard shortcuts list. The name matches each system's own term (macOS and
+  Windows both say "Keyboard shortcuts"); the footer shortens it to one word,
+  and More and the list's title say it in full. Changing shortcuts belongs to
+  the settings design, not to this list.
 - **Screen readers** hear the actions in one group named "Keys". Buttons stay
   visible and reachable when focus leaves Search; Enter then presses the
   focused button. Copy is offered only when its current output is ready.
 - **Fit before wrapping.** Measure the actual controls and key caps, including
-  the pin and the current Copy label. When they do not fit, shorten the library
-  status using its existing ellipses and full tooltip. Only then wrap, keeping
-  8 px above and below. Restore status space when the contents fit again;
-  width, text size, platform and format labels all affect this decision.
-  Search and unrelated controls keep their focus.
+  the current Copy label. When they do not fit, drop Shortcuts first
+  (More still lists it), then shorten the library status using its existing
+  ellipses and full tooltip. Only then wrap, keeping 8 px above and below.
+  Restore the hint and status space when the contents fit again; width, text
+  size, platform and format labels all affect this decision. A folded focused
+  Shortcuts action returns focus to More; Search and unrelated controls keep it.
   If the footer still changes height, the local results scroller keeps the
   highlighted row visible only while Search owns keyboard navigation. Pointer
   choices and another focused control do not make the list move.
@@ -469,7 +475,7 @@ Settings window will use.
    row), off until turned on.
 
 "Look again" is a text button under the group. The footer shows "No library
-chosen" and More, so nothing else changes once a library opens.
+chosen", Shortcuts and More, so nothing else changes once a library opens.
 
 **Selection and focus.** One rule set for every control:
 

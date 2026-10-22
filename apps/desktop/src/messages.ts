@@ -197,6 +197,7 @@ export const keyText = {
     menuLeave: "Leave the menu and return to the search",
     open: "Open Ibis",
   },
+  allKeys: "Shortcuts",
   footer: "Keys",
   copy: "Copy",
   copyAs: (format: string) => `Copy as ${format}`,

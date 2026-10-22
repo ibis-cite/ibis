@@ -78,14 +78,14 @@ test("the selected row follows each platform", () => {
   expect(tokens).toMatch(/--row-active-background:\s*var\(--selected-background\)/);
   expect(tokens).toMatch(/--selected-background:\s*AccentColor/);
   expect(tokens).toMatch(/--selected-text:\s*AccentColorText/);
-  // Windows: soft grey with an accent pill; Linux: GTK's selection colour (the Highlight pair).
+  // Windows: soft grey with an accent pill; Linux: the same full accent pair.
   expect(rules(tokens, ':root[data-platform="windows"]')).toMatch(/--row-active-background:\s*color-mix\(in srgb, var\(--text\)/);
   expect(rules(styles, ':root[data-platform="windows"] [role="option"][data-active]::before')).toMatch(/background:\s*var\(--accent\)/);
   const linux = rules(tokens, ':root[data-platform="linux"]');
-  expect(linux).toMatch(/--row-active-background:\s*Highlight;/);
-  expect(linux).toMatch(/--row-active-text:\s*HighlightText;/);
+  expect(linux).toMatch(/--row-active-background:\s*var\(--selected-background\);/);
+  expect(linux).toMatch(/--row-active-text:\s*var\(--selected-text\);/);
   // No later Linux rule turns it back into a faint tint or neutral fill.
-  expect(linux.slice(linux.indexOf("Highlight;"))).not.toMatch(/--row-active-background/);
+  expect(linux.slice(linux.indexOf("--row-active-background:") + "--row-active-background:".length)).not.toMatch(/--row-active-background/);
 });
 
 test("high contrast keeps a non-colour edge on the active row", () => {
@@ -216,7 +216,7 @@ test("scarlet marks only the citation: copied text and the shelf's quote mark", 
   }
   // The shelf's output and chips use text colours (docs/design/preview.md).
   expect(scarlet).not.toMatch(/preview-text|\.chip/);
-  // Selection, the pin and the main controls keep the system accent.
+  // Selection and primary controls use the system accent; the pin stays neutral.
   expect(scarlet).not.toMatch(/button|\.search-bar|::before|\[role="option"\]\[data-active\]\s*(,|$)/);
   // Contrast and forced colours fall back to CanvasText.
   for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
@@ -466,7 +466,7 @@ const pair = (token: string) => tokens.match(new RegExp(`${token}:\\s*light-dark
 
 test("macOS and Linux focus rings reach 3:1 on the surface with the default accent", () => {
   const [surface, text] = [pair("--surface"), pair("--text")];
-  const accents = { macos: ["#007aff", "#0a84ff"], linux: ["#3584e4", "#3584e4"] };
+  const accents = { macos: ["#007aff", "#0a84ff"], linux: ["#3584e4", "#78aeed"] };
   for (const mode of [0, 1]) {
     expect(ratio(hex(accents.macos[mode]!), surface[mode]!), `macOS ${mode}`).toBeGreaterThanOrEqual(3);
     // Linux: the accent mixed half toward the text colour, as the token says.
@@ -478,7 +478,7 @@ test("macOS and Linux focus rings reach 3:1 on the surface with the default acce
 test("the Linux active row stands out 3:1 from neighbouring rows with Adwaita's accent", () => {
   // GTK's selection colour is the accent (Adwaita #3584e4); neighbours are the surface.
   const surface = pair("--surface");
-  for (const mode of [0, 1]) expect(ratio(hex("#3584e4"), surface[mode]!), `mode ${mode}`).toBeGreaterThanOrEqual(3);
+  for (const mode of [0, 1]) expect(ratio(hex(["#3584e4", "#78aeed"][mode]!), surface[mode]!), `mode ${mode}`).toBeGreaterThanOrEqual(3);
   // libadwaita's 25% tint would not: the reason the full selection colour is used.
   expect(ratio(mix(hex("#3584e4"), surface[0]!, .25), surface[0]!)).toBeLessThan(3);
 });
@@ -802,4 +802,22 @@ test("spacing audits resolve aliases and calc without exempting arbitrary one-pi
     expect(gridPixels(resolveToken("max(var(--space-1), calc(var(--chip-group-target) - var(--chip-height)))", scope)!)).toBe(gap);
   }
   expect(opticalSpacing({ file: "fixture", selector: ".other", scope: "root", values: [] }, "padding", "1px")).toBeFalsy();
+});
+
+test("unsupported native accent keywords use each platform's light and dark defaults", () => {
+  for (const [platform, pair] of Object.entries({
+    macos: "#007aff, #0a84ff", windows: "#005fb8, #60cdff", linux: "#3584e4, #78aeed",
+  })) expect(rules(tokens, platform === "macos" ? ":root" : `:root[data-platform="${platform}"]`))
+    .toContain(`--accent-fallback: light-dark(${pair})`);
+  expect(tokens).toMatch(/--selected-background:\s*var\(--accent\)/);
+  expect(tokens).toContain("@supports (color: AccentColor)");
+});
+
+test("bright Windows and GNOME dark defaults pair with readable dark text", () => {
+  for (const platform of ["windows", "linux"]) {
+    const block = rules(tokens, `:root[data-platform="${platform}"]`);
+    expect(block).toContain("--on-accent-fallback: light-dark(#fff, #000)");
+    const dark = block.match(/--accent-fallback:\s*light-dark\(#[0-9a-f]{6},\s*(#[0-9a-f]{6})\)/)![1]!;
+    expect(ratio(hex(dark), hex("#000000"))).toBeGreaterThanOrEqual(4.5);
+  }
 });

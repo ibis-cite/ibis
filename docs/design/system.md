@@ -1,9 +1,9 @@
 # Design system foundations
 
-This page holds the tokens, shapes, states and components every Ibis window
-uses. It builds on [design.md](../design.md) (the picker spec), ADR 0021 (React
-Aria plus three CSS token layers), `apps/desktop/src/tokens.css` and the soft
-depth look (variant B, branch `design/depth-prototype`). Where it disagrees with
+This page is the single source of truth for the tokens, shapes, states and
+components every Ibis window uses. [design.md](../design.md) applies it to the
+picker. ADR 0021 defines React Aria and three CSS token layers;
+`apps/desktop/src/tokens.css` supplies their values. Where it disagrees with
 an accepted ADR, the ADR wins. The Settings window and shortcut recorder are in
 [settings.md](settings.md); the citation shelf is in [preview.md](preview.md).
 Work is tracked in #761–#775.
@@ -28,7 +28,7 @@ browser comparisons verify the winning values and rendered appearance.
 | D3 | **Per-OS radius values:** macOS 15: win 12, control 6, menu 8 (verify). macOS 26: win 28, control capsule in the header, 8 in content, menu 12. Windows 11: win/overlay/card 8, control/row/tile 4. GNOME (libadwaita 1.8+ look): win/card 15, derived row 7, control/tile 6, popover 12. | `--r-*` |
 | D4 | **Surfaces are four layers:** `--surface-window` (base) < `--surface` (content sheet) < `--surface-raised` (band, cards, shelf) < `--surface-overlay` (menus, popovers, dialogs). Values from soft depth B. | §2 |
 | D5 | **Text has four levels:** `--text`, `--muted` (secondary, always 4.5:1), `--text-tertiary` (icons at rest, placeholder hints, 3:1 minimum, never for sentences), `--text-disabled`. | |
-| D6 | **Accent is always the system's.** `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. On Windows and GNOME the accent is injected from Rust (#763). | |
+| D6 | **Accent is always the system's.** Native keywords win; unsupported engines use macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF, Adwaita #3584E4 / #78AEED (light / dark). Windows and Adwaita pair their bright defaults in dark mode with dark text. `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. On Windows and GNOME the accent is injected from Rust (#763). | |
 | D7 | **Selection is a fill, never a ring.** macOS and GNOME: full accent fill with `--text-on-accent`. Windows: subtle fill plus a 3 × 16 px accent pill. `--row-inactive-background` for a kept-open picker that lost focus. Menu highlight: accent fill on macOS, subtle fill on Windows and GNOME. | `--row-active-*`, `--menu-highlight*` |
 | D8 | **Focus ring only on keyboard focus** (`:focus-visible` / `data-focus-visible`). macOS: 2 px accent, 1 px gap. Windows: 2 px text-colour outer, 1 px surface inner. GNOME: 2 px half-accent mixed to 3:1, drawn **inside** (offset −2 px) so scroll containers never clip it. Contrast modes: 2 px `CanvasText`. | `--focus-ring-*` |
 | D9 | **Scarlet marks the citation only:** the shelf's quote mark, the added tile and the logo. The citation's text is in the text colour ([preview.md](preview.md)). Never on a control, link, toggle, progress, badge, selection, focus or error. On an accent-filled selected row the added tile becomes a `--text-on-accent` tile with a scarlet check, so a red or orange accent never meets scarlet fill-on-fill. | `--citation`, `--citation-tile` |
@@ -445,7 +445,7 @@ loops except a busy indicator.
 | Button, primary | `--accent` + `--text-on-accent` | accent 92 % mixed to text | accent 84 % | | ring | `--fill-disabled`, `--text-disabled` |
 | Button, secondary | `--fill-control` (+ Windows stroke) | `-hover` | `-pressed` | `aria-pressed`: `--fill-control-pressed` | ring | as above |
 | Button, quiet | none, `--muted` | `--fill-subtle-hover`, `--text` | `--fill-subtle-pressed` | accent glyph | ring | `--text-disabled` |
-| Icon button | as quiet, 32 × 32 | | | filled glyph | ring | |
+| Icon button | as quiet, 32 × 32 | | | filled glyph on `--fill-control-pressed`, neutral `--text` | ring | `--text-disabled`, `--fill-disabled` |
 | Pop-up | quiet in the header, secondary in Settings | | open: pressed fill | | ring | |
 | Menu item | none | `--menu-highlight` (pointer and arrows alike) | same | leading ✓ | the highlight is the focus | `--text-disabled`, reachable |
 | Segmented control | track `--fill-control` | segment `--fill-subtle-hover` | | thumb `--surface-raised` + `--shadow-card` (mac, Windows), `--fill-control-pressed` (GNOME) | ring on the group | |
