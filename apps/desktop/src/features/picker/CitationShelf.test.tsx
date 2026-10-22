@@ -220,9 +220,9 @@ test("the beak quote is decorative, unfocusable and confined to the output line"
 test("RTL mirrors the beak through its HTML shelf direction", () => {
   const sheet = document.createElement("style");
   sheet.textContent = readFileSync(new FileURL("./CitationShelf.css", import.meta.url), "utf8");
-  // Chromium does not match :dir on this SVG, although jsdom does.
-  // Resolve direction on the HTML shelf to keep browser mirroring reliable.
-  expect(sheet.textContent).toContain(".shelf:dir(rtl) .shelf-mark");
+  // The build lowers :dir(rtl) to :lang(...), which misses explicit RTL
+  // in an English UI. Keep the direction attribute in the built selector.
+  expect(sheet.textContent).toContain('[dir="rtl"] .shelf-mark');
   document.head.append(sheet);
   try {
     const { container } = render(<div dir="rtl">{shelf({ shown: { markup: [], text: "Synthetic citation", html: "", warnings: [] } })}</div>);

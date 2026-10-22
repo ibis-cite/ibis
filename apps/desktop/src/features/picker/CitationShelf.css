@@ -6,4 +6,4 @@
    Keep the full column width so the text stays on the result-title edge.
    The 20 px glyph scales with text inside the existing 40 px output line. */
 .shelf .shelf-mark { height: var(--space-5); }
-.shelf:dir(rtl) .shelf-mark { transform: scaleX(-1); }
+[dir="rtl"] .shelf-mark { transform: scaleX(-1); }
