@@ -111,7 +111,9 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
     && (menu !== null) === Boolean(state.menuOpen)
     && (root.querySelector('[role="dialog"]') !== null) === Boolean(state.keys)
     && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li`).length === (state.tray ?? 0)
-    && (!state.formatted || root.querySelector(".format-preview .preview-text") !== null)
+    && (!state.formatted || (state.showPastePreview === false
+      ? root.querySelector(".format-preview") === null && root.querySelector('footer [aria-keyshortcuts="Enter"]') !== null
+      : root.querySelector(".format-preview .preview-text") !== null))
     && selectionContained(root, state);
 }
 

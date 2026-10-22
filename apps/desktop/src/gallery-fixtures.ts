@@ -26,6 +26,7 @@ export type GalleryState = {
   menuOpen?: boolean;
   tray?: number;
   formatted?: boolean;
+  showPastePreview?: boolean;
   keys?: boolean;
 };
 
@@ -152,6 +153,8 @@ export const galleryStates: readonly GalleryState[] = [
     references: 2, error: "The library file is unavailable; keeping the last loaded references" }), query: "memory", results: examples.slice(0, 2), menuOpen: true },
   { id: "pinned", label: "Pinned", library: library(), query: "memory", results: examples, pinned: true },
   { id: "menu-open", label: "More menu open", library: library(), query: "memory", results: examples, menuOpen: true },
+  ...[true, false].map((showPastePreview) => ({ id: `preview-${showPastePreview ? "on" : "off"}`, label: `Citation output ${showPastePreview ? "shown" : "hidden"}`,
+    library: library(), query: "memory", results: examples, tray: 2, pinned: true, formatted: true, showPastePreview })),
   ...[20, 40, 50].map((count) => ({ id: `tray-${count}`, label: `${count} long keys selected`,
     library: library({ references: 50 }), query: "selection", results: largeSelection, tray: count, pinned: true })),
   { id: "tray-preview", label: "50 selected with formatted preview", library: library({ references: 50 }), query: "selection",
@@ -170,14 +173,14 @@ export function galleryProvider(state: GalleryState): { api: PickerApi; preview:
       libraryStatus: async () => state.library,
       search: async () => ({ revision: state.library.revision, results: state.results ?? [] }),
       copyCitation: async (ids) => ({ text: (state.tray ?? 0) >= 20 ? `[@${ids.map((id) => id.native_key).join("; @")}]` : "[@example2026]", warnings: [] }),
-      ...((state.tray ?? 0) >= 20 ? {
+      ...((state.tray ?? 0) >= 20 || state.formatted ? {
         cslItems: async (ids: Parameters<NonNullable<PickerApi["cslItems"]>>[0]) => JSON.stringify(ids.map((id) => ({
           id: id.native_key, type: "book", title: "Synthetic preview pressure", author: [{ family: id.native_key }], issued: { "date-parts": [[2026]] },
         }))),
         copyFormatted: async () => null,
       } : {}),
       copyFormat: async () => "pandoc",
-      pickerPreferences: async () => ({ citation_style: state.formatted ? "apa" : null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false, show_paste_preview: true }),
+      pickerPreferences: async () => ({ citation_style: state.formatted ? "apa" : null, density: state.density ?? "comfortable", larger_text: state.largerTextSetting ?? false, show_paste_preview: state.showPastePreview ?? true }),
       setPickerPreferences: async () => null,
       shortcutStatus: async () => ({ shortcut: "Ctrl+Shift+Y", registered: true, error: null }),
       chooseLibrary: async () => undefined,

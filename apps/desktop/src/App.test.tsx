@@ -1558,6 +1558,109 @@ test("format, density and text size choices are saved without losing each other"
   expect(document.documentElement.dataset.density).toBe("spacious");
 });
 
+test("hiding output keeps chips and pending copy checks, and remembers the choice on restart", async () => {
+  const formatter = await import("./format/formatted");
+  const output = { markup: ["(Smith, 2020)"], text: "(Smith, 2020)", html: "(Smith, 2020)", warnings: [] };
+  let finish!: () => void;
+  const pending = new Promise<void>((resolve) => { finish = resolve; });
+  const format = vi.spyOn(formatter, "formatCitation").mockImplementation(async () => { await pending; return output; });
+  const copies = vi.fn(() => null);
+  let shown = true;
+  backend({
+    search: () => [result("a", "First")], csl_items: () => "[]", copy_formatted: copies,
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false, show_paste_preview: shown }),
+    set_picker_preferences: ({ preferences }) => { shown = (preferences as api.PickerPreferences).show_paste_preview; return null; },
+  });
+  try {
+    const first = render(<App />);
+    const box = screen.getByLabelText("Search references");
+    await screen.findByRole("region", { name: "Preview" });
+    await waitFor(() => expect(format).toHaveBeenCalledOnce());
+    fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+    await chooseFromMore("Show what will be pasted", "menuitemcheckbox");
+    await waitFor(() => expect(shown).toBe(false));
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    expect(screen.queryByRole("region", { name: "Preview" })).toBeNull();
+    expect(screen.getByRole("list", { name: "Selected references" })).toBeTruthy();
+    expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa");
+    act(() => box.focus());
+    fireEvent.keyDown(box, { key: "Enter" });
+    expect(copies).not.toHaveBeenCalled();
+    await screen.findByText(/still being formatted/);
+    await act(async () => { finish(); await pending; });
+    await waitFor(() => expect(screen.getByRole("group", { name: "Keys" }).textContent).toContain("Copy as APA"));
+    expect(format).toHaveBeenCalledOnce();
+    fireEvent.keyDown(box, { key: "Enter" });
+    await waitFor(() => expect(copies).toHaveBeenCalledOnce());
+    expect(copies.mock.calls[0]).toEqual([{ text: output.text, html: output.html, expectedRevision: "1" }]);
+    first.unmount();
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /^More/ }));
+    const choice = await screen.findByRole("menuitemcheckbox", { name: "Show what will be pasted" });
+    await waitFor(() => expect(choice.getAttribute("aria-checked")).toBe("false"));
+    expect(document.querySelector(".format-preview")).toBeNull();
+    fireEvent.click(choice);
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    await screen.findByRole("region", { name: "Preview" });
+    await waitFor(() => expect(shown).toBe(true));
+  } finally { format.mockRestore(); }
+});
+
+test("preview choices made during a delayed read and rapid queued saves keep their order", async () => {
+  let loaded!: () => void, saved!: () => void;
+  const reading = new Promise<void>((resolve) => { loaded = resolve; });
+  const writing = new Promise<void>((resolve) => { saved = resolve; });
+  const choices: api.PickerPreferences[] = [];
+  backend({
+    picker_preferences: async () => { await reading; return { citation_style: null, density: "compact", larger_text: true, show_paste_preview: true }; },
+    set_picker_preferences: async ({ preferences }) => { choices.push(preferences as api.PickerPreferences); if (choices.length === 1) await writing; return null; },
+  });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  fireEvent.keyDown(box, { key: "i", ctrlKey: true });
+  await act(async () => { loaded(); await reading; });
+  await waitFor(() => expect(choices).toHaveLength(1));
+  act(() => {
+    fireEvent.keyDown(box, { key: "i", ctrlKey: true });
+    fireEvent.keyDown(box, { key: "i", ctrlKey: true });
+  });
+  expect(choices).toHaveLength(1);
+  await act(async () => { saved(); await writing; });
+  await waitFor(() => expect(choices.map((choice) => choice.show_paste_preview)).toEqual([false, true, false]));
+  expect(choices.every((choice) => choice.density === "compact" && choice.larger_text && choice.citation_style === null)).toBe(true);
+});
+
+test.each([{ repeat: true }, { isComposing: true }, { keyCode: 229 }, { altKey: true },
+  { shiftKey: true }, { ctrlKey: false }, { metaKey: true }, { ctrlKey: false, metaKey: true }])(
+  "preview shortcut ignores held/composing/other modified input: %j", async (more) => {
+    const save = vi.fn(() => null);
+    backend({ copy_format: () => "typst", set_picker_preferences: save });
+    render(<App />);
+    const box = screen.getByLabelText("Search references");
+    await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst"));
+    await act(async () => { fireEvent.keyDown(box, { key: "i", code: "KeyI", ctrlKey: true, ...more }); });
+    expect(save).not.toHaveBeenCalled();
+  },
+);
+
+test("preview shortcuts update the open More checkbox without closing the menu", async () => {
+  const saved: boolean[] = [];
+  backend({ copy_format: () => "typst", set_picker_preferences: ({ preferences }) => {
+    saved.push((preferences as api.PickerPreferences).show_paste_preview); return null;
+  } });
+  render(<App />);
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst"));
+  fireEvent.click(screen.getByRole("button", { name: /^More/ }));
+  const choice = await screen.findByRole("menuitemcheckbox", { name: "Show what will be pasted" });
+  expect(choice.textContent).toContain("Ctrl+I");
+  fireEvent.keyDown(choice, { key: "I", code: "KeyI", ctrlKey: true });
+  await waitFor(() => expect(choice.getAttribute("aria-checked")).toBe("false"));
+  fireEvent.keyDown(choice, { key: "ш", code: "KeyI", ctrlKey: true });
+  await waitFor(() => expect(saved).toEqual([false, true]));
+  expect(choice.getAttribute("aria-checked")).toBe("true");
+  expect(screen.getByRole("menu")).toBeTruthy();
+});
+
 test("a choice made while saved choices load is kept and saved, not replaced", async () => {
   let finish = () => undefined as void;
   const loaded = new Promise<void>((resolve) => { finish = resolve; });
@@ -1588,6 +1691,7 @@ test("unreadable saved choices are reported and never overwritten with defaults"
   expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("typst");
   fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:apa" } });
   await chooseFromMore("Larger text", "menuitemcheckbox");
+  await chooseFromMore("Show what will be pasted", "menuitemcheckbox");
   expect(document.documentElement.dataset.textSize).toBe("larger");
   expect(calls).not.toContain("set_picker_preferences");
 });

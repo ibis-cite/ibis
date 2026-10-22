@@ -259,10 +259,14 @@ async function expectRenderedFixture(id: string): Promise<void> {
       }
       expect(container.querySelectorAll('[aria-label="Selected references"] > li')).toHaveLength(state.tray!);
       expect(container.querySelector("[data-active]")?.id).toBe(`result-${state.tray! - 1}`);
-      if (state.formatted) expect(container.querySelector(".format-preview .preview-text")?.textContent).toBe(text);
     } else {
       await act(() => vi.advanceTimersByTimeAsync(1000));
       await act(() => vi.advanceTimersByTimeAsync(1000));
+    }
+    if (state.formatted) {
+      if (state.showPastePreview === false) expect(container.querySelector(".format-preview")).toBeNull();
+      else expect(container.querySelector(".format-preview .preview-text")?.textContent).toBe(text);
+      expect(container.querySelector('footer [aria-keyshortcuts="Enter"]')).toBeTruthy();
     }
     expect(acknowledge).toHaveBeenCalledExactlyOnceWith(id);
   } finally {

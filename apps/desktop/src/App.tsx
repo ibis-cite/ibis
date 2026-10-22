@@ -10,7 +10,7 @@ import { afterCopy } from "./copyFeedback";
 import { KeysDialog } from "./features/picker/KeysDialog";
 import { isMac } from "./platform";
 import { choiceKey, choiceName, idKey, sameLibrary, styleOf, type Choice } from "./features/picker/choice";
-import { composing, isKeysShortcut, isMenuShortcut, isQuitShortcut } from "./features/picker/shortcuts";
+import { composing, isKeysShortcut, isMenuShortcut, isPreviewShortcut, isQuitShortcut } from "./features/picker/shortcuts";
 import { PickerHeader } from "./features/picker/PickerHeader";
 import { Notices, type Operation } from "./features/picker/Notices";
 import { FormatPreview, SelectionTray } from "./features/picker/SelectionTray";
@@ -65,7 +65,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const [selectionChanged, setSelectionChanged] = useState(false);
   const { failures, setFailures, report, perform } = useOperations();
   const preferences = usePickerPreferences(api, { styles: Boolean(cslItems && copyFormatted), report, perform });
-  const { format, density, largerText, changeDensity, toggleLargerText, quitAfterSaving } = preferences;
+  const { format, density, largerText, showPastePreview, changeDensity, toggleLargerText, togglePastePreview, quitAfterSaving } = preferences;
   const style = cslItems && copyFormatted ? styleOf(format) : null;
   // The formatted preview, tagged with the style, choice and library it was
   // made for, so Enter never copies a preview of an earlier choice.
@@ -576,7 +576,10 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       onBlur={() => setSearchFocused(false)}
       onKeyDown={(e) => {
         if (composing(e)) return;
-        if (isKeysShortcut(e)) {
+        if (isPreviewShortcut(e)) {
+          e.preventDefault();
+          if (!e.repeat) togglePastePreview();
+        } else if (isKeysShortcut(e)) {
           e.preventDefault();
           openKeys();
         } else if (e.key === "Escape") {
@@ -638,7 +641,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         toggle(r);
         input.current?.focus({ preventScroll: true });
       }} />
-      {style && chosen.length > 0 && <FormatPreview style={style} shown={shown} focusable={selected.size > 0} />}
+      {showPastePreview && style && chosen.length > 0 && <FormatPreview style={style} shown={shown} focusable={selected.size > 0} />}
       <div className="results-area">
         <div className="results-heading" aria-hidden="true">
           <span>{query ? pickerText.bestMatches : pickerText.references}</span><span>{results.length > 0 ? pickerText.resultCount(results.length) : ""}</span>
@@ -689,7 +692,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               name: (choice) => (typeof choice === "object" ? groupName(choice.group) : pickerText.myLibrary),
               toggle: toggleLibrary,
             } : null}
-            density={density} largerText={largerText}
+            density={density} largerText={largerText} showPastePreview={showPastePreview}
             startAtLogin={loginItemOffered && startAtLogin ? { item: startAtLogin, toggle: toggleStartAtLogin } : null}
             actions={{
               choose: () => runFromMenu("choose", chooseLibrary),
@@ -697,6 +700,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
               reload: () => runFromMenu("reload", reloadLibrary),
               density: changeDensity,
               largerText: toggleLargerText,
+              preview: togglePastePreview,
               keys: openKeys,
               quit: () => runFromMenu("quit", quitAfterSaving),
             }} />

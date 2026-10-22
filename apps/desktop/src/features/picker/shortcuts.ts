@@ -19,7 +19,7 @@ export function typesText(target: EventTarget | null): boolean {
 /** `?` outside a text field, or Ctrl/⌘ with / (or ?) anywhere. Hebrew types /
  * on the Q key, so a press that is a letter shortcut is not this one. */
 export function isKeysShortcut(e: React.KeyboardEvent, mac = isMac): boolean {
-  if (e.altKey || isQuitShortcut(e, mac) || isMenuShortcut(e, mac)) return false;
+  if (e.altKey || isQuitShortcut(e, mac) || isMenuShortcut(e, mac) || isPreviewShortcut(e, mac)) return false;
   if ((e.key === "/" || e.key === "?") && commandKey(e, mac)) return true;
   return e.key === "?" && !e.ctrlKey && !e.metaKey && !typesText(e.target);
 }
@@ -27,6 +27,11 @@ export function isKeysShortcut(e: React.KeyboardEvent, mac = isMac): boolean {
 /** The More menu shortcut from the key table: ⌘K on macOS, Ctrl+K elsewhere. */
 export function isMenuShortcut(e: React.KeyboardEvent, mac = isMac): boolean {
   return matchesAccelerator(e, keysFor("more"), mac);
+}
+
+/** The output visibility shortcut: ⌘I on macOS, Ctrl+I elsewhere. */
+export function isPreviewShortcut(e: React.KeyboardEvent, mac = isMac): boolean {
+  return matchesAccelerator(e, keysFor("preview"), mac);
 }
 
 /** The quit shortcut from the key table: ⌘Q on macOS, Ctrl+Q elsewhere. */
