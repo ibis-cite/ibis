@@ -1,8 +1,9 @@
 import type { SearchResult } from "../../api";
 import { pickerText, rowText } from "../../messages";
 
-/** Full metadata for the highlighted reference in the wide citation pane.
- * No saved selection or source path is inferred from the highlighted row. */
+/** The highlighted search result's supplied metadata, without row truncation.
+ * SearchResult already summarizes names/publications; this does not enrich
+ * those fields or infer a saved selection or source path. */
 export function ReferenceDetails({ reference }: { reference: SearchResult | null }) {
   if (!reference) return null;
   const type = rowText.itemType(reference.item_type);

@@ -11,7 +11,7 @@ const reference: SearchResult = {
   first_author: "García", author_count: 3, container: "Synthetic Journal", item_type: "article-journal",
 };
 
-test("details show the complete focused reference without source paths or abbreviated authors", () => {
+test("details preserve supplied reference text without source paths or further author abbreviation", () => {
   render(<ReferenceDetails reference={reference} />);
   const details = screen.getByRole("region", { name: "Reference details" });
   expect(screen.getByRole("heading", { level: 2, name: reference.title })).toBeTruthy();
