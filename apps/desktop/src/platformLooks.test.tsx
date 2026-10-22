@@ -474,8 +474,8 @@ test("secondary text keeps 4.5:1 on each look's surface", () => {
 
 test("spacing tokens, direct gaps/padding and resolved formulas keep the 4 px grid", () => {
   const off: string[] = [];
-  for (const platform of ["macos", "windows", "linux"]) for (const mode of ["normal", "more", "forced", "gallery"]) {
-    const blocks = tokenBlocks(appSheets, platform, mode), scopes = tokenScopes(blocks);
+  for (const platform of ["macos", "windows", "linux"]) for (const mode of ["normal", "more", "forced", "gallery"]) for (const coarse of [false, true]) {
+    const blocks = tokenBlocks(appSheets, platform, mode, true, false, false, coarse), scopes = tokenScopes(blocks);
     for (const block of blocks) for (const [name, value] of block.values) {
       if (/^padding-(top|right|bottom|left)$/.test(name) && block.values.some(([key]) => key === "padding")) continue;
       if (!/^(--[\w-]*(padding|gap|inset)|gap|row-gap|column-gap|padding[\w-]*)$/.test(name) || opticalSpacing(block, name, value)) continue;
@@ -588,22 +588,22 @@ test("the alias-only migration exposes the complete design-system role inventory
 });
 
 // CSSOM parses declarations/conditions; this audits the existing root, menu and
-// notice and shelf token scopes, rather than pooling inactive declarations into a global set.
+// notice, shelf and chip-group token scopes, rather than pooling inactive declarations into a global set.
 // This bounded dependency audit is not a CSS cascade/specificity interpreter;
 // browser comparisons verify the actual winning values and rendered appearance.
 const appSheets = Object.fromEntries(readdirSync(new FileURL(".", import.meta.url), { recursive: true })
   .filter((file) => file.endsWith(".css")).map((file) => [file.replaceAll("\\", "/"), readFileSync(new FileURL(file.replaceAll("\\", "/"), import.meta.url), "utf8")]));
 const parsedSheets = new Map<string, CSSRuleList>();
 type TokenBlock = { file: string; selector: string; values: [string, string][]; scope: string };
-function tokenBlocks(sheets: Record<string, string>, platform = "macos", mode = "normal", advanced = true, material = false, notice = false) {
+function tokenBlocks(sheets: Record<string, string>, platform = "macos", mode = "normal", advanced = true, material = false, notice = false, coarse = false) {
   const doc = document.implementation.createHTMLDocument();
   doc.documentElement.dataset.platform = platform;
   if (notice) doc.documentElement.classList.add("notice-window");
   if (mode === "gallery") doc.documentElement.dataset.galleryTheme = "contrast";
   if (material) doc.documentElement.dataset.nativeAppearance = "vibrancy";
   const blocks: TokenBlock[] = [];
-  const media = (query: string) => query.split(",").some((part) => [...part.matchAll(/\((prefers-[\w-]+|forced-colors):\s*([\w-]+)\)/g)].every(([, feature, value]) =>
-    value === ({ "prefers-contrast": mode === "more" ? "more" : "no-preference", "forced-colors": mode === "forced" ? "active" : "none", "prefers-reduced-motion": mode === "reduced" ? "reduce" : "no-preference", "prefers-reduced-transparency": mode === "transparency" ? "reduce" : "no-preference" } as Record<string, string>)[feature!]));
+  const media = (query: string) => query.split(",").some((part) => [...part.matchAll(/\((prefers-[\w-]+|forced-colors|pointer):\s*([\w-]+)\)/g)].every(([, feature, value]) =>
+    value === ({ "prefers-contrast": mode === "more" ? "more" : "no-preference", "forced-colors": mode === "forced" ? "active" : "none", "pointer": coarse ? "coarse" : "fine", "prefers-reduced-motion": mode === "reduced" ? "reduce" : "no-preference", "prefers-reduced-transparency": mode === "transparency" ? "reduce" : "no-preference" } as Record<string, string>)[feature!]));
   for (const [file, css] of Object.entries(sheets)) {
     if (!parsedSheets.has(css)) {
       const sheet = document.createElement("style");
@@ -623,9 +623,9 @@ function tokenBlocks(sheets: Record<string, string>, platform = "macos", mode = 
         return (!prefix || doc.documentElement.matches(prefix)) && (!look || look === platform);
       });
       if (!active) continue;
-      const scope = /\.shelf(?:\b|-)/.test(selector) ? "shelf" : (/\.menu-|\.toolbar-menu/.test(selector) || (selector === "@keyframe" && file.endsWith("Menu.css"))) && !/^:root[^ ]*$/.test(selector) ? "menu" : file.endsWith("notice.css") && !selector.startsWith(":root") ? "notice" : "root";
+      const scope = /\.chip-group(?:\b|-)/.test(selector) ? "chip-group" : /\.shelf(?:\b|-)/.test(selector) ? "shelf" : (/\.menu-|\.toolbar-menu/.test(selector) || (selector === "@keyframe" && file.endsWith("Menu.css"))) && !/^:root[^ ]*$/.test(selector) ? "menu" : file.endsWith("notice.css") && !selector.startsWith(":root") ? "notice" : "root";
       const values: [string, string][] = Array.from(styled.style).map((name) => [name, styled.style.getPropertyValue(name)]);
-      if (scope === "root" && values.some(([name]) => name.startsWith("--")) && !selector.startsWith(":root")) throw new Error(`Unmodeled token scope: ${selector}`);
+      if (scope === "root" && values.some(([name]) => name.startsWith("--")) && !selector.split(/,(?![^()]*\))/).every((part) => /^:root\S*$/.test(part.trim()))) throw new Error(`Unmodeled token scope: ${selector}`);
       blocks.push({ file, selector, scope, values });
       if (scope === "menu" && selector.includes(".keys-dialog")) blocks.push({ file, selector, scope: "root", values });
     } };
@@ -661,18 +661,18 @@ function tokenScopes(blocks: TokenBlock[]) {
   const root = raw("root");
   // Inherited custom properties resolve on the parent, before child overrides.
   const inherited = [...root].map(([name, value]) => [name, resolveToken(value, root) ?? value] as [string, string]);
-  return new Map([ ["root", root], ...["menu", "notice", "shelf"].map((scope) => [scope, new Map([...inherited, ...raw(scope)])] as const) ]);
+  return new Map([ ["root", root], ...["menu", "notice", "shelf", "chip-group"].map((scope) => [scope, new Map([...inherited, ...raw(scope)])] as const) ]);
 }
 
 test("every application var resolves in its active look/mode, without alias cycles", () => {
   expect(Object.keys(appSheets).length).toBeGreaterThanOrEqual(8);
   expect(tokenBlocks(appSheets).flatMap((block) => block.values).length).toBeGreaterThan(500);
   const errors: string[] = [];
-  for (const platform of ["macos", "windows", "linux"]) for (const mode of ["normal", "more", "forced", "gallery", "reduced", "transparency"]) for (const advanced of [true, false]) for (const material of [false, true]) for (const notice of [false, true]) {
-    const blocks = tokenBlocks(appSheets, platform, mode, advanced, material, notice), scopes = tokenScopes(blocks);
+  for (const platform of ["macos", "windows", "linux"]) for (const mode of ["normal", "more", "forced", "gallery", "reduced", "transparency"]) for (const advanced of [true, false]) for (const material of [false, true]) for (const notice of [false, true]) for (const coarse of [false, true]) {
+    const blocks = tokenBlocks(appSheets, platform, mode, advanced, material, notice, coarse), scopes = tokenScopes(blocks);
     for (const block of blocks) for (const [name, value] of block.values) {
       const definitions = scopes.get(block.scope)!;
-      if ((name.startsWith("--") && hasCycle(name, definitions)) || resolveToken(value, definitions) === null) errors.push(`${platform}/${mode}/${advanced}/${material}/${notice} ${block.file} ${block.selector} ${name}: ${value}`);
+      if ((name.startsWith("--") && hasCycle(name, definitions)) || resolveToken(value, definitions) === null) errors.push(`${platform}/${mode}/${advanced}/${material}/${notice}/${coarse} ${block.file} ${block.selector} ${name}: ${value}`);
     }
   }
   expect([...new Set(errors)]).toEqual([]);
@@ -693,6 +693,10 @@ test("the var audit distinguishes fallbacks, inactive definitions and cycles inc
   const shelf = tokenScopes(tokenBlocks({ fixture: ":root { --value: 4px; } .shelf { --value: 8px; }" }));
   expect(resolveToken("var(--value)", shelf.get("root")!)).toBe("4px");
   expect(resolveToken("var(--value)", shelf.get("shelf")!)).toBe("8px");
+  const chips = tokenScopes(tokenBlocks({ fixture: ":root { --value: 4px; } .chip-group { --value: 12px; }" }));
+  expect(resolveToken("var(--value)", chips.get("root")!)).toBe("4px");
+  expect(resolveToken("var(--value)", chips.get("chip-group")!)).toBe("12px");
+  expect(() => tokenBlocks({ fixture: ":root .unmodeled { --local: 4px; }" })).toThrow("Unmodeled token scope");
   const overrides = { fixture: ':root { --a: 4px; } :root[data-platform="windows"] { --a: var(--b); --b: var(--a); }' };
   expect(hasCycle("--a", tokenScopes(tokenBlocks(overrides, "windows")).get("root")!)).toBe(true);
   expect(resolveToken("var(--a)", tokenScopes(tokenBlocks(overrides, "macos")).get("root")!)).toBe("4px");
@@ -703,6 +707,11 @@ test("the var audit distinguishes fallbacks, inactive definitions and cycles inc
 /** Only arithmetic used by spacing declarations; 16 px/rem is the unscaled grid. */
 function gridPixels(value: string): number | null {
   if (value === "auto" || value.includes("%")) return null;
+  if (value.startsWith("max(") && value.endsWith(")")) {
+    const options = cssParts(value.slice(4, -1), true).map(gridPixels);
+    if (options.some((n) => n === null)) throw new Error("Non-length grid maximum");
+    return Math.max(...options as number[]);
+  }
   if (/[^0-9.\s()+*/-]/.test(value.replace(/calc|rem|px/g, ""))) throw new Error(`Unsupported spacing expression: ${value}`);
   const tokens = value.replaceAll("calc", "").match(/(?:\d*\.)?\d+(?:rem|px)?|[()+*/-]/g) ?? [];
   let at = 0;
@@ -742,5 +751,10 @@ test("spacing audits resolve aliases and calc without exempting arbitrary one-pi
   expect(gridPixels(resolveToken("var(--gap)", definitions)!)).toBe(8);
   expect(gridPixels(resolveToken("calc(var(--gap) + 1px)", definitions)!)).toBe(9);
   expect(gridPixels("1px")).toBe(1);
+  for (const [coarse, target, gap] of [[false, 32, 8], [true, 44, 20]] as const) {
+    const scope = tokenScopes(tokenBlocks(appSheets, "windows", "normal", true, false, false, coarse)).get("chip-group")!;
+    expect(gridPixels(resolveToken("var(--chip-group-target)", scope)!)).toBe(target);
+    expect(gridPixels(resolveToken("max(var(--space-1), calc(var(--chip-group-target) - var(--chip-height)))", scope)!)).toBe(gap);
+  }
   expect(opticalSpacing({ file: "fixture", selector: ".other", scope: "root", values: [] }, "padding", "1px")).toBeFalsy();
 });
