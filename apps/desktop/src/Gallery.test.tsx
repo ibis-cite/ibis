@@ -310,7 +310,7 @@ async function expectRenderedFixture(id: string): Promise<void> {
         await act(() => vi.advanceTimersByTimeAsync(16));
       }
       // Six chips, then "+N" for the rest (docs/design/preview.md).
-      expect(container.querySelectorAll('[aria-label="Selected references"] > li.chip')).toHaveLength(Math.min(state.tray!, 6));
+      expect(container.querySelectorAll('.shelf [data-chip-list] > [data-chip-item]')).toHaveLength(Math.min(state.tray!, 6));
       expect(container.querySelector("[data-active]")?.id).toBe(`result-${state.tray! - 1}`);
       if (state.formatted) expect(container.querySelector(".shelf-output .preview-text")?.textContent).toBe(text);
     } else {
@@ -411,7 +411,7 @@ test.each([
   ["pinned", (root: HTMLElement) => root.querySelector('footer button[aria-label="Kept open; click to stop"]') !== null],
   ["menu-open", () => document.querySelector('[role="menu"]') !== null],
   ["keys", (root: HTMLElement) => root.querySelector('[role="dialog"]') !== null],
-  ["tray", (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('ul[aria-label="Selected references"] .chip')].map((chip) => chip.title).join() === "example2026,研究2026"],
+  ["tray", (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('.shelf [data-chip-list] > [data-chip-item]')].map((chip) => chip.dataset.key?.split('\0').slice(1).join('\0')).join() === "example2026,研究2026"],
   ["compact", () => document.documentElement.dataset.density === "compact"],
   ["spacious", () => document.documentElement.dataset.density === "spacious"],
   ["larger-text", () => document.documentElement.dataset.textSize === "larger"],

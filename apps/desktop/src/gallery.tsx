@@ -63,6 +63,9 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
     steps.push(() => press(search(), "Enter", { shiftKey: true }));
   }
   if (state.pinned) steps.push(() => press(search(), "P", { code: "KeyP", shiftKey: true, ...(navigator.platform.includes("Mac") ? { metaKey: true } : { ctrlKey: true }) }));
+  if (state.chipsOpen) steps.push(() => {
+    const trigger = root.querySelector<HTMLButtonElement>(".chip-disclosure-trigger"); trigger?.focus(); trigger?.click();
+  });
   if (state.keys) steps.push(() => press(root.querySelector("main"), "?"));
   if (state.menuOpen) steps.push(() => root.querySelector<HTMLButtonElement>('footer button[aria-haspopup]')?.click());
   if (state.formatMenu) steps.push(() => root.querySelector<HTMLButtonElement>(".toolbar-menu-button")?.click());
@@ -85,6 +88,9 @@ function selectionContained(root: HTMLElement, state: GalleryState): boolean {
   const active = root.querySelector<HTMLElement>("[data-active]");
   const row = active?.getBoundingClientRect();
   if (!content || !viewport || !active || !row) return false;
+  // A disclosed modal intentionally blocks the background. Its own controls
+  // are checked below; the ordinary selection fixture still requires hit tests.
+  const covered = Boolean(state.chipsOpen && document.querySelector('.chip-disclosure [role="dialog"]'));
   const top = Math.max(0, content.top, viewport.top);
   const bottom = Math.min(innerHeight, content.bottom, viewport.bottom);
   const visibleTop = Math.max(top, row.top);
@@ -97,7 +103,7 @@ function selectionContained(root: HTMLElement, state: GalleryState): boolean {
     .filter((node) => node !== null).map((node) => node.getBoundingClientRect());
   return main.scrollTop === 0 && main.scrollHeight <= main.clientHeight + 1 && document.documentElement.scrollHeight <= innerHeight + 1
     && bottom - top >= 24 && visibleBottom - visibleTop >= Math.min(row.height, bottom - top) - 1
-    && hit(active, (Math.max(row.left, content.left) + Math.min(row.right, content.right)) / 2, (visibleTop + visibleBottom) / 2)
+    && (covered || hit(active, (Math.max(row.left, content.left) + Math.min(row.right, content.right)) / 2, (visibleTop + visibleBottom) / 2))
     && bands.every((box, i) => i === 0 || bands[i - 1]!.bottom <= box.top + 1)
     && [".search-bar", "footer"].every((selector) => {
       const box = root.querySelector(selector)?.getBoundingClientRect();
@@ -105,13 +111,23 @@ function selectionContained(root: HTMLElement, state: GalleryState): boolean {
     })
     && [root.querySelector("#search"), root.querySelector('footer button[aria-haspopup]')].every((node) => {
       const box = node?.getBoundingClientRect();
-      return node && box && box.top >= 0 && box.bottom <= innerHeight + 1 && hit(node, (box.left + box.right) / 2, (box.top + box.bottom) / 2);
+      return node && box && box.top >= 0 && box.bottom <= innerHeight + 1 && (covered || hit(node, (box.left + box.right) / 2, (box.top + box.bottom) / 2));
     });
 }
 
 /** The seeded settings and interactions are on screen, and nothing else is. */
 function seeded(root: HTMLElement, state: GalleryState): boolean {
   const html = document.documentElement;
+  const chosen = state.tray ?? 0;
+  const inline = root.querySelectorAll('.shelf [data-chip-list] > [data-chip-item]').length;
+  const overflow = root.querySelector(".shelf-chips .chip-disclosure-trigger");
+  const disclosed = document.querySelector<HTMLElement>('.chip-disclosure [role="dialog"]');
+  const threshold = parseFloat(getComputedStyle(html).getPropertyValue("--chip-count-only-width"));
+  const chipsReady = chosen === 0 ? !root.querySelector(".shelf-chips")
+    : root.querySelector(`[aria-label="${pickerText.citationSelection}"]`)?.textContent === pickerText.selectionCount(chosen)
+      && (innerWidth < threshold ? inline === 0 && overflow?.textContent === pickerText.chosenCount(chosen)
+        : inline > 0 && inline <= Math.min(chosen, SHELF_CHIPS)
+          && (inline === chosen ? overflow === null : overflow?.textContent === pickerText.moreChosen(chosen - inline)));
   // Menus open in a popover outside the picker's root.
   const menu = document.querySelector<HTMLElement>('[role="menu"]');
   const filter = document.querySelector<HTMLInputElement>(".toolbar-menu-filter input");
@@ -126,7 +142,10 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
     && (document.querySelector(".toolbar-menu") !== null) === Boolean(state.formatMenu)
     && (typeof state.formatMenu !== "string" || filter?.value === state.formatMenu)
     && (root.querySelector('[role="dialog"]') !== null) === Boolean(state.keys)
-    && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li.chip`).length === Math.min(state.tray ?? 0, SHELF_CHIPS)
+    && chipsReady
+    && Boolean(disclosed) === Boolean(state.chipsOpen)
+    && (!state.chipsOpen || disclosed?.querySelectorAll("[data-chip-item]").length === chosen
+      && disclosed.contains(document.activeElement) && disclosed.scrollWidth <= disclosed.clientWidth)
     && (state.showPastePreview === false ? root.querySelector(".shelf-output") === null
       && root.querySelector('footer [aria-keyshortcuts="Enter"]') !== null
       : !(state.formatted || state.showPastePreview) || root.querySelector(".shelf-output .preview-text") !== null)

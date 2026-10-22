@@ -29,6 +29,7 @@ export type GalleryState = {
   /** Opens the header format menu; a string is typed into its filter. */
   formatMenu?: true | string;
   tray?: number;
+  chipsOpen?: boolean;
   formatted?: boolean;
   showPastePreview?: boolean;
   keys?: boolean;
@@ -127,6 +128,18 @@ const largeSelection = Array.from({ length: 50 }, (_, i) => reference(
   `synthetic_${String(i + 1).padStart(2, "0")}_${"long_key_".repeat(5)}`,
   `Selection study ${i + 1}: a synthetic reference`, "Example, Sample", "Journal of Synthetic Studies"));
 
+const chipAttacks: SearchResult[] = [
+  ...["a", "b"].map((native_key) => ({ ...reference("shared", "Same title", "Example, Division"),
+    first_author: "Example", id: { source: `synthetic-${native_key}`, native_key } })),
+  { ...reference("natural", "Natural suffix", "Example 2026a"), year: null },
+  { ...reference("Example 2026b", "Key fallback", ""), year: null },
+  { ...reference("hostile", "Literal hostile metadata", '<img src=x onerror="attack()"> العربية 漢字' + "長".repeat(1000)),
+    first_author: '<img src=x onerror="attack()"> العربية 漢字' + "長".repeat(1000) },
+  reference("CJK", "多言語の合成文献", "架空 研究者"),
+  reference("RTL", "مرجع اصطناعي", "كاتب مثال"),
+  { ...reference("", "", ""), id: { source: "synthetic-empty", native_key: "empty" }, year: null },
+];
+
 export const galleryStates: readonly GalleryState[] = [
   { id: "first-run", label: "First run", library: library({ state: "none", name: null, snapshot_name: null, has_snapshot: false, zotero: false, references: 0 }) },
   { id: "first-run-found", label: "First run, libraries found", library: library({ state: "none", name: null, snapshot_name: null, has_snapshot: false, zotero: false, references: 0 }),
@@ -179,6 +192,9 @@ export const galleryStates: readonly GalleryState[] = [
     results: largeSelection, tray: 50, pinned: true, formatted: true },
   { id: "tray-system-large", label: "50 selected at 200% system text", library: library({ references: 50 }), query: "selection",
     results: largeSelection, tray: 50, pinned: true, largeText: true },
+  ...[false, true].map((chipsOpen) => ({ id: chipsOpen ? "chips-overflow" : "chips-collisions",
+    label: chipsOpen ? "All chosen references" : "Colliding and hostile chip labels", library: library({ references: chipAttacks.length }),
+    query: "synthetic", results: chipAttacks, tray: chipAttacks.length, chipsOpen })),
   { id: "tray", label: "Several references chosen", library: library(), query: "memory", results: examples, tray: 2 },
   { id: "keys", label: "All keys", library: library(), query: "memory", results: examples, keys: true },
   { id: "compact", label: "Compact rows", library: library(), query: "memory", results: many, density: "compact", tray: 2 },

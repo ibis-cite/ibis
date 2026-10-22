@@ -94,14 +94,15 @@ function measureLayout() {
     .filter((element) => !element.classList.contains("picker-content") && !element.classList.contains("visually-hidden"))
     .map((element) => ({ name: name(element), ...box(element) }))
     .filter((region) => region.bottom - region.top > 0.5 && region.right - region.left > 0.5);
-  const tray = document.querySelector('[aria-label="Selected references"]');
-  const edges = tray && getComputedStyle(tray);
+  const tray = document.querySelector('.shelf [data-chip-list]');
+  const clip = tray?.closest(".shelf-chips");
+  const edges = clip && getComputedStyle(clip);
   const list = document.querySelector(".results-area");
   return {
     regions,
     // What the tray shows: its padding box, inside the borders.
-    tray: tray ? { clip: { top: box(tray).top + parseFloat(edges.borderTopWidth), bottom: box(tray).bottom - parseFloat(edges.borderBottomWidth) },
-      chips: [...tray.children].map(box) } : null,
+    tray: tray && clip ? { clip: { top: box(clip).top + parseFloat(edges.borderTopWidth), bottom: box(clip).bottom - parseFloat(edges.borderBottomWidth) },
+      chips: [...tray.children].filter((chip) => chip.hasAttribute("data-chip-item")).map(box) } : null,
     list: list ? { ownScroll: /auto|scroll/.test(getComputedStyle(list).overflowY) } : null,
   };
 }
