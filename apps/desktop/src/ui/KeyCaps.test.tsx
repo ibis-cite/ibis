@@ -28,25 +28,22 @@ test("implicit key caps follow the rendered look when it differs from the host a
 test("footer and More pair visible keys with their accessible shortcut after a look change", () => {
   vi.spyOn(navigator, "platform", "get").mockReturnValue("MacIntel");
   const footer = () => <PickerFooter library={null} groupName={() => ""} hints={{ enter: "Copy", shiftEnter: "Add", escape: "Hide" }} altHeld={false} pinned={false} onUnpin={vi.fn()}
-    actions={{ copy: vi.fn(), add: vi.fn(), escape: vi.fn(), keys: vi.fn() }}
+    actions={{ copy: vi.fn(), add: vi.fn(), escape: vi.fn() }}
     more={<MoreMenu isOpen={false} onOpenChange={vi.fn()} buttonRef={{ current: null }} searchRef={{ current: null }} keys="CmdOrCtrl+K">{null}</MoreMenu>} />;
   document.documentElement.dataset.platform = "windows";
   const { container, rerender } = render(footer());
-  const check = (shortcut: string, more: string, keyCaps: string[], moreCaps: string[]) => {
-    const shortcuts = container.querySelector<HTMLButtonElement>('.shortcuts-hint')!;
+  const check = (more: string, moreCaps: string[], copyKey = "Enter") => {
+    const copy = container.querySelector<HTMLButtonElement>('[aria-keyshortcuts="Enter"]')!;
     const trigger = container.querySelector<HTMLButtonElement>('.more > button')!;
-    expect(shortcuts.getAttribute("aria-keyshortcuts")).toBe(shortcut);
-    expect(caps(shortcuts)).toEqual(keyCaps);
+    expect(caps(copy)).toEqual([copyKey]);
     expect(trigger.getAttribute("aria-keyshortcuts")).toBe(more);
     expect(caps(trigger)).toEqual(moreCaps);
   };
-  check("Control+/", "Control+K", ["Ctrl", "/"], ["Ctrl", "K"]);
-  document.documentElement.dataset.platform = "macos";
-  rerender(footer());
-  check("Meta+/", "Meta+K", ["⌘/"], ["⌘K"]);
-  document.documentElement.dataset.platform = "linux";
-  rerender(footer());
-  check("Control+/", "Control+K", ["Ctrl", "/"], ["Ctrl", "K"]);
+  check("Control+K", ["Ctrl", "K"]);
+  document.documentElement.dataset.platform = "macos"; rerender(footer());
+  check("Meta+K", ["⌘K"], "↵");
+  document.documentElement.dataset.platform = "linux"; rerender(footer());
+  check("Control+K", ["Ctrl", "K"]);
 });
 
 test("macOS joins the glyphs in one cap, as its menus write them", () => {

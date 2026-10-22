@@ -762,7 +762,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
       <PickerFooter library={library} groupName={groupName}
         pinned={pinned} onUnpin={() => { togglePin(); input.current?.focus(); }}
         hints={{ enter: enterAction, shiftEnter: shiftEnterAction, escape: escapeAction }}
-        altHeld={altHeld} actions={{ copy: () => { void copy(); }, add: toggleHighlighted, escape: escapeStep, keys: openKeys }}
+        altHeld={altHeld} actions={{ copy: () => { void copy(); }, add: toggleHighlighted, escape: escapeStep }}
         more={
           <PickerMenu isOpen={menuOpen} onOpenChange={(open) => (open ? openMore() : closeMenu(false))}
             buttonRef={moreButton} searchRef={input} library={library} libraryDetail={libraryDetail}

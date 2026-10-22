@@ -241,7 +241,7 @@ list, preview and tray) from a control layer (search and format).
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
 | Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows: a plus, or a check on a row already added. A row in the citation always shows a scarlet tile with a white check, the only scarlet on the row. A 32 px pointer target with its name in the tooltip ("Add García 2021 to citation"); it adds no Tab stop, because a listbox option holds no controls, and keyboards use Shift+Enter. |
 | Citation shelf | Once a reference is highlighted or added | One quiet card above the footer's Copy action ([design/preview.md](design/preview.md)): the chosen references as author-year chips (at most six, then "+N", which shows them all), then the exact text Enter pastes on one line, in text colours with one scarlet quote mark. Results never move when a reference is added. Page numbers come later (#24). |
-| Footer key hints | Always | What Enter does now, Shortcuts and More, label first and keys after (see **Footer**). |
+| Footer key hints | Always | What Enter does now and More, label first and keys after (see **Footer**). |
 | Footer tip | One at a time | Tied to what the user is doing, retired once they have done it. Otherwise the footer shows library status. |
 | Library status | Always, quietly | A dot, the source and the count; the age only when it is news or a warning (see below). A sentence above the list only when something needs the user. |
 
@@ -377,12 +377,12 @@ its keys**, 8 px between them, 16 px between hints, all at 12 px on one
 baseline, each key cap 20 px high and centred on it.
 
 - **Order.** What Enter does now ("Copy as Pandoc ↵", the primary hint, in the
-  text colour), then "Shortcuts ⌘/", then "More ⌘K" (both secondary). The
+  text colour), then "More ⌘K" (secondary). The
   hint that comes and goes is first, so the cluster's trailing end never moves.
   With Alt held: "Add to citation ⇧↵", then the Escape step ("Clear search
   Esc" or "Hide Esc"), then More.
 - **Actions** are quiet buttons, including Copy, the alternate Add/Remove and
-  Escape step, Shortcuts and More. Their labels match their accessible names;
+  Escape step and More. Their labels match their accessible names;
   decorative caps are hidden from screen readers and `aria-keyshortcuts`
   names the keys. They invoke the same guarded actions as the keyboard.
   The quiet fill is drawn 28 px high in the 40 px footer, with a
@@ -390,20 +390,17 @@ baseline, each key cap 20 px high and centred on it.
   Targets wrap without overlap; the footer grows when needed. More has
   `aria-haspopup="menu"`, `aria-expanded` and `aria-keyshortcuts`; its caps
   are hidden from screen readers.
-- **Shortcuts** opens the keyboard shortcuts list. The name matches each system's own term (macOS and
-  Windows both say "Keyboard shortcuts"); the footer shortens it to one word,
-  and More and the list's title say it in full. Changing shortcuts belongs to
-  the settings design, not to this list.
+- **Keyboard shortcuts** stays in More, and ⌘/ or Ctrl+/ and ? still open the
+  list. Changing shortcuts belongs to the settings design.
 - **Screen readers** hear the actions in one group named "Keys". Buttons stay
   visible and reachable when focus leaves Search; Enter then presses the
   focused button. Copy is offered only when its current output is ready.
 - **Fit before wrapping.** Measure the actual controls and key caps, including
-  the pin and the current Copy label. When they do not fit, drop Shortcuts first
-  (More still lists it), then shorten the library status using its existing
-  ellipses and full tooltip. Only then wrap, keeping 8 px above and below.
-  Restore the hint and status space when the contents fit again; width, text
-  size, platform and format labels all affect this decision. A folded focused
-  Shortcuts action returns focus to More; Search and unrelated controls keep it.
+  the pin and the current Copy label. When they do not fit, shorten the library
+  status using its existing ellipses and full tooltip. Only then wrap, keeping
+  8 px above and below. Restore status space when the contents fit again;
+  width, text size, platform and format labels all affect this decision.
+  Search and unrelated controls keep their focus.
   If the footer still changes height, the local results scroller keeps the
   highlighted row visible only while Search owns keyboard navigation. Pointer
   choices and another focused control do not make the list move.
@@ -472,7 +469,7 @@ Settings window will use.
    row), off until turned on.
 
 "Look again" is a text button under the group. The footer shows "No library
-chosen", Shortcuts and More, so nothing else changes once a library opens.
+chosen" and More, so nothing else changes once a library opens.
 
 **Selection and focus.** One rule set for every control:
 

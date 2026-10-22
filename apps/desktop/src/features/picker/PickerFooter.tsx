@@ -19,7 +19,7 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
   hints: KeyHints;
   /** While Alt (⌥) is held, the footer shows the other keys instead of Enter. */
   altHeld: boolean;
-  actions: { copy: () => void; add: () => void; escape: () => void; keys: () => void };
+  actions: { copy: () => void; add: () => void; escape: () => void };
   /** The More button and its menu. */
   more: React.ReactNode;
   pinned: boolean;
@@ -27,12 +27,10 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
 }) {
   const bar = useRef<HTMLElement>(null);
   const hintsRow = useRef<HTMLElement>(null);
-  const shortcut = useRef<HTMLButtonElement>(null);
   const pin = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLSpanElement>(null);
   const statusSize = useRef<HTMLSpanElement>(null);
-  const foldedFocus = useRef(false);
-  const [fit, setFit] = useState({ shortcuts: false, status: false });
+  const [statusCompact, setStatusCompact] = useState(false);
   const platform = currentPlatform();
   useLayoutEffect(() => {
     const element = bar.current;
@@ -46,19 +44,13 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
       const hintStyle = hintsRow.current ? getComputedStyle(hintsRow.current) : null;
       const innerGap = parseFloat(hintStyle?.columnGap ?? "") || 0;
       const hintMargin = (parseFloat(hintStyle?.marginInlineStart ?? "") || 0) + (parseFloat(hintStyle?.marginInlineEnd ?? "") || 0);
-      const actions = [...(hintsRow.current?.children ?? [])].filter((child) => child !== shortcut.current);
-      const optional = width(shortcut.current);
+      const actions = [...(hintsRow.current?.children ?? [])];
       const actionWidth = actions.reduce((sum, child) => sum + width(child), 0);
       const pinWidth = width(pin.current), menuWidth = width(menu.current?.querySelector("button") ?? null);
-      const needed = (showShortcut: boolean) => {
-        const count = actions.length + (showShortcut && optional > 0 ? 1 : 0);
-        const bands = 1 + (pinWidth > 0 ? 1 : 0) + (menuWidth > 0 ? 1 : 0) + (count > 0 ? 1 : 0);
-        return pinWidth + menuWidth + actionWidth + (showShortcut ? optional : 0) + Math.max(0, count - 1) * innerGap + (bands - 1) * gap + (count > 0 ? hintMargin : 0);
-      };
-      const shortcuts = preferred + needed(true) > available;
-      const status = preferred + needed(!shortcuts) > available;
-      if (shortcuts && shortcut.current?.contains(document.activeElement)) foldedFocus.current = true;
-      setFit((previous) => previous.shortcuts === shortcuts && previous.status === status ? previous : { shortcuts, status });
+      const bands = 1 + (pinWidth > 0 ? 1 : 0) + (menuWidth > 0 ? 1 : 0) + (actions.length > 0 ? 1 : 0);
+      const needed = pinWidth + menuWidth + actionWidth + Math.max(0, actions.length - 1) * innerGap
+        + (bands - 1) * gap + (actions.length > 0 ? hintMargin : 0);
+      setStatusCompact(preferred + needed > available);
     };
     measure();
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
@@ -66,14 +58,9 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
     window.addEventListener("resize", measure);
     return () => { observer?.disconnect(); window.removeEventListener("resize", measure); };
   }, [hints.enter, hints.shiftEnter, hints.escape, altHeld, pinned, platform]);
-  useLayoutEffect(() => {
-    if (!foldedFocus.current || !fit.shortcuts) return;
-    foldedFocus.current = false;
-    if (document.activeElement === document.body || shortcut.current?.contains(document.activeElement)) menu.current?.querySelector("button")?.focus({ preventScroll: true });
-  }, [fit.shortcuts]);
   return (
     <footer>
-      <section ref={bar} aria-label={pickerText.libraryRegion} className="library-bar" data-shortcuts-folded={fit.shortcuts || undefined} data-status-compact={fit.status || undefined}>
+      <section ref={bar} aria-label={pickerText.libraryRegion} className="library-bar" data-status-compact={statusCompact || undefined}>
         <span className="footer-fit-measure" aria-hidden="true" inert><span ref={statusSize} className="footer-status-size" /></span>
         <LibraryStatusLine library={library} groupName={groupName} />
         {pinned && <button ref={pin} type="button" className="pin-button" aria-label={pickerText.unpinTitle} title={pickerText.unpinTitle} onClick={onUnpin}>
@@ -81,15 +68,12 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
             <path d="M9 4h6l-1 5 4 4H6l4-4z" /><path d="M12 13v7" />
           </svg>
         </button>}
-        <small ref={hintsRow} data-optional-only={!altHeld && !hints.enter || undefined} className="enter-hints" aria-label={keyText.footer} role="group">
+        {(altHeld || hints.enter) && <small ref={hintsRow} className="enter-hints" aria-label={keyText.footer} role="group">
           {altHeld ? <>
             {hints.shiftEnter && <FooterAction label={hints.shiftEnter} keys={keysFor("add")} onAction={actions.add} />}
             <FooterAction label={hints.escape} keys={keysFor("escape")} onAction={actions.escape} />
-          </> : <>
-            {hints.enter && <FooterAction label={hints.enter} keys={keysFor("copy")} primary onAction={actions.copy} />}
-            <FooterAction label={keyText.allKeys} keys={keysFor("keys")} className="shortcuts-hint" folded={fit.shortcuts} controlRef={shortcut} onAction={actions.keys} />
-          </>}
-        </small>
+          </> : hints.enter && <FooterAction label={hints.enter} keys={keysFor("copy")} primary onAction={actions.copy} />}
+        </small>}
         <span ref={menu} className="more">
           {more}
         </span>
@@ -99,11 +83,11 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
   );
 }
 
-function FooterAction({ label, keys, primary, className = "", folded, controlRef, onAction }: {
-  label: string; keys: string; primary?: boolean; className?: string; folded?: boolean; controlRef?: React.Ref<HTMLButtonElement>; onAction: () => void;
+function FooterAction({ label, keys, primary, onAction }: {
+  label: string; keys: string; primary?: boolean; onAction: () => void;
 }) {
   const platform = currentPlatform();
-  return <button ref={controlRef} type="button" className={`quiet-button footer-action ${className}`} aria-label={label} aria-hidden={folded || undefined} inert={folded || undefined} tabIndex={folded ? -1 : undefined}
+  return <button type="button" className="quiet-button footer-action" aria-label={label}
     aria-keyshortcuts={ariaKeys(keys, platform === "macos")} onClick={onAction}>
     <KeyHint label={label} keys={keys} primary={primary} platform={platform} hidden />
   </button>;

@@ -2363,8 +2363,7 @@ test.each(["Escape", "hidden"])("a click waiting for its preview never copies af
 });
 
 // Each visible hint as "label keys"; the label always comes first (docs/design.md, Footer).
-const footerKeys = () => [...screen.getByRole("group", { name: "Keys" }).children]
-  .filter((hint) => hint.getAttribute("aria-hidden") !== "true")
+const footerKeys = () => [...(screen.queryByRole("group", { name: "Keys" })?.children ?? [])]
   .map((hint) => `${hint.querySelector(".key-hint-label")?.textContent} ${hint.querySelector(".key-caps")?.textContent}`).join(" · ");
 
 test("the footer says what Enter will copy, and holding Alt shows the other keys", async () => {
@@ -2372,10 +2371,10 @@ test("the footer says what Enter will copy, and holding Alt shows the other keys
   render(<App />);
   const box = screen.getByLabelText("Search references");
   // Nothing to copy yet, so Enter is not advertised.
-  await waitFor(() => expect(footerKeys()).toBe("Shortcuts Ctrl+/"));
+  await waitFor(() => expect(footerKeys()).toBe(""));
   fireEvent.change(box, { target: { value: "x" } });
   await screen.findByText("First");
-  expect(footerKeys()).toBe("Copy as Pandoc Enter · Shortcuts Ctrl+/");
+  expect(footerKeys()).toBe("Copy as Pandoc Enter");
   chooseFormat("typst");
   await waitFor(() => expect(footerKeys()).toContain("Copy as Typst Enter"));
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
@@ -2402,7 +2401,7 @@ test("More reads like the hints beside it: its name first, then its keys", async
   // The hint that comes and goes is first, so More never moves.
   const hints = [...screen.getByRole("group", { name: "Keys" }).children];
   expect(hints[0]?.textContent).toContain("Copy as Pandoc");
-  expect(hints.at(-1)?.textContent).toContain("Shortcuts");
+  expect(hints).toHaveLength(1);
 });
 
 test("footer actions copy and open shortcuts without using a keyboard shortcut", async () => {
@@ -2420,12 +2419,10 @@ test("footer actions copy and open shortcuts without using a keyboard shortcut",
   fireEvent.pointerUp(copy, { button: 0, pointerType: "mouse" });
   fireEvent.click(copy);
   await waitFor(() => expect(copied).toEqual([{ source: "refs.bib", native_key: "a" }]));
-  const shortcuts = screen.getByRole("button", { name: "Shortcuts" });
-  act(() => shortcuts.focus());
-  fireEvent.click(shortcuts);
+  await chooseFromMore("Keyboard shortcuts");
   expect(await screen.findByRole("dialog", { name: "Keyboard shortcuts" })).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Close" }));
-  expect(document.activeElement).toBe(shortcuts);
+  expect(document.activeElement).toBe(screen.getByLabelText("Search references"));
 });
 
 test("alternate footer buttons use the current add, remove, clear and hide actions", async () => {
