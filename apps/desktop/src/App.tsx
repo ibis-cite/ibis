@@ -65,7 +65,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const [selectionChanged, setSelectionChanged] = useState(false);
   const { failures, setFailures, report, perform } = useOperations();
   const preferences = usePickerPreferences(api, { styles: Boolean(cslItems && copyFormatted), report, perform });
-  const { format, density, largerText, showPastePreview, changeDensity, toggleLargerText, togglePastePreview, quitAfterSaving } = preferences;
+  const { format, density, largerText, showPastePreview, changeDensity, toggleLargerText, quitAfterSaving } = preferences;
   const style = cslItems && copyFormatted ? styleOf(format) : null;
   // The formatted preview, tagged with the style, choice and library it was
   // made for, so Enter never copies a preview of an earlier choice.
@@ -80,6 +80,13 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   // Undefined while loading; null means the status request itself failed.
   const [library, setLibrary] = useState<LibraryStatus | null>();
   const input = useRef<HTMLInputElement>(null);
+  const togglePastePreview = () => {
+    // Return focus before removing this picker's active output. More and
+    // unrelated controls keep their own focus.
+    const output = input.current?.closest("main")?.querySelector(".format-preview");
+    if (showPastePreview && output?.contains(document.activeElement)) input.current?.focus({ preventScroll: true });
+    preferences.togglePastePreview();
+  };
   const moreButton = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [keysOpen, setKeysOpen] = useState(false);

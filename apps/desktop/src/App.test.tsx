@@ -1558,6 +1558,28 @@ test("format, density and text size choices are saved without losing each other"
   expect(document.documentElement.dataset.density).toBe("spacious");
 });
 
+test("hiding focused citation output returns to Search", async () => {
+  const formatter = await import("./format/formatted");
+  const format = vi.spyOn(formatter, "formatCitation").mockResolvedValue({ markup: ["(Smith, 2020)"], text: "(Smith, 2020)", html: "(Smith, 2020)", warnings: [] });
+  backend({
+    search: () => [result("a", "First")], csl_items: () => "[]",
+    picker_preferences: () => ({ citation_style: "apa", density: "comfortable", larger_text: false, show_paste_preview: true }),
+  });
+  try {
+    render(<App />);
+    await screen.findByText("First");
+    const box = screen.getByLabelText("Search references");
+    fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
+    const preview = await screen.findByRole("region", { name: "Preview" });
+    await within(preview).findByText("(Smith, 2020)");
+    act(() => preview.focus());
+    expect(document.activeElement).toBe(preview);
+    fireEvent.keyDown(preview, { key: "i", code: "KeyI", ctrlKey: true });
+    await waitFor(() => expect(screen.queryByRole("region", { name: "Preview" })).toBeNull());
+    expect(document.activeElement).toBe(box);
+  } finally { format.mockRestore(); }
+});
+
 test("hiding output keeps chips and pending copy checks, and remembers the choice on restart", async () => {
   const formatter = await import("./format/formatted");
   const output = { markup: ["(Smith, 2020)"], text: "(Smith, 2020)", html: "(Smith, 2020)", warnings: [] };
@@ -1606,14 +1628,15 @@ test("hiding output keeps chips and pending copy checks, and remembers the choic
   } finally { format.mockRestore(); }
 });
 
-test("preview choices made during a delayed read and rapid queued saves keep their order", async () => {
+test("preview choices made during a delayed read and rapid queued saves drain in order before Quit", async () => {
   let loaded!: () => void, saved!: () => void;
   const reading = new Promise<void>((resolve) => { loaded = resolve; });
   const writing = new Promise<void>((resolve) => { saved = resolve; });
   const choices: api.PickerPreferences[] = [];
-  backend({
+  const calls = backend({
     picker_preferences: async () => { await reading; return { citation_style: null, density: "compact", larger_text: true, show_paste_preview: true }; },
     set_picker_preferences: async ({ preferences }) => { choices.push(preferences as api.PickerPreferences); if (choices.length === 1) await writing; return null; },
+    quit: () => null,
   });
   render(<App />);
   const box = screen.getByLabelText("Search references");
@@ -1625,9 +1648,12 @@ test("preview choices made during a delayed read and rapid queued saves keep the
     fireEvent.keyDown(box, { key: "i", ctrlKey: true });
   });
   expect(choices).toHaveLength(1);
+  fireEvent.keyDown(box, { key: "q", ctrlKey: true });
+  expect(calls).not.toContain("quit");
   await act(async () => { saved(); await writing; });
   await waitFor(() => expect(choices.map((choice) => choice.show_paste_preview)).toEqual([false, true, false]));
   expect(choices.every((choice) => choice.density === "compact" && choice.larger_text && choice.citation_style === null)).toBe(true);
+  await waitFor(() => expect(calls).toContain("quit"));
 });
 
 test.each([{ repeat: true }, { isComposing: true }, { keyCode: 229 }, { altKey: true },
@@ -1653,8 +1679,10 @@ test("preview shortcuts update the open More checkbox without closing the menu",
   fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   const choice = await screen.findByRole("menuitemcheckbox", { name: "Show what will be pasted" });
   expect(choice.textContent).toContain("Ctrl+I");
+  act(() => choice.focus());
   fireEvent.keyDown(choice, { key: "I", code: "KeyI", ctrlKey: true });
   await waitFor(() => expect(choice.getAttribute("aria-checked")).toBe("false"));
+  expect(document.activeElement).toBe(choice);
   fireEvent.keyDown(choice, { key: "ш", code: "KeyI", ctrlKey: true });
   await waitFor(() => expect(saved).toEqual([false, true]));
   expect(choice.getAttribute("aria-checked")).toBe("true");
