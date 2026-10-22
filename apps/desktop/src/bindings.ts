@@ -51,6 +51,8 @@ export const commands = {
 	 *  are saved separately when selected, even if no citation is copied.
 	 */
 	copyCitation: (ids: RecordId[], format: KeyFormat, expectedRevision: string) => __TAURI_INVOKE<Copied>("copy_citation", { ids, format, expectedRevision }),
+	/**  Preview a key citation without writing the clipboard or saving a choice. */
+	citationText: (ids: RecordId[], format: KeyFormat, expectedRevision: string) => __TAURI_INVOKE<Copied>("citation_text", { ids, format, expectedRevision }),
 	/**  The format the picker starts with: the last one chosen, or Pandoc. */
 	copyFormat: () => __TAURI_INVOKE<KeyFormat>("copy_format"),
 	/**
@@ -118,6 +120,19 @@ export const commands = {
 /* Types */
 /**  A bundled citation style the picker can format with (ADR 0020). */
 export type CitationStyle = "apa" | "chicago-author-date" | "harvard-cite-them-right" | "ieee" | "modern-language-association";
+
+/**
+ *  A failed command as the interface receives it: the interface decides
+ *  from `code`, never from the text in `message`.
+ */
+export type CommandError =
+/**
+ *  The references the interface chose from are no longer the open
+ *  library; search again and choose again.
+ */
+{ code: "snapshot_changed" } |
+/**  Anything else, with fixed text for the user. */
+{ code: "failed"; message: string };
 
 export type Copied = {
 	text: string,
@@ -219,6 +234,11 @@ export type LoginItemProblem =
 /**  The current state could not be read. */
 "unreadable";
 
+/**  Which part of a record matched a query term. */
+export type MatchField = "citekey" | "title" | "author" | "year" | "doi" | "keyword" | "container" | "abstract" |
+/**  An ISBN, PubMed ID or arXiv ID given as the whole query. */
+"identifier";
+
 /**
  *  How the picker looks and what it formats with, remembered across restarts
  *  (ADR 0020). A new key format is saved with the same preference change.
@@ -253,7 +273,7 @@ export type SearchResult = {
 	title: string,
 	authors: string,
 	year: number | null,
-	matched: string[],
+	matched: MatchField[],
 	/**
 	 *  Family name of the first author (or the whole name of an
 	 *  organization); empty when the record names no authors.
