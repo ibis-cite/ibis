@@ -200,10 +200,6 @@ footer { display: flex; align-items: center; border-top: var(--border-width) sol
 .status-dot[data-health="stop"] { background: var(--status-stop); }
 
 
-/* Only a kept-open picker offers this footer control, visible at rest. */
-.pin-button { display: inline-grid; place-items: center; flex-shrink: 0; min-width: var(--control-min-size); min-height: var(--control-min-size); padding: 0; background: var(--clear); border-color: var(--clear); color: var(--accent); }
-.pin-button svg { width: var(--icon-glyph-size); stroke-width: var(--icon-stroke); }
-
 /* More stays at the far end even when the footer wraps, so its menu opens inward. */
 .more { position: relative; margin-inline-start: auto; }
 .more > button { display: inline-flex; align-items: center; min-height: var(--control-min-size); padding-block: 0; padding-inline: calc(var(--space-1) - var(--border-width)); background: var(--clear); }
@@ -317,7 +313,7 @@ main[data-selection] .results-area { flex: 1 0 var(--results-min-height); overfl
 .footer-action:hover { background: var(--clear); }
 .footer-action:hover > .key-hint { background: var(--button-hover-background); }
 @media (pointer: coarse) {
-  .footer-action, .more > button, .pin-button { min-width: 2.75rem; min-height: 2.75rem; }
+  .footer-action, .more > button { min-width: 2.75rem; min-height: 2.75rem; }
 }
 :root[data-text-size="larger"] .shortcuts-hint { display: none; }
 @media (width < 520px) { .shortcuts-hint { display: none; } }

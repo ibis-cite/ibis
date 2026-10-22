@@ -226,7 +226,7 @@ list, preview and tray) from a control layer (search and format).
 | Search box | Always | The largest element, focused on open. Its placeholder lists what can be searched. |
 | Format (for example "Pandoc ⌃⌄" on macOS) | Once a library is chosen | What is pasted depends on it. One word, no icon; each platform's pop-up button (see **Header**). "Key formats" and "Citation styles" show real samples and a leading check; unavailable styles stay focusable; typing filters. |
 | More (Ctrl/⌘ K) | Always | The one door to every other action; each shows its shortcut, so the menu is also the cheat sheet. In the footer it reads "More ⌘K", like the hints beside it (see **Footer**). |
-| Keep Window Open | In More | Checkable, with ⌘⇧P on macOS and Ctrl+Shift+P elsewhere. Only while kept open, a visible footer pin offers “Kept open; click to stop”. The first outside-click tip will name the action and shortcut. |
+| Keep Window Open | In More | Checkable, with ⌘⇧P on macOS and Ctrl+Shift+P elsewhere. Only while kept open, a visible footer pin offers “Kept open; click to stop”. The first outside-click tip is planned for 0.3 (#571/#572), naming the action and shortcut. |
 | Filter chips | Once added | `#tag`, `y:2019-2022` or `a:name` followed by a space becomes a removable chip. Backspace in an empty box removes the last one. |
 | Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab reaches the current browsing tab; ← and → choose another (see **Keyboard focus order**). |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter, or Tab while the suggestions are open, picks the first. |

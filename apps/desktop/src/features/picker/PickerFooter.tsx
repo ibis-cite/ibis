@@ -2,6 +2,7 @@ import type React from "react";
 import type { LibraryStatus } from "../../api";
 import { ariaKeys, keysFor } from "../../keys";
 import { LibraryStatusLine } from "../../LibraryStatusLine";
+import "./PickerFooter.css";
 import { keyText, pickerText } from "../../messages";
 import { currentPlatform } from "../../platform";
 import { KeyHint } from "../../ui/KeyCaps";

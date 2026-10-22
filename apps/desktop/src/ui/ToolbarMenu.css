@@ -3,7 +3,7 @@
 .toolbar-menu-button, .toolbar-menu-button:hover {
   position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: var(--space-1);
   min-height: var(--control-min-size); padding: 0 var(--row-pad);
-  border: 0; border-radius: var(--r-row); background: var(--clear); color: var(--text);
+  border: 0; border-radius: var(--button-radius); background: var(--clear); color: var(--text);
   font: var(--metadata-size)/var(--metadata-line-height) var(--font-family);
 }
 .toolbar-menu-button::before {
@@ -16,7 +16,7 @@
   inset-block: auto; top: 50%; height: calc(var(--control-min-size) - var(--space-1)); transform: translateY(-50%);
 }
 :root[data-platform="windows"] .toolbar-menu-button::before { background: var(--button-background); border-color: var(--button-edge); border-bottom-color: var(--line); }
-:root[data-platform="linux"] .toolbar-menu-button { font-weight: var(--type-strong-weight); }
+:root[data-platform="linux"] .toolbar-menu-button { font-weight: bold; }
 .toolbar-menu-button[data-hovered]::before { background: var(--button-hover-background); }
 .toolbar-menu-button[data-pressed]::before, .toolbar-menu-button[aria-expanded="true"]::before { background: var(--button-hover-background); }
 :root[data-platform="windows"] .toolbar-menu-button[data-pressed]::before,
@@ -47,5 +47,5 @@
   .toolbar-menu-button::before { transition: none; }
 }
 @media (pointer: coarse) {
-  .toolbar-menu-control, .toolbar-menu-button { min-width: calc(11 * var(--space-1)); min-height: calc(11 * var(--space-1)); }
+  .toolbar-menu-control, .toolbar-menu-button { min-width: calc(var(--control-min-size) + var(--row-pad)); min-height: calc(var(--control-min-size) + var(--row-pad)); }
 }

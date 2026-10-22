@@ -92,6 +92,16 @@ test("the many-results fixture exercises a scrollable real result list", async (
   expect(within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option")).toHaveLength(20);
 });
 
+test("the scope-menu fixture shows the existing multi-library choices in More", async () => {
+  const state = galleryStates.find((candidate) => candidate.id === "scope-menu");
+  expect(state).toBeTruthy();
+  render(<App {...galleryProvider(state!)} />);
+  fireEvent.click(await screen.findByRole("button", { name: "More" }));
+  const personal = await screen.findByRole("menuitemcheckbox", { name: "My Library" });
+  expect(personal.getAttribute("aria-checked")).toBe("true");
+  expect(screen.getByRole("menuitemcheckbox", { name: "Group 41" }).getAttribute("aria-checked")).toBe("true");
+});
+
 test("a gallery state with horizontal overflow is not accepted as rendered", async () => {
   vi.useFakeTimers();
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
