@@ -9,3 +9,5 @@ Geometry and layout output is byte-identical. 144 of 156 report checks pass; the
 The 72 adversarial cases cover three looks, both themes, normal/115%/200% text, 360/720 px widths and both directions. All pass: no partly cut chips or horizontal overflow, focused last-chip visibility, fade removal on focus, selection removal and Search recovery, increased-contrast and forced-colours fades.
 
 Native materials and broad text-contrast acceptance are separate observations; these captures and geometry results do not establish either. Long formatted previews scroll as before.
+
+Supplementary rendered axe audit: 48 matching frames per source, 71 violation nodes before and 61 after, zero new foreground/background/size failure facts. Existing Chromium system selection and GNOME control/key-cap pairs remain below 4.5:1; unresolved checks remain incomplete. See contrast-comparison.json. This does not establish the issue’s broad 4.5:1 acceptance criterion.

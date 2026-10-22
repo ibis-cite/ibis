@@ -1,0 +1,970 @@
+{
+  "before": "9456d8096180878457f10c11af174e650f30df43",
+  "after": "281a87bb51d63bc9aa4ea0759188e257f95c1309",
+  "method": "axe-core rendered color-contrast in Chromium 151; identical viewport, pointer outside, platform/theme/text/state; not pixel-sampled or native material acceptance",
+  "framesPerSource": 48,
+  "beforeViolationNodes": 71,
+  "afterViolationNodes": 61,
+  "newViolationFacts": 0,
+  "qualification": "Inherited macOS-look Chromium system selection and GNOME control/key-cap colour pairs fail the general 4.5:1 requirement. Unresolved nodes remain incomplete, not passed. This is evidence of no new reported contrast failure, not blanket contrast acceptance.",
+  "results": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "many-results",
+      "beforeViolations": 5,
+      "afterViolations": 5,
+      "beforeUnresolved": 84,
+      "afterUnresolved": 2,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.3pt (15px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        },
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "9.8pt (13px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "menu-open",
+      "beforeViolations": 1,
+      "afterViolations": 1,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "9.8pt (13px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "many-results",
+      "beforeViolations": 5,
+      "afterViolations": 5,
+      "beforeUnresolved": 90,
+      "afterUnresolved": 2,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "12.9pt (17.25px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        },
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.2pt (14.95px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-preview",
+      "beforeViolations": 5,
+      "afterViolations": 5,
+      "beforeUnresolved": 2,
+      "afterUnresolved": 28,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.3pt (15px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        },
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "9.8pt (13px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "menu-open",
+      "beforeViolations": 1,
+      "afterViolations": 1,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.2pt (14.95px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "many-results",
+      "beforeViolations": 5,
+      "afterViolations": 5,
+      "beforeUnresolved": 84,
+      "afterUnresolved": 2,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.3pt (15px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        },
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "9.8pt (13px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-preview",
+      "beforeViolations": 5,
+      "afterViolations": 5,
+      "beforeUnresolved": 2,
+      "afterUnresolved": 26,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "12.9pt (17.25px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        },
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.2pt (14.95px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "menu-open",
+      "beforeViolations": 1,
+      "afterViolations": 1,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "9.8pt (13px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "many-results",
+      "beforeViolations": 5,
+      "afterViolations": 5,
+      "beforeUnresolved": 90,
+      "afterUnresolved": 2,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "12.9pt (17.25px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        },
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.2pt (14.95px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-preview",
+      "beforeViolations": 5,
+      "afterViolations": 5,
+      "beforeUnresolved": 2,
+      "afterUnresolved": 28,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.3pt (15px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        },
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "9.8pt (13px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "menu-open",
+      "beforeViolations": 1,
+      "afterViolations": 1,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.2pt (14.95px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "many-results",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 78,
+      "afterUnresolved": 78,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-preview",
+      "beforeViolations": 5,
+      "afterViolations": 5,
+      "beforeUnresolved": 2,
+      "afterUnresolved": 26,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "12.9pt (17.25px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        },
+        {
+          "pair": {
+            "bgColor": "#0075ff",
+            "contrastRatio": 4.2,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#ffffff",
+            "fontSize": "11.2pt (14.95px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "menu-open",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "many-results",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 88,
+      "afterUnresolved": 88,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-preview",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "menu-open",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "many-results",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 78,
+      "afterUnresolved": 78,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-preview",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "menu-open",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "many-results",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 88,
+      "afterUnresolved": 88,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-preview",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "menu-open",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "first-run",
+      "beforeViolations": 7,
+      "afterViolations": 2,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#e6e6e7",
+            "contrastRatio": 4.22,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#6b6b75",
+            "fontSize": "9.0pt (12px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "many-results",
+      "beforeViolations": 2,
+      "afterViolations": 2,
+      "beforeUnresolved": 83,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#e6e6e7",
+            "contrastRatio": 4.22,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#6b6b75",
+            "fontSize": "9.0pt (12px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-preview",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "menu-open",
+      "beforeViolations": 2,
+      "afterViolations": 2,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#ebebeb",
+            "contrastRatio": 4.42,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#6b6b75",
+            "fontSize": "9.8pt (13px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "first-run",
+      "beforeViolations": 6,
+      "afterViolations": 1,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#e6e6e7",
+            "contrastRatio": 4.22,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#6b6b75",
+            "fontSize": "10.3pt (13.8px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "many-results",
+      "beforeViolations": 1,
+      "afterViolations": 1,
+      "beforeUnresolved": 89,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#e6e6e7",
+            "contrastRatio": 4.22,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#6b6b75",
+            "fontSize": "10.3pt (13.8px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "normal",
+      "state": "tray-preview",
+      "beforeViolations": 2,
+      "afterViolations": 2,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 27,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#e6e6e7",
+            "contrastRatio": 4.22,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#6b6b75",
+            "fontSize": "9.0pt (12px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "menu-open",
+      "beforeViolations": 2,
+      "afterViolations": 2,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#ebebeb",
+            "contrastRatio": 4.42,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#6b6b75",
+            "fontSize": "11.2pt (14.95px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "many-results",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 82,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": "large",
+      "state": "tray-preview",
+      "beforeViolations": 1,
+      "afterViolations": 1,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 25,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#e6e6e7",
+            "contrastRatio": 4.22,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#6b6b75",
+            "fontSize": "10.3pt (13.8px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "menu-open",
+      "beforeViolations": 2,
+      "afterViolations": 2,
+      "beforeUnresolved": 1,
+      "afterUnresolved": 1,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#48484c",
+            "contrastRatio": 3.76,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#a6a6af",
+            "fontSize": "9.8pt (13px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "first-run",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "many-results",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 88,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "normal",
+      "state": "tray-preview",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 26,
+      "newViolationFacts": [],
+      "violationPairs": []
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "menu-open",
+      "beforeViolations": 2,
+      "afterViolations": 2,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 0,
+      "newViolationFacts": [],
+      "violationPairs": [
+        {
+          "pair": {
+            "bgColor": "#48484c",
+            "contrastRatio": 3.76,
+            "expectedContrastRatio": "4.5:1",
+            "fgColor": "#a6a6af",
+            "fontSize": "11.2pt (14.95px)",
+            "fontWeight": "normal",
+            "messageKey": null
+          },
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": "large",
+      "state": "tray-preview",
+      "beforeViolations": 0,
+      "afterViolations": 0,
+      "beforeUnresolved": 0,
+      "afterUnresolved": 24,
+      "newViolationFacts": [],
+      "violationPairs": []
+    }
+  ]
+}

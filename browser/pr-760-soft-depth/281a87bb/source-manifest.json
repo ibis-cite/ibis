@@ -826,6 +826,14 @@
     {
       "file": "before-geometry.txt",
       "sha256": "cf66869d4870128880583bf95eb295dfd300538a92777ba1ba740d6758936974"
+    },
+    {
+      "file": "README.md",
+      "sha256": "a98b6665be82660987cff010c57fe71a2a9da0a16a6f34b9bfdd8697a545e037"
+    },
+    {
+      "file": "contrast-comparison.json",
+      "sha256": "8d6c61adeaf5fecbe499bd0c58934960844b52840a662e0f748359884eaa5571"
     }
   ]
 }
