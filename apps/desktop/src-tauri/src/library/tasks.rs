@@ -157,7 +157,11 @@ pub(crate) fn start_open(app: &AppHandle, source: Source, remember: bool) {
     let Some((request, reload, _)) = begin_open(&app.state(), &app.state(), source.clone()) else {
         return;
     };
-    let intent = if remember { OpenIntent::Remember } else { OpenIntent::Read };
+    let intent = if remember {
+        OpenIntent::Remember
+    } else {
+        OpenIntent::Read
+    };
     run_open(app, request, source, reload, intent);
 }
 
