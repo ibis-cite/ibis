@@ -563,3 +563,20 @@ test("the thicker active-row edge in increased contrast does not move the row's 
   const contrast = styles.slice(styles.indexOf("@media (prefers-contrast: more)"));
   expect(rules(contrast, '[role="option"][data-active]')).toMatch(/padding-inline:\s*calc\(var\(--row-pad\) - var\(--contrast-border-width\)\)/);
 });
+
+test("the alias-only migration exposes the complete design-system role inventory", () => {
+  const roles = `surface-window surface-raised surface-overlay surface-field
+    fill-control fill-control-hover fill-control-pressed fill-subtle-hover fill-subtle-pressed fill-disabled
+    text-tertiary text-disabled text-on-accent accent-text row-inactive-background
+    stroke-control stroke-field stroke-overlay scrim status-info
+    shadow-card shadow-raised shadow-overlay shadow-dialog shadow-toast
+    ease-in ease-out motion-exit z-content z-chrome z-overlay z-tooltip z-modal z-toast overlay-margin
+    r-control r-key r-card r-dialog r-full`.split(/\s+/);
+  for (const role of roles) expect(tokens, role).toMatch(new RegExp(`--${role}:`));
+  for (const [step, px] of [[1, 4], [2, 8], [3, 12], [4, 16], [5, 20], [6, 24], [8, 32], [10, 40]]) {
+    expect(Number(tokens.match(new RegExp(`--space-${step}:\\s*([\\d.]+)rem;`))?.[1]) * 16).toBe(px);
+  }
+  for (const old of ["focus", "focus-width", "focus-offset", "key-radius", "key-padding"]) {
+    expect(tokens).not.toMatch(new RegExp(`--${old}:`));
+  }
+});
