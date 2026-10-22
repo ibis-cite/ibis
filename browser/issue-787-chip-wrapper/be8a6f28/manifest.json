@@ -1,0 +1,30 @@
+{
+  "source": "be8a6f28c194",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "normal/linux-dark/chips",
+    "normal/linux-dark/chips-rtl",
+    "normal/linux-light/chips",
+    "normal/linux-light/chips-rtl",
+    "normal/macos-dark/chips",
+    "normal/macos-dark/chips-rtl",
+    "normal/macos-light/chips",
+    "normal/macos-light/chips-rtl",
+    "normal/windows-dark/chips",
+    "normal/windows-dark/chips-rtl",
+    "normal/windows-light/chips",
+    "normal/windows-light/chips-rtl"
+  ],
+  "failed": [],
+  "full_source": "be8a6f28c194f7b3aa7f2dece9b2962abb02fcaa",
+  "qualification": "Synthetic component-only gallery; not production shelf integration or native acceptance.",
+  "sha256": {
+    "contact-sheet-normal.png": "8145cf4fce788195097469ea8674bb3d6b866f2dacad3873665fb10e0c4c6ed4",
+    "browser-checks.json": "f0546ca0f28b4637799c38df39c56a664023ce6c577b372ae03c49f62c7e7de1"
+  }
+}
