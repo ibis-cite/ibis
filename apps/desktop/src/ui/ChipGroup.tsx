@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, type ComponentPropsWithRef, type KeyboardEvent, type RefObject } from "react";
+import { useCallback, useEffect, useRef, type ComponentPropsWithRef, type KeyboardEvent, type ReactNode, type Ref, type RefObject } from "react";
 import { Button, I18nProvider, Tag, TagGroup, TagList, useLocale } from "react-aria-components";
 import "./ChipGroup.css";
 
-export type ChipItem = { id: string; label: string; textValue: string; removeLabel: string };
+export type ChipItem = { id: string; label: ReactNode; textValue: string; removeLabel: string; title?: string };
 type Props = {
   label: string; items: readonly ChipItem[]; onRemove: (keys: ReadonlySet<string>) => void;
   fallbackFocusRef: RefObject<HTMLElement | null>; locale?: string;
+  listRef?: Ref<HTMLDivElement>;
 };
 
 /** Controlled labels: the caller owns identity, membership and order. */
@@ -13,7 +14,7 @@ export function ChipGroup(props: Props) {
   return props.locale ? <I18nProvider locale={props.locale}><Chips {...props} /></I18nProvider> : <Chips {...props} />;
 }
 
-function Chips({ label, items, onRemove, fallbackFocusRef }: Props) {
+function Chips({ label, items, onRemove, fallbackFocusRef, listRef }: Props) {
   const { direction } = useLocale();
   const group = useRef<HTMLDivElement | null>(null);
   const fallback = useRef(fallbackFocusRef);
@@ -48,9 +49,10 @@ function Chips({ label, items, onRemove, fallbackFocusRef }: Props) {
       emptyRemoval.current = items.length > 0 && items.every((item) => keys.has(item.id)) && Boolean(group.current?.contains(document.activeElement));
       onRemove(new Set([...keys].map(String)));
     }}>
-    <TagList items={items} className="chip-group-list">
-      {(item) => <Tag id={item.id} textValue={item.textValue} className="chip-group-item">
-        <bdi>{item.label}</bdi>
+    <TagList ref={listRef} data-chip-list="" items={items} className="chip-group-list">
+      {(item) => <Tag id={item.id} textValue={item.textValue} className="chip-group-item" data-chip-item=""
+        render={(props) => <div {...props as ComponentPropsWithRef<"div">} title={item.title} />}>
+        {typeof item.label === "string" ? <bdi>{item.label}</bdi> : item.label}
         <Button slot="remove" className="chip-group-remove"
           render={(props) => <button {...props as ComponentPropsWithRef<"button">} aria-label={item.removeLabel} aria-labelledby={undefined} />}>
           <span aria-hidden="true">×</span>
