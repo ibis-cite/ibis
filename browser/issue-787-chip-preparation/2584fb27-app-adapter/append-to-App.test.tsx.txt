@@ -1,0 +1,64 @@
+
+test("chip adapter preparation: Delete removes one source identity and preserves focus and copied order", async () => {
+  const records = [result("shared", "First source", "zotero:user"), result("shared", "Second source", "zotero:group:7"),
+    result("third", "Third chosen", "zotero:user")];
+  const copied: unknown[] = [];
+  backend({
+    library_status: () => ({ ...zoteroStatus(["user", { group: 7 }]), references: 3 }),
+    zotero_groups: () => [{ id: 7, name: "Reading group" }],
+    search: () => records,
+    copy_citation: (args) => { copied.push(args); return { text: "synthetic citation", warnings: [] }; },
+  });
+  render(<App />);
+  for (const record of records) fireEvent.click(await screen.findByText(record.title), { shiftKey: true });
+  const groupRemove = await screen.findByRole("button", { name: "Remove shared (Reading group) from the selection" });
+  const target = groupRemove.closest<HTMLElement>('[role="row"]') ?? groupRemove;
+  act(() => target.focus());
+  fireEvent.keyDown(target, { key: "Delete" });
+  await waitFor(() => expect(screen.queryByRole("button", { name: "Remove shared (Reading group) from the selection" })).toBeNull());
+  expect(screen.getByText("First source").closest('[role="option"]')?.hasAttribute("data-citation-selected")).toBe(true);
+  expect(screen.getByText("Second source").closest('[role="option"]')?.hasAttribute("data-citation-selected")).toBe(false);
+  const next = screen.getByRole("button", { name: "Remove third from the selection" }).closest('[role="row"]');
+  expect(next).not.toBeNull();
+  expect(document.activeElement).toBe(next);
+  fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
+  await waitFor(() => expect(copied).toEqual([{
+    ids: [records[0]!.id, records[2]!.id], format: "pandoc", expectedRevision: "1",
+  }]));
+});
+
+test("chip adapter preparation: final Delete returns to Search and held Enter cannot copy", async () => {
+  const calls = backend({ search: () => [result("only", "Only chosen")],
+    copy_citation: () => ({ text: "synthetic citation", warnings: [] }) });
+  render(<App />);
+  fireEvent.click(await screen.findByText("Only chosen"), { shiftKey: true });
+  const remove = screen.getByRole("button", { name: "Remove only from the selection" });
+  const target = remove.closest<HTMLElement>('[role="row"]') ?? remove;
+  act(() => target.focus());
+  fireEvent.keyDown(target, { key: "Delete" });
+  const search = screen.getByLabelText("Search references");
+  await waitFor(() => expect(document.activeElement).toBe(search));
+  expect(screen.queryByRole("button", { name: "Remove only from the selection" })).toBeNull();
+  fireEvent.keyDown(search, { key: "Enter", repeat: true });
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  expect(calls).not.toContain("copy_citation");
+  expect(calls).not.toContain("hide_picker");
+});
+
+test("chip adapter preparation: composition protects chosen identities and the picker Escape layer", async () => {
+  const calls = backend({ search: () => [result("one", "First chosen"), result("two", "Second chosen")] });
+  render(<App />);
+  for (const title of ["First chosen", "Second chosen"]) fireEvent.click(await screen.findByText(title), { shiftKey: true });
+  const remove = screen.getByRole("button", { name: "Remove one from the selection" });
+  const target = remove.closest<HTMLElement>('[role="row"]') ?? remove;
+  act(() => target.focus());
+  fireEvent.compositionStart(target);
+  for (const key of ["Delete", "Backspace", "Escape"]) fireEvent.keyDown(target, { key });
+  expect(screen.getByRole("button", { name: "Remove one from the selection" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Remove two from the selection" })).toBeTruthy();
+  expect(calls).not.toContain("hide_picker");
+  fireEvent.compositionEnd(target);
+  fireEvent.keyDown(target, { key: "Delete" });
+  await waitFor(() => expect(screen.queryByRole("button", { name: "Remove one from the selection" })).toBeNull());
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "Remove two from the selection" }).closest('[role="row"]'));
+});

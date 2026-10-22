@@ -1,0 +1,58 @@
+{
+  "baselineMainCommit": "2584fb277cfd3ccd1e6b50a4b37f222f6d5353e6",
+  "date": "2026-10-22",
+  "fixtureSHA256": "56e515a9be2077ae3afe6dd0796bac3e022612e1164a1ca75fac9b7615cd7b58",
+  "runtime": {
+    "vitest": "5.0.5",
+    "environment": "jsdom"
+  },
+  "command": "pnpm exec vitest run src/App.test.tsx -t 'chip adapter preparation:'",
+  "result": {
+    "exitCode": 1,
+    "passed": 0,
+    "expectedFailures": 3,
+    "intentionallyFiltered": 209,
+    "typecheck": "passed"
+  },
+  "failures": [
+    {
+      "title": "chip adapter preparation: Delete removes one source identity and preserves focus and copied order",
+      "status": "failed",
+      "firstFailure": "AssertionError: expected <button type=\"button\" \u2026(1)></button> to be null"
+    },
+    {
+      "title": "chip adapter preparation: final Delete returns to Search and held Enter cannot copy",
+      "status": "failed",
+      "firstFailure": "AssertionError: expected <button type=\"button\" \u2026(1)></button> to be <input id=\"search\" \u2026(8)></input> // Object.is equality"
+    },
+    {
+      "title": "chip adapter preparation: composition protects chosen identities and the picker Escape layer",
+      "status": "failed",
+      "firstFailure": "AssertionError: expected [ 'library_status', \u2026(6) ] to not include 'hide_picker'"
+    }
+  ],
+  "integrationInspection": {
+    "depthHead": "58c34afdf4daf9a04ec529251d2cd24dfd1b232e",
+    "currentMainIsDepthAncestor": true,
+    "chipHead": "be8a6f28c194f7b3aa7f2dece9b2962abb02fcaa",
+    "cleanVirtualMergeTreeWithCurrentMain": "ad1418ebedc399d3ad5de0e20b2a5397f1e92a7c",
+    "virtualMergeDiffFiles": [
+      "apps/desktop/src/gallery.tsx",
+      "apps/desktop/src/ui/ChipGroup.css",
+      "apps/desktop/src/ui/ChipGroup.test.tsx",
+      "apps/desktop/src/ui/ChipGroup.tsx",
+      "apps/desktop/src/ui/ChipGroupGallery.tsx",
+      "docs/design/preview.md"
+    ],
+    "formatMenuGalleryHooksPreserved": true
+  },
+  "qualification": [
+    "Expected failures describe the unimplemented production chip keyboard adapter; these are not a claim that existing main regressed",
+    "The fixture appends to existing App.test.tsx and reuses its synthetic backend, result and zoteroStatus helpers",
+    "Only the first failing assertion in each case ran to failure; later focus, copy-order and held-Enter assertions are prepared acceptance conditions, not passed evidence",
+    "No pending Shelf source, ChipGroup implementation or ancestry was copied into the actual-main preparation checkout",
+    "No frozen PR head changed, and no full, build, browser or native check was run",
+    "The virtual merge only inspects main plus the generic wrapper; it does not establish final shelf/toggle integration acceptance",
+    "When applying after the actual Shelf lands, use the integrated App suite's citation_text mock for key-preview requests; no preview command fixture was imported here"
+  ]
+}
