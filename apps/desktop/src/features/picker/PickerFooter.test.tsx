@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { readFileSync } from "node:fs";
+import footerStyles from "./PickerFooter.css?raw";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { galleryStates } from "../../gallery-fixtures";
 import { PickerFooter } from "./PickerFooter";
@@ -112,7 +112,7 @@ test("the live hint margin restores Shortcuts at the actual fit boundary", () =>
 
 test("an optional-only hint keeps its intrinsic width while folded and restores on growth", () => {
   const style = document.createElement("style");
-  style.textContent = ".footer-action { max-width: 100%; }\n" + readFileSync("src/features/picker/PickerFooter.css", "utf8");
+  style.textContent = ".footer-action { max-width: 100%; }\n" + footerStyles;
   document.head.append(style);
   try {
     const fit = geometry(388, 0, true);
