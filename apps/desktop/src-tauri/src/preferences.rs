@@ -129,6 +129,131 @@ impl SettingsFile {
 mod tests {
     use super::*;
     use ibis_core::settings::LibrarySetting;
+    use tauri::Manager;
+
+    fn preference_request(
+        preferences: PickerPreferences,
+        copy_format: Option<KeyFormat>,
+    ) -> tauri::webview::InvokeRequest {
+        tauri::webview::InvokeRequest {
+            cmd: "set_picker_preferences".into(),
+            callback: tauri::ipc::CallbackFn(0),
+            error: tauri::ipc::CallbackFn(1),
+            url: if cfg!(windows) {
+                "http://tauri.localhost"
+            } else {
+                "tauri://localhost"
+            }
+            .parse()
+            .unwrap_or_else(|e| panic!("invalid fixture URL: {e}")),
+            body: tauri::ipc::InvokeBody::Json(serde_json::json!({
+                "preferences": preferences, "copyFormat": copy_format,
+            })),
+            headers: Default::default(),
+            invoke_key: tauri::test::INVOKE_KEY.into(),
+        }
+    }
+
+    #[test]
+    fn preference_dispatch_returns_while_writer_is_busy_and_save_keeps_current_settings() {
+        use std::sync::mpsc;
+        use std::time::Duration;
+
+        let directory = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+        let path = directory.path().join("settings.json");
+        std::fs::write(&path, r#"{"copy_format":"keys","future_choice":"before dispatch"}"#)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let app = tauri::test::mock_builder()
+            .manage(SettingsFile::new(path.clone()))
+            .invoke_handler(tauri::generate_handler![set_picker_preferences])
+            .build(tauri::generate_context!(test = true))
+            .unwrap_or_else(|e| panic!("cannot build preference fixture: {e}"));
+        let window = tauri::WebviewWindowBuilder::new(&app, "main", Default::default())
+            .build()
+            .unwrap_or_else(|e| panic!("cannot build window fixture: {e}"));
+        let file = app.state::<SettingsFile>();
+        let writing = file.writing.lock().unwrap_or_else(|_| panic!("writer lock poisoned"));
+        let chosen = PickerPreferences {
+            citation_style: None,
+            density: Density::Spacious,
+            larger_text: true,
+            show_paste_preview: false,
+        };
+        let (dispatched, dispatch) = mpsc::channel();
+        let (responded, response) = mpsc::channel();
+        let thread = std::thread::spawn(move || {
+            window.as_ref().clone().on_message(
+                preference_request(chosen, Some(KeyFormat::Typst)),
+                Box::new(move |_, _, reply, _, _| {
+                    let _ = responded.send(reply);
+                }),
+            );
+            let _ = dispatched.send(());
+        });
+        let returned = dispatch.recv_timeout(Duration::from_secs(3));
+        let pending = matches!(response.try_recv(), Err(mpsc::TryRecvError::Empty));
+        // Simulate an external edit after dispatch, before the writer can read.
+        let current = serde_json::json!({
+            "schema_version": 2, "copy_format": "cite", "citation_style": "apa",
+            "library": { "bibtex": "refs.bib" }, "shortcut": "Alt+Space", "update_checks": false,
+            "future_choice": { "kept": [true, null, "参考"] },
+        });
+        let edited = std::fs::write(&path, current.to_string());
+        drop(writing);
+        let reply = response.recv_timeout(Duration::from_secs(3));
+        // Release the lock and collect the reply even on a regression.
+        assert!(returned.is_ok(), "IPC dispatch blocked behind a settings writer");
+        assert!(pending, "save must wait for the existing writer");
+        edited.unwrap_or_else(|e| panic!("{e}"));
+        let tauri::ipc::InvokeResponse::Ok(body) = reply.unwrap_or_else(|e| panic!("save did not finish: {e}")) else {
+            panic!("save unexpectedly failed");
+        };
+        assert_eq!(
+            body.deserialize::<serde_json::Value>()
+                .unwrap_or_else(|e| panic!("invalid reply: {e}")),
+            serde_json::Value::Null
+        );
+        thread.join().unwrap_or_else(|_| panic!("dispatch thread panicked"));
+        let loaded = settings::load(&path);
+        assert!(loaded.problem.is_none());
+        assert_eq!(PickerPreferences::from_settings(&loaded.settings), chosen);
+        assert_eq!(loaded.settings.copy_format, Some(KeyFormat::Typst));
+        let saved: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap_or_default()).unwrap_or_else(|e| panic!("{e}"));
+        for field in ["library", "shortcut", "update_checks", "future_choice"] {
+            assert_eq!(saved[field], current[field], "queued save keeps the current {field}");
+        }
+    }
+
+    #[test]
+    fn preference_ipc_rejects_invalid_settings_without_private_details_or_overwriting() {
+        let directory = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+        let path = directory.path().join("settings.json");
+        let app = tauri::test::mock_builder()
+            .manage(SettingsFile::new(path.clone()))
+            .invoke_handler(tauri::generate_handler![set_picker_preferences])
+            .build(tauri::generate_context!(test = true))
+            .unwrap_or_else(|e| panic!("cannot build preference fixture: {e}"));
+        let window = tauri::WebviewWindowBuilder::new(&app, "main", Default::default())
+            .build()
+            .unwrap_or_else(|e| panic!("cannot build window fixture: {e}"));
+        let chosen = PickerPreferences::from_settings(&settings::Settings::default());
+        for (text, expected) in [
+            (
+                r#"{"copy_format":"synthetic-private-value"}"#,
+                "settings.json is not valid",
+            ),
+            (
+                r#"{"schema_version":3,"private":"synthetic-private-value"}"#,
+                "settings.json was written by a newer version of Ibis",
+            ),
+        ] {
+            std::fs::write(&path, text).unwrap_or_else(|e| panic!("{e}"));
+            let result = tauri::test::get_ipc_response(&window, preference_request(chosen, None));
+            assert_eq!(result.err(), Some(serde_json::json!(expected)));
+            assert_eq!(std::fs::read_to_string(&path).unwrap_or_default(), text);
+        }
+    }
 
     #[test]
     fn unreadable_settings_report_no_operating_system_payload() {
