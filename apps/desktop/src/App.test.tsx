@@ -3380,6 +3380,7 @@ test.each([{ repeat: true }, { isComposing: true }, { keyCode: 229 }, { altKey: 
     render(<App />);
     fireEvent.click(await waitFor(() => formatButton("Copy as Pandoc")));
     fireEvent.keyDown(screen.getByRole("searchbox"), { key: "i", code: "KeyI", ctrlKey: true, ...more });
+    await act(async () => { await new Promise(requestAnimationFrame); await new Promise(requestAnimationFrame); });
     expect(screen.getByRole("menu")).toBeTruthy();
     expect(calls).not.toContain("set_picker_preferences");
     expect(calls).not.toContain("quit");
