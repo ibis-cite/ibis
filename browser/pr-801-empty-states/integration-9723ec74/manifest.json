@@ -1,0 +1,12 @@
+{
+  "source": "9723ec740c72c2c96c8fcdad89734ec977200ed1",
+  "baseline": "9456d8096180878457f10c11af174e650f30df43",
+  "ui_passed": 452,
+  "component_passed": 12,
+  "browser_passed": 240,
+  "typescript": "passed",
+  "gallery_build": "passed",
+  "full": "not run on final head; pending",
+  "independent_final_review": "pending",
+  "status": "paused draft"
+}

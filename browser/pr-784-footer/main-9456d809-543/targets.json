@@ -1,0 +1,799 @@
+{
+  "source": "9456d8096180878457f10c11af174e650f30df43",
+  "passed": 24,
+  "total": 24,
+  "results": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 291.234375,
+          "right": 267.640625,
+          "bottom": 355.234375,
+          "width": 227.640625,
+          "height": 64,
+          "client": 226,
+          "scroll": 226
+        },
+        {
+          "name": null,
+          "x": 269.859375,
+          "y": 371.234375,
+          "right": 445,
+          "bottom": 435.234375,
+          "width": 175.140625,
+          "height": 64,
+          "client": 173,
+          "scroll": 173
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 262.421875,
+          "right": 267.640625,
+          "bottom": 350.421875,
+          "width": 227.640625,
+          "height": 88,
+          "client": 226,
+          "scroll": 226
+        },
+        {
+          "name": null,
+          "x": 269.859375,
+          "y": 366.421875,
+          "right": 445,
+          "bottom": 454.421875,
+          "width": 175.140625,
+          "height": 88,
+          "client": 173,
+          "scroll": 173
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 347.453125,
+          "right": 267.640625,
+          "bottom": 411.453125,
+          "width": 227.640625,
+          "height": 64,
+          "client": 226,
+          "scroll": 226
+        },
+        {
+          "name": null,
+          "x": 269.859375,
+          "y": 427.453125,
+          "right": 445,
+          "bottom": 491.453125,
+          "width": 175.140625,
+          "height": 64,
+          "client": 173,
+          "scroll": 173
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 316.125,
+          "right": 267.640625,
+          "bottom": 404.125,
+          "width": 227.640625,
+          "height": 88,
+          "client": 226,
+          "scroll": 226
+        },
+        {
+          "name": null,
+          "x": 269.859375,
+          "y": 420.125,
+          "right": 445,
+          "bottom": 508.125,
+          "width": 175.140625,
+          "height": 88,
+          "client": 173,
+          "scroll": 173
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 291.234375,
+          "right": 267.640625,
+          "bottom": 355.234375,
+          "width": 227.640625,
+          "height": 64,
+          "client": 226,
+          "scroll": 226
+        },
+        {
+          "name": null,
+          "x": 269.859375,
+          "y": 371.234375,
+          "right": 445,
+          "bottom": 435.234375,
+          "width": 175.140625,
+          "height": 64,
+          "client": 173,
+          "scroll": 173
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 262.421875,
+          "right": 267.640625,
+          "bottom": 350.421875,
+          "width": 227.640625,
+          "height": 88,
+          "client": 226,
+          "scroll": 226
+        },
+        {
+          "name": null,
+          "x": 269.859375,
+          "y": 366.421875,
+          "right": 445,
+          "bottom": 454.421875,
+          "width": 175.140625,
+          "height": 88,
+          "client": 173,
+          "scroll": 173
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 347.453125,
+          "right": 267.640625,
+          "bottom": 411.453125,
+          "width": 227.640625,
+          "height": 64,
+          "client": 226,
+          "scroll": 226
+        },
+        {
+          "name": null,
+          "x": 269.859375,
+          "y": 427.453125,
+          "right": 445,
+          "bottom": 491.453125,
+          "width": 175.140625,
+          "height": 64,
+          "client": 173,
+          "scroll": 173
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 316.125,
+          "right": 267.640625,
+          "bottom": 404.125,
+          "width": 227.640625,
+          "height": 88,
+          "client": 226,
+          "scroll": 226
+        },
+        {
+          "name": null,
+          "x": 269.859375,
+          "y": 420.125,
+          "right": 445,
+          "bottom": 508.125,
+          "width": 175.140625,
+          "height": 88,
+          "client": 173,
+          "scroll": 173
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 32,
+          "y": 285.984375,
+          "right": 292.78125,
+          "bottom": 349.984375,
+          "width": 260.78125,
+          "height": 64,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 229.265625,
+          "y": 365.984375,
+          "right": 453,
+          "bottom": 429.984375,
+          "width": 223.734375,
+          "height": 64,
+          "client": 222,
+          "scroll": 222
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 32,
+          "y": 256.90625,
+          "right": 292.78125,
+          "bottom": 344.90625,
+          "width": 260.78125,
+          "height": 88,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 229.265625,
+          "y": 360.90625,
+          "right": 453,
+          "bottom": 448.90625,
+          "width": 223.734375,
+          "height": 88,
+          "client": 222,
+          "scroll": 222
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 32,
+          "y": 342.875,
+          "right": 292.78125,
+          "bottom": 406.875,
+          "width": 260.78125,
+          "height": 64,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 229.265625,
+          "y": 422.875,
+          "right": 453,
+          "bottom": 486.875,
+          "width": 223.734375,
+          "height": 64,
+          "client": 222,
+          "scroll": 222
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 32,
+          "y": 311.140625,
+          "right": 292.78125,
+          "bottom": 399.140625,
+          "width": 260.78125,
+          "height": 88,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 229.265625,
+          "y": 415.140625,
+          "right": 453,
+          "bottom": 503.140625,
+          "width": 223.734375,
+          "height": 88,
+          "client": 222,
+          "scroll": 222
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 32,
+          "y": 285.984375,
+          "right": 292.78125,
+          "bottom": 349.984375,
+          "width": 260.78125,
+          "height": 64,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 229.265625,
+          "y": 365.984375,
+          "right": 453,
+          "bottom": 429.984375,
+          "width": 223.734375,
+          "height": 64,
+          "client": 222,
+          "scroll": 222
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 32,
+          "y": 256.90625,
+          "right": 292.78125,
+          "bottom": 344.90625,
+          "width": 260.78125,
+          "height": 88,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 229.265625,
+          "y": 360.90625,
+          "right": 453,
+          "bottom": 448.90625,
+          "width": 223.734375,
+          "height": 88,
+          "client": 222,
+          "scroll": 222
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 32,
+          "y": 342.875,
+          "right": 292.78125,
+          "bottom": 406.875,
+          "width": 260.78125,
+          "height": 64,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 229.265625,
+          "y": 422.875,
+          "right": 453,
+          "bottom": 486.875,
+          "width": 223.734375,
+          "height": 64,
+          "client": 222,
+          "scroll": 222
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 32,
+          "y": 311.140625,
+          "right": 292.78125,
+          "bottom": 399.140625,
+          "width": 260.78125,
+          "height": 88,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 229.265625,
+          "y": 415.140625,
+          "right": 453,
+          "bottom": 503.140625,
+          "width": 223.734375,
+          "height": 88,
+          "client": 222,
+          "scroll": 222
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 291.234375,
+          "right": 300.78125,
+          "bottom": 355.234375,
+          "width": 260.78125,
+          "height": 64,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 198.578125,
+          "y": 371.234375,
+          "right": 445,
+          "bottom": 435.234375,
+          "width": 246.421875,
+          "height": 64,
+          "client": 244,
+          "scroll": 244
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 262.421875,
+          "right": 300.78125,
+          "bottom": 350.421875,
+          "width": 260.78125,
+          "height": 88,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 198.578125,
+          "y": 366.421875,
+          "right": 445,
+          "bottom": 454.421875,
+          "width": 246.421875,
+          "height": 88,
+          "client": 244,
+          "scroll": 244
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 347.453125,
+          "right": 300.78125,
+          "bottom": 411.453125,
+          "width": 260.78125,
+          "height": 64,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 198.578125,
+          "y": 427.453125,
+          "right": 445,
+          "bottom": 491.453125,
+          "width": 246.421875,
+          "height": 64,
+          "client": 244,
+          "scroll": 244
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 316.125,
+          "right": 300.78125,
+          "bottom": 404.125,
+          "width": 260.78125,
+          "height": 88,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 198.578125,
+          "y": 420.125,
+          "right": 445,
+          "bottom": 508.125,
+          "width": 246.421875,
+          "height": 88,
+          "client": 244,
+          "scroll": 244
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 291.234375,
+          "right": 300.78125,
+          "bottom": 355.234375,
+          "width": 260.78125,
+          "height": 64,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 198.578125,
+          "y": 371.234375,
+          "right": 445,
+          "bottom": 435.234375,
+          "width": 246.421875,
+          "height": 64,
+          "client": 244,
+          "scroll": 244
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 262.421875,
+          "right": 300.78125,
+          "bottom": 350.421875,
+          "width": 260.78125,
+          "height": 88,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 198.578125,
+          "y": 366.421875,
+          "right": 445,
+          "bottom": 454.421875,
+          "width": 246.421875,
+          "height": 88,
+          "client": 244,
+          "scroll": 244
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": false,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 347.453125,
+          "right": 300.78125,
+          "bottom": 411.453125,
+          "width": 260.78125,
+          "height": 64,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 198.578125,
+          "y": 427.453125,
+          "right": 445,
+          "bottom": 491.453125,
+          "width": 246.421875,
+          "height": 64,
+          "client": 244,
+          "scroll": 244
+        }
+      ],
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "systemText": 200,
+      "coarse": true,
+      "metrics": [
+        {
+          "name": "Copy as Pandoc",
+          "x": 40,
+          "y": 316.125,
+          "right": 300.78125,
+          "bottom": 404.125,
+          "width": 260.78125,
+          "height": 88,
+          "client": 259,
+          "scroll": 259
+        },
+        {
+          "name": null,
+          "x": 198.578125,
+          "y": 420.125,
+          "right": 445,
+          "bottom": 508.125,
+          "width": 246.421875,
+          "height": 88,
+          "client": 244,
+          "scroll": 244
+        }
+      ],
+      "pass": true
+    }
+  ]
+}

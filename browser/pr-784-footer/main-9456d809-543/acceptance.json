@@ -1,0 +1,725 @@
+{
+  "source": "9456d8096180878457f10c11af174e650f30df43",
+  "results": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "normal",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "flex"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "large",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "normal",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "flex"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "large",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "normal",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "flex"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "large",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "normal",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "flex"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "large",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "normal",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "flex"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "large",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "damaged-library",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": false,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 461,
+      "coarse": true,
+      "text": "system200",
+      "pass": true,
+      "metrics": {
+        "main": [
+          461,
+          461
+        ],
+        "footer": [
+          461,
+          461
+        ],
+        "shortcuts": "none"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "normal",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "flex"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "state": "zotero-kept",
+      "width": 720,
+      "coarse": false,
+      "text": "large",
+      "pass": true,
+      "metrics": {
+        "main": [
+          720,
+          720
+        ],
+        "footer": [
+          720,
+          720
+        ],
+        "shortcuts": "none"
+      }
+    }
+  ]
+}
