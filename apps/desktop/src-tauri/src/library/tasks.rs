@@ -18,7 +18,7 @@ use crate::preferences::SettingsFile;
 use crate::tray::{LibraryMenuItem, library_line};
 
 use super::error::LoadError;
-use super::load::load_source;
+use super::load::{Loaded, load_source};
 use super::retry::{begin_check, begin_focus_retry, begin_zotero_retry, retry, zotero_choice, zotero_to_check};
 use super::source::Source;
 use super::state::{
@@ -297,7 +297,12 @@ pub(crate) fn refresh_zotero(app: &AppHandle) {
             let loaded = tauri::async_runtime::spawn_blocking(move || load_source(source, true, previous))
                 .await
                 .unwrap_or(Err(LoadError::Stopped));
-            if install_loaded(&app.state(), &app.state(), request, loaded).is_some() {
+            // A check of the open library is automatic: it keeps the library's warnings.
+            let installed = match loaded {
+                Ok(Loaded::New(new)) => install_automatic(&app.state(), &app.state(), request, Ok(*new)),
+                other => install_loaded(&app.state(), &app.state(), request, other),
+            };
+            if installed.is_some() {
                 publish_current(&app);
                 watch_current(&app, request);
             }
