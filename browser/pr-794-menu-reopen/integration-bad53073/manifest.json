@@ -1,0 +1,145 @@
+{
+  "source": "bad53073995de43896d836cd0adad6a644c3351c",
+  "actual_main_base": "30ea730b1fcdb35779049fe22748583f4e7af1ec",
+  "kind": "synthetic browser evidence; native acceptance separate",
+  "versions": {
+    "chromium": "151.0.7922.34",
+    "webkit": "26.5"
+  },
+  "qualification": {
+    "ordinary_runtime_source": "b0a5cc2df926abf7f015f4ba1c317c4c5ac71779",
+    "ordinary_runtime_identical_to_final": true,
+    "method": "git diff b0a5cc2d..bad53073 -- apps/desktop/src apps/desktop/src-tauri crates has no changes; follow-up only changes smoke-native.py",
+    "rapid_source": "bad53073995de43896d836cd0adad6a644c3351c",
+    "activation": "Virtual DOM trigger activation and synthetic shortcut input; physical pointer behavior is separately exercised by the ordinary matrix. No new physical rapid-pointer or native rapid acceptance claim."
+  },
+  "checks": {
+    "ordinary_paths": 128,
+    "rapid_lifecycle_paths": 72,
+    "default_ui_tests": 431,
+    "typescript": "passed",
+    "gallery_build": "passed",
+    "smoke_contracts": {
+      "total": 101,
+      "passed": 97,
+      "explicit_skips": 4
+    },
+    "macos_hid_contract": "passed",
+    "guarded_full": "in progress at evidence publication; not yet claimed"
+  },
+  "setup_diagnoses": [
+    {
+      "probe": "close plus reopen in one JavaScript task",
+      "observation": "No committed data-exiting popover",
+      "result": "Unexercised setup; split close activation into its own task."
+    },
+    {
+      "probe": "DOM click labelled pointer",
+      "observation": "Virtual activation marks the first row; ArrowDown correctly advances to the second.",
+      "result": "Label virtual activation accurately and assert the observed initial first-row strategy before navigation."
+    },
+    {
+      "probe": "real close click then untrusted pointer replay",
+      "observation": "Physical cursor retained over Reload can trigger hover; untrusted replay also retained a first-row focus state.",
+      "result": "Do not infer physical opening behavior from replay. Keep the cursor outside, use labelled virtual activation and leave physical rapid acceptance unclaimed."
+    }
+  ],
+  "limits": [
+    "Browser looks do not establish native fonts, materials, screen-reader speech or physical rapid-pointer behavior.",
+    "Native evidence remains the one bounded actual dfe54536 macOS path; full native suite, native rapid/reduced-motion/appearance are not claimed.",
+    "Final guarded full result and hosted required gates are reported separately in the PR."
+  ],
+  "frames": [
+    {
+      "file": "macos-light-more.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "c8d85dbdcfc8c5529374bf520058fa661d38c12c0bafc36078abd7cd94fa28bf"
+    },
+    {
+      "file": "macos-light-toolbar.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "a1d25f770cbcaeddcb0b47976b3b0b51f797fe8da1c2ed0da17f81727da9ca9d"
+    },
+    {
+      "file": "macos-dark-more.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "97acb022f14fbeb1b347b0275eb27bcd3c29907dea760db34aff9e8ceb4b4a4b"
+    },
+    {
+      "file": "macos-dark-toolbar.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "f1d61c822ceb0d46bbf69971d8a3b65484dc44205964380de6aecda5c9eb1eca"
+    },
+    {
+      "file": "windows-light-more.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "81b099ab542c6bf8a6da060489619e2e29accfcb43f9bdcb5dc3a7871f876dc7"
+    },
+    {
+      "file": "windows-light-toolbar.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "a995262a6b0de24cdb0b775d48ec78efac2bc3870754e34c3d0271570057f164"
+    },
+    {
+      "file": "windows-dark-more.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "32f69255d213bb6db8efc406375b2c8d418c26671daf71174f35c5d6d22582ba"
+    },
+    {
+      "file": "windows-dark-toolbar.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "7b2a83ccf7563d35accdc6842eea85a8dcf5fed49aa209c94aca73b0dcc70bda"
+    },
+    {
+      "file": "linux-light-more.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "a33d79f792f80ef6d921082a62f7ac9c7b46f7f12d7a045b013e7e9290e2e1d7"
+    },
+    {
+      "file": "linux-light-toolbar.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "2d829c9e3a740a0dc8163f3a5f1eccbf2ae2e3e603ed7855558008396f38b697"
+    },
+    {
+      "file": "linux-dark-more.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "9ee968606c75a23a800efbd87a24107557151548e35b3caedc526599b7b84b9a"
+    },
+    {
+      "file": "linux-dark-toolbar.png",
+      "format": "PNG",
+      "width": 720,
+      "height": 480,
+      "sha256": "ffaf420c5b0d35a30d8eac402abeed89a8f224c192c04cdc4ac368967659675e"
+    },
+    {
+      "file": "contact-sheet.png",
+      "format": "PNG",
+      "width": 1500,
+      "height": 940,
+      "sha256": "7fa455d58d11344e6201ee799b0a9cb974900d65ce3f4947fb6a559e9e155d04"
+    }
+  ]
+}
