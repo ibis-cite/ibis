@@ -1,0 +1,27 @@
+{
+  "issue": 749,
+  "base": "624100a076ee4fe475dfe3e1873c7ebf2ebb87b3",
+  "head": "86eba06f4e3ec7b2cd3aab10c3fcd62b680c498c",
+  "preliminary": true,
+  "browser": "Chromium 151.0.7922.34",
+  "synthetic_clock": "2026-10-22T09:00:00Z",
+  "frame_pairs": 96,
+  "preferences_state_pairs": 108,
+  "focused_tests": {
+    "passed": 96
+  },
+  "typecheck": "passed",
+  "ui_imports": "passed",
+  "full_check": "running; no pass claimed",
+  "geometry_enforce": "failed identically before and after: 146/153, seven macOS radius mismatches and Linux normal tray-20 readiness timeout",
+  "geometry_logs_identical": true,
+  "body_secondary_neutral_contrast": "no below-4.5 ratios in supported cases; system-selected/accent/disabled role exceptions excluded",
+  "gnome_light_neutral_label_ratio": 10.271,
+  "mac_dark_inactive_segment_brightest_bounded_veil_ratio": 5.884,
+  "remaining": [
+    "actual landed #849 values and renewed whole-depth evidence",
+    "exact final full verification",
+    "independent exact-head review",
+    "native material/platform physical acceptance remains #8/#627"
+  ]
+}
