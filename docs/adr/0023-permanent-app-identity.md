@@ -34,13 +34,26 @@ controls the running app's registration.
   replace an unrelated nonempty destination. On a failed migration, continue
   reading and saving the old settings and show a fixed notice; retry on a later
   launch. Do not log file contents, paths or operating-system error payloads.
-- Preserve each channel's actual start-at-login choice. Windows retains the
-  product-named Run entry. Linux replaces only the corresponding Ibis-owned
-  autostart entry after preparing its replacement. macOS re-registers the new
-  main-app service when the prior enabled choice can be established; report
-  required system approval. A copied JSON file is never evidence of consent.
-  Do not switch the shipped identifiers until these platform transitions are
-  implemented and tested. Existing system permissions may need approval again.
+- Preserve each channel's actual start-at-login choice on Windows and Linux.
+  Windows retains the product-named Run entry. Linux prepares the corresponding
+  Ibis-owned replacement before retiring the old entry and preserves disabled
+  overrides; migration must not expose an enabled system entry.
+- On macOS, a replaced main-app identity cannot reliably read its former
+  OS-owned login choice. The maintainer approved visible one-time reapproval in
+  [#695](https://github.com/ibiscite/ibis/issues/695#issuecomment-6345031681): after
+  matching legacy migration, explain the new identity and direct the person to
+  Open at Login. Leave unknown old consent off. Register only after an explicit
+  request, then report the actual enabled, approval-needed or refused state.
+  A copied JSON file is never evidence of consent; do not disable a known
+  enabled registration under the new identity.
+- Keep the reapproval notice separate for Stable and Nightly. Acknowledge it
+  only after successful display or explicit dismissal; if acknowledgement
+  cannot be saved safely, retain it for a later launch. An undelivered notice
+  must not disappear on reopening. Libraries and shortcuts remain preserved.
+- Do not switch the shipped identifiers until these transitions are implemented
+  and tested for updater and direct replacement paths. Existing system privacy
+  permissions may need approval again; reapproval is not installed-upgrade or
+  restart/login acceptance evidence.
 
 Special files are unreadable settings, not streams to open: keep regular backup
 recovery and refuse writes over a special primary, backup or temporary file.
