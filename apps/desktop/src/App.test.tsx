@@ -3559,7 +3559,8 @@ test("preview choices made during a delayed read and rapid queued saves drain in
 
 
 test.each([{ repeat: true }, { isComposing: true }, { keyCode: 229 }, { altKey: true },
-  { shiftKey: true }, { ctrlKey: false }, { metaKey: true }, { ctrlKey: false, metaKey: true }])(
+  { shiftKey: true }, { ctrlKey: false }, { metaKey: true }, { ctrlKey: false, metaKey: true },
+  { key: "'" }, { key: "ш" }])(
   "preview shortcut ignores held/composing/other modified input: %j", async (more) => {
     const save = vi.fn(() => null);
     backend({ copy_format: () => "typst", set_picker_preferences: save });
@@ -3582,16 +3583,19 @@ test("preview shortcuts update the open More checkbox without closing the menu",
   const choice = await screen.findByRole("menuitemcheckbox", { name: "Show what will be pasted" });
   expect(choice.textContent).toContain("Ctrl+I");
   act(() => choice.focus());
+  fireEvent.keyDown(choice, { key: "'", code: "KeyI", ctrlKey: true });
+  expect(choice.getAttribute("aria-checked")).toBe("true");
+  expect(saved).toEqual([]);
   fireEvent.keyDown(choice, { key: "I", code: "KeyI", ctrlKey: true });
   await waitFor(() => expect(choice.getAttribute("aria-checked")).toBe("false"));
   expect(document.activeElement).toBe(choice);
-  fireEvent.keyDown(choice, { key: "ш", code: "KeyI", ctrlKey: true });
+  fireEvent.keyDown(choice, { key: "i", code: "Quote", ctrlKey: true });
   await waitFor(() => expect(saved).toEqual([false, true]));
   expect(choice.getAttribute("aria-checked")).toBe("true");
   expect(screen.getByRole("menu")).toBeTruthy();
 });
 
-test.each(["i", "ш"])("Format hands off the %s preview shortcut without changing the citation or copying", async (key) => {
+test.each(["i", "I"])("Format hands off the %s preview shortcut without changing the citation or copying", async (key) => {
   const formatter = await import("./format/formatted");
   const format = vi.spyOn(formatter, "formatCitation").mockResolvedValue({ markup: ["(Smith, 2020)"], text: "(Smith, 2020)", html: "(Smith, 2020)", warnings: [] });
   const calls = backend({ search: () => [result("a", "First")], csl_items: () => "[]",
@@ -3603,7 +3607,7 @@ test.each(["i", "ш"])("Format hands off the %s preview shortcut without changin
     const box = screen.getByLabelText("Search references");
     fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
     fireEvent.click(formatButton());
-    fireEvent.keyDown(screen.getByRole("searchbox"), { key, code: "KeyI", ctrlKey: true });
+    fireEvent.keyDown(screen.getByRole("searchbox"), { key, code: "Quote", ctrlKey: true });
     await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
     await waitFor(() => expect(document.activeElement).toBe(box));
     expect(screen.queryByRole("region", { name: "Preview" })).toBeNull();
@@ -3614,7 +3618,7 @@ test.each(["i", "ш"])("Format hands off the %s preview shortcut without changin
   } finally { format.mockRestore(); }
 });
 
-test.each([{ repeat: true }, { isComposing: true }, { keyCode: 229 }, { altKey: true }, { shiftKey: true }])(
+test.each([{ repeat: true }, { isComposing: true }, { keyCode: 229 }, { altKey: true }, { shiftKey: true }, { key: "'" }, { key: "ш" }])(
   "Format ignores a modified/composing/held preview shortcut: %j", async (more) => {
     const calls = backend();
     render(<App />);

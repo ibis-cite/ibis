@@ -39,7 +39,8 @@ export function isPinShortcut(e: React.KeyboardEvent, mac = isMac): boolean {
   return matchesAccelerator(e, keysFor("pin"), mac);
 }
 
-/** Show or hide the output using the platform's command modifier. */
+/** Logical I with the platform command modifier; punctuation on the physical
+ * I key must not become a command on another keyboard layout. */
 export function isPreviewShortcut(e: React.KeyboardEvent, mac = isMac): boolean {
-  return matchesAccelerator(e, keysFor("preview"), mac);
+  return e.key.toLowerCase() === "i" && matchesAccelerator(e, keysFor("preview"), mac);
 }

@@ -40,7 +40,8 @@ layer from `design/depth-prototype` (variant B). The footer pattern
   with the output block pinned at its bottom.
 - **It can be hidden, and is on by default.** One setting, "Show what will be
   pasted" (Settings › Citations, see [settings.md](settings.md); in More until
-  Settings exists), plus ⌘I / Ctrl+I in the picker. Both are saved.
+  Settings exists), plus ⌘I / Ctrl+I in the picker. Both are saved. The shortcut
+  follows the logical I key; punctuation on its physical key does not toggle.
   - On by default: the output is the last check before an action that is hard to
     undo once it lands in a document, and it teaches what each format produces.
     It costs 40 px.

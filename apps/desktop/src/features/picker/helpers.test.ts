@@ -50,11 +50,15 @@ test("a letter shortcut typed as punctuation is not the keys shortcut", () => {
   expect(isMenuShortcut(press("/", "Slash"), false)).toBe(false);
 });
 
-test("preview shortcuts use the platform command key, strict modifiers and non-Latin fallback", () => {
+test("preview shortcuts use logical I, the platform command key and strict modifiers", () => {
   const press = (more: Partial<React.KeyboardEvent> = {}) => ({ key: "i", code: "KeyI", ctrlKey: true,
     metaKey: false, altKey: false, shiftKey: false, target: null, ...more }) as React.KeyboardEvent;
-  for (const key of ["i", "I", "ш", "/"]) expect(isPreviewShortcut(press({ key }), false)).toBe(true);
-  expect(isKeysShortcut(press({ key: "/" }), false)).toBe(false);
+  for (const mac of [false, true]) {
+    const modifier = mac ? { ctrlKey: false, metaKey: true } : {};
+    for (const key of ["i", "I"]) expect(isPreviewShortcut(press({ key, code: "Quote", ...modifier }), mac)).toBe(true);
+    for (const key of ["'", "ш", "/"]) expect(isPreviewShortcut(press({ key, ...modifier }), mac)).toBe(false);
+  }
+  expect(isKeysShortcut(press({ key: "/" }), false)).toBe(true);
   expect(isPreviewShortcut(press({ ctrlKey: false, metaKey: true }), true)).toBe(true);
   for (const modifiers of [{ altKey: true }, { shiftKey: true }, { metaKey: true }, { ctrlKey: false }]) {
     expect(isPreviewShortcut(press(modifiers), false)).toBe(false);
