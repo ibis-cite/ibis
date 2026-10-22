@@ -1469,8 +1469,8 @@ test("rows shorten the authors and keep the journal, key and library label visib
   // row gap). Chromium probe numbers for the crowded cases are in PR #502.
   expect(styles).not.toMatch(/line-clamp/);
   expect(styles).toMatch(/\.result-meta \{[^}]*flex-wrap: wrap; row-gap: 0;/);
-  // Rows at least 25em wide (461px or more at normal text) never wrap.
-  expect(styles).toMatch(/\[role="option"\] \{ container-type: inline-size; \}/);
+  // The body measures the space left after the tile and year columns.
+  expect(styles).toMatch(/\.result-body \{[^}]*container-type: inline-size; \}/);
   expect(styles).toMatch(/@container \(min-width: 25em\) \{ \.result-meta \{ flex-wrap: nowrap; \} \}/);
   expect(styles).toMatch(/\.result-byline \{[^}]*flex: 1 1 auto; min-width: min\(12em, 60%\)/);
   expect(styles).toMatch(/\.result-authors \{ flex: none; max-width: 60%;[^}]*text-overflow: ellipsis/);
