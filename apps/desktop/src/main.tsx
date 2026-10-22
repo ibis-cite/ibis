@@ -3,9 +3,10 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "./styles.css";
 import { commands } from "./bindings";
-import { installNativeAppearance, setPlatform } from "./nativeAppearance";
+import { installAccentContrast, installNativeAppearance, setPlatform } from "./nativeAppearance";
 
 setPlatform();
+installAccentContrast();
 void installNativeAppearance(commands.nativeAppearance);
 
 const root = document.getElementById("root");

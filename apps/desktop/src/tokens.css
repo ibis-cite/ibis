@@ -105,7 +105,8 @@
   --button-edge: var(--clear);
   --hover-background: color-mix(in srgb, var(--text) 3%, var(--surface));
   --selected-background: var(--accent);
-  --selected-text: var(--on-accent-fallback);
+  --readable-accent-text: initial; /* filled by the older-webview appearance hook */
+  --selected-text: var(--readable-accent-text, var(--on-accent-fallback));
   --clear: transparent;
   --border-width: 1px;
   /* The keyboard focus ring, drawn only on :focus-visible: 2 px with a 1 px
@@ -249,12 +250,17 @@
 }
 @supports (color: AccentColor) { :root { --accent: AccentColor; } }
 /* Filled accent with its paired text colour, so any system accent stays legible. */
-@supports (color: AccentColorText) { :root { --selected-background: AccentColor; --selected-text: AccentColorText; } }
+@supports (color: AccentColorText) { :root { --selected-background: AccentColor; --selected-text: var(--readable-accent-text, AccentColorText); } }
 
 /* WKWebView accepts AccentColorText but resolves it to black. Use the paired
    native list colours on macOS; contrast overrides below still take priority. */
 @supports (background: -apple-system-selected-content-background) and (color: -apple-system-alternate-selected-text) {
-  :root[data-platform="macos"] { --selected-background: -apple-system-selected-content-background; --selected-text: -apple-system-alternate-selected-text; }
+  :root[data-platform="macos"] { --selected-background: -apple-system-selected-content-background; --selected-text: var(--readable-accent-text, -apple-system-alternate-selected-text); }
+}
+/* Native paired text can fall below 4.5:1. Choose black or white against the
+   actual system fill; contrast modes below retain their own system pairs. */
+@supports (color: contrast-color(white)) {
+  :root { --selected-text: contrast-color(var(--selected-background)); }
 }
 
 /* Per platform (docs/design.md): only radius, the selected row, the focus ring and the search box change. */

@@ -9,7 +9,7 @@ import { App, type PickerApi } from "./App";
 import { SHELF_CHIPS } from "./features/picker/CitationShelf";
 import { libraryMessages, pickerText } from "./messages";
 import { hasRetainedFreshnessProblem } from "./LibraryStatusLine";
-import { setPlatform } from "./nativeAppearance";
+import { installAccentContrast, setPlatform } from "./nativeAppearance";
 import "./styles.css";
 import "./gallery.css";
 import "./notice.css";
@@ -311,4 +311,5 @@ if (root && (import.meta.env.DEV || import.meta.env.MODE === "evidence")) {
     if (switches.theme) document.documentElement.dataset.galleryTheme = switches.theme;
     createRoot(root).render(<Gallery switches={switches} />);
   }
+  installAccentContrast();
 }

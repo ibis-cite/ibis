@@ -1,7 +1,7 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { installNativeAppearance, setNativeAppearance } from "./nativeAppearance";
+import { installAccentContrast, installNativeAppearance, setNativeAppearance } from "./nativeAppearance";
 
-afterEach(() => { delete document.documentElement.dataset.nativeAppearance; });
+afterEach(() => { delete document.documentElement.dataset.nativeAppearance; vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 test("only explicit native success exposes a material", () => {
   for (const bad of [undefined, null, false, {}, "transparent", "vibrancy; color: red"]) {
@@ -56,4 +56,41 @@ test("live native changes replace startup state and reject invalid modes", async
   changed({ mode: "mica" });
   expect(document.documentElement.dataset.nativeAppearance).toBe("opaque");
   dispose();
+});
+
+test("older engines repair unreadable accent text and refresh on system changes", () => {
+  let background = "rgb(0, 117, 255)";
+  const listeners = new Map<string, () => void>();
+  vi.stubGlobal("CSS", { supports: () => false });
+  vi.stubGlobal("matchMedia", (query: string) => ({ matches: false,
+    addEventListener: (_: string, listener: () => void) => listeners.set(query, listener),
+    removeEventListener: () => {} }));
+  vi.spyOn(window, "getComputedStyle").mockImplementation(() => ({ backgroundColor: background }) as CSSStyleDeclaration);
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({ clearRect: () => {}, fillRect: () => {},
+    getImageData: () => ({ data: new Uint8ClampedArray([...background.match(/\d+/g)!.map(Number), 255]) }),
+  } as unknown as CanvasRenderingContext2D);
+  const dispose = installAccentContrast();
+  const text = () => document.documentElement.style.getPropertyValue("--readable-accent-text");
+  expect(text()).toBe("#000"); // Native white is only 4.21:1; black is 4.99:1.
+  background = "rgb(0, 40, 100)";
+  window.dispatchEvent(new Event("focus"));
+  expect(text()).toBe("#fff");
+  background = "rgb(255, 230, 0)";
+  listeners.get("(prefers-color-scheme: dark)")!();
+  expect(text()).toBe("#000");
+  background = "rgb(0, 40, 100)";
+  setNativeAppearance("vibrancy");
+  expect(text()).toBe("#fff");
+  const forced = window.matchMedia("(forced-colors: active)");
+  vi.stubGlobal("matchMedia", () => ({ ...forced, matches: true }));
+  setNativeAppearance("opaque");
+  expect(text()).toBe("");
+  dispose();
+  window.dispatchEvent(new Event("focus"));
+  expect(text()).toBe("");
+  vi.stubGlobal("matchMedia", undefined);
+  vi.mocked(HTMLCanvasElement.prototype.getContext).mockReturnValue(null);
+  const unavailable = installAccentContrast();
+  expect(text()).toBe("");
+  unavailable();
 });

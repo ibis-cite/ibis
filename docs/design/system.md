@@ -177,7 +177,7 @@ your citation" one colour. Done and Look stay close to the platform hues.
 | Meaningful icons (status, added check, the citation mark) | 3:1 |
 | Tertiary glyphs at rest | 3:1 |
 | Disabled | none; aim ≥ 2:1 |
-| Text on a system or fallback accent | ≥ 4.5:1. Keep the accent fill and use a readable paired foreground; native pairs require measured acceptance. |
+| Text on a system or fallback accent | ≥ 4.5:1. Keep the accent fill; derive black or white from its resolved colour when the native paired foreground is unreadable. Native pairs require measured acceptance. |
 | Over the macOS material | 4.5:1 over a white, a black and a saturated wallpaper, measured natively (#774) |
 
 Measured on browser specimens: secondary text 7.2–7.6:1 on macOS and

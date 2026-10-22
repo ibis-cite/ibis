@@ -63,9 +63,12 @@ test("macOS selection uses a supported native background and text pair before co
   expect(start).toBeGreaterThan(tokens.indexOf("@supports (color: AccentColorText)"));
   const block = tokens.slice(start).match(/^[^{]+\{\s*:root\[data-platform="macos"\]\s*\{([^{}]*)\}/)?.[1];
   expect(block).toMatch(/--selected-background:\s*-apple-system-selected-content-background;/);
-  expect(block).toMatch(/--selected-text:\s*-apple-system-alternate-selected-text;/);
+  expect(block).toMatch(/--selected-text:\s*var\(--readable-accent-text, -apple-system-alternate-selected-text\);/);
+  const readable = tokens.indexOf("@supports (color: contrast-color(white))");
+  expect(readable).toBeGreaterThan(start);
+  expect(tokens.slice(readable)).toContain("--selected-text: contrast-color(var(--selected-background))");
   for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
-    expect(tokens.indexOf(media)).toBeGreaterThan(start);
+    expect(tokens.indexOf(media)).toBeGreaterThan(readable);
     expect(rules(tokens.slice(tokens.indexOf(media)), ":root[data-platform]")).toMatch(/--selected-background:\s*Highlight;\s*--selected-text:\s*HighlightText;/);
   }
 });
@@ -77,7 +80,7 @@ test("the selected row follows each platform", () => {
   // macOS (the default): filled accent with paired text.
   expect(tokens).toMatch(/--row-active-background:\s*var\(--selected-background\)/);
   expect(tokens).toMatch(/--selected-background:\s*AccentColor/);
-  expect(tokens).toMatch(/--selected-text:\s*AccentColorText/);
+  expect(tokens).toMatch(/--selected-text:\s*var\(--readable-accent-text, AccentColorText\)/);
   // Windows: soft grey with an accent pill; Linux: the same full accent pair.
   expect(rules(tokens, ':root[data-platform="windows"]')).toMatch(/--row-active-background:\s*color-mix\(in srgb, var\(--text\)/);
   expect(rules(styles, ':root[data-platform="windows"] [role="option"][data-active]::before')).toMatch(/background:\s*var\(--accent\)/);
