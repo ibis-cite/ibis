@@ -1,0 +1,126 @@
+{
+  "source": "cfb6e27971e07fe95dbe1628209c9a5d65fb1afa",
+  "browser": "151.0.7922.34",
+  "results": [
+    {
+      "platform": "macos",
+      "name": "focus-order-and-strict-layout",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "name": "more-and-chip-focus",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "name": "format-handoff",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "name": "hidden-output-copy",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "name": "exact-visible-copy-feedback",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "name": "huge-narrow-200-percent",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "name": "rtl-cjk-hostile-and-wide",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "name": "empty-toggle-and-menu",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "name": "focus-order-and-strict-layout",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "name": "more-and-chip-focus",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "name": "format-handoff",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "name": "hidden-output-copy",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "name": "exact-visible-copy-feedback",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "name": "huge-narrow-200-percent",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "name": "rtl-cjk-hostile-and-wide",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "name": "empty-toggle-and-menu",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "name": "focus-order-and-strict-layout",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "name": "more-and-chip-focus",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "name": "format-handoff",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "name": "hidden-output-copy",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "name": "exact-visible-copy-feedback",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "name": "huge-narrow-200-percent",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "name": "rtl-cjk-hostile-and-wide",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "name": "empty-toggle-and-menu",
+      "passed": true
+    }
+  ]
+}

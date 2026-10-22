@@ -1,0 +1,36 @@
+{
+  "source": "4ffddeb2e973",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "large/linux-dark/chips",
+    "large/linux-dark/chips-rtl",
+    "large/linux-light/chips",
+    "large/linux-light/chips-rtl",
+    "large/macos-dark/chips",
+    "large/macos-dark/chips-rtl",
+    "large/macos-light/chips",
+    "large/macos-light/chips-rtl",
+    "large/windows-dark/chips",
+    "large/windows-dark/chips-rtl",
+    "large/windows-light/chips",
+    "large/windows-light/chips-rtl",
+    "normal/linux-dark/chips",
+    "normal/linux-dark/chips-rtl",
+    "normal/linux-light/chips",
+    "normal/linux-light/chips-rtl",
+    "normal/macos-dark/chips",
+    "normal/macos-dark/chips-rtl",
+    "normal/macos-light/chips",
+    "normal/macos-light/chips-rtl",
+    "normal/windows-dark/chips",
+    "normal/windows-dark/chips-rtl",
+    "normal/windows-light/chips",
+    "normal/windows-light/chips-rtl"
+  ],
+  "failed": []
+}
