@@ -1,0 +1,14 @@
+{
+  "head": "beece9aef34375dc774f1f50a132a4be9f17573d",
+  "base": "5704c7a8790e4e43a5247025c870402bbd0438c9",
+  "capture": "Synthetic browser render, not native evidence",
+  "tests": "97/97 focused tests passed (Menu,ToolbarMenu,platform,motion); typecheck and production/evidence builds passed",
+  "contactSheet": "576/576 frames before and after; final manifest identifies exact head",
+  "minimumWindow": "360x320, normal and115%Larger text;108before/108aftervariants across3OSlooks x2themes x3contrastmodes x2textsizes x3menus; initial andkeyboard-scrolled frames retained",
+  "assertions": "All108aftervariants stay within8px viewport bounds (0.5px rounding tolerance), keepSearchclear, scrollinside; shortcutspans have no capborder and remainhiddenfromaccessible names",
+  "attack": "18open-windowresize(720x480to360x320),LTR/RTL,wheelscroll-to-last,Tabfocusreturncasespassed;boundaryremovesonclose",
+  "geometry": "149/156 before and after, identical7inheritedmacOScornermismatches",
+  "limitations": "Underlying narrow picker can still put footertriggerbelowwindow (#584); thischangeprojectsitsmenuanchorinsideviewportwithouteditingprotectedpickerfiles. Native webviews/screenreaders notrun.",
+  "fullCheck": "Notrun; hosted exact-headCI is the gate. NoCargo slot used.",
+  "wrapUp": "Maintainer requestedstop; nofurtherbuildsorimplementation. Running independentreview willbe recordedorhandoffpostedwithoutfixingfindings."
+}

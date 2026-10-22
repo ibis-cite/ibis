@@ -1,0 +1,632 @@
+[
+  {
+    "name": "macos-format-menu-ltr",
+    "pop": {
+      "x": 8,
+      "y": 102,
+      "bottom": 312,
+      "right": 272,
+      "height": 210
+    },
+    "menu": {
+      "x": 15,
+      "y": 139,
+      "bottom": 305,
+      "right": 265,
+      "height": 166
+    },
+    "last": {
+      "x": 15,
+      "y": 277,
+      "bottom": 305,
+      "right": 265,
+      "height": 28
+    },
+    "search": {
+      "x": 73.5625,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.8125,
+      "height": 46
+    },
+    "scrollTop": 235,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "macos-format-menu-rtl",
+    "pop": {
+      "x": 86.8125,
+      "y": 102,
+      "bottom": 312,
+      "right": 350.8125,
+      "height": 210
+    },
+    "menu": {
+      "x": 93.8125,
+      "y": 139,
+      "bottom": 305,
+      "right": 343.8125,
+      "height": 166
+    },
+    "last": {
+      "x": 93.8125,
+      "y": 277,
+      "bottom": 305,
+      "right": 343.8125,
+      "height": 28
+    },
+    "search": {
+      "x": 9.1875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 286.4375,
+      "height": 46
+    },
+    "scrollTop": 235,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "macos-scope-menu-ltr",
+    "pop": {
+      "x": 84.8125,
+      "y": 63.1875,
+      "bottom": 306,
+      "right": 350.625,
+      "height": 242.8125
+    },
+    "menu": {
+      "x": 91.8125,
+      "y": 70.1875,
+      "bottom": 299,
+      "right": 343.625,
+      "height": 228.8125
+    },
+    "last": {
+      "x": 91.8125,
+      "y": 271.5625,
+      "bottom": 299.5625,
+      "right": 343.625,
+      "height": 28
+    },
+    "search": {
+      "x": 73.5625,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.8125,
+      "height": 46
+    },
+    "scrollTop": 161,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "macos-scope-menu-rtl",
+    "pop": {
+      "x": 8,
+      "y": 63.1875,
+      "bottom": 306,
+      "right": 273.8125,
+      "height": 242.8125
+    },
+    "menu": {
+      "x": 15,
+      "y": 70.1875,
+      "bottom": 299,
+      "right": 266.8125,
+      "height": 228.8125
+    },
+    "last": {
+      "x": 15,
+      "y": 271.5625,
+      "bottom": 299.5625,
+      "right": 266.8125,
+      "height": 28
+    },
+    "search": {
+      "x": 9.1875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 286.4375,
+      "height": 46
+    },
+    "scrollTop": 161,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "macos-menu-open-ltr",
+    "pop": {
+      "x": 84.8125,
+      "y": 63.1875,
+      "bottom": 306,
+      "right": 350.625,
+      "height": 242.8125
+    },
+    "menu": {
+      "x": 91.8125,
+      "y": 70.1875,
+      "bottom": 299,
+      "right": 343.625,
+      "height": 228.8125
+    },
+    "last": {
+      "x": 91.8125,
+      "y": 271.5625,
+      "bottom": 299.5625,
+      "right": 343.625,
+      "height": 28
+    },
+    "search": {
+      "x": 73.5625,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.8125,
+      "height": 46
+    },
+    "scrollTop": 117,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "macos-menu-open-rtl",
+    "pop": {
+      "x": 8,
+      "y": 63.1875,
+      "bottom": 306,
+      "right": 273.8125,
+      "height": 242.8125
+    },
+    "menu": {
+      "x": 15,
+      "y": 70.1875,
+      "bottom": 299,
+      "right": 266.8125,
+      "height": 228.8125
+    },
+    "last": {
+      "x": 15,
+      "y": 271.5625,
+      "bottom": 299.5625,
+      "right": 266.8125,
+      "height": 28
+    },
+    "search": {
+      "x": 9.1875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 286.4375,
+      "height": 46
+    },
+    "scrollTop": 117,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "windows-format-menu-ltr",
+    "pop": {
+      "x": 8,
+      "y": 97,
+      "bottom": 312,
+      "right": 272,
+      "height": 215
+    },
+    "menu": {
+      "x": 13,
+      "y": 132,
+      "bottom": 307,
+      "right": 267,
+      "height": 175
+    },
+    "last": {
+      "x": 13,
+      "y": 275,
+      "bottom": 307,
+      "right": 267,
+      "height": 32
+    },
+    "search": {
+      "x": 4.578125,
+      "y": 4.59375,
+      "bottom": 50.59375,
+      "right": 355.40625,
+      "height": 46
+    },
+    "scrollTop": 274,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "windows-format-menu-rtl",
+    "pop": {
+      "x": 88,
+      "y": 97,
+      "bottom": 312,
+      "right": 352,
+      "height": 215
+    },
+    "menu": {
+      "x": 93,
+      "y": 132,
+      "bottom": 307,
+      "right": 347,
+      "height": 175
+    },
+    "last": {
+      "x": 93,
+      "y": 275,
+      "bottom": 307,
+      "right": 347,
+      "height": 32
+    },
+    "search": {
+      "x": 4.59375,
+      "y": 4.59375,
+      "bottom": 50.59375,
+      "right": 355.421875,
+      "height": 46
+    },
+    "scrollTop": 274,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "windows-scope-menu-ltr",
+    "pop": {
+      "x": 62,
+      "y": 58.59375,
+      "bottom": 306,
+      "right": 352.0625,
+      "height": 247.40625
+    },
+    "menu": {
+      "x": 67,
+      "y": 63.59375,
+      "bottom": 301,
+      "right": 347.0625,
+      "height": 237.40625
+    },
+    "last": {
+      "x": 67,
+      "y": 268.96875,
+      "bottom": 300.96875,
+      "right": 347.0625,
+      "height": 32
+    },
+    "search": {
+      "x": 4.578125,
+      "y": 4.59375,
+      "bottom": 50.59375,
+      "right": 355.40625,
+      "height": 46
+    },
+    "scrollTop": 197,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "windows-scope-menu-rtl",
+    "pop": {
+      "x": 8,
+      "y": 58.59375,
+      "bottom": 306,
+      "right": 298.0625,
+      "height": 247.40625
+    },
+    "menu": {
+      "x": 13,
+      "y": 63.59375,
+      "bottom": 301,
+      "right": 293.0625,
+      "height": 237.40625
+    },
+    "last": {
+      "x": 13,
+      "y": 268.96875,
+      "bottom": 300.96875,
+      "right": 293.0625,
+      "height": 32
+    },
+    "search": {
+      "x": 4.59375,
+      "y": 4.59375,
+      "bottom": 50.59375,
+      "right": 355.421875,
+      "height": 46
+    },
+    "scrollTop": 197,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "windows-menu-open-ltr",
+    "pop": {
+      "x": 62,
+      "y": 58.59375,
+      "bottom": 306,
+      "right": 352.0625,
+      "height": 247.40625
+    },
+    "menu": {
+      "x": 67,
+      "y": 63.59375,
+      "bottom": 301,
+      "right": 347.0625,
+      "height": 237.40625
+    },
+    "last": {
+      "x": 67,
+      "y": 268.96875,
+      "bottom": 300.96875,
+      "right": 347.0625,
+      "height": 32
+    },
+    "search": {
+      "x": 4.578125,
+      "y": 4.59375,
+      "bottom": 50.59375,
+      "right": 355.40625,
+      "height": 46
+    },
+    "scrollTop": 149,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "windows-menu-open-rtl",
+    "pop": {
+      "x": 8,
+      "y": 58.59375,
+      "bottom": 306,
+      "right": 298.0625,
+      "height": 247.40625
+    },
+    "menu": {
+      "x": 13,
+      "y": 63.59375,
+      "bottom": 301,
+      "right": 293.0625,
+      "height": 237.40625
+    },
+    "last": {
+      "x": 13,
+      "y": 268.96875,
+      "bottom": 300.96875,
+      "right": 293.0625,
+      "height": 32
+    },
+    "search": {
+      "x": 4.59375,
+      "y": 4.59375,
+      "bottom": 50.59375,
+      "right": 355.421875,
+      "height": 46
+    },
+    "scrollTop": 149,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "linux-format-menu-ltr",
+    "pop": {
+      "x": 8,
+      "y": 102,
+      "bottom": 312,
+      "right": 272,
+      "height": 210
+    },
+    "menu": {
+      "x": 15,
+      "y": 139,
+      "bottom": 305,
+      "right": 265,
+      "height": 166
+    },
+    "last": {
+      "x": 15,
+      "y": 273,
+      "bottom": 305,
+      "right": 265,
+      "height": 32
+    },
+    "search": {
+      "x": 9.171875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.8125,
+      "height": 46
+    },
+    "scrollTop": 283,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "linux-format-menu-rtl",
+    "pop": {
+      "x": 86.8125,
+      "y": 102,
+      "bottom": 312,
+      "right": 350.8125,
+      "height": 210
+    },
+    "menu": {
+      "x": 93.8125,
+      "y": 139,
+      "bottom": 305,
+      "right": 343.8125,
+      "height": 166
+    },
+    "last": {
+      "x": 93.8125,
+      "y": 273,
+      "bottom": 305,
+      "right": 343.8125,
+      "height": 32
+    },
+    "search": {
+      "x": 9.1875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.828125,
+      "height": 46
+    },
+    "scrollTop": 283,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "linux-scope-menu-ltr",
+    "pop": {
+      "x": 56.8125,
+      "y": 63.1875,
+      "bottom": 306,
+      "right": 350.875,
+      "height": 242.8125
+    },
+    "menu": {
+      "x": 63.8125,
+      "y": 70.1875,
+      "bottom": 299,
+      "right": 343.875,
+      "height": 228.8125
+    },
+    "last": {
+      "x": 63.8125,
+      "y": 267.5625,
+      "bottom": 299.5625,
+      "right": 343.875,
+      "height": 32
+    },
+    "search": {
+      "x": 9.171875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.8125,
+      "height": 46
+    },
+    "scrollTop": 205,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "linux-scope-menu-rtl",
+    "pop": {
+      "x": 8,
+      "y": 63.1875,
+      "bottom": 306,
+      "right": 302.0625,
+      "height": 242.8125
+    },
+    "menu": {
+      "x": 15,
+      "y": 70.1875,
+      "bottom": 299,
+      "right": 295.0625,
+      "height": 228.8125
+    },
+    "last": {
+      "x": 15,
+      "y": 267.5625,
+      "bottom": 299.5625,
+      "right": 295.0625,
+      "height": 32
+    },
+    "search": {
+      "x": 9.1875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.828125,
+      "height": 46
+    },
+    "scrollTop": 205,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "linux-menu-open-ltr",
+    "pop": {
+      "x": 56.8125,
+      "y": 63.1875,
+      "bottom": 306,
+      "right": 350.875,
+      "height": 242.8125
+    },
+    "menu": {
+      "x": 63.8125,
+      "y": 70.1875,
+      "bottom": 299,
+      "right": 343.875,
+      "height": 228.8125
+    },
+    "last": {
+      "x": 63.8125,
+      "y": 267.5625,
+      "bottom": 299.5625,
+      "right": 343.875,
+      "height": 32
+    },
+    "search": {
+      "x": 9.171875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.8125,
+      "height": 46
+    },
+    "scrollTop": 157,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  },
+  {
+    "name": "linux-menu-open-rtl",
+    "pop": {
+      "x": 8,
+      "y": 63.1875,
+      "bottom": 306,
+      "right": 302.0625,
+      "height": 242.8125
+    },
+    "menu": {
+      "x": 15,
+      "y": 70.1875,
+      "bottom": 299,
+      "right": 295.0625,
+      "height": 228.8125
+    },
+    "last": {
+      "x": 15,
+      "y": 267.5625,
+      "bottom": 299.5625,
+      "right": 295.0625,
+      "height": 32
+    },
+    "search": {
+      "x": 9.1875,
+      "y": 9.1875,
+      "bottom": 55.1875,
+      "right": 350.828125,
+      "height": 46
+    },
+    "scrollTop": 157,
+    "animation": "0s",
+    "boundaries": 1,
+    "focusReturned": true
+  }
+]
