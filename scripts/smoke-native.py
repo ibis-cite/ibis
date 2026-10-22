@@ -2740,6 +2740,35 @@ class ContractTests(unittest.TestCase):
                 self.assertTrue(all(report["menu_escape_focus"].values()))
                 self.assertEqual(native.value, native.original)
 
+    def test_macos_hid_contract_timeout_preserves_only_bounded_fixed_phases(self):
+        phases = [f"MACOS HID CONTRACT {phase}" for phase in (
+            "start", "source-ready", "fullscreen-cases", "key-plan-cases", "permission-cases",
+            "click-cases", "unicode-bridge-cases", "picker-key-cases", "snapshot-cases", "complete",
+        )]
+        dirty = "\n".join([phases[0], "private-output", phases[1], phases[0], "MACOS HID CONTRACT private"])
+        for stdout, stderr, expected in [
+            (dirty, phases[1] + "\n" + phases[-1], [phases[0], phases[1], phases[-1]]),
+            (dirty.encode() + b'\n\xffprivate', None, phases[:2]),
+            (None, dirty.encode(), phases[:2]),
+            (None, None, []), (7, {"private": "output"}, []),
+            ("prefix " + phases[0] + "\n" + phases[1] + " private", "MACOS HID CONTRACT", []),
+            (phases[0] + "\n" + "private" * 100000 + "\n" + phases[-1], None, phases[:1]),
+            ("\n".join(phases * 100), "\n".join(phases), phases),
+        ]:
+            error = subprocess.TimeoutExpired(["private-command"], 20, output=stdout, stderr=stderr)
+            with patch("subprocess.run", side_effect=error) as helper, patch("builtins.print") as output:
+                with self.assertRaises(subprocess.TimeoutExpired) as caught:
+                    self.test_global_macos_hid_event_contracts_without_native_execution()
+                self.assertIs(caught.exception, error)
+                self.assertIs(error.stdout, stdout)
+                self.assertIs(error.stderr, stderr)
+                self.assertEqual(helper.call_count, 1)
+                self.assertEqual(helper.call_args.kwargs, {
+                    "check": True, "stdout": subprocess.PIPE, "stderr": subprocess.PIPE, "timeout": 20,
+                })
+                self.assertEqual([entry.args[0] for entry in output.call_args_list], expected)
+                self.assertTrue(all(entry.kwargs.get("file") is sys.stderr for entry in output.call_args_list))
+
     def test_global_macos_hid_event_contracts_without_native_execution(self):
         subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
