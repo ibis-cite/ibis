@@ -284,14 +284,14 @@ new, from the design-system foundations, and are defined here:
 | `--r-control` | Buttons, fields, pop-up buttons | 6 (a capsule in the header on macOS 26) | 4 | 6 |
 | `--r-key` | Key caps | 4 (5 on macOS 26) | 4 | 4 |
 | `--surface-raised` | Cards and grouped forms, one step above `--surface` | `#fff` / `#2c2c2f` | white 70 % / white 5 % | `#fff` / `#2e2e32` |
-| `--text-tertiary` | Glyphs at rest (pin, indicators), at least 3:1; never sentences | black 45 % / white 45 % (`tertiaryLabelColor`) | black 45 % / white 54 % (`TextFillColorTertiary`) | `currentColor` at 45 % |
+| `--text-tertiary` | Glyphs at rest (indicators, empty-state icons), at least 3:1; never sentences | black 45 % / white 45 % (`tertiaryLabelColor`) | black 45 % / white 54 % (`TextFillColorTertiary`) | `currentColor` at 45 % |
 
 `--key-cap` (20 px) is the existing key-cap height.
 
 **Edges.** Visible edges line up with the content; hit targets may overhang
 them. The leading edge is the tile column (`inset + row-pad`), the text column
 starts at `text x`, and the trailing edge is where row text ends
-(`W − inset − row-pad`). The pin's glyph, the last key cap in the footer and
+(`W − inset − row-pad`). The last header selector, the last key cap in the footer and
 the year column all end on that trailing edge; a 32 px target around a 20 px
 glyph overhangs it by 6 px. Controls in one bar share a centre line, and text
 in one bar shares a baseline.
@@ -355,7 +355,8 @@ nothing holds focus:
    ← and → focus and choose the previous or next tab, wrapping at the ends;
    Home and End choose the first or last. These keys apply only while a tab
    has focus, leaving text editing and attachment preview in the search box
-   unchanged. Tab leaves for More; Shift+Tab returns to the header toolbar.
+   unchanged. Tab leaves for the footer pin when present, then More;
+   Shift+Tab returns to the header toolbar.
    Clicking or tapping a tab chooses the same view. There is no required
    Ctrl+Tab shortcut: ordinary Tab followed by arrow keys is the keyboard
    route on every platform, including when browser accelerators are consumed.
