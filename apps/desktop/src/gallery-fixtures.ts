@@ -169,6 +169,7 @@ export function galleryProvider(state: GalleryState): { api: PickerApi; preview:
     api: {
       libraryStatus: async () => state.library,
       search: async () => ({ revision: state.library.revision, results: state.results ?? [] }),
+      citationText: async (ids) => ({ text: `[${ids.map((id) => `@${id.native_key}`).join("; ")}]`, warnings: [] }),
       copyCitation: async (ids) => ({ text: (state.tray ?? 0) >= 20 ? `[@${ids.map((id) => id.native_key).join("; @")}]` : "[@example2026]", warnings: [] }),
       ...((state.tray ?? 0) >= 20 ? {
         cslItems: async (ids: Parameters<NonNullable<PickerApi["cslItems"]>>[0]) => JSON.stringify(ids.map((id) => ({
