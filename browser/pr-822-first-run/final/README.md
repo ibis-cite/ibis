@@ -1,7 +1,7 @@
 # First-run browser contact sheet
 
-Source: `53af43d59d65af033938b494f6317fbcd0c8168f`.
-Actual-main baseline: `3aec80b4042fa248d4c70689d9b6b056b3c912c1`.
+Source: `486531892bedcc40c5d1b3f5a6864a3a30e779b7`.
+Actual-main baseline: `2584fb277cfd3ccd1e6b50a4b37f222f6d5353e6`.
 
 One contact sheet, 12 synthetic frames: first-run and first-run-found,
 three browser looks (macOS, Windows, Linux), light and dark, normal text,
@@ -13,11 +13,10 @@ when the synthetic discovery reports it available. Writing selection uses a
 fill. The duplicate header format control and first-run section heading are
 absent. The two offered files are synthetic, not paths from a real computer.
 
-Six additional browser-only checks used coarse input, 200% text and widths
-360/720 across all three looks: no horizontal overflow; the Typst selection
-keeps a distinct fill and remains hit-test reachable after keyboard focus;
-the suggested library action remains scroll-reachable and clickable. All six
-passed. No second contact sheet or native run was produced.
+Twelve additional browser-only checks covered both states, coarse input,
+200% text and widths 360/720 across all three looks: no horizontal overflow;
+the Typst selection keeps a distinct fill; the suggested library action
+remains scroll-reachable and clickable. All twelve passed.
 
 Final check and independent exact-head review status belong in PR #822's one
 current evidence comment. This sheet claims no native keyboard delivery,
