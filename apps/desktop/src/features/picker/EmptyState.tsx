@@ -62,7 +62,7 @@ export function EmptyState({ library, query, narrowed, onChooseLibrary, onClearS
     : query ? pickerText.noMatchesHint : pickerText.typeToFindHint;
   return (
     <div className="empty-state empty-template">
-      <svg className="empty-icon" aria-hidden="true" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg className="empty-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         {empty ? <path d="M5 3h9l5 5v13H5zM14 3v5h5M8 12h8M8 16h6" />
           : <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></>}
       </svg>
