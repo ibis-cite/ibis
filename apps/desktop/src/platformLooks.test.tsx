@@ -166,6 +166,24 @@ test("window radius follows each platform and macOS matches the native corner", 
   expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--r-win:\s*15px/);
 });
 
+test("per-OS overlay roles keep their shapes, easing, scrims and shadow-free contrast", () => {
+  for (const [platform, ease, dialog] of [["windows", "0, 0, 0, 1", "--r-win"], ["linux", ".33, 1, .68, 1", "--r-menu"]]) {
+    const look = rules(tokens, `:root[data-platform="${platform}"]`);
+    expect(look).toContain(`--ease-out: cubic-bezier(${ease});`);
+    expect(look).toContain(`--r-dialog: var(${dialog});`);
+  }
+  expect(rules(tokens, ':root[data-platform="windows"]')).toContain("--ease-in: cubic-bezier(1, 0, 1, 1);");
+  expect(tokens).not.toMatch(/--(?:menu-shadow|motion-ease)\s*:/);
+  expect(rules(tokens, ":root")).toContain("--scrim: rgb(0 0 0 / 30%);");
+  for (const [platform, alpha] of [["macos", "20%"], ["linux", "25%"]]) expect(rules(tokens, `:root[data-platform="${platform}"]`)).toContain(`--scrim: light-dark(rgb(0 0 0 / ${alpha})`);
+  const at = tokens.indexOf("@media (prefers-contrast: more), (forced-colors: active)");
+  expect(at).toBeGreaterThan(0);
+  for (const block of [rules(tokens.slice(at), ":root, :root[data-platform]"), rules(tokens, ':root[data-gallery-theme="contrast"]')]) {
+    for (const level of ["card", "raised", "overlay", "dialog", "toast"]) expect(block).toContain(`--shadow-${level}: none;`);
+    expect(block).toContain("--scrim: Canvas;");
+  }
+});
+
 test("menus and dialogs consume their shared elevation and separate shape roles", () => {
   const menus = readFileSync(new FileURL("./ui/Menu.css", import.meta.url), "utf8");
   const native = readFileSync(new FileURL("./nativeAppearance.css", import.meta.url), "utf8");
