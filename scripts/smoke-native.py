@@ -211,7 +211,9 @@ def menu_action(native, name):
         try:
             native.click(name)
             return True
-        except (AssertionError, RuntimeError, subprocess.CalledProcessError):
+        except (AssertionError, RuntimeError, subprocess.CalledProcessError) as error:
+            if isinstance(native, Linux) and isinstance(error, native.accessibility_error):
+                raise
             return False
     wait_for(pressed, f"{name} appears in the More menu", timeout=5)
 
@@ -948,6 +950,11 @@ class Linux:
             for index in range(count):
                 try:
                     child = parent[index]
+                except IndexError:
+                    break  # The collection shrank after childCount was read.
+                except self.accessibility_error:
+                    continue
+                try:
                     if child and (not owned or child.get_process_id() == self.app.pid):
                         yield child
                 except self.accessibility_error:
@@ -1840,7 +1847,7 @@ class ContractTests(unittest.TestCase):
     def linux_click_fixture(self):
         native = Linux.__new__(Linux)
         native.app = Mock(pid=100)
-        native.accessibility_error = type("AccessibilityError", (Exception,), {})
+        native.accessibility_error = type("AccessibilityError", (RuntimeError,), {})
         target = self.CensusNode(name="Reload")
         target.queryAction = Mock(return_value=Mock(nActions=1, doAction=Mock(return_value=True)))
         foreign = self.CensusNode(999, "Reload", [target])
@@ -1912,6 +1919,23 @@ class ContractTests(unittest.TestCase):
                 native.click("Reload")
         target.queryAction.assert_not_called()
         foreign.queryAction.assert_not_called()
+
+    def test_linux_click_keeps_discovered_targets_when_children_shrink(self):
+        for level in ("desktop", "owned"):
+            with self.subTest(level=level):
+                native, desktop, owned, target, foreign = self.linux_click_fixture()
+                desktop.children = [owned, foreign]
+                owned.children.append(self.CensusNode())
+                owned.childCount += 1
+                parent = desktop if level == "desktop" else owned
+                original_getitem = self.CensusNode.__getitem__
+                def getitem(node, index):
+                    if node is parent and index == 1:
+                        raise IndexError("collection shrank")
+                    return original_getitem(node, index)
+                with patch.object(self.CensusNode, "__getitem__", getitem):
+                    native.click("Reload")
+                target.queryAction.return_value.doAction.assert_called_once_with(0)
 
     def test_linux_menu_action_does_not_retry_uncertain_activation(self):
         native, desktop, owned, target, foreign = self.linux_click_fixture()
@@ -2863,6 +2887,12 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(native.click.call_args_list, [call("More"), call("Reload")])
         with self.assertRaises(ValueError):
             menu_action(native, "Search references")
+        for error in (AssertionError(), RuntimeError(), subprocess.CalledProcessError(1, "synthetic")):
+            native.click.reset_mock()
+            native.click.side_effect = [None, error, None]
+            with patch("time.sleep"):
+                menu_action(native, "Reload")
+            self.assertEqual(native.click.call_args_list, [call("More"), call("Reload"), call("Reload")])
 
     class MenuKeyboardModel:
         """Native keys own the input; accessibility can focus its active option."""
