@@ -279,6 +279,21 @@ jobs:
         if: env.NATIVE == 'true' && (runner.os == 'Linux')
         working-directory: .
         run: |
+          # Prefer the HTTPS archive already configured by runner-images (#857).
+          sudo python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("/etc/apt/apt-mirrors.txt")
+          archive = "https://archive.ubuntu.com/ubuntu/"
+          lines = path.read_text().splitlines(keepends=True)
+          matches = [i for i, line in enumerate(lines) if line.split()[:1] == [archive]]
+          if len(matches) != 1 or lines[matches[0]].split() not in (
+              [archive, "priority:2"], [archive, "priority:0"]
+          ):
+              raise SystemExit("expected runner archive mirror is missing or ambiguous")
+          lines[matches[0]] = f"{archive}\tpriority:0\n"
+          path.write_text("".join(lines))
+          PY
           # Match runner-images' acquire bounds even on images with older defaults (#857).
           ibis_apt_options=(-o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15)
           sudo apt-get "${ibis_apt_options[@]}" update

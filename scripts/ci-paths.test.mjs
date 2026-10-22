@@ -130,25 +130,35 @@ test("a classifier crash fails the configured workflow shell, even after partial
   }
 });
 
-test("Linux WebView downloads bound both APT commands and propagate failures", { skip: process.platform === "win32" }, (t) => {
+function aptWorkflow(mirrors) {
   const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
   const step = workflow.match(/- name: Install system WebView libraries \(Linux\)\n([\s\S]*?)\n      - name:/)?.[1];
   assert.ok(step, "the Linux dependency step exists");
-  const command = step.match(/        run: \|\n([\s\S]*)/)[1].replace(/^          /gm, "");
+  return step.match(/        run: \|\n([\s\S]*)/)[1].replace(/^          /gm, "")
+    .replace('Path("/etc/apt/apt-mirrors.txt")', `Path(${JSON.stringify(mirrors)})`);
+}
+
+const runnerMirrors = "http://azure.archive.ubuntu.com/ubuntu/\tpriority:1\nhttps://archive.ubuntu.com/ubuntu/\tpriority:2\nhttps://security.ubuntu.com/ubuntu/\tpriority:3\n";
+const aptStubs = `sudo() { [[ "$1" == apt-get || "$1" == python3 ]] || return 98; "$@"; }
+  apt-get() {
+    printf '%s\\n' "$*" >> "$APT_LOG"
+    if [[ " $* " == *" $FAIL_APT "* ]]; then return 42; fi
+  }`;
+
+test("Linux WebView downloads prefer the existing HTTPS archive, bound APT and propagate failures", { skip: process.platform === "win32" }, (t) => {
   const dir = mkdtempSync(join(tmpdir(), "ibis-ci-apt-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   const log = join(dir, "calls");
-  const stubs = `sudo() { [[ "$1" == apt-get ]] || return 98; "$@"; }
-    apt-get() {
-      printf '%s\\n' "$*" >> "$APT_LOG"
-      if [[ " $* " == *" $FAIL_APT "* ]]; then return 42; fi
-    }`;
-  for (const failure of ["none", "update", "install"]) {
+  const mirrors = join(dir, "mirrors");
+  const command = aptWorkflow(mirrors);
+  for (const [failure, contents] of [["none", runnerMirrors], ["update", runnerMirrors], ["install", runnerMirrors], ["none", runnerMirrors.replace("priority:2", "priority:0")]]) {
     writeFileSync(log, "");
-    const result = spawnSync("bash", ["--noprofile", "--norc", "-e", "-o", "pipefail", "-c", `${stubs}\n${command}`], {
+    writeFileSync(mirrors, contents);
+    const result = spawnSync("bash", ["--noprofile", "--norc", "-e", "-o", "pipefail", "-c", `${aptStubs}\n${command}`], {
       cwd: dir, encoding: "utf8", timeout: 5000, env: { ...process.env, APT_LOG: log, FAIL_APT: failure },
     });
     assert.equal(result.status, failure === "none" ? 0 : 42, result.stderr);
+    assert.equal(readFileSync(mirrors, "utf8"), runnerMirrors.replace("priority:2", "priority:0"), "only the already configured archive priority changes");
     const calls = readFileSync(log, "utf8").trim().split("\n");
     assert.equal(calls.length, failure === "update" ? 1 : 2, "a failed update stops before install");
     for (const call of calls) {
@@ -159,5 +169,21 @@ test("Linux WebView downloads bound both APT commands and propagate failures", {
     }
     assert.match(calls[0], /\bupdate$/);
     if (calls[1]) assert.match(calls[1], /\binstall -y --no-install-recommends libwebkit2gtk-4\.1-dev\b/);
+  }
+});
+
+test("an unexpected runner mirror list stops before APT without replacing it", { skip: process.platform === "win32" }, (t) => {
+  const dir = mkdtempSync(join(tmpdir(), "ibis-ci-apt-refusal-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const mirrors = join(dir, "mirrors"), log = join(dir, "calls");
+  for (const contents of ["", runnerMirrors.replace("https://archive.ubuntu.com/ubuntu/", "https://other.example/ubuntu/"), runnerMirrors + "https://archive.ubuntu.com/ubuntu/\tpriority:2\n", runnerMirrors.replace("priority:2", "priority:9")]) {
+    writeFileSync(mirrors, contents);
+    writeFileSync(log, "");
+    const result = spawnSync("bash", ["-e", "-o", "pipefail", "-c", `${aptStubs}\n${aptWorkflow(mirrors)}`], {
+      cwd: dir, encoding: "utf8", timeout: 5000, env: { ...process.env, APT_LOG: log, FAIL_APT: "none" },
+    });
+    assert.equal(result.status, 1);
+    assert.equal(readFileSync(log, "utf8"), "");
+    assert.equal(readFileSync(mirrors, "utf8"), contents);
   }
 });
