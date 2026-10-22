@@ -1,0 +1,462 @@
+{
+  "source": "d7dcd918f14a1208932e00cf9c6a6d81973a6579",
+  "status": "historical only; final-source acceptance pending CI lint repair and refreshed artifact",
+  "method": "Embedded Display ICC converted to sRGB. Dominant row fill and median opaque text/glyph core pixels; approximate screenshot measurements, excluding antialias edges. Some theme-transition captures may precede settling.",
+  "captures": [
+    {
+      "file": "blue-dark-increased-contrast-focus.png",
+      "selectionFill_sRGB": [
+        57,
+        85,
+        118
+      ],
+      "selectedTextCore_sRGB": [
+        250,
+        255,
+        255
+      ],
+      "selectedTextContrast_approx": 7.61,
+      "footerBackground_sRGB": [
+        32,
+        32,
+        32
+      ],
+      "footerGlyphCore_sRGB": [
+        255,
+        255,
+        255
+      ],
+      "footerGlyphContrast_approx": 16.29
+    },
+    {
+      "file": "blue-dark-live.png",
+      "selectionFill_sRGB": [
+        0,
+        122,
+        254
+      ],
+      "selectedTextCore_sRGB": [
+        0,
+        2,
+        29
+      ],
+      "selectedTextContrast_approx": 5.08,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": [
+        246,
+        249,
+        255
+      ],
+      "footerGlyphContrast_approx": 10.28
+    },
+    {
+      "file": "blue-dark-restart.png",
+      "selectionFill_sRGB": [
+        0,
+        122,
+        254
+      ],
+      "selectedTextCore_sRGB": [
+        0,
+        2,
+        29
+      ],
+      "selectedTextContrast_approx": 5.08,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": [
+        246,
+        249,
+        255
+      ],
+      "footerGlyphContrast_approx": 10.28
+    },
+    {
+      "file": "blue-light-increased-contrast-footer-focus.png",
+      "selectionFill_sRGB": [
+        179,
+        215,
+        255
+      ],
+      "selectedTextCore_sRGB": [
+        0,
+        2,
+        10
+      ],
+      "selectedTextContrast_approx": 13.9,
+      "footerBackground_sRGB": [
+        255,
+        255,
+        255
+      ],
+      "footerGlyphCore_sRGB": [
+        0,
+        0,
+        0
+      ],
+      "footerGlyphContrast_approx": 21.0
+    },
+    {
+      "file": "blue-light-live-focus.png",
+      "selectionFill_sRGB": [
+        0,
+        122,
+        254
+      ],
+      "selectedTextCore_sRGB": [
+        0,
+        2,
+        29
+      ],
+      "selectedTextContrast_approx": 5.08,
+      "footerBackground_sRGB": [
+        235,
+        235,
+        237
+      ],
+      "footerGlyphCore_sRGB": [
+        1,
+        14,
+        29
+      ],
+      "footerGlyphContrast_approx": 16.3
+    },
+    {
+      "file": "blue-light-restart.png",
+      "selectionFill_sRGB": [
+        0,
+        122,
+        254
+      ],
+      "selectedTextCore_sRGB": [
+        0,
+        2,
+        29
+      ],
+      "selectedTextContrast_approx": 5.08,
+      "footerBackground_sRGB": [
+        235,
+        235,
+        237
+      ],
+      "footerGlyphCore_sRGB": [
+        1,
+        14,
+        29
+      ],
+      "footerGlyphContrast_approx": 16.3
+    },
+    {
+      "file": "multicolor-auto-restored.png",
+      "selectionFill_sRGB": [
+        0,
+        122,
+        254
+      ],
+      "selectedTextCore_sRGB": [
+        0,
+        2,
+        29
+      ],
+      "selectedTextContrast_approx": 5.08,
+      "footerBackground_sRGB": [
+        235,
+        235,
+        237
+      ],
+      "footerGlyphCore_sRGB": null,
+      "footerGlyphContrast_approx": null
+    },
+    {
+      "file": "red-dark-footer-activated.png",
+      "selectionFill_sRGB": [
+        255,
+        82,
+        87
+      ],
+      "selectedTextCore_sRGB": [
+        23,
+        0,
+        0
+      ],
+      "selectedTextContrast_approx": 6.36,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": null,
+      "footerGlyphContrast_approx": null
+    },
+    {
+      "file": "red-dark-footer-keyboard-focus.png",
+      "selectionFill_sRGB": [
+        255,
+        82,
+        87
+      ],
+      "selectedTextCore_sRGB": [
+        23,
+        0,
+        0
+      ],
+      "selectedTextContrast_approx": 6.36,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": [
+        255,
+        248,
+        248
+      ],
+      "footerGlyphContrast_approx": 10.34
+    },
+    {
+      "file": "red-dark-live-return.png",
+      "selectionFill_sRGB": [
+        224,
+        56,
+        61
+      ],
+      "selectedTextCore_sRGB": [
+        23,
+        0,
+        0
+      ],
+      "selectedTextContrast_approx": 4.63,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": [
+        254,
+        247,
+        247
+      ],
+      "footerGlyphContrast_approx": 10.25
+    },
+    {
+      "file": "red-dark-live.png",
+      "selectionFill_sRGB": [
+        255,
+        82,
+        87
+      ],
+      "selectedTextCore_sRGB": [
+        23,
+        0,
+        0
+      ],
+      "selectedTextContrast_approx": 6.36,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": null,
+      "footerGlyphContrast_approx": null
+    },
+    {
+      "file": "red-dark-restart.png",
+      "selectionFill_sRGB": [
+        255,
+        82,
+        87
+      ],
+      "selectedTextCore_sRGB": [
+        23,
+        0,
+        0
+      ],
+      "selectedTextContrast_approx": 6.36,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": [
+        255,
+        248,
+        248
+      ],
+      "footerGlyphContrast_approx": 10.34
+    },
+    {
+      "file": "red-light-live.png",
+      "selectionFill_sRGB": [
+        255,
+        82,
+        87
+      ],
+      "selectedTextCore_sRGB": [
+        23,
+        0,
+        0
+      ],
+      "selectedTextContrast_approx": 6.36,
+      "footerBackground_sRGB": [
+        235,
+        235,
+        237
+      ],
+      "footerGlyphCore_sRGB": null,
+      "footerGlyphContrast_approx": null
+    },
+    {
+      "file": "red-light-restart.png",
+      "selectionFill_sRGB": [
+        224,
+        56,
+        61
+      ],
+      "selectedTextCore_sRGB": [
+        23,
+        0,
+        0
+      ],
+      "selectedTextContrast_approx": 4.63,
+      "footerBackground_sRGB": [
+        235,
+        235,
+        237
+      ],
+      "footerGlyphCore_sRGB": [
+        26,
+        8,
+        9
+      ],
+      "footerGlyphContrast_approx": 16.29
+    },
+    {
+      "file": "yellow-dark-live-focus.png",
+      "selectionFill_sRGB": [
+        255,
+        198,
+        39
+      ],
+      "selectedTextCore_sRGB": [
+        12,
+        1,
+        0
+      ],
+      "selectedTextContrast_approx": 13.1,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": [
+        254,
+        253,
+        248
+      ],
+      "footerGlyphContrast_approx": 10.64
+    },
+    {
+      "file": "yellow-dark-restart.png",
+      "selectionFill_sRGB": [
+        255,
+        198,
+        0
+      ],
+      "selectedTextCore_sRGB": [
+        12,
+        1,
+        0
+      ],
+      "selectedTextContrast_approx": 13.07,
+      "footerBackground_sRGB": [
+        61,
+        61,
+        63
+      ],
+      "footerGlyphCore_sRGB": null,
+      "footerGlyphContrast_approx": null
+    },
+    {
+      "file": "yellow-light-live-return.png",
+      "selectionFill_sRGB": [
+        255,
+        198,
+        39
+      ],
+      "selectedTextCore_sRGB": [
+        12,
+        1,
+        0
+      ],
+      "selectedTextContrast_approx": 13.1,
+      "footerBackground_sRGB": [
+        235,
+        235,
+        237
+      ],
+      "footerGlyphCore_sRGB": [
+        30,
+        25,
+        5
+      ],
+      "footerGlyphContrast_approx": 14.74
+    },
+    {
+      "file": "yellow-light-live.png",
+      "selectionFill_sRGB": [
+        255,
+        198,
+        39
+      ],
+      "selectedTextCore_sRGB": [
+        12,
+        1,
+        0
+      ],
+      "selectedTextContrast_approx": 13.1,
+      "footerBackground_sRGB": [
+        235,
+        235,
+        237
+      ],
+      "footerGlyphCore_sRGB": [
+        30,
+        25,
+        5
+      ],
+      "footerGlyphContrast_approx": 14.74
+    },
+    {
+      "file": "yellow-light-restart.png",
+      "selectionFill_sRGB": [
+        255,
+        198,
+        39
+      ],
+      "selectedTextCore_sRGB": [
+        12,
+        1,
+        0
+      ],
+      "selectedTextContrast_approx": 13.1,
+      "footerBackground_sRGB": [
+        235,
+        235,
+        237
+      ],
+      "footerGlyphCore_sRGB": [
+        30,
+        25,
+        5
+      ],
+      "footerGlyphContrast_approx": 14.74
+    }
+  ]
+}
