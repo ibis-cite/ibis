@@ -172,7 +172,7 @@ def fixed_windows_failure(stderr):
         elif line.startswith("NATIVE CONTROL STATE ") and len(line) <= 512:
             try:
                 value = json.loads(line.removeprefix("NATIVE CONTROL STATE "))
-                if isinstance(value, dict):
+                if isinstance(value, dict) and value.keys() <= CONTROL_ACTIVATION_KEYS:
                     lines.append("NATIVE CONTROL STATE " + json.dumps(control_activation_facts(value)))
             except (ValueError, TypeError, RuntimeError, RecursionError):
                 pass
@@ -298,9 +298,12 @@ def menu_escape_focus(native, snapshot, shortcut, report):
     assert all(facts.values()), "Native menu keyboard ownership failed"
 
 
+CONTROL_ACTIVATION_KEYS = {"pressed", "button_role", "menu_item_role", "toggle_role",
+                           "invoke_pattern", "expand_collapse_pattern", "toggle_pattern"}
+
+
 def control_activation_facts(state):
-    keys = {"pressed", "button_role", "menu_item_role", "toggle_role",
-            "invoke_pattern", "expand_collapse_pattern", "toggle_pattern"}
+    keys = CONTROL_ACTIVATION_KEYS
     if (not isinstance(state, dict) or type(state.get("pressed")) is not bool or
             any(type(state[key]) is not bool for key in keys & state.keys())):
         raise RuntimeError("Native button action metadata unavailable")
@@ -2737,6 +2740,14 @@ class ContractTests(unittest.TestCase):
             if isinstance(outcome, subprocess.CompletedProcess) and outcome.returncode:
                 self.assertIn("NATIVE SNAPSHOT FAILURE", str(output.call_args_list))
                 self.assertIn("NATIVE CONTROL STATE", str(output.call_args_list))
+
+    def test_traced_failures_preserve_control_facts_and_reject_private_or_mistyped_fields(self):
+        fact = {"pressed": False, "invoke_pattern": True, "menu_item_role": True}
+        line = lambda value: "NATIVE CONTROL STATE " + json.dumps(value, sort_keys=True)
+        self.assertEqual(fixed_windows_failure(line(fact)), [line(fact)])
+        for value in (dict(fact, path="PRIVATE"), dict(fact, pressed=1), dict(fact, invoke_pattern="PRIVATE"),
+                      {"invoke_pattern": True}, [], None):
+            self.assertEqual(fixed_windows_failure(line(value)), [])
 
     def test_foreground_trace_stops_after_eight_snapshots_and_caps_retained_records(self):
         native = Scripted.__new__(Scripted)
