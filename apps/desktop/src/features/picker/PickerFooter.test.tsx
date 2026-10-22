@@ -2,10 +2,36 @@ import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { galleryStates } from "../../gallery-fixtures";
 import { PickerFooter } from "./PickerFooter";
+import { setNativeAccent } from "../../nativeAccent";
 
 const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
 const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
 const footerStyles = readFileSync(new FileURL("./PickerFooter.css", import.meta.url), "utf8");
+
+test("the transparent unpin glyph uses readable accent text at rest and hover, including Yellow", () => {
+  render(footer());
+  const pin = document.querySelector(".pin-button")!;
+  expect(pin.querySelector("svg")?.getAttribute("fill")).toBe("currentColor");
+  const rule = footerStyles.match(/\.pin-button,\s*\.pin-button:hover\s*\{([^}]+)\}/)![1]!;
+  expect(rule).toMatch(/background:\s*var\(--clear\)/);
+  const role = rule.match(/(?:^|[;\s])color:\s*var\((--[\w-]+)\)/)![1]!;
+  const tokens = readFileSync(new FileURL("../../tokens.css", import.meta.url), "utf8");
+  const surfaces = tokens.match(/--surface:\s*light-dark\((#[\da-f]+),\s*(#[\da-f]+)\)/)!.slice(1);
+  const luminance = (rgb: number[]) => rgb.reduce((sum, c, i) => sum + (c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4) * [.2126, .7152, .0722][i]!, 0);
+  try {
+    for (const rgb of [[1, .72, 0], [.5, .5, .5], [1, 0, 0], [0, .48, 1], [0, 1, 0], [0, 0, 0], [1, 1, 1]]) {
+      setNativeAccent(rgb);
+      for (const [i, theme] of ["light", "dark"].entries()) {
+        const input = role === "--accent" ? "fill" : theme;
+        const foreground = document.documentElement.style.getPropertyValue(`--native-accent-${input}`).slice(11, -1).split(" ").map(Number);
+        const surface = surfaces[i]!.slice(1).match(/../g)!.map((c) => parseInt(c, 16) / 255);
+        const [low, high] = [luminance(foreground), luminance(surface)].sort((a, b) => a - b);
+        expect((high! + .05) / (low! + .05), `${theme} footer, accent ${rgb}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+    expect(role).toBe("--accent-text"); // D6 foreground role; the native fill stays unchanged.
+  } finally { setNativeAccent(null); }
+});
 
 const library = galleryStates.find((state) => state.id === "tray-20")!.library;
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
