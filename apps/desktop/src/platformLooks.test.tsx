@@ -586,7 +586,7 @@ test("the alias-only migration exposes the complete design-system role inventory
 });
 
 // CSSOM parses declarations/conditions; this audits the existing root, menu and
-// notice token scopes, rather than pooling inactive declarations into a global set.
+// notice and tray token scopes, rather than pooling inactive declarations into a global set.
 const appSheets = Object.fromEntries(readdirSync(new FileURL(".", import.meta.url), { recursive: true })
   .filter((file) => file.endsWith(".css")).map((file) => [file.replaceAll("\\", "/"), readFileSync(new FileURL(file.replaceAll("\\", "/"), import.meta.url), "utf8")]));
 const parsedSheets = new Map<string, CSSRuleList>();
@@ -619,7 +619,7 @@ function tokenBlocks(sheets: Record<string, string>, platform = "macos", mode = 
         return (!prefix || doc.documentElement.matches(prefix)) && (!look || look === platform);
       });
       if (!active) continue;
-      const scope = (/\.menu-|\.toolbar-menu/.test(selector) || (selector === "@keyframe" && file.endsWith("Menu.css"))) && !/^:root[^ ]*$/.test(selector) ? "menu" : file.endsWith("notice.css") && !selector.startsWith(":root") ? "notice" : "root";
+      const scope = selector.includes('[aria-label="Selected references"]') ? "tray" : (/\.menu-|\.toolbar-menu/.test(selector) || (selector === "@keyframe" && file.endsWith("Menu.css"))) && !/^:root[^ ]*$/.test(selector) ? "menu" : file.endsWith("notice.css") && !selector.startsWith(":root") ? "notice" : "root";
       const values: [string, string][] = Array.from(styled.style).map((name) => [name, styled.style.getPropertyValue(name)]);
       if (scope === "root" && values.some(([name]) => name.startsWith("--")) && !selector.startsWith(":root")) throw new Error(`Unmodeled token scope: ${selector}`);
       blocks.push({ file, selector, scope, values });
@@ -657,7 +657,7 @@ function tokenScopes(blocks: TokenBlock[]) {
   const root = raw("root");
   // Inherited custom properties resolve on the parent, before child overrides.
   const inherited = [...root].map(([name, value]) => [name, resolveToken(value, root) ?? value] as [string, string]);
-  return new Map([ ["root", root], ...["menu", "notice"].map((scope) => [scope, new Map([...inherited, ...raw(scope)])] as const) ]);
+  return new Map([ ["root", root], ...["menu", "notice", "tray"].map((scope) => [scope, new Map([...inherited, ...raw(scope)])] as const) ]);
 }
 
 test("every application var resolves in its active look/mode, without alias cycles", () => {
