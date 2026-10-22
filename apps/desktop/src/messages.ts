@@ -119,6 +119,7 @@ export const pickerText = {
   searchResults: "Search results",
   results: "Results",
   noDate: "No date",
+  unnamedReference: "Untitled reference",
   addedToCitation: "Added to citation",
   /** The tile button's tooltip: "Add García 2021 to citation". */
   addNamed: (name: string) => `Add ${name} to citation`,

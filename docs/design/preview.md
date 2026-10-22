@@ -54,8 +54,13 @@ layer from `design/depth-prototype` (variant B). The footer pattern
 - As many chips as fit on one line, at most 6; the rest fold into "+N". In the
   720 px window that is usually 4 to 6. The shelf never grows a second chip
   line.
-- If two chips would read the same, add the second author ("García & Okafor
-  2021"), then the key.
+- If two chips would read the same, add letters in selection order:
+  "García 2021a", "García 2021b" (then aa after z). This is a display label;
+  citation formatting, keys, identities and copy order stay unchanged. Only the
+  author shortens, as in "Garc… 2021a"; never the year or its letter. The full
+  author, year and key remain in the tooltip and accessible name. Missing dates
+  keep the letter as a separate trailing part; missing author and year use the
+  key, then native key or title, then "Untitled reference".
 - "+N" opens a popover with every chosen reference, remove buttons and
   reordering (Alt+↑↓, drag), with the chip keyboard model (← → between chips,
   Backspace and Delete remove).

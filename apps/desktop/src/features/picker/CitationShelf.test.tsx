@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
 import type { SearchResult } from "../../api";
-import { chipLabels, CitationShelf } from "./CitationShelf";
+import { CitationShelf } from "./CitationShelf";
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
@@ -21,56 +21,6 @@ const shelf = (props: Partial<Parameters<typeof CitationShelf>[0]>) => (
   <CitationShelf announce={false} selected={new Map()} removeLabel={(r) => `Remove ${r.key}`} onRemove={() => undefined}
     style={null} keys shown={undefined} focusable={false} {...props} />
 );
-
-test("chip labels keep unique author/year or key fallbacks", () => {
-  expect(chipLabels([record("a"), record("b", "Okafor", 2019), record("c", "", null)])).toEqual(["García 2021", "Okafor 2019", "c"]);
-  expect(chipLabels([record("a", "", 0), record("b", "Example", -42)])).toEqual(["0", "Example -42"]);
-});
-
-test("colliding chip labels use year letters even when titles and citation keys match", () => {
-  const first = { ...record("shared"), title: "Same title", id: { source: "zotero:user", native_key: "A" } };
-  const second = { ...first, id: { source: "zotero:group:3", native_key: "B" } };
-  const differentTitle = { ...record("other"), title: "Different title" };
-  const records = [first, second, differentTitle];
-  const original = JSON.stringify(records);
-  expect(chipLabels(records)).toEqual(["García 2021a", "García 2021b", "García 2021c"]);
-  expect(JSON.stringify(records)).toBe(original);
-  expect(chipLabels([second, first])).toEqual(["García 2021a", "García 2021b"]);
-  expect(chipLabels([second])).toEqual(["García 2021"]);
-});
-
-test("collision letters follow each group in selection order beyond z", () => {
-  const records = Array.from({ length: 50 }, (_, i) => record(`key${i}`));
-  const labels = chipLabels(records);
-  expect(labels.slice(0, 2)).toEqual(["García 2021a", "García 2021b"]);
-  expect(labels.slice(25, 28)).toEqual(["García 2021z", "García 2021aa", "García 2021ab"]);
-  expect(labels.at(-1)).toBe("García 2021ax");
-  expect(new Set(labels).size).toBe(50);
-  expect(chipLabels([record("a"), record("b", "Okafor"), record("c"), record("d", "Okafor")]))
-    .toEqual(["García 2021a", "Okafor 2021a", "García 2021b", "Okafor 2021b"]);
-});
-
-test("visually identical whitespace and Unicode authors share a collision group", () => {
-  expect(chipLabels([record("a", " Garci\u0301a "), record("b", "García")]))
-    .toEqual(["García 2021a", "García 2021b"]);
-  expect(chipLabels([record("a", "Example   Group"), record("b", "Example\tGroup")]))
-    .toEqual(["Example Group 2021a", "Example Group 2021b"]);
-});
-
-test("equal titles do not merge different author/year groups, and missing dates still disambiguate", () => {
-  expect(chipLabels([record("a", "García", null), record("b", "García", null)]))
-    .toEqual(["García a", "García b"]);
-  expect(chipLabels([record("a", "García", 2020), record("b", "Okafor", 2020), record("c", "García", 2021)]))
-    .toEqual(["García 2020", "Okafor 2020", "García 2021"]);
-});
-
-test("chip labels preserve literal hostile, huge, RTL and CJK metadata without parsing authors", () => {
-  const author = '<img src=x onerror="attack()"> العربية 漢字' + "長".repeat(10_000);
-  const first = { ...record("a", author), authors: "Organization, Division, Other author" };
-  const second = { ...record("b", author), authors: "Different, Joined, Authors" };
-  expect(chipLabels([first, second])).toEqual([`${author} 2021a`, `${author} 2021b`]);
-  expect(chipLabels([record("a", "", null), record("a", "", null)])).toEqual(["a a", "a b"]);
-});
 
 test("six chips show, the rest fold into +N, and +N shows every chip so each can be removed", () => {
   const records = Array.from({ length: 9 }, (_, i) => record(`k${i}`, `Author${i}`));

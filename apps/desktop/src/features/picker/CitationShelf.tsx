@@ -4,24 +4,11 @@ import { provisional, type FormattedCitation } from "../../format/formatted";
 import { render } from "../../format/markup";
 import type { StyleId } from "../../format/styles";
 import { pickerText } from "../../messages";
+import { chipLabels } from "./chipLabels";
 
 /** The shelf shows at most this many chips; the rest fold into "+N"
  * (docs/design/preview.md, "Chips before the count"). */
 export const SHELF_CHIPS = 6;
-
-/** "García 2021": the first author's family name and the year, or the key
- * when the record names neither. */
-export function chipLabel(r: SearchResult): string {
-  const label = [r.first_author, r.year ?? ""].join(" ").trim();
-  return label || r.key;
-}
-
-/** Chip labels, with the key added to any label that two chips share. */
-export function chipLabels(records: SearchResult[]): string[] {
-  const labels = records.map(chipLabel);
-  return labels.map((label, i) =>
-    labels.indexOf(label) !== labels.lastIndexOf(label) && label !== records[i]!.key ? `${label} · ${records[i]!.key}` : label);
-}
 
 /** What Enter pastes, above the footer's Copy action (docs/design/preview.md):
  * a line of chips for the references chosen with Shift+Enter, then the exact
