@@ -1,6 +1,6 @@
 # Empty-state browser evidence
 
-Source: `4f2f7a828640d31741a548147a5e5ec219e61c1f`.
+Source: `a3763da1d401e22b87aff20e4401b45497d71eb6`.
 Actual-main baseline: `082db515d869f7a74cfee4df23824f3c7d0806e4`.
 
 One evidence set, 96 synthetic frames: opening, empty file, idle, no matches,
@@ -15,6 +15,8 @@ a spinner and filename, without a description or chooser. Empty/no-match views
 have a filled suggested action and quieter alternatives. Empty and unavailable
 views have no results heading; reloading retains both rows beneath progress.
 The header uses the landed Format menu and retained rows keep the CitationShelf.
+Nonbusy titles and lines follow the named results list in DOM reading order;
+busy progress stays before the retained rows.
 
 The timer boundary, cancellation/restart, long multilingual filenames, full
 accessible names and older-webview fallback are covered by interface tests.
