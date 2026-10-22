@@ -25,6 +25,30 @@ afterEach(async () => {
   clearMocks();
 });
 
+test("the shelf shows what Enter pastes in a key syntax, without copying, and leaves out a failed key preview", async () => {
+  let fail = false;
+  const calls = backend({
+    search: ({ query }) => [query === "again" ? result("b", "Second") : result("a", "First")],
+    citation_text: ({ ids }) => {
+      if (fail) throw new Error("synthetic preview failure");
+      return { text: `[@${(ids as api.RecordId[]).map((id) => id.native_key).join("; @")}]`, warnings: [] };
+    },
+  });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "first" } });
+  const output = await screen.findByRole("region", { name: "Preview" });
+  await waitFor(() => expect(output.textContent).toContain("[@a]"));
+  expect(output.hasAttribute("data-keys")).toBe(true);
+  expect(calls).not.toContain("copy_citation");
+  fail = true;
+  fireEvent.change(box, { target: { value: "again" } });
+  await screen.findByText("Second");
+  await waitFor(() => expect(calls.filter((c) => c === "citation_text")).toHaveLength(2));
+  await waitFor(() => expect(screen.queryByRole("region", { name: "Preview" })).toBeNull());
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
 test("copy confirmation expires, but copy warnings remain until dismissed", async () => {
   let warnings: string[] = [];
   backend({
@@ -3061,28 +3085,4 @@ test("a retained freshness warning does not hide an actual search failure", asyn
   render(<App />);
   await screen.findByText("Ibis could not search your library. Use Reload, then try again.");
   expect(screen.getAllByRole("alert")).toHaveLength(1);
-});
-
-test("the shelf shows what Enter pastes in a key syntax, without copying, and leaves out a failed key preview", async () => {
-  let fail = false;
-  const calls = backend({
-    search: ({ query }) => [query === "again" ? result("b", "Second") : result("a", "First")],
-    citation_text: ({ ids }) => {
-      if (fail) throw new Error("synthetic preview failure");
-      return { text: `[@${(ids as api.RecordId[]).map((id) => id.native_key).join("; @")}]`, warnings: [] };
-    },
-  });
-  render(<App />);
-  const box = screen.getByLabelText("Search references");
-  fireEvent.change(box, { target: { value: "first" } });
-  const output = await screen.findByRole("region", { name: "Preview" });
-  await waitFor(() => expect(output.textContent).toContain("[@a]"));
-  expect(output.hasAttribute("data-keys")).toBe(true);
-  expect(calls).not.toContain("copy_citation");
-  fail = true;
-  fireEvent.change(box, { target: { value: "again" } });
-  await screen.findByText("Second");
-  await waitFor(() => expect(calls.filter((c) => c === "citation_text")).toHaveLength(2));
-  await waitFor(() => expect(screen.queryByRole("region", { name: "Preview" })).toBeNull());
-  expect(screen.queryByRole("alert")).toBeNull();
 });
