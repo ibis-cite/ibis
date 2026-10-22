@@ -3,7 +3,7 @@ import type React from "react";
 import type { SearchResult } from "../../api";
 import { choiceKey, choiceName, idKey, sameLibrary, styleOf } from "./choice";
 import { abbreviatedAuthors, hiddenMatch, tileName } from "./rows";
-import { isKeysShortcut, isMenuShortcut, isQuitShortcut } from "./shortcuts";
+import { isKeysShortcut, isMenuShortcut, isPreviewShortcut, isQuitShortcut } from "./shortcuts";
 
 const record = (more: Partial<SearchResult> = {}): SearchResult => ({
   revision: "1", id: { source: "refs.bib", native_key: "a" }, key: "a", title: "T", authors: "García", year: 2021,
@@ -48,4 +48,17 @@ test("a letter shortcut typed as punctuation is not the keys shortcut", () => {
   expect(isKeysShortcut(press("/", "Slash"), false)).toBe(true);
   expect(isKeysShortcut({ ...press("?", "KeyM"), shiftKey: true } as React.KeyboardEvent, false)).toBe(true);
   expect(isMenuShortcut(press("/", "Slash"), false)).toBe(false);
+});
+
+test("preview shortcuts use the platform command key, strict modifiers and non-Latin fallback", () => {
+  const press = (more: Partial<React.KeyboardEvent> = {}) => ({ key: "i", code: "KeyI", ctrlKey: true,
+    metaKey: false, altKey: false, shiftKey: false, target: null, ...more }) as React.KeyboardEvent;
+  for (const key of ["i", "I", "ш", "/"]) expect(isPreviewShortcut(press({ key }), false)).toBe(true);
+  expect(isKeysShortcut(press({ key: "/" }), false)).toBe(false);
+  expect(isPreviewShortcut(press({ ctrlKey: false, metaKey: true }), true)).toBe(true);
+  for (const modifiers of [{ altKey: true }, { shiftKey: true }, { metaKey: true }, { ctrlKey: false }]) {
+    expect(isPreviewShortcut(press(modifiers), false)).toBe(false);
+  }
+  expect(isPreviewShortcut(press(), true)).toBe(false);
+  expect(isPreviewShortcut(press({ key: "j" }), false)).toBe(false);
 });
