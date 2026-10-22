@@ -1,0 +1,44 @@
+{
+  "source": "a0435fb0ae65f818934e73dc5a21f9f7004156af",
+  "results": [
+    {
+      "platform": "macos",
+      "target": {
+        "width": 44,
+        "height": 44,
+        "coarse": true
+      },
+      "unpinSearch": true,
+      "searchCommand": true,
+      "menuBefore": "true",
+      "menuAfter": "false",
+      "menuShortcutToggled": true
+    },
+    {
+      "platform": "windows",
+      "target": {
+        "width": 44,
+        "height": 44,
+        "coarse": true
+      },
+      "unpinSearch": true,
+      "searchCommand": true,
+      "menuBefore": "true",
+      "menuAfter": "false",
+      "menuShortcutToggled": true
+    },
+    {
+      "platform": "linux",
+      "target": {
+        "width": 44,
+        "height": 44,
+        "coarse": true
+      },
+      "unpinSearch": true,
+      "searchCommand": true,
+      "menuBefore": "true",
+      "menuAfter": "false",
+      "menuShortcutToggled": true
+    }
+  ]
+}
