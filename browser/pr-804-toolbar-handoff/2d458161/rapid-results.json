@@ -1,0 +1,199 @@
+{
+  "source": "2d458161eb103391f9a697216fa69ade6948f370",
+  "browser": "Chromium",
+  "method": "Synthetic browser looks; virtual close/reopen after observed real data-exiting; not native or physical pointer proof",
+  "results": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "no-preference",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "action",
+      "passed": true,
+      "samePopover": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "reducedMotion": "reduce",
+      "close": "Escape",
+      "passed": true,
+      "samePopover": true
+    }
+  ]
+}

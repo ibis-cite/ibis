@@ -1,0 +1,24 @@
+{
+  "source": "2d458161eb10",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "normal/linux-dark/toolbar-menu",
+    "normal/linux-dark/toolbar-menu-filtered",
+    "normal/linux-light/toolbar-menu",
+    "normal/linux-light/toolbar-menu-filtered",
+    "normal/macos-dark/toolbar-menu",
+    "normal/macos-dark/toolbar-menu-filtered",
+    "normal/macos-light/toolbar-menu",
+    "normal/macos-light/toolbar-menu-filtered",
+    "normal/windows-dark/toolbar-menu",
+    "normal/windows-dark/toolbar-menu-filtered",
+    "normal/windows-light/toolbar-menu",
+    "normal/windows-light/toolbar-menu-filtered"
+  ],
+  "failed": []
+}
