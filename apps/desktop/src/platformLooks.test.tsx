@@ -664,11 +664,11 @@ function tokenScopes(blocks: TokenBlock[]) {
   return new Map([ ["root", root], ...["menu", "notice", "shelf", "chip-group"].map((scope) => [scope, new Map([...inherited, ...raw(scope)])] as const) ]);
 }
 
-test("every application var resolves in its active look/mode, without alias cycles", () => {
+test.each(["macos", "windows", "linux"])("every application var resolves on %s in its active mode, without alias cycles", (platform) => {
   expect(Object.keys(appSheets).length).toBeGreaterThanOrEqual(8);
   expect(tokenBlocks(appSheets).flatMap((block) => block.values).length).toBeGreaterThan(500);
   const errors: string[] = [];
-  for (const platform of ["macos", "windows", "linux"]) for (const mode of ["normal", "more", "forced", "gallery", "reduced", "transparency"]) for (const advanced of [true, false]) for (const material of [false, true]) for (const notice of [false, true]) for (const coarse of [false, true]) {
+  for (const mode of ["normal", "more", "forced", "gallery", "reduced", "transparency"]) for (const advanced of [true, false]) for (const material of [false, true]) for (const notice of [false, true]) for (const coarse of [false, true]) {
     const blocks = tokenBlocks(appSheets, platform, mode, advanced, material, notice, coarse), scopes = tokenScopes(blocks);
     for (const block of blocks) for (const [name, value] of block.values) {
       const definitions = scopes.get(block.scope)!;
