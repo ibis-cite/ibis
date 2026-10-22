@@ -2743,6 +2743,33 @@ class ContractTests(unittest.TestCase):
                 self.assertIn("-TraceForeground", helper.call_args.args[0])
                 self.assertNotIn("payload", str(output.call_args_list))
 
+    def test_recovery_observations_stop_after_eight_existing_snapshots_and_cap_output(self):
+        native = Scripted.__new__(Scripted)
+        native.system, native.command, native.foreground_remaining = "Windows", ["synthetic-helper"], 8
+        fact = {"action": "snapshot", "stage": "snapshot", "owner": "unknown", "foreground_observed": True,
+                "foreground_available": False, "picker_owned": True, "picker_visible": False, "elapsed_ms": 1}
+        trace = "NATIVE FOREGROUND STATE " + json.dumps(fact)
+        with patch("subprocess.run", return_value=subprocess.CompletedProcess([], 0, '{}', trace)) as helper, patch("builtins.print"):
+            for _ in range(9):
+                native.call("snapshot", "456")
+            self.assertEqual(helper.call_count, 9)
+            self.assertTrue(all("-TraceForeground" in entry.args[0] for entry in helper.call_args_list[:8]))
+            self.assertNotIn("-TraceForeground", helper.call_args_list[8].args[0])
+            self.assertEqual(native.foreground_trace, [fact] * 8)
+        native.foreground_trace = []
+        with patch("builtins.print") as output:
+            for _ in range(100):
+                native.record_foreground(trace)
+            self.assertEqual(len(native.foreground_trace), 64)
+            self.assertTrue(native.foreground_trace_capped)
+            self.assertEqual(output.call_count, 64)
+        failure = ('NATIVE HELPER ERROR COMException\nNATIVE CONTROL STATE {"pressed":false}\n'
+                   'NATIVE SNAPSHOT FAILURE {"phase":"ownership","kind":"COMException","operation":"from-handle"}\n'
+                   'NATIVE FOREGROUND STATE {"private":"payload"}')
+        lines = fixed_windows_failure(failure, "snapshot")
+        self.assertEqual(len(lines), 3)
+        self.assertNotIn("payload", str(lines))
+
     def test_menu_actions_open_more_first(self):
         native = Mock()
         menu_action(native, "Reload")
@@ -3765,11 +3792,13 @@ $operation=[scriptblock]::Create($clause.Substring(1,$clause.Length-2))
 Add-Type @'
 using System;
 public static class IbisSmoke {
- public static bool Valid=true, Visible=true; public static uint Owner=42;
+ public static bool Valid=true, Visible=true, ReadFails=false, VisibilityFails=false;
+ public static uint Owner=42, ForegroundOwner=42;
  public static long Handle=7;
  public static bool IsWindow(IntPtr handle) { return Valid && handle.ToInt64()==Handle; }
- public static bool IsWindowVisible(IntPtr handle) { return Visible; }
- public static uint OwnerPid(IntPtr handle) { return Owner; }
+ public static bool IsWindowVisible(IntPtr handle) { if(VisibilityFails) throw new Exception("private"); return Visible; }
+ public static IntPtr GetForegroundWindow() { if(ReadFails) throw new Exception("private"); return new IntPtr(9); }
+ public static uint OwnerPid(IntPtr handle) { return handle.ToInt64()==9 ? ForegroundOwner : Owner; }
 }
 namespace IbisClickContract {
  public enum TreeScope { Descendants }
@@ -3783,9 +3812,9 @@ namespace IbisClickContract {
  public class ExpandCollapsePattern { public static int Pattern=2; }
  public class TogglePattern { public static int Pattern=3; }
 public class ClickPattern {
- public int Activations; public bool Fail;
+ public int Activations; public bool Fail, Hide;
  public void Invoke() { Activate(); } public void Expand() { Activate(); } public void Toggle() { Activate(); }
- private void Activate() { Activations++; if(Fail) throw new Exception("uncertain activation"); }
+ private void Activate() { Activations++; if(Hide) IbisSmoke.Visible=false; if(Fail) throw new Exception("uncertain activation"); }
 }
 public class ClickElement {
  public string Name="Typst"; public ClickElement Current { get { return this; } }
@@ -3846,6 +3875,45 @@ foreach ($failure in @('missing','wrong-label','text-toggle','menu-toggle','dupl
 [IbisClickContract.AutomationElement]::Window=$null
 $rejected=$false; try {& $operation | Out-Null} catch {$rejected=$true}
 if(!$rejected) {throw 'Missing owned window accepted'}
+$traceFunction=$ast.Find({param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Write-ForegroundTrace'},$true)
+. ([scriptblock]::Create($traceFunction.Extent.Text))
+$script:ForegroundClock=[Diagnostics.Stopwatch]::StartNew()
+$Action='snapshot'; $AppId=$PID+2; $EditorId=$PID+1; $EditorStarted=100; $script:EditorTicks=100
+function Get-Process { [CmdletBinding()] param([int] $Id) [pscustomobject]@{StartTime=[DateTime]::new($script:EditorTicks)} }
+$originalError=[Console]::Error; $traceLog=[IO.StringWriter]::new(); [Console]::SetError($traceLog)
+try {
+ [IbisSmoke]::Valid=$true; [IbisSmoke]::Visible=$false; [IbisSmoke]::Owner=$AppId
+ foreach ($case in @(@($AppId,'app',$true),@($EditorId,'editor',$true),@($PID,'owned_helper',$true),@(($PID+3),'unknown',$true),@(0,'unknown',$false))) {
+  [void]$traceLog.GetStringBuilder().Clear(); [IbisSmoke]::ForegroundOwner=$case[0]
+  Write-ForegroundTrace 'snapshot' ([IntPtr]7)
+  $fact=$traceLog.ToString().Trim().Substring(24) | ConvertFrom-Json
+  if($fact.owner -ne $case[1] -or !$fact.foreground_observed -or $fact.foreground_available -ne $case[2] -or
+     !$fact.picker_owned -or $fact.picker_visible -ne $false) {throw 'Hidden foreground observation changed'}
+ }
+ foreach ($mode in @('reused-editor','unavailable','picker-unavailable')) {
+  [void]$traceLog.GetStringBuilder().Clear(); [IbisSmoke]::ForegroundOwner=$EditorId
+  $script:EditorTicks=101; [IbisSmoke]::ReadFails=$mode -eq 'unavailable'
+  [IbisSmoke]::VisibilityFails=$mode -eq 'picker-unavailable'
+  Write-ForegroundTrace 'snapshot' ([IntPtr]7)
+  $fact=$traceLog.ToString().Trim().Substring(24) | ConvertFrom-Json
+  if($fact.owner -ne 'unknown' -or $fact.foreground_observed -ne ($mode -ne 'unavailable') -or
+     ($mode -eq 'picker-unavailable' -and ($null -ne $fact.picker_owned -or $null -ne $fact.picker_visible))) {throw 'Unavailable observation guessed a state'}
+ }
+ [IbisSmoke]::ReadFails=$false; [IbisSmoke]::VisibilityFails=$false; [IbisSmoke]::Visible=$true
+ [IbisSmoke]::ForegroundOwner=$AppId; $TraceForeground=$true; $Action='click'; $Text='Reload'; $PickerHandle=7
+ [IbisClickContract.AutomationElement]::Window=$script:window
+ foreach ($uncertain in @($false,$true)) {
+  [void]$traceLog.GetStringBuilder().Clear()
+  [IbisSmoke]::Visible=$true
+  $element=[IbisClickContract.ClickElement]::new(); $element.Name='Reload'; $element.Supported=1
+  $element.Action.Fail=$uncertain; $element.Action.Hide=$true
+  $script:window.Elements=@($element); $failed=$false
+  try {& $operation | Out-Null} catch {$failed=$true}
+  $records=@($traceLog.ToString() -split "\r?\n" | Where-Object { $_.StartsWith('NATIVE FOREGROUND STATE ') } | ForEach-Object { $_.Substring(24) | ConvertFrom-Json })
+  if(($records.stage -join ',') -ne 'ready,before,after' -or $failed -ne $uncertain -or $element.Action.Activations -ne 1 -or
+     !$records[1].picker_visible -or $records[2].picker_visible -ne $false) {throw 'Trace changed activation or phase order'}
+ }
+} finally { [Console]::SetError($originalError) }
 [Console]::Error.WriteLine('WINDOWS CLICK CONTRACT complete')
 '''
         with tempfile.TemporaryDirectory() as temporary:
