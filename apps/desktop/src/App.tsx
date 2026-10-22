@@ -629,6 +629,17 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         showFormat={library === null || Boolean(library?.has_snapshot)}
         styles={Boolean(cslItems && copyFormatted)}
         onFormatChange={chooseFormat}
+        onFormatCommand={(command) => {
+          const visibility = copyVisibility.current;
+          return {
+            isCurrent: () => visibility === copyVisibility.current && hiddenAt.current === null,
+            run: () => {
+              if (command === "more") openMore();
+              else if (command === "keys") openKeys();
+              else void perform("quit", quitAfterSaving);
+            },
+          };
+        }}
         pinned={pinned}
         onTogglePin={togglePin}
       />
