@@ -42,6 +42,11 @@ controls the running app's registration.
   Do not switch the shipped identifiers until these platform transitions are
   implemented and tested. Existing system permissions may need approval again.
 
+Special files are unreadable settings, not streams to open: keep regular backup
+recovery and refuse writes over a special primary, backup or temporary file.
+Ordinary file symlinks retain their existing behavior. Metadata preflight bounds
+this failure case; it is not a lock against concurrent external path changes.
+
 ## Consequences
 
 The identity no longer depends on the hosting organization. Stable and Nightly
