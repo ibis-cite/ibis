@@ -6,7 +6,7 @@ import { PickerFooter } from "./PickerFooter";
 const library = galleryStates.find((state) => state.id === "tray-20")!.library;
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
-function geometry(initial = 692) {
+function geometry(initial = 692, trailingMargin = 0) {
   let width = initial; let scale = 1; let copy = 162; let shortcuts = 133.8125; let more = 129.75;
   const observers: { callback: () => void; nodes: Set<Element> }[] = [];
   vi.stubGlobal("ResizeObserver", class {
@@ -23,7 +23,7 @@ function geometry(initial = 692) {
   const computed = window.getComputedStyle;
   vi.spyOn(window, "getComputedStyle").mockImplementation((node) => {
     if (!node.matches(".library-bar, .enter-hints")) return computed(node);
-    const style = document.createElement("div").style; style.columnGap = `${(node.matches(".library-bar") ? 8 : 16) * scale}px`; return style;
+    const style = document.createElement("div").style; style.columnGap = `${(node.matches(".library-bar") ? 8 : 16) * scale}px`; style.marginInlineEnd = `${node.matches(".enter-hints") ? trailingMargin : 0}px`; return style;
   });
   return { resize(next: number, values: { scale?: number; copy?: number; shortcuts?: number; more?: number } = {}) {
     width = next; scale = values.scale ?? scale; copy = values.copy ?? copy; shortcuts = values.shortcuts ?? shortcuts; more = values.more ?? more;
@@ -94,5 +94,11 @@ test("platform key-cap changes restore optional content using the new live width
   expect(screen.queryByRole("button", { name: "Shortcuts" })).toBeNull();
   platform.mockReturnValue("MacIntel"); fit.resize(692, { shortcuts: 75, more: 85 }); view.rerender(footer());
   expect(document.querySelectorAll(".shortcuts-hint kbd")).toHaveLength(1);
+  expect(screen.getByRole("button", { name: "Shortcuts" })).toBeTruthy();
+});
+
+
+test("the live hint margin restores Shortcuts at the actual fit boundary", () => {
+  geometry(718, -4); render(footer());
   expect(screen.getByRole("button", { name: "Shortcuts" })).toBeTruthy();
 });

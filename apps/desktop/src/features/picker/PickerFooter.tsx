@@ -43,7 +43,9 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
       if (!(available > 0 && preferred > 0)) return;
       const width = (node: Element | null) => node?.getBoundingClientRect().width ?? 0;
       const gap = parseFloat(getComputedStyle(element).columnGap) || 0;
-      const innerGap = hintsRow.current ? parseFloat(getComputedStyle(hintsRow.current).columnGap) || 0 : 0;
+      const hintStyle = hintsRow.current ? getComputedStyle(hintsRow.current) : null;
+      const innerGap = parseFloat(hintStyle?.columnGap ?? "") || 0;
+      const hintMargin = (parseFloat(hintStyle?.marginInlineStart ?? "") || 0) + (parseFloat(hintStyle?.marginInlineEnd ?? "") || 0);
       const actions = [...(hintsRow.current?.children ?? [])].filter((child) => child !== shortcut.current);
       const optional = width(shortcut.current);
       const actionWidth = actions.reduce((sum, child) => sum + width(child), 0);
@@ -51,7 +53,7 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
       const needed = (showShortcut: boolean) => {
         const count = actions.length + (showShortcut && optional > 0 ? 1 : 0);
         const bands = 1 + (pinWidth > 0 ? 1 : 0) + (menuWidth > 0 ? 1 : 0) + (count > 0 ? 1 : 0);
-        return pinWidth + menuWidth + actionWidth + (showShortcut ? optional : 0) + Math.max(0, count - 1) * innerGap + (bands - 1) * gap;
+        return pinWidth + menuWidth + actionWidth + (showShortcut ? optional : 0) + Math.max(0, count - 1) * innerGap + (bands - 1) * gap + (count > 0 ? hintMargin : 0);
       };
       const shortcuts = preferred + needed(true) > available;
       const status = preferred + needed(!shortcuts) > available;
