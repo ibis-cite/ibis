@@ -1,0 +1,39 @@
+{
+  "source": "b1374bb33bf0",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "normal/linux-dark/tray-50",
+    "normal/linux-dark/tray-system-large",
+    "normal/linux-light/tray-50",
+    "normal/linux-light/tray-system-large",
+    "normal/macos-dark/tray-50",
+    "normal/macos-dark/tray-system-large",
+    "normal/macos-light/tray-50",
+    "normal/macos-light/tray-system-large",
+    "normal/windows-dark/tray-50",
+    "normal/windows-dark/tray-system-large",
+    "normal/windows-light/tray-50",
+    "normal/windows-light/tray-system-large"
+  ],
+  "failed": [],
+  "publishedContactSheets": 1,
+  "files": [
+    {
+      "file": "browser-checks.json",
+      "sha256": "393128a07760bffbae688e89a00e8f424a0e32dc9a2b529684dc064235eb3642"
+    },
+    {
+      "file": "contact-sheet-normal.png",
+      "sha256": "141a1a379115dd6c8f7e992d0dc535c10f9d731311d48c4a63ba321e64b48298"
+    },
+    {
+      "file": "height-comparison.json",
+      "sha256": "2f35660d5ea244a6b03d6a710ccace524850afe44ed1bd1db3af21db78a006e6"
+    }
+  ]
+}

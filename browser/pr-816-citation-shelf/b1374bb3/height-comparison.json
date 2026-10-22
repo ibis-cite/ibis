@@ -1,0 +1,535 @@
+{
+  "main": "3aec80b4042fa248d4c70689d9b6b056b3c912c1",
+  "runtimeSource": "b2a01f50ea168f8ddf50e6677cbbb7df34226323",
+  "kind": "synthetic Chromium geometry at200%text; finalruntimeunchanged",
+  "results": [
+    {
+      "source": "main3aec80b4",
+      "platform": "macos",
+      "width": 360,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 184,
+        "height": 184,
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 184,
+        "bottom": 276,
+        "height": 92,
+        "clientHeight": 92,
+        "scrollHeight": 25749
+      },
+      "shelf": null,
+      "output": null,
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "main3aec80b4",
+      "platform": "macos",
+      "width": 720,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 184,
+        "height": 184,
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "footer": {
+        "top": 356,
+        "bottom": 480,
+        "height": 124,
+        "clientHeight": 123,
+        "scrollHeight": 123
+      },
+      "middle": {
+        "top": 184,
+        "bottom": 356,
+        "height": 172,
+        "clientHeight": 172,
+        "scrollHeight": 8349
+      },
+      "shelf": null,
+      "output": null,
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "main3aec80b4",
+      "platform": "windows",
+      "width": 360,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 168,
+        "height": 168,
+        "clientHeight": 167,
+        "scrollHeight": 167
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 168,
+        "bottom": 276,
+        "height": 108,
+        "clientHeight": 108,
+        "scrollHeight": 21933
+      },
+      "shelf": null,
+      "output": null,
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "main3aec80b4",
+      "platform": "windows",
+      "width": 720,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 96,
+        "height": 96,
+        "clientHeight": 95,
+        "scrollHeight": 95
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 96,
+        "bottom": 276,
+        "height": 180,
+        "clientHeight": 180,
+        "scrollHeight": 8333
+      },
+      "shelf": null,
+      "output": null,
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "main3aec80b4",
+      "platform": "linux",
+      "width": 360,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 184,
+        "height": 184,
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 184,
+        "bottom": 276,
+        "height": 92,
+        "clientHeight": 92,
+        "scrollHeight": 25749
+      },
+      "shelf": null,
+      "output": null,
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "main3aec80b4",
+      "platform": "linux",
+      "width": 720,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 112,
+        "height": 112,
+        "clientHeight": 111,
+        "scrollHeight": 111
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 112,
+        "bottom": 276,
+        "height": 164,
+        "clientHeight": 164,
+        "scrollHeight": 8349
+      },
+      "shelf": null,
+      "output": null,
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "shelf working tree",
+      "platform": "macos",
+      "width": 360,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 184,
+        "height": 184,
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 184,
+        "bottom": 208,
+        "height": 24,
+        "clientHeight": 24,
+        "scrollHeight": 25588
+      },
+      "shelf": {
+        "top": 208,
+        "bottom": 260,
+        "height": 52,
+        "clientHeight": 52,
+        "scrollHeight": 160
+      },
+      "output": {
+        "top": 288,
+        "bottom": 368,
+        "height": 80,
+        "clientHeight": 80,
+        "scrollHeight": 80
+      },
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "shelf working tree",
+      "platform": "macos",
+      "width": 720,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 184,
+        "height": 184,
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "footer": {
+        "top": 356,
+        "bottom": 480,
+        "height": 124,
+        "clientHeight": 123,
+        "scrollHeight": 123
+      },
+      "middle": {
+        "top": 184,
+        "bottom": 208,
+        "height": 24,
+        "clientHeight": 24,
+        "scrollHeight": 8188
+      },
+      "shelf": {
+        "top": 208,
+        "bottom": 340,
+        "height": 132,
+        "clientHeight": 132,
+        "scrollHeight": 160
+      },
+      "output": {
+        "top": 288,
+        "bottom": 368,
+        "height": 80,
+        "clientHeight": 80,
+        "scrollHeight": 80
+      },
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "shelf working tree",
+      "platform": "windows",
+      "width": 360,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 168,
+        "height": 168,
+        "clientHeight": 167,
+        "scrollHeight": 167
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 168,
+        "bottom": 192,
+        "height": 24,
+        "clientHeight": 24,
+        "scrollHeight": 21772
+      },
+      "shelf": {
+        "top": 192,
+        "bottom": 268,
+        "height": 76,
+        "clientHeight": 74,
+        "scrollHeight": 160
+      },
+      "output": {
+        "top": 273,
+        "bottom": 353,
+        "height": 80,
+        "clientHeight": 80,
+        "scrollHeight": 80
+      },
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "shelf working tree",
+      "platform": "windows",
+      "width": 720,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 96,
+        "height": 96,
+        "clientHeight": 95,
+        "scrollHeight": 95
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 96,
+        "bottom": 120,
+        "height": 24,
+        "clientHeight": 24,
+        "scrollHeight": 8172
+      },
+      "shelf": {
+        "top": 120,
+        "bottom": 268,
+        "height": 148,
+        "clientHeight": 146,
+        "scrollHeight": 160
+      },
+      "output": {
+        "top": 201,
+        "bottom": 281,
+        "height": 80,
+        "clientHeight": 80,
+        "scrollHeight": 80
+      },
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "shelf working tree",
+      "platform": "linux",
+      "width": 360,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 184,
+        "height": 184,
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 184,
+        "bottom": 208,
+        "height": 24,
+        "clientHeight": 24,
+        "scrollHeight": 25588
+      },
+      "shelf": {
+        "top": 208,
+        "bottom": 276,
+        "height": 68,
+        "clientHeight": 67,
+        "scrollHeight": 160
+      },
+      "output": {
+        "top": 289,
+        "bottom": 369,
+        "height": 80,
+        "clientHeight": 80,
+        "scrollHeight": 80
+      },
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    },
+    {
+      "source": "shelf working tree",
+      "platform": "linux",
+      "width": 720,
+      "systemText": 200,
+      "viewportHeight": 480,
+      "header": {
+        "top": 0,
+        "bottom": 112,
+        "height": 112,
+        "clientHeight": 111,
+        "scrollHeight": 111
+      },
+      "footer": {
+        "top": 276,
+        "bottom": 480,
+        "height": 204,
+        "clientHeight": 203,
+        "scrollHeight": 203
+      },
+      "middle": {
+        "top": 112,
+        "bottom": 136,
+        "height": 24,
+        "clientHeight": 24,
+        "scrollHeight": 8188
+      },
+      "shelf": {
+        "top": 136,
+        "bottom": 276,
+        "height": 140,
+        "clientHeight": 139,
+        "scrollHeight": 160
+      },
+      "output": {
+        "top": 217,
+        "bottom": 297,
+        "height": 80,
+        "clientHeight": 80,
+        "scrollHeight": 80
+      },
+      "main": {
+        "top": 0,
+        "bottom": 480,
+        "height": 480,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "rootHeight": 480
+    }
+  ]
+}
