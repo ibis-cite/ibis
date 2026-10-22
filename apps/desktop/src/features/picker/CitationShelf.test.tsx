@@ -142,6 +142,55 @@ test("the output is one line in text colours: keys in monospace, failures and pe
   expect(screen.getByText("Missing year")).toBeTruthy();
 });
 
+test("proportional overflow digits cannot cycle the fitted count, and growth restores chips", async () => {
+  let width = 350;
+  const observers: (() => void)[] = [];
+  vi.stubGlobal("innerWidth", 720);
+  vi.stubGlobal("ResizeObserver", class {
+    constructor(callback: () => void) { observers.push(callback); }
+    observe = vi.fn(); disconnect = vi.fn();
+  });
+  vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (this: HTMLElement) {
+    return this.matches(".shelf-chips") ? width : 0;
+  });
+  const computed = window.getComputedStyle;
+  vi.spyOn(window, "getComputedStyle").mockImplementation((element) => {
+    if (!element.matches(".shelf-chips, .shelf-chip-measure")) return computed(element);
+    const style = document.createElement("div").style;
+    style.columnGap = "4px"; style.paddingInlineStart = style.paddingInlineEnd = "0px";
+    return style;
+  });
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    // Three chips produce the wider +20; two produce the narrower +21.
+    const width = this.matches(".shelf-chip-minimum") ? 100
+      : this.matches(".shelf-chip-target") ? 32
+      : this.matches(".shelf-author-measure, .shelf-label-measure bdi") ? 0
+      : this.textContent === "+20" ? 40 : this.textContent === "+21" ? 30 : 35;
+    return new DOMRect(0, 0, width, 24);
+  });
+  const records = Array.from({ length: 23 }, (_, i) => record(`k${i}`, `Author${i}`));
+  const { container } = render(shelf({ selected: chosen(records) }));
+  const visible = () => within(screen.getByRole("grid", { name: "Selected references" })).getAllByRole("row");
+  const more = () => screen.getByRole("button", { name: "Show all 23 selected references" });
+  expect(visible()).toHaveLength(2);
+  expect(more().textContent).toBe("+21");
+  expect(container.querySelectorAll(".chip-fit-measure > button").length).toBeLessThanOrEqual(7);
+  act(() => more().focus());
+  act(() => { for (const observer of [...observers]) observer(); });
+  expect(document.activeElement).toBe(more());
+  expect(visible()).toHaveLength(2);
+  width = 1000;
+  act(() => { for (const observer of [...observers]) observer(); });
+  expect(visible()).toHaveLength(6);
+  width = 350;
+  act(() => { for (const observer of [...observers]) observer(); });
+  expect(visible()).toHaveLength(2);
+  fireEvent.click(more());
+  const popup = await screen.findByRole("dialog", { name: "Selected references" });
+  expect(within(popup).getAllByRole("button", { name: /^Remove/ }).map((button) => button.getAttribute("aria-label")))
+    .toEqual(records.map((r) => `Remove ${r.key}`));
+});
+
 test("nothing chosen and nothing to show draws no shelf", () => {
   const { container } = render(shelf({}));
   expect(container.querySelector(".shelf")).toBeNull();
