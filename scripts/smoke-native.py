@@ -1818,6 +1818,72 @@ class ContractTests(unittest.TestCase):
                 raise NotImplementedError
             return Mock(characterCount=len(self.value), getText=lambda start, end: self.value[start:end])
 
+    def linux_click_fixture(self):
+        native = Linux.__new__(Linux)
+        native.app = Mock(pid=100)
+        native.accessibility_error = type("AccessibilityError", (Exception,), {})
+        target = self.CensusNode(name="Reload")
+        target.queryAction = Mock(return_value=Mock(nActions=1, doAction=Mock(return_value=True)))
+        foreign = self.CensusNode(999, "Reload", [target])
+        foreign.queryAction = Mock()
+        owned = self.CensusNode(100, children=[target])
+        desktop = self.CensusNode(children=[foreign, owned])
+        native.atspi = Mock(Registry=Mock(getDesktop=lambda _: desktop))
+        return native, desktop, owned, target, foreign
+
+    def test_linux_click_skips_stale_discovery_before_owned_target(self):
+        for point in ("owner", "name", "queryAction", "nActions", "children"):
+            with self.subTest(point=point):
+                native, desktop, owned, target, foreign = self.linux_click_fixture()
+                stale = self.CensusNode(100, "Reload")
+                stale.queryAction = Mock(return_value=Mock(nActions=1))
+                error = native.accessibility_error("stale accessible")
+                attribute = "name" if point == "name" else "children"
+                original = stale.__dict__[attribute]
+                def read(node):
+                    if node is stale:
+                        raise error
+                    return node.__dict__[attribute]
+                if point == "owner":
+                    stale.get_process_id = Mock(side_effect=error)
+                    desktop.children.insert(0, stale)
+                else:
+                    owned.children.append(stale)  # LIFO visits stale before target.
+                if point == "queryAction":
+                    stale.queryAction.side_effect = error
+                if point == "nActions":
+                    action = stale.queryAction.return_value
+                    del action.nActions
+                    action.attach_mock(Mock(side_effect=error), "unused")
+                    from unittest.mock import PropertyMock
+                    type(action).nActions = PropertyMock(side_effect=error)
+                if point == "children":
+                    stale.name = "unrelated"
+                with patch.object(self.CensusNode, attribute, property(read), create=True) if point in ("name", "children") else patch.dict({}, {}):
+                    native.click("Reload")
+                target.queryAction.return_value.doAction.assert_called_once_with(0)
+                foreign.queryAction.assert_not_called()
+
+    def test_linux_click_rejects_foreign_namesake_without_owned_target(self):
+        native, desktop, owned, target, foreign = self.linux_click_fixture()
+        owned.children = []
+        with self.assertRaisesRegex(AssertionError, "No invokable accessibility control"):
+            native.click("Reload")
+        target.queryAction.assert_not_called()
+        foreign.queryAction.assert_not_called()
+
+    def test_linux_menu_action_does_not_retry_uncertain_activation(self):
+        native, desktop, owned, target, foreign = self.linux_click_fixture()
+        more = self.CensusNode(name="More")
+        more.queryAction = Mock(return_value=Mock(nActions=1, doAction=Mock(return_value=True)))
+        owned.children.append(more)
+        target.queryAction.return_value.doAction.side_effect = native.accessibility_error("uncertain activation")
+        with self.assertRaises(native.accessibility_error):
+            menu_action(native, "Reload")
+        more.queryAction.return_value.doAction.assert_called_once_with(0)
+        target.queryAction.return_value.doAction.assert_called_once_with(0)
+        foreign.queryAction.assert_not_called()
+
     def census_commands(self, argv):
         rows = {("ps", "-eo", "pid=,ppid="): "100 1\n200 100\n300 200\n999 1\n",
                 ("xprop", "-root", "_NET_CLIENT_LIST"): "_NET_CLIENT_LIST(WINDOW): window id # 0xa\n",
