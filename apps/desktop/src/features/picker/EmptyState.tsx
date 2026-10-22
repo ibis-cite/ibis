@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { ProgressBar } from "react-aria-components";
 import type { LibraryStatus } from "../../api";
 import { keysFor } from "../../keys";
 import { keyText, libraryMessages, pickerText } from "../../messages";
 import { KeyHint } from "../../ui/KeyCaps";
+import { IndeterminateProgress } from "../../ui/Progress";
 import "./EmptyState.css";
 
 // The empty-state contract keeps fast library opens free of transient content.
@@ -28,12 +28,12 @@ function LibraryProgress({ library }: { library: LibraryStatus }) {
   if (!visible) return null;
   const progress = library.state === "reloading" ? libraryMessages.reloading : libraryMessages.opening;
   const name = library.name || null;
-  return <div role="status" aria-live="polite"><ProgressBar className="empty-loading" isIndeterminate aria-label={progress(name)}>
+  return <div role="status" aria-live="polite"><IndeterminateProgress className="empty-loading" label={progress(name)}>
     <svg className="empty-spinner" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
       <path d="M12 3a9 9 0 1 1-9 9" />
     </svg>
     <span aria-hidden="true" dir="auto">{progress(shortName(name))}</span>
-  </ProgressBar></div>;
+  </IndeterminateProgress></div>;
 }
 
 /** What the result list says when it has no rows: an empty library, no
