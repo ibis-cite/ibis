@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -63,9 +64,12 @@ test("CSL corpus keeps colliding legacy inputs, deduplicates bytes and seeds ord
     writeFileSync("fuzz/corpus/csl_export/collision", "current");
     writeFileSync("fuzz/corpus/load_str/collision", Buffer.from([0, 255]));
     writeFileSync("fuzz/corpus/load_str/empty", "");
+    const occupied = createHash("sha256").update(Buffer.from([0, 255])).digest("hex");
+    writeFileSync(`fuzz/corpus/csl_export/${occupied}`, "distinct current bytes");
     seedCorpus("csl_export");
+    assert.equal(readFileSync(`fuzz/corpus/csl_export/${occupied}`, "utf8"), "distinct current bytes");
     const files = readdirSync("fuzz/corpus/csl_export");
-    assert.equal(files.length, 5);
+    assert.equal(files.length, 6);
     assert.ok(files.some((file) => readFileSync(`fuzz/corpus/csl_export/${file}`).equals(Buffer.from([0, 255]))));
     assert.equal(readFileSync("fuzz/corpus/csl_export/collision", "utf8"), "current");
     seedCorpus("csl_export");

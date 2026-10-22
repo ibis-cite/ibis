@@ -62,7 +62,16 @@ export function seedCorpus(target) {
     for (const file of readdirSync("fuzz/corpus/load_str")) {
       const input = readFileSync(`fuzz/corpus/load_str/${file}`);
       const name = createHash("sha256").update(input).digest("hex");
-      writeFileSync(`${corpus}/${name}`, input);
+      for (let suffix = 0; ; suffix++) {
+        const destination = `${corpus}/${name}${suffix ? `-${suffix}` : ""}`;
+        try {
+          writeFileSync(destination, input, { flag: "wx" });
+          break;
+        } catch (error) {
+          if (error.code !== "EEXIST") throw error;
+          if (readFileSync(destination).equals(input)) break;
+        }
+      }
     }
   }
 }
