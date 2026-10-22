@@ -26,6 +26,7 @@
   --search-bar-height: calc(var(--field-h) + 2 * var(--inset)); /* 56, 48 on Windows */
   --footer-height: 2.5rem;
   --control-min-size: 2rem;
+  --touch-target: 2.75rem;
   --icon-glyph-size: 1.25rem;
   --icon-stroke: 1.5;
   --row-compact: 2.5rem;       /* one line */
@@ -158,6 +159,7 @@
      with a quieter fill than the card under them. */
   --shelf-line: 2.5rem;
   --shelf-fill: var(--tile-background);
+  --chip-count-only-width: 460px;
   --chip-height: 1.5rem;
   --chip-fill: color-mix(in srgb, var(--text) 8%, transparent);
   --chip-radius: calc(var(--chip-height) / 2);
