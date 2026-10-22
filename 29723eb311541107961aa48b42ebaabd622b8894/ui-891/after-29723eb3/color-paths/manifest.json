@@ -1,0 +1,103 @@
+{
+  "source": "29723eb311541107961aa48b42ebaabd622b8894",
+  "browser": "151.0.7922.34",
+  "note": "Fallback simulation removes only native keyword support branches in browser CSSOM; native app is separate evidence.",
+  "observations": [
+    {
+      "mode": "native-keywords",
+      "platform": "macos",
+      "theme": "light",
+      "fill": "rgb(0, 117, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 0
+    },
+    {
+      "mode": "native-keywords",
+      "platform": "macos",
+      "theme": "dark",
+      "fill": "rgb(0, 117, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 0
+    },
+    {
+      "mode": "native-keywords",
+      "platform": "windows",
+      "theme": "light",
+      "fill": "rgb(0, 117, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 0
+    },
+    {
+      "mode": "native-keywords",
+      "platform": "windows",
+      "theme": "dark",
+      "fill": "rgb(0, 117, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 0
+    },
+    {
+      "mode": "native-keywords",
+      "platform": "linux",
+      "theme": "light",
+      "fill": "rgb(0, 117, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 0
+    },
+    {
+      "mode": "native-keywords",
+      "platform": "linux",
+      "theme": "dark",
+      "fill": "rgb(0, 117, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 0
+    },
+    {
+      "mode": "fallback",
+      "platform": "macos",
+      "theme": "light",
+      "fill": "rgb(0, 122, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 3
+    },
+    {
+      "mode": "fallback",
+      "platform": "macos",
+      "theme": "dark",
+      "fill": "rgb(10, 132, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 3
+    },
+    {
+      "mode": "fallback",
+      "platform": "windows",
+      "theme": "light",
+      "fill": "rgb(0, 95, 184)",
+      "text": "rgb(255, 255, 255)",
+      "removed": 3
+    },
+    {
+      "mode": "fallback",
+      "platform": "windows",
+      "theme": "dark",
+      "fill": "rgb(96, 205, 255)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 3
+    },
+    {
+      "mode": "fallback",
+      "platform": "linux",
+      "theme": "light",
+      "fill": "rgb(53, 132, 228)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 3
+    },
+    {
+      "mode": "fallback",
+      "platform": "linux",
+      "theme": "dark",
+      "fill": "rgb(120, 174, 237)",
+      "text": "rgb(0, 0, 0)",
+      "removed": 3
+    }
+  ]
+}
