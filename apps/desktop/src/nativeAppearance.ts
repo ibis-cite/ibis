@@ -19,18 +19,23 @@ export function installAccentContrast(): Dispose {
   canvas.width = canvas.height = 1;
   const context = canvas.getContext("2d", { willReadFrequently: true });
   const media = (query: string) => typeof window.matchMedia === "function" ? window.matchMedia(query) : null;
+  let sampledColor = "";
   const refresh = () => {
     const contrast = ["(forced-colors: active)", "(prefers-contrast: more)"].some((query) => media(query)?.matches)
       || root.dataset.galleryTheme === "contrast";
+    if (contrast || !context) {
+      root.style.removeProperty("--readable-accent-text"); sampledColor = ""; return;
+    }
+    const color = getComputedStyle(probe).backgroundColor;
+    if (color === sampledColor) return;
     root.style.removeProperty("--readable-accent-text");
-    if (contrast || !context) return;
     // Let the engine parse modern rgb(), percentages and wide-gamut color().
     // The default canvas readback converts them to sRGB, independent of syntax.
     let rgba: Uint8ClampedArray;
     try {
       context.clearRect(0, 0, 1, 1);
       context.fillStyle = "transparent";
-      context.fillStyle = getComputedStyle(probe).backgroundColor;
+      context.fillStyle = color;
       context.fillRect(0, 0, 1, 1);
       rgba = context.getImageData(0, 0, 1, 1).data;
     } catch { return; } // Unavailable readback retains the native/fallback pair.
@@ -41,17 +46,22 @@ export function installAccentContrast(): Dispose {
     });
     const luminance = channels[0]! * .2126 + channels[1]! * .7152 + channels[2]! * .0722;
     root.style.setProperty("--readable-accent-text", (luminance + .05) / .05 >= 1.05 / (luminance + .05) ? "#000" : "#fff");
+    sampledColor = color;
   };
   const queries = ["(prefers-color-scheme: dark)", "(forced-colors: active)", "(prefers-contrast: more)"].map(media);
   for (const query of queries) query?.addEventListener?.("change", refresh);
   window.addEventListener("focus", refresh);
   document.addEventListener("visibilitychange", refresh);
+  // Old engines have no system-accent change event. Match the existing native
+  // appearance watch's one-second cadence, doing no work while hidden.
+  const timer = window.setInterval(() => { if (!document.hidden) refresh(); }, 1_000);
   refreshAccentContrast = refresh;
   refresh();
   return () => {
     for (const query of queries) query?.removeEventListener?.("change", refresh);
     window.removeEventListener("focus", refresh);
     document.removeEventListener("visibilitychange", refresh);
+    window.clearInterval(timer);
     refreshAccentContrast = () => {};
     root.style.removeProperty("--readable-accent-text");
     probe.remove();

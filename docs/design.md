@@ -183,7 +183,7 @@ symbolic masters. How the assets are regenerated is in the
 | Switch | 38 × 22, the regular `NSSwitch` size | 40 × 20, outlined when off | 46 × 26 |
 | Copied | Pill near the top of the screen | Notice bottom-right | Toast at the bottom |
 
-On macOS, use WebKit's selected-content background when supported. Native accent fills win; derive black or white from the resolved fill to reach 4.5:1, using CSS `contrast-color()` or the shared appearance hook on older webviews. The hook refreshes on system appearance, theme and focus changes. Without native keywords, use each OS’s default accent: macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF and Adwaita #3584E4 / #78AEED (light / dark). Fallback foregrounds are black except Windows light, which uses white; all six pairs reach 4.5:1. Increased contrast and forced colours retain their system Highlight pair.
+On macOS, use WebKit's selected-content background when supported. Native accent fills win; derive black or white from the resolved fill to reach 4.5:1, using CSS `contrast-color()` or the shared appearance hook on older webviews. The hook refreshes on system appearance, theme and focus changes, and checks once a second while visible for accent-only changes. Without native keywords, use each OS’s default accent: macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF and Adwaita #3584E4 / #78AEED (light / dark). Fallback foregrounds are black except Windows light, which uses white; all six pairs reach 4.5:1. Increased contrast and forced colours retain their system Highlight pair.
 
 The Linux selected row uses the full selection colour rather than a tint: focus
 stays in the search box while ↑ ↓ move the selection, so the fill is the only

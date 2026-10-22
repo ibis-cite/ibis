@@ -66,7 +66,7 @@ test("macOS selection uses a supported native background and text pair before co
   expect(block).toMatch(/--selected-text:\s*var\(--readable-accent-text, -apple-system-alternate-selected-text\);/);
   const readable = tokens.indexOf("@supports (color: contrast-color(white))");
   expect(readable).toBeGreaterThan(start);
-  expect(tokens.slice(readable)).toContain("--selected-text: contrast-color(var(--selected-background))");
+  expect(tokens.slice(readable)).toContain(":root, :root[data-platform] { --selected-text: contrast-color(var(--selected-background))");
   for (const media of ["@media (prefers-contrast: more)", "@media (forced-colors: active)"]) {
     expect(tokens.indexOf(media)).toBeGreaterThan(readable);
     expect(rules(tokens.slice(tokens.indexOf(media)), ":root[data-platform]")).toMatch(/--selected-background:\s*Highlight;\s*--selected-text:\s*HighlightText;/);

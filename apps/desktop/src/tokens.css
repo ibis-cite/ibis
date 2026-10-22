@@ -260,7 +260,7 @@
 /* Native paired text can fall below 4.5:1. Choose black or white against the
    actual system fill; contrast modes below retain their own system pairs. */
 @supports (color: contrast-color(white)) {
-  :root { --selected-text: contrast-color(var(--selected-background)); }
+  :root, :root[data-platform] { --selected-text: contrast-color(var(--selected-background)); }
 }
 
 /* Per platform (docs/design.md): only radius, the selected row, the focus ring and the search box change. */

@@ -1,7 +1,7 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { installAccentContrast, installNativeAppearance, setNativeAppearance } from "./nativeAppearance";
 
-afterEach(() => { delete document.documentElement.dataset.nativeAppearance; vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(() => { delete document.documentElement.dataset.nativeAppearance; vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 test("only explicit native success exposes a material", () => {
   for (const bad of [undefined, null, false, {}, "transparent", "vibrancy; color: red"]) {
@@ -59,6 +59,7 @@ test("live native changes replace startup state and reject invalid modes", async
 });
 
 test("older engines repair unreadable accent text and refresh on system changes", () => {
+  vi.useFakeTimers();
   let background = "rgb(0, 117, 255)";
   const listeners = new Map<string, () => void>();
   vi.stubGlobal("CSS", { supports: () => false });
@@ -73,8 +74,13 @@ test("older engines repair unreadable accent text and refresh on system changes"
   const text = () => document.documentElement.style.getPropertyValue("--readable-accent-text");
   expect(text()).toBe("#000"); // Native white is only 4.21:1; black is 4.99:1.
   background = "rgb(0, 40, 100)";
-  window.dispatchEvent(new Event("focus"));
+  vi.advanceTimersByTime(1_000); // Accent-only change, with no focus/theme event.
   expect(text()).toBe("#fff");
+  const read = vi.mocked(window.getComputedStyle);
+  const hidden = vi.spyOn(document, "hidden", "get").mockReturnValue(true);
+  read.mockClear(); vi.advanceTimersByTime(1_000);
+  expect(read).not.toHaveBeenCalled();
+  hidden.mockRestore();
   background = "rgb(255, 230, 0)";
   listeners.get("(prefers-color-scheme: dark)")!();
   expect(text()).toBe("#000");
@@ -86,6 +92,8 @@ test("older engines repair unreadable accent text and refresh on system changes"
   setNativeAppearance("opaque");
   expect(text()).toBe("");
   dispose();
+  read.mockClear(); vi.advanceTimersByTime(1_000);
+  expect(read).not.toHaveBeenCalled();
   window.dispatchEvent(new Event("focus"));
   expect(text()).toBe("");
   vi.stubGlobal("matchMedia", undefined);
