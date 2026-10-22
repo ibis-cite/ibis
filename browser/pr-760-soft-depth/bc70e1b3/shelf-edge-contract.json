@@ -1,0 +1,570 @@
+{
+  "qualification": "Minimal synthetic base-border/class fixture with current tokens/depth; not actual production shelf integration or native acceptance.",
+  "cases": [
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": 100,
+      "before": {
+        "width": 328,
+        "height": 192,
+        "scrollHeight": 190,
+        "clientHeight": 190,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 328,
+        "height": 192,
+        "scrollHeight": 190,
+        "clientHeight": 190,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "shadow": "rgb(255, 255, 255) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "sameGeometry": true,
+      "oneEdge": true,
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "text": 200,
+      "before": {
+        "width": 328,
+        "height": 384,
+        "scrollHeight": 382,
+        "clientHeight": 382,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 328,
+        "height": 384,
+        "scrollHeight": 382,
+        "clientHeight": 382,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "shadow": "rgb(255, 255, 255) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "sameGeometry": true,
+      "oneEdge": true,
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": 100,
+      "before": {
+        "width": 328,
+        "height": 192,
+        "scrollHeight": 190,
+        "clientHeight": 190,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 328,
+        "height": 192,
+        "scrollHeight": 190,
+        "clientHeight": 190,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "shadow": "rgba(255, 255, 255, 0.07) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 0px 0px 1px, rgba(0, 0, 0, 0.26) 0px 2px 4px 0px",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "sameGeometry": true,
+      "oneEdge": true,
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "text": 200,
+      "before": {
+        "width": 328,
+        "height": 384,
+        "scrollHeight": 382,
+        "clientHeight": 382,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 328,
+        "height": 384,
+        "scrollHeight": 382,
+        "clientHeight": 382,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": "1px",
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "shadow": "rgba(255, 255, 255, 0.07) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 0px 0px 1px, rgba(0, 0, 0, 0.26) 0px 2px 4px 0px",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "sameGeometry": true,
+      "oneEdge": true,
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": 100,
+      "before": {
+        "width": 328,
+        "height": 192,
+        "scrollHeight": 191,
+        "clientHeight": 191,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 328,
+        "height": 192,
+        "scrollHeight": 191,
+        "clientHeight": 191,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "sameGeometry": true,
+      "oneEdge": true,
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "text": 200,
+      "before": {
+        "width": 328,
+        "height": 384,
+        "scrollHeight": 383,
+        "clientHeight": 383,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 328,
+        "height": 384,
+        "scrollHeight": 383,
+        "clientHeight": 383,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(0, 0, 0)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "sameGeometry": true,
+      "oneEdge": true,
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": 100,
+      "before": {
+        "width": 328,
+        "height": 192,
+        "scrollHeight": 191,
+        "clientHeight": 191,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 328,
+        "height": 192,
+        "scrollHeight": 191,
+        "clientHeight": 191,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "sameGeometry": true,
+      "oneEdge": true,
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "text": 200,
+      "before": {
+        "width": 328,
+        "height": 384,
+        "scrollHeight": 383,
+        "clientHeight": 383,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 328,
+        "height": 384,
+        "scrollHeight": 383,
+        "clientHeight": 383,
+        "borders": [
+          {
+            "width": "1px",
+            "color": "rgb(96, 96, 96)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": "0px",
+            "color": "rgb(255, 255, 255)"
+          }
+        ],
+        "shadow": "none",
+        "button": [
+          {
+            "width": 44,
+            "height": 44
+          }
+        ]
+      },
+      "sameGeometry": true,
+      "oneEdge": true,
+      "passed": true
+    }
+  ],
+  "source": "bc70e1b3cc39a56c47bec1107e669405066e0a6d",
+  "sha256": {
+    "tokens.css": "b039e8a1f13f92b2e26c435a73690eb8e72018cfac5e9dd9ba7a75e7718be06c",
+    "depth.css": "63ae143dc01e8951b51383f72efee4c33a0f1102eecfbed3c553ec8054edee7e"
+  }
+}
