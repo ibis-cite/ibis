@@ -217,7 +217,7 @@ mod tests {
                 // Deliberately respond before returning the request handle.
                 connection
                     .emit_signal(
-                        Some(sender),
+                        Some(sender.as_str()),
                         &path,
                         "org.freedesktop.portal.Request",
                         "Response",
