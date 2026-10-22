@@ -581,6 +581,8 @@ test("the alias-only migration exposes the complete design-system role inventory
 
 // CSSOM parses declarations/conditions; this audits the existing root, menu and
 // notice and tray token scopes, rather than pooling inactive declarations into a global set.
+// This bounded dependency audit is not a CSS cascade/specificity interpreter;
+// browser comparisons verify the actual winning values and rendered appearance.
 const appSheets = Object.fromEntries(readdirSync(new FileURL(".", import.meta.url), { recursive: true })
   .filter((file) => file.endsWith(".css")).map((file) => [file.replaceAll("\\", "/"), readFileSync(new FileURL(file.replaceAll("\\", "/"), import.meta.url), "utf8")]));
 const parsedSheets = new Map<string, CSSRuleList>();

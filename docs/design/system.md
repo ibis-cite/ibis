@@ -17,6 +17,8 @@ the alias inventory alone does not establish the final per-OS appearance.
 The platform tests audit the root, menu, notice and tray scopes, optional-value
 fallbacks and the unscaled 16 px/rem spacing grid. Native menu metrics, the
 notice glyph/pill insets and border/optical formulas have exact exceptions.
+These are bounded dependency checks, not a cascade/specificity interpreter;
+browser comparisons verify the winning values and rendered appearance.
 
 | # | Decision | Target token(s) |
 |---|---|---|
