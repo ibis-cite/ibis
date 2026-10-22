@@ -1,0 +1,31 @@
+{
+  "source": "81803bba2a708b7ec2480666976bc6027c0d7252",
+  "main": "fc7a81217e30da9ebfc54d91219b6669db03d5e1",
+  "browser": "Chromium 151.0.7922.34",
+  "actionLayout": {
+    "passed": 72,
+    "total": 72
+  },
+  "system200": {
+    "passed": 36,
+    "total": 36
+  },
+  "uiTests": {
+    "passed": 432,
+    "total": 432
+  },
+  "focusedTests": {
+    "passed": 237,
+    "total": 237
+  },
+  "typecheck": "passed",
+  "build": "passed",
+  "guardedFull": "not run at publication; see PR evidence comment for later status",
+  "native": "not run",
+  "prospectiveMenuMerge": {
+    "source": "bad53073995de43896d836cd0adad6a644c3351c",
+    "exit": 0,
+    "tree": "f0253c69545a181a3a414f1bfd2002821035c248"
+  },
+  "dependencyRestore": "Private copy of an existing complete installation with matching package/lock hashes; the subsequent frozen install passed with npm_config_offline=true."
+}
