@@ -244,6 +244,9 @@ jobs:
         shell: bash
         env:
           NODE_PATH: ${{ runner.temp }}/ibis-gallery/node_modules
+          GIT_CONFIG_COUNT: 1
+          GIT_CONFIG_KEY_0: safe.directory
+          GIT_CONFIG_VALUE_0: ${{ github.workspace }}
         run: |
           npm install --prefix "$RUNNER_TEMP/ibis-gallery" --no-save --no-package-lock --ignore-scripts --no-audit --no-fund playwright@1.62.0
           node scripts/gallery-contact-sheet.mjs --no-build

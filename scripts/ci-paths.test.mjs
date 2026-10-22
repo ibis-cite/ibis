@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -132,6 +132,25 @@ test("the required Web job renders the full browser gallery and keeps every fail
     assert.equal(log.length, install ? 1 : 2);
     if (!install) assert.equal(log[1], "node scripts/gallery-contact-sheet.mjs --no-build", "no look, text or state filter can omit a frame");
   }
+});
+
+test("container gallery Git trust covers only its checkout and changes no config file", { skip: process.platform === "win32" }, (t) => {
+  const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
+  const step = workflow.match(/- name: Render every browser gallery frame\n([\s\S]*?)\n      - name:/)[1];
+  const dir = mkdtempSync(join(tmpdir(), "ibis gallery-owner-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const checkout = join(dir, "checkout");
+  const other = join(dir, "other");
+  for (const path of [checkout, other]) assert.equal(spawnSync("git", ["init", "-q", path], { cwd: dir, timeout: 5000 }).status, 0);
+  const env = { ...process.env, GIT_CONFIG_NOSYSTEM: "1", GIT_CONFIG_GLOBAL: join(dir, "absent-config"), GIT_CONFIG_COUNT: "0", GIT_TEST_ASSUME_DIFFERENT_OWNER: "1" };
+  const probe = (cwd, config) => spawnSync("git", ["rev-parse", "--show-toplevel"], { cwd, env: { ...env, ...config }, encoding: "utf8", timeout: 5000 });
+  assert.equal(probe(checkout, {}).status, 128, "a foreign-owned checkout starts untrusted");
+  const config = Object.fromEntries([...step.matchAll(/^          (GIT_CONFIG_(?:COUNT|KEY_0|VALUE_0)): (.+)$/gm)].map(([, key, value]) => [key, value.replace("${{ github.workspace }}", checkout)]));
+  const trusted = probe(checkout, config);
+  assert.equal(trusted.status, 0, trusted.stderr);
+  assert.equal(trusted.stdout.trim(), realpathSync(checkout));
+  assert.equal(probe(other, config).status, 128, "a different checkout remains untrusted");
+  assert.equal(existsSync(env.GIT_CONFIG_GLOBAL), false, "no global config was written");
 });
 
 test("the real workflow shell falls back on failed reads or changing refs", { skip: process.platform === "win32" }, (t) => {
