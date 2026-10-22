@@ -378,12 +378,14 @@ battery saver.
 | `--shadow-raised` | `0 1px 0 var(--separator), 0 8px 16px -12px rgb(0 0 0/22%)` | none | none |
 | `--shadow-overlay` | `0 12px 32px rgb(0 0 0/16%)` + hairline | `0 0 2px rgb(0 0 0/12%), 0 8px 16px rgb(0 0 0/14%)` | `0 1px 5px 1px rgb(0 0 0/9%), 0 2px 14px 3px rgb(0 0 0/5%)` |
 | `--shadow-dialog` | `0 24px 48px rgb(0 0 0/22%)` | `0 0 8px rgb(0 0 0/12%), 0 32px 64px rgb(0 0 0/14%)` | `0 4px 24px rgb(0 0 0/18%)` |
-| `--shadow-toast` | `0 8px 16px rgb(0 0 0/18%)` | `0 0 8px rgb(0 0 0/20%), 0 14px 28px rgb(0 0 0/24%)` | none (dark toast) |
+| `--shadow-toast` | `0 8px 16px rgb(0 0 0/18%)` | `0 4px 16px rgb(0 0 0/22%)` | none (dark toast) |
 | `--shadow-row-lift` | selected row only: `inset 0 1px 0 rgb(255 255 255/22%), 0 1px 2px rgb(0 0 0/14%), 0 4px 10px -4px rgb(0 0 0/24%)` | none | none |
 
 Windows dark values use Ibis's 1.7 × alpha adaptation. This is distinct from
 [Fluent UI's upstream 2 × neutral shadow ramp](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/alias/darkColor.ts);
-the toast uses the explicit stronger values above. No shadow on rows at rest, chips, key
+the toast keeps its compact footprint because its fixed 420 × 112 native window
+reserves 16 px around the card. A generic shadow28 produces a visible clipped
+edge in that viewport. No shadow on rows at rest, chips, key
 caps on Windows and GNOME, anything in contrast modes, anything on Linux except
 cards, overlays and dialogs, or anything inside an overlay. In dark mode, fills
 and hairlines separate layers first.

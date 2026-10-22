@@ -184,6 +184,19 @@ test("per-OS overlay roles keep their shapes, easing, scrims and shadow-free con
   }
 });
 
+test("the Windows notice keeps its nominal shadow within the reserved gutter", () => {
+  const notices = readFileSync(new FileURL("./notice.css", import.meta.url), "utf8");
+  const gutter = Number(rules(notices, '.copied-notice[data-platform="windows"]').match(/margin:\s*([\d.]+)rem/)?.[1]) * 16;
+  expect(gutter).toBeGreaterThan(0);
+  const shadows = [...rules(tokens, ':root[data-platform="windows"]').matchAll(/--shadow-toast:\s*([^;]+);/g)];
+  expect(shadows.length).toBeGreaterThan(0);
+  for (const [, shadow] of shadows) {
+    const layers = [...shadow!.matchAll(/0 (-?[\d.]+)(?:px)? ([\d.]+)px /g)];
+    expect(layers.length).toBeGreaterThan(0);
+    for (const [, offset, blur] of layers) expect(Math.abs(Number(offset)) + Number(blur) / 2).toBeLessThanOrEqual(gutter);
+  }
+});
+
 test("menus and dialogs consume their shared elevation and separate shape roles", () => {
   const menus = readFileSync(new FileURL("./ui/Menu.css", import.meta.url), "utf8");
   const native = readFileSync(new FileURL("./nativeAppearance.css", import.meta.url), "utf8");
