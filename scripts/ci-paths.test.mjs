@@ -91,6 +91,39 @@ test("workflow retains web validation and gates native-only Windows bootstrap", 
   assert.equal(workflow.match(/= "\$EXPECTED_REFS"/g)?.length, 2);
 });
 
+test("the required Web job renders the full browser gallery and keeps every failure", { skip: process.platform === "win32" }, (t) => {
+  const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
+  const web = workflow.match(/\n  web:\n([\s\S]*?)\n  desktop:/)[1];
+  const step = web.match(/- name: Render every browser gallery frame\n([\s\S]*?)\n      - name:/)?.[1];
+  assert.ok(step, "all gallery looks and states run inside the required Web job");
+  assert.match(step, /if: env.WEB == 'true'/);
+  assert.match(step, /shell: bash/);
+  assert.match(workflow, /needs: \[changes, test, web, desktop, fidelity, dependencies\]/);
+  const command = step.match(/        run: \|\n([\s\S]*)/)[1].replace(/^          /gm, "");
+  const dir = mkdtempSync(join(tmpdir(), "ibis gallery-ci-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const bin = join(dir, "ibis-gallery/node_modules/.bin");
+  mkdirSync(bin, { recursive: true });
+  const browser = join(bin, "playwright");
+  writeFileSync(browser, '#!/bin/sh\nprintf "browser %s\\n" "$*" >> "$CALLS"\nexit "$BROWSER_STATUS"\n');
+  chmodSync(browser, 0o755);
+  const calls = join(dir, "calls");
+  const stubs = 'npm() { printf "npm %s\\n" "$*" >> "$CALLS"; return "$INSTALL_STATUS"; }\nnode() { printf "node %s\\n" "$*" >> "$CALLS"; return "$FRAME_STATUS"; }';
+  for (const [install, browserStatus, frame, expected] of [[0, 0, 0, 0], [17, 0, 0, 17], [0, 42, 0, 42], [0, 0, 1, 1], [0, 0, 2, 2]]) {
+    writeFileSync(calls, "");
+    const result = spawnSync("bash", ["-e", "-o", "pipefail", "-c", stubs + "\n" + command], {
+      cwd: dir, encoding: "utf8", timeout: 5000,
+      env: { ...process.env, RUNNER_TEMP: dir, CALLS: calls, INSTALL_STATUS: String(install), BROWSER_STATUS: String(browserStatus), FRAME_STATUS: String(frame) },
+    });
+    assert.equal(result.status, expected, result.stderr);
+    const log = readFileSync(calls, "utf8").trim().split("\n");
+    assert.match(log[0], /--ignore-scripts .*playwright@1\.62\.1$/);
+    assert.equal(log.length, install ? 1 : browserStatus ? 2 : 3);
+    if (!install) assert.equal(log[1], "browser install --with-deps --only-shell chromium");
+    if (!install && !browserStatus) assert.equal(log[2], "node scripts/gallery-contact-sheet.mjs --no-build", "no look, text or state filter can omit a frame");
+  }
+});
+
 test("the real workflow shell falls back on failed reads or changing refs", { skip: process.platform === "win32" }, (t) => {
   const dir = mkdtempSync(join(tmpdir(), "ibis-ci-refs-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
