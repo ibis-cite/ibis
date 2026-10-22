@@ -6,5 +6,7 @@
 }
 .pin-button svg { width: var(--icon-glyph-size); stroke-width: var(--icon-stroke); }
 @media (pointer: coarse) {
+  /* The count-only shelf needs a reachable touch target under wrapped chrome. */
+  main:has(.shelf-chips[data-count-only]) > footer .key-caps { display: none; }
   .pin-button { min-width: calc(var(--control-min-size) + var(--row-pad)); min-height: calc(var(--control-min-size) + var(--row-pad)); }
 }

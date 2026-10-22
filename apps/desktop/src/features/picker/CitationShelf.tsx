@@ -126,7 +126,7 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
       {(records.length > 0 || shown !== undefined) && (
         <div className="shelf">
           {records.length > 0 && (
-            <div ref={strip} className="shelf-chips">
+            <div ref={strip} className="shelf-chips" data-count-only={visibleChips === 0 || undefined}>
               <div ref={measure} className="shelf-chip-measure" aria-hidden="true">
                 <span className="shelf-chip-minimum" /><span className="shelf-chip-target" />
                 {labels.slice(0, SHELF_CHIPS).map((label, index) => <span className="shelf-label-measure" key={ids[index]}>

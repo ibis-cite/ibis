@@ -92,7 +92,9 @@ layer from `design/depth-prototype` (variant B). The footer pattern
 When large system text and wrapped header/footer controls consume the available
 height, the shelf shrinks into its own scroll area. Keep at least 24 CSS px of
 the results scroller reachable; chips, overflow and output remain reachable by
-scrolling the shelf.
+scrolling the shelf. In count-only mode on coarse pointers, the footer folds
+printed key caps while keeping its labelled actions and accessible shortcuts.
+More still opens the complete shortcuts list.
 
 ### Per OS
 

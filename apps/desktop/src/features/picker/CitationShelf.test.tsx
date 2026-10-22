@@ -102,6 +102,7 @@ test("under the count-only width no hidden inline chips remain in the keyboard c
   expect(screen.queryByRole("grid")).toBeNull();
   const count = screen.getByRole("button", { name: "Show all 3 selected references" });
   expect(count.textContent).toBe("3 references ›");
+  expect(count.closest(".shelf-chips")?.hasAttribute("data-count-only")).toBe(true);
   fireEvent.click(count);
   const dialog = await screen.findByRole("dialog", { name: "Selected references" });
   expect(within(dialog).getAllByRole("row")).toHaveLength(3);
