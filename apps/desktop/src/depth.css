@@ -145,6 +145,6 @@
 :root { --motion-highlight: 140ms; --press-scale: .98; }
 @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
   [role="option"] { transition: background-color var(--motion-highlight) var(--motion-ease), box-shadow var(--motion-highlight) var(--motion-ease), transform var(--motion-feedback) var(--motion-ease); }
-  :is(button, kbd, .format-picker) { transition: background-color var(--motion-feedback) var(--motion-ease), box-shadow var(--motion-feedback) var(--motion-ease), transform var(--motion-feedback) var(--motion-ease); }
+  :is(button, kbd) { transition: background-color var(--motion-feedback) var(--motion-ease), box-shadow var(--motion-feedback) var(--motion-ease), transform var(--motion-feedback) var(--motion-ease); }
   :is([role="option"], button):active { transform: scale(var(--press-scale)); }
 }
