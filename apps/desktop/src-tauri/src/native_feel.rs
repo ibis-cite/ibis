@@ -111,10 +111,8 @@ fn refresh(app: &AppHandle, replay: bool) -> Appearance {
     // Accent changes and query replay are independent of material success and
     // cache state, including opaque mode before JavaScript has subscribed.
     let accent = platform::accent();
-    if cache.accent_changed(accent, replay) {
-        if window.emit("accent:changed", accent).is_err() {
-            warning();
-        }
+    if cache.accent_changed(accent, replay) && window.emit("accent:changed", accent).is_err() {
+        warning();
     }
     if cache.requested == Some(requested) {
         return cache.applied;
