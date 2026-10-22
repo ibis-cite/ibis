@@ -91,3 +91,15 @@ test("cross-group repairs skip reserved natural labels and stay deterministic", 
   expect(chipLabels(records)).toEqual(expected);
   expect(new Set(chipLabels(records)).size).toBe(records.length);
 });
+
+test("1024 source-qualified records with huge hostile metadata keep unique labels without losing input", () => {
+  const hostile = '<img src=x onerror="attack()"> العربية 漢字 ' + "長い組織名 ".repeat(2048);
+  const records = Array.from({ length: 1024 }, (_, i) => ({
+    ...record(hostile, hostile), id: { source: `synthetic-source-${i}`, native_key: "same" }, title: hostile,
+  }));
+  const parts = chipLabelParts(records);
+  expect(parts).toHaveLength(records.length);
+  expect(new Set(parts.map((part) => part.text)).size).toBe(records.length);
+  expect(parts.every((part) => part.author === hostile.trim() && part.year === "2021" && part.letter.length > 0)).toBe(true);
+  expect(records.every((record) => record.first_author === hostile && record.key === hostile && record.title === hostile)).toBe(true);
+});
