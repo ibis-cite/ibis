@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import type { SearchResult } from "../../api";
+import type { Density, SearchResult } from "../../api";
 import { rowText } from "../../messages";
 import { ResultList } from "./ResultList";
 
@@ -15,6 +15,40 @@ function list(active: number, onChoose = vi.fn(), onToggle = vi.fn()) {
   return <ResultList results={rows} active={active} selected={new Map()} density="comfortable" libraryOf={() => null}
     onMouseMove={() => undefined} onChoose={onChoose} onToggle={onToggle} />;
 }
+
+test.each<Density>(["compact", "comfortable", "spacious"])("%s rows reserve the trailing column for the year", (density) => {
+  const record = { ...rows[0]!, title: "多言語の研究 · الذاكرة", key: "memory2020", year: null };
+  const { container, getByRole } = render(<ResultList results={[record]} active={0} selected={new Map()} density={density}
+    libraryOf={() => "Example library"} onMouseMove={vi.fn()} onChoose={vi.fn()} onToggle={vi.fn()} />);
+  const row = getByRole("option");
+  const year = container.querySelector(".result-year")!;
+  const key = container.querySelector(".result-key")!;
+  expect(year.parentElement).toBe(row);
+  expect(year.textContent).toBe("No date");
+  expect(container.querySelector(".result-meta")?.contains(key)).toBe(true);
+  expect(key.getAttribute("dir")).toBe("ltr");
+  expect(key.getAttribute("title")).toBe(record.key);
+  expect(getByRole("option", { name: /多言語の研究 · الذاكرة.*memory2020.*No date/ })).toBe(row);
+});
+
+test.each(["", "研究_memory_".repeat(1_000)])("unusual keys stay literal and do not change row actions (%#)", (key) => {
+  const record = { ...rows[0]!, key, year: 0 };
+  const onChoose = vi.fn();
+  const { container, getByRole } = render(<ResultList results={[record]} active={0} selected={new Map()} density="comfortable"
+    libraryOf={() => null} onMouseMove={vi.fn()} onChoose={onChoose} onToggle={vi.fn()} />);
+  expect(container.querySelector(".result-key")?.textContent).toBe(key);
+  expect(container.querySelector(".result-year")?.textContent).toBe("0");
+  const range = document.createRange();
+  range.selectNodeContents(container.querySelector(".result-key")!);
+  window.getSelection()?.addRange(range);
+  fireEvent.click(container.querySelector(".result-key")!);
+  if (key) expect(onChoose).not.toHaveBeenCalled();
+  window.getSelection()?.removeAllRanges();
+  onChoose.mockClear();
+  fireEvent.click(container.querySelector(".result-year")!);
+  expect(onChoose).toHaveBeenCalledWith(0, record, "copy");
+  expect(getByRole("option").getAttribute("aria-selected")).toBe("true");
+});
 
 test("moving the highlight re-renders only the rows it leaves and reaches", () => {
   const { rerender, container } = render(list(0));
