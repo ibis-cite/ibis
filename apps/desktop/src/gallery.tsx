@@ -1,6 +1,7 @@
 // First, so a ?platform= switch is in place as early as this page allows.
 import { galleryProvider, galleryStates, gallerySwitches, withSwitches, type GallerySwitches, type GalleryState } from "./gallery-fixtures";
 import { renderToolbarMenuGallery, toolbarMenuGalleryStates } from "./ui/ToolbarMenuGallery";
+import { chipGroupGalleryStates, renderChipGroupGallery } from "./ui/ChipGroupGallery";
 import { createRoot } from "react-dom/client";
 import { isTauri } from "@tauri-apps/api/core";
 import { emitTo } from "@tauri-apps/api/event";
@@ -40,7 +41,9 @@ function rendered(root: HTMLElement, state: GalleryState): boolean {
     && JSON.stringify(actualAlerts) === JSON.stringify(alerts)
     && (root.querySelector('.empty-loading[role="progressbar"]')?.getAttribute("aria-label") ?? null) === busy
     && (root.querySelector('[aria-label="Choose library to get started"]') !== null) === (library.state === "none")
-    && (root.querySelector(".copy-notice code")?.textContent ?? null) === (state.copied?.text ?? null)
+    && (state.copied ? root.querySelector(".copy-notice") !== null
+      && (root.querySelector(".copy-notice code")?.textContent ?? root.querySelector(".shelf-output .preview-text")?.textContent) === state.copied.text
+      : root.querySelector(".copy-notice") === null)
     && (root.querySelector('.library-bar p[role="status"]')?.textContent ?? null) === library.note
     && (document.querySelector(".gallery-notice .copied-notice code")?.textContent ?? null) === (state.notice ?? null);
 }
@@ -124,7 +127,9 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
     && (typeof state.formatMenu !== "string" || filter?.value === state.formatMenu)
     && (root.querySelector('[role="dialog"]') !== null) === Boolean(state.keys)
     && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li.chip`).length === Math.min(state.tray ?? 0, SHELF_CHIPS)
-    && (!state.formatted || root.querySelector(".shelf-output .preview-text") !== null)
+    && (state.showPastePreview === false ? root.querySelector(".shelf-output") === null
+      && root.querySelector('footer [aria-keyshortcuts="Enter"]') !== null
+      : !(state.formatted || state.showPastePreview) || root.querySelector(".shelf-output .preview-text") !== null)
     && selectionContained(root, state);
 }
 
@@ -278,7 +283,7 @@ function Gallery({ switches }: { switches: GallerySwitches }) {
         )}
       </header>
       <div className="gallery-grid">
-        {[...galleryStates, ...(isTauri() ? [] : toolbarMenuGalleryStates)].map((state) => (
+        {[...galleryStates, ...(isTauri() ? [] : [...toolbarMenuGalleryStates, ...chipGroupGalleryStates])].map((state) => (
           <section key={state.id} aria-label={state.label}>
             <h2><a href={galleryHref(switches, { state: state.id })}>{state.label}</a></h2>
             <iframe src={galleryHref(switches, { state: state.id })} title={state.label} tabIndex={-1} />
@@ -295,10 +300,11 @@ if (root && (import.meta.env.DEV || import.meta.env.MODE === "evidence")) {
   const switches = gallerySwitches(window.location.search);
   const id = new URLSearchParams(window.location.search).get("state");
   const state = galleryStates.find((candidate) => candidate.id === id);
-  if (toolbarMenuGalleryStates.some((candidate) => candidate.id === id) && !isTauri()) {
+  if ([...toolbarMenuGalleryStates, ...chipGroupGalleryStates].some((candidate) => candidate.id === id) && !isTauri()) {
     if (switches.theme) document.documentElement.dataset.galleryTheme = switches.theme;
     document.documentElement.dataset.textSize = switches.text === "large" ? "larger" : "normal";
-    renderToolbarMenuGallery(root, id!);
+    if (chipGroupGalleryStates.some((candidate) => candidate.id === id)) renderChipGroupGallery(root, id!);
+    else renderToolbarMenuGallery(root, id!);
   } else if (state) {
     renderGalleryState(root, withSwitches(state, switches));
   } else {
