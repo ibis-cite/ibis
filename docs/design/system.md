@@ -10,7 +10,13 @@ Work is tracked in #761–#775.
 
 ## Decisions D1–D17
 
-Token names are the target names.
+Token names are the target names. The first migration (#761) exposes aliases of
+the current values and moves only the old Search focus consumers to
+`--focus-ring-*`. Other consumers deliberately retain their existing tokens;
+the alias inventory alone does not establish the final per-OS appearance.
+The platform tests audit the root, menu and notice scopes, optional-value
+fallbacks and the unscaled 16 px/rem spacing grid. Native menu metrics, the
+notice glyph/pill insets and border/optical formulas have exact exceptions.
 
 | # | Decision | Target token(s) |
 |---|---|---|
