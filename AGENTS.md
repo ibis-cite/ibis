@@ -62,6 +62,6 @@ Follow the [architecture principles](docs/architecture.md#principles), including
 ## Version control safety
 
 - Run `git status` before editing; never reset, restore, delete or reformat work you did not make.
-- After creating a worktree, set every later command's working directory explicitly; `git worktree add` does not change it. Run repository-relative diff pathspecs from the repository root and confirm they match files before treating an empty diff as equality.
+- Create each worktree in a standalone tool call. In the next call, use its explicit working directory and verify `pwd`, branch and `git status` before any mutation; `git worktree add` does not change directories. Keep explicit working directories thereafter. Run repository-relative diff pathspecs from the repository root and confirm they match files before treating an empty diff as equality.
 - Never push to `main` or a `claude/*` branch. One branch per pull request.
 - Commits follow the [standard](docs/development.md#commits): Conventional Commits in the imperative mood, `!` or a `BREAKING CHANGE:` footer for breaking changes, signed off (`git commit -s`), and, when an AI tool helped, an `Assisted-by: <tool and model>` trailer or the tool's co-author line (ADR 0011). Never put conversation history, pause notes or private context in commits, pull requests or issues.
