@@ -86,6 +86,11 @@ or establish activation from native Wayland applications. This preview has no
 GlobalShortcuts portal integration. The Wayland capability tiers above remain
 design goals; a successful X11 check or Xvfb run does not verify them.
 
+The first #782 slice adds a bounded local-bus GlobalShortcuts client, pending
+picker integration. It parses desktop trigger descriptions without persisting
+them. Real GNOME and KDE Wayland sessions remain unverified; neither unit tests
+nor a fake portal establish compositor activation or focus behavior.
+
 ## Test matrix
 
 `scripts/smoke-native.py` supplies one narrow automated cell on each hosted OS:
