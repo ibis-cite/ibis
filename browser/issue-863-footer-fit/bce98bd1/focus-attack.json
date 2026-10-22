@@ -1,0 +1,159 @@
+{
+  "source": "bce98bd1c77865a9cfc05bbb9a65531a15a6d813",
+  "rows": [
+    {
+      "platform": "macos",
+      "owner": "shortcut",
+      "folded": {
+        "owner": null,
+        "id": "react-aria6434849522-_r_0_",
+        "shortcuts": true,
+        "more": true
+      },
+      "restored": {
+        "owner": null,
+        "id": "react-aria6434849522-_r_0_",
+        "visible": true,
+        "more": true
+      },
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "owner": "search",
+      "folded": {
+        "owner": null,
+        "id": "search",
+        "shortcuts": true,
+        "more": false
+      },
+      "restored": {
+        "owner": null,
+        "id": "search",
+        "visible": true,
+        "more": false
+      },
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "owner": "copy",
+      "folded": {
+        "owner": "Copy 20 as Pandoc",
+        "id": "",
+        "shortcuts": true,
+        "more": false
+      },
+      "restored": {
+        "owner": "Copy 20 as Pandoc",
+        "id": "",
+        "visible": true,
+        "more": false
+      },
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "owner": "shortcut",
+      "folded": {
+        "owner": null,
+        "id": "react-aria5261049336-_r_0_",
+        "shortcuts": true,
+        "more": true
+      },
+      "restored": {
+        "owner": null,
+        "id": "react-aria5261049336-_r_0_",
+        "visible": true,
+        "more": true
+      },
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "owner": "search",
+      "folded": {
+        "owner": null,
+        "id": "search",
+        "shortcuts": true,
+        "more": false
+      },
+      "restored": {
+        "owner": null,
+        "id": "search",
+        "visible": true,
+        "more": false
+      },
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "owner": "copy",
+      "folded": {
+        "owner": "Copy 20 as Pandoc",
+        "id": "",
+        "shortcuts": true,
+        "more": false
+      },
+      "restored": {
+        "owner": "Copy 20 as Pandoc",
+        "id": "",
+        "visible": true,
+        "more": false
+      },
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "owner": "shortcut",
+      "folded": {
+        "owner": null,
+        "id": "react-aria5747821235-_r_0_",
+        "shortcuts": true,
+        "more": true
+      },
+      "restored": {
+        "owner": null,
+        "id": "react-aria5747821235-_r_0_",
+        "visible": true,
+        "more": true
+      },
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "owner": "search",
+      "folded": {
+        "owner": null,
+        "id": "search",
+        "shortcuts": true,
+        "more": false
+      },
+      "restored": {
+        "owner": null,
+        "id": "search",
+        "visible": true,
+        "more": false
+      },
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "owner": "copy",
+      "folded": {
+        "owner": "Copy 20 as Pandoc",
+        "id": "",
+        "shortcuts": true,
+        "more": false
+      },
+      "restored": {
+        "owner": "Copy 20 as Pandoc",
+        "id": "",
+        "visible": true,
+        "more": false
+      },
+      "pass": true
+    }
+  ],
+  "errors": []
+}
