@@ -1,7 +1,7 @@
 //! Saving choices made in the picker to the settings file.
 
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use ibis_core::cite::KeyFormat;
 use ibis_core::settings::{self, CitationStyle, Density};
@@ -43,17 +43,18 @@ pub(crate) fn settings_notice(path: &Path, loaded: &settings::Loaded) -> Option<
 }
 
 /// Where the settings file is, for saving choices made in the picker.
+#[derive(Clone)]
 pub(crate) struct SettingsFile {
     pub(crate) path: PathBuf,
     /// Held for each whole read, change and save, so two saves never interleave.
-    writing: Mutex<()>,
+    writing: Arc<Mutex<()>>,
 }
 
 impl SettingsFile {
     pub(crate) fn new(path: PathBuf) -> Self {
         SettingsFile {
             path,
-            writing: Mutex::new(()),
+            writing: Arc::new(Mutex::new(())),
         }
     }
 
@@ -98,12 +99,16 @@ pub(crate) fn picker_preferences(settings_file: State<'_, SettingsFile>) -> Pick
 /// Remember the picker preferences; other settings in the file are kept.
 #[tauri::command]
 #[specta::specta]
-pub(crate) fn set_picker_preferences(
+pub(crate) async fn set_picker_preferences(
     preferences: PickerPreferences,
     copy_format: Option<KeyFormat>,
     settings_file: State<'_, SettingsFile>,
 ) -> Result<(), String> {
-    settings_file.save_preferences(preferences, copy_format).map(|_| ())
+    let settings_file = settings_file.inner().clone();
+    // Keep the whole locked read/change/flush off the command and async workers.
+    tauri::async_runtime::spawn_blocking(move || settings_file.save_preferences(preferences, copy_format).map(|_| ()))
+        .await
+        .map_err(|_| "picker preferences could not be saved".to_string())?
 }
 
 impl SettingsFile {
@@ -319,7 +324,7 @@ mod tests {
     fn settings_saves_from_several_threads_never_lose_each_other() {
         let dir = std::env::temp_dir().join(format!("ibis-concurrent-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
-        let file = std::sync::Arc::new(SettingsFile::new(dir.join("settings.json")));
+        let file = SettingsFile::new(dir.join("settings.json"));
         let threads: Vec<_> = (0..8)
             .map(|i| {
                 let file = file.clone();
