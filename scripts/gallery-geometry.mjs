@@ -83,9 +83,10 @@ export function layout(platform, text, state, { regions, tray, list }) {
 }
 
 /** Runs in the page: every visible region of the picker, the tray's chips and the list's overflow. */
-function measureLayout() {
+export function measureLayout() {
   const box = (element) => {
     const { top, bottom, left, right } = element.getBoundingClientRect();
+    if (![top, bottom, left, right].every(Number.isFinite)) throw new Error("gallery target bounds must be finite");
     return { top, bottom, left, right };
   };
   const name = (element) => element.getAttribute("aria-label") ?? (element.className || element.localName);
@@ -94,15 +95,14 @@ function measureLayout() {
     .filter((element) => !element.classList.contains("picker-content") && !element.classList.contains("visually-hidden"))
     .map((element) => ({ name: name(element), ...box(element) }))
     .filter((region) => region.bottom - region.top > 0.5 && region.right - region.left > 0.5);
-  const tray = document.querySelector('.shelf [data-chip-list]');
-  const clip = tray?.closest(".shelf-chips");
-  const edges = clip && getComputedStyle(clip);
+  const tray = document.querySelector(".shelf-chips");
+  const edges = tray && getComputedStyle(tray);
   const list = document.querySelector(".results-area");
   return {
     regions,
     // What the tray shows: its padding box, inside the borders.
-    tray: tray && clip ? { clip: { top: box(clip).top + parseFloat(edges.borderTopWidth), bottom: box(clip).bottom - parseFloat(edges.borderBottomWidth) },
-      chips: [...tray.children].filter((chip) => chip.hasAttribute("data-chip-item")).map(box) } : null,
+    tray: tray ? { clip: { top: box(tray).top + parseFloat(edges.borderTopWidth), bottom: box(tray).bottom - parseFloat(edges.borderBottomWidth) },
+      chips: [...tray.querySelectorAll("[data-chip-item], [data-chip-disclosure]")].map(box) } : null,
     list: list ? { ownScroll: /auto|scroll/.test(getComputedStyle(list).overflowY) } : null,
   };
 }

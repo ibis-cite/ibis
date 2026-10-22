@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { SPEC_FILE, compare, derive, layout, table } from "./gallery-geometry.mjs";
+import { SPEC_FILE, compare, derive, layout, measureLayout, table } from "./gallery-geometry.mjs";
 
 const spec = JSON.parse(readFileSync(SPEC_FILE, "utf8"));
 const design = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "docs", "design.md"), "utf8");
@@ -98,4 +98,43 @@ test("overlapping regions, a half chip and a list without its own scroll fail (#
   assert.equal(rows[0].measured, 2);
   // Without a tray only regions and the list are checked, and a missing list fails.
   assert.deepEqual(layout("linux", "large", "many-results", { regions: [], tray: null, list: null }).map((row) => row.pass), [true, false]);
+});
+
+
+test("RAC chip measurement includes inline items and the disclosure, including count-only clipping", () => {
+  const priorDocument = globalThis.document, priorStyle = globalThis.getComputedStyle;
+  let countOnly = false, invalid = false;
+  const bounds = (top, bottom) => ({ top, bottom, left: 12, right: 708 });
+  const items = [bounds(106, 130), bounds(106, 130)].map((rect) => ({
+    hasAttribute: (name) => name === "data-chip-item", getBoundingClientRect: () => rect,
+  }));
+  const trigger = { getBoundingClientRect: () => ({ ...bounds(106, 144), left: invalid ? NaN : 500 }) };
+  const strip = {
+    getBoundingClientRect: () => bounds(100, 140),
+    querySelectorAll: (selector) => [
+      ...(!countOnly && selector.includes("data-chip-item") ? items : []),
+      ...(selector.includes("data-chip-disclosure") ? [trigger] : []),
+    ],
+  };
+  globalThis.document = {
+    querySelectorAll: () => [],
+    querySelector: (selector) => selector === ".shelf-chips" ? strip
+      : selector === ".results-area" ? {} : null,
+  };
+  globalThis.getComputedStyle = () => ({ borderTopWidth: "1px", borderBottomWidth: "1px", overflowY: "auto" });
+  try {
+    for (countOnly of [false, true]) {
+      const measured = measureLayout();
+      assert.ok(measured.tray, "a count-only tray is still measured");
+      assert.equal(measured.tray.chips.length, countOnly ? 1 : 3);
+      const rows = layout("linux", "normal", "tray", measured);
+      assert.equal(rows.find((row) => row.name.startsWith("no chip cut")).pass, false,
+        "the partially clipped disclosure must fail even without inline chips");
+    }
+    invalid = true;
+    assert.throws(() => measureLayout(), /finite/, "invalid target geometry cannot silently pass");
+  } finally {
+    if (priorDocument === undefined) delete globalThis.document; else globalThis.document = priorDocument;
+    if (priorStyle === undefined) delete globalThis.getComputedStyle; else globalThis.getComputedStyle = priorStyle;
+  }
 });
