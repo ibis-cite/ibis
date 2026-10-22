@@ -2,7 +2,7 @@
 
 Exact source: `93f64ec2da0f4a627bcb675d42444583bb3be185`, including the landed platform looks and live hint-margin correction. Chromium browser renders, not native captures.
 
-The existing contact-sheet runner rendered all 576 frames: 504 picker frames and 72 component previews, across macOS, Windows and Linux looks, light/dark themes and normal/Larger text. `manifest.json` records every frame. Both labelled contact sheets were visually inspected.
+The existing contact-sheet runner rendered all 576 frames: 528 picker frames and 48 component previews, across macOS, Windows and Linux looks, light/dark themes and normal/Larger text. `manifest.json` records every frame. Both labelled contact sheets were visually inspected.
 
 `baseline-32dac16a` reproduces the original Linux/light/normal pinned 20-reference failure at 720×480: an 80px footer leaves 18px of the 58px active row visible. Current `normal/linux-light/tray-20.png` keeps a 40px footer and the whole row visible. All six originally failing Linux normal tray20/40/50 frames render.
 
