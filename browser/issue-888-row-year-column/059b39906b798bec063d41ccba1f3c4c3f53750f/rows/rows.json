@@ -1,0 +1,6867 @@
+{
+  "source": "059b39906b798bec063d41ccba1f3c4c3f53750f",
+  "baseline": "c6f3f34a",
+  "browser": "151.0.7922.34",
+  "frames": [
+    "macos-normal-light-normal-before.png",
+    "macos-normal-light-normal-after.png",
+    "macos-normal-light-narrow-before.png",
+    "macos-normal-light-narrow-after.png",
+    "macos-normal-light-rtl-before.png",
+    "macos-normal-light-rtl-after.png",
+    "macos-normal-light-cjk-before.png",
+    "macos-normal-light-cjk-after.png",
+    "macos-normal-light-crowded-before.png",
+    "macos-normal-light-crowded-after.png",
+    "macos-normal-dark-normal-before.png",
+    "macos-normal-dark-normal-after.png",
+    "macos-normal-dark-narrow-before.png",
+    "macos-normal-dark-narrow-after.png",
+    "macos-normal-dark-rtl-before.png",
+    "macos-normal-dark-rtl-after.png",
+    "macos-normal-dark-cjk-before.png",
+    "macos-normal-dark-cjk-after.png",
+    "macos-normal-dark-crowded-before.png",
+    "macos-normal-dark-crowded-after.png",
+    "macos-normal-contrast-normal-before.png",
+    "macos-normal-contrast-normal-after.png",
+    "macos-normal-contrast-narrow-before.png",
+    "macos-normal-contrast-narrow-after.png",
+    "macos-normal-contrast-rtl-before.png",
+    "macos-normal-contrast-rtl-after.png",
+    "macos-normal-contrast-cjk-before.png",
+    "macos-normal-contrast-cjk-after.png",
+    "macos-normal-contrast-crowded-before.png",
+    "macos-normal-contrast-crowded-after.png",
+    "macos-large-light-normal-before.png",
+    "macos-large-light-normal-after.png",
+    "macos-large-light-narrow-before.png",
+    "macos-large-light-narrow-after.png",
+    "macos-large-light-rtl-before.png",
+    "macos-large-light-rtl-after.png",
+    "macos-large-light-cjk-before.png",
+    "macos-large-light-cjk-after.png",
+    "macos-large-light-crowded-before.png",
+    "macos-large-light-crowded-after.png",
+    "macos-large-dark-normal-before.png",
+    "macos-large-dark-normal-after.png",
+    "macos-large-dark-narrow-before.png",
+    "macos-large-dark-narrow-after.png",
+    "macos-large-dark-rtl-before.png",
+    "macos-large-dark-rtl-after.png",
+    "macos-large-dark-cjk-before.png",
+    "macos-large-dark-cjk-after.png",
+    "macos-large-dark-crowded-before.png",
+    "macos-large-dark-crowded-after.png",
+    "macos-large-contrast-normal-before.png",
+    "macos-large-contrast-normal-after.png",
+    "macos-large-contrast-narrow-before.png",
+    "macos-large-contrast-narrow-after.png",
+    "macos-large-contrast-rtl-before.png",
+    "macos-large-contrast-rtl-after.png",
+    "macos-large-contrast-cjk-before.png",
+    "macos-large-contrast-cjk-after.png",
+    "macos-large-contrast-crowded-before.png",
+    "macos-large-contrast-crowded-after.png",
+    "windows-normal-light-normal-before.png",
+    "windows-normal-light-normal-after.png",
+    "windows-normal-light-narrow-before.png",
+    "windows-normal-light-narrow-after.png",
+    "windows-normal-light-rtl-before.png",
+    "windows-normal-light-rtl-after.png",
+    "windows-normal-light-cjk-before.png",
+    "windows-normal-light-cjk-after.png",
+    "windows-normal-light-crowded-before.png",
+    "windows-normal-light-crowded-after.png",
+    "windows-normal-dark-normal-before.png",
+    "windows-normal-dark-normal-after.png",
+    "windows-normal-dark-narrow-before.png",
+    "windows-normal-dark-narrow-after.png",
+    "windows-normal-dark-rtl-before.png",
+    "windows-normal-dark-rtl-after.png",
+    "windows-normal-dark-cjk-before.png",
+    "windows-normal-dark-cjk-after.png",
+    "windows-normal-dark-crowded-before.png",
+    "windows-normal-dark-crowded-after.png",
+    "windows-normal-contrast-normal-before.png",
+    "windows-normal-contrast-normal-after.png",
+    "windows-normal-contrast-narrow-before.png",
+    "windows-normal-contrast-narrow-after.png",
+    "windows-normal-contrast-rtl-before.png",
+    "windows-normal-contrast-rtl-after.png",
+    "windows-normal-contrast-cjk-before.png",
+    "windows-normal-contrast-cjk-after.png",
+    "windows-normal-contrast-crowded-before.png",
+    "windows-normal-contrast-crowded-after.png",
+    "windows-large-light-normal-before.png",
+    "windows-large-light-normal-after.png",
+    "windows-large-light-narrow-before.png",
+    "windows-large-light-narrow-after.png",
+    "windows-large-light-rtl-before.png",
+    "windows-large-light-rtl-after.png",
+    "windows-large-light-cjk-before.png",
+    "windows-large-light-cjk-after.png",
+    "windows-large-light-crowded-before.png",
+    "windows-large-light-crowded-after.png",
+    "windows-large-dark-normal-before.png",
+    "windows-large-dark-normal-after.png",
+    "windows-large-dark-narrow-before.png",
+    "windows-large-dark-narrow-after.png",
+    "windows-large-dark-rtl-before.png",
+    "windows-large-dark-rtl-after.png",
+    "windows-large-dark-cjk-before.png",
+    "windows-large-dark-cjk-after.png",
+    "windows-large-dark-crowded-before.png",
+    "windows-large-dark-crowded-after.png",
+    "windows-large-contrast-normal-before.png",
+    "windows-large-contrast-normal-after.png",
+    "windows-large-contrast-narrow-before.png",
+    "windows-large-contrast-narrow-after.png",
+    "windows-large-contrast-rtl-before.png",
+    "windows-large-contrast-rtl-after.png",
+    "windows-large-contrast-cjk-before.png",
+    "windows-large-contrast-cjk-after.png",
+    "windows-large-contrast-crowded-before.png",
+    "windows-large-contrast-crowded-after.png",
+    "linux-normal-light-normal-before.png",
+    "linux-normal-light-normal-after.png",
+    "linux-normal-light-narrow-before.png",
+    "linux-normal-light-narrow-after.png",
+    "linux-normal-light-rtl-before.png",
+    "linux-normal-light-rtl-after.png",
+    "linux-normal-light-cjk-before.png",
+    "linux-normal-light-cjk-after.png",
+    "linux-normal-light-crowded-before.png",
+    "linux-normal-light-crowded-after.png",
+    "linux-normal-dark-normal-before.png",
+    "linux-normal-dark-normal-after.png",
+    "linux-normal-dark-narrow-before.png",
+    "linux-normal-dark-narrow-after.png",
+    "linux-normal-dark-rtl-before.png",
+    "linux-normal-dark-rtl-after.png",
+    "linux-normal-dark-cjk-before.png",
+    "linux-normal-dark-cjk-after.png",
+    "linux-normal-dark-crowded-before.png",
+    "linux-normal-dark-crowded-after.png",
+    "linux-normal-contrast-normal-before.png",
+    "linux-normal-contrast-normal-after.png",
+    "linux-normal-contrast-narrow-before.png",
+    "linux-normal-contrast-narrow-after.png",
+    "linux-normal-contrast-rtl-before.png",
+    "linux-normal-contrast-rtl-after.png",
+    "linux-normal-contrast-cjk-before.png",
+    "linux-normal-contrast-cjk-after.png",
+    "linux-normal-contrast-crowded-before.png",
+    "linux-normal-contrast-crowded-after.png",
+    "linux-large-light-normal-before.png",
+    "linux-large-light-normal-after.png",
+    "linux-large-light-narrow-before.png",
+    "linux-large-light-narrow-after.png",
+    "linux-large-light-rtl-before.png",
+    "linux-large-light-rtl-after.png",
+    "linux-large-light-cjk-before.png",
+    "linux-large-light-cjk-after.png",
+    "linux-large-light-crowded-before.png",
+    "linux-large-light-crowded-after.png",
+    "linux-large-dark-normal-before.png",
+    "linux-large-dark-normal-after.png",
+    "linux-large-dark-narrow-before.png",
+    "linux-large-dark-narrow-after.png",
+    "linux-large-dark-rtl-before.png",
+    "linux-large-dark-rtl-after.png",
+    "linux-large-dark-cjk-before.png",
+    "linux-large-dark-cjk-after.png",
+    "linux-large-dark-crowded-before.png",
+    "linux-large-dark-crowded-after.png",
+    "linux-large-contrast-normal-before.png",
+    "linux-large-contrast-normal-after.png",
+    "linux-large-contrast-narrow-before.png",
+    "linux-large-contrast-narrow-after.png",
+    "linux-large-contrast-rtl-before.png",
+    "linux-large-contrast-rtl-after.png",
+    "linux-large-contrast-cjk-before.png",
+    "linux-large-contrast-cjk-after.png",
+    "linux-large-contrast-crowded-before.png",
+    "linux-large-contrast-crowded-after.png"
+  ],
+  "checks": [
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 635.703125,
+          "y": 124.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 591.25,
+          "y": 124.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 100
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 131,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 209,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 100
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 169,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 209,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 20,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64.453125,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 157,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 166.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 641.328125,
+          "y": 189.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(76, 82, 96)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 157,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 177,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 596.875,
+          "y": 189.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(76, 82, 96)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 101.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 334.796875,
+          "y": 124.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 81
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 123.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 136.875,
+          "y": 136,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 635.703125,
+          "y": 124.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 591.25,
+          "y": 124.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 100
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 131,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 209,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 100
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 169,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 209,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 20,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64.453125,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 157,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 166.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 641.328125,
+          "y": 189.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(192, 195, 204)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 157,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 177,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 596.875,
+          "y": 189.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(192, 195, 204)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 101.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 334.796875,
+          "y": 124.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 81
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 123.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 136.875,
+          "y": 136,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 611.59375,
+          "y": 124.5,
+          "width": 88.40625,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 88,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 567.140625,
+          "y": 124.5,
+          "width": 88.40625,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 88,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 104
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 133,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 211,
+          "width": 82.796875,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 83,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 104
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 171,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 211,
+          "width": 69.453125,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 69,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 20,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64.453125,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 161,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 170.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 641.328125,
+          "y": 193.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 161,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 181,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 596.875,
+          "y": 193.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 101.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 334.796875,
+          "y": 124.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 85
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 125.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 136.875,
+          "y": 138,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 623.078125,
+          "y": 142.90625,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 572.53125,
+          "y": 142.546875,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 151.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 240.140625,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 194.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 240.140625,
+          "width": 63.859375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 22.984375,
+          "y": 142.90625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.53125,
+          "y": 142.546875,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 202.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 213.90625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 629.546875,
+          "y": 239.203125,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(76, 82, 96)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 202.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 225.046875,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 579,
+          "y": 238.84375,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(76, 82, 96)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 92.40625
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 109.765625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 155.765625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 91.703125
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 141.265625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 155.0625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 623.078125,
+          "y": 142.90625,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 572.53125,
+          "y": 142.546875,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 151.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 240.140625,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 194.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 240.140625,
+          "width": 63.859375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 22.984375,
+          "y": 142.90625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.53125,
+          "y": 142.546875,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 202.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 213.90625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 629.546875,
+          "y": 239.203125,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(192, 195, 204)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 202.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 225.046875,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 579,
+          "y": 238.84375,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(192, 195, 204)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 92.40625
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 109.765625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 155.765625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 91.703125
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 141.265625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 155.0625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgb(0, 117, 255)",
+        "yearColor": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 595.34375,
+          "y": 142.90625,
+          "width": 101.671875,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 102,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 544.796875,
+          "y": 142.546875,
+          "width": 101.671875,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 102,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 153.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 242.140625,
+          "width": 79.03125,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 79,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 196.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 242.140625,
+          "width": 63.859375,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 22.984375,
+          "y": 142.90625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.53125,
+          "y": 142.546875,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 206.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 217.90625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 629.546875,
+          "y": 243.203125,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 206.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 229.046875,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 579,
+          "y": 242.84375,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 111.765625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 180.0625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 154.765625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 180.0625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 89.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 639.703125,
+          "y": 112.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 100,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 595.25,
+          "y": 112.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 116,
+          "width": 352,
+          "height": 100
+        },
+        "year": {
+          "x": 311.546875,
+          "y": 119,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60,
+          "y": 197,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 116,
+          "width": 352,
+          "height": 100
+        },
+        "year": {
+          "x": 311.546875,
+          "y": 157,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60,
+          "y": 197,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 16,
+          "y": 89.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 16,
+          "y": 112.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 16,
+          "y": 100,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60.453125,
+          "y": 112.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 145,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 154.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 645.328125,
+          "y": 177.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 145,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 165,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 600.875,
+          "y": 177.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 408.328125,
+          "y": 89.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 330.796875,
+          "y": 112.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 464,
+          "height": 81
+        },
+        "year": {
+          "x": 408.328125,
+          "y": 111.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 132.875,
+          "y": 124,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 89.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 639.703125,
+          "y": 112.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 100,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 595.25,
+          "y": 112.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 116,
+          "width": 352,
+          "height": 100
+        },
+        "year": {
+          "x": 311.546875,
+          "y": 119,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60,
+          "y": 197,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 116,
+          "width": 352,
+          "height": 100
+        },
+        "year": {
+          "x": 311.546875,
+          "y": 157,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60,
+          "y": 197,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 16,
+          "y": 89.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 16,
+          "y": 112.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 16,
+          "y": 100,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60.453125,
+          "y": 112.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 145,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 154.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 645.328125,
+          "y": 177.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 145,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 165,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 600.875,
+          "y": 177.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 408.328125,
+          "y": 89.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 330.796875,
+          "y": 112.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 464,
+          "height": 81
+        },
+        "year": {
+          "x": 408.328125,
+          "y": 111.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 132.875,
+          "y": 124,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 89.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 615.59375,
+          "y": 112.5,
+          "width": 88.40625,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 88,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 100,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 571.140625,
+          "y": 112.5,
+          "width": 88.40625,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 88,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 116,
+          "width": 352,
+          "height": 104
+        },
+        "year": {
+          "x": 311.546875,
+          "y": 121,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60,
+          "y": 199,
+          "width": 85.1875,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 85,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 116,
+          "width": 352,
+          "height": 104
+        },
+        "year": {
+          "x": 311.546875,
+          "y": 159,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60,
+          "y": 199,
+          "width": 71.859375,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 72,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 16,
+          "y": 89.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 16,
+          "y": 112.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 16,
+          "y": 100,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 60.453125,
+          "y": 112.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 149,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 158.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 645.328125,
+          "y": 181.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 149,
+          "width": 712,
+          "height": 58
+        },
+        "year": {
+          "x": 671.546875,
+          "y": 169,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 600.875,
+          "y": 181.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 408.328125,
+          "y": 89.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 330.796875,
+          "y": 112.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4,
+          "y": 80,
+          "width": 464,
+          "height": 85
+        },
+        "year": {
+          "x": 408.328125,
+          "y": 113.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 132.875,
+          "y": 126,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 103.8125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 627.671875,
+          "y": 129.109375,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 114.953125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 577.125,
+          "y": 128.75,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 133.359375,
+          "width": 350.8125,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 304.859375,
+          "y": 137.359375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.984375,
+          "y": 226.359375,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 133.359375,
+          "width": 350.8125,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 304.859375,
+          "y": 180.359375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.984375,
+          "y": 226.359375,
+          "width": 66.609375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 18.390625,
+          "y": 103.8125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 18.390625,
+          "y": 129.109375,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 18.390625,
+          "y": 114.953125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.9375,
+          "y": 128.75,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 188.265625,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 200.109375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 634.140625,
+          "y": 225.40625,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 188.265625,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 211.25,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 583.59375,
+          "y": 225.046875,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 464,
+          "height": 92.40625
+        },
+        "year": {
+          "x": 400.96875,
+          "y": 95.96875,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 151.640625,
+          "y": 141.96875,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 464,
+          "height": 91.703125
+        },
+        "year": {
+          "x": 400.96875,
+          "y": 127.46875,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 151.640625,
+          "y": 141.265625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.902118 0.902118 0.902118)",
+        "yearColor": "rgb(96, 96, 96)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 103.8125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 627.671875,
+          "y": 129.109375,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 114.953125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 577.125,
+          "y": 128.75,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 133.359375,
+          "width": 350.8125,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 304.859375,
+          "y": 137.359375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.984375,
+          "y": 226.359375,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 133.359375,
+          "width": 350.8125,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 304.859375,
+          "y": 180.359375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.984375,
+          "y": 226.359375,
+          "width": 66.609375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 18.390625,
+          "y": 103.8125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 18.390625,
+          "y": 129.109375,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 18.390625,
+          "y": 114.953125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.9375,
+          "y": 128.75,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 188.265625,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 200.109375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 634.140625,
+          "y": 225.40625,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 188.265625,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 211.25,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 583.59375,
+          "y": 225.046875,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 464,
+          "height": 92.40625
+        },
+        "year": {
+          "x": 400.96875,
+          "y": 95.96875,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 151.640625,
+          "y": 141.96875,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 464,
+          "height": 91.703125
+        },
+        "year": {
+          "x": 400.96875,
+          "y": 127.46875,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 151.640625,
+          "y": 141.265625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "color(srgb 0.177961 0.177961 0.177961)",
+        "yearColor": "rgb(207, 207, 207)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 103.8125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 599.9375,
+          "y": 129.109375,
+          "width": 101.671875,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 102,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 114.953125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 549.390625,
+          "y": 128.75,
+          "width": 101.671875,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 102,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 133.359375,
+          "width": 350.8125,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 304.859375,
+          "y": 139.359375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.984375,
+          "y": 228.359375,
+          "width": 81.78125,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 82,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 133.359375,
+          "width": 350.8125,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 304.859375,
+          "y": 182.359375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.984375,
+          "y": 228.359375,
+          "width": 66.609375,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 18.390625,
+          "y": 103.8125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 18.390625,
+          "y": 129.109375,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 18.390625,
+          "y": 114.953125,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 68.9375,
+          "y": 128.75,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 192.265625,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 204.109375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 634.140625,
+          "y": 229.40625,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 192.265625,
+          "width": 710.8125,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 664.859375,
+          "y": 215.25,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 583.59375,
+          "y": 229.046875,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 464,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 400.96875,
+          "y": 97.96875,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 151.640625,
+          "y": 166.265625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 4.59375,
+          "y": 91.96875,
+          "width": 464,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 400.96875,
+          "y": 140.96875,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 151.640625,
+          "y": 166.265625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 635.703125,
+          "y": 124.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 591.25,
+          "y": 124.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 100
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 131,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 209,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 100
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 169,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 209,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 20,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64.453125,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 157,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 166.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 641.328125,
+          "y": 189.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(107, 107, 117)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 157,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 177,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 596.875,
+          "y": 189.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(107, 107, 117)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 101.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 334.796875,
+          "y": 124.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 81
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 123.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 136.875,
+          "y": 136,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 635.703125,
+          "y": 124.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 591.25,
+          "y": 124.5,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 100
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 131,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 209,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 100
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 169,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 209,
+          "width": 64.296875,
+          "height": 18
+        },
+        "keyScroll": 64,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 20,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64.453125,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 157,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 166.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 641.328125,
+          "y": 189.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(166, 166, 175)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 157,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 177,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 596.875,
+          "y": 189.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(166, 166, 175)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 101.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 334.796875,
+          "y": 124.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 81
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 123.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 136.875,
+          "y": 136,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 611.59375,
+          "y": 124.5,
+          "width": 88.40625,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 88,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 567.140625,
+          "y": 124.5,
+          "width": 88.40625,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 88,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 104
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 133,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 211,
+          "width": 82.796875,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 83,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 128,
+          "width": 344,
+          "height": 104
+        },
+        "year": {
+          "x": 307.546875,
+          "y": 171,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64,
+          "y": 211,
+          "width": 69.453125,
+          "height": 18
+        },
+        "keyScroll": 88,
+        "keyClient": 69,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 101.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 20,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 20,
+          "y": 112,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 64.453125,
+          "y": 124.5,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 161,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 170.5,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 641.328125,
+          "y": 193.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 161,
+          "width": 704,
+          "height": 58
+        },
+        "year": {
+          "x": 667.546875,
+          "y": 181,
+          "width": 32.453125,
+          "height": 18
+        },
+        "key": {
+          "x": 596.875,
+          "y": 193.5,
+          "width": 58.671875,
+          "height": 18
+        },
+        "keyScroll": 59,
+        "keyClient": 59,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 76
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 101.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 334.796875,
+          "y": 124.5,
+          "width": 48.203125,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 48,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 8,
+          "y": 92,
+          "width": 464,
+          "height": 85
+        },
+        "year": {
+          "x": 412.328125,
+          "y": 125.5,
+          "width": 47.671875,
+          "height": 18
+        },
+        "key": {
+          "x": 136.875,
+          "y": 138,
+          "width": 80.375,
+          "height": 18
+        },
+        "keyScroll": 80,
+        "keyClient": 80,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 623.078125,
+          "y": 142.90625,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 572.53125,
+          "y": 142.546875,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 151.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 240.140625,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 194.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 240.140625,
+          "width": 63.859375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 22.984375,
+          "y": 142.90625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.53125,
+          "y": 142.546875,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 202.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 213.90625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 629.546875,
+          "y": 239.203125,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(107, 107, 117)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 202.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 225.046875,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 579,
+          "y": 238.84375,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(107, 107, 117)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 92.40625
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 109.765625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 155.765625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "light",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 91.703125
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 141.265625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 155.0625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 623.078125,
+          "y": 142.90625,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 572.53125,
+          "y": 142.546875,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 151.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 240.140625,
+          "width": 73.9375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 74,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 114.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 194.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 240.140625,
+          "width": 63.859375,
+          "height": 20.703125
+        },
+        "keyScroll": 74,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 22.984375,
+          "y": 142.90625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.53125,
+          "y": 142.546875,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 202.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 213.90625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 629.546875,
+          "y": 239.203125,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(166, 166, 175)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 202.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 225.046875,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 579,
+          "y": 238.84375,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(166, 166, 175)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 92.40625
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 109.765625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 155.765625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "dark",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 91.703125
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 141.265625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 155.0625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(179, 215, 255, 0.8)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 595.34375,
+          "y": 142.90625,
+          "width": 101.671875,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 102,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 544.796875,
+          "y": 142.546875,
+          "width": 101.671875,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 102,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "normal",
+      "keyboard": true,
+      "pointer": true,
+      "accessibleKeyYear": true,
+      "focusStaysInSearch": true,
+      "reducedMotion": true
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 153.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 242.140625,
+          "width": 79.03125,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 79,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "narrow",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 147.140625,
+          "width": 341.625,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 300.265625,
+          "y": 196.140625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.578125,
+          "y": 242.140625,
+          "width": 63.859375,
+          "height": 20.703125
+        },
+        "keyScroll": 102,
+        "keyClient": 64,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 117.609375,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 22.984375,
+          "y": 142.90625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "rtl",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 22.984375,
+          "y": 128.75,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 73.53125,
+          "y": 142.546875,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 206.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 217.90625,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 629.546875,
+          "y": 243.203125,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "cjk",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 206.0625,
+          "width": 701.625,
+          "height": 66.6875
+        },
+        "year": {
+          "x": 660.265625,
+          "y": 229.046875,
+          "width": 36.75,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 579,
+          "y": 242.84375,
+          "width": 67.46875,
+          "height": 20.703125
+        },
+        "keyScroll": 67,
+        "keyClient": 67,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "false",
+        "background": "rgba(0, 0, 0, 0)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "before",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 111.765625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 180.0625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": false,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "theme": "contrast",
+      "variant": "crowded",
+      "phase": "after",
+      "geometry": {
+        "overlap": false,
+        "row": {
+          "x": 9.1875,
+          "y": 105.765625,
+          "width": 464,
+          "height": 118.703125
+        },
+        "year": {
+          "x": 405.5625,
+          "y": 154.765625,
+          "width": 53.828125,
+          "height": 20.703125
+        },
+        "key": {
+          "x": 156.234375,
+          "y": 180.0625,
+          "width": 92.421875,
+          "height": 20.703125
+        },
+        "keyScroll": 92,
+        "keyClient": 92,
+        "keyDirection": "ltr",
+        "yearIsTrailing": true,
+        "keyInMeta": true,
+        "selected": "true",
+        "background": "rgba(128, 188, 254, 0.6)",
+        "yearColor": "rgb(0, 0, 0)"
+      }
+    }
+  ]
+}

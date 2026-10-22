@@ -1,0 +1,569 @@
+{
+  "source": "059b39906b798bec063d41ccba1f3c4c3f53750f",
+  "checks": [
+    {
+      "platform": "macos",
+      "text": "normal",
+      "dir": "ltr",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "dir": "rtl",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "dir": "ltr",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "dir": "rtl",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "dir": "ltr",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "dir": "rtl",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "dir": "ltr",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "dir": "rtl",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "dir": "ltr",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "dir": "rtl",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "dir": "ltr",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "dir": "rtl",
+      "sizes": [
+        {
+          "width": 720,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 640,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 560,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 464,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        },
+        {
+          "width": 360,
+          "keyClipped": true,
+          "bylineWhole": true,
+          "overlap": false,
+          "centered": true
+        }
+      ],
+      "selectable": true,
+      "keyDirection": "ltr",
+      "monospace": "ui-monospace, \"SF Mono\", \"Cascadia Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+      "motion": "0s",
+      "emptyFits": true
+    }
+  ]
+}
