@@ -75,12 +75,12 @@ layer from `design/depth-prototype` (variant B). The footer pattern
 | Selection | Selectable in the pane, where it wraps. In the shelf it is one read-only line, so selection never fights row clicks. |
 | Larger text, RTL | Chips and lines scale; fewer chips fit before "+N". In RTL the mark sits at the start (right) and chips flow from the right. |
 | Small window (under 460 px) | The chip row shows only "3 references ›", which opens the list; the output line stays. |
+| Increased contrast, forced colours | Card and chips get a 1 px `CanvasText` edge and the mark turns `CanvasText`. Words carry every state. |
 
 When large system text and wrapped header/footer controls consume the available
 height, the shelf shrinks into its own scroll area. Keep at least 24 CSS px of
 the results scroller reachable; chips, overflow and output remain reachable by
 scrolling the shelf.
-| Increased contrast, forced colours | Card and chips get a 1 px `CanvasText` edge and the mark turns `CanvasText`. Words carry every state. |
 
 ### Per OS
 
