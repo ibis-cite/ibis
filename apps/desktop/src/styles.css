@@ -306,7 +306,7 @@ main[data-selection] [aria-label="Selected references"][data-more]:not(:focus-wi
 .footer-action:hover { background: var(--clear); }
 .footer-action:hover > .key-hint { background: var(--button-hover-background); }
 @media (pointer: coarse) {
-  .footer-action, .more > button { min-width: 2.75rem; min-height: 2.75rem; }
+  .footer-action, .more > button, .pin-button { min-width: 2.75rem; min-height: 2.75rem; }
 }
 :root[data-text-size="larger"] .shortcuts-hint { display: none; }
 @media (width < 520px) { .shortcuts-hint { display: none; } }
