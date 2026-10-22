@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -185,5 +185,45 @@ test("an unexpected runner mirror list stops before APT without replacing it", {
     assert.equal(result.status, 1);
     assert.equal(readFileSync(log, "utf8"), "");
     assert.equal(readFileSync(mirrors, "utf8"), contents);
+  }
+});
+
+test("only the Linux offline observer is elevated, and capture keeps failures", { skip: process.platform === "win32" }, (t) => {
+  const dir = mkdtempSync(join(tmpdir(), "ibis-ci-observer-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  mkdirSync(join(dir, "target/debug"), { recursive: true });
+  const app = join(dir, "target/debug/ibis-desktop");
+  writeFileSync(app, "#!/bin/sh\nexec sleep 30\n");
+  chmodSync(app, 0o755);
+  const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
+  const step = workflow.match(/- name: Capture the picker \(Linux and macOS\)\n([\s\S]*?)\n      - name:/)[1];
+  const command = step.match(/        run: \|\n([\s\S]*)/)[1].replace(/^          /gm, "").split('\nif [ "$RUNNER_OS" = Linux ]; then')[0];
+  assert.match(command, /^  target\/debug\/ibis-desktop > screenshots\/startup-/m, "the app stays unprivileged");
+  const stubs = `python3() {
+    printf '%s\n' "python $OBSERVER_ELEVATED $*" >> "$CALLS"
+    if [[ "$*" == *--pid* ]]; then
+      [[ "$RUNNER_OS" != Linux || "$OBSERVER_ELEVATED" == 1 ]] || return 41
+      return "$SAMPLE_STATUS"
+    fi
+  }
+  sudo() {
+    [[ "$1" == -n && "$2" == python3 ]] || return 98
+    printf 'sudo\n' >> "$CALLS"
+    [[ "$SUDO_STATUS" == 0 ]] || return "$SUDO_STATUS"
+    shift; OBSERVER_ELEVATED=1 "$@"
+  }
+  import() { :; }; screencapture() { :; }`;
+  const calls = join(dir, "calls");
+  for (const [system, sample, sudo, expected] of [["Linux", 0, 0, 0], ["Linux", 42, 0, 42], ["Linux", 0, 73, 73], ["macOS", 0, 0, 0], ["macOS", 42, 0, 42]]) {
+    writeFileSync(calls, "");
+    const result = spawnSync("bash", ["-e", "-o", "pipefail", "-c", `${stubs}\n${command}\ncapture`], {
+      cwd: dir, encoding: "utf8", timeout: 5000,
+      env: { ...process.env, RUNNER_OS: system, CALLS: calls, OBSERVER_ELEVATED: "0", SAMPLE_STATUS: String(sample), SUDO_STATUS: String(sudo) },
+    });
+    assert.equal(result.status, expected, `${system}: ${result.stderr}`);
+    const log = readFileSync(calls, "utf8");
+    assert.match(log, /^python 0 scripts\/check-offline.py --record-baseline /);
+    assert.equal(log.includes("sudo\n"), system === "Linux");
+    if (sudo === 0) assert.match(log, new RegExp(`python ${system === "Linux" ? 1 : 0} scripts/check-offline.py --pid \\d+ --baseline screenshots/offline-${system}.json --seconds 60`));
   }
 });
