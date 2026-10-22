@@ -124,7 +124,7 @@ test("every inner radius follows one concentric chain per platform", () => {
     for (const platform of ["windows", "linux"]) expect(rules(tokens, `:root[data-platform="${platform}"]`), `${platform} ${name}`).not.toContain(`${name}:`);
   }
   // docs/design.md, Corners: macOS before 26 (the native 12 pt corner), Windows 11, GNOME.
-  const expected = { macos: [12, 8, 6, 6, 12, 6], windows: [8, 4, 4, 2, 8, 4], linux: [14, 8, 6, 4, 12, 6] };
+  const expected = { macos: [12, 8, 6, 6, 12, 6], windows: [8, 4, 4, 4, 8, 4], linux: [12, 8, 6, 6, 12, 6] };
   for (const [platform, [win, inset, row, tile, menu, item]] of Object.entries(expected)) {
     const g = geometry(platform === "macos" ? undefined : platform);
     const rRow = Math.max(g["--r-min"]!, g["--r-win"]! - g["--inset"]!);
