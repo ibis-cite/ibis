@@ -576,7 +576,7 @@ test.each(["macos", "windows", "linux"])("%s depth gives the future shelf one su
       expect(painted).toEqual([shelf]);
       expect(properties(shelf)).toContain("--shelf-fill");
       // No flex, minimum height, scrolling, insets, padding or target overrides.
-      expect(properties(shelf).filter((property) => !["--shelf-fill", "border-radius", "box-shadow"].includes(property!))).toEqual([]);
+      expect(properties(shelf).filter((property) => !["--shelf-fill", "border-radius", "box-shadow", "border-color"].includes(property!))).toEqual([]);
       for (const child of shelf.querySelectorAll("*")) expect(applied(child)).toEqual([]);
     }
     // Output-only and hidden-output states still share the same outer surface.
@@ -587,6 +587,31 @@ test.each(["macos", "windows", "linux"])("%s depth gives the future shelf one su
     document.documentElement.dataset.galleryTheme = "contrast";
     expect(applied(shelf)).toEqual([]);
   } finally { shelf.remove(); delete document.documentElement.dataset.galleryTheme; }
+});
+
+test.each(["windows", "linux"])("%s shelf depth keeps one edge when the base already supplies a border", (platform) => {
+  document.documentElement.dataset.platform = platform;
+  const shelf = document.createElement("div");
+  shelf.className = "shelf";
+  // Synthetic public base-edge contract, without importing the pending shelf.
+  const base = document.createElement("style");
+  base.textContent = `.shelf { ${platform === "linux" ? "border-top" : "border"}: 1px solid gray; }`;
+  document.head.append(base);
+  document.body.append(shelf);
+  try {
+    const width = getComputedStyle(shelf).borderTopWidth;
+    expect(width).toBe("1px");
+    const declarations = layerRules().filter(({ head }) => shelf.matches(head)).flatMap(({ body }) =>
+      [...body.matchAll(/(?:^|;)\s*([\w-]+)\s*:\s*([^;]+)/g)].map(([, property, value]) => [property!, value!.trim()]));
+    const value = (property: string) => declarations.filter(([name]) => name === property).at(-1)?.[1];
+    if (platform === "linux") expect(value("box-shadow")).toBe("none");
+    else {
+      expect(value("border-color")).toBe("var(--clear)");
+      expect(value("box-shadow")).toContain("var(--card-shadow)");
+    }
+    expect(declarations.map(([property]) => property)).not.toContain("border-width");
+    expect(getComputedStyle(shelf).borderTopWidth).toBe(width);
+  } finally { shelf.remove(); base.remove(); }
 });
 
 test("each platform has its own layers: lifted on macOS, Fluent on Windows, Adwaita-flat on GNOME", () => {

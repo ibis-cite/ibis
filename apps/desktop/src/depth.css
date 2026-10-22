@@ -92,8 +92,10 @@
       --shelf-fill: var(--layer-raised); border-radius: var(--card-radius);
       box-shadow: inset 0 1px 0 var(--layer-highlight), var(--card-shadow);
     }
+    /* Preserve the base border's space; the Fluent shadow supplies its stroke. */
+    :root[data-platform="windows"]:not([data-gallery-theme="contrast"]) .shelf { border-color: var(--clear); }
     :root[data-platform="linux"]:not([data-gallery-theme="contrast"]) .shelf {
-      --shelf-fill: var(--layer-sheet); border-radius: 0; box-shadow: inset 0 1px 0 var(--separator);
+      --shelf-fill: var(--layer-sheet); border-radius: 0; box-shadow: none;
     }
 
     /* The upper tray and preview remain supported until the shelf replaces

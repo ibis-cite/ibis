@@ -247,8 +247,10 @@ coloured, and no layer has a full rim.
 
 For the bottom shelf, only the outer `.shelf` receives depth: one raised card
 on macOS and Windows, a flat band with one separator on GNOME. Its chip/output
-rows keep their own fills, fitting, hit targets and scrolling. Upper-tray rules
-exclude `.shelf-chips` while both class contracts are supported.
+rows keep their own fills, fitting, hit targets and scrolling. GNOME retains
+the base top border; Windows keeps its border space transparent beneath the
+shadow's stroke, so neither edge doubles. Upper-tray rules exclude
+`.shelf-chips` while both class contracts are supported.
 
 ## What shows, and when
 
