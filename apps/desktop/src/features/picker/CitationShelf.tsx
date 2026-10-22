@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { SearchResult } from "../../api";
 import { provisional, type FormattedCitation } from "../../format/formatted";
 import { render } from "../../format/markup";
@@ -47,9 +47,42 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, style
   // More than SHELF_CHIPS fold into "+N", which shows every chip on a few
   // scrolling lines, so each chosen reference can always be removed here.
   const [expanded, setExpanded] = useState(false);
+  const [visibleChips, setVisibleChips] = useState(SHELF_CHIPS);
+  const chips = useRef<HTMLUListElement>(null);
+  const more = useRef<HTMLLIElement>(null);
+  useLayoutEffect(() => {
+    const list = chips.current;
+    if (!list) return;
+    const fit = () => {
+      const first = list.querySelector<HTMLElement>(".chip");
+      if (!first || list.clientWidth <= 0) return;
+      const style = getComputedStyle(list);
+      const minimum = parseFloat(getComputedStyle(first).minWidth);
+      if (!(minimum > 0)) return;
+      const gap = parseFloat(style.columnGap) || 0;
+      const available = list.clientWidth - (parseFloat(style.paddingInlineStart) || 0) - (parseFloat(style.paddingInlineEnd) || 0);
+      const capacity = Math.min(selected.size, SHELF_CHIPS);
+      let next = SHELF_CHIPS;
+      if (selected.size > SHELF_CHIPS || capacity * minimum + (capacity - 1) * gap > available) {
+        const button = more.current?.querySelector("button");
+        // First create the overflow control, then reserve its actual text width.
+        next = button ? Math.max(0, Math.min(capacity, Math.floor((available - button.getBoundingClientRect().width) / (minimum + gap)))) : Math.max(0, capacity - 1);
+        if (!expanded && [...list.querySelectorAll(".chip")].slice(next).some((chip) => chip.contains(document.activeElement))) button?.focus();
+      }
+      setVisibleChips(next);
+    };
+    fit();
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(fit);
+    observer?.observe(list);
+    if (more.current) observer?.observe(more.current);
+    window.addEventListener("resize", fit);
+    return () => { observer?.disconnect(); window.removeEventListener("resize", fit); };
+  }, [selected, expanded, visibleChips]);
   if (expanded && selected.size === 0) setExpanded(false);
-  const folded = records.length > SHELF_CHIPS ? records.length - SHELF_CHIPS : 0;
-  const shownChips = folded > 0 && !expanded ? records.slice(0, SHELF_CHIPS) : records;
+  const folded = Math.max(0, records.length - visibleChips);
+  // Keep the first chips measurable even if none fit; hidden chips are neither
+  // exposed nor focusable. Expanding still renders every record in source order.
+  const shownChips = expanded ? records : records.slice(0, SHELF_CHIPS);
   return (
     <>
       <p className="visually-hidden" role="status" aria-label={pickerText.citationSelection} aria-live="polite" aria-atomic="true">
@@ -58,15 +91,15 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, style
       {(records.length > 0 || shown !== undefined) && (
         <div className="shelf">
           {records.length > 0 && (
-            <ul className="shelf-chips" aria-label={pickerText.selectedReferences} data-expanded={(folded > 0 && expanded) || undefined}>
+            <ul ref={chips} className="shelf-chips" aria-label={pickerText.selectedReferences} data-expanded={(folded > 0 && expanded) || undefined}>
               {shownChips.map((r, i) => (
-                <li key={keysOf[i]} className="chip" title={r.key}>
+                <li key={keysOf[i]} className="chip" title={r.key} hidden={!expanded && i >= visibleChips}>
                   <bdi className="chip-label">{labels[i]}</bdi>
                   <button type="button" className="chip-remove" onClick={() => onRemove(r)} aria-label={removeLabel(r)} />
                 </li>
               ))}
               {folded > 0 && (
-                <li className="chip-more">
+                <li ref={more} className="chip-more">
                   <button type="button" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}
                     aria-label={expanded ? pickerText.fewerChosen : pickerText.allChosen(records.length)}>
                     {expanded ? pickerText.fewerChosenShort : pickerText.moreChosen(folded)}

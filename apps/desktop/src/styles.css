@@ -140,6 +140,7 @@ main {
 main:has(> .shelf) > footer { border-top-color: var(--clear); }
 .shelf-chips { display: flex; align-items: center; gap: var(--space-1); height: var(--shelf-line); margin: 0; padding: 0 var(--row-pad); list-style: none; overflow: hidden; }
 .chip { flex: 0 1 auto; min-width: var(--chip-min-width); display: inline-flex; align-items: center; height: var(--chip-height); max-width: var(--chip-max-width); padding-inline-start: var(--space-2); border-radius: var(--chip-radius); background: var(--chip-fill); font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 500; }
+.chip[hidden] { display: none; }
 .chip-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* A 16 px cross in the chip's last 24 px; the glyph is a mask on a pseudo-element
    so the keyboard focus ring is never masked away. */
@@ -157,7 +158,7 @@ main:has(> .shelf) > footer { border-top-color: var(--clear); }
 .chip-more button:hover { background: var(--chip-fill); color: var(--text); }
 /* "+N" opened: every chip, wrapping onto at most three scrolling lines. */
 /* Chips shorten before "+N" is pushed out of sight. */
-.shelf-chips[data-expanded] .chip { flex: none; }
+.shelf-chips[data-expanded] .chip { flex: none; max-width: min(var(--chip-max-width), 100%); }
 .shelf-chips[data-expanded] { flex-wrap: wrap; align-content: flex-start; height: auto; max-height: calc(3 * (var(--chip-height) + var(--space-1)) + var(--space-2) * 2); padding-block: var(--space-2); overflow: auto; }
 .shelf-output { display: flex; align-items: center; gap: var(--row-gap); height: var(--shelf-line); padding-inline: var(--row-pad); font-size: var(--type-citation-size); }
 .shelf-mark { flex: none; width: var(--tile-size); text-align: center; font-size: var(--icon-size); font-weight: 700; line-height: 1; }
