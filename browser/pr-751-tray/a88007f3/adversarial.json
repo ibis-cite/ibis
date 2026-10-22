@@ -1,0 +1,1231 @@
+{
+  "source": "a88007f33284697f7bfc838a33ea7a30de8eac58",
+  "browser": "Chromium; synthetic browser check, not native",
+  "results": [
+    {
+      "name": "macos-light-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-light-200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "macos-dark-200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-light-200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "windows-dark-200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-light-200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-normal-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-normal-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-normal-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-normal-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-large-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-large-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-large-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-large-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-200-360-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-200-360-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-200-720-ltr",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    },
+    {
+      "name": "linux-dark-200-720-rtl",
+      "geometry": {
+        "count": 50,
+        "clipped": 0,
+        "horizontal": true,
+        "keyNamed": true
+      },
+      "focused": {
+        "active": true,
+        "visible": true,
+        "mask": "none"
+      },
+      "removedToSearch": true,
+      "contrast": true,
+      "forcedColors": true
+    }
+  ],
+  "errors": []
+}
