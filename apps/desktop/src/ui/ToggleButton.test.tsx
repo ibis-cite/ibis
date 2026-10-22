@@ -1,5 +1,7 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { createRef } from "react";
+import { ToggleButtonContext } from "react-aria-components";
 import { ToggleButton } from "./ToggleButton";
 
 afterEach(() => { cleanup(); delete document.documentElement.dataset.platform; });
@@ -26,4 +28,25 @@ test.each(["macos", "windows", "linux"])("%s: a toggle exposes its name, state a
   fireEvent.click(button);
   expect(button.hasAttribute("disabled")).toBe(true);
   expect(changed).not.toHaveBeenCalled();
+});
+
+test("shortcut updates preserve the consumer and React Aria context refs", () => {
+  const consumer = createRef<HTMLButtonElement>(), context = createRef<HTMLButtonElement>();
+  const changed = vi.fn();
+  const control = (shortcut?: string) => <ToggleButtonContext.Provider value={{ ref: context }}>
+    <ToggleButton ref={consumer} aria-label="Keep Window Open" aria-keyshortcuts={shortcut} isSelected onChange={changed}>Pin</ToggleButton>
+  </ToggleButtonContext.Provider>;
+  const view = render(control("Control+Shift+P"));
+  const button = screen.getByRole("button", { name: "Keep Window Open" });
+  expect(button.getAttribute("aria-keyshortcuts")).toBe("Control+Shift+P");
+  view.rerender(control("Meta+Shift+P"));
+  expect(button.getAttribute("aria-keyshortcuts")).toBe("Meta+Shift+P");
+  view.rerender(control());
+  expect(button.hasAttribute("aria-keyshortcuts")).toBe(false);
+  expect(consumer.current).toBe(button); expect(context.current).toBe(button);
+  fireEvent.click(button);
+  expect(changed).toHaveBeenLastCalledWith(false);
+  expect(button.getAttribute("aria-pressed")).toBe("true");
+  view.unmount();
+  expect(consumer.current).toBeNull(); expect(context.current).toBeNull();
 });
