@@ -1,0 +1,30 @@
+{
+  "source": "92834ebb37dd",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "normal/linux-dark/rtl",
+    "normal/linux-light/rtl",
+    "normal/macos-dark/rtl",
+    "normal/macos-light/rtl",
+    "normal/windows-dark/rtl",
+    "normal/windows-light/rtl"
+  ],
+  "failed": [],
+  "independentReview": "Codex GPT-6",
+  "checks": "69 focused status/key-cap/platform UI tests, TypeScript and evidence build passed; 48 rendered invariant cases passed; not a full or native verification claim",
+  "files": [
+    {
+      "file": "contact-sheet-normal.png",
+      "sha256": "7a2f6991d51abc7163b6ccbb8aecdce8b5b660fd89c0fa782e3b923f0c866f95"
+    },
+    {
+      "file": "invariants.json",
+      "sha256": "72b4aaf0e11a5fc27face91b7e9f73788cc131baae31ddeacacdf6f8340262ba"
+    }
+  ]
+}

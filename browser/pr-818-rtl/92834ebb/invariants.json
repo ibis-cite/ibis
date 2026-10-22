@@ -1,0 +1,390 @@
+{
+  "source": "92834ebb37dd0ecc818e0e65a6595f4ac581d3ff",
+  "checks": "physical source/separator/state order; stable logical library-status text; BDI separator; LTR isolated key caps and per-glyph order; no page overflow; normal and 200% text",
+  "cases": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "direction": "ltr",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 360,
+      "scale": 2,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 1,
+      "passes": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "direction": "rtl",
+      "width": 720,
+      "scale": 2,
+      "passes": true
+    }
+  ]
+}
