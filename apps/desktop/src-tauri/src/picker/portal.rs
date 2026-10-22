@@ -8,7 +8,7 @@ use std::{
     time::Duration,
 };
 use zbus::{
-    Connection, MessageStream, Proxy,
+    Connection, Proxy,
     export::futures_core::Stream,
     zvariant::{OwnedObjectPath, OwnedValue, Value},
 };
@@ -35,7 +35,11 @@ impl From<()> for Failure {
 }
 
 fn successful((code, values): (u32, Dict)) -> Result<Dict, Failure> {
-    if code == 0 { Ok(values) } else { Err(Failure::Denied) }
+    match code {
+        0 => Ok(values),
+        1 => Err(Failure::Denied),
+        _ => Err(Failure::Unavailable),
+    }
 }
 
 fn session_handle(mut values: Dict) -> Result<OwnedObjectPath, ()> {
@@ -104,19 +108,12 @@ async fn request(proxy: &Proxy<'_>, method: &str, session: Option<&OwnedObjectPa
     }
 }
 
-pub(super) enum Event {
-    Activated,
-    Changed(Option<String>),
-    Lost,
-    Idle,
-}
-
+/// Session setup is separate from binding so the activation listener can be
+/// installed and drained before BindShortcuts presents the consent dialog.
 pub(super) struct Portal {
-    connection: Connection,
-    owner: String,
-    session: OwnedObjectPath,
-    signals: MessageStream,
-    pub(super) trigger: Option<String>,
+    pub(super) connection: Connection,
+    pub(super) owner: String,
+    pub(super) session: OwnedObjectPath,
 }
 
 impl Portal {
@@ -125,89 +122,30 @@ impl Portal {
         let bus = bounded(zbus::fdo::DBusProxy::new(&connection)).await?;
         // Properties.Get activates the service and proves the interface exists.
         let service = bounded(Proxy::new(&connection, SERVICE, ROOT, INTERFACE)).await?;
-        let version: u32 = bounded(service.get_property("version")).await?;
-        if version == 0 {
-            return Err(Failure::Unavailable);
-        }
+        let _: u32 = bounded(service.get_property("version")).await?;
         let owner = bounded(bus.get_name_owner(SERVICE.try_into().map_err(|_| ())?))
             .await?
             .to_string();
         let proxy = bounded(Proxy::new(&connection, owner.as_str(), ROOT, INTERFACE)).await?;
-        let rule = zbus::MatchRule::builder()
-            .msg_type(zbus::message::Type::Signal)
-            .sender(owner.as_str())
-            .map_err(|_| ())?
-            .path_namespace(ROOT)
-            .map_err(|_| ())?
-            .build();
-        let signals = bounded(MessageStream::for_match_rule(rule, &connection, Some(64))).await?;
         let session = session_handle(request(&proxy, "CreateSession", None).await?)?;
-        let bound = request(&proxy, "BindShortcuts", Some(&session)).await?;
-        let listed = request(&proxy, "ListShortcuts", Some(&session)).await.unwrap_or(bound);
-        let trigger = listed
-            .get("shortcuts")
-            .and_then(|value| value.try_clone().ok())
-            .and_then(|value| Shortcuts::try_from(value).ok())
-            .and_then(trigger);
-        drop(proxy);
-        drop(service);
-        drop(bus);
         Ok(Self {
-            connection,
+            connection: connection.clone(),
             owner,
             session,
-            signals,
-            trigger,
         })
     }
 
-    pub(super) async fn next(&mut self) -> Result<Event, ()> {
-        let message = match tokio::time::timeout(CALL, poll_fn(|cx| Pin::new(&mut self.signals).poll_next(cx))).await {
-            Ok(Some(message)) => message.map_err(|_| ())?,
-            Ok(None) => return Err(()),
-            Err(_) => {
-                let bus = bounded(zbus::fdo::DBusProxy::new(&self.connection)).await?;
-                let owner = bounded(bus.get_name_owner(SERVICE.try_into().map_err(|_| ())?)).await?;
-                return if owner.as_str() == self.owner {
-                    Ok(Event::Idle)
-                } else {
-                    Err(())
-                };
-            }
-        };
-        let header = message.header();
-        let member = header.member().map(|name| name.as_str());
-        let interface = header.interface().map(|name| name.as_str());
-        if interface == Some("org.freedesktop.portal.Session")
-            && member == Some("Closed")
-            && header.path().map(|path| path.as_str()) == Some(self.session.as_str())
-        {
-            return Ok(Event::Lost);
-        }
-        if interface != Some(INTERFACE) {
-            return Ok(Event::Idle);
-        }
-        match member {
-            Some("Activated") => {
-                let (session, id, _, _): (OwnedObjectPath, String, u64, Dict) =
-                    message.body().deserialize().map_err(|_| ())?;
-                Ok(if session == self.session && id == ID {
-                    Event::Activated
-                } else {
-                    Event::Idle
-                })
-            }
-            Some("ShortcutsChanged") => {
-                let (session, shortcuts): (OwnedObjectPath, Shortcuts) =
-                    message.body().deserialize().map_err(|_| ())?;
-                Ok(if session == self.session {
-                    Event::Changed(trigger(shortcuts))
-                } else {
-                    Event::Idle
-                })
-            }
-            _ => Ok(Event::Idle),
-        }
+    pub(super) async fn bind(&self) -> Result<Option<String>, Failure> {
+        let proxy = bounded(Proxy::new(&self.connection, self.owner.as_str(), ROOT, INTERFACE)).await?;
+        let bound = request(&proxy, "BindShortcuts", Some(&self.session)).await?;
+        let listed = request(&proxy, "ListShortcuts", Some(&self.session))
+            .await
+            .unwrap_or(bound);
+        Ok(listed
+            .get("shortcuts")
+            .and_then(|value| value.try_clone().ok())
+            .and_then(|value| Shortcuts::try_from(value).ok())
+            .and_then(trigger))
     }
 }
 
@@ -215,38 +153,24 @@ impl Portal {
 mod tests {
     use super::*;
 
+    fn dict(key: &str, text: &str) -> Dict {
+        HashMap::from([(key.into(), zbus::zvariant::Str::from(text).into())])
+    }
+
     #[test]
     fn session_handle_is_a_string_and_failures_are_not_success() {
-        let values = HashMap::from([(
-            "session_handle".into(),
-            zbus::zvariant::Str::from("/session/one").into(),
-        )]);
-        assert_eq!(
-            session_handle(values).ok().as_deref().map(|p| p.as_str()),
-            Some("/session/one")
-        );
-        assert!(session_handle(HashMap::new()).is_err());
+        assert!(session_handle(dict("session_handle", "/session/one")).is_ok());
+        assert!(session_handle(dict("session_handle", "bad path")).is_err());
         assert!(session_handle(HashMap::from([("session_handle".into(), 4u32.into())])).is_err());
-        assert!(
-            session_handle(HashMap::from([(
-                "session_handle".into(),
-                zbus::zvariant::Str::from("bad path").into()
-            )]))
-            .is_err()
-        );
-        assert!(successful((1, HashMap::new())).is_err());
-        assert!(successful((2, HashMap::new())).is_err());
+        assert!(session_handle(HashMap::new()).is_err());
+        assert_eq!(successful((1, HashMap::new())), Err(Failure::Denied));
+        assert_eq!(successful((2, HashMap::new())), Err(Failure::Unavailable));
         assert!(successful((0, HashMap::new())).is_ok());
     }
 
     #[test]
     fn only_the_desktop_trigger_for_our_action_is_displayed() {
-        let entry = |id: &str, label: &str| {
-            (
-                id.into(),
-                HashMap::from([("trigger_description".into(), zbus::zvariant::Str::from(label).into())]),
-            )
-        };
+        let entry = |id: &str, label: &str| (id.into(), dict("trigger_description", label));
         assert_eq!(
             trigger(vec![entry("other", "wrong"), entry(ID, "Strg+Umschalt+Y")]),
             Some("Strg+Umschalt+Y".into())
@@ -261,5 +185,82 @@ mod tests {
             <&str>::try_from(&options.1["preferred_trigger"]).ok(),
             Some("CTRL+SHIFT+y")
         );
+    }
+
+    #[cfg(target_os = "linux")]
+    mod private_bus {
+        use super::*;
+        use std::sync::{Arc, atomic::AtomicU32};
+
+        struct Fake(Arc<AtomicU32>);
+
+        #[zbus::interface(name = "org.freedesktop.portal.GlobalShortcuts")]
+        impl Fake {
+            #[zbus(property)]
+            fn version(&self) -> u32 {
+                2
+            }
+
+            async fn create_session(
+                &self,
+                options: Dict,
+                #[zbus(connection)] connection: &Connection,
+                #[zbus(header)] header: zbus::message::Header<'_>,
+            ) -> zbus::fdo::Result<OwnedObjectPath> {
+                let sender = header
+                    .sender()
+                    .ok_or_else(|| zbus::fdo::Error::Failed("sender".into()))?;
+                let token = <&str>::try_from(&options["handle_token"]).map_err(zbus::Error::from)?;
+                let sender_path = sender.as_str()[1..].replace('.', "_");
+                let path = OwnedObjectPath::try_from(format!("{ROOT}/request/{sender_path}/{token}"))
+                    .map_err(zbus::Error::from)?;
+                // Deliberately respond before returning the request handle.
+                connection
+                    .emit_signal(
+                        Some(sender),
+                        &path,
+                        "org.freedesktop.portal.Request",
+                        "Response",
+                        &(self.0.load(Ordering::Relaxed), dict("session_handle", "/session/fake")),
+                    )
+                    .await?;
+                Ok(path)
+            }
+        }
+
+        #[test]
+        fn immediate_response_on_a_private_bus() -> Result<(), Box<dyn std::error::Error>> {
+            if std::env::var_os("IBIS_PRIVATE_PORTAL_TEST").is_none() {
+                let status = std::process::Command::new("dbus-run-session")
+                    .arg("--")
+                    .arg(std::env::current_exe()?)
+                    .args([
+                        "--exact",
+                        "picker::portal::tests::private_bus::immediate_response_on_a_private_bus",
+                    ])
+                    .env("IBIS_PRIVATE_PORTAL_TEST", "1")
+                    .status()?;
+                assert!(status.success());
+                return Ok(());
+            }
+            tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()?
+                .block_on(async {
+                    let code = Arc::new(AtomicU32::new(0));
+                    let _server = zbus::connection::Builder::session()?
+                        .name(SERVICE)?
+                        .serve_at(ROOT, Fake(code.clone()))?
+                        .build()
+                        .await?;
+                    let portal = Portal::connect().await.map_err(|_| "session failed")?;
+                    assert_eq!(portal.session.as_str(), "/session/fake");
+                    code.store(1, Ordering::Relaxed);
+                    assert!(matches!(Portal::connect().await, Err(Failure::Denied)));
+                    code.store(2, Ordering::Relaxed);
+                    assert!(matches!(Portal::connect().await, Err(Failure::Unavailable)));
+                    Ok(())
+                })
+        }
     }
 }
