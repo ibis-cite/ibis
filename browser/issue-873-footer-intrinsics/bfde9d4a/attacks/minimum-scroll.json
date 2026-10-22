@@ -1,0 +1,474 @@
+[
+  {
+    "source": "f2031235",
+    "platform": "macos",
+    "dir": "ltr",
+    "before": {
+      "docWidth": 360,
+      "docHeight": 739,
+      "docTop": 0,
+      "mainWidth": 360,
+      "mainHeight": 739,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 246.15625,
+        "y": 676.0625,
+        "width": 104.65625,
+        "height": 50.59375,
+        "hit": false
+      },
+      "focus": "search"
+    },
+    "after": {
+      "docWidth": 360,
+      "docHeight": 739,
+      "docTop": 419,
+      "mainWidth": 360,
+      "mainHeight": 739,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 246.15625,
+        "y": 257.0625,
+        "width": 104.65625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "search"
+    },
+    "menuOpened": true,
+    "closed": {
+      "docWidth": 360,
+      "docHeight": 739,
+      "docTop": 419,
+      "mainWidth": 360,
+      "mainHeight": 739,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 246.15625,
+        "y": 257.0625,
+        "width": 104.65625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "react-aria9398236957-_r_0_"
+    },
+    "pass": true,
+    "errors": []
+  },
+  {
+    "source": "f2031235",
+    "platform": "windows",
+    "dir": "ltr",
+    "before": {
+      "docWidth": 360,
+      "docHeight": 756,
+      "docTop": 0,
+      "mainWidth": 360,
+      "mainHeight": 756,
+      "mainClient": 713,
+      "mainTop": 0,
+      "more": {
+        "x": 221.40625,
+        "y": 657.671875,
+        "width": 134,
+        "height": 50.59375,
+        "hit": false
+      },
+      "focus": "search"
+    },
+    "after": {
+      "docWidth": 360,
+      "docHeight": 756,
+      "docTop": 436,
+      "mainWidth": 360,
+      "mainHeight": 756,
+      "mainClient": 713,
+      "mainTop": 0,
+      "more": {
+        "x": 221.40625,
+        "y": 221.671875,
+        "width": 134,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "search"
+    },
+    "menuOpened": true,
+    "closed": {
+      "docWidth": 360,
+      "docHeight": 756,
+      "docTop": 436,
+      "mainWidth": 360,
+      "mainHeight": 756,
+      "mainClient": 713,
+      "mainTop": 0,
+      "more": {
+        "x": 221.40625,
+        "y": 221.671875,
+        "width": 134,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "react-aria6964510760-_r_0_"
+    },
+    "pass": true,
+    "errors": []
+  },
+  {
+    "source": "f2031235",
+    "platform": "linux",
+    "dir": "ltr",
+    "before": {
+      "docWidth": 360,
+      "docHeight": 774,
+      "docTop": 0,
+      "mainWidth": 360,
+      "mainHeight": 774,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 203.65625,
+        "y": 676.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": false
+      },
+      "focus": "search"
+    },
+    "after": {
+      "docWidth": 360,
+      "docHeight": 774,
+      "docTop": 454,
+      "mainWidth": 360,
+      "mainHeight": 774,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 203.65625,
+        "y": 222.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "search"
+    },
+    "menuOpened": true,
+    "closed": {
+      "docWidth": 360,
+      "docHeight": 774,
+      "docTop": 454,
+      "mainWidth": 360,
+      "mainHeight": 774,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 203.65625,
+        "y": 222.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "react-aria2778047372-_r_0_"
+    },
+    "pass": true,
+    "errors": []
+  },
+  {
+    "source": "f2031235",
+    "platform": "linux",
+    "dir": "rtl",
+    "before": {
+      "docWidth": 360,
+      "docHeight": 774,
+      "docTop": 0,
+      "mainWidth": 360,
+      "mainHeight": 774,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 9.1875,
+        "y": 676.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": false
+      },
+      "focus": "search"
+    },
+    "after": {
+      "docWidth": 360,
+      "docHeight": 774,
+      "docTop": 454,
+      "mainWidth": 360,
+      "mainHeight": 774,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 9.1875,
+        "y": 222.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "search"
+    },
+    "menuOpened": true,
+    "closed": {
+      "docWidth": 360,
+      "docHeight": 774,
+      "docTop": 454,
+      "mainWidth": 360,
+      "mainHeight": 774,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 9.1875,
+        "y": 222.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "react-aria2640017957-_r_0_"
+    },
+    "pass": true,
+    "errors": []
+  },
+  {
+    "source": "bfde9d4a",
+    "platform": "macos",
+    "dir": "ltr",
+    "before": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 0,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 246.15625,
+        "y": 676.0625,
+        "width": 104.65625,
+        "height": 50.59375,
+        "hit": false
+      },
+      "focus": "search"
+    },
+    "after": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 411,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 246.15625,
+        "y": 265.0625,
+        "width": 104.65625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "search"
+    },
+    "menuOpened": true,
+    "closed": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 411,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 246.15625,
+        "y": 265.0625,
+        "width": 104.65625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "react-aria5857969440-_r_0_"
+    },
+    "pass": true,
+    "errors": []
+  },
+  {
+    "source": "bfde9d4a",
+    "platform": "windows",
+    "dir": "ltr",
+    "before": {
+      "docWidth": 360,
+      "docHeight": 713,
+      "docTop": 0,
+      "mainWidth": 360,
+      "mainHeight": 713,
+      "mainClient": 713,
+      "mainTop": 0,
+      "more": {
+        "x": 221.40625,
+        "y": 657.671875,
+        "width": 134,
+        "height": 50.59375,
+        "hit": false
+      },
+      "focus": "search"
+    },
+    "after": {
+      "docWidth": 360,
+      "docHeight": 713,
+      "docTop": 393,
+      "mainWidth": 360,
+      "mainHeight": 713,
+      "mainClient": 713,
+      "mainTop": 0,
+      "more": {
+        "x": 221.40625,
+        "y": 264.671875,
+        "width": 134,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "search"
+    },
+    "menuOpened": true,
+    "closed": {
+      "docWidth": 360,
+      "docHeight": 713,
+      "docTop": 393,
+      "mainWidth": 360,
+      "mainHeight": 713,
+      "mainClient": 713,
+      "mainTop": 0,
+      "more": {
+        "x": 221.40625,
+        "y": 264.671875,
+        "width": 134,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "react-aria8058186729-_r_0_"
+    },
+    "pass": true,
+    "errors": []
+  },
+  {
+    "source": "bfde9d4a",
+    "platform": "linux",
+    "dir": "ltr",
+    "before": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 0,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 203.65625,
+        "y": 676.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": false
+      },
+      "focus": "search"
+    },
+    "after": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 411,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 203.65625,
+        "y": 265.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "search"
+    },
+    "menuOpened": true,
+    "closed": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 411,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 203.65625,
+        "y": 265.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "react-aria9910268852-_r_0_"
+    },
+    "pass": true,
+    "errors": []
+  },
+  {
+    "source": "bfde9d4a",
+    "platform": "linux",
+    "dir": "rtl",
+    "before": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 0,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 9.1875,
+        "y": 676.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": false
+      },
+      "focus": "search"
+    },
+    "after": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 411,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 9.1875,
+        "y": 265.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "search"
+    },
+    "menuOpened": true,
+    "closed": {
+      "docWidth": 360,
+      "docHeight": 731,
+      "docTop": 411,
+      "mainWidth": 360,
+      "mainHeight": 731,
+      "mainClient": 731,
+      "mainTop": 0,
+      "more": {
+        "x": 9.1875,
+        "y": 265.0625,
+        "width": 147.15625,
+        "height": 50.59375,
+        "hit": true
+      },
+      "focus": "react-aria173154573-_r_0_"
+    },
+    "pass": true,
+    "errors": []
+  }
+]
