@@ -116,7 +116,7 @@ export const pickerText = {
   removeNamed: (name: string) => `Remove ${name} from citation`,
   bestMatches: "Best matches",
   noMatches: "No matching references",
-  noMatchesHint: "Check the spelling, or try fewer words, an author's surname or a year.",
+  noMatchesHint: "Check spelling, or try fewer words, a surname or year.",
   clearSearch: "Clear search",
   searchAllLibraries: "Search all Zotero libraries",
   typeToFind: "Type to find a reference",

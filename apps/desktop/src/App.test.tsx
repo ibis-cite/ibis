@@ -2324,7 +2324,7 @@ test("when nothing matches, the picker offers to clear the search", async () => 
   const box = screen.getByLabelText("Search references") as HTMLInputElement;
   fireEvent.change(box, { target: { value: "nothing here" } });
   expect(await screen.findByText("No matching references")).toBeTruthy();
-  expect(screen.getByText("Check the spelling, or try fewer words, an author's surname or a year.")).toBeTruthy();
+  expect(screen.getByText("Check spelling, or try fewer words, a surname or year.")).toBeTruthy();
   expect(screen.queryByRole("button", { name: "Search all Zotero libraries" })).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
   expect(box.value).toBe("");

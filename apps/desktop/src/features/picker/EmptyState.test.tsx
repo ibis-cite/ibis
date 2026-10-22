@@ -17,7 +17,7 @@ test.each(["", "unmatched"])("one empty-state template has a plain title, descri
   const { container } = mount(query);
   expect(container.querySelector(".empty-title")?.textContent).toBe(query ? "No matching references" : "Type to find a reference");
   expect(container.querySelector(".empty-description")?.textContent).toBe(query
-    ? "Check the spelling, or try fewer words, an author's surname or a year."
+    ? "Check spelling, or try fewer words, a surname or year."
     : "Search by title, author, year, citation key or DOI.");
   expect(container.querySelector(".empty-icon")?.getAttribute("aria-hidden")).toBe("true");
   expect(screen.queryByRole("heading")).toBeNull();
