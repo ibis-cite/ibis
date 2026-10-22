@@ -116,15 +116,17 @@ instead of going square or looking like a separate floating slab.
 
 | | macOS | Windows 11 | Linux (GNOME) |
 |---|---|---|---|
-| `--r-win` | 28 on macOS 26 and later; 12 pt before that (the native panel corner, #236) | 8 | 14 |
-| `--inset` · `--r-min` | 8 · 6 | 4 · 2 | 8 · 4 |
-| `--r-row` | 20 on macOS 26 and later; 6 before | 4 | 6 |
-| `--r-tile` | 8 on macOS 26 and later; 6 before | 2 | 4 |
+| `--r-win` | 28 on macOS 26 and later; 12 pt before that (the native panel corner, #236) | 8 | 15 |
+| `--inset` · `--r-min` | 8 · 6 | 4 · 4 | 8 · 6 |
+| `--r-row` | 20 on macOS 26 and later; 6 before | 4 | 7 |
+| `--r-tile` | 8 on macOS 26 and later; 6 before | 4 | 6 |
 | `--r-menu` · `--menu-pad` · `--r-mi` | 12 · 6 · 6 | 8 · 4 · 4 | 12 · 6 · 6 |
-| `--e2` menu shadow, plus a 1 px hairline | `0 12px 32px` black 16% | `0 8px 16px` black 14% | `0 2px 8px` black 20% |
+| Menu elevation | One `--shadow-overlay` per look; values and theme treatment in [system §6.3](design/system.md#63-shadows). | | |
 
-On GNOME, rows are flat with the 6 px radius of Adwaita's sidebar and popover
-rows: a boxed list cannot be concentric at an 8 px inset in a 14 px window.
+GNOME follows [libadwaita 1.8's 15 px window](https://github.com/GNOME/libadwaita/blob/1.8.0/doc/css-variables.md#window-radius);
+1.6/1.7 used 12 px. With an 8 px inset and 6 px floor the chain gives 7 px
+rows and 6 px tiles; popovers keep their separate 12 px radius. Windows rows
+and tiles use Fluent's 4 px small radius.
 
 Each look sets only `--r-win`, `--inset` and `--r-min` (and the menu pair);
 every inner radius follows from them. With Larger text the inset grows with the
@@ -138,9 +140,10 @@ native item padding (items stay at least 32 px high, rule 4), separators, and
 open and close motion. Check them side by side with a real
 menu on each platform before calling them done.
 
-**Motion.** 120 ms for feedback, 200 ms for panels, 280 ms for layout, all with
-`cubic-bezier(.2, .8, .2, 1)`. No bounce. With reduced motion, panels fade
-instead of sliding. Hover never moves anything.
+**Motion.** 120 ms for feedback, 200 ms for panels, 280 ms for layout. Each
+look uses its `--ease-out` for entrances and `--ease-in` for exits
+([system §7](design/system.md#7-motion)). No bounce. Reduced motion keeps fades
+at most 100 ms and removes movement. Hover never moves anything.
 
 **Icons.** Ibis's own set: 20 px, 1.5 px stroke, rounded ends, the same
 drawings on every platform, so a source or a reference type always looks the
@@ -394,10 +397,16 @@ baseline, each key cap 20 px high and centred on it.
 - **Screen readers** hear the actions in one group named "Keys". Buttons stay
   visible and reachable when focus leaves Search; Enter then presses the
   focused button. Copy is offered only when its current output is ready.
-- **Narrow windows.** The library status shortens first (its own rules).
-  Under 520 px, or with Larger text, the Shortcuts hint is dropped (More
-  still lists it). If the rest still does not fit, the hints wrap onto a
-  second line, which keeps 8 px above and below.
+- **Fit before wrapping.** Measure the actual controls and key caps, including
+  the pin and the current Copy label. When they do not fit, drop Shortcuts first
+  (More still lists it), then shorten the library status using its existing
+  ellipses and full tooltip. Only then wrap, keeping 8 px above and below.
+  Restore the hint and status space when the contents fit again; width, text
+  size, platform and format labels all affect this decision. A folded focused
+  Shortcuts action returns focus to More; Search and unrelated controls keep it.
+  If the footer still changes height, the local results scroller keeps the
+  highlighted row visible only while Search owns keyboard navigation. Pointer
+  choices and another focused control do not make the list move.
 - **Library status** keeps its rules (see **Library status**): the dot is
   6 px, centred on the text's x-height, and starts on the leading edge.
 - **Key caps.** A 20 px fill (`--key-cap` on the control fill), radius

@@ -5,6 +5,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 #[derive(Clone, Copy)]
 pub(crate) enum NativeIssue {
     Startup,
+    LoginRegistrationRefresh,
     TrayCreation,
     Shortcut,
     Window,
@@ -27,6 +28,9 @@ pub(crate) enum NativeIssue {
     Position,
     Pointer,
     TrayLibrary,
+    LoginMenuUpdate,
+    LoginMenuRead,
+    AutomaticMenuUpdate,
     LibraryEvent,
     Notice,
     #[cfg(debug_assertions)]
@@ -37,6 +41,7 @@ impl NativeIssue {
     fn message(self) -> &'static str {
         match self {
             Self::Startup => "the app could not start",
+            Self::LoginRegistrationRefresh => "the login registration could not be refreshed",
             Self::TrayCreation => "the menu bar item could not be created",
             Self::Shortcut => "the shortcut needs attention; check the picker for details",
             Self::Window => "the picker window is unavailable",
@@ -59,6 +64,9 @@ impl NativeIssue {
             Self::Position => "the picker could not be positioned",
             Self::Pointer => "the pointer position could not be read",
             Self::TrayLibrary => "the tray library status could not be updated",
+            Self::LoginMenuUpdate => "the login menu check could not be updated",
+            Self::LoginMenuRead => "the login menu check could not be read",
+            Self::AutomaticMenuUpdate => "the automatic update menu check could not be updated",
             Self::LibraryEvent => "the library-changed event could not be sent",
             Self::Notice => "the Copied notice could not be shown",
             #[cfg(debug_assertions)]
@@ -138,6 +146,7 @@ mod tests {
     fn native_failures_report_only_the_allowlisted_operation() {
         for issue in [
             NativeIssue::Startup,
+            NativeIssue::LoginRegistrationRefresh,
             NativeIssue::TrayCreation,
             NativeIssue::Shortcut,
             NativeIssue::Window,
@@ -168,6 +177,39 @@ mod tests {
             let value = checked_with(Err::<(), _>(PrivateError), issue, |message| messages.push(message));
             assert!(value.is_none());
             assert_eq!(messages, [issue.message()]);
+        }
+    }
+
+    #[test]
+    fn menu_diagnostics_keep_fixed_labels_and_successful_check_values() {
+        for (issue, expected) in [
+            (
+                NativeIssue::LoginMenuUpdate,
+                "ibis: the login menu check could not be updated\n",
+            ),
+            (
+                NativeIssue::LoginMenuRead,
+                "ibis: the login menu check could not be read\n",
+            ),
+            (
+                NativeIssue::AutomaticMenuUpdate,
+                "ibis: the automatic update menu check could not be updated\n",
+            ),
+        ] {
+            let mut output = Vec::new();
+            let value = checked_with(Err::<bool, _>(PrivateError), issue, |message| {
+                write_diagnostic(&mut output, message)
+            });
+            assert_eq!(value, None);
+            assert_eq!(output, expected.as_bytes());
+        }
+        for value in [false, true] {
+            assert_eq!(
+                checked_with(Ok::<_, PrivateError>(value), NativeIssue::LoginMenuRead, |_| {
+                    panic!("a successful check read must not report a failure")
+                }),
+                Some(value)
+            );
         }
     }
 
@@ -210,6 +252,18 @@ mod tests {
     }
 
     #[test]
+    fn login_registration_refresh_failure_uses_only_the_fixed_message() {
+        let mut output = Vec::new();
+        let value = checked_with(
+            Err::<(), _>(PrivateError),
+            NativeIssue::LoginRegistrationRefresh,
+            |message| write_diagnostic(&mut output, message),
+        );
+        assert_eq!(value, None);
+        assert_eq!(output, b"ibis: the login registration could not be refreshed\n");
+    }
+
+    #[test]
     fn successful_native_values_are_preserved_without_a_diagnostic() {
         let mut messages = Vec::new();
         let value = checked_with(Ok::<_, PrivateError>(false), NativeIssue::Visibility, |message| {
@@ -234,9 +288,13 @@ mod tests {
         }
         for issue in [
             NativeIssue::Show,
+            NativeIssue::LoginRegistrationRefresh,
             NativeIssue::Startup,
             NativeIssue::TrayCreation,
             NativeIssue::Shortcut,
+            NativeIssue::LoginMenuUpdate,
+            NativeIssue::LoginMenuRead,
+            NativeIssue::AutomaticMenuUpdate,
         ] {
             assert!(
                 checked_with(Err::<(), _>(PrivateError), issue, |message| {

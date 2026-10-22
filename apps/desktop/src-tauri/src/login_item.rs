@@ -22,6 +22,8 @@ use serde::Serialize;
 use tauri::menu::CheckMenuItem;
 use tauri::{AppHandle, Manager};
 
+use crate::diagnostics::{NativeIssue, checked, report};
+
 /// Passed by the login entry (Windows and Linux), so Ibis starts without
 /// showing the picker. macOS reports a login launch in its open event instead.
 pub(crate) const AT_LOGIN_ARG: &str = "--at-login";
@@ -187,7 +189,10 @@ impl LoginItems {
         if let Some(entry) = &self.entry
             && entry.is_enabled() == Ok(true)
         {
-            let _ = entry.refresh();
+            crate::diagnostics::report(
+                entry.refresh(),
+                crate::diagnostics::NativeIssue::LoginRegistrationRefresh,
+            );
         }
     }
 }
@@ -344,7 +349,7 @@ fn unsupported(app: &AppHandle) -> LoginItem {
 
 fn show_in_menu(app: &AppHandle, item: &LoginItem) {
     if let Some(menu) = app.try_state::<LoginMenuItem>() {
-        let _ = menu.0.set_checked(item.enabled);
+        report(menu.0.set_checked(item.enabled), NativeIssue::LoginMenuUpdate);
     }
 }
 
@@ -387,7 +392,7 @@ pub(crate) fn toggle_from_menu(app: &AppHandle) {
         // state again and change nothing.
         let Some(wanted) = app
             .try_state::<LoginMenuItem>()
-            .and_then(|menu| menu.0.is_checked().ok())
+            .and_then(|menu| checked(menu.0.is_checked(), NativeIssue::LoginMenuRead))
         else {
             current(&app);
             return;
@@ -470,6 +475,7 @@ mod tests {
         refuse: bool,
         approve: bool,
         registration_error: bool,
+        refresh_error: bool,
         unreadable: bool,
         /// Registrations made but not allowed yet.
         pending: std::sync::atomic::AtomicBool,
@@ -483,6 +489,7 @@ mod tests {
                 refuse: false,
                 approve: true,
                 registration_error: false,
+                refresh_error: false,
                 unreadable: false,
                 pending: false.into(),
                 refreshed: 0.into(),
@@ -518,7 +525,7 @@ mod tests {
         }
         fn refresh(&self) -> Result<(), Failed> {
             self.refreshed.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-            Ok(())
+            if self.refresh_error { Err(Failed) } else { Ok(()) }
         }
     }
 
@@ -636,14 +643,17 @@ mod tests {
     }
 
     #[test]
-    fn refreshing_never_turns_on_a_switched_off_entry() {
+    fn refresh_preserves_system_state_and_skips_entries_that_are_not_on() {
         let off = LoginItems::new("Ibis", Some(Box::new(FakeEntry::new(false))));
         off.refresh();
         assert_eq!(off.reading(), item(false, None));
         let on = LoginItems::new("Ibis", Some(Box::new(FakeEntry::new(true))));
         on.refresh();
         assert_eq!(on.reading(), item(true, None));
-        assert!(!LoginItems::new("Ibis", None).available());
+        let unsupported = LoginItems::new("Ibis", None);
+        unsupported.refresh();
+        assert!(!unsupported.available());
+        assert_eq!(unsupported.reading(), item(false, Some(LoginItemProblem::Unsupported)));
         // Only an entry that is on is offered a refresh.
         let entry = std::sync::Arc::new(FakeEntry::new(false));
         struct Shared(std::sync::Arc<FakeEntry>);
@@ -667,6 +677,29 @@ mod tests {
         let _ = items.change(true);
         items.refresh();
         assert_eq!(entry.refreshed.load(std::sync::atomic::Ordering::SeqCst), 1);
+
+        for unreadable in [false, true] {
+            let entry = std::sync::Arc::new(FakeEntry {
+                unreadable,
+                refresh_error: true,
+                ..FakeEntry::new(true)
+            });
+            let items = LoginItems::new("Ibis", Some(Box::new(Shared(entry.clone()))));
+            items.refresh();
+            assert_eq!(
+                entry.refreshed.load(std::sync::atomic::Ordering::SeqCst),
+                usize::from(!unreadable)
+            );
+            assert!(entry.on.lock().is_ok_and(|on| *on));
+            assert_eq!(
+                items.reading(),
+                if unreadable {
+                    item(false, Some(LoginItemProblem::Unreadable))
+                } else {
+                    item(true, None)
+                }
+            );
+        }
     }
 
     #[test]
