@@ -176,7 +176,8 @@ test.each(["", "unmatched"])("result headings only name actual rows, preserving 
   backend();
   render(<App />);
   if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
-  await screen.findByText(query ? "No matching references" : "Type to find a reference");
+  const title = await screen.findByText(query ? "No matching references" : "Type to find a reference");
+  expect(screen.getByRole("listbox").compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   if (!query) {
     expect(screen.queryByRole("button", { name: "Search references" })).toBeNull();
     expect(document.activeElement).toBe(screen.getByLabelText("Search references"));
@@ -988,8 +989,9 @@ test("a reload keeps the previous library searchable and announces the reload", 
     search: () => [result("kept", "Kept reference")],
   });
   render(<App />);
-  await screen.findByText("Reloading refs.bib…");
+  const progress = await screen.findByRole("progressbar", { name: "Reloading refs.bib…" });
   await screen.findByText("Kept reference");
+  expect(progress.compareDocumentPosition(screen.getByRole("listbox")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(document.querySelector(".results-heading")).toBeNull();
 });
 
@@ -1054,7 +1056,8 @@ test.each(["", "sleep"])("an empty loaded library is explained even for query %s
   render(<App />);
   await waitFor(() => expect(screen.getByRole("status", { name: "Library status" }).textContent).toBe("empty 研究.bib · no references"));
   if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
-  await screen.findByText("No references in empty 研究.bib");
+  const title = await screen.findByText("No references in empty 研究.bib");
+  expect(screen.getByRole("listbox").compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(document.querySelector(".results-heading")).toBeNull();
   expect(screen.getByText("Choose a file with references.")).toBeTruthy();
   expect(screen.queryByText("Type to find a reference")).toBeNull();

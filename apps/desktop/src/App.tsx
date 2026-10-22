@@ -571,6 +571,19 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
     if (highlighted) toggle(highlighted);
     input.current?.focus();
   };
+  const emptyState = library !== undefined && (busy || results.length === 0 && !error && !library?.error) ? (
+    <EmptyState library={library} query={query} narrowed={narrowed}
+      onChooseLibrary={() => void perform("choose", chooseLibrary)}
+      onClearSearch={() => { setQuery(""); input.current?.focus(); }}
+      onSearchAll={searchAllLibraries}
+      onReload={() => { input.current?.focus(); void perform("reload", reloadLibrary); }}
+      setup={
+        <LibrarySetup api={setupApi} perform={perform}
+          writing={{ format, formatted: Boolean(cslItems && copyFormatted), choose: chooseFormat }}
+          shortcut={shortcut?.registered ? shortcutLabel(shortcut.shortcut, isMac) : null}
+          startAtLogin={loginItemOffered && startAtLogin ? { name: startAtLogin.name, enabled: startAtLogin.enabled, toggle: toggleStartAtLogin } : undefined} />
+      } />
+  ) : null;
 
   return (
     <main
@@ -656,19 +669,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>
-        {library !== undefined && (busy || results.length === 0 && !error && !library?.error) && (
-          <EmptyState library={library} query={query} narrowed={narrowed}
-            onChooseLibrary={() => void perform("choose", chooseLibrary)}
-            onClearSearch={() => { setQuery(""); input.current?.focus(); }}
-            onSearchAll={searchAllLibraries}
-            onReload={() => { input.current?.focus(); void perform("reload", reloadLibrary); }}
-            setup={
-              <LibrarySetup api={setupApi} perform={perform}
-                writing={{ format, formatted: Boolean(cslItems && copyFormatted), choose: chooseFormat }}
-                shortcut={shortcut?.registered ? shortcutLabel(shortcut.shortcut, isMac) : null}
-                startAtLogin={loginItemOffered && startAtLogin ? { name: startAtLogin.name, enabled: startAtLogin.enabled, toggle: toggleStartAtLogin } : undefined} />
-            } />
-        )}
+        {busy && emptyState}
         <ResultList results={results} active={active} selected={selected} density={density}
           libraryOf={severalLibraries ? libraryOf : noLibrary} onMouseMove={pointer.onMouseMove}
           onChoose={(i, r, action) => {
@@ -686,6 +687,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             toggle(r);
             input.current?.focus();
           }} />
+        {!busy && emptyState}
       </div>
       </div>
       <CitationShelf announce={selectionChanged} selected={selected} removeLabel={removeLabel} onRemove={(r) => {
