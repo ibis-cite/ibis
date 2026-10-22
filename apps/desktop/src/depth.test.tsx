@@ -98,16 +98,22 @@ test.each(["macos", "windows", "linux"])("%s paints one real shelf and preserves
   expect(painted.some((rule) => rule.style.getPropertyValue("box-shadow") === "var(--shadow-row-lift)")).toBe(platform === "macos");
 });
 
-test("neutral depth never replaces first-run action, writing-choice or disabled fills/text", async () => {
-  document.documentElement.dataset.platform = "macos";
+test.each(["macos", "windows", "linux"])("%s keeps neutral labels readable without replacing action, writing-choice or disabled roles", async (platform) => {
+  document.documentElement.dataset.platform = platform;
   render(<App {...galleryProvider(state("first-run-found"))} />);
   await waitFor(() => expect(document.querySelectorAll(".writing-choice").length).toBeGreaterThan(1));
   for (const button of document.querySelectorAll(".suggested-action, .writing-choice")) expect(matchingPaint(button)).toEqual([]);
+  const track = document.querySelector(".setup-writing .setup-choices")!;
+  expect(matchingPaint(track).some((rule) => rule.style.getPropertyValue("color") === "var(--text)")).toBe(true);
   const neutral = document.querySelector<HTMLButtonElement>(".empty-state button:not(.suggested-action, .writing-choice)");
   expect(neutral).toBeTruthy();
-  expect(matchingPaint(neutral!).length).toBeGreaterThan(0);
+  expect(matchingPaint(neutral!).some((rule) => rule.style.getPropertyValue("color") === "var(--text)")).toBe(true);
+  const folder = document.querySelector(".found-folder")!;
+  expect(matchingPaint(folder).some((rule) => rule.style.getPropertyValue("color") === "var(--text)")).toBe(true);
   neutral!.setAttribute("aria-disabled", "true");
   expect(matchingPaint(neutral!)).toEqual([]);
+  folder.closest("button")!.setAttribute("aria-disabled", "true");
+  expect(matchingPaint(folder)).toEqual([]);
 });
 
 test("the real empty Zotero state keeps its primary and alternative action roles", () => {
