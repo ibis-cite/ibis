@@ -1,0 +1,33 @@
+{
+  "source": "df03d13936cbf5d166ffb56217da067852f91573",
+  "main": "fc7a81217e30da9ebfc54d91219b6669db03d5e1",
+  "uiTests": {
+    "passed": 434,
+    "total": 434
+  },
+  "keyCapTests": {
+    "passed": 7,
+    "total": 7
+  },
+  "actionLayout": {
+    "passed": 72,
+    "total": 72
+  },
+  "system200": {
+    "passed": 36,
+    "total": 36
+  },
+  "hostLook": {
+    "passed": 18,
+    "total": 18
+  },
+  "typecheck": "passed",
+  "galleryBuild": "passed",
+  "full": "interrupted for requested pause during script checks; no full pass claimed",
+  "native": "not run",
+  "prospectiveMenuMerge": {
+    "source": "bad53073995de43896d836cd0adad6a644c3351c",
+    "exit": 0,
+    "tree": "f2001b62e2b9b5eefebaee1389e6b72e19b6d793"
+  }
+}

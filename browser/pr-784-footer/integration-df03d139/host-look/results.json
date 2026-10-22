@@ -1,0 +1,463 @@
+{
+  "sha": "df03d13936cbf5d166ffb56217da067852f91573",
+  "total": 18,
+  "passed": 18,
+  "results": [
+    {
+      "host": "macos",
+      "look": "macos",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Meta+/",
+          "caps": [
+            "⌘/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Meta+K",
+          "caps": [
+            "⌘K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "macos",
+      "look": "macos",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Meta+/",
+          "caps": [
+            "⌘/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Meta+K",
+          "caps": [
+            "⌘K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "macos",
+      "look": "windows",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "macos",
+      "look": "windows",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "macos",
+      "look": "linux",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 1
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 1
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "macos",
+      "look": "linux",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 1
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 1
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "windows",
+      "look": "macos",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Meta+/",
+          "caps": [
+            "⌘/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Meta+K",
+          "caps": [
+            "⌘K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "windows",
+      "look": "macos",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Meta+/",
+          "caps": [
+            "⌘/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Meta+K",
+          "caps": [
+            "⌘K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "windows",
+      "look": "windows",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "windows",
+      "look": "windows",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "windows",
+      "look": "linux",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 1
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 1
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "windows",
+      "look": "linux",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 1
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 1
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "linux",
+      "look": "macos",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Meta+/",
+          "caps": [
+            "⌘/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Meta+K",
+          "caps": [
+            "⌘K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "linux",
+      "look": "macos",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Meta+/",
+          "caps": [
+            "⌘/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Meta+K",
+          "caps": [
+            "⌘K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "linux",
+      "look": "windows",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "linux",
+      "look": "windows",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 0
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "linux",
+      "look": "linux",
+      "theme": "light",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 1
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 1
+        }
+      ],
+      "pass": true
+    },
+    {
+      "host": "linux",
+      "look": "linux",
+      "theme": "dark",
+      "actual": [
+        {
+          "label": "Shortcuts",
+          "aria": "Control+/",
+          "caps": [
+            "Ctrl",
+            "/"
+          ],
+          "pluses": 1
+        },
+        {
+          "label": null,
+          "aria": "Control+K",
+          "caps": [
+            "Ctrl",
+            "K"
+          ],
+          "pluses": 1
+        }
+      ],
+      "pass": true
+    }
+  ]
+}
