@@ -129,6 +129,59 @@ def helper_timeout_stages(stderr):
     return [line for line in (stderr or "").splitlines() if line in allowed]
 
 
+def foreground_diagnostics(stderr):
+    """Only fixed, bounded observations; never retain arbitrary helper output."""
+    if isinstance(stderr, bytes):
+        stderr = stderr.decode("utf-8", errors="replace")
+    facts = []
+    for line in (stderr or "").splitlines():
+        if not line.startswith("NATIVE FOREGROUND STATE ") or len(line) > 512:
+            continue
+        try:
+            value = json.loads(line.removeprefix("NATIVE FOREGROUND STATE "))
+        except (ValueError, RecursionError):
+            continue
+        if (not isinstance(value, dict) or set(value) != {
+                "action", "stage", "owner", "available", "picker_owned", "picker_visible", "elapsed_ms"}
+                or value["action"] not in ("more", "reload", "snapshot")
+                or value["stage"] not in ("before", "after", "snapshot")
+                or value["owner"] not in ("app", "editor", "owned_helper", "unknown")
+                or any(type(value[key]) is not bool for key in ("available", "picker_owned", "picker_visible"))
+                or type(value["elapsed_ms"]) is not int or not 0 <= value["elapsed_ms"] <= 30000
+                or (not value["available"] and value["owner"] != "unknown")
+                or (value["picker_visible"] and not value["picker_owned"])):
+            continue
+        facts.append(value)
+        if len(facts) == 64:
+            break
+    return facts
+
+
+def fixed_windows_failure(stderr):
+    """Preserve existing error stages without forwarding unvalidated stderr."""
+    lines = helper_timeout_stages(stderr)
+    kinds = {"ElementNotAvailableException", "COMException", "InvalidOperationException", "TimeoutException",
+             "UnauthorizedAccessException", "ArgumentException", "RuntimeException", "other"}
+    phases = {"discovery", "provider", "handle-parse", "ownership", "window-bound", "search-bound",
+              "tree-bound", "text-bound", "unknown"}
+    operations = {"from-handle", "window-handle", "descendant-list", "node-current", "value-pattern",
+                  "value-read", "text-pattern", "text-read", "node-type", "node-name", "node-focus", "unknown"}
+    for line in (stderr or "").splitlines():
+        if line.startswith("NATIVE HELPER ERROR ") and line.removeprefix("NATIVE HELPER ERROR ") in kinds:
+            lines.append(line)
+        elif line.startswith("NATIVE SNAPSHOT FAILURE ") and len(line) <= 512:
+            try:
+                value = json.loads(line.removeprefix("NATIVE SNAPSHOT FAILURE "))
+                if (isinstance(value, dict) and set(value) == {"phase", "kind", "operation"}
+                        and value["phase"] in phases and value["kind"] in kinds and value["operation"] in operations):
+                    lines.append("NATIVE SNAPSHOT FAILURE " + json.dumps(value))
+            except (ValueError, TypeError, RecursionError):
+                pass
+        if len(lines) >= 64:
+            break
+    return lines[:64]
+
+
 def editor_focus_facts(native, stage):
     state = native.call("editor-focus-state")
     keys = ("system_events_editor_frontmost", "workspace_editor_frontmost", "workspace_ibis_frontmost",
@@ -1042,19 +1095,46 @@ class Scripted:
                     or type(handle) is not int or handle == 0):
                 raise RuntimeError("Verified native picker window identity unavailable")
             arguments.append(str(handle))
+        tracing = False
+        if self.system == "Windows":
+            if action == "click" and text in ("More", "Reload"):
+                self.foreground_remaining = 8
+                tracing = True
+            elif action == "snapshot" and getattr(self, "foreground_remaining", 0) > 0:
+                self.foreground_remaining -= 1
+                tracing = True
+            if tracing:
+                arguments += ["-TraceForeground", "-EditorStarted", str(getattr(self, "editor_started", 0))]
         try:
             result = subprocess.run(self.command + arguments, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
         except subprocess.TimeoutExpired as error:
+            if tracing:
+                self.record_foreground(error.stderr)
             # Never print TimeoutExpired itself: its command contains paths and
             # synthetic clipboard/query arguments. The fixed action is enough.
             for stage in helper_timeout_stages(error.stderr):
                 print(stage, file=sys.stderr)
             raise AssertionError(f"Native helper timed out during {action} after {timeout:g}s") from None
+        if tracing:
+            self.record_foreground(result.stderr)
         if result.returncode:
             # Helpers emit fixed diagnostics only, never tree or clipboard text.
-            print(result.stderr, file=sys.stderr)
+            if tracing:
+                for line in fixed_windows_failure(result.stderr):
+                    print(line, file=sys.stderr)
+            else:
+                print(result.stderr, file=sys.stderr)
             raise subprocess.CalledProcessError(result.returncode, self.command, stderr=result.stderr)
         return json.loads(result.stdout)
+
+    def record_foreground(self, stderr):
+        facts = foreground_diagnostics(stderr)
+        previous = getattr(self, "foreground_trace", [])
+        self.foreground_trace = (previous + facts)[:64]
+        self.foreground_truncated = (getattr(self, "foreground_truncated", False)
+                                     or len(facts) == 64 or len(previous) + len(facts) > 64)
+        for fact in facts[:max(0, 64 - len(previous))]:
+            print("NATIVE FOREGROUND STATE " + json.dumps(fact), file=sys.stderr)
 
     def snapshot(self, *, timeout=None):
         if self.system != "Windows":
@@ -1716,6 +1796,10 @@ def main():
                 app.kill()
         if log:
             log.close()
+        trace = getattr(native, "foreground_trace", None)
+        if type(trace) is list:
+            report["foreground_trace"] = trace
+            report["foreground_trace_truncated"] = getattr(native, "foreground_truncated", False) is True
         try:
             report["library_phases"] = library_phase_diagnostics(diagnostic_logs)
         except OSError:
@@ -2600,6 +2684,117 @@ class ContractTests(unittest.TestCase):
         error_lines = [call.args[0] for call in output.call_args_list if call.kwargs.get("file") is stderr]
         self.assertEqual(error_lines, ["NATIVE HELPER STAGE windows-input-compile-start"])
 
+    def test_foreground_trace_accepts_only_bounded_fixed_records(self):
+        fact = {"action": "more", "stage": "before", "owner": "app", "available": True,
+                "picker_owned": True, "picker_visible": True, "elapsed_ms": 0}
+        line = lambda value: "NATIVE FOREGROUND STATE " + json.dumps(value)
+        self.assertEqual(foreground_diagnostics(line(fact)), [fact])
+        missing = dict(fact, owner="unknown", available=False)
+        self.assertEqual(foreground_diagnostics(line(missing).encode()), [missing])
+        for changed in ({"owner": "PRIVATE"}, {"path": "PRIVATE"}, {"available": 1},
+                        {"elapsed_ms": True}, {"elapsed_ms": -1}, {"elapsed_ms": float("inf")},
+                        {"owner": "editor", "available": False}, {"picker_owned": False}):
+            self.assertEqual(foreground_diagnostics(line(dict(fact, **changed))), [])
+        self.assertEqual(foreground_diagnostics("PRIVATE\nNATIVE FOREGROUND STATE {invalid"), [])
+        self.assertEqual(len(foreground_diagnostics((line(fact) + "\n") * 100)), 64)
+
+    def test_foreground_trace_survives_success_failure_and_timeout_without_retry(self):
+        fact = {"action": "more", "stage": "before", "owner": "unknown", "available": False,
+                "picker_owned": True, "picker_visible": True, "elapsed_ms": 2}
+        stderr = ("PRIVATE\nNATIVE SNAPSHOT FAILURE " + json.dumps({"phase": "provider", "kind": "COMException", "operation": "node-name"})
+                  + "\nNATIVE FOREGROUND STATE " + json.dumps(fact))
+        for outcome in (subprocess.CompletedProcess([], 0, stdout='{"pressed":true}', stderr=stderr),
+                        subprocess.CompletedProcess([], 1, stdout="", stderr=stderr),
+                        subprocess.TimeoutExpired(["PRIVATE"], 3.5, stderr=stderr.encode())):
+            native = Scripted.__new__(Scripted)
+            native.system, native.command = "Windows", ["synthetic-helper"]
+            native.app = type("App", (), {"pid": 123})()
+            native.picker_app_pid, native.picker_handle = 123, 456
+            options = {"side_effect": outcome} if isinstance(outcome, Exception) else {"return_value": outcome}
+            with patch("subprocess.run", **options) as helper, patch("builtins.print") as output:
+                if isinstance(outcome, subprocess.TimeoutExpired):
+                    with self.assertRaisesRegex(AssertionError, "timed out during click after 3.5s"):
+                        native.call("click", "More", timeout=3.5)
+                elif outcome.returncode:
+                    with self.assertRaises(subprocess.CalledProcessError) as failure:
+                        native.call("click", "More", timeout=3.5)
+                    self.assertEqual(failure.exception.returncode, outcome.returncode)
+                else:
+                    self.assertEqual(native.call("click", "More", timeout=3.5), {"pressed": True})
+            self.assertEqual(native.foreground_trace, [fact])
+            self.assertEqual(helper.call_count, 1)
+            self.assertEqual(helper.call_args.kwargs["timeout"], 3.5)
+            self.assertNotIn("PRIVATE", str(output.call_args_list))
+            if isinstance(outcome, subprocess.CompletedProcess) and outcome.returncode:
+                self.assertIn("NATIVE SNAPSHOT FAILURE", str(output.call_args_list))
+
+    def test_foreground_trace_stops_after_eight_snapshots_and_caps_retained_records(self):
+        native = Scripted.__new__(Scripted)
+        native.system, native.command = "Windows", ["synthetic-helper"]
+        native.app = type("App", (), {"pid": 123})()
+        native.picker_app_pid, native.picker_handle = 123, 456
+        completed = subprocess.CompletedProcess([], 0, stdout="true", stderr="")
+        with patch("subprocess.run", return_value=completed) as helper, patch("builtins.print"):
+            native.call("click", "Reload")
+            for _ in range(9):
+                native.call("snapshot", "456")
+        self.assertEqual(sum("-TraceForeground" in call.args[0] for call in helper.call_args_list), 9)
+        fact = {"action": "reload", "stage": "before", "owner": "unknown", "available": False,
+                "picker_owned": True, "picker_visible": True, "elapsed_ms": 0}
+        with patch("builtins.print"):
+            for _ in range(70):
+                native.record_foreground("NATIVE FOREGROUND STATE " + json.dumps(fact))
+        self.assertEqual(len(native.foreground_trace), 64)
+        self.assertTrue(native.foreground_truncated)
+
+    @unittest.skipUnless(shutil.which("pwsh"), "PowerShell is required for the foreground classifier contract")
+    def test_windows_foreground_classifier_keeps_null_and_unverified_owners_unknown(self):
+        script = r'''
+param([string]$Source)
+$ErrorActionPreference='Stop'
+$tokens=$null; $errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile($Source,[ref]$tokens,[ref]$errors)
+if($errors.Count) {throw 'Invalid helper syntax'}
+$definition=$ast.Find({param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -eq 'Write-ForegroundTrace'},$true)
+Invoke-Expression $definition.Extent.Text
+Add-Type @'
+using System;
+public static class IbisSmoke {
+ public static long Foreground=8; public static uint ForegroundOwner=42;
+ public static IntPtr GetForegroundWindow() {return new IntPtr(Foreground);}
+ public static bool IsWindow(IntPtr h) {return h.ToInt64()==7;}
+ public static bool IsWindowVisible(IntPtr h) {return true;}
+ public static uint OwnerPid(IntPtr h) {return h.ToInt64()==7?42:ForegroundOwner;}
+}
+'@
+function Get-Process {param($Id,$ErrorAction) @{StartTime=[DateTime]::new(1000,[DateTimeKind]::Utc)}}
+$Action='click';$Text='More';$AppId=42;$EditorId=43;$EditorStarted=1000
+$script:ForegroundClock=[Diagnostics.Stopwatch]::StartNew()
+$buffer=[IO.StringWriter]::new();$previous=[Console]::Error
+try {
+ [Console]::SetError($buffer)
+ foreach($case in @(@(0,42,'unknown',$false),@(8,42,'app',$true),@(8,43,'editor',$true),
+                    @(8,$PID,'owned_helper',$true),@(8,99,'unknown',$true),@(8,0,'unknown',$false))) {
+  [void]$buffer.GetStringBuilder().Clear()
+  [IbisSmoke]::Foreground=$case[0];[IbisSmoke]::ForegroundOwner=$case[1]
+  Write-ForegroundTrace 'before' ([IntPtr]7)
+  $record=$buffer.ToString().Trim().Substring('NATIVE FOREGROUND STATE '.Length) | ConvertFrom-Json
+  if($record.owner -cne $case[2] -or $record.available -ne $case[3] -or !$record.picker_owned -or !$record.picker_visible) {throw 'Incorrect ownership class'}
+ }
+ $EditorStarted=1001;[IbisSmoke]::ForegroundOwner=43
+ [void]$buffer.GetStringBuilder().Clear();Write-ForegroundTrace 'before' ([IntPtr]7)
+ $record=$buffer.ToString().Trim().Substring('NATIVE FOREGROUND STATE '.Length) | ConvertFrom-Json
+ if($record.owner -cne 'unknown') {throw 'Reused editor identity accepted'}
+} finally {[Console]::SetError($previous)}
+'''
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "foreground-contract.ps1"
+            path.write_text(script, encoding="utf-8")
+            result = subprocess.run([shutil.which("pwsh"), "-NoProfile", "-File", str(path),
+                                     "-Source", str(Path(__file__).with_name("smoke-windows.ps1"))],
+                                    capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_editor_focus_diagnostics_preserve_only_fixed_boolean_ownership_facts(self):
         native = Scripted.__new__(Scripted)
         fields = ("system_events_editor_frontmost", "workspace_editor_frontmost", "workspace_ibis_frontmost",
@@ -3184,7 +3379,8 @@ Reject
             with self.subTest(verified_handle=handle), patch("subprocess.run", return_value=result) as helper:
                 native.picker_handle = handle
                 native.call("click", "Reload")
-                self.assertEqual(helper.call_args.args[0], ["synthetic-helper", "click", "123", "0", "Reload", str(handle)])
+                self.assertEqual(helper.call_args.args[0], ["synthetic-helper", "click", "123", "0", "Reload", str(handle),
+                                                          "-TraceForeground", "-EditorStarted", "0"])
         for owner, handle in ((124, 456), (123, 0), (123, True), (123, 1.5)):
             with self.subTest(owner=owner, handle=handle), patch("subprocess.run") as helper:
                 native.picker_app_pid, native.picker_handle = owner, handle

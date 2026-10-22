@@ -84,6 +84,15 @@ Exit 0 is a pass, 1 a failure and 2 unavailable, never a pass. `--self-test` tes
 
 On Windows, control activation reuses the picker window handle verified by a snapshot and checks its process ownership, existence and visibility again. A modal menu hides Search from accessibility, so opening it must not force the next action to rediscover the window through Search.
 
+Around More and Reload, the same Windows helper records bounded foreground-owner
+classes and picker visibility before/after activation and for the next eight
+snapshots. At most 64 validated records reach `smoke.json`; truncation is explicit.
+Owners are app, verified editor, current helper or unknown. A NULL foreground
+window is unavailable, not evidence of an unrelated owner. Hidden snapshots'
+ordinary `foreground: false` field does not measure ownership. These observations
+start after helper initialization, cannot establish helper-start focus loss, and
+do not change activation, retries, deadlines or release-only blur behavior.
+
 The menu focus check proves Escape ownership with Space reopening More. After Tab closes it, a native key-delivered probe must read back exactly in Search, then the original query and results must return before copying. AT-SPI/UIA may report a combobox's active result as focused while the input owns keyboard focus, so a focus flag alone never proves post-Tab typing. The probe never clicks or programmatically focuses Search; it checks the owned app, visible foreground picker and absent menu before delivery and readback. Only fixed Boolean outcomes enter the report.
 
 **First-run preferences.** `--first-run-preferences` (instead of `--budgets`) runs the first-run check (#486): choose a writing format, quit, restart and copy, and the copy must use the saved format without choosing it again. Quit must finish within ten seconds. What it does not cover is listed in #238.

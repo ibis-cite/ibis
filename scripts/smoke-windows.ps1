@@ -1,6 +1,7 @@
 # UI Automation reads/invokes controls; SendInput exercises the actual shortcut
 # and typing path. Called by smoke-native.py, not a test-mode application API.
-param([string] $Action, [int] $AppId, [int] $EditorId, [string] $Text, [long] $PickerHandle)
+param([string] $Action, [int] $AppId, [int] $EditorId, [string] $Text, [long] $PickerHandle,
+      [switch] $TraceForeground, [long] $EditorStarted)
 $ErrorActionPreference = 'Stop'
 [Console]::Error.WriteLine('NATIVE HELPER STAGE windows-encoding-start')
 # JSON crosses a pipe to Python; neither end may inherit an OEM/ANSI code page.
@@ -46,6 +47,30 @@ public static class IbisSmoke {
 }
 '@
 [Console]::Error.WriteLine('NATIVE HELPER STAGE windows-input-compile-ready')
+$script:ForegroundClock = [Diagnostics.Stopwatch]::StartNew()
+function Write-ForegroundTrace([string] $Stage, [IntPtr] $Handle) {
+  # Diagnostics must neither activate a window nor turn an action into a failure.
+  $available=$false; $owner='unknown'; $owned=$false; $visible=$false
+  try {
+    $owned = $Handle -ne [IntPtr]::Zero -and [IbisSmoke]::IsWindow($Handle) -and [IbisSmoke]::OwnerPid($Handle) -eq $AppId
+    if ($owned) { $visible = [IbisSmoke]::IsWindowVisible($Handle) }
+    $foreground = [IbisSmoke]::GetForegroundWindow()
+    if ($foreground -ne [IntPtr]::Zero) {
+      $foregroundOwner = [IbisSmoke]::OwnerPid($foreground)
+      $available = $foregroundOwner -ne 0
+      if ($available -and $foregroundOwner -eq $PID) { $owner='owned_helper' }
+      elseif ($available -and $owned -and $foregroundOwner -eq $AppId) { $owner='app' }
+      elseif ($available -and $EditorStarted -gt 0 -and $foregroundOwner -eq $EditorId) {
+        $editor = Get-Process -Id $EditorId -ErrorAction Stop
+        if ($editor.StartTime.ToUniversalTime().Ticks -eq $EditorStarted) { $owner='editor' }
+      }
+    }
+  } catch { $available=$false; $owner='unknown' }
+  $operation = if ($Action -eq 'snapshot') {'snapshot'} elseif ($Text -ceq 'More') {'more'} else {'reload'}
+  $facts = @{action=$operation;stage=$Stage;owner=$owner;available=$available;picker_owned=$owned;
+    picker_visible=$visible;elapsed_ms=[long] $script:ForegroundClock.ElapsedMilliseconds}
+  try { [Console]::Error.WriteLine('NATIVE FOREGROUND STATE ' + (ConvertTo-Json -InputObject $facts -Compress)) } catch {}
+}
 function Get-AppWindow([int] $Id) {
   $script:SnapshotPhase = 'discovery'
   $condition = [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ProcessIdProperty, $Id)
@@ -80,6 +105,7 @@ function Get-Tree {
       $script:SnapshotPhase = 'ownership'
       throw 'Verified picker window identity was lost'
     }
+    if ($TraceForeground) { Write-ForegroundTrace 'snapshot' $handle }
     if (![IbisSmoke]::IsWindowVisible($handle)) { return @{nodes=@();visible=$false;foreground=$false;picker_handle=$handle.ToInt64()} }
     $script:SnapshotOperation = 'from-handle'
     $window = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
@@ -320,10 +346,12 @@ try {
       }
       # Fixed booleans survive an uncertain activation; no accessible text.
       [Console]::Error.WriteLine('NATIVE CONTROL STATE ' + (ConvertTo-Json -InputObject $facts -Compress))
+      if ($TraceForeground) { Write-ForegroundTrace 'before' $handle }
       if ($facts.invoke_pattern) { $invoke.Invoke() }
       elseif ($facts.expand_collapse_pattern) { $expand.Expand() }
       elseif ($facts.button_role -and $facts.toggle_pattern) { $toggle.Toggle() }
       else { throw 'Named accessibility control cannot be pressed' }
+      if ($TraceForeground) { Write-ForegroundTrace 'after' $handle }
       $facts.pressed=$true
       $facts
     }
