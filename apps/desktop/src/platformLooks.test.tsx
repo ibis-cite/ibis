@@ -540,16 +540,12 @@ test("buttons and key caps are fills without an outline except in contrast modes
 test("the shelf is two 40 px lines of 24 px chips and one output line above the footer", () => {
   expect(rules(tokens, ":root")).toMatch(/--shelf-line:\s*2\.5rem/);
   expect(rules(tokens, ":root")).toMatch(/--chip-height:\s*1\.5rem/);
-  expect(rules(styles, ".shelf-chips")).toMatch(/height:\s*var\(--shelf-line\)/);
   expect(rules(styles, ".shelf-output")).toMatch(/height:\s*var\(--shelf-line\)/);
   // The output is one line; the full text is its tooltip.
   expect(rules(styles, ".shelf-output .preview-text, .shelf-output p")).toMatch(/white-space:\s*nowrap/);
-  // Chips are fills without an outline, except in contrast modes.
   const edge = styles.lastIndexOf("@media (prefers-contrast: more), (forced-colors: active) {");
-  expect(rules(styles.slice(0, edge), ".chip")).toMatch(/background:\s*var\(--chip-fill\)/);
-  expect(rules(styles.slice(0, edge), ".chip")).not.toMatch(/border:/);
   const contrast = styles.slice(edge);
-  expect(rules(contrast, ".shelf, .chip")).toMatch(/border:\s*var\(--border-width\) solid CanvasText/);
+  expect(rules(contrast, ".shelf")).toMatch(/border:\s*var\(--border-width\) solid CanvasText/);
   // Windows draws a layer card with a stroke; GNOME a flat band under one separator.
   expect(rules(styles, ':root[data-platform="windows"] .shelf')).toMatch(/border:\s*var\(--border-width\) solid var\(--button-edge\)/);
   expect(rules(styles, ':root[data-platform="linux"] .shelf')).toMatch(/border-top:\s*var\(--border-width\) solid var\(--separator\)/);

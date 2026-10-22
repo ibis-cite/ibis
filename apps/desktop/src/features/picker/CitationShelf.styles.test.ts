@@ -1,6 +1,7 @@
-import { readFileSync } from "node:fs";
-import { URL as FileURL } from "node:url";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+
+const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
+const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
 
 const styles = readFileSync(new FileURL("./CitationShelf.css", import.meta.url), "utf8");
 const beforeContrast = styles.slice(0, styles.lastIndexOf("@media (prefers-contrast: more), (forced-colors: active) {"));
