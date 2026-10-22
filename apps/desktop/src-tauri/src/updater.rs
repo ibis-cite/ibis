@@ -280,13 +280,15 @@ mod tests {
 
     #[test]
     fn update_offer_uses_standard_windows_consent_buttons() {
-        match offer_buttons() {
-            MessageDialogButtons::YesNo => assert!(cfg!(target_os = "windows")),
-            MessageDialogButtons::OkCancelCustom(yes, no) => {
-                assert!(!cfg!(target_os = "windows"));
-                assert_eq!((yes.as_str(), no.as_str()), ("Install and Restart", "Later"));
+        if cfg!(target_os = "windows") {
+            assert!(matches!(offer_buttons(), MessageDialogButtons::YesNo));
+        } else {
+            match offer_buttons() {
+                MessageDialogButtons::OkCancelCustom(yes, no) => {
+                    assert_eq!((yes.as_str(), no.as_str()), ("Install and Restart", "Later"));
+                }
+                _ => panic!("the update must offer an explicit accept and decline action"),
             }
-            _ => panic!("the update must offer an explicit accept and decline action"),
         }
     }
 
