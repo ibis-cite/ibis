@@ -1,0 +1,152 @@
+{
+  "qualification": "Installed React Aria standalone synthetic behavior probe; not Ibis shelf acceptance.",
+  "package": "react-aria-components 1.22.1",
+  "facts": [
+    {
+      "rtl": false,
+      "tabs": [
+        {
+          "identity": "[\"first.bib\",\"shared\"]",
+          "id": "react-aria5403848489-_r_0_-[\"first.bib\",\"shared\"]",
+          "role": "row",
+          "label": "García 2021 ([\"first.bib\",\"shared\"])"
+        },
+        {
+          "identity": null,
+          "id": "react-aria5403848489-_r_7_",
+          "role": null,
+          "label": "Remove [\"first.bib\",\"shared\"]"
+        },
+        {
+          "identity": null,
+          "id": "after",
+          "role": null,
+          "label": null
+        },
+        {
+          "identity": null,
+          "id": "",
+          "role": null,
+          "label": null
+        }
+      ],
+      "next": {
+        "identity": "[\"second.bib\",\"shared\"]",
+        "id": "react-aria5403848489-_r_0_-[\"second.bib\",\"shared\"]",
+        "role": "row",
+        "label": "García 2021 ([\"second.bib\",\"shared\"])"
+      },
+      "composingDidNotRemove": true,
+      "removedMiddle": {
+        "identity": "[\"first.bib\",\"quoted\\\"\\n]\"]",
+        "id": "react-aria5403848489-_r_0_-[\"first.bib\",\"quoted\\\"\\n]\"]",
+        "role": "row",
+        "label": "العربية 2020 ([\"first.bib\",\"quoted\\\"\\n]\"])"
+      },
+      "removedEnd": {
+        "identity": "[\"first.bib\",\"shared\"]",
+        "id": "react-aria5403848489-_r_0_-[\"first.bib\",\"shared\"]",
+        "role": "row",
+        "label": "García 2021 ([\"first.bib\",\"shared\"])"
+      },
+      "removedLast": {
+        "identity": null,
+        "id": "react-aria5403848489-_r_0_",
+        "role": "group",
+        "label": "Chosen"
+      },
+      "removalIds": [
+        [
+          "[\"second.bib\",\"shared\"]"
+        ],
+        [
+          "[\"first.bib\",\"quoted\\\"\\n]\"]"
+        ],
+        [
+          "[\"first.bib\",\"shared\"]"
+        ]
+      ]
+    },
+    {
+      "rtl": true,
+      "tabs": [
+        {
+          "identity": "[\"first.bib\",\"shared\"]",
+          "id": "react-aria9788841989-_r_0_-[\"first.bib\",\"shared\"]",
+          "role": "row",
+          "label": "García 2021 ([\"first.bib\",\"shared\"])"
+        },
+        {
+          "identity": null,
+          "id": "react-aria9788841989-_r_7_",
+          "role": null,
+          "label": "Remove [\"first.bib\",\"shared\"]"
+        },
+        {
+          "identity": null,
+          "id": "after",
+          "role": null,
+          "label": null
+        },
+        {
+          "identity": null,
+          "id": "",
+          "role": null,
+          "label": null
+        }
+      ],
+      "next": {
+        "identity": "[\"second.bib\",\"shared\"]",
+        "id": "react-aria9788841989-_r_0_-[\"second.bib\",\"shared\"]",
+        "role": "row",
+        "label": "García 2021 ([\"second.bib\",\"shared\"])"
+      },
+      "composingDidNotRemove": true,
+      "removedMiddle": {
+        "identity": "[\"first.bib\",\"quoted\\\"\\n]\"]",
+        "id": "react-aria9788841989-_r_0_-[\"first.bib\",\"quoted\\\"\\n]\"]",
+        "role": "row",
+        "label": "العربية 2020 ([\"first.bib\",\"quoted\\\"\\n]\"])"
+      },
+      "removedEnd": {
+        "identity": "[\"first.bib\",\"shared\"]",
+        "id": "react-aria9788841989-_r_0_-[\"first.bib\",\"shared\"]",
+        "role": "row",
+        "label": "García 2021 ([\"first.bib\",\"shared\"])"
+      },
+      "removedLast": {
+        "identity": null,
+        "id": "react-aria9788841989-_r_0_",
+        "role": "group",
+        "label": "Chosen"
+      },
+      "removalIds": [
+        [
+          "[\"second.bib\",\"shared\"]"
+        ],
+        [
+          "[\"first.bib\",\"quoted\\\"\\n]\"]"
+        ],
+        [
+          "[\"first.bib\",\"shared\"]"
+        ]
+      ]
+    },
+    {
+      "qualification": "Negative context probe: DOM dir=rtl with en-US React Aria context",
+      "next": "[\"first.bib\",\"quoted\\\"\\n]\"]"
+    }
+  ],
+  "package_integrity": {
+    "TagGroup.mjs": "5f236c63c710e7ce70ee1ab26664f00d89c035e815c817a09d9a62ce1c9441db"
+  },
+  "assertions": {
+    "ltr_and_rtl_next_tag": true,
+    "source_identity_removals": true,
+    "composing_delete_ignored": true,
+    "middle_focus_next": true,
+    "end_focus_previous": true,
+    "final_focus_empty_group": true,
+    "css_direction_alone_does_not_mirror_arrows": true
+  }
+}
