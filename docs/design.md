@@ -116,15 +116,15 @@ instead of going square or looking like a separate floating slab.
 
 | | macOS | Windows 11 | Linux (GNOME) |
 |---|---|---|---|
-| `--r-win` | 28 on macOS 26 and later; 12 pt before that (the native panel corner, #236) | 8 | 14 |
-| `--inset` · `--r-min` | 8 · 6 | 4 · 2 | 8 · 4 |
+| `--r-win` | 28 on macOS 26 and later; 12 pt before that (the native panel corner, #236) | 8 | 12 |
+| `--inset` · `--r-min` | 8 · 6 | 4 · 4 | 8 · 6 |
 | `--r-row` | 20 on macOS 26 and later; 6 before | 4 | 6 |
-| `--r-tile` | 8 on macOS 26 and later; 6 before | 2 | 4 |
+| `--r-tile` | 8 on macOS 26 and later; 6 before | 4 | 6 |
 | `--r-menu` · `--menu-pad` · `--r-mi` | 12 · 6 · 6 | 8 · 4 · 4 | 12 · 6 · 6 |
 | `--e2` menu shadow, plus a 1 px hairline | `0 12px 32px` black 16% | `0 8px 16px` black 14% | `0 2px 8px` black 20% |
 
-On GNOME, rows are flat with the 6 px radius of Adwaita's sidebar and popover
-rows: a boxed list cannot be concentric at an 8 px inset in a 14 px window.
+GNOME's 12 px window and 6 px floor give rows and tiles the universal small
+radius. Windows rows and tiles use Fluent's 4 px small radius.
 
 Each look sets only `--r-win`, `--inset` and `--r-min` (and the menu pair);
 every inner radius follows from them. With Larger text the inset grows with the

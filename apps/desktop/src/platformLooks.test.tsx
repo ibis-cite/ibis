@@ -163,7 +163,7 @@ test("window radius follows each platform and macOS matches the native corner", 
   expect(rules(tokens, ":root")).toMatch(new RegExp(`--r-win:\\s*${Number(native)}px`));
   expect(rules(tokens, ':root[data-platform="windows"]')).toMatch(/--r-win:\s*8px/);
   expect(rules(tokens, ':root[data-platform="windows"]')).toMatch(/--button-radius:\s*4px/);
-  expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--r-win:\s*14px/);
+  expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--r-win:\s*12px/);
 });
 
 test("scarlet marks only the citation: copied text and the shelf's quote mark", () => {

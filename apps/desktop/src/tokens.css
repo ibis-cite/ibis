@@ -247,7 +247,7 @@
 :root[data-platform="windows"] { --font-family: "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif; }
 :root[data-platform="linux"] { --font-family: system-ui, "Adwaita Sans", Cantarell, sans-serif; }
 :root[data-platform="windows"] {
-  --r-win: 8px; --inset: var(--space-1); --r-min: 2px; --r-menu: 8px; --menu-pad: 4px;
+  --r-win: 8px; --inset: var(--space-1); --r-min: 4px; --r-menu: 8px; --menu-pad: 4px;
   --button-radius: 4px; --chip-radius: var(--button-radius);
   --row-active-background: color-mix(in srgb, var(--text) 6%, var(--surface)); --row-active-text: var(--text); --row-active-muted: var(--muted);
   --tile-active-background: light-dark(#fff, rgb(255 255 255 / 10%));
@@ -256,10 +256,9 @@
   --focus-ring-color: var(--text); --focus-ring-shadow: 0 0 0 1px var(--surface);
 }
 :root[data-platform="linux"] {
-  /* Rows sit flat on the window, with the 6 px radius of Adwaita's sidebar
-     and popover rows: a boxed list cannot be concentric at an 8 px inset in a
-     14 px window. The chain gives 6 for rows and the entry, 4 for tiles. */
-  --r-win: 14px; --r-min: 4px;
+  /* Adwaita's 12 px window and 6 px floor keep rows, the entry and tiles
+     at the universal small radius, including with larger text. */
+  --r-win: 12px; --r-min: 6px;
   /* The selected row is GTK's selection colour with its paired text: the
      system Highlight pair, which WebKitGTK takes from the GTK theme. A tint
      like libadwaita's 25% accent ($view_selected_color) reaches only about
