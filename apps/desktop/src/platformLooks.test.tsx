@@ -166,6 +166,18 @@ test("window radius follows each platform and macOS matches the native corner", 
   expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--r-win:\s*15px/);
 });
 
+test("menus and dialogs consume their shared elevation and separate shape roles", () => {
+  const menus = readFileSync(new FileURL("./ui/Menu.css", import.meta.url), "utf8");
+  const native = readFileSync(new FileURL("./nativeAppearance.css", import.meta.url), "utf8");
+  expect(rules(menus, ".menu-popover")).toMatch(/box-shadow:\s*var\(--shadow-overlay\)/);
+  expect(menus).not.toMatch(/--menu-shadow\s*:/);
+  const dialog = rules(styles, ".keys-dialog");
+  expect(dialog).toMatch(/border-radius:\s*var\(--r-dialog\)/);
+  expect(dialog).toMatch(/box-shadow:\s*var\(--shadow-dialog\)/);
+  expect(rules(styles, ".keys-backdrop")).toMatch(/background:\s*var\(--scrim\)/);
+  expect(native).not.toMatch(/:is\(\.menu-popover,\s*\.keys-dialog\)\s*\{[^}]*border-radius:/);
+});
+
 test("scarlet marks only the citation: copied text and the shelf's quote mark", () => {
   const scarlet = [...styles.matchAll(/([^{}]+)\{[^{}]*var\(--citation\)[^{}]*\}/g)].map(([, head]) => head!.trim()).join(",");
   for (const target of [".copy-notice code", ".shelf-mark"]) {
