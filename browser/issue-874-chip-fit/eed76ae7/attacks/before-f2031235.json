@@ -1,0 +1,15 @@
+{
+  "source": "f2031235bf9692290abf31171301722df46f77ea",
+  "platform": "linux",
+  "text": "large",
+  "coarse": true,
+  "viewport": {
+    "width": 360,
+    "height": 320
+  },
+  "expectedBeforeFailure": true,
+  "errors": [
+    "Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+  ],
+  "mounted": 0
+}
