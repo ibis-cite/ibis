@@ -134,7 +134,6 @@ export const pickerText = {
   more: "More",
   keepOpen: "Keep Window Open",
   showPastePreview: "Show what will be pasted",
-  unpinTitle: "Kept open; click to stop",
   moreTitle: (keys: string) => `More actions (${keys})`,
   firstRun: "Choose a library to get started",
   firstRunChoose: "Choose library to get started",

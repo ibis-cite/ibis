@@ -53,7 +53,7 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
       />
       {showFormat && <FormatMenu format={format} styles={styles} onChange={onFormatChange} searchRef={inputRef} onCommand={onFormatCommand} />}
       <ToggleButton className="pin-button" aria-label={pickerText.keepOpen} aria-keyshortcuts={ariaKeys(keysFor("pin"), currentPlatform() === "macos")}
-        title={pinned ? pickerText.unpinTitle : pickerText.keepOpen} isSelected={pinned} onChange={onTogglePin}>
+        isSelected={pinned} onChange={onTogglePin}>
         <svg aria-hidden="true" viewBox="0 0 24 24" fill={pinned ? "currentColor" : "none"} stroke="currentColor">
           <path d="M9 4h6l-1 5 4 4H6l4-4z" /><path d="M12 13v7" />
         </svg>

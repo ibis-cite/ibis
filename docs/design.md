@@ -340,7 +340,7 @@ in one bar shares a baseline.
   Open", with `aria-pressed`: outline glyph at rest, filled glyph on the
   selected-control fill while kept open. Text colours, never accent; only
   keyboard focus draws a ring. Clicking it returns focus to Search. The
-  tooltip while selected says "Kept open; click to stop". No duplicate in
+  delayed tooltip with its shortcut is tracked in #765. No duplicate in
   More or the footer.
 - **Targets.** Every header control keeps a 32 px target (44 px under
   `pointer: coarse`), even where it draws 28 px.
