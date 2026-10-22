@@ -312,10 +312,10 @@ test("no active row has an edge or ring outside contrast and forced colours", ()
     expect(body, head).not.toMatch(/border(-color)?:|box-shadow:\s*(?!none)|outline:/);
   }
   expect(tokens).not.toMatch(/--row-active-edge/);
-  // Linux falls back to the system pair without color-mix.
+  // Linux uses the native or documented fallback pair without a tint.
   const plain = tokens.slice(0, tokens.indexOf("@supports (background: color-mix"));
   const linuxPlain = rules(plain, ':root[data-platform="linux"]');
-  expect(linuxPlain).toMatch(/--row-active-background:\s*Highlight;/);
+  expect(linuxPlain).toMatch(/--row-active-background:\s*var\(--selected-background\);/);
   expect(linuxPlain).not.toMatch(/:\s*color-mix/);
 });
 
