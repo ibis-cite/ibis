@@ -1,8 +1,11 @@
 import { afterEach, expect, test, vi } from "vitest";
-import footerStyles from "./PickerFooter.css?raw";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { galleryStates } from "../../gallery-fixtures";
 import { PickerFooter } from "./PickerFooter";
+
+const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
+const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
+const footerStyles = readFileSync(new FileURL("./PickerFooter.css", import.meta.url), "utf8");
 
 const library = galleryStates.find((state) => state.id === "tray-20")!.library;
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
