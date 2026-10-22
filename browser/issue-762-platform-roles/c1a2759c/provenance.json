@@ -1,0 +1,17 @@
+{
+  "preliminary": true,
+  "browser": "Chromium 151.0.7922.34",
+  "frame_base": "ac20919e0046c0858cf0252da78758dac7686a12",
+  "frame_head": "c1a2759c4382cefe5f52d9475a4678b958a8c5c2",
+  "frame_pairs": 120,
+  "text_sizes": [
+    "normal",
+    "larger"
+  ],
+  "fixed_clock": "2026-10-22T09:00:00Z",
+  "focus_head": "41da261a76f4703322bc98910b36055ed52e6878",
+  "focus_profiles": 72,
+  "source_branch": "fix/762-platform-token-values",
+  "final_alias_integration_pending": true,
+  "native_acceptance": false
+}
