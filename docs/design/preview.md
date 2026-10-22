@@ -57,7 +57,7 @@ layer from `design/depth-prototype` (variant B). The footer pattern
 
 - As many chips as fit on one line, at most 6; the rest fold into "+N". In the
   720 px window that is usually 4 to 6. The shelf never grows a second chip
-  line.
+  line. Fold another chip before the author becomes an unreadable sliver.
 - If two chips would read the same, add letters in selection order:
   "García 2021a", "García 2021b" (then aa after z). This is a display label;
   citation formatting, keys, identities and copy order stay unchanged. Only the

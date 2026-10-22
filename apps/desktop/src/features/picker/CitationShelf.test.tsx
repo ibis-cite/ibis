@@ -25,7 +25,7 @@ const shelf = (props: Partial<Parameters<typeof CitationShelf>[0]>) => (
 );
 
 function layout() {
-  let width = 344; let scale = 1;
+  let width = 420; let scale = 1;
   const observations: { callback: () => void; nodes: Set<Element> }[] = [];
   vi.stubGlobal("innerWidth", 720);
   vi.stubGlobal("ResizeObserver", class {
@@ -49,7 +49,7 @@ function layout() {
     return style;
   });
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
-    const width = this.matches(".chip-disclosure-trigger") ? 40 : this.matches(".shelf-chip-minimum") ? 80 : this.matches(".shelf-chip-measure bdi") ? 35 : this.matches(".shelf-chip-target, .chip-group-remove") ? 32 : 0;
+    const width = this.matches(".chip-disclosure-trigger") ? 40 : this.matches(".shelf-chip-minimum") ? 80 : this.matches(".shelf-author-measure") ? 42 : this.matches(".shelf-chip-measure bdi") ? 35 : this.matches(".shelf-chip-target, .chip-group-remove") ? 32 : 0;
     return new DOMRect(0, 0, width * scale, 24 * scale);
   });
   return { resize(next: number, larger = 1) {
@@ -86,7 +86,7 @@ test("measured fitting reserves overflow width at 200% text and moves newly fold
   expect(within(inline).getAllByRole("row")).toHaveLength(3);
   expect(screen.getByRole("button", { name: "Show all 50 selected references" }).textContent).toBe("+47");
   act(() => within(inline).getAllByRole("row")[2]!.focus());
-  geometry.resize(328, 2);
+  geometry.resize(420, 2);
   expect(within(inline).getAllByRole("row")).toHaveLength(1);
   const more = screen.getByRole("button", { name: "Show all 50 selected references" });
   expect(more.textContent).toBe("+49");

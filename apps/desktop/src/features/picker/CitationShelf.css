@@ -4,7 +4,9 @@
 .shelf-chips .chip-group-item, .selected-chip-item { flex: 0 1 auto; min-width: var(--chip-min-width); max-width: var(--chip-max-width); border-radius: var(--chip-radius); background: var(--chip-fill); }
 .shelf-chips .chip-label, .selected-chip-item .chip-label { display: inline-flex; align-items: center; gap: var(--space-1); min-width: 0; }
 .shelf-chips .chip-year, .selected-chip-item .chip-year { overflow: visible; }
-.shelf-chip-measure { position: absolute; visibility: hidden; pointer-events: none; display: flex; white-space: nowrap; padding-inline-start: var(--space-2); border-inline-start: var(--border-width) solid var(--clear); }
+.shelf-chip-measure { position: absolute; visibility: hidden; pointer-events: none; display: flex; width: max-content; white-space: nowrap; padding-inline-start: var(--space-2); border-inline-start: var(--border-width) solid var(--clear); }
+.shelf-label-measure { flex: none; display: inline-flex; }
+.shelf-author-measure { flex: none; max-width: var(--chip-min-width); overflow: hidden; white-space: nowrap; }
 .shelf-chip-minimum { flex: none; width: var(--chip-min-width); }
 .shelf-chip-target { flex: none; width: var(--shelf-chip-target); }
 .shelf-chips .chip-disclosure-trigger { position: relative; min-height: var(--chip-height); padding: 0 var(--space-2); border: 0; border-radius: var(--chip-radius); background: var(--clear); color: var(--muted); font-size: inherit; }

@@ -65,7 +65,11 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
       const target = calibration[1]?.getBoundingClientRect().width ?? 0;
       const sizingStyle = getComputedStyle(sizing);
       const pad = (parseFloat(sizingStyle.paddingInlineStart) || 0) + 2 * (parseFloat(sizingStyle.borderInlineStartWidth) || 0);
-      const widths = calibration.slice(2).map((year) => Math.max(minimum, year.getBoundingClientRect().width + target + pad + gap));
+      const widths = calibration.slice(2).map((label) => {
+        const author = label.querySelector<HTMLElement>(".shelf-author-measure")!.getBoundingClientRect().width;
+        const year = label.querySelector("bdi")!.getBoundingClientRect().width;
+        return Math.max(minimum, author + year + target + pad + (author > 0 && year > 0 ? gap : 0));
+      });
       const capacity = Math.min(records.length, SHELF_CHIPS);
       let next = countOnly ? 0 : capacity;
       if (!countOnly && !(minimum > 0)) return;
@@ -123,7 +127,9 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
             <div ref={strip} className="shelf-chips">
               <div ref={measure} className="shelf-chip-measure" aria-hidden="true">
                 <span className="shelf-chip-minimum" /><span className="shelf-chip-target" />
-                {labels.slice(0, SHELF_CHIPS).map((label, index) => <bdi key={ids[index]}>{label.year}{label.letter}</bdi>)}
+                {labels.slice(0, SHELF_CHIPS).map((label, index) => <span className="shelf-label-measure" key={ids[index]}>
+                  <span className="shelf-author-measure">{label.author}</span><bdi>{label.year}{label.letter}</bdi>
+                </span>)}
               </div>
               {items.length > 0 && <ChipGroup label={pickerText.selectedReferences} items={items} listRef={chips}
                 onRemove={remove} fallbackFocusRef={fallbackFocusRef} />}
