@@ -13,7 +13,7 @@ ObjC.import('CoreFoundation');
 function sendPhysicalChord(chord, post) {
     const modifiers = {ctrl: [59, 1 << 18], shift: [56, 1 << 17],
         super: [55, 1 << 20], alt: [58, 1 << 19]};
-    const codes = {a: 0, g: 5, r: 15, v: 9, escape: 53, return: 36, space: 49};
+    const codes = {a: 0, g: 5, k: 40, r: 15, v: 9, escape: 53, return: 36, space: 49, tab: 48};
     const keys = chord.toLowerCase().split('+');
     const last = keys.pop();
     if (!Object.hasOwn(codes, last) || keys.some(key => !Object.hasOwn(modifiers, key)) || new Set(keys).size !== keys.length) {
@@ -83,8 +83,9 @@ function readEditorWindowState(read) {
     // unknown state to wait out; permission and window-count errors still fail.
     try { return read(); }
     catch (error) {
-        const details = String(error);
-        if (!/Invalid index\. \(-1719\)/.test(details) || /assistive access/i.test(details)) throw error;
+        // The status is a JXA property; only osascript's outer formatter
+        // appends it to the message printed for an uncaught error.
+        if (!error || error.errorNumber !== -1719 || error.message !== 'Invalid index.') throw error;
         return {available: false, fullscreen: null, visible: false};
     }
 }
