@@ -389,8 +389,6 @@ fn snapshot(response: &Response) -> Result<Snapshot, ZoteroError> {
 mod tests {
     use std::collections::VecDeque;
 
-    use serde_json::json;
-
     use super::*;
     use crate::zotero::test_support::{items, number};
 
