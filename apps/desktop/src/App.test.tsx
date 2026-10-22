@@ -124,13 +124,13 @@ test("the borderless picker has a permitted drag region around its editable sear
   await waitFor(() => expect((box as HTMLInputElement).value).toBe("sleep"));
 });
 
-/** Mock the Rust commands; returns the list of commands called. */
 /** Native keys in the live chip collection, in source-qualified caller order. */
 function chipKeys(root: ParentNode = document) {
   const list = root instanceof Element && root.matches("[data-chip-list], .selected-chip-list") ? root : root.querySelector("[data-chip-list], .selected-chip-list");
-  return [...(list?.querySelectorAll<HTMLElement>("[data-chip-item]") ?? [])].map((chip) => chip.dataset.key?.split("\0").slice(1).join("\0"));
+  return [...(list?.querySelectorAll<HTMLElement>("[data-chip-item]") ?? [])].map((chip) => (JSON.parse(chip.dataset.chipId!) as string).split("\0").slice(1).join("\0"));
 }
 
+/** Mock the Rust commands; returns the list of commands called. */
 function backend(overrides: Record<string, Handler> = {}): string[] {
   const calls: string[] = [];
   const defaults: Record<string, Handler> = {
@@ -508,7 +508,7 @@ test.each([
     for (let i = 1; i < count; i++) fireEvent.keyDown(box, { key: "ArrowUp" });
     const active = box.getAttribute("aria-activedescendant");
     const tray = screen.getByRole("grid", { name: "Selected references" });
-    const remove = within(tray).getAllByRole("button")[index]!;
+    const remove = within(tray).getAllByRole("button", { name: /^Remove/ })[index]!;
     act(() => remove.focus());
     if (activation === "pointer") {
       fireEvent.pointerDown(remove, { button: 0 });
@@ -526,7 +526,7 @@ test.each([
     expect(calls).not.toContain("hide_picker");
     if (remaining.length === 0) expect(document.activeElement).toBe(box);
     else await waitFor(() => expect(remaining.map((record) => `${record.id.source}\0${record.id.native_key}`))
-      .toContain((document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")?.dataset.key));
+      .toContain(JSON.parse((document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")!.dataset.chipId!)));
     act(() => box.focus());
     expect((box as HTMLInputElement).value).toBe("focus");
     fireEvent.keyDown(document.activeElement!, { key: "ArrowDown" });
@@ -631,6 +631,30 @@ test.each([20, 40, 50])("%i long-key selections retain order across queries and 
   expect(copies[0]).toEqual({ ids: expected.map((record) => record.id), format: "pandoc", expectedRevision: "1" });
   await screen.findByText(`[@${expected.map((record) => record.key).join("; @")}]`);
   expect(screen.queryByRole("grid", { name: "Selected references" })).toBeNull();
+});
+
+test("inline reorder keeps the focused identity and sends preview and copy the same source order", async () => {
+  const records = [result("shared", "First", "first.bib"), result("shared", "Second", "second.bib"), result("last", "Third")];
+  const copies: Record<string, unknown>[] = [];
+  backend({ search: () => records, copy_citation: (args) => { copies.push(args); return { text: "copied", warnings: [] }; },
+    citation_text: ({ ids }) => ({ text: (ids as api.RecordId[]).map((id) => `${id.source}/${id.native_key}`).join("; "), warnings: [] }),
+  });
+  render(<App />); await screen.findByText("First");
+  const search = screen.getByLabelText("Search references");
+  for (let i = 0; i < records.length; i++) {
+    fireEvent.keyDown(search, { key: "Enter", shiftKey: true });
+    if (i < records.length - 1) fireEvent.keyDown(search, { key: "ArrowDown" });
+  }
+  const grid = screen.getByRole("grid", { name: "Selected references" });
+  const second = within(grid).getAllByRole("row")[1]!; act(() => second.focus());
+  fireEvent.keyDown(second, { key: "ArrowUp", altKey: true });
+  expect(within(grid).getAllByRole("row")[0]).toBe(second);
+  expect(document.activeElement).toBe(second);
+  const expected = [records[1]!.id, records[0]!.id, records[2]!.id];
+  await waitFor(() => expect(screen.getByRole("region", { name: "Preview" }).textContent).toContain(expected.map((id) => `${id.source}/${id.native_key}`).join("; ")));
+  act(() => search.focus()); fireEvent.keyDown(search, { key: "Enter" });
+  await waitFor(() => expect(copies).toHaveLength(1));
+  expect(copies[0]!.ids).toEqual(expected);
 });
 
 test("warnings keep the picker open and failures say nothing was copied", async () => {

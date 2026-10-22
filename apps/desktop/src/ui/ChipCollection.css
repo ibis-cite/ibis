@@ -1,0 +1,14 @@
+.chip-collection-list { --chip-group-target: var(--control-min-size); display: flex; flex-wrap: wrap; gap: max(var(--space-1), calc(var(--chip-group-target) - var(--chip-height))) var(--space-1); }
+.chip-collection-item { display: inline-flex; align-items: center; max-width: 100%; height: var(--chip-height); padding-inline-start: var(--space-2); border: var(--border-width) solid var(--button-edge); border-radius: var(--button-radius); background: var(--button-background); color: var(--text); font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 500; }
+.chip-collection-item[data-focus-visible-within] { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); }
+.chip-collection-item[data-dragging] { border-style: dashed; background: var(--fill-control-pressed); }
+.chip-collection-drop { flex: none; width: var(--focus-ring-width); height: var(--chip-height); margin-inline: calc((var(--space-1) + var(--focus-ring-width)) / -2); background: var(--clear); }
+.chip-collection-drop[data-drop-target] { background: var(--accent-text); }
+.chip-collection-drag { flex: none; width: var(--chip-height); min-height: var(--chip-height); padding: 0; border: 0; background: var(--clear); color: var(--muted); }
+@media (pointer: coarse) {
+  .chip-collection-list { --chip-group-target: var(--touch-target); }
+}
+.chip-collection-drag.visually-hidden { width: var(--hidden-size); height: var(--hidden-size); min-height: 0; }
+.chip-collection-remove { position: relative; flex: none; width: var(--chip-group-target); height: var(--chip-height); min-height: 0; padding: 0; border: 0; background: var(--clear); color: var(--muted); }
+.chip-collection-remove:hover { background: var(--clear); color: var(--text); }
+.chip-collection-remove::after { content: ""; position: absolute; inset: calc((var(--chip-group-target) - var(--chip-height)) / -2) 0; }

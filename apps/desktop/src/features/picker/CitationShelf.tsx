@@ -5,8 +5,7 @@ import { render } from "../../format/markup";
 import type { StyleId } from "../../format/styles";
 import { pickerText } from "../../messages";
 import { ChipDisclosure } from "../../ui/ChipDisclosure";
-import { ChipGroup } from "../../ui/ChipGroup";
-import { SelectedChipLabel, SelectedChipList } from "./SelectedChipList";
+import { SelectedChipList } from "./SelectedChipList";
 import { chipLabelParts } from "./chipLabels";
 import "./CitationShelf.css";
 
@@ -82,6 +81,7 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
       }
       const hidden = [...(chips.current?.querySelectorAll<HTMLElement>("[data-chip-item]") ?? [])].slice(next);
       if (!expanded && hidden.some((chip) => chip.contains(document.activeElement))) foldedFocus.current = true;
+      if (!expanded && next === records.length && more.current === document.activeElement && popupReturn.current === undefined) popupReturn.current = null;
       setVisibleChips(next);
     };
     fit();
@@ -100,11 +100,17 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
       if (document.activeElement === document.body || strip.current?.contains(document.activeElement) || popup.current?.contains(document.activeElement)) fallbackFocusRef.current?.focus({ preventScroll: true });
     }
     if (!expanded && popupReturn.current !== undefined) {
-      const id = popupReturn.current; popupReturn.current = undefined;
-      if (document.activeElement === document.body || popup.current?.contains(document.activeElement)) {
-        const rows = [...(chips.current?.querySelectorAll<HTMLElement>("[data-chip-item]") ?? [])];
-        (rows.find((row) => row.dataset.key === id) ?? rows[0] ?? fallbackFocusRef.current)?.focus({ preventScroll: true });
-      }
+      // Closing may remove the trigger after the fitting layout update. Let
+      // React Aria restore it first; only replace a destination that vanished.
+      const frame = requestAnimationFrame(() => {
+        const id = popupReturn.current; popupReturn.current = undefined;
+        if (more.current?.isConnected) return;
+        if (document.activeElement === document.body || popup.current?.contains(document.activeElement)) {
+          const rows = [...(chips.current?.querySelectorAll<HTMLElement>("[data-chip-item]") ?? [])];
+          (rows.find((row) => row.dataset.chipId === id) ?? rows[0] ?? fallbackFocusRef.current)?.focus({ preventScroll: true });
+        }
+      });
+      return () => cancelAnimationFrame(frame);
     }
   }, [selected.size, visibleChips, expanded, fallbackFocusRef]);
   const remove = (keys: ReadonlySet<string>) => {
@@ -112,10 +118,6 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
     onRemove(keys);
   };
   const folded = Math.max(0, records.length - visibleChips);
-  const items = records.slice(0, visibleChips).map((record, index) => {
-    const name = [labels[index]!.text, record.authors || record.first_author, record.key, record.title].filter(Boolean).join(" · ");
-    return { id: ids[index]!, label: <SelectedChipLabel label={labels[index]!} title={name} />, textValue: name, title: name, removeLabel: removeLabel(record) };
-  });
   return (
     <>
       <p className="visually-hidden" role="status" aria-label={pickerText.citationSelection} aria-live="polite" aria-atomic="true">
@@ -131,15 +133,16 @@ export function CitationShelf({ announce, selected, removeLabel, onRemove, onReo
                   <span className="shelf-author-measure">{label.author}</span><bdi>{label.year}{label.letter}</bdi>
                 </span>)}
               </div>
-              {items.length > 0 && <ChipGroup label={pickerText.selectedReferences} items={items} listRef={chips}
-                onRemove={remove} fallbackFocusRef={fallbackFocusRef} />}
+              {visibleChips > 0 && <SelectedChipList label={pickerText.selectedReferences} selected={selected} visibleCount={visibleChips} listRef={chips}
+                locale={document.documentElement.dir === "rtl" ? "ar-AE" : undefined} removeLabel={removeLabel}
+                reorderLabel={(record) => pickerText.reorderReference(record.key)} onRemove={remove} onReorder={onReorder} />}
               {(folded > 0 || expanded) && <ChipDisclosure label={pickerText.selectedReferences} triggerLabel={pickerText.allChosen(records.length)}
                 trigger={visibleChips === 0 || folded === 0 ? pickerText.chosenCount(records.length) : pickerText.moreChosen(folded)}
                 triggerRef={more} contentRef={popup} isOpen={expanded} onOpenChange={(open) => {
-                  if (!open && folded === 0 && popup.current?.contains(document.activeElement)) popupReturn.current = (document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")?.dataset.key ?? null;
+                  if (!open && popup.current?.contains(document.activeElement)) popupReturn.current = (document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")?.dataset.chipId ?? null;
                   setExpanded(open);
                 }}>
-                <SelectedChipList label={pickerText.selectedReferences} selected={selected} removeLabel={removeLabel}
+                <SelectedChipList label={pickerText.selectedReferences} selected={selected} locale={document.documentElement.dir === "rtl" ? "ar-AE" : undefined} removeLabel={removeLabel}
                   reorderLabel={(record) => pickerText.reorderReference(record.key)} onRemove={remove} onReorder={onReorder} />
               </ChipDisclosure>}
             </div>

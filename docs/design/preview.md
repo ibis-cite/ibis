@@ -67,9 +67,10 @@ layer from `design/depth-prototype` (variant B). The footer pattern
   key, then native key or title, then "Untitled reference". If a natural label
   itself equals a generated label, append a separate letter to the natural
   label, skipping letters that would duplicate any other final label.
-- "+N" opens a popover with every chosen reference, remove buttons and
-  reordering (Alt+↑↓, drag), with the chip keyboard model (← → between chips,
-  Backspace and Delete remove).
+- Inline chips and "+N" use the same reorderable collection: Alt+↑↓ or drag
+  changes citation order; ← → move between chips, Backspace and Delete remove.
+  The inline strip shows only labels and remove controls; React Aria owns the
+  drag affordance and insertion indicator. "+N" opens every chosen reference.
 
 ## Anatomy and states
 
@@ -128,8 +129,10 @@ otherwise use a plain quote mark and keep the beak glyph for larger brand uses
 - **Chip keyboard foundation:** `ui/ChipGroup` owns navigation and removal,
   with controlled opaque identities/order, locale-matched direction and a
   caller-supplied empty-removal focus destination. The browser-only `chips`
-  and `chips-rtl` gallery states exercise it separately; production shelf
-  fitting, disclosure and reordering integrate in later leaves.
+  and `chips-rtl` gallery states exercise it separately. Production shelf chips
+  use one Ibis `ui/ChipCollection` wrapping React Aria GridList for fitted inline
+  chips and the full disclosure, adding reordering without a second keyboard
+  implementation.
 - **Key formats need a pure preview.** `copyCitation` formats keys in Rust and
   writes the clipboard in one step. Add a side-effect-free command (for example
   `citation_text(ids, format, revision)`) or reuse the Rust formatter without

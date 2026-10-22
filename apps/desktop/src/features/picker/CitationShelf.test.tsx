@@ -162,5 +162,36 @@ test("removing overflow down to one inline row keeps the open collection and its
   expect(within(dialog).getAllByRole("row")).toHaveLength(6);
   fireEvent.keyDown(document.activeElement!, { key: "Escape" });
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-  await waitFor(() => expect((document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")?.dataset.key).toBe(idKey(records[3]!.id)));
+  await waitFor(() => expect((document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")?.dataset.chipId).toBe(JSON.stringify(idKey(records[3]!.id))));
+});
+
+
+test.each([false, true])("widening removes the count-only trigger without losing owned focus or stealing another control (elsewhere=%s)", async (elsewhere) => {
+  const geometry = layout(); vi.stubGlobal("innerWidth", 360);
+  render(<><input aria-label="Elsewhere" />{shelf({ selected: chosen([record("a"), record("b"), record("c")]) })}</>);
+  const trigger = screen.getByRole("button", { name: "Show all 3 selected references" });
+  const other = screen.getByRole("textbox", { name: "Elsewhere" });
+  act(() => (elsewhere ? other : trigger).focus());
+  vi.stubGlobal("innerWidth", 720); geometry.resize(1000);
+  expect(screen.queryByRole("button", { name: "Show all 3 selected references" })).toBeNull();
+  await waitFor(() => expect(document.activeElement).toBe(elsewhere ? other : screen.getAllByRole("row")[0]));
+});
+
+test("closing a resized disclosure returns the same identity when its trigger no longer fits the closed strip", async () => {
+  const geometry = layout(); geometry.resize(400);
+  const records = Array.from({ length: 9 }, (_, i) => record(`k${i}`, `Author${i}`));
+  function Picker() {
+    const [selected, setSelected] = useState(chosen(records));
+    return shelf({ selected, onRemove: (ids) => setSelected((latest) => new Map([...latest].filter(([id]) => !ids.has(id)))) });
+  }
+  render(<Picker />);
+  fireEvent.click(screen.getByRole("button", { name: "Show all 9 selected references" }));
+  const dialog = await screen.findByRole("dialog", { name: "Selected references" });
+  for (let i = 0; i < 6; i++) fireEvent.click(within(dialog).getByRole("button", { name: `Remove k${i}` }));
+  const identity = idKey(records[7]!.id);
+  act(() => within(dialog).getAllByRole("row").find((row) => row.dataset.chipId === JSON.stringify(identity))!.focus());
+  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  expect(screen.queryByRole("button", { name: "Show all 3 selected references" })).toBeNull();
+  await waitFor(() => expect((document.activeElement as HTMLElement).closest<HTMLElement>("[data-chip-item]")?.dataset.chipId).toBe(JSON.stringify(identity)));
 });

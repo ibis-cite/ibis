@@ -136,14 +136,3 @@ test.each([false, true])("final removal leaves a newly focused control alone (un
   act(() => row(0).focus()); press("Delete");
   await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("button", { name: "New destination" })));
 });
-
-test("feature labels retain separate year content, full tooltip and a measured live collection", () => {
-  const listRef = { current: null as HTMLDivElement | null };
-  const rich = { ...items[0]!, label: <span><bdi>García</bdi><bdi>2021a</bdi></span>, title: "García, 2021, shared" };
-  render(<ChipGroup label="Chosen" items={[rich]} listRef={listRef} onRemove={() => undefined} fallbackFocusRef={{ current: null }} />);
-  expect(listRef.current?.hasAttribute("data-chip-list")).toBe(true);
-  const chip = screen.getByRole("row", { name: rich.textValue });
-  expect(chip.getAttribute("title")).toBe(rich.title);
-  expect(chip.hasAttribute("data-chip-item")).toBe(true);
-  expect(chip.querySelectorAll("bdi")).toHaveLength(2);
-});

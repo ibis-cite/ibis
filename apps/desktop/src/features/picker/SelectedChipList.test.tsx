@@ -17,13 +17,19 @@ const record = (source: string, native_key: string): SearchResult => ({
 });
 const records = [record("first.bib", "a"), record("second.bib", "b"), record("first.bib", "c")];
 const [a, b, c] = records.map((item) => idKey(item.id)) as [string, string, string];
-function mount() {
+function mount(visibleCount?: number, locale?: string, entries = records) {
   vi.stubGlobal("ResizeObserver", class { observe() {} unobserve() {} disconnect() {} });
   Element.prototype.scrollIntoView = vi.fn();
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    const grid = this.closest('[role="grid"]');
+    const rows = grid ? [...grid.querySelectorAll('[role="row"]')] : [];
+    const index = rows.indexOf(this.closest('[role="row"]')!);
+    return new DOMRect((locale === "ar-AE" ? rows.length - 1 - index : index) * 120, 0, 116, 24);
+  });
   const removed = vi.fn(); const reordered = vi.fn(); const parentKeys = vi.fn();
   function Example() {
-    const [selected, setSelected] = useState(new Map(records.map((item) => [idKey(item.id), item])));
-    return <main onKeyDown={parentKeys}><SelectedChipList label="All chosen references" selected={selected}
+    const [selected, setSelected] = useState(new Map(entries.map((item) => [idKey(item.id), item])));
+    return <main onKeyDown={parentKeys}><input aria-label="Search" /><SelectedChipList label="All chosen references" selected={selected} visibleCount={visibleCount} locale={locale}
       removeLabel={(item) => `Remove ${item.id.source}/${item.id.native_key}`}
       reorderLabel={(item) => `Reorder ${item.id.source}/${item.id.native_key}`}
       onRemove={(ids) => { removed(ids); setSelected((latest) => new Map([...latest].filter(([id]) => !ids.has(id)))); }}
@@ -68,7 +74,7 @@ test("Delete removes the focused identity and React Aria keeps focus in the rema
   const second = row(grid, "2026b"); act(() => second.focus());
   fireEvent.keyDown(second, { key: "Delete" });
   expect(removed).toHaveBeenCalledWith(new Set([b]));
-  await waitFor(() => expect((document.activeElement as HTMLElement).closest<HTMLElement>('[role="row"]')?.dataset.key).toBe(c));
+  await waitFor(() => expect((document.activeElement as HTMLElement).closest<HTMLElement>('[role="row"]')?.dataset.chipId).toBe(JSON.stringify(c)));
   expect(within(grid).getByRole("button", { name: "Remove first.bib/c" })).toBeTruthy();
   fireEvent.keyDown(document.activeElement!, { key: "Delete", repeat: true });
   expect(removed).toHaveBeenLastCalledWith(new Set([c]));
@@ -95,12 +101,68 @@ test("composition, 229 and modified keys cannot remove or reorder a different re
 test("React Aria keyboard dragging delivers source-qualified reorder keys", async () => {
   const { grid, reordered } = mount();
   const handle = within(grid).getByRole("button", { name: "Reorder second.bib/b" });
+  act(() => handle.closest<HTMLElement>('[role="row"]')!.focus());
   act(() => handle.focus());
   fireEvent.keyDown(handle, { key: "Enter" }); fireEvent.keyUp(handle, { key: "Enter" });
   const beforeFirst = await screen.findByRole("button", { name: /^Insert before Example 2026a/ });
   act(() => beforeFirst.focus());
-  expect(beforeFirst.closest(".selected-chip-drop")?.hasAttribute("data-drop-target")).toBe(true);
+  expect(beforeFirst.closest(".chip-collection-drop")?.hasAttribute("data-drop-target")).toBe(true);
   fireEvent.keyDown(beforeFirst, { key: "Enter" }); fireEvent.keyUp(beforeFirst, { key: "Enter" });
   await waitFor(() => expect(reordered).toHaveBeenCalledWith(new Set([b]), a, "before"));
-  expect(within(grid).getAllByRole("row")[0]?.getAttribute("data-key")).toBe(b);
+  expect(within(grid).getAllByRole("row")[0]?.getAttribute("data-chip-id")).toBe(JSON.stringify(b));
+});
+
+
+test.each(["en-US", "ar-AE"])("inline %s uses the live grid, mirrors arrows and keeps identity through reorder/removal", async (locale) => {
+  const { grid, reordered, removed } = mount(3, locale);
+  expect(grid.hasAttribute("data-chip-list")).toBe(true);
+  expect(grid.closest("[dir]")?.getAttribute("dir")).toBe(locale === "ar-AE" ? "rtl" : "ltr");
+  expect(document.activeElement).not.toBe(row(grid, "2026a"));
+  const first = row(grid, "2026a"); const second = row(grid, "2026b");
+  act(() => first.focus());
+  fireEvent.keyDown(first, { key: locale === "ar-AE" ? "ArrowLeft" : "ArrowRight" });
+  expect(document.activeElement).toBe(second);
+  fireEvent.keyDown(second, { key: "ArrowUp", altKey: true });
+  expect(reordered).toHaveBeenCalledWith(new Set([b]), a, "before");
+  expect(document.activeElement).toBe(second);
+  fireEvent.keyDown(second, { key: "Backspace" });
+  expect(removed).toHaveBeenCalledWith(new Set([b]));
+  await waitFor(() => expect((document.activeElement as HTMLElement).closest('[role="row"]')).toBe(first));
+});
+
+test("inline labels retain suffixes from the whole selection and support React Aria keyboard drag", async () => {
+  const { grid, reordered } = mount(2);
+  expect(within(grid).getAllByRole("row")).toHaveLength(2);
+  expect(within(grid).getByText("2026a")).toBeTruthy();
+  const handle = within(grid).getByRole("button", { name: "Reorder second.bib/b" });
+  expect(handle.classList.contains("visually-hidden")).toBe(true);
+  act(() => handle.closest<HTMLElement>('[role="row"]')!.focus());
+  act(() => handle.focus());
+  fireEvent.keyDown(handle, { key: "Enter" }); fireEvent.keyUp(handle, { key: "Enter" });
+  const target = await screen.findByRole("button", { name: /^Insert before Example 2026a/ });
+  act(() => target.focus());
+  fireEvent.keyDown(target, { key: "Enter" }); fireEvent.keyUp(target, { key: "Enter" });
+  await waitFor(() => expect(reordered).toHaveBeenCalledWith(new Set([b]), a, "before"));
+  expect(within(grid).getAllByRole("row")[0]?.dataset.chipId).toBe(JSON.stringify(b));
+});
+
+
+test("NUL, lone-surrogate and quoted source identities remain distinct in the real collection lookup", async () => {
+  const entries = [record("first\0source", "same"), record("\ud800العربية", "same"), record('quoted"\n]', "same")];
+  const ids = entries.map((entry) => idKey(entry.id));
+  const { grid, reordered } = mount(3, "en-US", entries);
+  const first = row(grid, "2026a"); const second = row(grid, "2026b");
+  act(() => first.focus()); fireEvent.keyDown(first, { key: "ArrowRight" });
+  expect(document.activeElement).toBe(second);
+  fireEvent.keyDown(second, { key: "ArrowUp", altKey: true });
+  expect(reordered).toHaveBeenCalledWith(new Set([ids[1]]), ids[0], "before");
+  expect(within(grid).getAllByRole("row")[0]).toBe(second);
+  expect(new Set(within(grid).getAllByRole("row").map((element) => element.dataset.chipId)).size).toBe(3);
+  const handle = within(first).getByRole("button", { name: /^Reorder/ });
+  act(() => first.focus()); act(() => handle.focus());
+  fireEvent.keyDown(handle, { key: "Enter" }); fireEvent.keyUp(handle, { key: "Enter" });
+  const target = await screen.findByRole("button", { name: /^Insert before Example 2026a/ });
+  act(() => target.focus());
+  fireEvent.keyDown(target, { key: "Enter" }); fireEvent.keyUp(target, { key: "Enter" });
+  await waitFor(() => expect(reordered).toHaveBeenLastCalledWith(new Set([ids[0]]), ids[1], "before"));
 });
