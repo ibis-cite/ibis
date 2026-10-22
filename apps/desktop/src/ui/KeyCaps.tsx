@@ -1,14 +1,12 @@
 import { keyLabel } from "../keys";
-import { platformOf, type Platform } from "../platform";
+import { currentPlatform, type Platform } from "../platform";
 import "./KeyCaps.css";
-
-const current = (): Platform => (typeof navigator === "undefined" ? "linux" : platformOf(navigator.platform));
 
 /** The keys of an accelerator as each system writes them (docs/design.md,
  * Footer): one cap of joined glyphs on macOS (⌘K, as its menus write it), one
  * cap per key on Windows (Ctrl K, as PowerToys does), and on GNOME one cap per
  * key with a "+" between (Ctrl + K, as GTK's shortcut labels do). */
-export function KeyCaps({ accelerator, platform = current(), hidden }: {
+export function KeyCaps({ accelerator, platform = currentPlatform(), hidden }: {
   accelerator: string; platform?: Platform;
   /** Hidden from screen readers where the control already names its keys. */
   hidden?: boolean;

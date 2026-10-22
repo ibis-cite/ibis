@@ -3,7 +3,7 @@ import type { LibraryStatus } from "../../api";
 import { ariaKeys, keysFor } from "../../keys";
 import { LibraryStatusLine } from "../../LibraryStatusLine";
 import { keyText, pickerText } from "../../messages";
-import { isMac } from "../../platform";
+import { currentPlatform } from "../../platform";
 import { KeyHint } from "../../ui/KeyCaps";
 
 /** What the keys do now; null where a key does nothing. */
@@ -46,8 +46,9 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
 function FooterAction({ label, keys, primary, className = "", onAction }: {
   label: string; keys: string; primary?: boolean; className?: string; onAction: () => void;
 }) {
+  const platform = currentPlatform();
   return <button type="button" className={`quiet-button footer-action ${className}`} aria-label={label}
-    aria-keyshortcuts={ariaKeys(keys, isMac)} onClick={onAction}>
-    <KeyHint label={label} keys={keys} primary={primary} hidden />
+    aria-keyshortcuts={ariaKeys(keys, platform === "macos")} onClick={onAction}>
+    <KeyHint label={label} keys={keys} primary={primary} platform={platform} hidden />
   </button>;
 }
