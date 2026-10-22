@@ -195,6 +195,8 @@ export const galleryStates: readonly GalleryState[] = [
   ...[false, true].map((chipsOpen) => ({ id: chipsOpen ? "chips-overflow" : "chips-collisions",
     label: chipsOpen ? "All chosen references" : "Colliding and hostile chip labels", library: library({ references: chipAttacks.length }),
     query: "synthetic", results: chipAttacks, tray: chipAttacks.length, chipsOpen })),
+  { id: "selected-chips-rtl", label: "Selected chips in right-to-left flow", library: library({ references: chipAttacks.length }),
+    query: "synthetic", results: chipAttacks, tray: chipAttacks.length, direction: "rtl" },
   { id: "tray", label: "Several references chosen", library: library(), query: "memory", results: examples, tray: 2 },
   { id: "keys", label: "All keys", library: library(), query: "memory", results: examples, keys: true },
   { id: "compact", label: "Compact rows", library: library(), query: "memory", results: many, density: "compact", tray: 2 },

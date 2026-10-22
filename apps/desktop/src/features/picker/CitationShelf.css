@@ -1,4 +1,4 @@
-.shelf-chips { --shelf-chip-target: var(--control-min-size); position: relative; display: flex; align-items: center; gap: var(--space-1); height: var(--shelf-line); padding-inline: var(--row-pad); overflow: hidden; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 500; }
+.shelf-chips { --shelf-chip-target: var(--control-min-size); position: relative; display: flex; align-items: center; gap: var(--space-1); height: max(var(--shelf-line), var(--shelf-chip-target)); padding-inline: var(--row-pad); overflow: hidden; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 500; }
 .shelf-chips .selected-chip-list { flex: 1; min-width: 0; }
 .shelf-chips .chip-collection-list { flex-wrap: nowrap; gap: var(--space-1); }
 .selected-chip-list .chip-collection-item { flex: 0 1 auto; min-width: var(--chip-min-width); max-width: var(--chip-max-width); border-radius: var(--chip-radius); background: var(--chip-fill); }

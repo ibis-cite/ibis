@@ -77,7 +77,7 @@ layer from `design/depth-prototype` (variant B). The footer pattern
 | Part | Spec |
 |---|---|
 | Card | `--surface-raised`, inset `--inset`, radius `--r-row`, card shadow. Windows: layer card with stroke. GNOME: no card, a flat band under one separator. The footer drops its top rule under the card. |
-| Chip row | 40 px. Chips are a filled `--fill-control` with no outline, label 13/18 at 500, a 16 px × in a 24 px chip with a 32 px hit area. Capsule on macOS and GNOME; 4 px radius with Fluent stroke on Windows. |
+| Chip row | 40 px; on coarse pointers, at least the 44 px touch target so its edge remains clickable. Chips are a filled `--fill-control` with no outline, label 13/18 at 500, a 16 px × in a 24 px chip with a 32 px hit area. Capsule on macOS and GNOME; 4 px radius with Fluent stroke on Windows. |
 | Output row | 40 px. The quote mark is centred over the tile column; text starts at the row-title edge (64 px; 60 on Windows), so search glyph, tiles and quote mark share one column. 13/18. |
 | Pending | Under 300 ms the previous text stays, dimmed. After that, "Formatting…" in secondary text with the mark at 45 %. Enter waits. |
 | Failed | A Stop icon replaces the mark, then "Couldn't format in APA. Choose another style, or copy keys." The Enter hint disappears. |

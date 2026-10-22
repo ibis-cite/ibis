@@ -412,6 +412,7 @@ test.each([
   ["menu-open", () => document.querySelector('[role="menu"]') !== null],
   ["keys", (root: HTMLElement) => root.querySelector('[role="dialog"]') !== null],
   ["tray", (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('.shelf [data-chip-list] > [data-chip-item]')].map((chip) => (JSON.parse(chip.dataset.chipId!) as string).split('\0').slice(1).join('\0')).join() === "example2026,研究2026"],
+  ["selected-chips-rtl", (root: HTMLElement) => root.querySelector('.shelf .chip-collection[dir="rtl"]') !== null],
   ["compact", () => document.documentElement.dataset.density === "compact"],
   ["spacious", () => document.documentElement.dataset.density === "spacious"],
   ["larger-text", () => document.documentElement.dataset.textSize === "larger"],

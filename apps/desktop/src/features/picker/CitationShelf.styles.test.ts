@@ -8,7 +8,7 @@ const listStyles = readFileSync(new FileURL("../../ui/ChipCollection.css", impor
 const beforeContrast = styles.slice(0, styles.lastIndexOf("@media (prefers-contrast: more), (forced-colors: active) {"));
 
 test("the chip strip keeps one shelf line and uses a fill instead of an outline", () => {
-  expect(beforeContrast.match(/\.shelf-chips \{([^}]+)\}/)?.[1]).toMatch(/height:\s*var\(--shelf-line\)/);
+  expect(beforeContrast.match(/\.shelf-chips \{([^}]+)\}/)?.[1]).toMatch(/height:\s*max\(var\(--shelf-line\), var\(--shelf-chip-target\)\)/);
   const chip = beforeContrast.match(/\.selected-chip-list \.chip-collection-item \{([^}]+)\}/)?.[1];
   expect(chip).toMatch(/background:\s*var\(--chip-fill\)/);
   expect(chip).not.toMatch(/border:/);
