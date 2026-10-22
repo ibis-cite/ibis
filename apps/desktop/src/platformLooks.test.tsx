@@ -587,8 +587,8 @@ test("the alias-only migration exposes the complete design-system role inventory
   }
 });
 
-// CSSOM parses declarations/conditions; this audits the existing root, menu and
-// notice, shelf and chip-group token scopes, rather than pooling inactive declarations into a global set.
+// CSSOM audits the live root, menu, notice and shelf scopes. Synthetic local
+// fixtures also exercise inheritance and pointer modes without pooling declarations.
 // This bounded dependency audit is not a CSS cascade/specificity interpreter;
 // browser comparisons verify the actual winning values and rendered appearance.
 const appSheets = Object.fromEntries(readdirSync(new FileURL(".", import.meta.url), { recursive: true })
@@ -751,8 +751,9 @@ test("spacing audits resolve aliases and calc without exempting arbitrary one-pi
   expect(gridPixels(resolveToken("var(--gap)", definitions)!)).toBe(8);
   expect(gridPixels(resolveToken("calc(var(--gap) + 1px)", definitions)!)).toBe(9);
   expect(gridPixels("1px")).toBe(1);
+  const local = { fixture: ":root { --space-1: .25rem; --control-min-size: 2rem; --chip-height: 1.5rem; } .chip-group { --chip-group-target: var(--control-min-size); } @media (pointer: coarse) { .chip-group { --chip-group-target: 2.75rem; } }" };
   for (const [coarse, target, gap] of [[false, 32, 8], [true, 44, 20]] as const) {
-    const scope = tokenScopes(tokenBlocks(appSheets, "windows", "normal", true, false, false, coarse)).get("chip-group")!;
+    const scope = tokenScopes(tokenBlocks(local, "windows", "normal", true, false, false, coarse)).get("chip-group")!;
     expect(gridPixels(resolveToken("var(--chip-group-target)", scope)!)).toBe(target);
     expect(gridPixels(resolveToken("max(var(--space-1), calc(var(--chip-group-target) - var(--chip-height)))", scope)!)).toBe(gap);
   }
