@@ -1,0 +1,23 @@
+{
+  "head": "611b2a52c92ef2cd0b5609e0d0a8e965f901b595",
+  "base": "c6f3f34aaa23c839256a41a5ad12c58ffa9a0461",
+  "kind": "Synthetic browser render; not native evidence",
+  "contactSheet": "576/576 rendered in Chromium 151.0.7922.34",
+  "matrix": "72 before/after variants: 3 OS looks x light/dark x normal/Larger text x ordinary/increased contrast/forced colours; chip bounds and citation x unchanged in all36pairs",
+  "edges": "30 cases at360px: one-line,RTL,CJK,200%systemtext,hidden output; direction,output-row containment,decorative AX output,pending45%,reduced motion checked",
+  "geometry": "149/156 before and after; identical seven inherited macOS corner mismatches",
+  "focus": "Mark unfocusable; selected citation remains focusable. AX output excludes mark; VoiceOver/NVDA/Orca not run.",
+  "checks": {
+    "shelfTests": "8/8 passed after final RTL fix",
+    "shelfPlatformTests": "51/51 passed on exact head",
+    "galleryTests": "81/81 passed before final selector fix",
+    "typecheck": "passed on exact head",
+    "productionWebBuild": "passed before final selector fix",
+    "evidenceBuild": "passed with final tree",
+    "prLint": "passed"
+  },
+  "failedRuns": "An earlier parallel full UI run had a15s gallery timeout followed by nine cascading gallery assertions; isolated gallery recheck passed81/81. Initial platform audit and50-choice tests also timed out under concurrent load; focused recheck passed50/50.",
+  "fullCheck": "Not run; waiting process cancelled before acquiring a Cargo slot. Latest maintainer decision requires hosted exact-head CI result instead.",
+  "attackFix": "Built :dir(rtl) was lowered to :lang and failed dir=rtl in an English UI. Explicit attribute selector fixes it, with a failing regression and built-browser verification.",
+  "extraPressureLimitation": "At360px with200%system text plus a wrapped header/footer, the macOS shelf scroll viewport can be shorter than one glyph. Baseline screenshots show the same clipped viewport. This inherited short-height layout is outside item6; required115%Larger text and one-line shelves fit. Existing issue #584 owns the global height budget."
+}

@@ -1,0 +1,3746 @@
+[
+  {
+    "name": "before-macos-light-normal-none",
+    "mark": {
+      "x": 20,
+      "y": 404,
+      "width": 32,
+      "height": 16,
+      "right": 52,
+      "bottom": 420
+    },
+    "output": {
+      "x": 8,
+      "y": 392,
+      "width": 704,
+      "height": 40,
+      "right": 712,
+      "bottom": 432
+    },
+    "text": {
+      "x": 64,
+      "y": 403,
+      "width": 636,
+      "height": 18,
+      "right": 700,
+      "bottom": 421
+    },
+    "chip": {
+      "x": 20,
+      "y": 360,
+      "width": 114.546875,
+      "height": 24,
+      "right": 134.546875,
+      "bottom": 384
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-light-normal-more",
+    "mark": {
+      "x": 21,
+      "y": 403,
+      "width": 32,
+      "height": 16,
+      "right": 53,
+      "bottom": 419
+    },
+    "output": {
+      "x": 9,
+      "y": 391,
+      "width": 702,
+      "height": 40,
+      "right": 711,
+      "bottom": 431
+    },
+    "text": {
+      "x": 65,
+      "y": 402,
+      "width": 634,
+      "height": 18,
+      "right": 699,
+      "bottom": 420
+    },
+    "chip": {
+      "x": 21,
+      "y": 359,
+      "width": 116.546875,
+      "height": 24,
+      "right": 137.546875,
+      "bottom": 383
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-light-normal-forced",
+    "mark": {
+      "x": 21,
+      "y": 403,
+      "width": 32,
+      "height": 16,
+      "right": 53,
+      "bottom": 419
+    },
+    "output": {
+      "x": 9,
+      "y": 391,
+      "width": 702,
+      "height": 40,
+      "right": 711,
+      "bottom": 431
+    },
+    "text": {
+      "x": 65,
+      "y": 402,
+      "width": 634,
+      "height": 18,
+      "right": 699,
+      "bottom": 420
+    },
+    "chip": {
+      "x": 21,
+      "y": 359,
+      "width": 116.546875,
+      "height": 24,
+      "right": 137.546875,
+      "bottom": 383
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-light-large-none",
+    "mark": {
+      "x": 22.984375,
+      "y": 392.609375,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 59.78125,
+      "bottom": 411.015625
+    },
+    "output": {
+      "x": 9.1875,
+      "y": 378.8125,
+      "width": 701.625,
+      "height": 46,
+      "right": 710.8125,
+      "bottom": 424.8125
+    },
+    "text": {
+      "x": 73.578125,
+      "y": 391.3125,
+      "width": 623.4375,
+      "height": 21,
+      "right": 697.015625,
+      "bottom": 412.3125
+    },
+    "chip": {
+      "x": 22.984375,
+      "y": 342.015625,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 153,
+      "bottom": 369.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-light-large-more",
+    "mark": {
+      "x": 23.984375,
+      "y": 391.609375,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 60.78125,
+      "bottom": 410.015625
+    },
+    "output": {
+      "x": 10.1875,
+      "y": 377.8125,
+      "width": 699.625,
+      "height": 46,
+      "right": 709.8125,
+      "bottom": 423.8125
+    },
+    "text": {
+      "x": 74.578125,
+      "y": 390.3125,
+      "width": 621.4375,
+      "height": 21,
+      "right": 696.015625,
+      "bottom": 411.3125
+    },
+    "chip": {
+      "x": 23.984375,
+      "y": 341.015625,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 156,
+      "bottom": 368.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-light-large-forced",
+    "mark": {
+      "x": 23.984375,
+      "y": 391.609375,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 60.78125,
+      "bottom": 410.015625
+    },
+    "output": {
+      "x": 10.1875,
+      "y": 377.8125,
+      "width": 699.625,
+      "height": 46,
+      "right": 709.8125,
+      "bottom": 423.8125
+    },
+    "text": {
+      "x": 74.578125,
+      "y": 390.3125,
+      "width": 621.4375,
+      "height": 21,
+      "right": 696.015625,
+      "bottom": 411.3125
+    },
+    "chip": {
+      "x": 23.984375,
+      "y": 341.015625,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 156,
+      "bottom": 368.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-dark-normal-none",
+    "mark": {
+      "x": 20,
+      "y": 404,
+      "width": 32,
+      "height": 16,
+      "right": 52,
+      "bottom": 420
+    },
+    "output": {
+      "x": 8,
+      "y": 392,
+      "width": 704,
+      "height": 40,
+      "right": 712,
+      "bottom": 432
+    },
+    "text": {
+      "x": 64,
+      "y": 403,
+      "width": 636,
+      "height": 18,
+      "right": 700,
+      "bottom": 421
+    },
+    "chip": {
+      "x": 20,
+      "y": 360,
+      "width": 114.546875,
+      "height": 24,
+      "right": 134.546875,
+      "bottom": 384
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-dark-normal-more",
+    "mark": {
+      "x": 21,
+      "y": 403,
+      "width": 32,
+      "height": 16,
+      "right": 53,
+      "bottom": 419
+    },
+    "output": {
+      "x": 9,
+      "y": 391,
+      "width": 702,
+      "height": 40,
+      "right": 711,
+      "bottom": 431
+    },
+    "text": {
+      "x": 65,
+      "y": 402,
+      "width": 634,
+      "height": 18,
+      "right": 699,
+      "bottom": 420
+    },
+    "chip": {
+      "x": 21,
+      "y": 359,
+      "width": 116.546875,
+      "height": 24,
+      "right": 137.546875,
+      "bottom": 383
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-dark-normal-forced",
+    "mark": {
+      "x": 21,
+      "y": 403,
+      "width": 32,
+      "height": 16,
+      "right": 53,
+      "bottom": 419
+    },
+    "output": {
+      "x": 9,
+      "y": 391,
+      "width": 702,
+      "height": 40,
+      "right": 711,
+      "bottom": 431
+    },
+    "text": {
+      "x": 65,
+      "y": 402,
+      "width": 634,
+      "height": 18,
+      "right": 699,
+      "bottom": 420
+    },
+    "chip": {
+      "x": 21,
+      "y": 359,
+      "width": 116.546875,
+      "height": 24,
+      "right": 137.546875,
+      "bottom": 383
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-dark-large-none",
+    "mark": {
+      "x": 22.984375,
+      "y": 392.609375,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 59.78125,
+      "bottom": 411.015625
+    },
+    "output": {
+      "x": 9.1875,
+      "y": 378.8125,
+      "width": 701.625,
+      "height": 46,
+      "right": 710.8125,
+      "bottom": 424.8125
+    },
+    "text": {
+      "x": 73.578125,
+      "y": 391.3125,
+      "width": 623.4375,
+      "height": 21,
+      "right": 697.015625,
+      "bottom": 412.3125
+    },
+    "chip": {
+      "x": 22.984375,
+      "y": 342.015625,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 153,
+      "bottom": 369.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-dark-large-more",
+    "mark": {
+      "x": 23.984375,
+      "y": 391.609375,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 60.78125,
+      "bottom": 410.015625
+    },
+    "output": {
+      "x": 10.1875,
+      "y": 377.8125,
+      "width": 699.625,
+      "height": 46,
+      "right": 709.8125,
+      "bottom": 423.8125
+    },
+    "text": {
+      "x": 74.578125,
+      "y": 390.3125,
+      "width": 621.4375,
+      "height": 21,
+      "right": 696.015625,
+      "bottom": 411.3125
+    },
+    "chip": {
+      "x": 23.984375,
+      "y": 341.015625,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 156,
+      "bottom": 368.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-macos-dark-large-forced",
+    "mark": {
+      "x": 23.984375,
+      "y": 391.609375,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 60.78125,
+      "bottom": 410.015625
+    },
+    "output": {
+      "x": 10.1875,
+      "y": 377.8125,
+      "width": 699.625,
+      "height": 46,
+      "right": 709.8125,
+      "bottom": 423.8125
+    },
+    "text": {
+      "x": 74.578125,
+      "y": 390.3125,
+      "width": 621.4375,
+      "height": 21,
+      "right": 696.015625,
+      "bottom": 411.3125
+    },
+    "chip": {
+      "x": 23.984375,
+      "y": 341.015625,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 156,
+      "bottom": 368.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-light-normal-none",
+    "mark": {
+      "x": 17,
+      "y": 407,
+      "width": 32,
+      "height": 16,
+      "right": 49,
+      "bottom": 423
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 114.546875,
+      "height": 24,
+      "right": 131.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-light-normal-more",
+    "mark": {
+      "x": 17,
+      "y": 407,
+      "width": 32,
+      "height": 16,
+      "right": 49,
+      "bottom": 423
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 116.546875,
+      "height": 24,
+      "right": 133.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-light-normal-forced",
+    "mark": {
+      "x": 17,
+      "y": 407,
+      "width": 32,
+      "height": 16,
+      "right": 49,
+      "bottom": 423
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 116.546875,
+      "height": 24,
+      "right": 133.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-light-large-none",
+    "mark": {
+      "x": 19.390625,
+      "y": 396.203125,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 56.1875,
+      "bottom": 414.609375
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 149.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-light-large-more",
+    "mark": {
+      "x": 19.390625,
+      "y": 396.203125,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 56.1875,
+      "bottom": 414.609375
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 151.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-light-large-forced",
+    "mark": {
+      "x": 19.390625,
+      "y": 396.203125,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 56.1875,
+      "bottom": 414.609375
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 151.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-dark-normal-none",
+    "mark": {
+      "x": 17,
+      "y": 407,
+      "width": 32,
+      "height": 16,
+      "right": 49,
+      "bottom": 423
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 114.546875,
+      "height": 24,
+      "right": 131.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-dark-normal-more",
+    "mark": {
+      "x": 17,
+      "y": 407,
+      "width": 32,
+      "height": 16,
+      "right": 49,
+      "bottom": 423
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 116.546875,
+      "height": 24,
+      "right": 133.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-dark-normal-forced",
+    "mark": {
+      "x": 17,
+      "y": 407,
+      "width": 32,
+      "height": 16,
+      "right": 49,
+      "bottom": 423
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 116.546875,
+      "height": 24,
+      "right": 133.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-dark-large-none",
+    "mark": {
+      "x": 19.390625,
+      "y": 396.203125,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 56.1875,
+      "bottom": 414.609375
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 149.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-dark-large-more",
+    "mark": {
+      "x": 19.390625,
+      "y": 396.203125,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 56.1875,
+      "bottom": 414.609375
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 151.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-windows-dark-large-forced",
+    "mark": {
+      "x": 19.390625,
+      "y": 396.203125,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 56.1875,
+      "bottom": 414.609375
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 151.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-light-normal-none",
+    "mark": {
+      "x": 12,
+      "y": 412,
+      "width": 32,
+      "height": 16,
+      "right": 44,
+      "bottom": 428
+    },
+    "output": {
+      "x": 0,
+      "y": 400,
+      "width": 720,
+      "height": 40,
+      "right": 720,
+      "bottom": 440
+    },
+    "text": {
+      "x": 56,
+      "y": 411,
+      "width": 652,
+      "height": 18,
+      "right": 708,
+      "bottom": 429
+    },
+    "chip": {
+      "x": 12,
+      "y": 368,
+      "width": 114.546875,
+      "height": 24,
+      "right": 126.546875,
+      "bottom": 392
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-light-normal-more",
+    "mark": {
+      "x": 13,
+      "y": 411,
+      "width": 32,
+      "height": 16,
+      "right": 45,
+      "bottom": 427
+    },
+    "output": {
+      "x": 1,
+      "y": 399,
+      "width": 718,
+      "height": 40,
+      "right": 719,
+      "bottom": 439
+    },
+    "text": {
+      "x": 57,
+      "y": 410,
+      "width": 650,
+      "height": 18,
+      "right": 707,
+      "bottom": 428
+    },
+    "chip": {
+      "x": 13,
+      "y": 367,
+      "width": 116.546875,
+      "height": 24,
+      "right": 129.546875,
+      "bottom": 391
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-light-normal-forced",
+    "mark": {
+      "x": 13,
+      "y": 411,
+      "width": 32,
+      "height": 16,
+      "right": 45,
+      "bottom": 427
+    },
+    "output": {
+      "x": 1,
+      "y": 399,
+      "width": 718,
+      "height": 40,
+      "right": 719,
+      "bottom": 439
+    },
+    "text": {
+      "x": 57,
+      "y": 410,
+      "width": 650,
+      "height": 18,
+      "right": 707,
+      "bottom": 428
+    },
+    "chip": {
+      "x": 13,
+      "y": 367,
+      "width": 116.546875,
+      "height": 24,
+      "right": 129.546875,
+      "bottom": 391
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-light-large-none",
+    "mark": {
+      "x": 13.796875,
+      "y": 401.796875,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 50.59375,
+      "bottom": 420.203125
+    },
+    "output": {
+      "x": 0,
+      "y": 388,
+      "width": 720,
+      "height": 46,
+      "right": 720,
+      "bottom": 434
+    },
+    "text": {
+      "x": 64.390625,
+      "y": 400.5,
+      "width": 641.8125,
+      "height": 21,
+      "right": 706.203125,
+      "bottom": 421.5
+    },
+    "chip": {
+      "x": 13.796875,
+      "y": 351.203125,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 143.8125,
+      "bottom": 378.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-light-large-more",
+    "mark": {
+      "x": 14.796875,
+      "y": 400.796875,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 51.59375,
+      "bottom": 419.203125
+    },
+    "output": {
+      "x": 1,
+      "y": 387,
+      "width": 718,
+      "height": 46,
+      "right": 719,
+      "bottom": 433
+    },
+    "text": {
+      "x": 65.390625,
+      "y": 399.5,
+      "width": 639.8125,
+      "height": 21,
+      "right": 705.203125,
+      "bottom": 420.5
+    },
+    "chip": {
+      "x": 14.796875,
+      "y": 350.203125,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 146.8125,
+      "bottom": 377.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-light-large-forced",
+    "mark": {
+      "x": 14.796875,
+      "y": 400.796875,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 51.59375,
+      "bottom": 419.203125
+    },
+    "output": {
+      "x": 1,
+      "y": 387,
+      "width": 718,
+      "height": 46,
+      "right": 719,
+      "bottom": 433
+    },
+    "text": {
+      "x": 65.390625,
+      "y": 399.5,
+      "width": 639.8125,
+      "height": 21,
+      "right": 705.203125,
+      "bottom": 420.5
+    },
+    "chip": {
+      "x": 14.796875,
+      "y": 350.203125,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 146.8125,
+      "bottom": 377.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-dark-normal-none",
+    "mark": {
+      "x": 12,
+      "y": 412,
+      "width": 32,
+      "height": 16,
+      "right": 44,
+      "bottom": 428
+    },
+    "output": {
+      "x": 0,
+      "y": 400,
+      "width": 720,
+      "height": 40,
+      "right": 720,
+      "bottom": 440
+    },
+    "text": {
+      "x": 56,
+      "y": 411,
+      "width": 652,
+      "height": 18,
+      "right": 708,
+      "bottom": 429
+    },
+    "chip": {
+      "x": 12,
+      "y": 368,
+      "width": 114.546875,
+      "height": 24,
+      "right": 126.546875,
+      "bottom": 392
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-dark-normal-more",
+    "mark": {
+      "x": 13,
+      "y": 411,
+      "width": 32,
+      "height": 16,
+      "right": 45,
+      "bottom": 427
+    },
+    "output": {
+      "x": 1,
+      "y": 399,
+      "width": 718,
+      "height": 40,
+      "right": 719,
+      "bottom": 439
+    },
+    "text": {
+      "x": 57,
+      "y": 410,
+      "width": 650,
+      "height": 18,
+      "right": 707,
+      "bottom": 428
+    },
+    "chip": {
+      "x": 13,
+      "y": 367,
+      "width": 116.546875,
+      "height": 24,
+      "right": 129.546875,
+      "bottom": 391
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-dark-normal-forced",
+    "mark": {
+      "x": 13,
+      "y": 411,
+      "width": 32,
+      "height": 16,
+      "right": 45,
+      "bottom": 427
+    },
+    "output": {
+      "x": 1,
+      "y": 399,
+      "width": 718,
+      "height": 40,
+      "right": 719,
+      "bottom": 439
+    },
+    "text": {
+      "x": 57,
+      "y": 410,
+      "width": 650,
+      "height": 18,
+      "right": 707,
+      "bottom": 428
+    },
+    "chip": {
+      "x": 13,
+      "y": 367,
+      "width": 116.546875,
+      "height": 24,
+      "right": 129.546875,
+      "bottom": 391
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-dark-large-none",
+    "mark": {
+      "x": 13.796875,
+      "y": 401.796875,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 50.59375,
+      "bottom": 420.203125
+    },
+    "output": {
+      "x": 0,
+      "y": 388,
+      "width": 720,
+      "height": 46,
+      "right": 720,
+      "bottom": 434
+    },
+    "text": {
+      "x": 64.390625,
+      "y": 400.5,
+      "width": 641.8125,
+      "height": 21,
+      "right": 706.203125,
+      "bottom": 421.5
+    },
+    "chip": {
+      "x": 13.796875,
+      "y": 351.203125,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 143.8125,
+      "bottom": 378.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-dark-large-more",
+    "mark": {
+      "x": 14.796875,
+      "y": 400.796875,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 51.59375,
+      "bottom": 419.203125
+    },
+    "output": {
+      "x": 1,
+      "y": 387,
+      "width": 718,
+      "height": 46,
+      "right": 719,
+      "bottom": 433
+    },
+    "text": {
+      "x": 65.390625,
+      "y": 399.5,
+      "width": 639.8125,
+      "height": 21,
+      "right": 705.203125,
+      "bottom": 420.5
+    },
+    "chip": {
+      "x": 14.796875,
+      "y": 350.203125,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 146.8125,
+      "bottom": 377.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "before-linux-dark-large-forced",
+    "mark": {
+      "x": 14.796875,
+      "y": 400.796875,
+      "width": 36.796875,
+      "height": 18.40625,
+      "right": 51.59375,
+      "bottom": 419.203125
+    },
+    "output": {
+      "x": 1,
+      "y": 387,
+      "width": 718,
+      "height": 46,
+      "right": 719,
+      "bottom": 433
+    },
+    "text": {
+      "x": 65.390625,
+      "y": 399.5,
+      "width": 639.8125,
+      "height": 21,
+      "right": 705.203125,
+      "bottom": 420.5
+    },
+    "chip": {
+      "x": 14.796875,
+      "y": 350.203125,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 146.8125,
+      "bottom": 377.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": null,
+    "svg": false,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-light-normal-none",
+    "mark": {
+      "x": 20,
+      "y": 402,
+      "width": 32,
+      "height": 20,
+      "right": 52,
+      "bottom": 422
+    },
+    "output": {
+      "x": 8,
+      "y": 392,
+      "width": 704,
+      "height": 40,
+      "right": 712,
+      "bottom": 432
+    },
+    "text": {
+      "x": 64,
+      "y": 403,
+      "width": 636,
+      "height": 18,
+      "right": 700,
+      "bottom": 421
+    },
+    "chip": {
+      "x": 20,
+      "y": 360,
+      "width": 114.546875,
+      "height": 24,
+      "right": 134.546875,
+      "bottom": 384
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-light-normal-more",
+    "mark": {
+      "x": 21,
+      "y": 401,
+      "width": 32,
+      "height": 20,
+      "right": 53,
+      "bottom": 421
+    },
+    "output": {
+      "x": 9,
+      "y": 391,
+      "width": 702,
+      "height": 40,
+      "right": 711,
+      "bottom": 431
+    },
+    "text": {
+      "x": 65,
+      "y": 402,
+      "width": 634,
+      "height": 18,
+      "right": 699,
+      "bottom": 420
+    },
+    "chip": {
+      "x": 21,
+      "y": 359,
+      "width": 116.546875,
+      "height": 24,
+      "right": 137.546875,
+      "bottom": 383
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-light-normal-forced",
+    "mark": {
+      "x": 21,
+      "y": 401,
+      "width": 32,
+      "height": 20,
+      "right": 53,
+      "bottom": 421
+    },
+    "output": {
+      "x": 9,
+      "y": 391,
+      "width": 702,
+      "height": 40,
+      "right": 711,
+      "bottom": 431
+    },
+    "text": {
+      "x": 65,
+      "y": 402,
+      "width": 634,
+      "height": 18,
+      "right": 699,
+      "bottom": 420
+    },
+    "chip": {
+      "x": 21,
+      "y": 359,
+      "width": 116.546875,
+      "height": 24,
+      "right": 137.546875,
+      "bottom": 383
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-light-large-none",
+    "mark": {
+      "x": 22.984375,
+      "y": 390.3125,
+      "width": 36.796875,
+      "height": 23,
+      "right": 59.78125,
+      "bottom": 413.3125
+    },
+    "output": {
+      "x": 9.1875,
+      "y": 378.8125,
+      "width": 701.625,
+      "height": 46,
+      "right": 710.8125,
+      "bottom": 424.8125
+    },
+    "text": {
+      "x": 73.578125,
+      "y": 391.3125,
+      "width": 623.4375,
+      "height": 21,
+      "right": 697.015625,
+      "bottom": 412.3125
+    },
+    "chip": {
+      "x": 22.984375,
+      "y": 342.015625,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 153,
+      "bottom": 369.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-light-large-more",
+    "mark": {
+      "x": 23.984375,
+      "y": 389.3125,
+      "width": 36.796875,
+      "height": 23,
+      "right": 60.78125,
+      "bottom": 412.3125
+    },
+    "output": {
+      "x": 10.1875,
+      "y": 377.8125,
+      "width": 699.625,
+      "height": 46,
+      "right": 709.8125,
+      "bottom": 423.8125
+    },
+    "text": {
+      "x": 74.578125,
+      "y": 390.3125,
+      "width": 621.4375,
+      "height": 21,
+      "right": 696.015625,
+      "bottom": 411.3125
+    },
+    "chip": {
+      "x": 23.984375,
+      "y": 341.015625,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 156,
+      "bottom": 368.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-light-large-forced",
+    "mark": {
+      "x": 23.984375,
+      "y": 389.3125,
+      "width": 36.796875,
+      "height": 23,
+      "right": 60.78125,
+      "bottom": 412.3125
+    },
+    "output": {
+      "x": 10.1875,
+      "y": 377.8125,
+      "width": 699.625,
+      "height": 46,
+      "right": 709.8125,
+      "bottom": 423.8125
+    },
+    "text": {
+      "x": 74.578125,
+      "y": 390.3125,
+      "width": 621.4375,
+      "height": 21,
+      "right": 696.015625,
+      "bottom": 411.3125
+    },
+    "chip": {
+      "x": 23.984375,
+      "y": 341.015625,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 156,
+      "bottom": 368.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-dark-normal-none",
+    "mark": {
+      "x": 20,
+      "y": 402,
+      "width": 32,
+      "height": 20,
+      "right": 52,
+      "bottom": 422
+    },
+    "output": {
+      "x": 8,
+      "y": 392,
+      "width": 704,
+      "height": 40,
+      "right": 712,
+      "bottom": 432
+    },
+    "text": {
+      "x": 64,
+      "y": 403,
+      "width": 636,
+      "height": 18,
+      "right": 700,
+      "bottom": 421
+    },
+    "chip": {
+      "x": 20,
+      "y": 360,
+      "width": 114.546875,
+      "height": 24,
+      "right": 134.546875,
+      "bottom": 384
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-dark-normal-more",
+    "mark": {
+      "x": 21,
+      "y": 401,
+      "width": 32,
+      "height": 20,
+      "right": 53,
+      "bottom": 421
+    },
+    "output": {
+      "x": 9,
+      "y": 391,
+      "width": 702,
+      "height": 40,
+      "right": 711,
+      "bottom": 431
+    },
+    "text": {
+      "x": 65,
+      "y": 402,
+      "width": 634,
+      "height": 18,
+      "right": 699,
+      "bottom": 420
+    },
+    "chip": {
+      "x": 21,
+      "y": 359,
+      "width": 116.546875,
+      "height": 24,
+      "right": 137.546875,
+      "bottom": 383
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-dark-normal-forced",
+    "mark": {
+      "x": 21,
+      "y": 401,
+      "width": 32,
+      "height": 20,
+      "right": 53,
+      "bottom": 421
+    },
+    "output": {
+      "x": 9,
+      "y": 391,
+      "width": 702,
+      "height": 40,
+      "right": 711,
+      "bottom": 431
+    },
+    "text": {
+      "x": 65,
+      "y": 402,
+      "width": 634,
+      "height": 18,
+      "right": 699,
+      "bottom": 420
+    },
+    "chip": {
+      "x": 21,
+      "y": 359,
+      "width": 116.546875,
+      "height": 24,
+      "right": 137.546875,
+      "bottom": 383
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-dark-large-none",
+    "mark": {
+      "x": 22.984375,
+      "y": 390.3125,
+      "width": 36.796875,
+      "height": 23,
+      "right": 59.78125,
+      "bottom": 413.3125
+    },
+    "output": {
+      "x": 9.1875,
+      "y": 378.8125,
+      "width": 701.625,
+      "height": 46,
+      "right": 710.8125,
+      "bottom": 424.8125
+    },
+    "text": {
+      "x": 73.578125,
+      "y": 391.3125,
+      "width": 623.4375,
+      "height": 21,
+      "right": 697.015625,
+      "bottom": 412.3125
+    },
+    "chip": {
+      "x": 22.984375,
+      "y": 342.015625,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 153,
+      "bottom": 369.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-dark-large-more",
+    "mark": {
+      "x": 23.984375,
+      "y": 389.3125,
+      "width": 36.796875,
+      "height": 23,
+      "right": 60.78125,
+      "bottom": 412.3125
+    },
+    "output": {
+      "x": 10.1875,
+      "y": 377.8125,
+      "width": 699.625,
+      "height": 46,
+      "right": 709.8125,
+      "bottom": 423.8125
+    },
+    "text": {
+      "x": 74.578125,
+      "y": 390.3125,
+      "width": 621.4375,
+      "height": 21,
+      "right": 696.015625,
+      "bottom": 411.3125
+    },
+    "chip": {
+      "x": 23.984375,
+      "y": 341.015625,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 156,
+      "bottom": 368.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-macos-dark-large-forced",
+    "mark": {
+      "x": 23.984375,
+      "y": 389.3125,
+      "width": 36.796875,
+      "height": 23,
+      "right": 60.78125,
+      "bottom": 412.3125
+    },
+    "output": {
+      "x": 10.1875,
+      "y": 377.8125,
+      "width": 699.625,
+      "height": 46,
+      "right": 709.8125,
+      "bottom": 423.8125
+    },
+    "text": {
+      "x": 74.578125,
+      "y": 390.3125,
+      "width": 621.4375,
+      "height": 21,
+      "right": 696.015625,
+      "bottom": 411.3125
+    },
+    "chip": {
+      "x": 23.984375,
+      "y": 341.015625,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 156,
+      "bottom": 368.609375
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-light-normal-none",
+    "mark": {
+      "x": 17,
+      "y": 405,
+      "width": 32,
+      "height": 20,
+      "right": 49,
+      "bottom": 425
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 114.546875,
+      "height": 24,
+      "right": 131.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-light-normal-more",
+    "mark": {
+      "x": 17,
+      "y": 405,
+      "width": 32,
+      "height": 20,
+      "right": 49,
+      "bottom": 425
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 116.546875,
+      "height": 24,
+      "right": 133.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-light-normal-forced",
+    "mark": {
+      "x": 17,
+      "y": 405,
+      "width": 32,
+      "height": 20,
+      "right": 49,
+      "bottom": 425
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 116.546875,
+      "height": 24,
+      "right": 133.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-light-large-none",
+    "mark": {
+      "x": 19.390625,
+      "y": 393.90625,
+      "width": 36.796875,
+      "height": 23,
+      "right": 56.1875,
+      "bottom": 416.90625
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 149.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-light-large-more",
+    "mark": {
+      "x": 19.390625,
+      "y": 393.90625,
+      "width": 36.796875,
+      "height": 23,
+      "right": 56.1875,
+      "bottom": 416.90625
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 151.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-light-large-forced",
+    "mark": {
+      "x": 19.390625,
+      "y": 393.90625,
+      "width": 36.796875,
+      "height": 23,
+      "right": 56.1875,
+      "bottom": 416.90625
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 151.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-dark-normal-none",
+    "mark": {
+      "x": 17,
+      "y": 405,
+      "width": 32,
+      "height": 20,
+      "right": 49,
+      "bottom": 425
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 114.546875,
+      "height": 24,
+      "right": 131.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-dark-normal-more",
+    "mark": {
+      "x": 17,
+      "y": 405,
+      "width": 32,
+      "height": 20,
+      "right": 49,
+      "bottom": 425
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 116.546875,
+      "height": 24,
+      "right": 133.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-dark-normal-forced",
+    "mark": {
+      "x": 17,
+      "y": 405,
+      "width": 32,
+      "height": 20,
+      "right": 49,
+      "bottom": 425
+    },
+    "output": {
+      "x": 5,
+      "y": 395,
+      "width": 710,
+      "height": 40,
+      "right": 715,
+      "bottom": 435
+    },
+    "text": {
+      "x": 61,
+      "y": 406,
+      "width": 642,
+      "height": 18,
+      "right": 703,
+      "bottom": 424
+    },
+    "chip": {
+      "x": 17,
+      "y": 363,
+      "width": 116.546875,
+      "height": 24,
+      "right": 133.546875,
+      "bottom": 387
+    },
+    "row": {
+      "x": 60,
+      "y": 87.5,
+      "width": 599.546875,
+      "height": 20,
+      "right": 659.546875,
+      "bottom": 107.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-dark-large-none",
+    "mark": {
+      "x": 19.390625,
+      "y": 393.90625,
+      "width": 36.796875,
+      "height": 23,
+      "right": 56.1875,
+      "bottom": 416.90625
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 149.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-dark-large-more",
+    "mark": {
+      "x": 19.390625,
+      "y": 393.90625,
+      "width": 36.796875,
+      "height": 23,
+      "right": 56.1875,
+      "bottom": 416.90625
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 151.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-windows-dark-large-forced",
+    "mark": {
+      "x": 19.390625,
+      "y": 393.90625,
+      "width": 36.796875,
+      "height": 23,
+      "right": 56.1875,
+      "bottom": 416.90625
+    },
+    "output": {
+      "x": 5.59375,
+      "y": 382.40625,
+      "width": 708.8125,
+      "height": 46,
+      "right": 714.40625,
+      "bottom": 428.40625
+    },
+    "text": {
+      "x": 69.984375,
+      "y": 394.90625,
+      "width": 630.625,
+      "height": 21,
+      "right": 700.609375,
+      "bottom": 415.90625
+    },
+    "chip": {
+      "x": 19.390625,
+      "y": 345.609375,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 151.40625,
+      "bottom": 373.203125
+    },
+    "row": {
+      "x": 68.984375,
+      "y": 100.8125,
+      "width": 582.078125,
+      "height": 23,
+      "right": 651.0625,
+      "bottom": 123.8125
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-light-normal-none",
+    "mark": {
+      "x": 12,
+      "y": 410,
+      "width": 32,
+      "height": 20,
+      "right": 44,
+      "bottom": 430
+    },
+    "output": {
+      "x": 0,
+      "y": 400,
+      "width": 720,
+      "height": 40,
+      "right": 720,
+      "bottom": 440
+    },
+    "text": {
+      "x": 56,
+      "y": 411,
+      "width": 652,
+      "height": 18,
+      "right": 708,
+      "bottom": 429
+    },
+    "chip": {
+      "x": 12,
+      "y": 368,
+      "width": 114.546875,
+      "height": 24,
+      "right": 126.546875,
+      "bottom": 392
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-light-normal-more",
+    "mark": {
+      "x": 13,
+      "y": 409,
+      "width": 32,
+      "height": 20,
+      "right": 45,
+      "bottom": 429
+    },
+    "output": {
+      "x": 1,
+      "y": 399,
+      "width": 718,
+      "height": 40,
+      "right": 719,
+      "bottom": 439
+    },
+    "text": {
+      "x": 57,
+      "y": 410,
+      "width": 650,
+      "height": 18,
+      "right": 707,
+      "bottom": 428
+    },
+    "chip": {
+      "x": 13,
+      "y": 367,
+      "width": 116.546875,
+      "height": 24,
+      "right": 129.546875,
+      "bottom": 391
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-light-normal-forced",
+    "mark": {
+      "x": 13,
+      "y": 409,
+      "width": 32,
+      "height": 20,
+      "right": 45,
+      "bottom": 429
+    },
+    "output": {
+      "x": 1,
+      "y": 399,
+      "width": 718,
+      "height": 40,
+      "right": 719,
+      "bottom": 439
+    },
+    "text": {
+      "x": 57,
+      "y": 410,
+      "width": 650,
+      "height": 18,
+      "right": 707,
+      "bottom": 428
+    },
+    "chip": {
+      "x": 13,
+      "y": 367,
+      "width": 116.546875,
+      "height": 24,
+      "right": 129.546875,
+      "bottom": 391
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-light-large-none",
+    "mark": {
+      "x": 13.796875,
+      "y": 399.5,
+      "width": 36.796875,
+      "height": 23,
+      "right": 50.59375,
+      "bottom": 422.5
+    },
+    "output": {
+      "x": 0,
+      "y": 388,
+      "width": 720,
+      "height": 46,
+      "right": 720,
+      "bottom": 434
+    },
+    "text": {
+      "x": 64.390625,
+      "y": 400.5,
+      "width": 641.8125,
+      "height": 21,
+      "right": 706.203125,
+      "bottom": 421.5
+    },
+    "chip": {
+      "x": 13.796875,
+      "y": 351.203125,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 143.8125,
+      "bottom": 378.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(194, 58, 28)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-light-large-more",
+    "mark": {
+      "x": 14.796875,
+      "y": 398.5,
+      "width": 36.796875,
+      "height": 23,
+      "right": 51.59375,
+      "bottom": 421.5
+    },
+    "output": {
+      "x": 1,
+      "y": 387,
+      "width": 718,
+      "height": 46,
+      "right": 719,
+      "bottom": 433
+    },
+    "text": {
+      "x": 65.390625,
+      "y": 399.5,
+      "width": 639.8125,
+      "height": 21,
+      "right": 705.203125,
+      "bottom": 420.5
+    },
+    "chip": {
+      "x": 14.796875,
+      "y": 350.203125,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 146.8125,
+      "bottom": 377.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-light-large-forced",
+    "mark": {
+      "x": 14.796875,
+      "y": 398.5,
+      "width": 36.796875,
+      "height": 23,
+      "right": 51.59375,
+      "bottom": 421.5
+    },
+    "output": {
+      "x": 1,
+      "y": 387,
+      "width": 718,
+      "height": 46,
+      "right": 719,
+      "bottom": 433
+    },
+    "text": {
+      "x": 65.390625,
+      "y": 399.5,
+      "width": 639.8125,
+      "height": 21,
+      "right": 705.203125,
+      "bottom": 420.5
+    },
+    "chip": {
+      "x": 14.796875,
+      "y": 350.203125,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 146.8125,
+      "bottom": 377.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(0, 0, 0)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-dark-normal-none",
+    "mark": {
+      "x": 12,
+      "y": 410,
+      "width": 32,
+      "height": 20,
+      "right": 44,
+      "bottom": 430
+    },
+    "output": {
+      "x": 0,
+      "y": 400,
+      "width": 720,
+      "height": 40,
+      "right": 720,
+      "bottom": 440
+    },
+    "text": {
+      "x": 56,
+      "y": 411,
+      "width": 652,
+      "height": 18,
+      "right": 708,
+      "bottom": 429
+    },
+    "chip": {
+      "x": 12,
+      "y": 368,
+      "width": 114.546875,
+      "height": 24,
+      "right": 126.546875,
+      "bottom": 392
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-dark-normal-more",
+    "mark": {
+      "x": 13,
+      "y": 409,
+      "width": 32,
+      "height": 20,
+      "right": 45,
+      "bottom": 429
+    },
+    "output": {
+      "x": 1,
+      "y": 399,
+      "width": 718,
+      "height": 40,
+      "right": 719,
+      "bottom": 439
+    },
+    "text": {
+      "x": 57,
+      "y": 410,
+      "width": 650,
+      "height": 18,
+      "right": 707,
+      "bottom": 428
+    },
+    "chip": {
+      "x": 13,
+      "y": 367,
+      "width": 116.546875,
+      "height": 24,
+      "right": 129.546875,
+      "bottom": 391
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-dark-normal-forced",
+    "mark": {
+      "x": 13,
+      "y": 409,
+      "width": 32,
+      "height": 20,
+      "right": 45,
+      "bottom": 429
+    },
+    "output": {
+      "x": 1,
+      "y": 399,
+      "width": 718,
+      "height": 40,
+      "right": 719,
+      "bottom": 439
+    },
+    "text": {
+      "x": 57,
+      "y": 410,
+      "width": 650,
+      "height": 18,
+      "right": 707,
+      "bottom": 428
+    },
+    "chip": {
+      "x": 13,
+      "y": 367,
+      "width": 116.546875,
+      "height": 24,
+      "right": 129.546875,
+      "bottom": 391
+    },
+    "row": {
+      "x": 64,
+      "y": 99.5,
+      "width": 591.546875,
+      "height": 20,
+      "right": 655.546875,
+      "bottom": 119.5
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-dark-large-none",
+    "mark": {
+      "x": 13.796875,
+      "y": 399.5,
+      "width": 36.796875,
+      "height": 23,
+      "right": 50.59375,
+      "bottom": 422.5
+    },
+    "output": {
+      "x": 0,
+      "y": 388,
+      "width": 720,
+      "height": 46,
+      "right": 720,
+      "bottom": 434
+    },
+    "text": {
+      "x": 64.390625,
+      "y": 400.5,
+      "width": 641.8125,
+      "height": 21,
+      "right": 706.203125,
+      "bottom": 421.5
+    },
+    "chip": {
+      "x": 13.796875,
+      "y": 351.203125,
+      "width": 130.015625,
+      "height": 27.59375,
+      "right": 143.8125,
+      "bottom": 378.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 122, 92)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-dark-large-more",
+    "mark": {
+      "x": 14.796875,
+      "y": 398.5,
+      "width": 36.796875,
+      "height": 23,
+      "right": 51.59375,
+      "bottom": 421.5
+    },
+    "output": {
+      "x": 1,
+      "y": 387,
+      "width": 718,
+      "height": 46,
+      "right": 719,
+      "bottom": 433
+    },
+    "text": {
+      "x": 65.390625,
+      "y": 399.5,
+      "width": 639.8125,
+      "height": 21,
+      "right": 705.203125,
+      "bottom": 420.5
+    },
+    "chip": {
+      "x": 14.796875,
+      "y": 350.203125,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 146.8125,
+      "bottom": 377.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  },
+  {
+    "name": "after-linux-dark-large-forced",
+    "mark": {
+      "x": 14.796875,
+      "y": 398.5,
+      "width": 36.796875,
+      "height": 23,
+      "right": 51.59375,
+      "bottom": 421.5
+    },
+    "output": {
+      "x": 1,
+      "y": 387,
+      "width": 718,
+      "height": 46,
+      "right": 719,
+      "bottom": 433
+    },
+    "text": {
+      "x": 65.390625,
+      "y": 399.5,
+      "width": 639.8125,
+      "height": 21,
+      "right": 705.203125,
+      "bottom": 420.5
+    },
+    "chip": {
+      "x": 14.796875,
+      "y": 350.203125,
+      "width": 132.015625,
+      "height": 27.59375,
+      "right": 146.8125,
+      "bottom": 377.796875
+    },
+    "row": {
+      "x": 73.578125,
+      "y": 114.609375,
+      "width": 572.890625,
+      "height": 23,
+      "right": 646.46875,
+      "bottom": 137.609375
+    },
+    "color": "rgb(255, 255, 255)",
+    "opacity": "1",
+    "transform": "none",
+    "transition": "0s",
+    "animation": "none",
+    "hidden": "true",
+    "focusable": "false",
+    "svg": true,
+    "ax": "- list \"Selected references\":\n  - listitem \"example2026\":\n    - text: Example 2026\n    - button \"Remove example2026 from the selection\"\n  - listitem \"研究2026\":\n    - text: 架空 著者 2026\n    - button \"Remove 研究2026 from the selection\"\n- region \"Preview\": \"[@example2026; @研究2026]\""
+  }
+]
