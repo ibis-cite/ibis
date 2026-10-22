@@ -1,0 +1,23 @@
+{
+  "base": "9fa35761c6e27a589f9da0d8bf887de325031a05",
+  "head": "802b7282d6f99b5acc8f80bab12b61c38769cda0",
+  "p": {
+    "platform": "linux",
+    "theme": "light",
+    "mode": "normal",
+    "width": 360,
+    "text": "large"
+  },
+  "state": "tray-preview",
+  "side": "before",
+  "errors": [],
+  "facts": {
+    "rendered": null,
+    "rootChildren": 1,
+    "main": true,
+    "options": 50,
+    "selected": 1,
+    "shelf": true,
+    "footer": true
+  }
+}

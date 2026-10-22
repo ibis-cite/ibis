@@ -1,0 +1,1145 @@
+{
+  "base": "9fa35761c6e27a589f9da0d8bf887de325031a05",
+  "head": "802b7282d6f99b5acc8f80bab12b61c38769cda0",
+  "browser": "151.0.7922.34",
+  "comparisons": 126,
+  "issues": [],
+  "native": "CSS attributes only. Contrast modeled for macOS light native backdrops141/255, dark0/120. Windows Mica and artificial Linux material attributes are paint-parity stress cases only, excluded from contrast claims. Not native certification.",
+  "reducedTransparency": "real CSS branches activated via CSSOM; not browser/OS preference emulation",
+  "results": [
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "macos",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "windows",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "normal"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "more"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "forced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "gallery"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "reduced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "native"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "light",
+        "mode": "opaque"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "normal"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "more"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "forced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "gallery"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "reduced"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "native"
+      },
+      "state": "tray",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "many-results",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "first-run-found",
+      "status": "passed"
+    },
+    {
+      "profile": {
+        "platform": "linux",
+        "theme": "dark",
+        "mode": "opaque"
+      },
+      "state": "tray",
+      "status": "passed"
+    }
+  ]
+}

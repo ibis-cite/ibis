@@ -1,0 +1,45 @@
+{
+  "issue": 749,
+  "base": "9fa35761c6e27a589f9da0d8bf887de325031a05",
+  "head": "802b7282d6f99b5acc8f80bab12b61c38769cda0",
+  "browser": "Chromium 151.0.7922.34",
+  "synthetic_clock": "2026-10-22T09:00:00Z",
+  "unfiltered_gallery_before": {
+    "rendered": 576,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "unfiltered_gallery_after": {
+    "rendered": 576,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "selected_frame_pairs": 96,
+  "comparison_sheets_inspected": 4,
+  "focused_tests": 132,
+  "geometry_contract_tests": 8,
+  "typescript": "passed",
+  "ui_imports": "passed",
+  "production_and_evidence_builds": "passed",
+  "width_matrix": {
+    "status": "failed",
+    "completed_logged": 144,
+    "planned": 216,
+    "baseline_reproduction": "GNOME/light/360px/Larger/tray-preview; no acknowledgement within 30 seconds"
+  },
+  "preference_matrix": {
+    "status": "passed",
+    "comparisons": 126,
+    "text_contrast_issues_in_these_profiles": 0
+  },
+  "frame_contrast": {
+    "status": "no new or worsened violations",
+    "frames": 576,
+    "new_or_worsened": 0,
+    "unchanged_baseline_violations": 12,
+    "absolute_all_text_45": "not passed"
+  },
+  "full_check": "not run; browser blocker remains",
+  "independent_review": "requested",
+  "native_acceptance": "remains #8/#627/#691/#79"
+}

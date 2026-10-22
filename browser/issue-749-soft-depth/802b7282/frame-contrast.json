@@ -1,0 +1,4174 @@
+{
+  "base": "9fa35761c6e27a589f9da0d8bf887de325031a05",
+  "head": "802b7282d6f99b5acc8f80bab12b61c38769cda0",
+  "browser": "151.0.7922.34",
+  "frames": 576,
+  "method": "Unfiltered gallery frame inventory; full-precision alpha-composited DOM solid-background text model; selected/system-accent, suggested/selected writing choices and disabled roles retain the accepted design-system exceptions. No native material, pixel/font-antialiasing or wallpaper certification.",
+  "newOrWorse": [],
+  "results": [
+    {
+      "name": "large/linux-dark/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 12.521752607685116,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 12.521752607685116,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/compact",
+      "status": "passed",
+      "textNodes": 89,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/copied-notice",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/copy-confirmation",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/damaged-library",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/dark",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/file-kept-menu",
+      "status": "passed",
+      "textNodes": 16,
+      "minimumUnexceptedRatio": 4.488552970398123,
+      "violations": [
+        {
+          "index": 16,
+          "tag": "key-hint-label",
+          "ratio": 4.488552970398123,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 4.488552970398123,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "large/linux-dark/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/forced-colors",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/format-menu",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/high-contrast",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 18.733663902900595,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/keys",
+      "status": "passed",
+      "textNodes": 78,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/larger-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/long-titles",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/many-results",
+      "status": "passed",
+      "textNodes": 107,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/menu-open",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 4.488552970398123,
+      "violations": [
+        {
+          "index": 21,
+          "tag": "key-hint-label",
+          "ratio": 4.488552970398123,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 4.488552970398123,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "large/linux-dark/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/pin-hover",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/pinned",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/preview-apa-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/preview-apa-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/preview-keys-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/preview-keys-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/reloading",
+      "status": "passed",
+      "textNodes": 16,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/rtl",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/scope-menu",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 4.488552970398123,
+      "violations": [
+        {
+          "index": 21,
+          "tag": "key-hint-label",
+          "ratio": 4.488552970398123,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 4.488552970398123,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "large/linux-dark/spacious",
+      "status": "passed",
+      "textNodes": 129,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.851265625238128,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.851265625238128,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/tray",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/tray-20",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/tray-40",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/tray-50",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/tray-preview",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/zotero-kept",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-dark/zotero-updated",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 10.27120149210096,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 10.27120149210096,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/compact",
+      "status": "passed",
+      "textNodes": 89,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/copied-notice",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/copy-confirmation",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/damaged-library",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/dark",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/file-kept-menu",
+      "status": "passed",
+      "textNodes": 16,
+      "minimumUnexceptedRatio": 3.8332834577272226,
+      "violations": [
+        {
+          "index": 16,
+          "tag": "key-hint-label",
+          "ratio": 3.8332834577272226,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 3.8332834577272226,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "large/linux-light/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/forced-colors",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/format-menu",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/high-contrast",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/keys",
+      "status": "passed",
+      "textNodes": 78,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/larger-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/long-titles",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/many-results",
+      "status": "passed",
+      "textNodes": 107,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/menu-open",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 3.8332834577272226,
+      "violations": [
+        {
+          "index": 21,
+          "tag": "key-hint-label",
+          "ratio": 3.8332834577272226,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 3.8332834577272226,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "large/linux-light/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/pin-hover",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/pinned",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/preview-apa-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/preview-apa-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/preview-keys-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/preview-keys-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/reloading",
+      "status": "passed",
+      "textNodes": 16,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/rtl",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/scope-menu",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 3.8332834577272226,
+      "violations": [
+        {
+          "index": 21,
+          "tag": "key-hint-label",
+          "ratio": 3.8332834577272226,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 3.8332834577272226,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "large/linux-light/spacious",
+      "status": "passed",
+      "textNodes": 129,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 12.23735166064171,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 12.23735166064171,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/tray",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/tray-20",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/tray-40",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/tray-50",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/tray-preview",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/zotero-kept",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/linux-light/zotero-updated",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 12.482384449277859,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 12.482384449277859,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/compact",
+      "status": "passed",
+      "textNodes": 90,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/copied-notice",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/copy-confirmation",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/damaged-library",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/dark",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/file-kept-menu",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 6.505031559808896,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/forced-colors",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/format-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/high-contrast",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 16.655722781141197,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/keys",
+      "status": "passed",
+      "textNodes": 79,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/larger-text",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 9.65729056834769,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/long-titles",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/many-results",
+      "status": "passed",
+      "textNodes": 108,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/menu-open",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.505031559808896,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 9.65729056834769,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/pin-hover",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/pinned",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/preview-apa-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/preview-apa-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/preview-keys-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/preview-keys-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/reloading",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/rtl",
+      "status": "passed",
+      "textNodes": 13,
+      "minimumUnexceptedRatio": 9.65729056834769,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/scope-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.505031559808896,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/spacious",
+      "status": "passed",
+      "textNodes": 130,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.626445165292282,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.626445165292282,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/tray",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/tray-20",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/tray-40",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/tray-50",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/tray-preview",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/zotero-kept",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 9.65729056834769,
+      "violations": []
+    },
+    {
+      "name": "large/macos-dark/zotero-updated",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 14.202774317510666,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 14.202774317510666,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/compact",
+      "status": "passed",
+      "textNodes": 90,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/copied-notice",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/copy-confirmation",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/damaged-library",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/dark",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/file-kept-menu",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 5.724159070049523,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/forced-colors",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/format-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/high-contrast",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 18.758462357639324,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/keys",
+      "status": "passed",
+      "textNodes": 79,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/larger-text",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/long-titles",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/many-results",
+      "status": "passed",
+      "textNodes": 108,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/menu-open",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.724159070049523,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/pin-hover",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/pinned",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/preview-apa-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/preview-apa-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/preview-keys-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/preview-keys-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/reloading",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/rtl",
+      "status": "passed",
+      "textNodes": 13,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/scope-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.724159070049523,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/spacious",
+      "status": "passed",
+      "textNodes": 130,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.883699921729914,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.883699921729914,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/tray",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/tray-20",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/tray-40",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/tray-50",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/tray-preview",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/zotero-kept",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/macos-light/zotero-updated",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 13.749407872940884,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 13.749407872940884,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/compact",
+      "status": "passed",
+      "textNodes": 89,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/copied-notice",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/copy-confirmation",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/damaged-library",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/dark",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/file-kept-menu",
+      "status": "passed",
+      "textNodes": 16,
+      "minimumUnexceptedRatio": 8.290826928165526,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/forced-colors",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/format-menu",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/high-contrast",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 16.655722781141197,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/keys",
+      "status": "passed",
+      "textNodes": 78,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/larger-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/long-titles",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/many-results",
+      "status": "passed",
+      "textNodes": 107,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/menu-open",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 8.290826928165526,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/pin-hover",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/pinned",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/preview-apa-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/preview-apa-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/preview-keys-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/preview-keys-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/reloading",
+      "status": "passed",
+      "textNodes": 16,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/rtl",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/scope-menu",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 8.290826928165526,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/spacious",
+      "status": "passed",
+      "textNodes": 129,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 16.29325535858735,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 16.29325535858735,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/tray",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/tray-20",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/tray-40",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/tray-50",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/tray-preview",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/zotero-kept",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "large/windows-dark/zotero-updated",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 16.705852230477177,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 16.705852230477177,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/compact",
+      "status": "passed",
+      "textNodes": 89,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/copied-notice",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/copy-confirmation",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/damaged-library",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/dark",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/file-kept-menu",
+      "status": "passed",
+      "textNodes": 16,
+      "minimumUnexceptedRatio": 5.819476822823303,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/forced-colors",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/format-menu",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/high-contrast",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 18.758462357639324,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/keys",
+      "status": "passed",
+      "textNodes": 78,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/larger-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/long-titles",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/many-results",
+      "status": "passed",
+      "textNodes": 107,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/menu-open",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/pin-hover",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/pinned",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/preview-apa-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/preview-apa-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/preview-keys-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/preview-keys-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/reloading",
+      "status": "passed",
+      "textNodes": 16,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/rtl",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/scope-menu",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/spacious",
+      "status": "passed",
+      "textNodes": 129,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.522767292214983,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.522767292214983,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/tray",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/tray-20",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/tray-40",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/tray-50",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/tray-preview",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/zotero-kept",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "large/windows-light/zotero-updated",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 12.521752607685116,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 12.521752607685116,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/compact",
+      "status": "passed",
+      "textNodes": 90,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/copied-notice",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/copy-confirmation",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/damaged-library",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/dark",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/file-kept-menu",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 4.488552970398123,
+      "violations": [
+        {
+          "index": 17,
+          "tag": "key-hint-label",
+          "ratio": 4.488552970398123,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 4.488552970398123,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "normal/linux-dark/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/forced-colors",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/format-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/high-contrast",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 18.733663902900595,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/keys",
+      "status": "passed",
+      "textNodes": 79,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/larger-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/long-titles",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/many-results",
+      "status": "passed",
+      "textNodes": 108,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/menu-open",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 4.488552970398123,
+      "violations": [
+        {
+          "index": 22,
+          "tag": "key-hint-label",
+          "ratio": 4.488552970398123,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 4.488552970398123,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "normal/linux-dark/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/pin-hover",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/pinned",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/preview-apa-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/preview-apa-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/preview-keys-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/preview-keys-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/reloading",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/rtl",
+      "status": "passed",
+      "textNodes": 13,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/scope-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 4.488552970398123,
+      "violations": [
+        {
+          "index": 22,
+          "tag": "key-hint-label",
+          "ratio": 4.488552970398123,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 4.488552970398123,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "normal/linux-dark/spacious",
+      "status": "passed",
+      "textNodes": 130,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.851265625238128,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.851265625238128,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/tray",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/tray-20",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/tray-40",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/tray-50",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/tray-preview",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 5.184550899076898,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/zotero-kept",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-dark/zotero-updated",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 10.27120149210096,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 10.27120149210096,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/compact",
+      "status": "passed",
+      "textNodes": 90,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/copied-notice",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/copy-confirmation",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/damaged-library",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/dark",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.563114287883053,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/file-kept-menu",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 3.8332834577272226,
+      "violations": [
+        {
+          "index": 17,
+          "tag": "key-hint-label",
+          "ratio": 3.8332834577272226,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 3.8332834577272226,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "normal/linux-light/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/forced-colors",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/format-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/high-contrast",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/keys",
+      "status": "passed",
+      "textNodes": 79,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/larger-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/long-titles",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/many-results",
+      "status": "passed",
+      "textNodes": 108,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/menu-open",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 3.8332834577272226,
+      "violations": [
+        {
+          "index": 22,
+          "tag": "key-hint-label",
+          "ratio": 3.8332834577272226,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 3.8332834577272226,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "normal/linux-light/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/pin-hover",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/pinned",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/preview-apa-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/preview-apa-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/preview-keys-off",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/preview-keys-on",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/reloading",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/rtl",
+      "status": "passed",
+      "textNodes": 13,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/scope-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 3.8332834577272226,
+      "violations": [
+        {
+          "index": 22,
+          "tag": "key-hint-label",
+          "ratio": 3.8332834577272226,
+          "backdrop": 255,
+          "exception": false,
+          "existing": true,
+          "beforeRatio": 3.8332834577272226,
+          "worsened": false
+        }
+      ]
+    },
+    {
+      "name": "normal/linux-light/spacious",
+      "status": "passed",
+      "textNodes": 130,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 12.23735166064171,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 12.23735166064171,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/tray",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/tray-20",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/tray-40",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/tray-50",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/tray-preview",
+      "status": "passed",
+      "textNodes": 264,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/zotero-kept",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/linux-light/zotero-updated",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.051818995320778,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 12.482384449277859,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 12.482384449277859,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/compact",
+      "status": "passed",
+      "textNodes": 90,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/copied-notice",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/copy-confirmation",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/damaged-library",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/dark",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/file-kept-menu",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 6.505031559808896,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/forced-colors",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/format-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/high-contrast",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 16.655722781141197,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/keys",
+      "status": "passed",
+      "textNodes": 79,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/larger-text",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 9.65729056834769,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/long-titles",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/many-results",
+      "status": "passed",
+      "textNodes": 108,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/menu-open",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.505031559808896,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 9.65729056834769,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/pin-hover",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/pinned",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/preview-apa-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/preview-apa-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/preview-keys-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/preview-keys-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/reloading",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/rtl",
+      "status": "passed",
+      "textNodes": 13,
+      "minimumUnexceptedRatio": 9.65729056834769,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/scope-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 6.505031559808896,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/spacious",
+      "status": "passed",
+      "textNodes": 130,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.626445165292282,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.626445165292282,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/tray",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/tray-20",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/tray-40",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/tray-50",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/tray-preview",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 7.901848164170052,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/zotero-kept",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 9.65729056834769,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-dark/zotero-updated",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 14.202774317510666,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 14.202774317510666,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/compact",
+      "status": "passed",
+      "textNodes": 90,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/copied-notice",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/copy-confirmation",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/damaged-library",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/dark",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.794217889952773,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/file-kept-menu",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 5.724159070049523,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/forced-colors",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/format-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/high-contrast",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 18.758462357639324,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/keys",
+      "status": "passed",
+      "textNodes": 79,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/larger-text",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/long-titles",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/many-results",
+      "status": "passed",
+      "textNodes": 108,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/menu-open",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.724159070049523,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/pin-hover",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/pinned",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/preview-apa-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/preview-apa-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/preview-keys-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/preview-keys-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/reloading",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/rtl",
+      "status": "passed",
+      "textNodes": 13,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/scope-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.724159070049523,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/spacious",
+      "status": "passed",
+      "textNodes": 130,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.883699921729914,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.883699921729914,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/tray",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/tray-20",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/tray-40",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/tray-50",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/tray-preview",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/zotero-kept",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/macos-light/zotero-updated",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 7.000287697719454,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 13.749407872940884,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 13.749407872940884,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/compact",
+      "status": "passed",
+      "textNodes": 90,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/copied-notice",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/copy-confirmation",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/damaged-library",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/dark",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/file-kept-menu",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 8.290826928165526,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/forced-colors",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/format-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/high-contrast",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 16.655722781141197,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/keys",
+      "status": "passed",
+      "textNodes": 79,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/larger-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/long-titles",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/many-results",
+      "status": "passed",
+      "textNodes": 108,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/menu-open",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.290826928165526,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/pin-hover",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/pinned",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/preview-apa-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/preview-apa-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/preview-keys-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/preview-keys-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/reloading",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/rtl",
+      "status": "passed",
+      "textNodes": 13,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/scope-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 8.290826928165526,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/spacious",
+      "status": "passed",
+      "textNodes": 130,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 16.29325535858735,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 16.29325535858735,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/tray",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/tray-20",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/tray-40",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/tray-50",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/tray-preview",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/zotero-kept",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 10.458103583938632,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-dark/zotero-updated",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/chips",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 16.705852230477177,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/chips-rtl",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 16.705852230477177,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/compact",
+      "status": "passed",
+      "textNodes": 90,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/copied-notice",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/copy-confirmation",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/damaged-library",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/dark",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 9.406240677196918,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/empty",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/empty-zotero",
+      "status": "passed",
+      "textNodes": 10,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/file-kept-menu",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/first-run",
+      "status": "passed",
+      "textNodes": 12,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/first-run-found",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/forced-colors",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 21,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/format-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/format-menu-filtered",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/high-contrast",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 18.758462357639324,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/idle",
+      "status": "passed",
+      "textNodes": 8,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/invalid-settings",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/keys",
+      "status": "passed",
+      "textNodes": 79,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/large-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/larger-text",
+      "status": "passed",
+      "textNodes": 21,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/loading",
+      "status": "passed",
+      "textNodes": 3,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/long-titles",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/many-results",
+      "status": "passed",
+      "textNodes": 108,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/menu-open",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/missing-file",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/no-results",
+      "status": "passed",
+      "textNodes": 9,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/pin-hover",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/pinned",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/preview-apa-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/preview-apa-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/preview-keys-off",
+      "status": "passed",
+      "textNodes": 23,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/preview-keys-on",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/reloading",
+      "status": "passed",
+      "textNodes": 17,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/rtl",
+      "status": "passed",
+      "textNodes": 13,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/scope-menu",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/spacious",
+      "status": "passed",
+      "textNodes": 130,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/toolbar-menu",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.522767292214983,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/toolbar-menu-filtered",
+      "status": "passed",
+      "textNodes": 1,
+      "minimumUnexceptedRatio": 15.522767292214983,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/tray",
+      "status": "passed",
+      "textNodes": 24,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/tray-20",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/tray-40",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/tray-50",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/tray-preview",
+      "status": "passed",
+      "textNodes": 265,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/tray-system-large",
+      "status": "passed",
+      "textNodes": 261,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/zotero-kept",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/zotero-unavailable",
+      "status": "passed",
+      "textNodes": 6,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    },
+    {
+      "name": "normal/windows-light/zotero-updated",
+      "status": "passed",
+      "textNodes": 22,
+      "minimumUnexceptedRatio": 5.667278966284383,
+      "violations": []
+    }
+  ]
+}
