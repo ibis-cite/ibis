@@ -235,11 +235,7 @@ mod tests {
             error_reason: Some(crate::library::LoadError::Source(
                 ibis_core::source::SourceError::Unavailable,
             )),
-            ..status(
-                Some("refs.bib"),
-                0,
-                Some("presentation wording is not a status code"),
-            )
+            ..status(Some("refs.bib"), 0, Some("presentation wording is not a status code"))
         };
         assert_eq!(
             library_line(&kept),
