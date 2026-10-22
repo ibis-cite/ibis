@@ -123,6 +123,8 @@ main {
 .empty-keys > .key-hint { flex-wrap: wrap; justify-content: center; max-width: 100%; white-space: normal; }
 .empty-template .empty-actions { margin-top: var(--space-4); }
 .empty-template .empty-actions > button { max-width: 100%; overflow-wrap: anywhere; }
+.suggested-action, .suggested-action:hover { background: var(--selected-background); color: var(--selected-text); font-weight: var(--type-strong-weight); }
+.empty-alternative, .empty-alternative:hover { background: var(--clear); color: var(--text); text-decoration: underline; }
 @media (pointer: coarse) {
   .empty-template .empty-actions > button { min-width: 2.75rem; min-height: 2.75rem; }
 }

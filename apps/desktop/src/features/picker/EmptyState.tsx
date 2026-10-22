@@ -50,11 +50,11 @@ export function EmptyState({ library, query, narrowed, onChooseLibrary, onClearS
         <KeyHint label={keyText.addToCitation} keys={keysFor("add")} />
       </div>}
       {empty ? <div className="empty-actions">
-        {library.zotero && <button type="button" onClick={onReload}>{pickerText.reload}</button>}
-        <button type="button" onClick={onChooseLibrary}>{pickerText.chooseLibrary}</button>
+        {library.zotero && <button type="button" className="suggested-action" onClick={onReload}>{pickerText.reload}</button>}
+        <button type="button" className={library.zotero ? "empty-alternative" : "suggested-action"} onClick={onChooseLibrary}>{pickerText.chooseLibrary}</button>
       </div> : query ? <div className="empty-actions">
-        <button type="button" onClick={onClearSearch}>{pickerText.clearSearch}</button>
-        {narrowed && <button type="button" onClick={onSearchAll}>{pickerText.searchAllLibraries}</button>}
+        <button type="button" className="suggested-action" onClick={onClearSearch}>{pickerText.clearSearch}</button>
+        {narrowed && <button type="button" className="empty-alternative" onClick={onSearchAll}>{pickerText.searchAllLibraries}</button>}
       </div> : null}
     </div>
   );

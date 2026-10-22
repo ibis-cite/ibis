@@ -17,7 +17,7 @@ test.each(["", "unmatched"])("one empty-state template has a plain title, descri
   const { container } = mount(query);
   expect(container.querySelector(".empty-title")?.textContent).toBe(query ? "No matching references" : "Type to find a reference");
   expect(container.querySelector(".empty-description")?.textContent).toBe(query
-    ? "Check spelling, or try fewer words, a surname or year."
+    ? "Try a surname, year or fewer words."
     : "Search by title, author, year, citation key or DOI.");
   expect(container.querySelector(".empty-icon")?.getAttribute("aria-hidden")).toBe("true");
   expect(screen.queryByRole("heading")).toBeNull();
@@ -44,7 +44,7 @@ test("no matches retain clear-search and search-all actions", () => {
 test("an empty file gets a separate title and recovery line, keeping the chooser", () => {
   const { container, choose } = mount("", true);
   expect(container.querySelector(".empty-title")?.textContent).toBe("No references in example.bib");
-  expect(container.querySelector(".empty-description")?.textContent).toBe("Choose a BibTeX or BibLaTeX export with references.");
+  expect(container.querySelector(".empty-description")?.textContent).toBe("Choose a file with references.");
   fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
   expect(choose).toHaveBeenCalledOnce();
 });
@@ -57,6 +57,19 @@ test("an empty Zotero library offers reload as well as choosing another library"
   fireEvent.click(screen.getByRole("button", { name: "Choose library…" }));
   expect(reload).toHaveBeenCalledOnce();
   expect(choose).toHaveBeenCalledOnce();
+});
+
+test.each(["file", "zotero", "no-results"])("%s has exactly one enabled suggested action, with quieter alternatives", (state) => {
+  const empty = state !== "no-results";
+  const { container } = render(<EmptyState library={{ ...loaded, references: empty ? 0 : 24, zotero: state === "zotero" }}
+    query={empty ? "" : "unmatched"} narrowed onChooseLibrary={vi.fn()} onClearSearch={vi.fn()}
+    onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+  const actions = container.querySelectorAll<HTMLButtonElement>(".empty-actions .suggested-action");
+  expect(actions).toHaveLength(1);
+  expect(actions.item(0).disabled).toBe(false);
+  expect(actions.item(0).textContent).toBe(state === "file" ? "Choose library…" : state === "zotero" ? "Reload" : "Clear search");
+  const alternative = container.querySelector(".empty-alternative");
+  expect(alternative?.textContent ?? null).toBe(state === "file" ? null : state === "zotero" ? "Choose library…" : "Search all Zotero libraries");
 });
 
 test.each(["🧑🏽‍🔬", "e\u0301"])("a long empty-library name keeps its extension, full accessible text and graphemes (%s)", (unit) => {

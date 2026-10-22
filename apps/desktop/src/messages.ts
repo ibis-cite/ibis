@@ -116,7 +116,7 @@ export const pickerText = {
   removeNamed: (name: string) => `Remove ${name} from citation`,
   bestMatches: "Best matches",
   noMatches: "No matching references",
-  noMatchesHint: "Check spelling, or try fewer words, a surname or year.",
+  noMatchesHint: "Try a surname, year or fewer words.",
   clearSearch: "Clear search",
   searchAllLibraries: "Search all Zotero libraries",
   typeToFind: "Type to find a reference",
@@ -209,7 +209,7 @@ export const libraryMessages = {
   emptyTitle: (name: string | null) => `No references in ${name ?? "this library"}`,
   emptyHint: (zotero = false) => zotero
     ? "Add items in Zotero, then reload."
-    : "Choose a BibTeX or BibLaTeX export with references.",
+    : "Choose a file with references.",
   /** The footer words: the source, then its state. A ticking age is kept
    * out of this text, so the live region never repeats a clock. The source is
    * separate so the footer can isolate its direction and shorten it first. */
