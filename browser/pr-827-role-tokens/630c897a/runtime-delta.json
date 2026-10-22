@@ -1,0 +1,14 @@
+{
+  "browser_base": "f73f460768d8408eb3e8cc7d39c308935a799fb6",
+  "browser_head": "49eaa7e9184464cf42d04f3dd540c770e52b0376",
+  "integration_base": "9890a0db565d0b1876f1d11435adb92adf5ee52b",
+  "runtime_css_delta_unchanged": true,
+  "changed_css_lines_sha256": "57137b96b4c44a9b0f71ae3c6ca2927d0725741c64fa3d41bc91c064b38984a8",
+  "paths": [
+    "apps/desktop/src/tokens.css",
+    "apps/desktop/src/styles.css",
+    "apps/desktop/src/nativeAppearance.css",
+    "apps/desktop/src/gallery.css"
+  ],
+  "integration_head": "630c897a0c820b382b582bad94482a14c28782a9"
+}

@@ -1,0 +1,12 @@
+# Role-token browser comparison
+
+Synthetic browser evidence for #761 / PR #827. Open [the before/after contact sheet](contact-sheet-comparison.png); individual frames and manifests are under `before/` and `after/`.
+
+- Browser sources: main `f73f460768d8408eb3e8cc7d39c308935a799fb6` → PR `49eaa7e9184464cf42d04f3dd540c770e52b0376`.
+- Final integration head: `630c897a0c820b382b582bad94482a14c28782a9`, based on actual main `9890a0db565d0b1876f1d11435adb92adf5ee52b`. The changed production CSS lines are identical to the browser comparison delta; `runtime-delta.json` records their SHA-256. Later integration changes only the token audit and its documentation.
+- Chromium 151.0.7922.34; 720 × 480 CSS pixels; scale 1. Three platform looks × light/dark × normal/Larger text × nine existing gallery states = 108 frame pairs. Larger text is the application's existing Larger-text option; separate computed probes use a 360 × 720 viewport and 200% root text.
+- Existing `scripts/gallery-contact-sheet.mjs` rendered `many-results`, `menu-open`, `format-menu`, `keys`, `high-contrast`, `forced-colors`, `tray-preview`, `tray-system-large` and `toolbar-menu`. The last state includes a disabled menu item and selected radio. No repository harness was added.
+- The capture process preloaded a browser init script fixing synthetic `Date.now` to `2026-10-22T08:00:00Z`, so generated library timestamps do not drift between source builds. Production code was unchanged.
+- 103/108 PNG pairs are byte-identical. The other five differ in 2–45 pixels, by at most 2/255 in a colour channel; see `raster-comparison.json` and per-frame hashes. Same-source baseline controls reproduce the 21-pixel macOS-dark and 45-pixel Linux-dark forced-colour differences. These measurements do not claim every pixel is identical.
+- All 72 before/after computed-style/geometry and keyboard-focus profiles passed: normal, increased contrast, forced colours, contrast gallery, narrow 200% text, RTL, CJK/long titles and optional-value fallback. Actual Tab/Shift+Tab, menu/dialog Escape restoration, Search/toolbar rings and horizontal overflow were checked. The fallback cases disable advanced `@supports` branches through CSSOM; they do not emulate an older engine.
+- Browser evidence only. Native webview, OS materials and window chrome still require their separate native checks (#627).

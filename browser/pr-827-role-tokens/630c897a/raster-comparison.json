@@ -1,0 +1,90 @@
+{
+  "base": "f73f460768d8408eb3e8cc7d39c308935a799fb6",
+  "head": "49eaa7e9184464cf42d04f3dd540c770e52b0376",
+  "framePairs": 108,
+  "identical": 103,
+  "maxChannelDelta": 2,
+  "differences": [
+    {
+      "frame": "normal/linux-dark/forced-colors",
+      "pixels": 45,
+      "maxChannelDelta": 1,
+      "bounds": {
+        "left": 8,
+        "top": 152,
+        "right": 711,
+        "bottom": 475
+      }
+    },
+    {
+      "frame": "normal/macos-dark/forced-colors",
+      "pixels": 21,
+      "maxChannelDelta": 1,
+      "bounds": {
+        "left": 386,
+        "top": 473,
+        "right": 708,
+        "bottom": 475
+      }
+    },
+    {
+      "frame": "normal/macos-light/toolbar-menu",
+      "pixels": 28,
+      "maxChannelDelta": 2,
+      "bounds": {
+        "left": 441,
+        "top": 53,
+        "right": 702,
+        "bottom": 381
+      }
+    },
+    {
+      "frame": "normal/windows-dark/forced-colors",
+      "pixels": 33,
+      "maxChannelDelta": 1,
+      "bounds": {
+        "left": 4,
+        "top": 139,
+        "right": 715,
+        "bottom": 475
+      }
+    },
+    {
+      "frame": "normal/windows-dark/high-contrast",
+      "pixels": 2,
+      "maxChannelDelta": 1,
+      "bounds": {
+        "left": 5,
+        "top": 394,
+        "right": 6,
+        "bottom": 394
+      }
+    }
+  ],
+  "sameSourceControls": [
+    {
+      "frame": "normal/macos-dark/forced-colors",
+      "base": "f73f460768d8408eb3e8cc7d39c308935a799fb6",
+      "pixels": 21,
+      "maxChannelDelta": 1,
+      "bounds": {
+        "left": 386,
+        "top": 473,
+        "right": 708,
+        "bottom": 475
+      }
+    },
+    {
+      "frame": "normal/linux-dark/forced-colors",
+      "base": "f73f460768d8408eb3e8cc7d39c308935a799fb6",
+      "pixels": 45,
+      "maxChannelDelta": 1,
+      "bounds": {
+        "left": 8,
+        "top": 152,
+        "right": 711,
+        "bottom": 475
+      }
+    }
+  ]
+}

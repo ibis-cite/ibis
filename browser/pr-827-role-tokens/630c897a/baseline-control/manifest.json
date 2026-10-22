@@ -1,0 +1,14 @@
+{
+  "source": "f73f460768d8",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "normal/linux-dark/forced-colors",
+    "normal/macos-dark/forced-colors"
+  ],
+  "failed": []
+}

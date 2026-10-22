@@ -1,0 +1,554 @@
+{
+  "base": "f73f460768d8408eb3e8cc7d39c308935a799fb6",
+  "head": "49eaa7e9184464cf42d04f3dd540c770e52b0376",
+  "clock": "2026-10-22T08:00:00Z fixed synthetic Date.now",
+  "frames": [
+    {
+      "frame": "large/linux-dark/forced-colors",
+      "before_sha256": "f04f2a1edde9a5838b95c68aea13374da2143d4a12e9f53e154c91e251b4490a",
+      "after_sha256": "f04f2a1edde9a5838b95c68aea13374da2143d4a12e9f53e154c91e251b4490a"
+    },
+    {
+      "frame": "large/linux-dark/format-menu",
+      "before_sha256": "f122e3816f4a758c761221cee18e3c29d7e58b2be7896fe14315e96bb93bcf56",
+      "after_sha256": "f122e3816f4a758c761221cee18e3c29d7e58b2be7896fe14315e96bb93bcf56"
+    },
+    {
+      "frame": "large/linux-dark/high-contrast",
+      "before_sha256": "78de01598f216148bad74031118912a005363f245dc31cf3983c937f3df601bd",
+      "after_sha256": "78de01598f216148bad74031118912a005363f245dc31cf3983c937f3df601bd"
+    },
+    {
+      "frame": "large/linux-dark/keys",
+      "before_sha256": "137c29369232b3348fbbeb7a773b794358e988b4cadc76bcb02d1986b7f37e91",
+      "after_sha256": "137c29369232b3348fbbeb7a773b794358e988b4cadc76bcb02d1986b7f37e91"
+    },
+    {
+      "frame": "large/linux-dark/many-results",
+      "before_sha256": "25cb0ed8c251a9c826de258e93a17dca4badab2e51b5d3703849596db8e8f934",
+      "after_sha256": "25cb0ed8c251a9c826de258e93a17dca4badab2e51b5d3703849596db8e8f934"
+    },
+    {
+      "frame": "large/linux-dark/menu-open",
+      "before_sha256": "ec3f6b015481294deeccae1dd8b1c64628e18bce66fc4eabca5ef848a31f95c1",
+      "after_sha256": "ec3f6b015481294deeccae1dd8b1c64628e18bce66fc4eabca5ef848a31f95c1"
+    },
+    {
+      "frame": "large/linux-dark/toolbar-menu",
+      "before_sha256": "ca70dbbe03ecdcd03aa05b9f63d9849b32f3cd2cdef2d5c422dd4a5c6d7278ed",
+      "after_sha256": "ca70dbbe03ecdcd03aa05b9f63d9849b32f3cd2cdef2d5c422dd4a5c6d7278ed"
+    },
+    {
+      "frame": "large/linux-dark/tray-preview",
+      "before_sha256": "9fea3056f30e97be15da896e7ef94ce52652d121920fff1882aea2ee4874504a",
+      "after_sha256": "9fea3056f30e97be15da896e7ef94ce52652d121920fff1882aea2ee4874504a"
+    },
+    {
+      "frame": "large/linux-dark/tray-system-large",
+      "before_sha256": "a8e4dd639a96f6b5915cf0850c8a71bf918a6761c96fd20b65b76b6c5f99b1c2",
+      "after_sha256": "a8e4dd639a96f6b5915cf0850c8a71bf918a6761c96fd20b65b76b6c5f99b1c2"
+    },
+    {
+      "frame": "large/linux-light/forced-colors",
+      "before_sha256": "75478d125a81fe4b85016e9936451be0d20c89d693ec31829a616941fef46cb7",
+      "after_sha256": "75478d125a81fe4b85016e9936451be0d20c89d693ec31829a616941fef46cb7"
+    },
+    {
+      "frame": "large/linux-light/format-menu",
+      "before_sha256": "bbf2b5ad9b2193107bd888152bbcc71d21d53ab6147d384180939c4ca312c8fa",
+      "after_sha256": "bbf2b5ad9b2193107bd888152bbcc71d21d53ab6147d384180939c4ca312c8fa"
+    },
+    {
+      "frame": "large/linux-light/high-contrast",
+      "before_sha256": "2a4f9718f417d2dabd88f6fbe2d4a75417a75f9f5740da7846cb7fde1c358aea",
+      "after_sha256": "2a4f9718f417d2dabd88f6fbe2d4a75417a75f9f5740da7846cb7fde1c358aea"
+    },
+    {
+      "frame": "large/linux-light/keys",
+      "before_sha256": "e0f8a19f9d67cf734176231bbed37dc4713e7e4c12a52395c90a8e576e418da5",
+      "after_sha256": "e0f8a19f9d67cf734176231bbed37dc4713e7e4c12a52395c90a8e576e418da5"
+    },
+    {
+      "frame": "large/linux-light/many-results",
+      "before_sha256": "4c068424f078f93d541beb8bd36512d71fe9fe4d686c500dbe6d4aa43143ebc3",
+      "after_sha256": "4c068424f078f93d541beb8bd36512d71fe9fe4d686c500dbe6d4aa43143ebc3"
+    },
+    {
+      "frame": "large/linux-light/menu-open",
+      "before_sha256": "24ae2aa91bdbb83a55fa18c8eb1a9bb7a82b3e2d735be0badfecb7e0b7f6f727",
+      "after_sha256": "24ae2aa91bdbb83a55fa18c8eb1a9bb7a82b3e2d735be0badfecb7e0b7f6f727"
+    },
+    {
+      "frame": "large/linux-light/toolbar-menu",
+      "before_sha256": "b1fa4367a78bc9ec0c7efd3e58789e1d656fd46ccce1a45b6b2795970e462632",
+      "after_sha256": "b1fa4367a78bc9ec0c7efd3e58789e1d656fd46ccce1a45b6b2795970e462632"
+    },
+    {
+      "frame": "large/linux-light/tray-preview",
+      "before_sha256": "b4ad80386378f655094340c504d3f66b126f64a1537212bcddbd202276f28e4a",
+      "after_sha256": "b4ad80386378f655094340c504d3f66b126f64a1537212bcddbd202276f28e4a"
+    },
+    {
+      "frame": "large/linux-light/tray-system-large",
+      "before_sha256": "8589c533a179c227ee87da8ca1661a81cfefc4b3d49f133519b89326e7a2e8e6",
+      "after_sha256": "8589c533a179c227ee87da8ca1661a81cfefc4b3d49f133519b89326e7a2e8e6"
+    },
+    {
+      "frame": "large/macos-dark/forced-colors",
+      "before_sha256": "8d753e11878df20f1c63802884cb26e6c297619f26422c8035cc9c4de1659e02",
+      "after_sha256": "8d753e11878df20f1c63802884cb26e6c297619f26422c8035cc9c4de1659e02"
+    },
+    {
+      "frame": "large/macos-dark/format-menu",
+      "before_sha256": "bfcebbf98943bf43ad566f38d349499487ebdb5ffd880703aa887d6d9ea9d2eb",
+      "after_sha256": "bfcebbf98943bf43ad566f38d349499487ebdb5ffd880703aa887d6d9ea9d2eb"
+    },
+    {
+      "frame": "large/macos-dark/high-contrast",
+      "before_sha256": "cc35882f916539466e3b445b2722cef6854560dbefd86bc5d21cd3e87f163bff",
+      "after_sha256": "cc35882f916539466e3b445b2722cef6854560dbefd86bc5d21cd3e87f163bff"
+    },
+    {
+      "frame": "large/macos-dark/keys",
+      "before_sha256": "b9776033ac4575d3bca01949f3c4492f0369628ce6b4191a10ba90df9e08853f",
+      "after_sha256": "b9776033ac4575d3bca01949f3c4492f0369628ce6b4191a10ba90df9e08853f"
+    },
+    {
+      "frame": "large/macos-dark/many-results",
+      "before_sha256": "a9d890be79d5d12ecece3576cd21440f2c9ccae71b7ad17fb97e0f323392296a",
+      "after_sha256": "a9d890be79d5d12ecece3576cd21440f2c9ccae71b7ad17fb97e0f323392296a"
+    },
+    {
+      "frame": "large/macos-dark/menu-open",
+      "before_sha256": "e4ce1bad92cc8ac0ec50e63f9093d79485a8240b395702c5d83054a4aecb0980",
+      "after_sha256": "e4ce1bad92cc8ac0ec50e63f9093d79485a8240b395702c5d83054a4aecb0980"
+    },
+    {
+      "frame": "large/macos-dark/toolbar-menu",
+      "before_sha256": "ea932304fb5a98268495e87701a358b76d48adf270df3cb54db188938395f5dd",
+      "after_sha256": "ea932304fb5a98268495e87701a358b76d48adf270df3cb54db188938395f5dd"
+    },
+    {
+      "frame": "large/macos-dark/tray-preview",
+      "before_sha256": "774f767d9ae2f9bc0c84727cb9ba149c3f604ea7e76dffa16c312232e44ebfa9",
+      "after_sha256": "774f767d9ae2f9bc0c84727cb9ba149c3f604ea7e76dffa16c312232e44ebfa9"
+    },
+    {
+      "frame": "large/macos-dark/tray-system-large",
+      "before_sha256": "69f835e2356b3cb0b7f647c7a8260611a04033d3b832cb2d43e03521bf0d904f",
+      "after_sha256": "69f835e2356b3cb0b7f647c7a8260611a04033d3b832cb2d43e03521bf0d904f"
+    },
+    {
+      "frame": "large/macos-light/forced-colors",
+      "before_sha256": "e4db9076a1524c35b4daee4cc21420cbbe8d392f0229cf24ec505d94af9eb8d9",
+      "after_sha256": "e4db9076a1524c35b4daee4cc21420cbbe8d392f0229cf24ec505d94af9eb8d9"
+    },
+    {
+      "frame": "large/macos-light/format-menu",
+      "before_sha256": "8c859f2c1f463ec49164c8a149e8acc61bee8c4206128c8f82c5015741ae285e",
+      "after_sha256": "8c859f2c1f463ec49164c8a149e8acc61bee8c4206128c8f82c5015741ae285e"
+    },
+    {
+      "frame": "large/macos-light/high-contrast",
+      "before_sha256": "d78e568c29552548a09c36a0e9ca2f78ed224f75caa2edc339e8b04381fb5ba5",
+      "after_sha256": "d78e568c29552548a09c36a0e9ca2f78ed224f75caa2edc339e8b04381fb5ba5"
+    },
+    {
+      "frame": "large/macos-light/keys",
+      "before_sha256": "b8ee95ecf19b6f8763d059b9dbf11fa5e79f703ac9c692755d58d2f8fb8aa768",
+      "after_sha256": "b8ee95ecf19b6f8763d059b9dbf11fa5e79f703ac9c692755d58d2f8fb8aa768"
+    },
+    {
+      "frame": "large/macos-light/many-results",
+      "before_sha256": "89eda11800a787171cbb85df33932d6bb322eaa74afded1c83f30a1a2f5033f5",
+      "after_sha256": "89eda11800a787171cbb85df33932d6bb322eaa74afded1c83f30a1a2f5033f5"
+    },
+    {
+      "frame": "large/macos-light/menu-open",
+      "before_sha256": "bd55d4865c985e37a21b324012c100d8c924f5e0952275a716bc1754b05b4657",
+      "after_sha256": "bd55d4865c985e37a21b324012c100d8c924f5e0952275a716bc1754b05b4657"
+    },
+    {
+      "frame": "large/macos-light/toolbar-menu",
+      "before_sha256": "504f20016330f8baa805842d322345f5499b1fe6a70fd8c4337c39e8606f146a",
+      "after_sha256": "504f20016330f8baa805842d322345f5499b1fe6a70fd8c4337c39e8606f146a"
+    },
+    {
+      "frame": "large/macos-light/tray-preview",
+      "before_sha256": "3642961b20f216e89b3ee2779158f711b49f86d825c1762e9d3f50b32377b5c1",
+      "after_sha256": "3642961b20f216e89b3ee2779158f711b49f86d825c1762e9d3f50b32377b5c1"
+    },
+    {
+      "frame": "large/macos-light/tray-system-large",
+      "before_sha256": "e1218af6bae601ffc2207d5b466ec56428db32a4b8980e2e1e5568e81cb1eaca",
+      "after_sha256": "e1218af6bae601ffc2207d5b466ec56428db32a4b8980e2e1e5568e81cb1eaca"
+    },
+    {
+      "frame": "large/windows-dark/forced-colors",
+      "before_sha256": "de4a1ce949c96a9ab9329f09286c861ae687a312828752bfc39e11466c078d35",
+      "after_sha256": "de4a1ce949c96a9ab9329f09286c861ae687a312828752bfc39e11466c078d35"
+    },
+    {
+      "frame": "large/windows-dark/format-menu",
+      "before_sha256": "0cd52d5412a77103b7e175c1b7eba9ecd50017fb3bbb3f1e877c655a4e3d96cc",
+      "after_sha256": "0cd52d5412a77103b7e175c1b7eba9ecd50017fb3bbb3f1e877c655a4e3d96cc"
+    },
+    {
+      "frame": "large/windows-dark/high-contrast",
+      "before_sha256": "956c39af656c2f39fc8ecc75c9141ccfa90d498393585d6a6331721440cf0a1e",
+      "after_sha256": "956c39af656c2f39fc8ecc75c9141ccfa90d498393585d6a6331721440cf0a1e"
+    },
+    {
+      "frame": "large/windows-dark/keys",
+      "before_sha256": "e3aabac2085b0442b1b7331b5c31650335ab9495e8a9c695225895819d977524",
+      "after_sha256": "e3aabac2085b0442b1b7331b5c31650335ab9495e8a9c695225895819d977524"
+    },
+    {
+      "frame": "large/windows-dark/many-results",
+      "before_sha256": "6affea5b1dedaf4cfb3dacf67cbb65da22b5bbf2e5b00516c74da749501ac989",
+      "after_sha256": "6affea5b1dedaf4cfb3dacf67cbb65da22b5bbf2e5b00516c74da749501ac989"
+    },
+    {
+      "frame": "large/windows-dark/menu-open",
+      "before_sha256": "1fd79c1bc41a9ee641a369465c84e0dbad11553d5e6753a46b506da2b786cdf6",
+      "after_sha256": "1fd79c1bc41a9ee641a369465c84e0dbad11553d5e6753a46b506da2b786cdf6"
+    },
+    {
+      "frame": "large/windows-dark/toolbar-menu",
+      "before_sha256": "a53394339e7b33d40e2f25816b4b3626f8dc85e5793e2dc3339df7aaa59d58bc",
+      "after_sha256": "a53394339e7b33d40e2f25816b4b3626f8dc85e5793e2dc3339df7aaa59d58bc"
+    },
+    {
+      "frame": "large/windows-dark/tray-preview",
+      "before_sha256": "3b9053a635c225eeb8f1a13ec3f3bcbbe29b27bbea433ad7733c599233023c0d",
+      "after_sha256": "3b9053a635c225eeb8f1a13ec3f3bcbbe29b27bbea433ad7733c599233023c0d"
+    },
+    {
+      "frame": "large/windows-dark/tray-system-large",
+      "before_sha256": "875ce53dd46253ec7cb7769d8d982437f2398916b5a0016cada9c2735a3a71d5",
+      "after_sha256": "875ce53dd46253ec7cb7769d8d982437f2398916b5a0016cada9c2735a3a71d5"
+    },
+    {
+      "frame": "large/windows-light/forced-colors",
+      "before_sha256": "75ba81c605bbeaa9591a600c81d3b1e150bef697730f135e25bec9181212786a",
+      "after_sha256": "75ba81c605bbeaa9591a600c81d3b1e150bef697730f135e25bec9181212786a"
+    },
+    {
+      "frame": "large/windows-light/format-menu",
+      "before_sha256": "44b5dd37247ea7575e2b3cd62da11ee2acae00cfe37f905ca9d6b23834f5f8d4",
+      "after_sha256": "44b5dd37247ea7575e2b3cd62da11ee2acae00cfe37f905ca9d6b23834f5f8d4"
+    },
+    {
+      "frame": "large/windows-light/high-contrast",
+      "before_sha256": "a12dccfa76d6ffd3370a730ecdead75d0bbdee5b54dbdc8bec36d8ef4b90f755",
+      "after_sha256": "a12dccfa76d6ffd3370a730ecdead75d0bbdee5b54dbdc8bec36d8ef4b90f755"
+    },
+    {
+      "frame": "large/windows-light/keys",
+      "before_sha256": "318f0228dd4bf9b1f428682002fedd8286cac3af5f0baddcf00d985cb61edfa3",
+      "after_sha256": "318f0228dd4bf9b1f428682002fedd8286cac3af5f0baddcf00d985cb61edfa3"
+    },
+    {
+      "frame": "large/windows-light/many-results",
+      "before_sha256": "103d528455b4a03993de3dddea144f3836e614900f85fe31c96a6fabcf4c2e41",
+      "after_sha256": "103d528455b4a03993de3dddea144f3836e614900f85fe31c96a6fabcf4c2e41"
+    },
+    {
+      "frame": "large/windows-light/menu-open",
+      "before_sha256": "cd372da215ffbf687243f04fa97e7c238dc5ff82fa46d925ea75bdc41e19a589",
+      "after_sha256": "cd372da215ffbf687243f04fa97e7c238dc5ff82fa46d925ea75bdc41e19a589"
+    },
+    {
+      "frame": "large/windows-light/toolbar-menu",
+      "before_sha256": "e2ebb367502186836f9a42a4fcfcce137e650a0654bd9c1f9c7114d2597f5d19",
+      "after_sha256": "e2ebb367502186836f9a42a4fcfcce137e650a0654bd9c1f9c7114d2597f5d19"
+    },
+    {
+      "frame": "large/windows-light/tray-preview",
+      "before_sha256": "1e174672d27c6908423c4cf4f1ac775fcc337d0982ef0e0895c522cf2f6ae47d",
+      "after_sha256": "1e174672d27c6908423c4cf4f1ac775fcc337d0982ef0e0895c522cf2f6ae47d"
+    },
+    {
+      "frame": "large/windows-light/tray-system-large",
+      "before_sha256": "1d7c48dd4540b9c66a118de719670b71d94d75443ba69fb9904ac1fa030a9125",
+      "after_sha256": "1d7c48dd4540b9c66a118de719670b71d94d75443ba69fb9904ac1fa030a9125"
+    },
+    {
+      "frame": "normal/linux-dark/forced-colors",
+      "before_sha256": "394b12e23e19d10b2a0075253dee7d0bed6eb815affb1e2217febf98cf20576a",
+      "after_sha256": "37f09a7fc459395f95a070ece06ab5623a2954db5ce4309262cb16872c04b13b"
+    },
+    {
+      "frame": "normal/linux-dark/format-menu",
+      "before_sha256": "a36acdc9ba258f33bef9d2fca26fea19ba7f41c7b47b9c2fc299fff247265291",
+      "after_sha256": "a36acdc9ba258f33bef9d2fca26fea19ba7f41c7b47b9c2fc299fff247265291"
+    },
+    {
+      "frame": "normal/linux-dark/high-contrast",
+      "before_sha256": "6d77805251e89385796ed086f5038c4908a6e71e311ff306a385cefd9c1839a6",
+      "after_sha256": "6d77805251e89385796ed086f5038c4908a6e71e311ff306a385cefd9c1839a6"
+    },
+    {
+      "frame": "normal/linux-dark/keys",
+      "before_sha256": "8b3c67fbf08349f93a2b6dd16c655f68115e514f66480961dea7fa425258d34e",
+      "after_sha256": "8b3c67fbf08349f93a2b6dd16c655f68115e514f66480961dea7fa425258d34e"
+    },
+    {
+      "frame": "normal/linux-dark/many-results",
+      "before_sha256": "78bf67f2eda28cebc754a39bf78219fce8dbee477a92625a0fb0476b45607c16",
+      "after_sha256": "78bf67f2eda28cebc754a39bf78219fce8dbee477a92625a0fb0476b45607c16"
+    },
+    {
+      "frame": "normal/linux-dark/menu-open",
+      "before_sha256": "f7d896376611047010e6f6bf41681f84b820b45180ef2b96d3c45f3c3150acdc",
+      "after_sha256": "f7d896376611047010e6f6bf41681f84b820b45180ef2b96d3c45f3c3150acdc"
+    },
+    {
+      "frame": "normal/linux-dark/toolbar-menu",
+      "before_sha256": "ed65f1ee4f6dfc2bc947f4eda7b2925899da7b2fe487599dc07a046d4dd860c0",
+      "after_sha256": "ed65f1ee4f6dfc2bc947f4eda7b2925899da7b2fe487599dc07a046d4dd860c0"
+    },
+    {
+      "frame": "normal/linux-dark/tray-preview",
+      "before_sha256": "7b3489013220a71f6c8f52baee75bf277509db525966a9c22e1425346aa9ac8d",
+      "after_sha256": "7b3489013220a71f6c8f52baee75bf277509db525966a9c22e1425346aa9ac8d"
+    },
+    {
+      "frame": "normal/linux-dark/tray-system-large",
+      "before_sha256": "a1658487d95bd3c6609b1ec45677023fd42753bca36bdfa2a74065e4d943cf1d",
+      "after_sha256": "a1658487d95bd3c6609b1ec45677023fd42753bca36bdfa2a74065e4d943cf1d"
+    },
+    {
+      "frame": "normal/linux-light/forced-colors",
+      "before_sha256": "c17e92cc4d16f3af5c0e2e49f9a4717c0322d92f3d94dc3718ddbbd10cb0ae04",
+      "after_sha256": "c17e92cc4d16f3af5c0e2e49f9a4717c0322d92f3d94dc3718ddbbd10cb0ae04"
+    },
+    {
+      "frame": "normal/linux-light/format-menu",
+      "before_sha256": "6aaedebd134d1b83fd2a999f7f298cf3661b459b1f22b0ebe799c5530551209b",
+      "after_sha256": "6aaedebd134d1b83fd2a999f7f298cf3661b459b1f22b0ebe799c5530551209b"
+    },
+    {
+      "frame": "normal/linux-light/high-contrast",
+      "before_sha256": "05ce2af4b83052d0f2a5c69966697db94894ce9b64943c48ad7ab04ba41de0a0",
+      "after_sha256": "05ce2af4b83052d0f2a5c69966697db94894ce9b64943c48ad7ab04ba41de0a0"
+    },
+    {
+      "frame": "normal/linux-light/keys",
+      "before_sha256": "62c250f0d67531247e07ef37efce3963dd0cda355e812cb567aad9995fa364b2",
+      "after_sha256": "62c250f0d67531247e07ef37efce3963dd0cda355e812cb567aad9995fa364b2"
+    },
+    {
+      "frame": "normal/linux-light/many-results",
+      "before_sha256": "750f7b196e2ca54e157bd5b77aa9ca980caedd6865da003b87cf0fe6973f5ceb",
+      "after_sha256": "750f7b196e2ca54e157bd5b77aa9ca980caedd6865da003b87cf0fe6973f5ceb"
+    },
+    {
+      "frame": "normal/linux-light/menu-open",
+      "before_sha256": "e66115903e262f41cd1d7a4db39575b25047fdcb0b443b9ac357e26ebe2ff391",
+      "after_sha256": "e66115903e262f41cd1d7a4db39575b25047fdcb0b443b9ac357e26ebe2ff391"
+    },
+    {
+      "frame": "normal/linux-light/toolbar-menu",
+      "before_sha256": "bbeab80523c67abc5c33066c59d61187a6096dcbd983e4cf60154ebaf79bd48b",
+      "after_sha256": "bbeab80523c67abc5c33066c59d61187a6096dcbd983e4cf60154ebaf79bd48b"
+    },
+    {
+      "frame": "normal/linux-light/tray-preview",
+      "before_sha256": "384d5f18b9d929ab2ea45c004a42d7a36c3ea7a25c069847fd721440cbc8b7ea",
+      "after_sha256": "384d5f18b9d929ab2ea45c004a42d7a36c3ea7a25c069847fd721440cbc8b7ea"
+    },
+    {
+      "frame": "normal/linux-light/tray-system-large",
+      "before_sha256": "e4103eae80efc2109bad07be727c8642710932a8273e5362b557feb801787261",
+      "after_sha256": "e4103eae80efc2109bad07be727c8642710932a8273e5362b557feb801787261"
+    },
+    {
+      "frame": "normal/macos-dark/forced-colors",
+      "before_sha256": "546e3dcf9124a8ad443388697c2b450a88e50d673a133b056cb95537e4dbc181",
+      "after_sha256": "34f55eb29876f61256d1f2008a0dbb93de5afe745abd89ff820d81f1495d4d74"
+    },
+    {
+      "frame": "normal/macos-dark/format-menu",
+      "before_sha256": "9a085f98d3b5faa8c85e48952ebe2c777ecd4479f07a1019cc1e0e15623b658e",
+      "after_sha256": "9a085f98d3b5faa8c85e48952ebe2c777ecd4479f07a1019cc1e0e15623b658e"
+    },
+    {
+      "frame": "normal/macos-dark/high-contrast",
+      "before_sha256": "84c9b66afdf6c043f977dbfec719e3f8e8d46b6d60d74fa930eed5c1f4b460a9",
+      "after_sha256": "84c9b66afdf6c043f977dbfec719e3f8e8d46b6d60d74fa930eed5c1f4b460a9"
+    },
+    {
+      "frame": "normal/macos-dark/keys",
+      "before_sha256": "5739ce6b86946e19e3b757b5bec0db4192bfbbb3994fbe437ad011f149caf2c6",
+      "after_sha256": "5739ce6b86946e19e3b757b5bec0db4192bfbbb3994fbe437ad011f149caf2c6"
+    },
+    {
+      "frame": "normal/macos-dark/many-results",
+      "before_sha256": "e0d809451c7f3d3c7574e4e86bd01d371a86472ee99c53dce1800ca3d357d1b0",
+      "after_sha256": "e0d809451c7f3d3c7574e4e86bd01d371a86472ee99c53dce1800ca3d357d1b0"
+    },
+    {
+      "frame": "normal/macos-dark/menu-open",
+      "before_sha256": "7fc6a102053a95c6854b8b95c3841a1f08c543ab19f4fc76f7aee150d46dd25b",
+      "after_sha256": "7fc6a102053a95c6854b8b95c3841a1f08c543ab19f4fc76f7aee150d46dd25b"
+    },
+    {
+      "frame": "normal/macos-dark/toolbar-menu",
+      "before_sha256": "68cae880d272b10e4576c65a19b0fb5a0b8bbbf0f04995e9aec03689efe043ae",
+      "after_sha256": "68cae880d272b10e4576c65a19b0fb5a0b8bbbf0f04995e9aec03689efe043ae"
+    },
+    {
+      "frame": "normal/macos-dark/tray-preview",
+      "before_sha256": "1b995929d45cf68562db27bace987e02b729ab53bd9d78a3e3abb2ad2bf7db56",
+      "after_sha256": "1b995929d45cf68562db27bace987e02b729ab53bd9d78a3e3abb2ad2bf7db56"
+    },
+    {
+      "frame": "normal/macos-dark/tray-system-large",
+      "before_sha256": "a4a223ff35ad1ded36ca2dbabc2ca0429b959aff8827e8f204013ea68fab61e4",
+      "after_sha256": "a4a223ff35ad1ded36ca2dbabc2ca0429b959aff8827e8f204013ea68fab61e4"
+    },
+    {
+      "frame": "normal/macos-light/forced-colors",
+      "before_sha256": "c600485e8b7899a5b4707b5d503022e71d4d604f4e77bdfd5413c0f38bbea158",
+      "after_sha256": "c600485e8b7899a5b4707b5d503022e71d4d604f4e77bdfd5413c0f38bbea158"
+    },
+    {
+      "frame": "normal/macos-light/format-menu",
+      "before_sha256": "9bb665a111f5f3e4080a015fffca50c3f6d42e8e036a7155e1a92fe298d152e9",
+      "after_sha256": "9bb665a111f5f3e4080a015fffca50c3f6d42e8e036a7155e1a92fe298d152e9"
+    },
+    {
+      "frame": "normal/macos-light/high-contrast",
+      "before_sha256": "6bb9e92c0c39e59926c2cbbdbf7bd29ae7b7ac4ba5fcb2976f9d40d031d2d1d9",
+      "after_sha256": "6bb9e92c0c39e59926c2cbbdbf7bd29ae7b7ac4ba5fcb2976f9d40d031d2d1d9"
+    },
+    {
+      "frame": "normal/macos-light/keys",
+      "before_sha256": "db2d8a4187369ebe9e181b02f087e213e24e9d2c9d8d77bb146b88f903d5a2d7",
+      "after_sha256": "db2d8a4187369ebe9e181b02f087e213e24e9d2c9d8d77bb146b88f903d5a2d7"
+    },
+    {
+      "frame": "normal/macos-light/many-results",
+      "before_sha256": "97e780bbe025268e73e9ae857907cffd732f050e6d062f7d74a5cf51aa1e6c1a",
+      "after_sha256": "97e780bbe025268e73e9ae857907cffd732f050e6d062f7d74a5cf51aa1e6c1a"
+    },
+    {
+      "frame": "normal/macos-light/menu-open",
+      "before_sha256": "881a6e74ab9c6802d66f3ddd775dea4e38f7d3bb96150776d63ae62d4a59d771",
+      "after_sha256": "881a6e74ab9c6802d66f3ddd775dea4e38f7d3bb96150776d63ae62d4a59d771"
+    },
+    {
+      "frame": "normal/macos-light/toolbar-menu",
+      "before_sha256": "598fd8ebc93339edb725bcb68878f8028ac13d9c44388f6ce35d15d90a2c247e",
+      "after_sha256": "757ae35080457f207778e5e7ff22123f1d2ad927c601d56a1e74323cef9f9174"
+    },
+    {
+      "frame": "normal/macos-light/tray-preview",
+      "before_sha256": "243f2986c2058d6d52dbd970f55b22d0c32dbe38f35568abeb499ecc243fface",
+      "after_sha256": "243f2986c2058d6d52dbd970f55b22d0c32dbe38f35568abeb499ecc243fface"
+    },
+    {
+      "frame": "normal/macos-light/tray-system-large",
+      "before_sha256": "e9c1e8ffa93d3604fd1ca0d919d4904e1901539eef5e78f843f3af967535cd2c",
+      "after_sha256": "e9c1e8ffa93d3604fd1ca0d919d4904e1901539eef5e78f843f3af967535cd2c"
+    },
+    {
+      "frame": "normal/windows-dark/forced-colors",
+      "before_sha256": "c7ac93aaddf639011ff0ecee60acc64066203d0a839d76befa91a07e5b59d0bf",
+      "after_sha256": "92edd20e8e00400884f35b545ba683ecc6531f9a5a19ab58b06909a98be0813a"
+    },
+    {
+      "frame": "normal/windows-dark/format-menu",
+      "before_sha256": "4e4e07a5affe939c38cc22852e453ebe21eddcef40f8a8d983815ff41b12e15d",
+      "after_sha256": "4e4e07a5affe939c38cc22852e453ebe21eddcef40f8a8d983815ff41b12e15d"
+    },
+    {
+      "frame": "normal/windows-dark/high-contrast",
+      "before_sha256": "62c9dcd41e6fa2d8a83d66ca3f87fc7840dd2addfb405e7204b8ba6c450fe8af",
+      "after_sha256": "beda3f6a88bb877c3364e0c4ae19a3db07282f40d130f59252d7a4ebd93d47aa"
+    },
+    {
+      "frame": "normal/windows-dark/keys",
+      "before_sha256": "ae63dd72e656ecc9c507e162f6aea320cb91f2f2ae5e0cd3a68bbd5cd878fc97",
+      "after_sha256": "ae63dd72e656ecc9c507e162f6aea320cb91f2f2ae5e0cd3a68bbd5cd878fc97"
+    },
+    {
+      "frame": "normal/windows-dark/many-results",
+      "before_sha256": "1ffb89b55d09a22bf5a1d02c421b8f7e4c2d9afa4534f1d15b6243ce85c37f01",
+      "after_sha256": "1ffb89b55d09a22bf5a1d02c421b8f7e4c2d9afa4534f1d15b6243ce85c37f01"
+    },
+    {
+      "frame": "normal/windows-dark/menu-open",
+      "before_sha256": "92e86d1dc92aa38f8581963453988d1affb4fcb5681155d4401d63270746d442",
+      "after_sha256": "92e86d1dc92aa38f8581963453988d1affb4fcb5681155d4401d63270746d442"
+    },
+    {
+      "frame": "normal/windows-dark/toolbar-menu",
+      "before_sha256": "8a34144151a6523d60eaddab80f4e96f0ca3f93d5d1f25cb846d7cc5eda539d5",
+      "after_sha256": "8a34144151a6523d60eaddab80f4e96f0ca3f93d5d1f25cb846d7cc5eda539d5"
+    },
+    {
+      "frame": "normal/windows-dark/tray-preview",
+      "before_sha256": "72dd9140fa7f0b1e30bb6de3ecb75fb90c9ef1f66550a155a8f0958a525d6f89",
+      "after_sha256": "72dd9140fa7f0b1e30bb6de3ecb75fb90c9ef1f66550a155a8f0958a525d6f89"
+    },
+    {
+      "frame": "normal/windows-dark/tray-system-large",
+      "before_sha256": "6234de9aa51c342f27a6eabf9d27e2b555f7a6380fe7b688a3ec2b8706e2eea0",
+      "after_sha256": "6234de9aa51c342f27a6eabf9d27e2b555f7a6380fe7b688a3ec2b8706e2eea0"
+    },
+    {
+      "frame": "normal/windows-light/forced-colors",
+      "before_sha256": "ac66c2b6c80efdcd84ae947ae1526b9bce9961f1828cef5f4088b372cdfa2a9a",
+      "after_sha256": "ac66c2b6c80efdcd84ae947ae1526b9bce9961f1828cef5f4088b372cdfa2a9a"
+    },
+    {
+      "frame": "normal/windows-light/format-menu",
+      "before_sha256": "ed1b9cf45338f9e5262d87f82a962fa6b0490dc2deca760dff357b269eb9e46e",
+      "after_sha256": "ed1b9cf45338f9e5262d87f82a962fa6b0490dc2deca760dff357b269eb9e46e"
+    },
+    {
+      "frame": "normal/windows-light/high-contrast",
+      "before_sha256": "dcd93ee9e4c6886707799bca37404011944ce00c90580849ef689cd66b482191",
+      "after_sha256": "dcd93ee9e4c6886707799bca37404011944ce00c90580849ef689cd66b482191"
+    },
+    {
+      "frame": "normal/windows-light/keys",
+      "before_sha256": "ce562a1c0ade5d6eac6c025d8b97249738297a5d81c0102c4cc26174bd9ba39d",
+      "after_sha256": "ce562a1c0ade5d6eac6c025d8b97249738297a5d81c0102c4cc26174bd9ba39d"
+    },
+    {
+      "frame": "normal/windows-light/many-results",
+      "before_sha256": "4da2f4d756e327f75de67cec9f4cb417f24a5db9226937a8e32c7020febb2f10",
+      "after_sha256": "4da2f4d756e327f75de67cec9f4cb417f24a5db9226937a8e32c7020febb2f10"
+    },
+    {
+      "frame": "normal/windows-light/menu-open",
+      "before_sha256": "1cb2ad4f4175a6569a47510fc6e32b7486bd0fa44057af253c333c975bf45956",
+      "after_sha256": "1cb2ad4f4175a6569a47510fc6e32b7486bd0fa44057af253c333c975bf45956"
+    },
+    {
+      "frame": "normal/windows-light/toolbar-menu",
+      "before_sha256": "3809353ea6353622ddac69f0411fcf6fcc2cb50b4f116c2479907c225af20684",
+      "after_sha256": "3809353ea6353622ddac69f0411fcf6fcc2cb50b4f116c2479907c225af20684"
+    },
+    {
+      "frame": "normal/windows-light/tray-preview",
+      "before_sha256": "b0f2ae6d4df2466246d9daf1bb1d023e65eae65c33793e98f39bd1d7b0d4ab8c",
+      "after_sha256": "b0f2ae6d4df2466246d9daf1bb1d023e65eae65c33793e98f39bd1d7b0d4ab8c"
+    },
+    {
+      "frame": "normal/windows-light/tray-system-large",
+      "before_sha256": "375180b7e21a01c4c039a31629610f7d95b3cb393cf7eef214ea4d2b735f1319",
+      "after_sha256": "375180b7e21a01c4c039a31629610f7d95b3cb393cf7eef214ea4d2b735f1319"
+    }
+  ],
+  "different": [
+    "normal/linux-dark/forced-colors",
+    "normal/macos-dark/forced-colors",
+    "normal/macos-light/toolbar-menu",
+    "normal/windows-dark/forced-colors",
+    "normal/windows-dark/high-contrast"
+  ]
+}
