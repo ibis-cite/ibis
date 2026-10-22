@@ -115,6 +115,9 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const pickerShows = useRef(0);
   const currentPin = useRef(pinned);
   currentPin.current = pinned;
+  const confirmedPin = useRef(false);
+  const pinRequest = useRef(0);
+  const pinWork = useRef(Promise.resolve());
   // Setup failures belong to the setup screen; they go when a library is chosen.
   const setupDone = library !== undefined && library?.state !== "none";
   useEffect(() => {
@@ -185,10 +188,22 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   const loginItemOffered = Boolean(setLoginItem) && startAtLogin !== null && startAtLogin.problem !== "unsupported";
 
   const togglePin = () => {
-    const on = !pinned;
+    const on = !currentPin.current;
+    currentPin.current = on;
     setPinnedState(on);
-    // Show the pin as it really is if the window could not change.
-    void perform("pin", () => setPinned(on).catch((error: unknown) => { setPinnedState(!on); throw error; }));
+    const request = ++pinRequest.current;
+    // Preserve native request order, and roll back only the latest request to
+    // the last confirmed state. An older failure cannot undo a newer choice.
+    pinWork.current = pinWork.current.then(() => perform("pin", async () => {
+      try { await setPinned(on); confirmedPin.current = on; }
+      catch (error: unknown) {
+        if (request === pinRequest.current) {
+          currentPin.current = confirmedPin.current;
+          setPinnedState(confirmedPin.current);
+        }
+        throw error;
+      }
+    }));
   };
 
   // When the picker is shown, put the cursor in the search box with the

@@ -1350,6 +1350,33 @@ test("a failed pin is reported", async () => {
   expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
 });
 
+test.each([false, true])("rapid keep-open changes retain the last confirmed state after failures (first succeeds: %s)", async (firstSucceeds) => {
+  const requests: { on: unknown; resolve: () => void; reject: () => void }[] = [];
+  backend({ set_pinned: ({ on }) => new Promise<void>((resolve, reject) => {
+    requests.push({ on, resolve, reject: () => reject(new Error("SYNTHETIC_PRIVATE_PAYLOAD")) });
+  }) });
+  render(<App />);
+  toggleKeepOpen();
+  await waitFor(() => expect(requests).toHaveLength(1));
+  toggleKeepOpen();
+  if (firstSucceeds) toggleKeepOpen();
+  // Native changes must complete in order, even when the shortcut and footer
+  // can both request a new state before the previous call answers.
+  expect(requests.map(({ on }) => on)).toEqual([true]);
+  await act(async () => { if (firstSucceeds) requests[0]!.resolve(); else requests[0]!.reject(); });
+  await waitFor(() => expect(requests).toHaveLength(2));
+  expect(requests[1]!.on).toBe(false);
+  await act(async () => { requests[1]!.reject(); });
+  if (firstSucceeds) {
+    await waitFor(() => expect(requests).toHaveLength(3));
+    expect(requests[2]!.on).toBe(true);
+    await act(async () => { requests[2]!.reject(); });
+  }
+  await screen.findByText("Ibis could not change the pin. Try again.");
+  expect(Boolean(screen.queryByRole("button", { name: "Kept open; click to stop" }))).toBe(firstSucceeds);
+  expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
+});
+
 test.each([[30_000, true, "first"], [61_000, true, ""], [61_000, false, "first"]])(
   "a search is kept unless the picker was hidden for over a minute (%i ms, hidden: %s)", async (away, hidden, kept) => {
     backend({ search: () => [result("a", "First")] });
