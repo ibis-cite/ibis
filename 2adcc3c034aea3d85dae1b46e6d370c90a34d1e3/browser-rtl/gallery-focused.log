@@ -1,0 +1,9 @@
+
+ RUN  v5.0.5 /Users/diyanko/.t3/worktrees/ibis/fix-885-title-clamp-rtl/apps/desktop
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 83 skipped (85)
+   Start at  16:23:16
+   Duration  8.55s (environment 37%, import 31%, tests 23%, transform 9%)
+

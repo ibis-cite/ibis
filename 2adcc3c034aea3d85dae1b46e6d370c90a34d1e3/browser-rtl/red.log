@@ -1,0 +1,32 @@
+
+ RUN  v5.0.5 /Users/diyanko/.t3/worktrees/ibis/fix-885-title-clamp-rtl/apps/desktop
+
+ ❯ src/App.test.tsx (264 tests | 2 failed | 262 skipped) 339ms
+   × the 1-result heading keeps its English word order on an RTL page 214ms
+   × the 20-result heading keeps its English word order on an RTL page 122ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > the 1-result heading keeps its English word order on an RTL page
+ FAIL  src/App.test.tsx > the 20-result heading keeps its English word order on an RTL page
+AssertionError: expected 'SPAN' to be 'BDI' // Object.is equality
+
+Expected: "BDI"
+Received: "SPAN"
+
+ ❯ src/App.test.tsx:832:25
+    830|   const label = heading.lastElementChild!;
+    831|   expect(label.textContent).toBe(`${count} ${count === 1 ? "result" : …
+    832|   expect(label.tagName).toBe("BDI");
+       |                         ^
+    833|   expect(heading.getAttribute("aria-hidden")).toBe("true");
+    834|   const announcement = screen.getByRole("status", { name: "Search resu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 262 skipped (264)
+   Start at  16:21:03
+   Duration  4.16s (import 42%, environment 35%, transform 12%, tests 9%, worker 2%)
+
