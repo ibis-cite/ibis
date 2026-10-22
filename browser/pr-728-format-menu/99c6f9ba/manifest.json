@@ -1,0 +1,30 @@
+{
+  "source": "99c6f9badbf7",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "normal/linux-dark/format-menu",
+    "normal/linux-dark/format-menu-filtered",
+    "normal/linux-dark/many-results",
+    "normal/linux-light/format-menu",
+    "normal/linux-light/format-menu-filtered",
+    "normal/linux-light/many-results",
+    "normal/macos-dark/format-menu",
+    "normal/macos-dark/format-menu-filtered",
+    "normal/macos-dark/many-results",
+    "normal/macos-light/format-menu",
+    "normal/macos-light/format-menu-filtered",
+    "normal/macos-light/many-results",
+    "normal/windows-dark/format-menu",
+    "normal/windows-dark/format-menu-filtered",
+    "normal/windows-dark/many-results",
+    "normal/windows-light/format-menu",
+    "normal/windows-light/format-menu-filtered",
+    "normal/windows-light/many-results"
+  ],
+  "failed": []
+}

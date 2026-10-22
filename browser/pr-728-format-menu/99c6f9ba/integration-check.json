@@ -1,0 +1,20 @@
+{
+  "final_source": "99c6f9badbf74cbe80a075624c1db97faa91f8a8",
+  "browser_cases_source": "91bf21fa62d7df500202134e919c1c092f4b64e8",
+  "changed_files": [
+    "apps/desktop/src/ui/ToolbarMenu.test.tsx"
+  ],
+  "diagnostic_peer": "2d458161eb103391f9a697216fa69ade6948f370",
+  "diagnostic_tree": "11ce6bb772b244104831d6ba0a75c16987d299c6",
+  "diagnostic_is_main": false,
+  "pending_peer_is_ancestor": false,
+  "shared_command_groups": 1,
+  "held_exit_cases": [
+    "k",
+    "Escape",
+    "Tab",
+    "reopen",
+    "unmount"
+  ],
+  "format_css_case_preserved": true
+}

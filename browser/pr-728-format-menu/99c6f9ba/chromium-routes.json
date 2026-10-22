@@ -1,0 +1,217 @@
+{
+  "source": "91bf21fa62d7df500202134e919c1c092f4b64e8",
+  "base": "actual main 3aec80b4",
+  "kind": "synthetic Chromium browser, not native; rapid reopen uses virtual activation after observed exit",
+  "results": [
+    {
+      "platform": "macos",
+      "action": "pick",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "Escape",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "Tab",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "More-Tab",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "More-Reload",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "More-Escape-Space",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "Keys-Escape",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "IME",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "repeat-More-exit",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "keys-during-exit",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "plain-key-exit",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "rapid-action",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "rapid-Escape",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "unavailable",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "pick",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "Escape",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "Tab",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "More-Tab",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "More-Reload",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "More-Escape-Space",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "Keys-Escape",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "IME",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "repeat-More-exit",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "keys-during-exit",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "plain-key-exit",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "rapid-action",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "rapid-Escape",
+      "passed": true
+    },
+    {
+      "platform": "windows",
+      "action": "unavailable",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "pick",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "Escape",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "Tab",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "More-Tab",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "More-Reload",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "More-Escape-Space",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "Keys-Escape",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "IME",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "repeat-More-exit",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "keys-during-exit",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "plain-key-exit",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "rapid-action",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "rapid-Escape",
+      "passed": true
+    },
+    {
+      "platform": "linux",
+      "action": "unavailable",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "source": "91bf21fa62d7df500202134e919c1c092f4b64e8",
+  "kind": "synthetic Chromium geometry and huge Unicode filtering, not native",
+  "results": [
+    {
+      "platform": "macos",
+      "width": 360,
+      "text": "normal",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "macos",
+      "width": 360,
+      "text": "large",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "text": "normal",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "macos",
+      "width": 720,
+      "text": "large",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "text": "normal",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "windows",
+      "width": 360,
+      "text": "large",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "text": "normal",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "windows",
+      "width": 720,
+      "text": "large",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "text": "normal",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "linux",
+      "width": 360,
+      "text": "large",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "text": "normal",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    },
+    {
+      "platform": "linux",
+      "width": 720,
+      "text": "large",
+      "passed": true,
+      "facts": {
+        "viewportFits": true,
+        "menuHorizontalOverflow": 0,
+        "rowHorizontalOverflow": 0,
+        "items": 12
+      }
+    }
+  ]
+}

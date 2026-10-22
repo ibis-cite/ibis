@@ -1,0 +1,23 @@
+{
+  "before": {
+    "entry": "assets/main-CfaitDvl.js",
+    "files": [
+      "assets/copyFeedback-DW3-GIwq.js",
+      "assets/main-CfaitDvl.js"
+    ],
+    "bytes": 439405,
+    "gzip_bytes": 138150
+  },
+  "after": {
+    "entry": "assets/main-CyTyOoh2.js",
+    "files": [
+      "assets/copyFeedback-C_ZjelT6.js",
+      "assets/main-CyTyOoh2.js"
+    ],
+    "bytes": 462159,
+    "gzip_bytes": 145258
+  },
+  "delta_gzip_bytes": 7108,
+  "base": "3aec80b4042fa248d4c70689d9b6b056b3c912c1",
+  "source": "91bf21fa62d7df500202134e919c1c092f4b64e8"
+}

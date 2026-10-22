@@ -1,0 +1,37 @@
+{
+  "source": "91bf21fa62d7df500202134e919c1c092f4b64e8",
+  "base": "actual main 3aec80b4",
+  "kind": "synthetic WebKit browser, not native; rapid reopen uses virtual activation after observed exit",
+  "results": [
+    {
+      "platform": "macos",
+      "action": "pick",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "More-Tab",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "More-Escape-Space",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "keys-during-exit",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "rapid-action",
+      "passed": true
+    },
+    {
+      "platform": "macos",
+      "action": "rapid-Escape",
+      "passed": true
+    }
+  ]
+}
