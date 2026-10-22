@@ -74,7 +74,7 @@ test("the selected row follows each platform", () => {
   const active = rules(styles, '[role="option"][data-active]');
   expect(active).toMatch(/background:\s*var\(--row-active-background\)/);
   expect(active).toMatch(/color:\s*var\(--row-active-text\)/);
-  // macOS (the default): filled accent with white text.
+  // macOS (the default): filled accent with paired text.
   expect(tokens).toMatch(/--row-active-background:\s*var\(--selected-background\)/);
   expect(tokens).toMatch(/--selected-background:\s*AccentColor/);
   expect(tokens).toMatch(/--selected-text:\s*AccentColorText/);
@@ -813,11 +813,25 @@ test("unsupported native accent keywords use each platform's light and dark defa
   expect(tokens).toContain("@supports (color: AccentColor)");
 });
 
-test("bright Windows and GNOME dark defaults pair with readable dark text", () => {
-  for (const platform of ["windows", "linux"]) {
-    const block = rules(tokens, `:root[data-platform="${platform}"]`);
-    expect(block).toContain("--on-accent-fallback: light-dark(#fff, #000)");
-    const dark = block.match(/--accent-fallback:\s*light-dark\(#[0-9a-f]{6},\s*(#[0-9a-f]{6})\)/)![1]!;
-    expect(ratio(hex(dark), hex("#000000"))).toBeGreaterThanOrEqual(4.5);
+test.each(["macos", "windows", "linux"])("%s: fallback accent text reaches 4.5:1 in both themes", (platform) => {
+  // Only fallback declarations: native pairs require rendered acceptance.
+  // This contract check does not simulate the browser's cascade.
+  const fallback = tokens.slice(0, tokens.indexOf("@supports (color: AccentColor)"));
+  const declarations = rules(fallback, ":root") + ";" + rules(fallback, `:root[data-platform="${platform}"]`);
+  for (const lightDarkSupported of [false, true]) for (const mode of [0, 1]) {
+    const values = new Map(
+      [...declarations.matchAll(/(--(?:accent|on-accent)-fallback):\s*([^;]+);/g)]
+        .filter(([, , value]) => lightDarkSupported || !value!.trim().startsWith("light-dark("))
+        .map(([, name, value]) => [name!, value!.trim()] as const),
+    );
+    const color = (name: string) => {
+      const raw = values.get(name)!;
+      const pair = raw.match(/^light-dark\(\s*(#[\da-f]+),\s*(#[\da-f]+)\s*\)$/i);
+      const value = pair ? pair[mode + 1]! : raw;
+      expect(value).toMatch(/^#(?:[\da-f]{3}|[\da-f]{6})$/i);
+      return hex(value.replace(/^#([\da-f])([\da-f])([\da-f])$/i, "#$1$1$2$2$3$3"));
+    };
+    expect(ratio(color("--accent-fallback"), color("--on-accent-fallback")),
+      `${platform}, theme ${mode}, light-dark ${lightDarkSupported}`).toBeGreaterThanOrEqual(4.5);
   }
 });
