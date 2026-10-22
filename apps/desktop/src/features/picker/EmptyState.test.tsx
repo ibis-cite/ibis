@@ -82,6 +82,14 @@ test("the delayed loader shortens mixed-script names visually and exposes the fu
   expect(container.querySelector(".visually-hidden")).toBeNull();
 });
 
+test.each([null, ""])("a missing loading name has the same visible and accessible fallback (%s)", async (name) => {
+  vi.useFakeTimers();
+  render(<EmptyState library={{ ...loaded, state: "loading", name }} query="" narrowed={false}
+    onChooseLibrary={vi.fn()} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+  await act(() => vi.advanceTimersByTimeAsync(400));
+  expect(screen.getByRole("progressbar", { name: "Opening library…" }).textContent).toBe("Opening library…");
+});
+
 test("no matches retain clear-search and search-all actions", () => {
   const { container, clear, searchAll } = mount("unmatched");
   expect(container.querySelector(".empty-actions")).toBeTruthy();

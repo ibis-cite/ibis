@@ -27,11 +27,12 @@ function LibraryProgress({ library }: { library: LibraryStatus }) {
   }, []);
   if (!visible) return null;
   const progress = library.state === "reloading" ? libraryMessages.reloading : libraryMessages.opening;
-  return <div role="status" aria-live="polite"><ProgressBar className="empty-loading" isIndeterminate aria-label={progress(library.name)}>
+  const name = library.name || null;
+  return <div role="status" aria-live="polite"><ProgressBar className="empty-loading" isIndeterminate aria-label={progress(name)}>
     <svg className="empty-spinner" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
       <path d="M12 3a9 9 0 1 1-9 9" />
     </svg>
-    <span aria-hidden="true" dir="auto">{progress(shortName(library.name))}</span>
+    <span aria-hidden="true" dir="auto">{progress(shortName(name))}</span>
   </ProgressBar></div>;
 }
 
