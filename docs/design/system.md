@@ -28,7 +28,7 @@ browser comparisons verify the winning values and rendered appearance.
 | D3 | **Per-OS radius values:** macOS 15: win 12, control 6, menu 8 (verify). macOS 26: win 28, control capsule in the header, 8 in content, menu 12. Windows 11: win/overlay/card 8, control/row/tile 4. GNOME (libadwaita 1.8+ look): win/card 15, derived row 7, control/tile 6, popover 12. | `--r-*` |
 | D4 | **Surfaces are four layers:** `--surface-window` (base) < `--surface` (content sheet) < `--surface-raised` (band, cards, shelf) < `--surface-overlay` (menus, popovers, dialogs). Values from soft depth B. | §2 |
 | D5 | **Text has four levels:** `--text`, `--muted` (secondary, always 4.5:1), `--text-tertiary` (icons at rest, placeholder hints, 3:1 minimum, never for sentences), `--text-disabled`. | |
-| D6 | **Accent is always the system's.** Native keywords win; unsupported engines use macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF, Adwaita #3584E4 / #78AEED (light / dark). Windows and Adwaita pair their bright defaults in dark mode with dark text. `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. On Windows and GNOME the accent is injected from Rust (#763). | |
+| D6 | **Accent is always the system's.** Native keywords win; unsupported engines use macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF, Adwaita #3584E4 / #78AEED (light / dark). Fallback foregrounds are black, except Windows light, which uses white; every fallback text pair reaches 4.5:1. `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. On Windows and GNOME the accent is injected from Rust (#763). | |
 | D7 | **Selection is a fill, never a ring.** macOS and GNOME: full accent fill with `--text-on-accent`. Windows: subtle fill plus a 3 × 16 px accent pill. `--row-inactive-background` for a kept-open picker that lost focus. Menu highlight: accent fill on macOS, subtle fill on Windows and GNOME. | `--row-active-*`, `--menu-highlight*` |
 | D8 | **Focus ring only on keyboard focus** (`:focus-visible` / `data-focus-visible`). macOS: 2 px accent, 1 px gap. Windows: 2 px text-colour outer, 1 px surface inner. GNOME: 2 px half-accent mixed to 3:1, drawn **inside** (offset −2 px) so scroll containers never clip it. Contrast modes: 2 px `CanvasText`. | `--focus-ring-*` |
 | D9 | **Scarlet marks the citation only:** the shelf's quote mark, the added tile and the logo. The citation's text is in the text colour ([preview.md](preview.md)). Never on a control, link, toggle, progress, badge, selection, focus or error. On an accent-filled selected row the added tile becomes a `--text-on-accent` tile with a scarlet check, so a red or orange accent never meets scarlet fill-on-fill. | `--citation`, `--citation-tile` |
@@ -111,7 +111,7 @@ Light / dark. † marks a value kept from today's `tokens.css`.
 | Secondary | `--muted` | `#4c5260` / `#c0c3cc`† (`secondaryLabelColor` is too faint) | black 62 % / white 79 % | `#5e5e66` / `#a6a6af` (`.dim-label` is too faint) | **≥ 4.5:1** |
 | Tertiary | `--text-tertiary` | black 45 % / white 45 % | black 45 % / white 54 % | `currentColor` 45 % | ≥ 3:1, glyphs and hints only |
 | Disabled | `--text-disabled` | black 25 % / white 25 % | black 36 % / white 36 % | control at opacity .5 | aim ≥ 2:1 |
-| On accent | `--text-on-accent` | `-apple-system-alternate-selected-text`† | `#ffffff` / `#000000` | `accent_fg_color` `#ffffff` | ≥ 4.5:1 on `--accent` |
+| On accent | `--text-on-accent` | native paired text†; fallback `#000000` | native paired text; fallback `#ffffff` / `#000000` | native paired text; fallback `#000000` | ≥ 4.5:1 on `--accent`; measure native pairs |
 
 **Accent, selection, focus**
 
@@ -119,11 +119,11 @@ Light / dark. † marks a value kept from today's `tokens.css`.
 |---|---|---|---|---|
 | Accent fill | `--accent` | `controlAccentColor` (system) | `SystemAccentColor`: `AccentDark1` light, `AccentLight2` dark; injected from Rust (WebView2 has no `AccentColor`) | `accent_bg_color` from the portal `accent-color` (GNOME 47+); injected from Rust (WebKitGTK 4.1 is GTK 3) |
 | Accent as text | `--accent-text` | darkened in light until 4.5:1 | `AccentDark2` light / `AccentLight3` dark | `oklab(from accent l→min(l,.5))` light, `max(l,.85)` dark |
-| Selected row | `--row-active-*` | `selectedContentBackgroundColor` + white† | subtle fill 6 %, text unchanged, accent pill 3 × 16 px, radius 1.5 px† | full accent with `--text-on-accent`† |
+| Selected row | `--row-active-*` | `selectedContentBackgroundColor` + paired text† | subtle fill 6 %, text unchanged, accent pill 3 × 16 px, radius 1.5 px† | full accent with `--text-on-accent`† |
 | Selected row, window inactive | `--row-inactive-background` | `#dcdcdc` / `#464646`, text unchanged | same subtle fill, pill `--text-tertiary` | `currentColor` 10 % |
-| Menu highlight | `--menu-highlight*` | accent fill + white | subtle fill, text unchanged† | `currentColor` 7 %† |
+| Menu highlight | `--menu-highlight*` | accent fill + paired text | subtle fill, text unchanged† | `currentColor` 7 %† |
 | Focus ring | `--focus-ring-*` | accent, 2 / +1 px† | text 2 px + surface 1 px† | `color-mix(accent 50 %, text)` 2 px, offset −2 px |
-| Text selection | `::selection` | accent 30 % | accent + white | accent 30 % |
+| Text selection | `::selection` | accent 30 % | accent + paired text | accent 30 % |
 
 **Separators and strokes**
 
@@ -177,7 +177,7 @@ your citation" one colour. Done and Look stay close to the platform hues.
 | Meaningful icons (status, added check, the citation mark) | 3:1 |
 | Tertiary glyphs at rest | 3:1 |
 | Disabled | none; aim ≥ 2:1 |
-| White on the system accent | the platform's own pair is accepted below 4.5:1 because the user chose the accent (white on macOS dark `#0a84ff` = 3.65:1, on GNOME `#3584e4` = 3.77:1). macOS rows and menus use `selectedContentBackgroundColor` (white 6.35:1 in dark); GNOME row titles stay semibold |
+| Text on a system or fallback accent | ≥ 4.5:1. Keep the accent fill and use a readable paired foreground; native pairs require measured acceptance. |
 | Over the macOS material | 4.5:1 over a white, a black and a saturated wallpaper, measured natively (#774) |
 
 Measured on browser specimens: secondary text 7.2–7.6:1 on macOS and

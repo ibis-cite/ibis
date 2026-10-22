@@ -175,7 +175,7 @@ symbolic masters. How the assets are regenerated is in the
 | System font | SF Pro (`-apple-system`) | Segoe UI Variable (Text) | Adwaita Sans or Cantarell (GTK's `system-ui`) |
 | Neutrals | Translucent fills over the material (below) | Fluent: surface `#f3f3f3` / `#202020`, text `#1b1b1b` / `#fff`, secondary `#606060` / `#cfcfcf`; controls on `ControlFillColorDefault` | Adwaita `window_bg` `#fafafb` / `#222226`, `window_fg`; buttons and entry on the control fill (text at 8%) |
 | Corners | See **Corners** above | | |
-| Selected row | Filled accent, white text | Soft grey with an accent pill on the left | GTK's selection colour (filled accent) with its paired text |
+| Selected row | Filled accent, paired text | Soft grey with an accent pill on the left | GTK's selection colour (filled accent) with its paired text |
 | Keyboard focus ring | 2 px accent, 1 px gap | 2 px in the text colour around a 1 px surface-coloured stroke (Fluent's focus visual) | 2 px, the accent mixed half toward the text colour, 1 px gap |
 | Search box | Frameless, large; with Liquid Glass, a 40 px capsule that also holds format | Text box with an underline that turns accent on focus | Framed entry |
 | Shortcut labels | ⌘ ⌥ ⇧ ⌃, joined in one key cap (⌘K) | Ctrl Alt Shift, one cap per key (Ctrl K) | Ctrl Super Shift, one cap per key with "+" between (Ctrl + K) |
@@ -183,7 +183,7 @@ symbolic masters. How the assets are regenerated is in the
 | Switch | 38 × 22, the regular `NSSwitch` size | 40 × 20, outlined when off | 46 × 26 |
 | Copied | Pill near the top of the screen | Notice bottom-right | Toast at the bottom |
 
-On macOS, use WebKit's paired selected-content background and alternate-selected text when both are supported. `AccentColorText` can resolve to black even on saturated blue; keyword support alone does not establish a native pair or custom-accent following. Other engines use each OS’s default accent: macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF and Adwaita #3584E4 / #78AEED (light / dark). Windows and Adwaita use dark text on their bright defaults in dark mode. Native keywords still win; increased contrast and forced colours retain their system Highlight pair.
+On macOS, use WebKit's paired selected-content background and alternate-selected text when both are supported. `AccentColorText` can resolve to black even on saturated blue; keyword support alone does not establish a native pair or custom-accent following. Other engines use each OS’s default accent: macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF and Adwaita #3584E4 / #78AEED (light / dark). Fallback foregrounds are black except Windows light, which uses white; all six pairs reach 4.5:1. Native keywords still win; increased contrast and forced colours retain their system Highlight pair.
 
 The Linux selected row uses the full selection colour rather than a tint: focus
 stays in the search box while ↑ ↓ move the selection, so the fill is the only

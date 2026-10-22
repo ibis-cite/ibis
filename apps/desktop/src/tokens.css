@@ -95,7 +95,7 @@
   --line: GrayText;      /* control edges that need 3:1: fields, contrast modes */
   --separator: var(--line); /* dividers between regions; quieter per look below */
   --active-edge: CanvasText;
-  --accent-fallback: #007aff; --on-accent-fallback: #fff;
+  --accent-fallback: #007aff; --on-accent-fallback: #000;
   --accent: var(--accent-fallback);
   --font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --button-background: color-mix(in srgb, var(--text) 4%, var(--surface));
@@ -241,11 +241,11 @@
     }
   }
 }
-:root[data-platform="windows"] { --accent-fallback: #005fb8; }
+:root[data-platform="windows"] { --accent-fallback: #005fb8; --on-accent-fallback: #fff; }
 :root[data-platform="linux"] { --accent-fallback: #3584e4; }
 @supports (color: light-dark(white, black)) {
   :root[data-platform="windows"] { --accent-fallback: light-dark(#005fb8, #60cdff); --on-accent-fallback: light-dark(#fff, #000); }
-  :root[data-platform="linux"] { --accent-fallback: light-dark(#3584e4, #78aeed); --on-accent-fallback: light-dark(#fff, #000); }
+  :root[data-platform="linux"] { --accent-fallback: light-dark(#3584e4, #78aeed); }
 }
 @supports (color: AccentColor) { :root { --accent: AccentColor; } }
 /* Filled accent with its paired text colour, so any system accent stays legible. */
