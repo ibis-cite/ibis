@@ -244,6 +244,30 @@ test("render acknowledgment waits for startup effects even after the first-run U
   }
 });
 
+test("loading evidence waits for the delayed spinner instead of capturing a blank result area", async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));
+  vi.stubGlobal("cancelAnimationFrame", (id: number) => window.clearTimeout(id));
+  const state = galleryStates.find((candidate) => candidate.id === "loading")!;
+  const acknowledge = vi.fn(async () => undefined);
+  const container = document.createElement("div");
+  document.body.append(container);
+  let stop: () => void = () => undefined;
+  try {
+    await act(async () => { stop = renderGalleryState(container, state, acknowledge); });
+    await act(() => vi.advanceTimersByTimeAsync(399));
+    expect(container.querySelector('[role="progressbar"]')).toBeNull();
+    expect(acknowledge).not.toHaveBeenCalled();
+    await act(() => vi.advanceTimersByTimeAsync(1));
+    expect(container.querySelector('[role="progressbar"]')?.getAttribute("aria-label")).toBe("Opening example.bib…");
+    await act(() => vi.advanceTimersByTimeAsync(32));
+    expect(acknowledge).toHaveBeenCalledExactlyOnceWith("loading");
+  } finally {
+    await act(async () => stop());
+    container.remove();
+  }
+});
+
 async function expectRenderedFixture(id: string): Promise<void> {
   vi.useFakeTimers();
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(() => callback(0), 16));

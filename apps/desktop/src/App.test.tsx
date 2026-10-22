@@ -129,9 +129,7 @@ test.each(["", "unmatched"])("result headings only name actual rows, preserving 
   if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
   await screen.findByText(query ? "No matching references" : "Type to find a reference");
   if (!query) {
-    const search = screen.getByRole("button", { name: "Search references" });
-    search.focus();
-    fireEvent.click(search);
+    expect(screen.queryByRole("button", { name: "Search references" })).toBeNull();
     expect(document.activeElement).toBe(screen.getByLabelText("Search references"));
   }
   expect(document.querySelector(".results-heading")).toBeNull();
@@ -948,6 +946,7 @@ test("an unavailable initial library is named once without a duplicate search er
   });
   render(<App />);
   const notice = await screen.findByRole("alert");
+  expect(document.querySelector(".results-heading")).toBeNull();
   expect(notice.textContent).toContain("研究 refs.bib");
   expect(notice.textContent).toContain("Choose it again");
   fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "sleep" } });

@@ -1,9 +1,9 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { galleryStates } from "../../gallery-fixtures";
 import { EmptyState } from "./EmptyState";
 
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.useRealTimers(); });
 const loaded = galleryStates.find((state) => state.id === "no-results")!.library;
 
 function mount(query = "", empty = false) {
@@ -23,29 +23,63 @@ test.each(["", "unmatched"])("one empty-state template has a plain title, descri
   expect(screen.queryByRole("heading")).toBeNull();
 });
 
-test("idle instructions keep footer hints and offer an enabled way to focus Search", () => {
-  const { container, clear } = mount();
+test("idle instructions show only the two decorative key hints without an action", () => {
+  const { container } = mount();
   const keys = container.querySelector(".empty-keys");
   expect(keys?.getAttribute("aria-hidden")).toBe("true");
   expect([...container.querySelectorAll(".key-hint-label")].map((label) => label.textContent)).toEqual(["Copy", "Add to citation"]);
   expect([...container.querySelectorAll(".key-hint")].every((hint) => hint.firstElementChild?.className === "key-hint-label")).toBe(true);
-  const search = screen.getByRole("button", { name: "Search references" });
-  expect(search.classList.contains("suggested-action")).toBe(true);
-  fireEvent.click(search);
-  expect(clear).toHaveBeenCalledOnce();
+  expect(screen.queryByRole("button")).toBeNull();
+  expect(container.querySelector(".empty-actions")).toBeNull();
 });
 
-test.each(["loading", "reloading"] as const)("%s has a title, one short line and the existing chooser action", (state) => {
-  const choose = vi.fn();
+test.each(["loading", "reloading"] as const)("%s stays blank for 400 ms, then shows only a spinner and the filename", async (state) => {
+  vi.useFakeTimers();
   const { container } = render(<EmptyState library={{ ...loaded, state }} query="" narrowed={false}
-    onChooseLibrary={choose} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
-  expect(screen.getByRole("status").textContent).toBe(`${state === "loading" ? "Opening" : "Reloading"} example.bib…`);
-  expect(container.querySelector(".empty-description")?.textContent).toBe("Choose another library if needed.");
-  const action = screen.getByRole("button", { name: "Choose library…" });
-  expect(action.classList.contains("suggested-action")).toBe(true);
-  expect(screen.getAllByRole("button")).toHaveLength(1);
-  fireEvent.click(action);
-  expect(choose).toHaveBeenCalledOnce();
+    onChooseLibrary={vi.fn()} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+  expect(container.textContent).toBe("");
+  await act(() => vi.advanceTimersByTimeAsync(399));
+  expect(container.textContent).toBe("");
+  await act(() => vi.advanceTimersByTimeAsync(1));
+  const title = `${state === "loading" ? "Opening" : "Reloading"} example.bib…`;
+  expect(screen.getByRole("progressbar", { name: title })).toBeTruthy();
+  expect(screen.getByRole("status").getAttribute("aria-live")).toBe("polite");
+  expect(container.querySelector(".empty-spinner")?.getAttribute("aria-hidden")).toBe("true");
+  expect(container.textContent).toBe(title);
+  expect(container.querySelector(".empty-description, .empty-icon, .empty-actions")).toBeNull();
+  expect(screen.queryByRole("button")).toBeNull();
+});
+
+test("a fast open cancels its loader; another filename starts its own delay", async () => {
+  vi.useFakeTimers();
+  const props = { query: "", narrowed: false, onChooseLibrary: vi.fn(), onClearSearch: vi.fn(), onSearchAll: vi.fn(), onReload: vi.fn(), setup: null };
+  const { rerender } = render(<EmptyState {...props} library={{ ...loaded, state: "loading" }} />);
+  await act(() => vi.advanceTimersByTimeAsync(200));
+  rerender(<EmptyState {...props} library={loaded} />);
+  await act(() => vi.advanceTimersByTimeAsync(400));
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  rerender(<EmptyState {...props} library={{ ...loaded, state: "loading" }} />);
+  await act(() => vi.advanceTimersByTimeAsync(400));
+  expect(screen.getByRole("progressbar", { name: "Opening example.bib…" })).toBeTruthy();
+  rerender(<EmptyState {...props} library={{ ...loaded, state: "loading", name: "other.bib" }} />);
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  await act(() => vi.advanceTimersByTimeAsync(399));
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  await act(() => vi.advanceTimersByTimeAsync(1));
+  expect(screen.getByRole("progressbar", { name: "Opening other.bib…" })).toBeTruthy();
+});
+
+test("the delayed loader shortens mixed-script names visually and exposes the full name once", async () => {
+  vi.useFakeTimers();
+  const name = `دراسة-研究-${"🧑🏽‍🔬e\u0301".repeat(50)}-library.bib`;
+  const { container } = render(<EmptyState library={{ ...loaded, state: "loading", name }} query="" narrowed={false}
+    onChooseLibrary={vi.fn()} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+  await act(() => vi.advanceTimersByTimeAsync(400));
+  const loader = screen.getByRole("progressbar", { name: `Opening ${name}…` });
+  expect(loader.textContent).toMatch(/^Opening دراسة-研究-.*….*library\.bib…$/);
+  expect(loader.textContent?.length).toBeLessThan(name.length);
+  expect(loader.querySelector("span")?.getAttribute("aria-hidden")).toBe("true");
+  expect(container.querySelector(".visually-hidden")).toBeNull();
 });
 
 test("no matches retain clear-search and search-all actions", () => {
