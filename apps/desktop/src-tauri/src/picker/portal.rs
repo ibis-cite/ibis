@@ -196,7 +196,7 @@ mod tests {
 
         #[zbus::interface(name = "org.freedesktop.portal.GlobalShortcuts")]
         impl Fake {
-            #[zbus(property)]
+            #[zbus(property, name = "version")]
             fn version(&self) -> u32 {
                 2
             }
@@ -226,6 +226,13 @@ mod tests {
                     .await?;
                 Ok(path)
             }
+        }
+
+        #[test]
+        fn fake_exports_the_portal_property_name() {
+            let mut xml = String::new();
+            zbus::object_server::Interface::introspect_to_writer(&Fake(Arc::new(AtomicU32::new(0))), &mut xml, 0);
+            assert!(xml.contains("property name=\"version\""));
         }
 
         #[test]
