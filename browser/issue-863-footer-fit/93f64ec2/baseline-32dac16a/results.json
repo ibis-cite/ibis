@@ -1,0 +1,93 @@
+{
+  "ack": null,
+  "footer": {
+    "left": 0,
+    "top": 400,
+    "width": 720,
+    "height": 80,
+    "bottom": 480,
+    "right": 720
+  },
+  "bar": {
+    "left": 20,
+    "top": 401,
+    "width": 692,
+    "height": 79,
+    "bottom": 480,
+    "right": 712
+  },
+  "gap": "8px",
+  "items": [
+    {
+      "class": "library-status",
+      "left": 20,
+      "top": 412.5,
+      "width": 336.1875,
+      "height": 15,
+      "bottom": 427.5,
+      "right": 356.1875
+    },
+    {
+      "class": "pin-button",
+      "left": 364.1875,
+      "top": 404,
+      "width": 32,
+      "height": 32,
+      "bottom": 436,
+      "right": 396.1875
+    },
+    {
+      "class": "enter-hints",
+      "left": 404.1875,
+      "top": 404,
+      "width": 311.8125,
+      "height": 32,
+      "bottom": 436,
+      "right": 716
+    },
+    {
+      "class": "more",
+      "left": 582.25,
+      "top": 444,
+      "width": 129.75,
+      "height": 32,
+      "bottom": 476,
+      "right": 712
+    }
+  ],
+  "hints": [
+    {
+      "name": "Copy 20 as Pandoc",
+      "left": 404.1875,
+      "top": 404,
+      "width": 162,
+      "height": 32,
+      "bottom": 436,
+      "right": 566.1875
+    },
+    {
+      "name": "Shortcuts",
+      "left": 582.1875,
+      "top": 404,
+      "width": 133.8125,
+      "height": 32,
+      "bottom": 436,
+      "right": 716
+    }
+  ],
+  "active": {
+    "left": 8,
+    "top": 301,
+    "width": 704,
+    "height": 58,
+    "bottom": 359,
+    "right": 712
+  },
+  "viewport": {
+    "top": 56,
+    "bottom": 319
+  },
+  "visible": 18,
+  "source": "32dac16af9fbec1de8635db12d4bcd7396e72d6e",
+  "errors": []
+}
