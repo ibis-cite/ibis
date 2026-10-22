@@ -77,6 +77,11 @@ layer from `design/depth-prototype` (variant B). The footer pattern
 | Small window (under 460 px) | The chip row shows only "3 references ›", which opens the list; the output line stays. |
 | Increased contrast, forced colours | Card and chips get a 1 px `CanvasText` edge and the mark turns `CanvasText`. Words carry every state. |
 
+When large system text and wrapped header/footer controls consume the available
+height, the shelf shrinks into its own scroll area. Keep at least 24 CSS px of
+the results scroller reachable; chips, overflow and output remain reachable by
+scrolling the shelf.
+
 ### Per OS
 
 | | macOS | Windows 11 | GNOME |
@@ -109,6 +114,11 @@ otherwise use a plain quote mark and keep the beak glyph for larger brand uses
 
 ## Engineering notes
 
+- **Chip keyboard foundation:** `ui/ChipGroup` owns navigation and removal,
+  with controlled opaque identities/order, locale-matched direction and a
+  caller-supplied empty-removal focus destination. The browser-only `chips`
+  and `chips-rtl` gallery states exercise it separately; production shelf
+  fitting, disclosure and reordering integrate in later leaves.
 - **Key formats need a pure preview.** `copyCitation` formats keys in Rust and
   writes the clipboard in one step. Add a side-effect-free command (for example
   `citation_text(ids, format, revision)`) or reuse the Rust formatter without

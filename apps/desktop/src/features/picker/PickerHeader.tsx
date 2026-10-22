@@ -6,7 +6,7 @@ import type { ToolbarMenuCommand } from "../../ui/ToolbarMenu";
 
 /** The search bar: the search box and the copy format. It is also
  * the window's drag region; the editable box itself is not. */
-export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, onFormatCommand }: {
+export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, showFormat, styles, onFormatChange, onFormatCommand }: {
   inputRef: React.RefObject<HTMLInputElement | null>;
   query: string;
   onQueryChange: (query: string) => void;
@@ -16,6 +16,7 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   /** The id of the highlighted row, when there is one. */
   activeDescendant: string | undefined;
   format: Choice;
+  showFormat: boolean;
   /** Whether formatted citation styles can be used now. */
   styles: boolean;
   onFormatChange: (choice: Choice) => void;
@@ -45,7 +46,7 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
         onChange={(e) => onQueryChange(e.target.value)}
         onKeyDown={onSearchKeyDown}
       />
-      <FormatMenu format={format} styles={styles} onChange={onFormatChange} searchRef={inputRef} onCommand={onFormatCommand} />
+      {showFormat && <FormatMenu format={format} styles={styles} onChange={onFormatChange} searchRef={inputRef} onCommand={onFormatCommand} />}
     </header>
   );
 }

@@ -27,6 +27,30 @@ afterEach(async () => {
   clearMocks();
 });
 
+test("the shelf shows what Enter pastes in a key syntax, without copying, and leaves out a failed key preview", async () => {
+  let fail = false;
+  const calls = backend({
+    search: ({ query }) => [query === "again" ? result("b", "Second") : result("a", "First")],
+    citation_text: ({ ids }) => {
+      if (fail) throw new Error("synthetic preview failure");
+      return { text: `[@${(ids as api.RecordId[]).map((id) => id.native_key).join("; @")}]`, warnings: [] };
+    },
+  });
+  render(<App />);
+  const box = screen.getByLabelText("Search references");
+  fireEvent.change(box, { target: { value: "first" } });
+  const output = await screen.findByRole("region", { name: "Preview" });
+  await waitFor(() => expect(output.textContent).toContain("[@a]"));
+  expect(output.hasAttribute("data-keys")).toBe(true);
+  expect(calls).not.toContain("copy_citation");
+  fail = true;
+  fireEvent.change(box, { target: { value: "again" } });
+  await screen.findByText("Second");
+  await waitFor(() => expect(calls.filter((c) => c === "citation_text")).toHaveLength(2));
+  await waitFor(() => expect(screen.queryByRole("region", { name: "Preview" })).toBeNull());
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
 test("copy confirmation expires, but copy warnings remain until dismissed", async () => {
   let warnings: string[] = [];
   backend({
@@ -38,9 +62,9 @@ test("copy confirmation expires, but copy warnings remain until dismissed", asyn
   const box = screen.getByLabelText("Search references");
   vi.useFakeTimers();
   await act(async () => { fireEvent.keyDown(box, { key: "Enter" }); });
-  expect(screen.getByText("@a")).toBeTruthy();
+  expect(screen.getByText("@a", { selector: ".copy-notice code" })).toBeTruthy();
   await act(() => vi.advanceTimersByTimeAsync(3000));
-  expect(screen.queryByText("@a")).toBeNull();
+  expect(screen.queryByText("@a", { selector: ".copy-notice code" })).toBeNull();
   vi.useRealTimers();
   warnings = ["A warning to read"];
   fireEvent.keyDown(box, { key: "Enter" });
@@ -101,6 +125,11 @@ test("the borderless picker has a permitted drag region around its editable sear
 });
 
 /** Mock the Rust commands; returns the list of commands called. */
+/** The keys of the shelf's chips, in order: each chip's tooltip is its key. */
+function chipKeys(root: ParentNode = document) {
+  return [...root.querySelectorAll<HTMLElement>('[aria-label="Selected references"] .chip')].map((chip) => chip.title);
+}
+
 function backend(overrides: Record<string, Handler> = {}): string[] {
   const calls: string[] = [];
   const defaults: Record<string, Handler> = {
@@ -110,6 +139,8 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
     show_copied_notice: () => null,
     set_pinned: () => null,
     copy_format: () => "pandoc",
+    // The shelf previews key syntaxes without touching the clipboard.
+    citation_text: ({ ids }) => ({ text: (ids as { native_key: string }[]).map((id) => `@${id.native_key}`).join("; "), warnings: [] }),
     picker_preferences: () => ({ citation_style: null, density: "comfortable", larger_text: false }),
     set_picker_preferences: () => null,
     login_item: () => ({ name: "Ibis", enabled: false, problem: null }),
@@ -169,6 +200,22 @@ test("first launch waits for library status and offers a chooser without a searc
   await waitFor(() => expect(calls).toContain("choose_library"));
   expect(screen.queryByRole("alert")).toBeNull();
   expect(calls).not.toContain("search");
+});
+
+test("first-run setup has no result section heading", async () => {
+  backend({ library_status: () => ({ state: "none", name: null, snapshot_name: null, has_snapshot: false,
+    zotero: false, references: 0, warnings: 0, error: null, note: null }) });
+  render(<App />);
+  await screen.findByText("Choose a library to get started");
+  expect(document.querySelector(".results-heading")).toBeNull();
+});
+
+test("first-run setup keeps the copy-format question out of the header", async () => {
+  backend({ library_status: () => ({ state: "none", name: null, snapshot_name: null, has_snapshot: false,
+    zotero: false, references: 0, warnings: 0, error: null, note: null }) });
+  render(<App />);
+  await screen.findByText("Choose a library to get started");
+  expect(within(screen.getByLabelText("Search references").closest("header")!).queryByRole("button", { name: /^Copy as / })).toBeNull();
 });
 
 test("typing after a library load failure keeps its single explanation visible", async () => {
@@ -460,7 +507,7 @@ test.each([
       fireEvent.click(remove, { detail: 0 });
     }
     const remaining = records.slice(0, count).filter((_, i) => i !== index);
-    expect([...document.querySelectorAll('[aria-label="Selected references"] code')].map((node) => node.textContent)).toEqual(remaining.map((record) => record.key));
+    expect(chipKeys()).toEqual(remaining.map((record) => record.key));
     expect(box.getAttribute("aria-activedescendant")).toBe(active);
     expect(calls).not.toContain("copy_citation");
     expect(calls).not.toContain("hide_picker");
@@ -495,12 +542,12 @@ test.each([false, true])("a held Enter after removal waits for a fresh press (Sh
   expect(document.activeElement).toBe(box);
   await act(async () => { fireEvent.keyDown(box, { key: "Enter", repeat: true, shiftKey }); });
   expect(copies).toEqual([]);
-  expect([...document.querySelectorAll('[aria-label="Selected references"] code')].map((node) => node.textContent)).toEqual(["b"]);
+  expect(chipKeys()).toEqual(["b"]);
   fireEvent.keyUp(box, { key: "Enter", shiftKey });
   if (shiftKey) {
     fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
     fireEvent.keyUp(box, { key: "Enter", shiftKey: true });
-    expect([...document.querySelectorAll('[aria-label="Selected references"] code')].map((node) => node.textContent)).toEqual(["b", "a"]);
+    expect(chipKeys()).toEqual(["b", "a"]);
   }
   fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(copies).toHaveLength(1));
@@ -549,11 +596,14 @@ test.each([20, 40, 50])("%i long-key selections retain order across queries and 
     }
   }
   const tray = screen.getByRole("list", { name: "Selected references" });
-  expect(within(tray).getAllByRole("listitem")).toHaveLength(count);
+  // The shelf shows six chips and folds the rest into "+N", which shows them all.
+  expect(chipKeys(tray)).toHaveLength(6);
+  fireEvent.click(within(tray).getByRole("button", { name: `Show all ${count} selected references` }));
+  expect(chipKeys(tray)).toHaveLength(count);
   const removed = [0, Math.floor(count / 2), count - 1];
   for (const i of removed) fireEvent.click(within(tray).getByRole("button", { name: `Remove ${records[i]!.key} from the selection` }));
   const expected = records.filter((_, i) => !removed.includes(i));
-  expect([...tray.querySelectorAll("code")].map((node) => node.textContent)).toEqual(expected.map((record) => record.key));
+  expect(chipKeys(tray)).toEqual(expected.map((record) => record.key));
   box.focus();
   fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(copies).toHaveLength(1));
@@ -626,7 +676,7 @@ test("while a newer search is pending, no key, click or hint acts on the previou
   });
   render(<App />);
   const box = screen.getByLabelText("Search references");
-  const chosenKeys = () => screen.queryByRole("list", { name: "Selected references" })?.textContent ?? "";
+  const chosenKeys = () => chipKeys().join(" ");
   // A deliberate choice from an earlier search stays chosen across searches.
   fireEvent.change(box, { target: { value: "kept" } });
   await screen.findByText("Kept result");
@@ -842,7 +892,7 @@ test("copy remains confirmed when hiding after a successful copy fails", async (
   await screen.findByText("First");
   fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
   await screen.findByText("Ibis could not hide this window. Try again.");
-  expect(screen.getByText("@a")).toBeTruthy();
+  expect(screen.getByText("@a", { selector: ".copy-notice code" })).toBeTruthy();
   expect(document.body.textContent).not.toContain("Nothing was copied");
   expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
 });
@@ -1328,7 +1378,7 @@ test("Escape clears the search before it hides the picker, keeping chosen refere
   fireEvent.keyDown(box, { key: "Enter", shiftKey: true });
   fireEvent.keyDown(box, { key: "Escape" });
   expect(box.value).toBe("");
-  expect(within(screen.getByRole("list", { name: "Selected references" })).getByText("a")).toBeTruthy();
+  expect(within(screen.getByRole("list", { name: "Selected references" })).getByTitle("a")).toBeTruthy();
   expect(calls).not.toContain("hide_picker");
   fireEvent.keyDown(box, { key: "Escape" });
   await waitFor(() => expect(calls).toContain("hide_picker"));
@@ -1384,7 +1434,7 @@ test("a pinned picker stays open after copying, and Escape never unpins it", asy
   fireEvent.change(box, { target: { value: "first" } });
   await screen.findByText("First");
   fireEvent.keyDown(box, { key: "Enter" });
-  await screen.findByText("@a");
+  await screen.findByText("@a", { selector: ".copy-notice code" });
   fireEvent.keyDown(box, { key: "Escape" });
   expect(screen.getByRole("button", { name: "Kept open; click to stop" })).toBeTruthy();
   expect(calls).not.toContain("hide_picker");
@@ -1566,6 +1616,7 @@ test.each(["menu", "shortcut"])("%s Quit waits for the initial read, then saves 
     quit: () => { atQuit = { copy_format: rememberedKey, citation_style: rememberedStyle }; return null; },
   });
   render(<App />);
+  await waitFor(() => formatButton());
   chooseFormat("cite");
   try {
     if (route === "menu") await chooseFromMore("Quit Ibis");
@@ -1644,6 +1695,7 @@ test("a choice made while saved choices load is kept and saved, not replaced", a
     set_picker_preferences: ({ preferences, copyFormat }) => { saved.push(preferences); keys.push(copyFormat); return null; },
   });
   render(<App />);
+  await waitFor(() => formatButton());
   chooseFormat("cite");
   await act(async () => { finish(); await loaded; });
   await waitFor(() => expect(saved).toEqual([{ citation_style: null, density: "compact", larger_text: false }]));
@@ -1971,15 +2023,17 @@ test("setup asks where you write, sets Copy as to match, and shows the shortcut"
   render(<App />);
   const places = await screen.findByRole("region", { name: "Where do you write?" });
   fireEvent.click(within(places).getByRole("button", { name: "LaTeX" }));
-  await waitFor(() => expect(formatValue()).toBe("cite"));
-  expect(within(places).getByRole("button", { name: "LaTeX" }).getAttribute("aria-pressed")).toBe("true");
+  await waitFor(() => expect(within(places).getByRole("button", { name: "LaTeX" }).getAttribute("aria-pressed")).toBe("true"));
+  expect(within(screen.getByLabelText("Search references").closest("header")!).queryByRole("button", { name: /^Copy as / })).toBeNull();
   fireEvent.click(within(places).getByRole("button", { name: "Word or Google Docs" }));
-  await waitFor(() => expect(formatValue()).toBe("style:apa"));
-  expect(screen.getByText("Citations copy as APA. Pick another style under Copy as.")).toBeTruthy();
+  await waitFor(() => expect(within(places).getByRole("button", { name: "Word or Google Docs" }).getAttribute("aria-pressed")).toBe("true"));
+  expect(screen.getByText("Citations copy as APA.")).toBeTruthy();
   expect(screen.getByText(/^Open Ibis from any app with /)).toBeTruthy();
+  await act(async () => { await emit("library:changed", { ...NO_LIBRARY, revision: "1", state: "loaded", has_snapshot: true,
+    name: "refs.bib", snapshot_name: "refs.bib", references: 1 }); });
+  await waitFor(() => expect(formatValue()).toBe("style:apa"));
   chooseFormat("style:ieee");
-  expect(await screen.findByText("Citations copy as IEEE. Pick another style under Copy as.")).toBeTruthy();
-  expect(within(places).getByRole("button", { name: "Word or Google Docs" }).getAttribute("aria-pressed")).toBe("false");
+  await waitFor(() => expect(formatValue()).toBe("style:ieee"));
 });
 
 test("shortcuts read as people type them on each system", async () => {
@@ -2006,7 +2060,7 @@ test("first-run writing choices save the key and style together before copying",
   fireEvent.click(within(places).getByRole("button", { name: "Typst" }));
   await waitFor(() => expect(saved).toEqual([{ style: null, key: "typst" }]));
   fireEvent.click(within(places).getByRole("button", { name: "Word or Google Docs" }));
-  await waitFor(() => expect(formatValue()).toBe("style:apa"));
+  await waitFor(() => expect(within(places).getByRole("button", { name: "Word or Google Docs" }).getAttribute("aria-pressed")).toBe("true"));
   await waitFor(() => expect(saved).toEqual([{ style: null, key: "typst" }, { style: "apa", key: null }]));
   expect(calls).not.toContain("copy_citation");
 });
@@ -2062,7 +2116,7 @@ test("a failed Copied notice never undoes the copy or the hide", async () => {
     fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "Enter" });
     await waitFor(() => expect(log).toHaveBeenCalledWith("The Copied notice could not be shown."));
     expect(screen.queryByRole("alert")).toBeNull();
-    expect(screen.getByText("@a")).toBeTruthy();
+    expect(screen.getByText("@a", { selector: ".copy-notice code" })).toBeTruthy();
     expect(log.mock.calls.flat().join(" ")).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
   } finally { log.mockRestore(); }
 });
@@ -2184,7 +2238,7 @@ test("a search cleared by Escape stays cleared once something else is typed or c
   await waitFor(() => expect(screen.getByText("References")).toBeTruthy());
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
   fireEvent.keyDown(box, { key: "Enter" });
-  await screen.findByText("@a");
+  await screen.findByText("@a", { selector: ".copy-notice code" });
   await act(async () => { await emit("picker:hidden"); });
   await act(async () => { await emit("picker:shown"); });
   expect(box.value).toBe("");
@@ -2214,7 +2268,7 @@ test.each(["Escape", "hidden"])("a click waiting for its preview never copies af
   await act(async () => { await emit("picker:hidden"); });
   const hides = calls.filter((c) => c === "hide_picker").length;
   await act(async () => { release(); await new Promise((resolve) => setTimeout(resolve, 50)); });
-  await waitFor(() => expect(document.querySelector(".format-preview")?.textContent).toContain("Smith"));
+  await waitFor(() => expect(document.querySelector(".shelf-output")?.textContent).toContain("Smith"));
   expect(calls).not.toContain("copy_formatted");
   expect(calls.filter((c) => c === "hide_picker")).toHaveLength(hides);
   expect(calls).not.toContain("show_copied_notice");
@@ -2651,7 +2705,7 @@ test.each(["style:ieee", "pandoc", "style:apa"])("changing format cancels a clic
   if (next === "style:apa") chooseFormat("style:ieee");
   chooseFormat(next);
   await act(async () => { release(); await ready; });
-  if (next !== "pandoc") await waitFor(() => expect(document.querySelector(".format-preview")?.textContent).toContain(next === "style:ieee" ? "[1]" : "Smith"));
+  if (next !== "pandoc") await waitFor(() => expect(document.querySelector(".shelf-output")?.textContent).toContain(next === "style:ieee" ? "[1]" : "Smith"));
   expect(output).toEqual([]);
   expect(calls).not.toContain("hide_picker");
   expect(calls).not.toContain("show_copied_notice");

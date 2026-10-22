@@ -71,7 +71,7 @@ export const setupText = {
   lookAgain: "Look again",
   whereYouWrite: "Where do you write?",
   places: { markdown: "Markdown or Pandoc", latex: "LaTeX", typst: "Typst", word: "Word or Google Docs" },
-  styleHint: (style: string) => `Citations copy as ${style}. Pick another style under Copy as.`,
+  styleHint: (style: string) => `Citations copy as ${style}.`,
   shortcut: (keys: string) => `Open Ibis from any app with ${keys}.`,
   nothingFound: "No Zotero or .bib files found nearby. Use Choose library… to pick a file.",
   found: (files: number, zotero: boolean) =>
@@ -101,6 +101,14 @@ export const pickerText = {
   previewNotReady: "Nothing was copied yet: the citation is still being formatted. Press Enter again in a moment.",
   previewError: "This citation could not be formatted. Choose another style, or copy citation keys.",
   provisional: "Provisional: the number depends on the other references cited in your document.",
+  provisionalShort: "Numbers may change",
+  shelfStale: "The library changed since these were chosen.",
+  warningCount: (n: number) => (n === 1 ? "1 warning" : `${n} warnings`),
+  /** The shelf's last chip, for references beyond the ones it shows. */
+  moreChosen: (n: number) => `+${n}`,
+  allChosen: (n: number) => `Show all ${n} selected references`,
+  fewerChosen: "Show fewer selected references",
+  fewerChosenShort: "Fewer",
   dismiss: "Dismiss",
   dismissWarnings: "Dismiss copy warnings",
   copyWarnings: "Copy warnings",
