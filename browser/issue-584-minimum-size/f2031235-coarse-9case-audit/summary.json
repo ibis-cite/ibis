@@ -1,0 +1,293 @@
+[
+  {
+    "platform": "macos",
+    "mode": "app115",
+    "root_font_px": 18.4,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 320,
+    "initial_header_rect_height": 119.5625,
+    "initial_shelf_rect_height": 47.6875,
+    "initial_active_visible_height": 23.171875,
+    "after_arrow_active_visible_height": 23.875,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": true,
+      "copy": true,
+      "more": true
+    },
+    "after_disclosure_touch_expanded": true,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 0,
+    "more_keyboard_active_visible_height": 23.875,
+    "more_keyboard_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit Ibis\u2318Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": []
+  },
+  {
+    "platform": "macos",
+    "mode": "root200",
+    "root_font_px": 32,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 560,
+    "initial_header_rect_height": 208,
+    "initial_shelf_rect_height": 0,
+    "initial_active_visible_height": 24,
+    "after_arrow_active_visible_height": 24,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": false,
+      "more": false
+    },
+    "after_disclosure_touch_expanded": false,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 240,
+    "more_keyboard_active_visible_height": 0,
+    "more_keyboard_target_hits": {
+      "search": false,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit Ibis\u2318Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": [
+      "after-disclosure-touch: disclosure not pointer-hittable"
+    ]
+  },
+  {
+    "platform": "macos",
+    "mode": "appLargerTimes2",
+    "root_font_px": 36.8,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 640,
+    "initial_header_rect_height": 239.15625,
+    "initial_shelf_rect_height": 0,
+    "initial_active_visible_height": 23.8125,
+    "after_arrow_active_visible_height": 24,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": false,
+      "more": false
+    },
+    "after_disclosure_touch_expanded": false,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 311,
+    "more_keyboard_active_visible_height": 0,
+    "more_keyboard_target_hits": {
+      "search": false,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit Ibis\u2318Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": [
+      "after-disclosure-touch: disclosure not pointer-hittable"
+    ]
+  },
+  {
+    "platform": "windows",
+    "mode": "app115",
+    "root_font_px": 18.4,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 320,
+    "initial_header_rect_height": 110.375,
+    "initial_shelf_rect_height": 61.46875,
+    "initial_active_visible_height": 23.765625,
+    "after_arrow_active_visible_height": 24,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": true,
+      "copy": true,
+      "more": true
+    },
+    "after_disclosure_touch_expanded": true,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 0,
+    "more_keyboard_active_visible_height": 24,
+    "more_keyboard_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit IbisCtrl+Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": []
+  },
+  {
+    "platform": "windows",
+    "mode": "root200",
+    "root_font_px": 32,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 538,
+    "initial_header_rect_height": 192,
+    "initial_shelf_rect_height": 2,
+    "initial_active_visible_height": 24,
+    "after_arrow_active_visible_height": 24,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": false,
+      "more": false
+    },
+    "after_disclosure_touch_expanded": false,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 218,
+    "more_keyboard_active_visible_height": 0,
+    "more_keyboard_target_hits": {
+      "search": false,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit IbisCtrl+Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": [
+      "after-disclosure-touch: disclosure not pointer-hittable"
+    ]
+  },
+  {
+    "platform": "windows",
+    "mode": "appLargerTimes2",
+    "root_font_px": 36.8,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 631,
+    "initial_header_rect_height": 220.75,
+    "initial_shelf_rect_height": 2,
+    "initial_active_visible_height": 23.609375,
+    "after_arrow_active_visible_height": 23.640625,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": false,
+      "more": false
+    },
+    "after_disclosure_touch_expanded": false,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 302,
+    "more_keyboard_active_visible_height": 0,
+    "more_keyboard_target_hits": {
+      "search": false,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit IbisCtrl+Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": [
+      "after-disclosure-touch: disclosure not pointer-hittable"
+    ]
+  },
+  {
+    "platform": "linux",
+    "mode": "app115",
+    "root_font_px": 18.4,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 320,
+    "initial_header_rect_height": 119.5625,
+    "initial_shelf_rect_height": 56.875,
+    "initial_active_visible_height": 23.171875,
+    "after_arrow_active_visible_height": 23.875,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": true,
+      "copy": true,
+      "more": true
+    },
+    "after_disclosure_touch_expanded": true,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 0,
+    "more_keyboard_active_visible_height": 23.875,
+    "more_keyboard_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit IbisCtrl+Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": []
+  },
+  {
+    "platform": "linux",
+    "mode": "root200",
+    "root_font_px": 32,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 545,
+    "initial_header_rect_height": 208,
+    "initial_shelf_rect_height": 1,
+    "initial_active_visible_height": 24,
+    "after_arrow_active_visible_height": 24,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": false,
+      "more": false
+    },
+    "after_disclosure_touch_expanded": false,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 225,
+    "more_keyboard_active_visible_height": 7,
+    "more_keyboard_target_hits": {
+      "search": false,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit IbisCtrl+Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": [
+      "after-disclosure-touch: disclosure not pointer-hittable"
+    ]
+  },
+  {
+    "platform": "linux",
+    "mode": "appLargerTimes2",
+    "root_font_px": 36.8,
+    "initial_main_rect_height": 320,
+    "initial_main_client_height": 320,
+    "initial_main_scroll_height": 639,
+    "initial_header_rect_height": 239.15625,
+    "initial_shelf_rect_height": 1,
+    "initial_active_visible_height": 23.8125,
+    "after_arrow_active_visible_height": 24,
+    "initial_target_hits": {
+      "search": true,
+      "disclosure": false,
+      "copy": false,
+      "more": false
+    },
+    "after_disclosure_touch_expanded": false,
+    "after_disclosure_touch_target_hit": false,
+    "more_keyboard_main_scroll_top": 310,
+    "more_keyboard_active_visible_height": 0,
+    "more_keyboard_target_hits": {
+      "search": false,
+      "disclosure": false,
+      "copy": true,
+      "more": true
+    },
+    "last_menu_item_text": "Quit IbisCtrl+Q",
+    "last_menu_item_point_hit": true,
+    "recorded_action_failures": [
+      "after-disclosure-touch: disclosure not pointer-hittable"
+    ]
+  }
+]

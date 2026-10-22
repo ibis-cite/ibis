@@ -1,0 +1,32 @@
+{
+  "issue": 584,
+  "source": "f2031235bf9692290abf31171301722df46f77ea",
+  "source_kind": "immutable landed-main checkpoint, not current main",
+  "capture_type": "synthetic Playwright Chromium browser",
+  "browser": "Chromium 151.0.7922.34",
+  "theme": "light",
+  "minimum_viewport": {
+    "width": 360,
+    "height": 320
+  },
+  "setup_viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "coarse_media_verified": true,
+  "font_modes": {
+    "app115": "app Larger text only; expected18.4px",
+    "root200": "32px root override, not composed",
+    "appLargerTimes2": "measured app Larger root multiplied by2; expected36.8px"
+  },
+  "capture_script": "capture.mjs",
+  "repeat_cases": 9,
+  "all_setups_acknowledged_50_selected": true,
+  "recorded_page_errors": 0,
+  "recorded_unmounts": 0,
+  "cases_with_recorded_action_failures": 6,
+  "acceptance_status": "observations include failures; not an acceptance pass",
+  "legacy_field_and_phase_semantics": "not retained; do not infer",
+  "original_461px_header_tile_report": "unverified; not replaced by this 360px tray-50 audit",
+  "native_validation": false
+}

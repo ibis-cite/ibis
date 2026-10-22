@@ -1,0 +1,4457 @@
+[
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "macos",
+    "mode": "app115",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 143.5625,
+        "width": 341.625,
+        "height": 47.6875,
+        "bottom": 191.25
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 23.171875,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 73.5625,
+            "y": 9.1875,
+            "width": 277.25,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 292.671875,
+            "y": 152.765625,
+            "width": 44.34375,
+            "height": 27.59375,
+            "bottom": 180.359375
+          },
+          "visible": 27.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 194.390625,
+            "y": 205.03125,
+            "width": 161.015625,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 246.15625,
+            "y": 264.8125,
+            "width": 104.65625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 143.5625,
+        "width": 341.625,
+        "height": 47.6875,
+        "bottom": 191.25
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 73.5625,
+            "y": 9.1875,
+            "width": 277.25,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 292.671875,
+            "y": 152.765625,
+            "width": 44.34375,
+            "height": 27.59375,
+            "bottom": 180.359375
+          },
+          "visible": 27.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 194.390625,
+            "y": 205.03125,
+            "width": 161.015625,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 246.15625,
+            "y": 264.8125,
+            "width": 104.65625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 143.5625,
+        "width": 341.625,
+        "height": 47.6875,
+        "bottom": 191.25
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 73.5625,
+            "y": 9.1875,
+            "width": 277.25,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 248.375,
+            "y": 1729.9375,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1757.53125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": true,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 194.390625,
+            "y": 205.03125,
+            "width": 161.015625,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 246.15625,
+            "y": 264.8125,
+            "width": 104.65625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "",
+        "label": "Show fewer selected references",
+        "text": "Fewer"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 143.5625,
+        "width": 341.625,
+        "height": 47.6875,
+        "bottom": 191.25
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 73.5625,
+            "y": 9.1875,
+            "width": 277.25,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 248.375,
+            "y": 1729.9375,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1757.53125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 194.390625,
+            "y": 205.03125,
+            "width": 161.015625,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 246.15625,
+            "y": 264.8125,
+            "width": 104.65625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria1893550238-_r_0_",
+        "label": null,
+        "text": "More ⌘K"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit Ibis⌘Q",
+      "y": 226.375,
+      "bottom": 254.375,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 143.5625,
+        "width": 341.625,
+        "height": 47.6875,
+        "bottom": 191.25
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 73.5625,
+            "y": 9.1875,
+            "width": 277.25,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 248.375,
+            "y": 1729.9375,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1757.53125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 194.390625,
+            "y": 205.03125,
+            "width": 161.015625,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 246.15625,
+            "y": 264.8125,
+            "width": 104.65625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria1893550238-_r_0_",
+        "label": null,
+        "text": "More ⌘K"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  },
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "macos",
+    "mode": "root200",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 560,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 208,
+        "bottom": 208
+      },
+      "shelf": {
+        "x": 16,
+        "y": 232,
+        "width": 328,
+        "height": 0,
+        "bottom": 232
+      },
+      "footer": {
+        "x": 0,
+        "y": 248,
+        "width": 360,
+        "height": 312,
+        "bottom": 560
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 128,
+            "y": 16,
+            "width": 216,
+            "height": 80,
+            "bottom": 96
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 243.59375,
+            "y": 248,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 296
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 360,
+            "width": 261.9375,
+            "height": 88,
+            "bottom": 448
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 168.859375,
+            "y": 464,
+            "width": 175.140625,
+            "height": 88,
+            "bottom": 552
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 560,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 208,
+        "bottom": 208
+      },
+      "shelf": {
+        "x": 16,
+        "y": 232,
+        "width": 328,
+        "height": 0,
+        "bottom": 232
+      },
+      "footer": {
+        "x": 0,
+        "y": 248,
+        "width": 360,
+        "height": 312,
+        "bottom": 560
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 128,
+            "y": 16,
+            "width": 216,
+            "height": 80,
+            "bottom": 96
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 243.59375,
+            "y": 248,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 296
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 360,
+            "width": 261.9375,
+            "height": 88,
+            "bottom": 448
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 168.859375,
+            "y": 464,
+            "width": 175.140625,
+            "height": 88,
+            "bottom": 552
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 500,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 208,
+        "bottom": 208
+      },
+      "shelf": {
+        "x": 16,
+        "y": 232,
+        "width": 328,
+        "height": 0,
+        "bottom": 232
+      },
+      "footer": {
+        "x": 0,
+        "y": 248,
+        "width": 360,
+        "height": 252,
+        "bottom": 500
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 128,
+            "y": 16,
+            "width": 216,
+            "height": 80,
+            "bottom": 96
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 243.59375,
+            "y": 248,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 296
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 300,
+            "width": 261.9375,
+            "height": 88,
+            "bottom": 388
+          },
+          "visible": 20,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 168.859375,
+            "y": 404,
+            "width": 175.140625,
+            "height": 88,
+            "bottom": 492
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 500,
+        "top": 180
+      },
+      "header": {
+        "x": 0,
+        "y": -180,
+        "width": 360,
+        "height": 208,
+        "bottom": 28
+      },
+      "shelf": {
+        "x": 16,
+        "y": 52,
+        "width": 328,
+        "height": 0,
+        "bottom": 52
+      },
+      "footer": {
+        "x": 0,
+        "y": 68,
+        "width": 360,
+        "height": 252,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 128,
+            "y": -164,
+            "width": 216,
+            "height": 80,
+            "bottom": -84
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 243.59375,
+            "y": 68,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 116
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 120,
+            "width": 261.9375,
+            "height": 88,
+            "bottom": 208
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 168.859375,
+            "y": 224,
+            "width": 175.140625,
+            "height": 88,
+            "bottom": 312
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria2287078841-_r_0_",
+        "label": null,
+        "text": "More ⌘K"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit Ibis⌘Q",
+      "y": 173,
+      "bottom": 213,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 500,
+        "top": 180
+      },
+      "header": {
+        "x": 0,
+        "y": -180,
+        "width": 360,
+        "height": 208,
+        "bottom": 28
+      },
+      "shelf": {
+        "x": 16,
+        "y": 52,
+        "width": 328,
+        "height": 0,
+        "bottom": 52
+      },
+      "footer": {
+        "x": 0,
+        "y": 68,
+        "width": 360,
+        "height": 252,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 128,
+            "y": -164,
+            "width": 216,
+            "height": 80,
+            "bottom": -84
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 243.59375,
+            "y": 68,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 116
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 120,
+            "width": 261.9375,
+            "height": 88,
+            "bottom": 208
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 168.859375,
+            "y": 224,
+            "width": 175.140625,
+            "height": 88,
+            "bottom": 312
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria2287078841-_r_0_",
+        "label": null,
+        "text": "More ⌘K"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  },
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "macos",
+    "mode": "appLargerTimes2",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 640,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": 239.15625
+      },
+      "shelf": {
+        "x": 18.390625,
+        "y": 263.15625,
+        "width": 323.21875,
+        "height": 0,
+        "bottom": 263.15625
+      },
+      "footer": {
+        "x": 0,
+        "y": 281.546875,
+        "width": 360,
+        "height": 358.71875,
+        "bottom": 640.265625
+      },
+      "activeVisible": 23.8125,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 147.15625,
+            "y": 18.390625,
+            "width": 194.453125,
+            "height": 92,
+            "bottom": 110.390625
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 45.984375,
+            "y": 281.5625,
+            "width": 87.421875,
+            "height": 55.1875,
+            "bottom": 336.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 410.3125,
+            "width": 300.34375,
+            "height": 101.1875,
+            "bottom": 511.5
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 140.671875,
+            "y": 529.890625,
+            "width": 200.9375,
+            "height": 101.1875,
+            "bottom": 631.078125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 640,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": 239.15625
+      },
+      "shelf": {
+        "x": 18.390625,
+        "y": 263.15625,
+        "width": 323.21875,
+        "height": 0,
+        "bottom": 263.15625
+      },
+      "footer": {
+        "x": 0,
+        "y": 281.546875,
+        "width": 360,
+        "height": 358.71875,
+        "bottom": 640.265625
+      },
+      "activeVisible": 23.8125,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 147.15625,
+            "y": 18.390625,
+            "width": 194.453125,
+            "height": 92,
+            "bottom": 110.390625
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 45.984375,
+            "y": 281.5625,
+            "width": 87.421875,
+            "height": 55.1875,
+            "bottom": 336.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 410.3125,
+            "width": 300.34375,
+            "height": 101.1875,
+            "bottom": 511.5
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 140.671875,
+            "y": 529.890625,
+            "width": 200.9375,
+            "height": 101.1875,
+            "bottom": 631.078125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 640,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": 239.15625
+      },
+      "shelf": {
+        "x": 18.390625,
+        "y": 263.15625,
+        "width": 323.21875,
+        "height": 0,
+        "bottom": 263.15625
+      },
+      "footer": {
+        "x": 0,
+        "y": 281.546875,
+        "width": 360,
+        "height": 358.71875,
+        "bottom": 640.265625
+      },
+      "activeVisible": 23.8125,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 147.15625,
+            "y": 18.390625,
+            "width": 194.453125,
+            "height": 92,
+            "bottom": 110.390625
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 45.984375,
+            "y": 281.5625,
+            "width": 87.421875,
+            "height": 55.1875,
+            "bottom": 336.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 410.3125,
+            "width": 300.34375,
+            "height": 101.1875,
+            "bottom": 511.5
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 140.671875,
+            "y": 529.890625,
+            "width": 200.9375,
+            "height": 101.1875,
+            "bottom": 631.078125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "",
+        "label": null,
+        "text": "\n    Search referencesPandocBest matches50 results50 resultsSelection study 1: a"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 640,
+        "top": 320
+      },
+      "header": {
+        "x": 0,
+        "y": -320,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": -80.84375
+      },
+      "shelf": {
+        "x": 18.390625,
+        "y": -56.84375,
+        "width": 323.21875,
+        "height": 0,
+        "bottom": -56.84375
+      },
+      "footer": {
+        "x": 0,
+        "y": -38.453125,
+        "width": 360,
+        "height": 358.71875,
+        "bottom": 320.265625
+      },
+      "activeVisible": 0,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 147.15625,
+            "y": -301.609375,
+            "width": 194.453125,
+            "height": 92,
+            "bottom": -209.609375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 45.984375,
+            "y": -38.4375,
+            "width": 87.421875,
+            "height": 55.1875,
+            "bottom": 16.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 90.3125,
+            "width": 300.34375,
+            "height": 101.1875,
+            "bottom": 191.5
+          },
+          "visible": 101.1875,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 140.671875,
+            "y": 209.890625,
+            "width": 200.9375,
+            "height": 101.1875,
+            "bottom": 311.078125
+          },
+          "visible": 101.1875,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria8413049568-_r_0_",
+        "label": null,
+        "text": "More ⌘K"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit Ibis⌘Q",
+      "y": 152.765625,
+      "bottom": 198.765625,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 640,
+        "top": 320
+      },
+      "header": {
+        "x": 0,
+        "y": -320,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": -80.84375
+      },
+      "shelf": {
+        "x": 18.390625,
+        "y": -56.84375,
+        "width": 323.21875,
+        "height": 0,
+        "bottom": -56.84375
+      },
+      "footer": {
+        "x": 0,
+        "y": -38.453125,
+        "width": 360,
+        "height": 358.71875,
+        "bottom": 320.265625
+      },
+      "activeVisible": 0,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 147.15625,
+            "y": -301.609375,
+            "width": 194.453125,
+            "height": 92,
+            "bottom": -209.609375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 45.984375,
+            "y": -38.4375,
+            "width": 87.421875,
+            "height": 55.1875,
+            "bottom": 16.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 90.3125,
+            "width": 300.34375,
+            "height": 101.1875,
+            "bottom": 191.5
+          },
+          "visible": 101.1875,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 140.671875,
+            "y": 209.890625,
+            "width": 200.9375,
+            "height": 101.1875,
+            "bottom": 311.078125
+          },
+          "visible": 101.1875,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria8413049568-_r_0_",
+        "label": null,
+        "text": "More ⌘K"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  },
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "windows",
+    "mode": "app115",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 110.375,
+        "bottom": 110.375
+      },
+      "shelf": {
+        "x": 4.59375,
+        "y": 134.375,
+        "width": 350.8125,
+        "height": 61.46875,
+        "bottom": 195.84375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 23.765625,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 4.578125,
+            "y": 4.59375,
+            "width": 350.828125,
+            "height": 46,
+            "bottom": 50.59375
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 296.265625,
+            "y": 144.578125,
+            "width": 44.34375,
+            "height": 27.59375,
+            "bottom": 172.171875
+          },
+          "visible": 27.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 177.5,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 221.40625,
+            "y": 264.8125,
+            "width": 134,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 110.375,
+        "bottom": 110.375
+      },
+      "shelf": {
+        "x": 4.59375,
+        "y": 134.375,
+        "width": 350.8125,
+        "height": 61.46875,
+        "bottom": 195.84375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 23.9375,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 4.578125,
+            "y": 4.59375,
+            "width": 350.828125,
+            "height": 46,
+            "bottom": 50.59375
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 296.265625,
+            "y": 144.578125,
+            "width": 44.34375,
+            "height": 27.59375,
+            "bottom": 172.171875
+          },
+          "visible": 27.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 177.5,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 221.40625,
+            "y": 264.8125,
+            "width": 134,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 110.375,
+        "bottom": 110.375
+      },
+      "shelf": {
+        "x": 4.59375,
+        "y": 134.375,
+        "width": 350.8125,
+        "height": 61.46875,
+        "bottom": 195.84375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 23.9375,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 4.578125,
+            "y": 4.59375,
+            "width": 350.828125,
+            "height": 46,
+            "bottom": 50.59375
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 244.78125,
+            "y": 1721.75,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1749.34375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": true,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 177.5,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 221.40625,
+            "y": 264.8125,
+            "width": 134,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "",
+        "label": "Show fewer selected references",
+        "text": "Fewer"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 110.375,
+        "bottom": 110.375
+      },
+      "shelf": {
+        "x": 4.59375,
+        "y": 134.375,
+        "width": 350.8125,
+        "height": 61.46875,
+        "bottom": 195.84375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 23.9375,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 4.578125,
+            "y": 4.59375,
+            "width": 350.828125,
+            "height": 46,
+            "bottom": 50.59375
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 244.78125,
+            "y": 1721.75,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1749.34375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 177.5,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 221.40625,
+            "y": 264.8125,
+            "width": 134,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria5473625084-_r_0_",
+        "label": null,
+        "text": "More CtrlK"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit IbisCtrl+Q",
+      "y": 224.375,
+      "bottom": 256.375,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 110.375,
+        "bottom": 110.375
+      },
+      "shelf": {
+        "x": 4.59375,
+        "y": 134.375,
+        "width": 350.8125,
+        "height": 61.46875,
+        "bottom": 195.84375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 23.9375,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 4.578125,
+            "y": 4.59375,
+            "width": 350.828125,
+            "height": 46,
+            "bottom": 50.59375
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 244.78125,
+            "y": 1721.75,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1749.34375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 177.5,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 221.40625,
+            "y": 264.8125,
+            "width": 134,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria5473625084-_r_0_",
+        "label": null,
+        "text": "More CtrlK"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  },
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "windows",
+    "mode": "root200",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 538,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 192,
+        "bottom": 192
+      },
+      "shelf": {
+        "x": 8,
+        "y": 216,
+        "width": 344,
+        "height": 2,
+        "bottom": 218
+      },
+      "footer": {
+        "x": 0,
+        "y": 226,
+        "width": 360,
+        "height": 312,
+        "bottom": 538
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 80,
+            "bottom": 88
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 250.59375,
+            "y": 233,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 281
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 32,
+            "y": 338,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 426
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 128.265625,
+            "y": 442,
+            "width": 223.734375,
+            "height": 88,
+            "bottom": 530
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 538,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 192,
+        "bottom": 192
+      },
+      "shelf": {
+        "x": 8,
+        "y": 216,
+        "width": 344,
+        "height": 2,
+        "bottom": 218
+      },
+      "footer": {
+        "x": 0,
+        "y": 226,
+        "width": 360,
+        "height": 312,
+        "bottom": 538
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 80,
+            "bottom": 88
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 250.59375,
+            "y": 233,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 281
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 32,
+            "y": 338,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 426
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 128.265625,
+            "y": 442,
+            "width": 223.734375,
+            "height": 88,
+            "bottom": 530
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 478,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 192,
+        "bottom": 192
+      },
+      "shelf": {
+        "x": 8,
+        "y": 216,
+        "width": 344,
+        "height": 2,
+        "bottom": 218
+      },
+      "footer": {
+        "x": 0,
+        "y": 226,
+        "width": 360,
+        "height": 252,
+        "bottom": 478
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 80,
+            "bottom": 88
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 250.59375,
+            "y": 233,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 281
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 32,
+            "y": 278,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 366
+          },
+          "visible": 42,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 128.265625,
+            "y": 382,
+            "width": 223.734375,
+            "height": 88,
+            "bottom": 470
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 478,
+        "top": 158
+      },
+      "header": {
+        "x": 0,
+        "y": -158,
+        "width": 360,
+        "height": 192,
+        "bottom": 34
+      },
+      "shelf": {
+        "x": 8,
+        "y": 58,
+        "width": 344,
+        "height": 2,
+        "bottom": 60
+      },
+      "footer": {
+        "x": 0,
+        "y": 68,
+        "width": 360,
+        "height": 252,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 8,
+            "y": -150,
+            "width": 344,
+            "height": 80,
+            "bottom": -70
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 250.59375,
+            "y": 75,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 123
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 32,
+            "y": 120,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 208
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 128.265625,
+            "y": 224,
+            "width": 223.734375,
+            "height": 88,
+            "bottom": 312
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria2175883666-_r_0_",
+        "label": null,
+        "text": "More CtrlK"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit IbisCtrl+Q",
+      "y": 175,
+      "bottom": 215,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 478,
+        "top": 158
+      },
+      "header": {
+        "x": 0,
+        "y": -158,
+        "width": 360,
+        "height": 192,
+        "bottom": 34
+      },
+      "shelf": {
+        "x": 8,
+        "y": 58,
+        "width": 344,
+        "height": 2,
+        "bottom": 60
+      },
+      "footer": {
+        "x": 0,
+        "y": 68,
+        "width": 360,
+        "height": 252,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 8,
+            "y": -150,
+            "width": 344,
+            "height": 80,
+            "bottom": -70
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 250.59375,
+            "y": 75,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 123
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 32,
+            "y": 120,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 208
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 128.265625,
+            "y": 224,
+            "width": 223.734375,
+            "height": 88,
+            "bottom": 312
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria2175883666-_r_0_",
+        "label": null,
+        "text": "More CtrlK"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  },
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "windows",
+    "mode": "appLargerTimes2",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 631,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 220.75,
+        "bottom": 220.75
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 244.75,
+        "width": 341.625,
+        "height": 2,
+        "bottom": 246.75
+      },
+      "footer": {
+        "x": 0,
+        "y": 255.9375,
+        "width": 360,
+        "height": 375.296875,
+        "bottom": 631.234375
+      },
+      "activeVisible": 23.609375,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": 9.1875,
+            "width": 341.640625,
+            "height": 92,
+            "bottom": 101.1875
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 233.96875,
+            "y": 264.15625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 319.34375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 36.796875,
+            "y": 384.703125,
+            "width": 323.203125,
+            "height": 117.765625,
+            "bottom": 502.46875
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 94.15625,
+            "y": 520.859375,
+            "width": 256.65625,
+            "height": 101.1875,
+            "bottom": 622.046875
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 631,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 220.75,
+        "bottom": 220.75
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 244.75,
+        "width": 341.625,
+        "height": 2,
+        "bottom": 246.75
+      },
+      "footer": {
+        "x": 0,
+        "y": 255.9375,
+        "width": 360,
+        "height": 375.296875,
+        "bottom": 631.234375
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": 9.1875,
+            "width": 341.640625,
+            "height": 92,
+            "bottom": 101.1875
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 233.96875,
+            "y": 264.15625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 319.34375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 36.796875,
+            "y": 384.703125,
+            "width": 323.203125,
+            "height": 117.765625,
+            "bottom": 502.46875
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 94.15625,
+            "y": 520.859375,
+            "width": 256.65625,
+            "height": 101.1875,
+            "bottom": 622.046875
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 563,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 220.75,
+        "bottom": 220.75
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 244.75,
+        "width": 341.625,
+        "height": 2,
+        "bottom": 246.75
+      },
+      "footer": {
+        "x": 0,
+        "y": 255.9375,
+        "width": 360,
+        "height": 307.109375,
+        "bottom": 563.046875
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": 9.1875,
+            "width": 341.640625,
+            "height": 92,
+            "bottom": 101.1875
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 233.96875,
+            "y": 264.15625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 319.34375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 36.796875,
+            "y": 316.515625,
+            "width": 323.203125,
+            "height": 117.765625,
+            "bottom": 434.28125
+          },
+          "visible": 3.484375,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 94.15625,
+            "y": 452.671875,
+            "width": 256.65625,
+            "height": 101.1875,
+            "bottom": 553.859375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 563,
+        "top": 243
+      },
+      "header": {
+        "x": 0,
+        "y": -243,
+        "width": 360,
+        "height": 220.75,
+        "bottom": -22.25
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 1.75,
+        "width": 341.625,
+        "height": 2,
+        "bottom": 3.75
+      },
+      "footer": {
+        "x": 0,
+        "y": 12.9375,
+        "width": 360,
+        "height": 307.109375,
+        "bottom": 320.046875
+      },
+      "activeVisible": 1.75,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": -233.8125,
+            "width": 341.640625,
+            "height": 92,
+            "bottom": -141.8125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 233.96875,
+            "y": 21.15625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 76.34375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 36.796875,
+            "y": 73.515625,
+            "width": 323.203125,
+            "height": 117.765625,
+            "bottom": 191.28125
+          },
+          "visible": 117.765625,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 94.15625,
+            "y": 209.671875,
+            "width": 256.65625,
+            "height": 101.1875,
+            "bottom": 310.859375
+          },
+          "visible": 101.1875,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria7632166146-_r_0_",
+        "label": null,
+        "text": "More CtrlK"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit IbisCtrl+Q",
+      "y": 154.765625,
+      "bottom": 200.765625,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 563,
+        "top": 243
+      },
+      "header": {
+        "x": 0,
+        "y": -243,
+        "width": 360,
+        "height": 220.75,
+        "bottom": -22.25
+      },
+      "shelf": {
+        "x": 9.1875,
+        "y": 1.75,
+        "width": 341.625,
+        "height": 2,
+        "bottom": 3.75
+      },
+      "footer": {
+        "x": 0,
+        "y": 12.9375,
+        "width": 360,
+        "height": 307.109375,
+        "bottom": 320.046875
+      },
+      "activeVisible": 1.75,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": -233.8125,
+            "width": 341.640625,
+            "height": 92,
+            "bottom": -141.8125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 233.96875,
+            "y": 21.15625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 76.34375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 36.796875,
+            "y": 73.515625,
+            "width": 323.203125,
+            "height": 117.765625,
+            "bottom": 191.28125
+          },
+          "visible": 117.765625,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 94.15625,
+            "y": 209.671875,
+            "width": 256.65625,
+            "height": 101.1875,
+            "bottom": 310.859375
+          },
+          "visible": 101.1875,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria7632166146-_r_0_",
+        "label": null,
+        "text": "More CtrlK"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  },
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "linux",
+    "mode": "app115",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 0,
+        "y": 143.5625,
+        "width": 360,
+        "height": 56.875,
+        "bottom": 200.4375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 23.171875,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": 9.1875,
+            "width": 341.640625,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 301.859375,
+            "y": 153.765625,
+            "width": 44.34375,
+            "height": 27.59375,
+            "bottom": 181.359375
+          },
+          "visible": 27.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 172.90625,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 203.65625,
+            "y": 264.8125,
+            "width": 147.15625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 0,
+        "y": 143.5625,
+        "width": 360,
+        "height": 56.875,
+        "bottom": 200.4375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": 9.1875,
+            "width": 341.640625,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 301.859375,
+            "y": 153.765625,
+            "width": 44.34375,
+            "height": 27.59375,
+            "bottom": 181.359375
+          },
+          "visible": 27.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 172.90625,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 203.65625,
+            "y": 264.8125,
+            "width": 147.15625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 0,
+        "y": 143.5625,
+        "width": 360,
+        "height": 56.875,
+        "bottom": 200.4375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": 9.1875,
+            "width": 341.640625,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 239.1875,
+            "y": 1730.9375,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1758.53125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": true,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 172.90625,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 203.65625,
+            "y": 264.8125,
+            "width": 147.15625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "",
+        "label": "Show fewer selected references",
+        "text": "Fewer"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 0,
+        "y": 143.5625,
+        "width": 360,
+        "height": 56.875,
+        "bottom": 200.4375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": 9.1875,
+            "width": 341.640625,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 239.1875,
+            "y": 1730.9375,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1758.53125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 172.90625,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 203.65625,
+            "y": 264.8125,
+            "width": 147.15625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria361645779-_r_0_",
+        "label": null,
+        "text": "More Ctrl+K"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit IbisCtrl+Q",
+      "y": 222.375,
+      "bottom": 254.375,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 18.4,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 320,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 119.5625
+      },
+      "shelf": {
+        "x": 0,
+        "y": 143.5625,
+        "width": 360,
+        "height": 56.875,
+        "bottom": 200.4375
+      },
+      "footer": {
+        "x": 0,
+        "y": 200.4375,
+        "width": 360,
+        "height": 119.5625,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 9.171875,
+            "y": 9.1875,
+            "width": 341.640625,
+            "height": 46,
+            "bottom": 55.1875
+          },
+          "visible": 46,
+          "hit": true,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 239.1875,
+            "y": 1730.9375,
+            "width": 57.015625,
+            "height": 27.59375,
+            "bottom": 1758.53125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show fewer selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 172.90625,
+            "y": 205.03125,
+            "width": 182.5,
+            "height": 50.59375,
+            "bottom": 255.625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 203.65625,
+            "y": 264.8125,
+            "width": 147.15625,
+            "height": 50.59375,
+            "bottom": 315.40625
+          },
+          "visible": 50.59375,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria361645779-_r_0_",
+        "label": null,
+        "text": "More Ctrl+K"
+      },
+      "expanded": true,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  },
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "linux",
+    "mode": "root200",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 545,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 208,
+        "bottom": 208
+      },
+      "shelf": {
+        "x": 0,
+        "y": 232,
+        "width": 360,
+        "height": 1,
+        "bottom": 233
+      },
+      "footer": {
+        "x": 0,
+        "y": 233,
+        "width": 360,
+        "height": 312,
+        "bottom": 545
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 16,
+            "y": 16,
+            "width": 328,
+            "height": 80,
+            "bottom": 96
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 259.59375,
+            "y": 249,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 297
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 345,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 433
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 97.578125,
+            "y": 449,
+            "width": 246.421875,
+            "height": 88,
+            "bottom": 537
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 545,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 208,
+        "bottom": 208
+      },
+      "shelf": {
+        "x": 0,
+        "y": 232,
+        "width": 360,
+        "height": 1,
+        "bottom": 233
+      },
+      "footer": {
+        "x": 0,
+        "y": 233,
+        "width": 360,
+        "height": 312,
+        "bottom": 545
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 16,
+            "y": 16,
+            "width": 328,
+            "height": 80,
+            "bottom": 96
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 259.59375,
+            "y": 249,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 297
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 345,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 433
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 97.578125,
+            "y": 449,
+            "width": 246.421875,
+            "height": 88,
+            "bottom": 537
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 485,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 208,
+        "bottom": 208
+      },
+      "shelf": {
+        "x": 0,
+        "y": 232,
+        "width": 360,
+        "height": 1,
+        "bottom": 233
+      },
+      "footer": {
+        "x": 0,
+        "y": 233,
+        "width": 360,
+        "height": 252,
+        "bottom": 485
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 16,
+            "y": 16,
+            "width": 328,
+            "height": 80,
+            "bottom": 96
+          },
+          "visible": 80,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 259.59375,
+            "y": 249,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 297
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 285,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 373
+          },
+          "visible": 35,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 97.578125,
+            "y": 389,
+            "width": 246.421875,
+            "height": 88,
+            "bottom": 477
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 485,
+        "top": 165
+      },
+      "header": {
+        "x": 0,
+        "y": -165,
+        "width": 360,
+        "height": 208,
+        "bottom": 43
+      },
+      "shelf": {
+        "x": 0,
+        "y": 67,
+        "width": 360,
+        "height": 1,
+        "bottom": 68
+      },
+      "footer": {
+        "x": 0,
+        "y": 68,
+        "width": 360,
+        "height": 252,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 16,
+            "y": -149,
+            "width": 328,
+            "height": 80,
+            "bottom": -69
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 259.59375,
+            "y": 84,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 132
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 120,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 208
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 97.578125,
+            "y": 224,
+            "width": 246.421875,
+            "height": 88,
+            "bottom": 312
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria6188606949-_r_0_",
+        "label": null,
+        "text": "More Ctrl+K"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit IbisCtrl+Q",
+      "y": 173,
+      "bottom": 213,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 32,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 485,
+        "top": 165
+      },
+      "header": {
+        "x": 0,
+        "y": -165,
+        "width": 360,
+        "height": 208,
+        "bottom": 43
+      },
+      "shelf": {
+        "x": 0,
+        "y": 67,
+        "width": 360,
+        "height": 1,
+        "bottom": 68
+      },
+      "footer": {
+        "x": 0,
+        "y": 68,
+        "width": 360,
+        "height": 252,
+        "bottom": 320
+      },
+      "activeVisible": 24,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 16,
+            "y": -149,
+            "width": 328,
+            "height": 80,
+            "bottom": -69
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 259.59375,
+            "y": 84,
+            "width": 76.40625,
+            "height": 48,
+            "bottom": 132
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 40,
+            "y": 120,
+            "width": 295.078125,
+            "height": 88,
+            "bottom": 208
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 97.578125,
+            "y": 224,
+            "width": 246.421875,
+            "height": 88,
+            "bottom": 312
+          },
+          "visible": 88,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria6188606949-_r_0_",
+        "label": null,
+        "text": "More Ctrl+K"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  },
+  {
+    "source": "f2031235bf9692290abf31171301722df46f77ea",
+    "platform": "linux",
+    "mode": "appLargerTimes2",
+    "theme": "light",
+    "viewport": {
+      "width": 360,
+      "height": 320
+    },
+    "coarse": true,
+    "appLargerRoot": 18.4,
+    "initial": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 639,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": 239.15625
+      },
+      "shelf": {
+        "x": 0,
+        "y": 263.15625,
+        "width": 360,
+        "height": 1,
+        "bottom": 264.15625
+      },
+      "footer": {
+        "x": 0,
+        "y": 264.15625,
+        "width": 360,
+        "height": 375.296875,
+        "bottom": 639.453125
+      },
+      "activeVisible": 23.8125,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 18.375,
+            "y": 18.390625,
+            "width": 323.234375,
+            "height": 92,
+            "bottom": 110.390625
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 244.15625,
+            "y": 282.5625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 337.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 392.921875,
+            "width": 304.796875,
+            "height": 117.765625,
+            "bottom": 510.6875
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 58.71875,
+            "y": 529.078125,
+            "width": 282.890625,
+            "height": 101.1875,
+            "bottom": 630.265625
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "search": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 639,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": 239.15625
+      },
+      "shelf": {
+        "x": 0,
+        "y": 263.15625,
+        "width": 360,
+        "height": 1,
+        "bottom": 264.15625
+      },
+      "footer": {
+        "x": 0,
+        "y": 264.15625,
+        "width": 360,
+        "height": 375.296875,
+        "bottom": 639.453125
+      },
+      "activeVisible": 23.8125,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 18.375,
+            "y": 18.390625,
+            "width": 323.234375,
+            "height": 92,
+            "bottom": 110.390625
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 244.15625,
+            "y": 282.5625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 337.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 392.921875,
+            "width": 304.796875,
+            "height": 117.765625,
+            "bottom": 510.6875
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 58.71875,
+            "y": 529.078125,
+            "width": 282.890625,
+            "height": 101.1875,
+            "bottom": 630.265625
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "disclosureTouch": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 571,
+        "top": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": 239.15625
+      },
+      "shelf": {
+        "x": 0,
+        "y": 263.15625,
+        "width": 360,
+        "height": 1,
+        "bottom": 264.15625
+      },
+      "footer": {
+        "x": 0,
+        "y": 264.15625,
+        "width": 360,
+        "height": 307.109375,
+        "bottom": 571.265625
+      },
+      "activeVisible": 23.8125,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 18.375,
+            "y": 18.390625,
+            "width": 323.234375,
+            "height": 92,
+            "bottom": 110.390625
+          },
+          "visible": 92,
+          "hit": true,
+          "focused": true,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 244.15625,
+            "y": 282.5625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 337.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 324.734375,
+            "width": 304.796875,
+            "height": 117.765625,
+            "bottom": 442.5
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 58.71875,
+            "y": 460.890625,
+            "width": 282.890625,
+            "height": 101.1875,
+            "bottom": 562.078125
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "search",
+        "label": null,
+        "text": ""
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "moreBefore": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 571,
+        "top": 251
+      },
+      "header": {
+        "x": 0,
+        "y": -251,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": -11.84375
+      },
+      "shelf": {
+        "x": 0,
+        "y": 12.15625,
+        "width": 360,
+        "height": 1,
+        "bottom": 13.15625
+      },
+      "footer": {
+        "x": 0,
+        "y": 13.15625,
+        "width": 360,
+        "height": 307.109375,
+        "bottom": 320.265625
+      },
+      "activeVisible": 11.96875,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 18.375,
+            "y": -232.609375,
+            "width": 323.234375,
+            "height": 92,
+            "bottom": -140.609375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 244.15625,
+            "y": 31.5625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 86.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 73.734375,
+            "width": 304.796875,
+            "height": 117.765625,
+            "bottom": 191.5
+          },
+          "visible": 117.765625,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 58.71875,
+            "y": 209.890625,
+            "width": 282.890625,
+            "height": 101.1875,
+            "bottom": 311.078125
+          },
+          "visible": 101.1875,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria9151496206-_r_0_",
+        "label": null,
+        "text": "More Ctrl+K"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "menuOpened": 1,
+    "menuEnd": {
+      "text": "Quit IbisCtrl+Q",
+      "y": 152.765625,
+      "bottom": 198.765625,
+      "hit": true
+    },
+    "moreClosed": {
+      "rootPx": 36.8,
+      "doc": {
+        "height": 320,
+        "width": 360,
+        "top": 0
+      },
+      "main": {
+        "height": 571,
+        "top": 251
+      },
+      "header": {
+        "x": 0,
+        "y": -251,
+        "width": 360,
+        "height": 239.15625,
+        "bottom": -11.84375
+      },
+      "shelf": {
+        "x": 0,
+        "y": 12.15625,
+        "width": 360,
+        "height": 1,
+        "bottom": 13.15625
+      },
+      "footer": {
+        "x": 0,
+        "y": 13.15625,
+        "width": 360,
+        "height": 307.109375,
+        "bottom": 320.265625
+      },
+      "activeVisible": 11.96875,
+      "actions": {
+        "search": {
+          "box": {
+            "x": 18.375,
+            "y": -232.609375,
+            "width": 323.234375,
+            "height": 92,
+            "bottom": -140.609375
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": null
+        },
+        "disclosure": {
+          "box": {
+            "x": 244.15625,
+            "y": 31.5625,
+            "width": 88.25,
+            "height": 55.1875,
+            "bottom": 86.75
+          },
+          "visible": 0,
+          "hit": false,
+          "focused": false,
+          "label": "Show all 50 selected references"
+        },
+        "copy": {
+          "box": {
+            "x": 46,
+            "y": 73.734375,
+            "width": 304.796875,
+            "height": 117.765625,
+            "bottom": 191.5
+          },
+          "visible": 117.765625,
+          "hit": true,
+          "focused": false,
+          "label": "Copy 50 as Pandoc"
+        },
+        "more": {
+          "box": {
+            "x": 58.71875,
+            "y": 209.890625,
+            "width": 282.890625,
+            "height": 101.1875,
+            "bottom": 311.078125
+          },
+          "visible": 101.1875,
+          "hit": true,
+          "focused": true,
+          "label": null
+        }
+      },
+      "focus": {
+        "id": "react-aria9151496206-_r_0_",
+        "label": null,
+        "text": "More Ctrl+K"
+      },
+      "expanded": false,
+      "selection": "50 references selected for citation"
+    },
+    "errors": []
+  }
+]
