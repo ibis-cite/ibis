@@ -29,6 +29,7 @@ export function installAccentContrast(): Dispose {
     const color = getComputedStyle(probe).backgroundColor;
     if (color === sampledColor) return;
     root.style.removeProperty("--readable-accent-text");
+    sampledColor = ""; // A failed/transparent sample must not leave a stale cache.
     // Let the engine parse modern rgb(), percentages and wide-gamut color().
     // The default canvas readback converts them to sRGB, independent of syntax.
     let rgba: Uint8ClampedArray;

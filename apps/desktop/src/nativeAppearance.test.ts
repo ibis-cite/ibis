@@ -68,11 +68,17 @@ test("older engines repair unreadable accent text and refresh on system changes"
     removeEventListener: () => {} }));
   vi.spyOn(window, "getComputedStyle").mockImplementation(() => ({ backgroundColor: background }) as CSSStyleDeclaration);
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({ clearRect: () => {}, fillRect: () => {},
-    getImageData: () => ({ data: new Uint8ClampedArray([...background.match(/\d+/g)!.map(Number), 255]) }),
+    getImageData: () => ({ data: new Uint8ClampedArray(background === "transparent" ? [0, 0, 0, 0] : [...background.match(/\d+/g)!.map(Number), 255]) }),
   } as unknown as CanvasRenderingContext2D);
   const dispose = installAccentContrast();
   const text = () => document.documentElement.style.getPropertyValue("--readable-accent-text");
   expect(text()).toBe("#000"); // Native white is only 4.21:1; black is 4.99:1.
+  background = "transparent";
+  window.dispatchEvent(new Event("focus"));
+  expect(text()).toBe("");
+  background = "rgb(0, 117, 255)";
+  window.dispatchEvent(new Event("focus"));
+  expect(text()).toBe("#000");
   background = "rgb(0, 40, 100)";
   vi.advanceTimersByTime(1_000); // Accent-only change, with no focus/theme event.
   expect(text()).toBe("#fff");
