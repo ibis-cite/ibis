@@ -55,6 +55,13 @@ cargo insta review                             # review changed snapshots
 
 `scripts/smoke-native.py` drives the real app with real input: UI Automation and SendInput on Windows, System Events and CoreGraphics on macOS, AT-SPI and xdotool on Linux. It checks the shortcut, search focus, accessibility roles, exact clipboard output, focus returning to the editor, a second launch, library reload after a change, damaged libraries and settings preservation. On Linux it also checks that the picker stays out of the taskbar and window switcher. It reads no personal library and cleans up only what it created.
 
+After a Linux check fails, one child of the existing harness has four seconds to
+record a structural census before fixture/app teardown. It flushes safe process
+and X-window facts before querying AT-SPI, retaining validated partial facts on
+timeout. Output contains only bounded counts, PIDs, booleans and fixed map-state
+enums; unavailable tools and failed/empty queries stay distinct. The original
+readiness deadline, failure and teardown are preserved.
+
 Build with `--features tauri/custom-protocol` and run only in a disposable interactive session: the harness takes over the clipboard, opens an editor and sends global input. It refuses to run over existing Ibis settings on macOS and Windows. Never bypass permissions to make it run.
 
 ```sh
@@ -74,6 +81,8 @@ python scripts/smoke-native.py --app target/debug/ibis-desktop.exe --output scre
 ```
 
 Exit 0 is a pass, 1 a failure and 2 unavailable, never a pass. `--self-test` tests the harness alone. Linux smoke runs in the required `Desktop (ubuntu-24.04)` check and blocks pull requests. macOS and Windows smoke run in the separate `Native UI (…)` jobs on the app the Desktop job built: they are not required checks, so a failure turns that job red without blocking a merge, and on `main` it also opens or updates an issue.
+
+On Windows, control activation reuses the picker window handle verified by a snapshot and checks its process ownership, existence and visibility again. A modal menu hides Search from accessibility, so opening it must not force the next action to rediscover the window through Search.
 
 **First-run preferences.** `--first-run-preferences` (instead of `--budgets`) runs the first-run check (#486): choose a writing format, quit, restart and copy, and the copy must use the saved format without choosing it again. Quit must finish within ten seconds. What it does not cover is listed in #238.
 
