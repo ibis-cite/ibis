@@ -86,3 +86,13 @@ test("RTL 200% pressure keeps core actions available and lets them wrap after op
     expect(clicked).toHaveBeenCalledOnce();
   } finally { document.documentElement.dir = ""; }
 });
+
+test("platform key-cap changes restore optional content using the new live widths", () => {
+  const platform = vi.spyOn(window.navigator, "platform", "get").mockReturnValue("Linux x86_64");
+  const fit = geometry(); const view = render(footer());
+  expect(document.querySelectorAll(".shortcuts-hint kbd")).toHaveLength(2);
+  expect(screen.queryByRole("button", { name: "Shortcuts" })).toBeNull();
+  platform.mockReturnValue("MacIntel"); fit.resize(692, { shortcuts: 75, more: 85 }); view.rerender(footer());
+  expect(document.querySelectorAll(".shortcuts-hint kbd")).toHaveLength(1);
+  expect(screen.getByRole("button", { name: "Shortcuts" })).toBeTruthy();
+});

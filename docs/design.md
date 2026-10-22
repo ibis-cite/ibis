@@ -401,6 +401,9 @@ baseline, each key cap 20 px high and centred on it.
   Restore the hint and status space when the contents fit again; width, text
   size, platform and format labels all affect this decision. A folded focused
   Shortcuts action returns focus to More; Search and unrelated controls keep it.
+  If the footer still changes height, the local results scroller keeps the
+  highlighted row visible only while Search owns keyboard navigation. Pointer
+  choices and another focused control do not make the list move.
 - **Library status** keeps its rules (see **Library status**): the dot is
   6 px, centred on the text's x-height, and starts on the leading edge.
 - **Key caps.** A 20 px fill (`--key-cap` on the control fill), radius
