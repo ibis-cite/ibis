@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { URL as FileURL } from "node:url";
 import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
@@ -193,4 +195,37 @@ test("proportional overflow digits cannot cycle the fitted count, and growth res
 test("nothing chosen and nothing to show draws no shelf", () => {
   const { container } = render(shelf({}));
   expect(container.querySelector(".shelf")).toBeNull();
+});
+
+test("the beak quote is decorative, unfocusable and confined to the output line", () => {
+  const output = { markup: [], text: "Synthetic citation", html: "", warnings: [] };
+  const { container, rerender } = render(shelf({ selected: chosen([record("a")]), shown: output, focusable: true }));
+  const preview = screen.getByRole("region", { name: "Preview" });
+  const mark = preview.querySelector("svg.shelf-mark");
+  expect(mark?.getAttribute("viewBox")).toBe("23 25 58 51");
+  expect(mark?.getAttribute("aria-hidden")).toBe("true");
+  expect(mark?.getAttribute("focusable")).toBe("false");
+  expect(mark?.querySelectorAll("circle")).toHaveLength(2);
+  expect(mark?.textContent).toBe("");
+  expect(preview.textContent).toBe(output.text);
+  preview.focus();
+  expect(document.activeElement).toBe(preview);
+  rerender(shelf({ selected: chosen([record("a")]), shown: null }));
+  expect(screen.getByRole("status", { name: "" }).textContent).toBe("Formatting…");
+  expect(container.querySelectorAll("svg.shelf-mark")).toHaveLength(1);
+  rerender(shelf({ selected: chosen([record("a")]) }));
+  expect(container.querySelector(".shelf-mark")).toBeNull();
+});
+
+test("RTL mirrors the beak through its HTML shelf direction", () => {
+  const sheet = document.createElement("style");
+  sheet.textContent = readFileSync(new FileURL("./CitationShelf.css", import.meta.url), "utf8");
+  // Chromium does not match :dir on this SVG, although jsdom does.
+  // Resolve direction on the HTML shelf to keep browser mirroring reliable.
+  expect(sheet.textContent).toContain(".shelf:dir(rtl) .shelf-mark");
+  document.head.append(sheet);
+  try {
+    const { container } = render(<div dir="rtl">{shelf({ shown: { markup: [], text: "Synthetic citation", html: "", warnings: [] } })}</div>);
+    expect(getComputedStyle(container.querySelector("svg.shelf-mark")!).transform).toBe("scaleX(-1)");
+  } finally { sheet.remove(); }
 });
