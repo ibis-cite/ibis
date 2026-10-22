@@ -560,6 +560,35 @@ test("depth preserves suggested, alternative and writing-choice fills", () => {
   } finally { empty.remove(); }
 });
 
+test.each(["macos", "windows", "linux"])("%s depth gives the future shelf one surface and leaves its rows and controls alone", (platform) => {
+  document.documentElement.dataset.platform = platform;
+  // Public shelf classes only; this does not render or copy the pending shelf.
+  const shelf = document.createElement("div");
+  shelf.className = "shelf";
+  document.body.append(shelf);
+  const applied = (node: Element) => layerRules().filter(({ head }) => node.matches(head));
+  const properties = (node: Element) => applied(node).flatMap(({ body }) => [...body.matchAll(/(?:^|;)\s*([\w-]+)\s*:/g)].map(([, property]) => property));
+  try {
+    for (const expanded of [false, true]) {
+      shelf.innerHTML = `<ul class="shelf-chips" aria-label="Selected references"${expanded ? " data-expanded" : ""}><li><button>Remove</button></li><li><button>+49</button></li></ul><section class="shelf-output"><button>Warning details</button></section>`;
+      const nodes = [shelf, ...shelf.querySelectorAll("*")];
+      const painted = nodes.filter((node) => applied(node).some(({ body }) => /(?:^|;)\s*(?:background(?:-color)?|box-shadow)\s*:/.test(body)));
+      expect(painted).toEqual([shelf]);
+      expect(properties(shelf)).toContain("--shelf-fill");
+      // No flex, minimum height, scrolling, insets, padding or target overrides.
+      expect(properties(shelf).filter((property) => !["--shelf-fill", "border-radius", "box-shadow"].includes(property!))).toEqual([]);
+      for (const child of shelf.querySelectorAll("*")) expect(applied(child)).toEqual([]);
+    }
+    // Output-only and hidden-output states still share the same outer surface.
+    for (const className of ["shelf-chips", "shelf-output"]) {
+      shelf.innerHTML = `<div class="${className}"></div>`;
+      expect(applied(shelf.firstElementChild!)).toEqual([]);
+    }
+    document.documentElement.dataset.galleryTheme = "contrast";
+    expect(applied(shelf)).toEqual([]);
+  } finally { shelf.remove(); delete document.documentElement.dataset.galleryTheme; }
+});
+
 test("each platform has its own layers: lifted on macOS, Fluent on Windows, Adwaita-flat on GNOME", () => {
   expect(styles).toMatch(/@import "\.\/nativeAppearance\.css";\n@import "\.\/depth\.css";/);
   const shared = rules(depth, layers());
@@ -609,8 +638,8 @@ test("soft depth changes colour, shadow and fill only, so the geometry chain sta
     ".format-preview { padding-inline: calc(var(--copy-padding) - var(--space-1)) }",
     ".setup-writing .setup-choices { margin-inline: auto }",
     ".setup-writing .setup-choices { width: fit-content }",
-    ":is([aria-label=\"Selected references\"], .format-preview) { margin-inline: var(--space-1) }",
-    "[aria-label=\"Selected references\"] { padding-inline: calc(var(--inset) + var(--row-pad) - var(--space-1)) }",
+    ":is([aria-label=\"Selected references\"]:not(.shelf-chips), .format-preview) { margin-inline: var(--space-1) }",
+    "[aria-label=\"Selected references\"]:not(.shelf-chips) { padding-inline: calc(var(--inset) + var(--row-pad) - var(--space-1)) }",
   ]);
   // The writing track only shrinks to its centred buttons: auto inline margins
   // keep them where justify-content put them, and its 2 px reach is a shadow.
@@ -618,7 +647,7 @@ test("soft depth changes colour, shadow and fill only, so the geometry chain sta
 });
 
 test("the depth card keeps tray content at each platform's selection inset", () => {
-  const padding = rules(depth, `${layers()} [aria-label="Selected references"]`).match(/padding-inline:\s*([^;]+);/)?.[1];
+  const padding = rules(depth, `${layers()} [aria-label="Selected references"]:not(.shelf-chips)`).match(/padding-inline:\s*([^;]+);/)?.[1];
   expect(padding).toBeTruthy();
   expect(tokens).toMatch(/--selection-padding:\s*var\(--space-2\) calc\(var\(--inset\) \+ var\(--row-pad\)\);/);
   for (const platform of ["macos", "windows", "linux"]) {

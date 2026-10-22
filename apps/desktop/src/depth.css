@@ -1,10 +1,10 @@
 /* Soft depth (docs/design.md, "Surfaces and layers"; #749). Layers, back to
    front: the window base (footer, gutters), the results sheet, the search band
-   and the tray card. Top edges catch a 1 px inner highlight and shadows are
+   and the citation card. Top edges catch a 1 px inner highlight and shadows are
    soft and neutral, never coloured; the selected row lifts without a ring or a
    glow. Only colour, shadow and fill change: the geometry chain is untouched.
    Windows keeps Fluent (Mica base, the list on a layer card, its own selection
-   and control elevation); GNOME stays Adwaita-flat with one card for the tray.
+   and control elevation); GNOME stays Adwaita-flat.
    With a native material the material is the base and the sheet. Increased
    contrast, forced colours, the gallery contrast preview and webviews without
    light-dark() keep the flat look. */
@@ -86,24 +86,35 @@
       background: var(--layer-raised); border-radius: var(--card-radius); box-shadow: var(--card-shadow); overflow: clip;
     }
 
-    /* The tray and the preview: one card under the band. Its sides come in by
-       --space-1 and its inline padding gives up the same, so chips and text stay
-       where they were; its top meets the band, so no height changes. */
-    :root[data-platform]:not([data-gallery-theme="contrast"]) :is([aria-label="Selected references"], .format-preview) {
+    /* The bottom shelf owns its geometry and scrolling. Paint one outer
+       surface through its public fill role; its rows and controls keep theirs. */
+    :root[data-platform]:not([data-gallery-theme="contrast"]) .shelf {
+      --shelf-fill: var(--layer-raised); border-radius: var(--card-radius);
+      box-shadow: inset 0 1px 0 var(--layer-highlight), var(--card-shadow);
+    }
+    :root[data-platform="linux"]:not([data-gallery-theme="contrast"]) .shelf {
+      --shelf-fill: var(--layer-sheet); border-radius: 0; box-shadow: inset 0 1px 0 var(--separator);
+    }
+
+    /* The upper tray and preview remain supported until the shelf replaces
+       them. Exclude the shelf's list so it never becomes another card. Their
+       sides come in by --space-1 and padding gives up the same, so chips and
+       text stay where they were; the top meets the band without more height. */
+    :root[data-platform]:not([data-gallery-theme="contrast"]) :is([aria-label="Selected references"]:not(.shelf-chips), .format-preview) {
       position: relative; margin-inline: var(--space-1); background: var(--layer-raised); border-bottom-color: var(--clear);
       border-radius: var(--card-radius); box-shadow: inset 0 1px 0 var(--layer-highlight), var(--card-shadow);
     }
     /* Match --selection-padding's platform inset, less the card's margin. */
-    :root[data-platform]:not([data-gallery-theme="contrast"]) [aria-label="Selected references"] { padding-inline: calc(var(--inset) + var(--row-pad) - var(--space-1)); }
+    :root[data-platform]:not([data-gallery-theme="contrast"]) [aria-label="Selected references"]:not(.shelf-chips) { padding-inline: calc(var(--inset) + var(--row-pad) - var(--space-1)); }
     :root[data-platform]:not([data-gallery-theme="contrast"]) .format-preview { padding-inline: calc(var(--copy-padding) - var(--space-1)); }
-    :root[data-platform]:not([data-gallery-theme="contrast"]) [aria-label="Selected references"]:has(+ .format-preview) {
+    :root[data-platform]:not([data-gallery-theme="contrast"]) [aria-label="Selected references"]:not(.shelf-chips):has(+ .format-preview) {
       border-end-start-radius: 0; border-end-end-radius: 0; border-bottom-color: var(--separator);
       box-shadow: inset 0 1px 0 var(--layer-highlight), 0 0 0 1px var(--layer-hairline);
     }
-    :root[data-platform]:not([data-gallery-theme="contrast"]) [aria-label="Selected references"] + .format-preview {
+    :root[data-platform]:not([data-gallery-theme="contrast"]) [aria-label="Selected references"]:not(.shelf-chips) + .format-preview {
       border-start-start-radius: 0; border-start-end-radius: 0; box-shadow: var(--card-shadow);
     }
-    :root[data-platform]:not([data-gallery-theme="contrast"]) [aria-label="Selected references"] li { border-color: var(--clear); background: var(--chip-background); }
+    :root[data-platform]:not([data-gallery-theme="contrast"]) [aria-label="Selected references"]:not(.shelf-chips) li { border-color: var(--clear); background: var(--chip-background); }
 
     /* The selected row lifts: its fill plus a neutral shadow, no ring or glow. */
     :root[data-platform]:not([data-gallery-theme="contrast"]) [role="option"][data-active] { box-shadow: var(--row-lift); }

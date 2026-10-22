@@ -245,6 +245,11 @@ reduced motion nothing moves. Increased contrast, forced colours and the
 gallery's contrast preview keep the flat, framed look. Shadows are never
 coloured, and no layer has a full rim.
 
+For the bottom shelf, only the outer `.shelf` receives depth: one raised card
+on macOS and Windows, a flat band with one separator on GNOME. Its chip/output
+rows keep their own fills, fitting, hit targets and scrolling. Upper-tray rules
+exclude `.shelf-chips` while both class contracts are supported.
+
 ## What shows, and when
 
 | Element | Visible | Why |
