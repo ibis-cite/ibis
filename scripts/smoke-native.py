@@ -169,6 +169,13 @@ def fixed_windows_failure(stderr):
     for line in (stderr or "").splitlines():
         if line.startswith("NATIVE HELPER ERROR ") and line.removeprefix("NATIVE HELPER ERROR ") in kinds:
             lines.append(line)
+        elif line.startswith("NATIVE CONTROL STATE ") and len(line) <= 512:
+            try:
+                value = json.loads(line.removeprefix("NATIVE CONTROL STATE "))
+                if isinstance(value, dict):
+                    lines.append("NATIVE CONTROL STATE " + json.dumps(control_activation_facts(value)))
+            except (ValueError, TypeError, RuntimeError, RecursionError):
+                pass
         elif line.startswith("NATIVE SNAPSHOT FAILURE ") and len(line) <= 512:
             try:
                 value = json.loads(line.removeprefix("NATIVE SNAPSHOT FAILURE "))
@@ -2696,12 +2703,14 @@ class ContractTests(unittest.TestCase):
                         {"owner": "editor", "available": False}, {"picker_owned": False}):
             self.assertEqual(foreground_diagnostics(line(dict(fact, **changed))), [])
         self.assertEqual(foreground_diagnostics("PRIVATE\nNATIVE FOREGROUND STATE {invalid"), [])
+        self.assertEqual(foreground_diagnostics(line(fact) + " " * 512), [])
         self.assertEqual(len(foreground_diagnostics((line(fact) + "\n") * 100)), 64)
 
     def test_foreground_trace_survives_success_failure_and_timeout_without_retry(self):
         fact = {"action": "more", "stage": "before", "owner": "unknown", "available": False,
                 "picker_owned": True, "picker_visible": True, "elapsed_ms": 2}
         stderr = ("PRIVATE\nNATIVE SNAPSHOT FAILURE " + json.dumps({"phase": "provider", "kind": "COMException", "operation": "node-name"})
+                  + '\nNATIVE CONTROL STATE {"pressed":false,"invoke_pattern":true}'
                   + "\nNATIVE FOREGROUND STATE " + json.dumps(fact))
         for outcome in (subprocess.CompletedProcess([], 0, stdout='{"pressed":true}', stderr=stderr),
                         subprocess.CompletedProcess([], 1, stdout="", stderr=stderr),
@@ -2727,6 +2736,7 @@ class ContractTests(unittest.TestCase):
             self.assertNotIn("PRIVATE", str(output.call_args_list))
             if isinstance(outcome, subprocess.CompletedProcess) and outcome.returncode:
                 self.assertIn("NATIVE SNAPSHOT FAILURE", str(output.call_args_list))
+                self.assertIn("NATIVE CONTROL STATE", str(output.call_args_list))
 
     def test_foreground_trace_stops_after_eight_snapshots_and_caps_retained_records(self):
         native = Scripted.__new__(Scripted)
