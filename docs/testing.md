@@ -55,6 +55,13 @@ cargo insta review                             # review changed snapshots
 
 `scripts/smoke-native.py` drives the real app with real input: UI Automation and SendInput on Windows, System Events and CoreGraphics on macOS, AT-SPI and xdotool on Linux. It checks the shortcut, search focus, accessibility roles, exact clipboard output, focus returning to the editor, a second launch, library reload after a change, damaged libraries and settings preservation. On Linux it also checks that the picker stays out of the taskbar and window switcher. It reads no personal library and cleans up only what it created.
 
+After a Linux check fails, one child of the existing harness has four seconds to
+record a structural census before fixture/app teardown. It flushes safe process
+and X-window facts before querying AT-SPI, retaining validated partial facts on
+timeout. Output contains only bounded counts, PIDs, booleans and fixed map-state
+enums; unavailable tools and failed/empty queries stay distinct. The original
+readiness deadline, failure and teardown are preserved.
+
 Build with `--features tauri/custom-protocol` and run only in a disposable interactive session: the harness takes over the clipboard, opens an editor and sends global input. It refuses to run over existing Ibis settings on macOS and Windows. Never bypass permissions to make it run.
 
 ```sh
@@ -93,7 +100,7 @@ On Windows, control activation reuses the picker window handle verified by a sna
 
 **Browser contact sheet.** `node scripts/gallery-contact-sheet.mjs` renders every gallery state in each platform look, light and dark, normal and Larger text, in Playwright's Chromium at the picker's 720×480. It writes PNGs and a `manifest.json` to `target/gallery-contact-sheet`. Narrow it with `--state`, `--platform`, `--theme` or `--text`. Frames are taken with the pointer outside the window, so hover styles show only in the `pin-hover` frame. `high-contrast` and `forced-colors` use Chromium's own contrast and forced-colours emulation; the native evidence app cannot emulate them, so it keeps the `data-gallery-theme="contrast"` CSS. It needs Playwright with Chromium installed and never downloads a browser. Exit 0 means every frame rendered, 1 that one did not, 2 that Chromium is unavailable. These show layout and colour, not native appearance, so label them "browser render". The same switches work by hand at `/gallery.html` under `pnpm -C apps/desktop dev` (`?platform=`, `?theme=`, `?text=`, `?density=`, `?state=`). The `toolbar-menu` states preview the shared menu component (#585) in the browser only.
 
-**Geometry check.** `node scripts/gallery-geometry.mjs` renders the same gallery for each look at normal and Larger text and prints a table of the picker's geometry against [`docs/design-geometry.json`](design-geometry.json): row height per density, footer, search band, the search glyph over the tile column, typed text at the row title's x, and the corner chain. It takes about half a minute and needs Playwright's Chromium, so it is not part of `scripts/check.mjs`; `scripts/gallery-geometry.test.mjs` (which is) keeps the JSON in step with `docs/design.md`. It reports only (exit 0) until the geometry work in #576 lands; `--enforce` exits 1 on a mismatch. `--no-build --dist DIR` reuses a build. Exit 2 means Playwright or Chromium is unavailable.
+**Geometry check.** `node scripts/gallery-geometry.mjs` renders the same gallery for each look at normal and Larger text and prints a table of the picker's geometry against [`docs/design-geometry.json`](design-geometry.json): row height per density, footer, search band, the search glyph over the tile column, typed text at the row title's x, and the corner chain. For five states with and without chosen references it also checks that no region of the picker (search band, notices, tray, preview, list, footer) overlaps another, that no chip is cut by the tray's edge, and that the list scrolls in its own area. It takes about half a minute and needs Playwright's Chromium, so it is not part of `scripts/check.mjs`; `scripts/gallery-geometry.test.mjs` (which is) keeps the JSON in step with `docs/design.md`. It reports only (exit 0) until the geometry work in #576 lands; `--enforce` exits 1 on a mismatch. `--no-build --dist DIR` reuses a build. Exit 2 means Playwright or Chromium is unavailable.
 
 Before and after images for a visual pull request belong in that pull request or on the `evidence` branch, not in `docs/`.
 

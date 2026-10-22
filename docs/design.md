@@ -262,7 +262,7 @@ coloured, and no layer has a full rim.
 | Attachment chip | When a file is attached | The platform's document (or globe) icon only, 16 px in a 24 px chip. "PDF, 12 pages" is its tooltip and accessible name, and it opens the preview. No empty column otherwise. |
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
 | Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows: a plus, or a check on a row already added. A row in the citation always shows a scarlet tile with a white check, the only scarlet on the row. A 32 px pointer target with its name in the tooltip ("Add García 2021 to citation"); it adds no Tab stop, because a listbox option holds no controls, and keyboards use Shift+Enter. |
-| Citation tray | Once a source is added | Page number per source and the exact text to be copied, in scarlet. |
+| Citation tray | Once a source is added | Page number per source and the exact text to be copied, in scarlet. The chips and the preview are bands above the list that never cover it. The tray shows at most two whole rows of one-line chips (a long key ends with an ellipsis; its tooltip and Remove button name it whole), scrolls by rows and fades at its bottom edge while more chips are below. |
 | Footer key hints | Always | What Enter does now, Shortcuts and More, label first and keys after (see **Footer**). |
 | Footer tip | One at a time | Tied to what the user is doing, retired once they have done it. Otherwise the footer shows library status. |
 | Library status | Always, quietly | A dot, the source and the count; the age only when it is news or a warning (see below). A sentence above the list only when something needs the user. |
@@ -402,20 +402,22 @@ baseline, each key cap 20 px high and centred on it.
   hint that comes and goes is first, so the cluster's trailing end never moves.
   With Alt held: "Add to citation ⇧↵", then the Escape step ("Clear search
   Esc" or "Hide Esc"), then More.
-- **More** looks like the other hints but is a button: a quiet fill on hover
-  and while open, drawn 28 px high and centred in the 40 px footer, with a
-  32 px target, radius `--r-tile`. Its name is "More", with
+- **Actions** are quiet buttons, including Copy, the alternate Add/Remove and
+  Escape step, Shortcuts and More. Their labels match their accessible names;
+  decorative caps are hidden from screen readers and `aria-keyshortcuts`
+  names the keys. They invoke the same guarded actions as the keyboard.
+  The quiet fill is drawn 28 px high in the 40 px footer, with a
+  32 px target (44 px under `pointer: coarse`), radius `--r-tile`.
+  Targets wrap without overlap; the footer grows when needed. More has
   `aria-haspopup="menu"`, `aria-expanded` and `aria-keyshortcuts`; its caps
   are hidden from screen readers.
-- **Shortcuts** is a hint, not a button: it names the key that opens the
-  keyboard shortcuts list. The name matches each system's own term (macOS and
+- **Shortcuts** opens the keyboard shortcuts list. The name matches each system's own term (macOS and
   Windows both say "Keyboard shortcuts"); the footer shortens it to one word,
   and More and the list's title say it in full. Changing shortcuts belongs to
   the settings design, not to this list.
-- **Screen readers** hear the hints as one group named "Keys", each as its
-  label then its keys ("Copy as Pandoc, Enter"). The Enter hint is hidden
-  from them while focus is outside the search box, where Enter does
-  something else.
+- **Screen readers** hear the actions in one group named "Keys". Buttons stay
+  visible and reachable when focus leaves Search; Enter then presses the
+  focused button. Copy is offered only when its current output is ready.
 - **Narrow windows.** The library status shortens first (its own rules).
   Under 520 px, or with Larger text, the Shortcuts hint is dropped (More
   still lists it). If the rest still does not fit, the hints wrap onto a
