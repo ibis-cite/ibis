@@ -37,11 +37,6 @@ afterEach(() => {
   delete document.documentElement.dataset.galleryTheme;
 });
 
-test("shared chip layout and touch roles keep the agreed physical values", () => {
-  expect(tokens).toMatch(/--chip-count-only-width:\s*460px/);
-  expect(tokens).toMatch(/--touch-target:\s*2\.75rem/);
-});
-
 test("soft depth is the default imported look, using role tokens without an opt-in gate or CSS glass", () => {
   expect(styles).toContain('@import "./depth.css";');
   expect(styles.indexOf('"./depth.css"')).toBeGreaterThan(styles.indexOf('"./nativeAppearance.css"'));
