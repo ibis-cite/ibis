@@ -128,6 +128,12 @@ test.each(["", "unmatched"])("result headings only name actual rows, preserving 
   render(<App />);
   if (query) fireEvent.change(screen.getByLabelText("Search references"), { target: { value: query } });
   await screen.findByText(query ? "No matching references" : "Type to find a reference");
+  if (!query) {
+    const search = screen.getByRole("button", { name: "Search references" });
+    search.focus();
+    fireEvent.click(search);
+    expect(document.activeElement).toBe(screen.getByLabelText("Search references"));
+  }
   expect(document.querySelector(".results-heading")).toBeNull();
   await waitFor(() => expect(screen.getByRole("status", { name: "Search results" }).textContent).toBe("0 results"));
 });

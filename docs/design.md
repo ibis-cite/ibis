@@ -424,11 +424,12 @@ no rows there is nothing to name.
 
 | Case | Title | Line | Below |
 |---|---|---|---|
-| Nothing typed, library loaded | Type to find a reference | Search by title, author, year, citation key or DOI. | Two key hints: "Copy ↵" and "Add to citation ⇧↵" |
+| Nothing typed, library loaded | Type to find a reference | Search by title, author, year, citation key or DOI. | Suggested: Search references (focuses Search); decorative Copy/Add key hints |
 | Nothing typed, with history (Rollout 6) | | | No template: "Recently cited" rows, ready for ↓ and Enter |
 | No matches | No matching references | Try a surname, year or fewer words. | Suggested: Clear search; quieter Search all libraries when some are left out |
 | Empty `.bib` library | No references in thesis.bib | Choose a file with references. | Suggested: Choose library… |
 | Empty Zotero library | No references in My Library | Add items in Zotero, then reload. | Suggested: Reload; quieter Choose library… |
+| Loading or reloading | Opening thesis.bib… / Reloading thesis.bib… | Choose another library if needed. | Suggested: Choose library…; retained rows remain below |
 
 Spotlight, Alfred and GNOME's search show nothing until something is typed;
 Raycast and the Windows 11 Start menu show recent items. Ibis does the second

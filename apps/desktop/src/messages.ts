@@ -120,6 +120,7 @@ export const pickerText = {
   clearSearch: "Clear search",
   searchAllLibraries: "Search all Zotero libraries",
   typeToFind: "Type to find a reference",
+  loadingHint: "Choose another library if needed.",
   typeToFindHint: "Search by title, author, year, citation key or DOI.",
   matchedIn: (field: string) => `Matched in ${matchFieldNames[field] ?? field}`,
   more: "More",

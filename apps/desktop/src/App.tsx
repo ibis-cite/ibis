@@ -443,9 +443,6 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
   }, [clickCopy, chosenKey, shown]);
 
   const busy = library?.state === "loading" || library?.state === "reloading";
-  const loadingMessage = library?.state === "reloading"
-    ? libraryMessages.reloading(library.name)
-    : libraryMessages.opening(library?.name ?? null);
 
   // Zotero libraries: the ones chosen, and the groups Zotero offers, listed
   // when the menu opens or when results come from several libraries.
@@ -627,7 +624,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         onTogglePin={togglePin}
       />
       <div className="picker-content">
-      <Notices library={library} busy={busy} loadingMessage={loadingMessage} failures={failures} startAtLogin={startAtLogin}
+      <Notices library={library} failures={failures} startAtLogin={startAtLogin}
         error={error} copyError={copyError} copied={copied} onDismissCopied={() => setCopied(null)} />
       <SelectionTray announce={selectionChanged} selected={selected} removeLabel={removeLabel} onRemove={(r) => {
         toggle(r);
@@ -641,6 +638,19 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         <p className="visually-hidden" role="status" aria-label={pickerText.searchResults} aria-live="polite" aria-atomic="true">
           {announcement}
         </p>
+        {library !== undefined && (busy || results.length === 0 && !error && !library?.error) && (
+          <EmptyState library={library} query={query} narrowed={narrowed}
+            onChooseLibrary={() => void perform("choose", chooseLibrary)}
+            onClearSearch={() => { setQuery(""); input.current?.focus(); }}
+            onSearchAll={searchAllLibraries}
+            onReload={() => { input.current?.focus(); void perform("reload", reloadLibrary); }}
+            setup={
+              <LibrarySetup api={setupApi} perform={perform}
+                writing={{ format, formatted: Boolean(cslItems && copyFormatted), choose: chooseFormat }}
+                shortcut={shortcut?.registered ? shortcutLabel(shortcut.shortcut, isMac) : null}
+                startAtLogin={loginItemOffered && startAtLogin ? { name: startAtLogin.name, enabled: startAtLogin.enabled, toggle: toggleStartAtLogin } : undefined} />
+            } />
+        )}
         <ResultList results={results} active={active} selected={selected} density={density}
           libraryOf={severalLibraries ? libraryOf : noLibrary} onMouseMove={pointer.onMouseMove}
           onChoose={(i, r, action) => {
@@ -658,19 +668,6 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
             toggle(r);
             input.current?.focus();
           }} />
-        {results.length === 0 && !error && library !== undefined && !busy && !library?.error && (
-          <EmptyState library={library} query={query} narrowed={narrowed}
-            onChooseLibrary={() => void perform("choose", chooseLibrary)}
-            onClearSearch={() => { setQuery(""); input.current?.focus(); }}
-            onSearchAll={searchAllLibraries}
-            onReload={() => { input.current?.focus(); void perform("reload", reloadLibrary); }}
-            setup={
-              <LibrarySetup api={setupApi} perform={perform}
-                writing={{ format, formatted: Boolean(cslItems && copyFormatted), choose: chooseFormat }}
-                shortcut={shortcut?.registered ? shortcutLabel(shortcut.shortcut, isMac) : null}
-                startAtLogin={loginItemOffered && startAtLogin ? { name: startAtLogin.name, enabled: startAtLogin.enabled, toggle: toggleStartAtLogin } : undefined} />
-            } />
-        )}
       </div>
       </div>
       <PickerFooter library={library} groupName={groupName}

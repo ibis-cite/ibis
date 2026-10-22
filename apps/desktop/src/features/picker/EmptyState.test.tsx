@@ -23,13 +23,29 @@ test.each(["", "unmatched"])("one empty-state template has a plain title, descri
   expect(screen.queryByRole("heading")).toBeNull();
 });
 
-test("idle instructions use the footer label-then-keys pattern without offering unavailable actions", () => {
-  const { container } = mount();
+test("idle instructions keep footer hints and offer an enabled way to focus Search", () => {
+  const { container, clear } = mount();
   const keys = container.querySelector(".empty-keys");
   expect(keys?.getAttribute("aria-hidden")).toBe("true");
   expect([...container.querySelectorAll(".key-hint-label")].map((label) => label.textContent)).toEqual(["Copy", "Add to citation"]);
   expect([...container.querySelectorAll(".key-hint")].every((hint) => hint.firstElementChild?.className === "key-hint-label")).toBe(true);
-  expect(screen.queryByRole("button")).toBeNull();
+  const search = screen.getByRole("button", { name: "Search references" });
+  expect(search.classList.contains("suggested-action")).toBe(true);
+  fireEvent.click(search);
+  expect(clear).toHaveBeenCalledOnce();
+});
+
+test.each(["loading", "reloading"] as const)("%s has a title, one short line and the existing chooser action", (state) => {
+  const choose = vi.fn();
+  const { container } = render(<EmptyState library={{ ...loaded, state }} query="" narrowed={false}
+    onChooseLibrary={choose} onClearSearch={vi.fn()} onSearchAll={vi.fn()} onReload={vi.fn()} setup={null} />);
+  expect(screen.getByRole("status").textContent).toBe(`${state === "loading" ? "Opening" : "Reloading"} example.bib…`);
+  expect(container.querySelector(".empty-description")?.textContent).toBe("Choose another library if needed.");
+  const action = screen.getByRole("button", { name: "Choose library…" });
+  expect(action.classList.contains("suggested-action")).toBe(true);
+  expect(screen.getAllByRole("button")).toHaveLength(1);
+  fireEvent.click(action);
+  expect(choose).toHaveBeenCalledOnce();
 });
 
 test("no matches retain clear-search and search-all actions", () => {
