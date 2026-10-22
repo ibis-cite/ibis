@@ -1,0 +1,21 @@
+{
+  "source": "f2031235bf9692290abf31171301722df46f77ea",
+  "browser": "Chromium 151.0.7922.34",
+  "scenario": {
+    "state": "first-run-found",
+    "platform": "macos",
+    "theme": "light",
+    "viewport": {
+      "width": 420,
+      "height": 480
+    },
+    "text": "normal"
+  },
+  "native_capture": false,
+  "unmodified_frames": 60,
+  "unmodified_fold_transitions": 59,
+  "counterfactual_frames": 60,
+  "counterfactual_fold_transitions": 0,
+  "counterfactual_source_change": false,
+  "counterfactual_css": ".library-bar[data-shortcuts-folded] .shortcuts-hint { width: max-content; max-width: none; }"
+}

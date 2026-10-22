@@ -1,0 +1,2484 @@
+[
+  {
+    "i": 0,
+    "version": "before",
+    "initial": {
+      "time": 145.60000000149012,
+      "flags": {
+        "shortcutsFolded": "true"
+      },
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 593
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 40
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 39
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 291.6875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 292
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 0,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "absolute",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 0
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 539,
+            "width": 32,
+            "height": 68
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "absolute",
+          "visibility": "hidden",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 30
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 21,
+            "y": 582,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 563,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    },
+    "settled": {
+      "time": 953.1000000014901,
+      "flags": {},
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 633
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 80
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 79
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 593,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 295.921875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 296
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 387.921875,
+            "y": 563,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px 0px 0px 299.688px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 603,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    }
+  },
+  {
+    "i": 0,
+    "version": "after",
+    "initial": {
+      "time": 116.79999999701977,
+      "flags": {
+        "shortcutsFolded": "true"
+      },
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 593
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 40
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 39
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 291.6875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 292
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 0,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "absolute",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 0
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 539,
+            "width": 32,
+            "height": 68
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "absolute",
+          "visibility": "hidden",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 30
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 21,
+            "y": 582,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 563,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    },
+    "settled": {
+      "time": 923.0999999940395,
+      "flags": {
+        "shortcutsFolded": "true"
+      },
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 593
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 40
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 39
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 291.6875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 292
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 0,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "absolute",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 0
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 539,
+            "width": 32,
+            "height": 68
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "absolute",
+          "visibility": "hidden",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 30
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 21,
+            "y": 582,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 563,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    }
+  },
+  {
+    "i": 1,
+    "version": "before",
+    "initial": {
+      "time": 108.30000000447035,
+      "flags": {},
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 633
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 80
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 79
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 593,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 295.921875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 296
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 387.921875,
+            "y": 563,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px 0px 0px 299.688px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 603,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    },
+    "settled": {
+      "time": 912.6000000014901,
+      "flags": {},
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 633
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 80
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 79
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 593,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 295.921875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 296
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 387.921875,
+            "y": 563,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px 0px 0px 299.688px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 603,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    }
+  },
+  {
+    "i": 1,
+    "version": "after",
+    "initial": {
+      "time": 109.69999999552965,
+      "flags": {},
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 633
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 80
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 79
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 593,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 295.921875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 296
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 387.921875,
+            "y": 563,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px 0px 0px 299.688px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 603,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    },
+    "settled": {
+      "time": 914.2999999970198,
+      "flags": {},
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 633
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 80
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 79
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 593,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 295.921875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 296
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 387.921875,
+            "y": 563,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px 0px 0px 299.688px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 603,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    }
+  },
+  {
+    "i": 2,
+    "version": "before",
+    "initial": {
+      "time": 108.29999999701977,
+      "flags": {},
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 633
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 80
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 79
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 593,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 295.921875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 296
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 387.921875,
+            "y": 563,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px 0px 0px 299.688px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 603,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    },
+    "settled": {
+      "time": 913,
+      "flags": {},
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 633
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 80
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 79
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 593,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 295.921875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 296
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 323.921875,
+            "y": 557,
+            "width": 92.078125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 387.921875,
+            "y": 563,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px 0px 0px 299.688px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 597,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 603,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    }
+  },
+  {
+    "i": 2,
+    "version": "after",
+    "initial": {
+      "time": 117.30000000447035,
+      "flags": {
+        "shortcutsFolded": "true"
+      },
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 593
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 40
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 39
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 291.6875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 292
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 0,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "absolute",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 0
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 539,
+            "width": 32,
+            "height": 68
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "absolute",
+          "visibility": "hidden",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 30
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 21,
+            "y": 582,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 563,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    },
+    "settled": {
+      "time": 924.3000000044703,
+      "flags": {
+        "shortcutsFolded": "true"
+      },
+      "nodes": [
+        {
+          "tag": "MAIN",
+          "text": "Search referencesChoose a library to get startedChoose library…Use ZoteroZotero is open, so Use Zotero can read your library. 2 .bib files found.Found on this computerresearch.bib in Documentsreading.bib in DesktopLook againWhere do you write?Markdown or PandocLaTeXTypstOpen Ibis from any app with ⌃⇧Y.Start Ibis when you log inNo library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 420,
+            "height": 593
+          },
+          "font": "16px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "FOOTER",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 0,
+            "y": 553,
+            "width": 420,
+            "height": 40
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 420
+        },
+        {
+          "tag": "library-bar",
+          "text": "No library chosenShortcuts ⌘/More ⌘K",
+          "rect": {
+            "x": 20,
+            "y": 554,
+            "width": 392,
+            "height": 39
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "1 1 0%",
+          "available": 392
+        },
+        {
+          "tag": "footer-status-size",
+          "text": "",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 224,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "auto",
+          "flex": "0 0 auto",
+          "available": 224
+        },
+        {
+          "tag": "library-status",
+          "text": "No library chosen",
+          "rect": {
+            "x": 20,
+            "y": 565.5,
+            "width": 291.6875,
+            "height": 15
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "8px",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "min(224px, 100%)",
+          "flex": "1 1 0%",
+          "available": 292
+        },
+        {
+          "tag": "enter-hints",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 573,
+            "width": 0,
+            "height": 0
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px -4px 0px 0px",
+          "gap": "8px 16px",
+          "position": "absolute",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 0
+        },
+        {
+          "tag": "quiet-button footer-action shortcuts-hint",
+          "text": "Shortcuts ⌘/",
+          "rect": {
+            "x": 20,
+            "y": 539,
+            "width": 32,
+            "height": 68
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "absolute",
+          "visibility": "hidden",
+          "minWidth": "32px",
+          "flex": "0 1 auto",
+          "available": 30
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘/",
+          "rect": {
+            "x": 21,
+            "y": 582,
+            "width": 27.078125,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "hidden",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 25
+        },
+        {
+          "tag": "more",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "relative",
+          "visibility": "visible",
+          "minWidth": "auto",
+          "flex": "0 1 auto",
+          "available": 92
+        },
+        {
+          "tag": "quiet-button",
+          "text": "More ⌘K",
+          "rect": {
+            "x": 319.6875,
+            "y": 557,
+            "width": 92.3125,
+            "height": 32
+          },
+          "font": "12px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "0px",
+          "flex": "0 1 auto",
+          "available": 90
+        },
+        {
+          "tag": "KBD",
+          "text": "⌘K",
+          "rect": {
+            "x": 368.515625,
+            "y": 563,
+            "width": 31.484375,
+            "height": 20
+          },
+          "font": "600 12px / 18px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "margin": "0px",
+          "gap": "normal",
+          "position": "static",
+          "visibility": "visible",
+          "minWidth": "20px",
+          "flex": "0 1 auto",
+          "available": 29
+        }
+      ]
+    }
+  }
+]
