@@ -202,8 +202,13 @@ they keep 4.5:1; the opaque surface keeps the usual scarlet. Fills, hairlines
 and key caps are translucent so the material shows through, and the window edge
 is a 1 px hairline (black 10% in light, white 10% in dark), never a white rim.
 
-**Materials by layer.** Every platform separates a content layer (the result
-list, preview and tray) from a control layer (search and format).
+**Materials by layer.** Soft depth is the default: window base, results sheet,
+search band and one citation shelf card, back to front. The surface and shadow
+roles in [the design system](design/system.md#62-layers) paint these layers
+without changing row, search or control geometry. The macOS active row keeps its
+accent fill and gains only a neutral lifting shadow; key caps outside overlays
+have a tactile edge. The first-run writing choices share a segmented track.
+Contrast modes retain flat, framed controls; reduced motion removes transitions.
 
 - **macOS.** Content stays on the standard material described above. Liquid
   Glass (`NSGlassEffectView`, macOS 26) is a later step (Rollout 9) and then
@@ -212,12 +217,12 @@ list, preview and tray) from a control layer (search and format).
   accent. Ibis sets no blur or opacity of its own, so the macOS 27 glass
   opacity setting, Reduce Transparency and Increase Contrast apply unchanged.
 - **Windows.** The picker is a transient, light-dismiss surface, which is what
-  Microsoft reserves Desktop Acrylic for. Content sits directly on it, with no
-  second layer. Mica is for long-lived windows such as settings. Both become the
+  Microsoft reserves Desktop Acrylic for. The existing native Acrylic / Mica
+  stays the base, with the result list on a Fluent layer card. Both become the
   solid surface when transparency effects are off or battery saver is on.
 - **Linux.** Flat and opaque on `window_bg`, with the search entry on
   `view_bg`. Ibis does not use the GNOME 51 blur API, since GNOME's own apps
-  stay flat.
+  stay flat; only the citation shelf is a raised card.
 
 ## What shows, and when
 
@@ -283,7 +288,7 @@ new, from the design-system foundations, and are defined here:
 |---|---|---|---|---|
 | `--r-control` | Buttons, fields, pop-up buttons | 6 (a capsule in the header on macOS 26) | 4 | 6 |
 | `--r-key` | Key caps | 4 (5 on macOS 26) | 4 | 4 |
-| `--surface-raised` | Cards and grouped forms, one step above `--surface` | `#fff` / `#2c2c2f` | white 70 % / white 5 % | `#fff` / `#2e2e32` |
+| `--surface-raised` | Cards and grouped forms, one step above `--surface` | `#fff` / `#2c2c2f` | white 50 % / `#3a3a3a` at 30 % | `#fff` / white 8 % |
 | `--text-tertiary` | Glyphs at rest (indicators, empty-state icons), at least 3:1; never sentences | black 45 % / white 45 % (`tertiaryLabelColor`) | black 45 % / white 54 % (`TextFillColorTertiary`) | `currentColor` at 45 % |
 
 `--key-cap` (20 px) is the existing key-cap height.

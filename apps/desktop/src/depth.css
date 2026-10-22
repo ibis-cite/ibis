@@ -1,0 +1,57 @@
+/* Soft depth follows the existing geometry and role API. Native materials stay
+   behind the page; contrast modes retain their framed, flat appearance. */
+@supports (color: light-dark(white, black)) {
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    :root:not([data-gallery-theme="contrast"]):not(.notice-window) {
+      --surface-window: light-dark(#f2f2f4, #1c1c1e);
+      --surface-raised: light-dark(#fff, #2c2c2f);
+      --shelf-fill: var(--surface-raised);
+      --shadow-row-lift: inset 0 1px 0 rgb(255 255 255 / 22%), 0 1px 2px rgb(0 0 0 / 14%), 0 4px 10px -4px rgb(0 0 0 / 24%);
+    }
+    :root[data-platform="windows"]:not([data-gallery-theme="contrast"]):not(.notice-window) {
+      --surface-window: light-dark(#f3f3f3, #202020);
+      --surface-raised: light-dark(rgb(255 255 255 / 50%), rgb(58 58 58 / 30%));
+    }
+    :root[data-platform="linux"]:not([data-gallery-theme="contrast"]):not(.notice-window) {
+      --surface-window: light-dark(#fafafb, #222226);
+      --surface-raised: light-dark(#fff, rgb(255 255 255 / 8%));
+    }
+    :root:not([data-native-appearance]):not([data-gallery-theme="contrast"]):not(.notice-window) { background: var(--surface-window); }
+    :root:not([data-gallery-theme="contrast"]):not(.notice-window) .results-area { background: var(--surface); }
+    :root[data-platform="macos"]:not([data-gallery-theme="contrast"]):not(.notice-window) .search-bar {
+      background: var(--surface-raised); border-bottom-color: var(--clear); box-shadow: var(--shadow-raised);
+    }
+    :root[data-platform="windows"]:not([data-gallery-theme="contrast"]):not(.notice-window) #results:not(:empty) {
+      background: var(--surface-raised); border-radius: var(--r-card); box-shadow: var(--shadow-card); overflow: clip;
+    }
+    /* One card surrounds the actual chips and output, including on GNOME. */
+    :root:not([data-gallery-theme="contrast"]):not(.notice-window) .shelf {
+      background: var(--shelf-fill); border-radius: var(--r-row); box-shadow: var(--shadow-card);
+    }
+    :root[data-platform="linux"]:not([data-gallery-theme="contrast"]):not(.notice-window) .shelf { border-top-color: var(--clear); }
+    :root[data-platform="macos"]:not([data-gallery-theme="contrast"]):not(.notice-window) [role="option"][data-active] {
+      border-radius: var(--r-row); box-shadow: var(--shadow-row-lift);
+    }
+    /* Caps inside menus and dialogs keep their overlay's flat, paired colours. */
+    :root[data-platform="macos"]:not([data-gallery-theme="contrast"]):not(.notice-window) :is(footer, .empty-state) kbd {
+      background: var(--surface-raised); border-color: var(--clear); box-shadow: var(--shadow-raised);
+    }
+    :root[data-platform="macos"]:not([data-gallery-theme="contrast"]):not(.notice-window) .empty-state button:not(.suggested-action, .empty-alternative, .writing-choice, :disabled, [aria-disabled="true"]):not(:hover, :active, :focus-visible) {
+      background: var(--surface-raised); box-shadow: var(--shadow-raised);
+    }
+    :root:not([data-gallery-theme="contrast"]):not(.notice-window) .setup-writing .setup-choices {
+      width: fit-content; margin-inline: auto; border-radius: var(--r-control); background: var(--fill-subtle-hover);
+    }
+    @media (prefers-reduced-transparency: no-preference) {
+      :root[data-native-appearance]:not([data-gallery-theme="contrast"]):not(.notice-window) .results-area { background: var(--clear); }
+      :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]):not(.notice-window) {
+        --surface-raised: light-dark(rgb(255 255 255 / 55%), rgb(44 44 47 / 50%));
+      }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      :root[data-platform="macos"]:not([data-gallery-theme="contrast"]):not(.notice-window) [role="option"] {
+        transition: box-shadow var(--motion-panel) var(--ease-out);
+      }
+    }
+  }
+}
