@@ -1,0 +1,6 @@
+.selected-chip-list { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.selected-chip-item { max-width: 100%; }
+.selected-chip-item .chip-label { display: inline-flex; gap: var(--space-1); }
+.chip-author { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip-year { flex: none; white-space: nowrap; }
+.chip-drag { flex: none; width: var(--chip-height); min-height: var(--chip-height); padding: 0; border: 0; background: var(--clear); color: var(--muted); }
