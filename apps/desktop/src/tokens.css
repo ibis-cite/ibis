@@ -256,9 +256,9 @@
   --focus-ring-color: var(--text); --focus-ring-shadow: 0 0 0 1px var(--surface);
 }
 :root[data-platform="linux"] {
-  /* Adwaita's 12 px window and 6 px floor keep rows, the entry and tiles
-     at the universal small radius, including with larger text. */
-  --r-win: 12px; --r-min: 6px;
+  /* libadwaita 1.8+: the 15 px window derives 7 px rows at the 8 px inset;
+     tiles and larger-text rows keep the 6 px floor. Popovers stay separate. */
+  --r-win: 15px; --r-min: 6px;
   /* The selected row is GTK's selection colour with its paired text: the
      system Highlight pair, which WebKitGTK takes from the GTK theme. A tint
      like libadwaita's 25% accent ($view_selected_color) reaches only about

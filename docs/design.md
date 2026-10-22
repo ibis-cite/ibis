@@ -116,15 +116,17 @@ instead of going square or looking like a separate floating slab.
 
 | | macOS | Windows 11 | Linux (GNOME) |
 |---|---|---|---|
-| `--r-win` | 28 on macOS 26 and later; 12 pt before that (the native panel corner, #236) | 8 | 12 |
+| `--r-win` | 28 on macOS 26 and later; 12 pt before that (the native panel corner, #236) | 8 | 15 |
 | `--inset` · `--r-min` | 8 · 6 | 4 · 4 | 8 · 6 |
-| `--r-row` | 20 on macOS 26 and later; 6 before | 4 | 6 |
+| `--r-row` | 20 on macOS 26 and later; 6 before | 4 | 7 |
 | `--r-tile` | 8 on macOS 26 and later; 6 before | 4 | 6 |
 | `--r-menu` · `--menu-pad` · `--r-mi` | 12 · 6 · 6 | 8 · 4 · 4 | 12 · 6 · 6 |
 | `--e2` menu shadow, plus a 1 px hairline | `0 12px 32px` black 16% | `0 8px 16px` black 14% | `0 2px 8px` black 20% |
 
-GNOME's 12 px window and 6 px floor give rows and tiles the universal small
-radius. Windows rows and tiles use Fluent's 4 px small radius.
+GNOME follows [libadwaita 1.8's 15 px window](https://github.com/GNOME/libadwaita/blob/1.8.0/doc/css-variables.md#window-radius);
+1.6/1.7 used 12 px. With an 8 px inset and 6 px floor the chain gives 7 px
+rows and 6 px tiles; popovers keep their separate 12 px radius. Windows rows
+and tiles use Fluent's 4 px small radius.
 
 Each look sets only `--r-win`, `--inset` and `--r-min` (and the menu pair);
 every inner radius follows from them. With Larger text the inset grows with the

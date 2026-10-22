@@ -124,7 +124,7 @@ test("every inner radius follows one concentric chain per platform", () => {
     for (const platform of ["windows", "linux"]) expect(rules(tokens, `:root[data-platform="${platform}"]`), `${platform} ${name}`).not.toContain(`${name}:`);
   }
   // docs/design.md, Corners: macOS before 26 (the native 12 pt corner), Windows 11, GNOME.
-  const expected = { macos: [12, 8, 6, 6, 12, 6], windows: [8, 4, 4, 4, 8, 4], linux: [12, 8, 6, 6, 12, 6] };
+  const expected = { macos: [12, 8, 6, 6, 12, 6], windows: [8, 4, 4, 4, 8, 4], linux: [15, 8, 7, 6, 12, 6] };
   for (const [platform, [win, inset, row, tile, menu, item]] of Object.entries(expected)) {
     const g = geometry(platform === "macos" ? undefined : platform);
     const rRow = Math.max(g["--r-min"]!, g["--r-win"]! - g["--inset"]!);
@@ -163,7 +163,7 @@ test("window radius follows each platform and macOS matches the native corner", 
   expect(rules(tokens, ":root")).toMatch(new RegExp(`--r-win:\\s*${Number(native)}px`));
   expect(rules(tokens, ':root[data-platform="windows"]')).toMatch(/--r-win:\s*8px/);
   expect(rules(tokens, ':root[data-platform="windows"]')).toMatch(/--button-radius:\s*4px/);
-  expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--r-win:\s*12px/);
+  expect(rules(tokens, ':root[data-platform="linux"]')).toMatch(/--r-win:\s*15px/);
 });
 
 test("scarlet marks only the citation: copied text and the shelf's quote mark", () => {

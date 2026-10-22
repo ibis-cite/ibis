@@ -16,7 +16,7 @@ Token names are the target names.
 |---|---|---|
 | D1 | **Components read role tokens only**, never raw colours, `GrayText`, literal px radii or literal shadows. | all below |
 | D2 | **One radius chain per OS.** Set only `--r-win`, `--inset`, `--r-min`, `--r-menu`, `--menu-pad`; everything else derives. New: `--r-control` (buttons, fields, pop-ups), `--r-key` (key caps, chips' inner parts), `--r-card` (= `--r-win`), `--r-dialog`, `--r-full: 999px`. | §3 |
-| D3 | **Per-OS radius values:** macOS 15: win 12, control 6, menu 8 (verify). macOS 26: win 28, control capsule in the header, 8 in content, menu 12. Windows 11: win/overlay/card 8, control/row/tile 4. GNOME: win/card/popover 12, control/row/tile 6. | `--r-*` |
+| D3 | **Per-OS radius values:** macOS 15: win 12, control 6, menu 8 (verify). macOS 26: win 28, control capsule in the header, 8 in content, menu 12. Windows 11: win/overlay/card 8, control/row/tile 4. GNOME (libadwaita 1.8+ look): win/card 15, derived row 7, control/tile 6, popover 12. | `--r-*` |
 | D4 | **Surfaces are four layers:** `--surface-window` (base) < `--surface` (content sheet) < `--surface-raised` (band, cards, shelf) < `--surface-overlay` (menus, popovers, dialogs). Values from soft depth B. | §2 |
 | D5 | **Text has four levels:** `--text`, `--muted` (secondary, always 4.5:1), `--text-tertiary` (icons at rest, placeholder hints, 3:1 minimum, never for sentences), `--text-disabled`. | |
 | D6 | **Accent is always the system's.** `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. On Windows and GNOME the accent is injected from Rust (#763). | |
@@ -216,10 +216,10 @@ Liquid Glass's three shape kinds map to `--r-control` (fixed), `--r-full`
 
 | Token | macOS 15 and earlier | macOS 26 | Windows 11 | GNOME |
 |---|---|---|---|---|
-| `--r-win` | 12 | 28 (verify against Spotlight) | 8 | 12 |
+| `--r-win` | 12 | 28 (verify against Spotlight) | 8 | 15 |
 | `--inset` | 8 | 8 | 4 | 8 |
 | `--r-min` | 6 | 6 | 4 | 6 |
-| `--r-row` | 6 | 20 | 4 | 6 |
+| `--r-row` | 6 | 20 | 4 | 7 |
 | `--r-tile` | 6 | 8 | 4 | 6 |
 | `--r-control` | 6 | 8 in content, capsule in the header | 4 | 6 |
 | `--r-menu` / `--menu-pad` / `--r-mi` | 8 / 5 / 4 (verify) | 12 / 6 / 6 | 8 / 4 / 4 | 12 / 6 / 6 |
@@ -230,8 +230,9 @@ Liquid Glass's three shape kinds map to `--r-control` (fixed), `--r-full`
 | Settings card | grouped form rows, 12 (verify) | verify | 4 per `SettingsCard`; the picker's list layer card stays 8 | 12 (boxed list) |
 | Switch, segmented track | capsule | capsule | capsule | capsule (switch), 6 (linked buttons) |
 
-GNOME uses libadwaita's 12 px window corner; with `--r-min: 6` the chain still
-gives 6 px rows and tiles, GNOME's universal small radius. Windows tiles are 4
+GNOME follows [libadwaita 1.8's 15 px window](https://github.com/GNOME/libadwaita/blob/1.8.0/doc/css-variables.md#window-radius);
+1.6/1.7 used 12 px. The 8 px inset derives 7 px rows; tiles keep the 6 px
+floor, and popovers retain their separate 12 px radius. Windows tiles are 4
 because Fluent has no 2 px list element.
 
 ### 3.3 Strokes
