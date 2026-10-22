@@ -1,10 +1,11 @@
-import { readFileSync } from "node:fs";
-import { URL as FileURL } from "node:url";
 import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
 import type { SearchResult } from "../../api";
 import { chipLabels, CitationShelf } from "./CitationShelf";
+
+const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
+const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
