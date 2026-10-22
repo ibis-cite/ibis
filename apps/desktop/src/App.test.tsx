@@ -3193,15 +3193,27 @@ test.each(["p", "З"])("Format hands the keep-open shortcut to the picker after 
   const search = screen.getByLabelText("Search references");
   fireEvent.click(await waitFor(() => formatButton("Copy as Pandoc")));
   const filter = screen.getByRole("searchbox");
-  fireEvent.keyDown(filter, { key, code: "KeyP", ctrlKey: true, shiftKey: true, repeat: true });
-  fireEvent.keyDown(filter, { key, code: "KeyP", ctrlKey: true, shiftKey: true, isComposing: true });
-  expect(calls).not.toContain("set_pinned");
   fireEvent.keyDown(filter, { key, code: "KeyP", ctrlKey: true, shiftKey: true });
   await screen.findByRole("button", { name: "Kept open; click to stop" });
   await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
   await waitFor(() => expect(document.activeElement).toBe(search));
   expect(calls.filter((call) => call === "set_pinned")).toHaveLength(1);
   expect(calls).not.toContain("quit");
+});
+
+test.each([
+  ["p", { repeat: true }], ["З", { repeat: true }],
+  ["p", { isComposing: true }], ["З", { isComposing: true }],
+])("Format ignores an isolated invalid keep-open key (%s, %j)", async (key, invalid) => {
+  const calls = backend();
+  render(<App />);
+  fireEvent.click(await waitFor(() => formatButton("Copy as Pandoc")));
+  fireEvent.keyDown(screen.getByRole("searchbox"), { key, code: "KeyP", ctrlKey: true, shiftKey: true, ...invalid });
+  // Let a wrongly queued command finish; another key must not cancel the probe.
+  await act(async () => { await new Promise(requestAnimationFrame); await new Promise(requestAnimationFrame); });
+  expect(calls).not.toContain("set_pinned");
+  expect(calls).not.toContain("quit");
+  expect(screen.getByRole("menu")).toBeTruthy();
 });
 
 test("format toolbar menu exposes both sections and saves a choice without copying", async () => {

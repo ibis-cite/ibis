@@ -27,7 +27,7 @@ export function FormatMenu({ format, styles, onChange, searchRef, onCommand }: {
   ];
   return <ToolbarMenu label={pickerText.copyAs} value={choiceName(format)} sections={sections} selectedKey={format}
     filterLabel={pickerText.filterFormats} onKeyCommand={(event) => {
-      const command = isMenuShortcut(event) ? "more" : isPinShortcut(event) ? "pin" : isKeysShortcut(event) ? "keys" : isQuitShortcut(event) ? "quit" : null;
+      const command = isMenuShortcut(event) ? "more" : isPinShortcut(event) && !event.repeat ? "pin" : isKeysShortcut(event) ? "keys" : isQuitShortcut(event) ? "quit" : null;
       return command ? onCommand(command) : undefined;
     }} onAction={(key) => onChange(key as Choice)} returnFocusRef={searchRef} />;
 }
