@@ -161,6 +161,7 @@ def menu_escape_focus(native, snapshot, shortcut, report):
     wait_for(reopened, "Space reopens More after Escape", timeout=5)
     native.key("Tab")
     wait_for(lambda: not named(snapshot(), "Reload"), "Tab closes More", timeout=5)
+    wait_for(lambda: search_focused(snapshot()), "Tab restores Search focus", timeout=5)
     returned = snapshot()
     facts["tab_search_focused"] = search_focused(returned)
     facts["search_unchanged"] = facts["search_unchanged"] and values(returned) == original
@@ -2255,6 +2256,32 @@ class ContractTests(unittest.TestCase):
         self.assertTrue(all(report["menu_escape_focus"].values()))
         self.assertEqual(state["value"], "synthetic query")
         self.assertEqual(native.key.call_args_list, [call("ctrl+k"), call("Escape"), call("space"), call("Tab")])
+
+    def test_menu_escape_waits_for_search_focus_after_tab(self):
+        state = {"menu": False, "more": False, "tab_reads": None}
+        def snapshot():
+            if state["tab_reads"] is not None:
+                state["tab_reads"] += 1
+            settled = state["tab_reads"] is None or state["tab_reads"] >= 5
+            return {"nodes": ([{"name": "Reload"}] if state["menu"] else [
+                {"name": "More", "focused": state["more"]},
+                {"name": "Search references", "value": "synthetic query", "focused": not state["more"] and settled}])}
+        def key(chord):
+            state.update(menu=chord in ("ctrl+k", "space"), more=chord == "Escape")
+            if chord == "Tab":
+                state["tab_reads"] = 0
+        def wait(predicate, description, *, timeout):
+            self.assertEqual(timeout, 5)
+            for _ in range(10):
+                if predicate():
+                    return
+            self.fail(description)
+        native, report = Mock(), {}
+        native.key.side_effect = key
+        with patch(__name__ + ".wait_for", side_effect=wait):
+            menu_escape_focus(native, snapshot, "ctrl+k", report)
+        self.assertGreaterEqual(state["tab_reads"], 5)
+        self.assertTrue(all(report["menu_escape_focus"].values()))
 
     def test_global_macos_hid_event_contracts_without_native_execution(self):
         subprocess.run(["node", str(Path(__file__).with_name("smoke-macos.test.cjs"))], check=True,
