@@ -136,7 +136,7 @@ main {
    output on one line. Its quote mark is centred over the tile column and the
    output starts at the row titles, so the search glyph, the tiles and the mark
    share one column. Windows draws a layer card with a stroke; GNOME a flat band. */
-.shelf { flex: none; margin: 0 var(--inset) var(--inset); border-radius: var(--r-row); background: var(--shelf-fill); }
+.shelf { flex: 0 1 auto; min-height: 0; overflow: auto; margin: 0 var(--inset) var(--inset); border-radius: var(--r-row); background: var(--shelf-fill); }
 main:has(> .shelf) > footer { border-top-color: var(--clear); }
 .shelf-chips { display: flex; align-items: center; gap: var(--space-1); height: var(--shelf-line); margin: 0; padding: 0 var(--row-pad); list-style: none; overflow: hidden; }
 .chip { flex: 0 1 auto; min-width: var(--chip-min-width); display: inline-flex; align-items: center; height: var(--chip-height); max-width: var(--chip-max-width); padding-inline-start: var(--space-2); border-radius: var(--chip-radius); background: var(--chip-fill); font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 500; }
@@ -271,12 +271,14 @@ kbd { font: inherit; font-size: var(--hint-size); font-weight: 500; display: inl
   /* Let the line break after the separator rather than inside a word. */
   .result-separator { white-space: pre-wrap; }
 }
-/* Selection keeps the outer controls fixed. At very short heights only the
-   central content can scroll; the shelf and footer stay whole. */
+/* Selection keeps the header and footer fixed; under pressure the results and
+   shelf scroll in their own allocated areas. */
 .picker-content { display: contents; }
 main[data-selection] { height: var(--picker-height); min-height: 0; overflow: hidden; }
-main[data-selection] > .search-bar, main[data-selection] > .shelf, main[data-selection] > footer { flex: none; }
-main[data-selection] > .picker-content { position: relative; display: flex; flex: 1; flex-direction: column; min-height: 0; overflow: auto; overscroll-behavior: contain; container-type: size; }
+main[data-selection] > .search-bar, main[data-selection] > footer { flex: none; }
+/* Keep a result reachable at large system text; the shelf uses its own scroll
+   area when the header, output and wrapped footer cannot all keep their height. */
+main[data-selection] > .picker-content { position: relative; display: flex; flex: 1; flex-direction: column; min-height: 24px; overflow: auto; overscroll-behavior: contain; container-type: size; }
 main[data-selection] .notices { flex: none; max-height: 6rem; overflow: auto; }
 main[data-selection] .results-area { flex: 1 0 var(--results-min-height); overflow: auto; }
 /* Use the available middle height, not a guessed header/footer size. Under
