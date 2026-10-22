@@ -1,0 +1,10 @@
+{
+  "base": "48554638cdc1f73571c4c9a0344a3a22a0c25c66",
+  "head": "f4d738425d4fd29ff3edd2387ea42f45bfe1077e",
+  "browser": "Chromium 151.0.7922.34",
+  "frame_pairs": 120,
+  "focus_profiles": 72,
+  "clock": "2026-10-22T09:00:00Z",
+  "native_acceptance": false,
+  "source_branch": "fix/762-platform-token-values"
+}

@@ -1,0 +1,15 @@
+{
+  "source": "f4d738425d4fd29ff3edd2387ea42f45bfe1077e",
+  "sample_utc": "2026-10-22T10:40:56.763465+00:00",
+  "logical_cores": 10,
+  "memory_gib": 16.0,
+  "memory_free_percent": 50,
+  "disk_available_gib": 22.86,
+  "cargo_jobs": 2,
+  "rust_test_threads": 1,
+  "debug_info": 0,
+  "incremental": false,
+  "offline": true,
+  "cargo_target": "new empty dedicated target",
+  "full_status": "running"
+}
