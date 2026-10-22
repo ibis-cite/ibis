@@ -119,6 +119,8 @@ main {
 .empty-icon { display: block; width: 3rem; height: 3rem; margin: 0 auto var(--space-3); color: var(--text-tertiary, var(--muted)); }
 .empty-title { margin: 0; color: var(--text); font-size: var(--title-size); line-height: var(--title-line-height); font-weight: var(--type-strong-weight); overflow-wrap: anywhere; }
 .empty-description { max-width: 40ch; margin: var(--space-2) auto 0; font-size: var(--metadata-size); line-height: var(--metadata-line-height); overflow-wrap: anywhere; }
+.empty-keys { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4); margin-top: var(--space-4); }
+.empty-keys > .key-hint { flex-wrap: wrap; justify-content: center; max-width: 100%; white-space: normal; }
 .empty-template .empty-actions { margin-top: var(--space-4); }
 .empty-template .empty-actions > button { max-width: 100%; overflow-wrap: anywhere; }
 @media (pointer: coarse) {

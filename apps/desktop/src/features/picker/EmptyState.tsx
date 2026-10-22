@@ -1,6 +1,8 @@
 import type React from "react";
 import type { LibraryStatus } from "../../api";
-import { libraryMessages, pickerText } from "../../messages";
+import { keysFor } from "../../keys";
+import { keyText, libraryMessages, pickerText } from "../../messages";
+import { KeyHint } from "../../ui/KeyCaps";
 
 /** Keep the start and extension without letting an unusually long name
  * push the recovery actions down the page. Older webviews keep the full
@@ -43,6 +45,10 @@ export function EmptyState({ library, query, narrowed, onChooseLibrary, onClearS
         <span aria-hidden="true">{title}</span><span className="visually-hidden">{fullTitle}</span>
       </> : title}</p>
       <p className="empty-description">{description}</p>
+      {!empty && !query && <div className="empty-keys" aria-hidden="true">
+        <KeyHint label={keyText.copy} keys={keysFor("copy")} />
+        <KeyHint label={keyText.addToCitation} keys={keysFor("add")} />
+      </div>}
       {empty ? <div className="empty-actions">
         {library.zotero && <button type="button" onClick={onReload}>{pickerText.reload}</button>}
         <button type="button" onClick={onChooseLibrary}>{pickerText.chooseLibrary}</button>

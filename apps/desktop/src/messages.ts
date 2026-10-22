@@ -188,6 +188,7 @@ export const keyText = {
   },
   allKeys: "Shortcuts",
   footer: "Keys",
+  copy: "Copy",
   copyAs: (format: string) => `Copy as ${format}`,
   copySeveralAs: (count: number, format: string) => `Copy ${count} as ${format}`,
   addToCitation: "Add to citation",
