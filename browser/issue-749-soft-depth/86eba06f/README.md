@@ -8,6 +8,6 @@ All 108 preference/state comparisons passed geometry parity, flat paint parity f
 
 The unchanged geometry checker **failed** at 146/153 on both commits: seven existing macOS expected-28/current-12 radius mismatches and a Linux normal tray-20 readiness timeout. Complete logs are byte-identical; this is not a geometry pass. Other measured layout, row, search and alignment checks agree.
 
-96 focused tests, TypeScript and UI import checks passed. The clean fresh-target exact-commit full check is running, not yet passed. The prior checkpoint's all-interface suite passed 592 tests; it is not a final-head full verdict.
+96 focused tests, TypeScript and UI import checks passed. The clean fresh-target exact-commit full check passed on this checkpoint: 594 interface tests, 168 desktop tests with one ignored, all 11 watcher tests, both strict Clippy runs, formatting, dependency policy, TypeScript and imports. This does not cover the later search-band stacking fix or final #849 integration.
 
 This is preliminary: #849's role values have not landed and were not copied. Whole-depth readiness still needs those actual landed values, renewed evidence, final full verification and independent exact-head review. Native material acceptance remains #8/#627.

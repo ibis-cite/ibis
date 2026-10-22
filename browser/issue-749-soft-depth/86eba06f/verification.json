@@ -12,7 +12,17 @@
   },
   "typecheck": "passed",
   "ui_imports": "passed",
-  "full_check": "running; no pass claimed",
+  "full_check": {
+    "commit": "86eba06f4e3ec7b2cd3aab10c3fcd62b680c498c",
+    "status": "passed",
+    "exit_code": 0,
+    "fresh_target": true,
+    "ui_tests": 594,
+    "desktop_tests": 168,
+    "desktop_ignored": 1,
+    "watcher_tests": 11,
+    "log_sha256": "ffb2fdd070b1d3e77c1227f0f4982832404fc8fc0d9c2bba0b7915eeae92d9a9"
+  },
   "geometry_enforce": "failed identically before and after: 146/153, seven macOS radius mismatches and Linux normal tray-20 readiness timeout",
   "geometry_logs_identical": true,
   "body_secondary_neutral_contrast": "no below-4.5 ratios in supported cases; system-selected/accent/disabled role exceptions excluded",
