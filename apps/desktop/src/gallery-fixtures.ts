@@ -1,5 +1,6 @@
 import { isTauri } from "@tauri-apps/api/core";
 import type { Copied, Density, LibraryStatus, SearchResult } from "./api";
+import type { Sources } from "./bindings";
 import type { PickerApi, PickerPreview } from "./App";
 import type { Platform } from "./nativeAppearance";
 
@@ -9,6 +10,7 @@ export type GalleryState = {
   id: string;
   label: string;
   library: GalleryLibrary;
+  sources?: Sources;
   results?: SearchResult[];
   query?: string;
   copied?: Copied;
@@ -24,6 +26,8 @@ export type GalleryState = {
   /** Seeded once the picker has rendered: pin it, open More, choose this many results, open All keys. */
   pinned?: boolean;
   menuOpen?: boolean;
+  /** Opens the header format menu; a string is typed into its filter. */
+  formatMenu?: true | string;
   tray?: number;
   formatted?: boolean;
   keys?: boolean;
@@ -124,6 +128,8 @@ const largeSelection = Array.from({ length: 50 }, (_, i) => reference(
 
 export const galleryStates: readonly GalleryState[] = [
   { id: "first-run", label: "First run", library: library({ state: "none", name: null, snapshot_name: null, has_snapshot: false, zotero: false, references: 0 }) },
+  { id: "first-run-found", label: "First run, libraries found", library: library({ state: "none", name: null, snapshot_name: null, has_snapshot: false, zotero: false, references: 0 }),
+    sources: { zotero: "available", list: 1, files: [{ name: "research.bib", folder: "Documents" }, { name: "reading.bib", folder: "Desktop" }], cut_short: false } },
   { id: "loading", label: "Opening a library", library: library({ state: "loading", has_snapshot: false, zotero: false, snapshot_name: null, references: 0 }) },
   { id: "empty", label: "Empty library", library: library({ name: "empty.bib", snapshot_name: "empty.bib", references: 0 }) },
   { id: "idle", label: "Nothing typed", library: library(), query: "" },
@@ -157,10 +163,14 @@ export const galleryStates: readonly GalleryState[] = [
     references: 2, error: "The library file is unavailable; keeping the last loaded references" }), query: "memory", results: examples.slice(0, 2), menuOpen: true },
   { id: "pinned", label: "Pinned", library: library(), query: "memory", results: examples, pinned: true },
   { id: "menu-open", label: "More menu open", library: library(), query: "memory", results: examples, menuOpen: true },
+  { id: "format-menu", label: "Format menu open", library: library(), query: "memory", results: examples, formatMenu: true },
+  { id: "format-menu-filtered", label: "Format menu filtered", library: library(), query: "memory", results: examples, formatMenu: "APA" },
   ...[20, 40, 50].map((count) => ({ id: `tray-${count}`, label: `${count} long keys selected`,
     library: library({ references: 50 }), query: "selection", results: largeSelection, tray: count, pinned: true })),
   { id: "tray-preview", label: "50 selected with formatted preview", library: library({ references: 50 }), query: "selection",
     results: largeSelection, tray: 50, pinned: true, formatted: true },
+  { id: "tray-system-large", label: "50 selected at 200% system text", library: library({ references: 50 }), query: "selection",
+    results: largeSelection, tray: 50, pinned: true, largeText: true },
   { id: "tray", label: "Several references chosen", library: library(), query: "memory", results: examples, tray: 2 },
   { id: "keys", label: "All keys", library: library(), query: "memory", results: examples, keys: true },
   { id: "compact", label: "Compact rows", library: library(), query: "memory", results: many, density: "compact", tray: 2 },
@@ -169,11 +179,14 @@ export const galleryStates: readonly GalleryState[] = [
 ];
 
 export function galleryProvider(state: GalleryState): { api: PickerApi; preview: PickerPreview } {
+  const sources = state.sources;
   return {
     preview: { query: state.query, copied: state.copied },
     api: {
       libraryStatus: async () => state.library,
+      ...(sources ? { findSources: async () => sources, openFoundLibrary: async () => null } : {}),
       search: async () => ({ revision: state.library.revision, results: state.results ?? [] }),
+      citationText: async (ids) => ({ text: `[${ids.map((id) => `@${id.native_key}`).join("; ")}]`, warnings: [] }),
       copyCitation: async (ids) => ({ text: (state.tray ?? 0) >= 20 ? `[@${ids.map((id) => id.native_key).join("; @")}]` : "[@example2026]", warnings: [] }),
       ...((state.tray ?? 0) >= 20 ? {
         cslItems: async (ids: Parameters<NonNullable<PickerApi["cslItems"]>>[0]) => JSON.stringify(ids.map((id) => ({

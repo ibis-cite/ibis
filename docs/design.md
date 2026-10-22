@@ -55,8 +55,8 @@ More detail:
 
 **Colour roles.** Selection, focus, the main button and the menu highlight
 use the system accent ("you are here, act on this"). Ibis scarlet means "this is
-what gets pasted" and marks only the citation: the text that will be copied,
-the citation tray, the tile of a row added to the citation, and the logo. Ibis
+what gets pasted" and marks only the citation: the copied text, the shelf's
+quote mark, the tile of a row added to the citation, and the logo. Ibis
 sets no app accent of its own, so a red or orange system accent never meets
 scarlet on a fill (on macOS, the Multicolor accent stays system blue). Status
 uses Done (copied, inserted), Look (skipped, needs a look) and Stop
@@ -224,7 +224,7 @@ list, preview and tray) from a control layer (search, format, pin).
 | Element | Visible | Why |
 |---|---|---|
 | Search box | Always | The largest element, focused on open. Its placeholder lists what can be searched. |
-| Format (for example "Pandoc ⌃⌄" on macOS) | Once a library is chosen | What is pasted depends on it. One word, no icon; each platform's pop-up button (see **Header**). |
+| Format (for example "Pandoc ⌃⌄" on macOS) | Once a library is chosen | What is pasted depends on it. One word, no icon; each platform's pop-up button (see **Header**). "Key formats" and "Citation styles" show real samples and a leading check; unavailable styles stay focusable; typing filters. |
 | More (Ctrl/⌘ K) | Always | The one door to every other action; each shows its shortcut, so the menu is also the cheat sheet. In the footer it reads "More ⌘K", like the hints beside it (see **Footer**). |
 | Pin | Always, faint at rest | Tertiary colour at rest, full strength on hover or while on, so it never moves or appears from nowhere. Its tooltip names the action ("Pin: keep Ibis open beside your document") and, once the key table assigns one, its key. The first time a click outside hides Ibis, a one-time footer tip explains the pin. |
 | Filter chips | Once added | `#tag`, `y:2019-2022` or `a:name` followed by a space becomes a removable chip. Backspace in an empty box removes the last one. |
@@ -237,7 +237,7 @@ list, preview and tray) from a control layer (search, format, pin).
 | Attachment chip | When a file is attached | The platform's document (or globe) icon only, 16 px in a 24 px chip. "PDF, 12 pages" is its tooltip and accessible name, and it opens the preview. No empty column otherwise. |
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
 | Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows: a plus, or a check on a row already added. A row in the citation always shows a scarlet tile with a white check, the only scarlet on the row. A 32 px pointer target with its name in the tooltip ("Add García 2021 to citation"); it adds no Tab stop, because a listbox option holds no controls, and keyboards use Shift+Enter. |
-| Citation tray | Once a source is added | Page number per source and the exact text to be copied, in scarlet. The chips and the preview are bands above the list that never cover it. The tray shows at most two whole rows of one-line chips (a long key ends with an ellipsis; its tooltip and Remove button name it whole), scrolls by rows and fades at its bottom edge while more chips are below. |
+| Citation shelf | Once a reference is highlighted or added | One quiet card above the footer's Copy action ([design/preview.md](design/preview.md)): the chosen references as author-year chips (at most six, then "+N", which shows them all), then the exact text Enter pastes on one line, in text colours with one scarlet quote mark. Results never move when a reference is added. Page numbers come later (#24). |
 | Footer key hints | Always | What Enter does now, Shortcuts and More, label first and keys after (see **Footer**). |
 | Footer tip | One at a time | Tied to what the user is doing, retired once they have done it. Otherwise the footer shows library status. |
 | Library status | Always, quietly | A dot, the source and the count; the age only when it is news or a warning (see below). A sentence above the list only when something needs the user. |

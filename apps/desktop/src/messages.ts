@@ -71,7 +71,7 @@ export const setupText = {
   lookAgain: "Look again",
   whereYouWrite: "Where do you write?",
   places: { markdown: "Markdown or Pandoc", latex: "LaTeX", typst: "Typst", word: "Word or Google Docs" },
-  styleHint: (style: string) => `Citations copy as ${style}. Pick another style under Copy as.`,
+  styleHint: (style: string) => `Citations copy as ${style}.`,
   shortcut: (keys: string) => `Open Ibis from any app with ${keys}.`,
   nothingFound: "No Zotero or .bib files found nearby. Use Choose library… to pick a file.",
   found: (files: number, zotero: boolean) =>
@@ -93,13 +93,22 @@ export const pickerText = {
   copyError: "Nothing was copied. Try again, or use Reload.",
   snapshotChanged: "The library changed. Search again and reselect the references before copying.",
   copied: "Copied",
-  keyFormats: "Citation keys",
-  formattedStyles: "Formatted citation",
+  keyFormats: "Key formats",
+  formattedStyles: "Citation styles",
+  filterFormats: "Filter formats",
   preview: "Preview",
   previewPending: "Formatting…",
   previewNotReady: "Nothing was copied yet: the citation is still being formatted. Press Enter again in a moment.",
   previewError: "This citation could not be formatted. Choose another style, or copy citation keys.",
   provisional: "Provisional: the number depends on the other references cited in your document.",
+  provisionalShort: "Numbers may change",
+  shelfStale: "The library changed since these were chosen.",
+  warningCount: (n: number) => (n === 1 ? "1 warning" : `${n} warnings`),
+  /** The shelf's last chip, for references beyond the ones it shows. */
+  moreChosen: (n: number) => `+${n}`,
+  allChosen: (n: number) => `Show all ${n} selected references`,
+  fewerChosen: "Show fewer selected references",
+  fewerChosenShort: "Fewer",
   dismiss: "Dismiss",
   dismissWarnings: "Dismiss copy warnings",
   copyWarnings: "Copy warnings",
@@ -383,4 +392,15 @@ export const copiedNoticeText = {
   windowsTitle: "Citation copied. Press Ctrl+V to paste.",
   source: "Ibis",
   noticeFailed: "The Copied notice could not be shown.",
+};
+
+// The format menu: each key format's name and what it pastes.
+export const copyFormatMenu: Record<KeyFormat, { label: string; sample: string }> = {
+  pandoc: { label: "Pandoc", sample: "[@key]" },
+  autocite: { label: "\\autocite", sample: "\\autocite{key}" },
+  parencite: { label: "\\parencite", sample: "\\parencite{key}" },
+  textcite: { label: "\\textcite", sample: "\\textcite{key}" },
+  cite: { label: "\\cite", sample: "\\cite{key}" },
+  typst: { label: "Typst", sample: "@key" },
+  keys: { label: "Keys only", sample: "key" },
 };
