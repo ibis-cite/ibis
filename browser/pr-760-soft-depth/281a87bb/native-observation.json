@@ -1,0 +1,31 @@
+{
+  "source": "281a87bb51d63bc9aa4ea0759188e257f95c1309",
+  "kind": "native macOS ordinary app, synthetic library, disposable identifier io.github.ibiscite.ibis.pr760",
+  "systemPreferencesChanged": false,
+  "checks": [
+    {
+      "name": "disposable identifier has no prior settings",
+      "pass": true
+    },
+    {
+      "name": "owned synthetic backdrop is ready",
+      "pass": true
+    },
+    {
+      "name": "ordinary picker is visible",
+      "pass": true
+    },
+    {
+      "name": "Search holds native keyboard focus",
+      "pass": false
+    }
+  ],
+  "nativeMode": [
+    "ibis: native appearance mode=vibrancy reason=applied"
+  ],
+  "status": "blocked",
+  "failure": "Search holds native keyboard focus",
+  "ownedProcessesStopped": true,
+  "qualification": "Owned-PID visible/vibrancy API observations only; keyboard-ownership check failed before typing. No native screenshot or visible-material acceptance. A later app-inspector selection was ambiguously bound and discarded without interaction or publication.",
+  "ownedBundleCleanupConfirmed": true
+}
