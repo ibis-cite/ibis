@@ -129,3 +129,35 @@ test("a classifier crash fails the configured workflow shell, even after partial
     assert.equal(result.status, 17);
   }
 });
+
+test("Linux WebView downloads bound both APT commands and propagate failures", { skip: process.platform === "win32" }, (t) => {
+  const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
+  const step = workflow.match(/- name: Install system WebView libraries \(Linux\)\n([\s\S]*?)\n      - name:/)?.[1];
+  assert.ok(step, "the Linux dependency step exists");
+  const command = step.match(/        run: \|\n([\s\S]*)/)[1].replace(/^          /gm, "");
+  const dir = mkdtempSync(join(tmpdir(), "ibis-ci-apt-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const log = join(dir, "calls");
+  const stubs = `sudo() { [[ "$1" == apt-get ]] || return 98; "$@"; }
+    apt-get() {
+      printf '%s\\n' "$*" >> "$APT_LOG"
+      if [[ " $* " == *" $FAIL_APT "* ]]; then return 42; fi
+    }`;
+  for (const failure of ["none", "update", "install"]) {
+    writeFileSync(log, "");
+    const result = spawnSync("bash", ["--noprofile", "--norc", "-e", "-o", "pipefail", "-c", `${stubs}\n${command}`], {
+      cwd: dir, encoding: "utf8", timeout: 5000, env: { ...process.env, APT_LOG: log, FAIL_APT: failure },
+    });
+    assert.equal(result.status, failure === "none" ? 0 : 42, result.stderr);
+    const calls = readFileSync(log, "utf8").trim().split("\n");
+    assert.equal(calls.length, failure === "update" ? 1 : 2, "a failed update stops before install");
+    for (const call of calls) {
+      for (const option of ["Acquire::Retries=1", "Acquire::http::Timeout=15", "Acquire::https::Timeout=15"]) {
+        const args = call.split(" ");
+        assert.equal(args[args.indexOf(option) - 1], "-o", `${option} is effective for ${call}`);
+      }
+    }
+    assert.match(calls[0], /\bupdate$/);
+    if (calls[1]) assert.match(calls[1], /\binstall -y --no-install-recommends libwebkit2gtk-4\.1-dev\b/);
+  }
+});
