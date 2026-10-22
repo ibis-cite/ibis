@@ -5,6 +5,7 @@ import { render } from "../../format/markup";
 import type { StyleId } from "../../format/styles";
 import { pickerText } from "../../messages";
 import { chipLabels } from "./chipLabels";
+import "./CitationShelf.css";
 
 /** The shelf shows at most this many chips; the rest fold into "+N"
  * (docs/design/preview.md, "Chips before the count"). */
