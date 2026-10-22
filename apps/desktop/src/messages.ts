@@ -86,6 +86,7 @@ export const densityNames = {
 } as const;
 
 export const pickerText = {
+  referenceDetails: "Reference details",
   searchLabel: "Search references",
   searchPlaceholder: "Search references…",
   dragSearchBar: "Drag the search bar edge to move the picker",
