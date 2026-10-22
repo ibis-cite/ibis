@@ -1,0 +1,19 @@
+{
+  "issue": 762,
+  "base": "32dac16af9fbec1de8635db12d4bcd7396e72d6e",
+  "head": "c19a79d798407d94e8d4b5cfcdd1cc5419ac5fb7",
+  "browser": "Chromium 151.0.7922.34",
+  "synthetic_clock": "2026-10-22T09:00:00Z",
+  "frame_pairs": 120,
+  "focus_layout_profiles_passed": 72,
+  "focused_tests_passed": 91,
+  "geometry_node_tests_passed": 8,
+  "typescript": "passed",
+  "ui_imports": "passed",
+  "physical_roles_contract": "failed before constants; passed afterward",
+  "full_check": "running; no current-head pass claim",
+  "independent_review": "pending",
+  "native_material_acceptance": "remains #627",
+  "versioned_macos_corners": "remains #691",
+  "windows_notice": "420x112 viewport, x16/y16/388x80 body; light/dark bottom edge alpha3/6, sides1"
+}

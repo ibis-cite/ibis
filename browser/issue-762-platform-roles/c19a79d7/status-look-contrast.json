@@ -1,0 +1,30 @@
+{
+  "surface": "55% rgb(30,30,34) veil over grayscale material 0 or 120, matching existing macosGlass.test.ts assumptions",
+  "values": [
+    {
+      "material_channel": 0,
+      "veiled_rgb": [
+        16.5,
+        16.5,
+        18.700000000000003
+      ],
+      "old_opaque_and_material_e3b341": 9.72791474116941,
+      "new_material_f0c25a": 11.33159152824627
+    },
+    {
+      "material_channel": 120,
+      "veiled_rgb": [
+        70.5,
+        70.5,
+        72.7
+      ],
+      "old_opaque_and_material_e3b341": 4.799652487240327,
+      "new_material_f0c25a": 5.590890022171451
+    }
+  ],
+  "old_luminance": 0.489527464505791,
+  "new_luminance": 0.5784702332120842,
+  "base": "32dac16af9fbec1de8635db12d4bcd7396e72d6e",
+  "head": "c19a79d798407d94e8d4b5cfcdd1cc5419ac5fb7",
+  "qualification": "Same unchanged colour/veil values as the prior artifact; current-head macosGlass tests passed. Arithmetic model, not native material certification."
+}
