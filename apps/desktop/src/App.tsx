@@ -626,6 +626,7 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
         expanded={results.length > 0}
         activeDescendant={results[active] ? `result-${active}` : undefined}
         format={format}
+        showFormat={Boolean(library?.has_snapshot)}
         styles={Boolean(cslItems && copyFormatted)}
         onFormatChange={chooseFormat}
         pinned={pinned}

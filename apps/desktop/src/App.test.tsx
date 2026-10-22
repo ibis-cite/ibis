@@ -151,6 +151,22 @@ test("first launch waits for library status and offers a chooser without a searc
   expect(calls).not.toContain("search");
 });
 
+test("first-run setup has no result section heading", async () => {
+  backend({ library_status: () => ({ state: "none", name: null, snapshot_name: null, has_snapshot: false,
+    zotero: false, references: 0, warnings: 0, error: null, note: null }) });
+  render(<App />);
+  await screen.findByText("Choose a library to get started");
+  expect(document.querySelector(".results-heading")).toBeNull();
+});
+
+test("first-run setup keeps the copy-format question out of the header", async () => {
+  backend({ library_status: () => ({ state: "none", name: null, snapshot_name: null, has_snapshot: false,
+    zotero: false, references: 0, warnings: 0, error: null, note: null }) });
+  render(<App />);
+  await screen.findByText("Choose a library to get started");
+  expect(screen.queryByLabelText("Copy as")).toBeNull();
+});
+
 test("typing after a library load failure keeps its single explanation visible", async () => {
   backend({
     library_status: () => ({ state: "error", has_snapshot: false, zotero: false, name: null, snapshot_name: null, references: 0, warnings: 0, error: "the synthetic library is unreadable", note: null }),
@@ -1896,15 +1912,17 @@ test("setup asks where you write, sets Copy as to match, and shows the shortcut"
   render(<App />);
   const places = await screen.findByRole("region", { name: "Where do you write?" });
   fireEvent.click(within(places).getByRole("button", { name: "LaTeX" }));
-  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("cite"));
-  expect(within(places).getByRole("button", { name: "LaTeX" }).getAttribute("aria-pressed")).toBe("true");
+  await waitFor(() => expect(within(places).getByRole("button", { name: "LaTeX" }).getAttribute("aria-pressed")).toBe("true"));
+  expect(screen.queryByLabelText("Copy as")).toBeNull();
   fireEvent.click(within(places).getByRole("button", { name: "Word or Google Docs" }));
-  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
-  expect(screen.getByText("Citations copy as APA. Pick another style under Copy as.")).toBeTruthy();
+  await waitFor(() => expect(within(places).getByRole("button", { name: "Word or Google Docs" }).getAttribute("aria-pressed")).toBe("true"));
+  expect(screen.getByText("Citations copy as APA.")).toBeTruthy();
   expect(screen.getByText(/^Open Ibis from any app with /)).toBeTruthy();
+  await act(async () => { await emit("library:changed", { ...NO_LIBRARY, revision: "1", state: "loaded", has_snapshot: true,
+    name: "refs.bib", snapshot_name: "refs.bib", references: 1 }); });
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
   fireEvent.change(screen.getByLabelText("Copy as"), { target: { value: "style:ieee" } });
-  expect(await screen.findByText("Citations copy as IEEE. Pick another style under Copy as.")).toBeTruthy();
-  expect(within(places).getByRole("button", { name: "Word or Google Docs" }).getAttribute("aria-pressed")).toBe("false");
+  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:ieee"));
 });
 
 test("shortcuts read as people type them on each system", async () => {
@@ -1931,7 +1949,7 @@ test("first-run writing choices save the key and style together before copying",
   fireEvent.click(within(places).getByRole("button", { name: "Typst" }));
   await waitFor(() => expect(saved).toEqual([{ style: null, key: "typst" }]));
   fireEvent.click(within(places).getByRole("button", { name: "Word or Google Docs" }));
-  await waitFor(() => expect((screen.getByLabelText("Copy as") as HTMLSelectElement).value).toBe("style:apa"));
+  await waitFor(() => expect(within(places).getByRole("button", { name: "Word or Google Docs" }).getAttribute("aria-pressed")).toBe("true"));
   await waitFor(() => expect(saved).toEqual([{ style: null, key: "typst" }, { style: "apa", key: null }]));
   expect(calls).not.toContain("copy_citation");
 });

@@ -5,7 +5,7 @@ import { FormatSelect } from "./FormatSelect";
 
 /** The search bar: the search box, the copy format and the pin. It is also
  * the window's drag region; the editable box itself is not. */
-export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, pinned, onTogglePin }: {
+export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, showFormat, styles, onFormatChange, pinned, onTogglePin }: {
   inputRef: React.Ref<HTMLInputElement>;
   query: string;
   onQueryChange: (query: string) => void;
@@ -15,6 +15,7 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   /** The id of the highlighted row, when there is one. */
   activeDescendant: string | undefined;
   format: Choice;
+  showFormat: boolean;
   styles: boolean;
   onFormatChange: (choice: Choice) => void;
   pinned: boolean;
@@ -44,7 +45,7 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
         onChange={(e) => onQueryChange(e.target.value)}
         onKeyDown={onSearchKeyDown}
       />
-      <FormatSelect format={format} styles={styles} onChange={onFormatChange} />
+      {showFormat && <FormatSelect format={format} styles={styles} onChange={onFormatChange} />}
       <button
         type="button"
         className="pin-button"
