@@ -121,7 +121,7 @@ test.each(["pointer", "key", "blur", "hidden"])("a later %s cancels a pending me
   expect(run).not.toHaveBeenCalled();
 });
 
-test.each(["k", "Escape", "Tab"])("%s during an exit stays inside the handoff", async (key) => {
+test.each(["k", "Escape", "Tab", "reopen", "unmount"])("%s during an exit stays inside the handoff", async (key) => {
   // Hold a real React Aria exit through its Web Animations API boundary.
   let release!: () => void;
   const finished = new Promise<void>((resolve) => { release = resolve; });
@@ -133,12 +133,17 @@ test.each(["k", "Escape", "Tab"])("%s during an exit stays inside the handoff", 
     const { menu, run, search } = mountCommand();
     fireEvent.keyDown(menu, { key: "k", ctrlKey: true });
     expect(menu.closest(".toolbar-menu-popover")?.hasAttribute("data-exiting")).toBe(true);
-    fireEvent.keyDown(menu, { key, ctrlKey: key === "k" });
+    if (key === "reopen") fireEvent.click(screen.getByRole("button", { name: "Copy as Pandoc" }));
+    else if (key === "unmount") cleanup();
+    else fireEvent.keyDown(menu, { key, ctrlKey: key === "k" });
     expect(run).not.toHaveBeenCalled();
     await act(async () => { release(); await finished; });
-    await waitFor(() => expect(menu.isConnected).toBe(false));
+    if (key === "reopen") expect(screen.getByRole("menu")).toBeTruthy();
+    else {
+      await waitFor(() => expect(menu.isConnected).toBe(false));
+      if (key !== "unmount") await waitFor(() => expect(document.activeElement).toBe(search));
+    }
     await act(async () => { await new Promise(requestAnimationFrame); });
-    expect(document.activeElement).toBe(search);
     expect(run).toHaveBeenCalledTimes(key === "k" ? 1 : 0);
   } finally {
     release();
