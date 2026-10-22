@@ -45,7 +45,7 @@ function rendered(root: HTMLElement, state: GalleryState): boolean {
     && (document.querySelector(".gallery-notice .copied-notice code")?.textContent ?? null) === (state.notice ?? null);
 }
 
-const pinButton = (root: HTMLElement) => root.querySelector<HTMLButtonElement>(`button[aria-label="${pickerText.pin}"]`);
+const pinButton = (root: HTMLElement) => root.querySelector<HTMLButtonElement>(`footer button[aria-label="${pickerText.unpinTitle}"]`);
 
 function press(target: Element | null, key: string, init: KeyboardEventInit = {}): void {
   target?.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...init }));
@@ -59,7 +59,7 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
     if (i > 0) steps.push(() => press(search(), "ArrowDown"));
     steps.push(() => press(search(), "Enter", { shiftKey: true }));
   }
-  if (state.pinned) steps.push(() => pinButton(root)?.click());
+  if (state.pinned) steps.push(() => press(search(), "P", { code: "KeyP", shiftKey: true, ...(navigator.platform.includes("Mac") ? { metaKey: true } : { ctrlKey: true }) }));
   if (state.keys) steps.push(() => press(root.querySelector("main"), "?"));
   if (state.menuOpen) steps.push(() => root.querySelector<HTMLButtonElement>('footer button[aria-haspopup]')?.click());
   return steps;
@@ -107,7 +107,7 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
   // A menu still fading in is not its final look.
   return menuFits && !document.querySelector("[data-entering]") && html.dataset.density === (state.density ?? "comfortable")
     && html.dataset.textSize === (state.largerTextSetting ? "larger" : "normal")
-    && (pinButton(root)?.getAttribute("aria-pressed") === "true") === Boolean(state.pinned)
+    && (pinButton(root) !== null) === Boolean(state.pinned)
     && (menu !== null) === Boolean(state.menuOpen)
     && (root.querySelector('[role="dialog"]') !== null) === Boolean(state.keys)
     && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li`).length === (state.tray ?? 0)

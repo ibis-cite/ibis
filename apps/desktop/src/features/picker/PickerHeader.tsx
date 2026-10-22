@@ -3,9 +3,9 @@ import { pickerText } from "../../messages";
 import type { Choice } from "./choice";
 import { FormatSelect } from "./FormatSelect";
 
-/** The search bar: the search box, the copy format and the pin. It is also
+/** The search bar: the search box and the copy format. It is also
  * the window's drag region; the editable box itself is not. */
-export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange, pinned, onTogglePin }: {
+export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, expanded, activeDescendant, format, styles, onFormatChange }: {
   inputRef: React.Ref<HTMLInputElement>;
   query: string;
   onQueryChange: (query: string) => void;
@@ -17,8 +17,6 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
   format: Choice;
   styles: boolean;
   onFormatChange: (choice: Choice) => void;
-  pinned: boolean;
-  onTogglePin: () => void;
 }) {
   return (
     <header className="search-bar" data-tauri-drag-region title={pickerText.dragSearchBar}>
@@ -45,19 +43,6 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
         onKeyDown={onSearchKeyDown}
       />
       <FormatSelect format={format} styles={styles} onChange={onFormatChange} />
-      <button
-        type="button"
-        className="pin-button"
-        aria-pressed={pinned}
-        aria-label={pickerText.pin}
-        title={pinned ? pickerText.unpinTitle : pickerText.pinTitle}
-        onClick={onTogglePin}
-      >
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill={pinned ? "currentColor" : "none"} stroke="currentColor">
-          <path d="M9 4h6l-1 5 4 4H6l4-4z" />
-          <path d="M12 13v7" />
-        </svg>
-      </button>
     </header>
   );
 }

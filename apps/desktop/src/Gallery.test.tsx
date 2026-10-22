@@ -355,7 +355,7 @@ async function renderUntilAcknowledged(id: string, provider = galleryProvider(ga
 }
 
 test.each([
-  ["pinned", (root: HTMLElement) => root.querySelector('button[aria-label="Pin Ibis"]')?.getAttribute("aria-pressed") === "true"],
+  ["pinned", (root: HTMLElement) => root.querySelector('footer button[aria-label="Kept open; click to stop"]') !== null],
   ["menu-open", () => document.querySelector('[role="menu"]') !== null],
   ["keys", (root: HTMLElement) => root.querySelector('[role="dialog"]') !== null],
   ["tray", (root: HTMLElement) => [...root.querySelectorAll('ul[aria-label="Selected references"] code')].map((key) => key.textContent).join() === "example2026,研究2026"],
@@ -378,7 +378,7 @@ test("a seeded interaction that does not take is never acknowledged", async () =
   provider.api = { ...provider.api, setPinned: async () => { throw new Error("synthetic pin failure"); } };
   const run = await renderUntilAcknowledged("pinned", provider);
   try {
-    expect(run.container.querySelector('button[aria-label="Pin Ibis"]')?.getAttribute("aria-pressed")).toBe("false");
+    expect(run.container.querySelector('button[aria-label="Kept open; click to stop"]')).toBeNull();
     expect(run.acknowledge).not.toHaveBeenCalled();
   } finally {
     await run.stop();
