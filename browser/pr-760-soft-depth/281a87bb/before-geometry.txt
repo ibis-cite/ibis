@@ -1,0 +1,159 @@
+Check                                            Look     Text    Spec  Measured
+row height (compact)                             macos    normal  40    40        ok
+no regions overlap (compact)                     macos    normal  0     0         ok
+no chip cut by the tray edge (compact)           macos    normal  0     0         ok
+the list scrolls in its own area (compact)       macos    normal  0     0         ok
+row height (comfortable)                         macos    normal  58    58        ok
+footer height                                    macos    normal  40    40        ok
+search band height                               macos    normal  56    56        ok
+search glyph centre x = tile centre x            macos    normal  36    36        ok
+typed text x = row title x                       macos    normal  64    64        ok
+typed text x                                     macos    normal  64    64        ok
+window radius                                    macos    normal  28    12        MISMATCH
+row radius                                       macos    normal  20    6         MISMATCH
+search field radius                              macos    normal  20    6         MISMATCH
+tile radius                                      macos    normal  8     6         MISMATCH
+row height (spacious)                            macos    normal  76    76        ok
+no regions overlap (tray-preview)                macos    normal  0     0         ok
+no chip cut by the tray edge (tray-preview)      macos    normal  0     0         ok
+the list scrolls in its own area (tray-preview)  macos    normal  0     0         ok
+no regions overlap (tray-20)                     macos    normal  0     0         ok
+no chip cut by the tray edge (tray-20)           macos    normal  0     0         ok
+the list scrolls in its own area (tray-20)       macos    normal  0     0         ok
+no regions overlap (tray)                        macos    normal  0     0         ok
+no chip cut by the tray edge (tray)              macos    normal  0     0         ok
+the list scrolls in its own area (tray)          macos    normal  0     0         ok
+no regions overlap (many-results)                macos    normal  0     0         ok
+the list scrolls in its own area (many-results)  macos    normal  0     0         ok
+row height (compact)                             macos    large   46    46        ok
+no regions overlap (compact)                     macos    large   0     0         ok
+no chip cut by the tray edge (compact)           macos    large   0     0         ok
+the list scrolls in its own area (compact)       macos    large   0     0         ok
+row height (comfortable)                         macos    large   66.7  66.7      ok
+footer height                                    macos    large   46    46        ok
+search band height                               macos    large   64.4  64.4      ok
+search glyph centre x = tile centre x            macos    large   41.4  41.4      ok
+typed text x = row title x                       macos    large   73.6  73.6      ok
+typed text x                                     macos    large   73.6  73.6      ok
+window radius                                    macos    large   28    12        MISMATCH
+row radius                                       macos    large   20    6         MISMATCH
+search field radius                              macos    large   20    6         MISMATCH
+tile radius                                      macos    large   8     6         MISMATCH
+row height (spacious)                            macos    large   87.4  87.4      ok
+no regions overlap (tray-preview)                macos    large   0     0         ok
+no chip cut by the tray edge (tray-preview)      macos    large   0     0         ok
+the list scrolls in its own area (tray-preview)  macos    large   0     0         ok
+no regions overlap (tray-20)                     macos    large   0     0         ok
+no chip cut by the tray edge (tray-20)           macos    large   0     0         ok
+the list scrolls in its own area (tray-20)       macos    large   0     0         ok
+no regions overlap (tray)                        macos    large   0     0         ok
+no chip cut by the tray edge (tray)              macos    large   0     0         ok
+the list scrolls in its own area (tray)          macos    large   0     0         ok
+no regions overlap (many-results)                macos    large   0     0         ok
+the list scrolls in its own area (many-results)  macos    large   0     0         ok
+row height (compact)                             windows  normal  40    40        ok
+no regions overlap (compact)                     windows  normal  0     0         ok
+no chip cut by the tray edge (compact)           windows  normal  0     0         ok
+the list scrolls in its own area (compact)       windows  normal  0     0         ok
+row height (comfortable)                         windows  normal  58    58        ok
+footer height                                    windows  normal  40    40        ok
+search band height                               windows  normal  48    48        ok
+search glyph centre x = tile centre x            windows  normal  32    32        ok
+typed text x = row title x                       windows  normal  60    60        ok
+typed text x                                     windows  normal  60    60        ok
+window radius                                    windows  normal  8     8         ok
+row radius                                       windows  normal  4     4         ok
+search field radius                              windows  normal  4     4         ok
+tile radius                                      windows  normal  2     2         ok
+row height (spacious)                            windows  normal  76    76        ok
+no regions overlap (tray-preview)                windows  normal  0     0         ok
+no chip cut by the tray edge (tray-preview)      windows  normal  0     0         ok
+the list scrolls in its own area (tray-preview)  windows  normal  0     0         ok
+no regions overlap (tray-20)                     windows  normal  0     0         ok
+no chip cut by the tray edge (tray-20)           windows  normal  0     0         ok
+the list scrolls in its own area (tray-20)       windows  normal  0     0         ok
+no regions overlap (tray)                        windows  normal  0     0         ok
+no chip cut by the tray edge (tray)              windows  normal  0     0         ok
+the list scrolls in its own area (tray)          windows  normal  0     0         ok
+no regions overlap (many-results)                windows  normal  0     0         ok
+the list scrolls in its own area (many-results)  windows  normal  0     0         ok
+row height (compact)                             windows  large   46    46        ok
+no regions overlap (compact)                     windows  large   0     0         ok
+no chip cut by the tray edge (compact)           windows  large   0     0         ok
+the list scrolls in its own area (compact)       windows  large   0     0         ok
+row height (comfortable)                         windows  large   66.7  66.7      ok
+footer height                                    windows  large   46    46        ok
+search band height                               windows  large   55.2  55.2      ok
+search glyph centre x = tile centre x            windows  large   36.8  36.8      ok
+typed text x = row title x                       windows  large   69    69        ok
+typed text x                                     windows  large   69    69        ok
+window radius                                    windows  large   8     8         ok
+row radius                                       windows  large   4     3.4       MISMATCH
+search field radius                              windows  large   4     3.4       MISMATCH
+tile radius                                      windows  large   2     2         ok
+row height (spacious)                            windows  large   87.4  87.4      ok
+no regions overlap (tray-preview)                windows  large   0     0         ok
+no chip cut by the tray edge (tray-preview)      windows  large   0     0         ok
+the list scrolls in its own area (tray-preview)  windows  large   0     0         ok
+no regions overlap (tray-20)                     windows  large   0     0         ok
+no chip cut by the tray edge (tray-20)           windows  large   0     0         ok
+the list scrolls in its own area (tray-20)       windows  large   0     0         ok
+no regions overlap (tray)                        windows  large   0     0         ok
+no chip cut by the tray edge (tray)              windows  large   0     0         ok
+the list scrolls in its own area (tray)          windows  large   0     0         ok
+no regions overlap (many-results)                windows  large   0     0         ok
+the list scrolls in its own area (many-results)  windows  large   0     0         ok
+row height (compact)                             linux    normal  40    40        ok
+no regions overlap (compact)                     linux    normal  0     0         ok
+no chip cut by the tray edge (compact)           linux    normal  0     0         ok
+the list scrolls in its own area (compact)       linux    normal  0     0         ok
+row height (comfortable)                         linux    normal  58    58        ok
+footer height                                    linux    normal  40    40        ok
+search band height                               linux    normal  56    56        ok
+search glyph centre x = tile centre x            linux    normal  36    36        ok
+typed text x = row title x                       linux    normal  64    64        ok
+typed text x                                     linux    normal  64    64        ok
+window radius                                    linux    normal  14    14        ok
+row radius                                       linux    normal  6     6         ok
+search field radius                              linux    normal  6     6         ok
+tile radius                                      linux    normal  4     4         ok
+row height (spacious)                            linux    normal  76    76        ok
+no regions overlap (tray-preview)                linux    normal  0     0         ok
+no chip cut by the tray edge (tray-preview)      linux    normal  0     0         ok
+the list scrolls in its own area (tray-preview)  linux    normal  0     0         ok
+no regions overlap (tray-20)                     linux    normal  0     0         ok
+no chip cut by the tray edge (tray-20)           linux    normal  0     0         ok
+the list scrolls in its own area (tray-20)       linux    normal  0     0         ok
+no regions overlap (tray)                        linux    normal  0     0         ok
+no chip cut by the tray edge (tray)              linux    normal  0     0         ok
+the list scrolls in its own area (tray)          linux    normal  0     0         ok
+no regions overlap (many-results)                linux    normal  0     0         ok
+the list scrolls in its own area (many-results)  linux    normal  0     0         ok
+row height (compact)                             linux    large   46    46        ok
+no regions overlap (compact)                     linux    large   0     0         ok
+no chip cut by the tray edge (compact)           linux    large   0     0         ok
+the list scrolls in its own area (compact)       linux    large   0     0         ok
+row height (comfortable)                         linux    large   66.7  66.7      ok
+footer height                                    linux    large   46    46        ok
+search band height                               linux    large   64.4  64.4      ok
+search glyph centre x = tile centre x            linux    large   41.4  41.4      ok
+typed text x = row title x                       linux    large   73.6  73.6      ok
+typed text x                                     linux    large   73.6  73.6      ok
+window radius                                    linux    large   14    14        ok
+row radius                                       linux    large   6     4.8       MISMATCH
+search field radius                              linux    large   6     4.8       MISMATCH
+tile radius                                      linux    large   4     4         ok
+row height (spacious)                            linux    large   87.4  87.4      ok
+no regions overlap (tray-preview)                linux    large   0     0         ok
+no chip cut by the tray edge (tray-preview)      linux    large   0     0         ok
+the list scrolls in its own area (tray-preview)  linux    large   0     0         ok
+no regions overlap (tray-20)                     linux    large   0     0         ok
+no chip cut by the tray edge (tray-20)           linux    large   0     0         ok
+the list scrolls in its own area (tray-20)       linux    large   0     0         ok
+no regions overlap (tray)                        linux    large   0     0         ok
+no chip cut by the tray edge (tray)              linux    large   0     0         ok
+the list scrolls in its own area (tray)          linux    large   0     0         ok
+no regions overlap (many-results)                linux    large   0     0         ok
+the list scrolls in its own area (many-results)  linux    large   0     0         ok
+
+144 of 156 geometry and layout checks pass (report only; --enforce fails on a mismatch).
