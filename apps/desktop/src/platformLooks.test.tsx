@@ -588,7 +588,7 @@ test("the alias-only migration exposes the complete design-system role inventory
 });
 
 // CSSOM parses declarations/conditions; this audits the existing root, menu and
-// notice and tray token scopes, rather than pooling inactive declarations into a global set.
+// notice and shelf token scopes, rather than pooling inactive declarations into a global set.
 // This bounded dependency audit is not a CSS cascade/specificity interpreter;
 // browser comparisons verify the actual winning values and rendered appearance.
 const appSheets = Object.fromEntries(readdirSync(new FileURL(".", import.meta.url), { recursive: true })
@@ -623,7 +623,7 @@ function tokenBlocks(sheets: Record<string, string>, platform = "macos", mode = 
         return (!prefix || doc.documentElement.matches(prefix)) && (!look || look === platform);
       });
       if (!active) continue;
-      const scope = selector.includes('[aria-label="Selected references"]') ? "tray" : (/\.menu-|\.toolbar-menu/.test(selector) || (selector === "@keyframe" && file.endsWith("Menu.css"))) && !/^:root[^ ]*$/.test(selector) ? "menu" : file.endsWith("notice.css") && !selector.startsWith(":root") ? "notice" : "root";
+      const scope = /\.shelf(?:\b|-)/.test(selector) ? "shelf" : (/\.menu-|\.toolbar-menu/.test(selector) || (selector === "@keyframe" && file.endsWith("Menu.css"))) && !/^:root[^ ]*$/.test(selector) ? "menu" : file.endsWith("notice.css") && !selector.startsWith(":root") ? "notice" : "root";
       const values: [string, string][] = Array.from(styled.style).map((name) => [name, styled.style.getPropertyValue(name)]);
       if (scope === "root" && values.some(([name]) => name.startsWith("--")) && !selector.startsWith(":root")) throw new Error(`Unmodeled token scope: ${selector}`);
       blocks.push({ file, selector, scope, values });
@@ -661,7 +661,7 @@ function tokenScopes(blocks: TokenBlock[]) {
   const root = raw("root");
   // Inherited custom properties resolve on the parent, before child overrides.
   const inherited = [...root].map(([name, value]) => [name, resolveToken(value, root) ?? value] as [string, string]);
-  return new Map([ ["root", root], ...["menu", "notice", "tray"].map((scope) => [scope, new Map([...inherited, ...raw(scope)])] as const) ]);
+  return new Map([ ["root", root], ...["menu", "notice", "shelf"].map((scope) => [scope, new Map([...inherited, ...raw(scope)])] as const) ]);
 }
 
 test("every application var resolves in its active look/mode, without alias cycles", () => {
@@ -690,6 +690,9 @@ test("the var audit distinguishes fallbacks, inactive definitions and cycles inc
   expect(resolveToken("var(--only-here)", inactive)).toBeNull();
   expect(resolveToken("var(--contrast-only)", inactive)).toBeNull();
   expect(() => tokenBlocks({ fixture: ".unmodeled { --local: 4px; }" })).toThrow("Unmodeled token scope");
+  const shelf = tokenScopes(tokenBlocks({ fixture: ":root { --value: 4px; } .shelf { --value: 8px; }" }));
+  expect(resolveToken("var(--value)", shelf.get("root")!)).toBe("4px");
+  expect(resolveToken("var(--value)", shelf.get("shelf")!)).toBe("8px");
   const overrides = { fixture: ':root { --a: 4px; } :root[data-platform="windows"] { --a: var(--b); --b: var(--a); }' };
   expect(hasCycle("--a", tokenScopes(tokenBlocks(overrides, "windows")).get("root")!)).toBe(true);
   expect(resolveToken("var(--a)", tokenScopes(tokenBlocks(overrides, "macos")).get("root")!)).toBe("4px");
