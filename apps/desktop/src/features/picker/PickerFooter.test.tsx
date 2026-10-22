@@ -41,9 +41,9 @@ function geometry(initial = 692, trailingMargin = 0, constrainHiddenHint = false
   } };
 }
 
-function footer(label = "Copy 20 as Pandoc") {
+function footer(label = "Copy 20 as Pandoc", pinned = true) {
   return <main><input aria-label="Search" /><button>Pointer destination</button><PickerFooter library={library} groupName={String}
-    hints={{ enter: label, shiftEnter: "Add to citation", escape: "Hide" }} altHeld={false} pinned onUnpin={() => undefined}
+    hints={{ enter: label, shiftEnter: "Add to citation", escape: "Hide" }} altHeld={false} pinned={pinned} onUnpin={() => undefined}
     actions={{ copy: () => undefined, add: () => undefined, escape: () => undefined, keys: () => undefined }}
     more={<button aria-label="More">More</button>} /></main>;
 }
@@ -134,4 +134,11 @@ test("an optional-only hint keeps its intrinsic width while folded and restores 
     fit.resize(388);
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "More" }));
   } finally { style.remove(); }
+});
+
+
+test("the normal footer offers only Copy and More even when there is room for another hint", () => {
+  geometry(900); render(footer("Copy 20 as Pandoc", false));
+  const actions = [...document.querySelector("footer")!.querySelectorAll("button")].map((button) => button.getAttribute("aria-label"));
+  expect(actions).toEqual(["Copy 20 as Pandoc", "More"]);
 });
