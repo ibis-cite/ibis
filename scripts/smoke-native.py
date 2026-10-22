@@ -940,18 +940,37 @@ class Linux:
         run("xdotool", "type", "--clearmodifiers", "--delay", "0", text)
 
     def click(self, name):
+        def children(parent, *, owned=False):
+            try:
+                count = parent.childCount
+            except self.accessibility_error:
+                return
+            for index in range(count):
+                try:
+                    child = parent[index]
+                    if child and (not owned or child.get_process_id() == self.app.pid):
+                        yield child
+                except self.accessibility_error:
+                    continue
+
         desktop = self.atspi.Registry.getDesktop(0)
-        stack = [a for a in desktop if a and a.get_process_id() == self.app.pid]
+        stack = list(children(desktop, owned=True))
         while stack:
             item = stack.pop()
-            if item.name == name:
-                try:
+            action = None
+            try:
+                if item.name == name:
                     action = item.queryAction()
-                    if action.nActions and action.doAction(0):
-                        return
-                except NotImplementedError:
-                    pass
-            stack.extend(c for c in item if c)
+                    if not action.nActions:
+                        action = None
+            except self.accessibility_error:
+                continue
+            except NotImplementedError:
+                action = None
+            # An action error can mean it already ran. Never rediscover/retry it.
+            if action is not None and action.doAction(0):
+                return
+            stack.extend(children(item))
         raise AssertionError(f"No invokable accessibility control {name!r}")
 
     def notice_visible(self):
@@ -1832,14 +1851,15 @@ class ContractTests(unittest.TestCase):
         return native, desktop, owned, target, foreign
 
     def test_linux_click_skips_stale_discovery_before_owned_target(self):
-        for point in ("owner", "name", "queryAction", "nActions", "children"):
+        from contextlib import nullcontext
+        from unittest.mock import PropertyMock
+        for point in ("owner", "name", "queryAction", "nActions", "children", "childCount", "entry"):
             with self.subTest(point=point):
                 native, desktop, owned, target, foreign = self.linux_click_fixture()
                 stale = self.CensusNode(100, "Reload")
                 stale.queryAction = Mock(return_value=Mock(nActions=1))
                 error = native.accessibility_error("stale accessible")
-                attribute = "name" if point == "name" else "children"
-                original = stale.__dict__[attribute]
+                attribute = point if point in ("name", "childCount") else "children"
                 def read(node):
                     if node is stale:
                         raise error
@@ -1847,28 +1867,49 @@ class ContractTests(unittest.TestCase):
                 if point == "owner":
                     stale.get_process_id = Mock(side_effect=error)
                     desktop.children.insert(0, stale)
+                    desktop.childCount += 1
                 else:
                     owned.children.append(stale)  # LIFO visits stale before target.
+                    owned.childCount += 1
                 if point == "queryAction":
                     stale.queryAction.side_effect = error
                 if point == "nActions":
                     action = stale.queryAction.return_value
-                    del action.nActions
-                    action.attach_mock(Mock(side_effect=error), "unused")
-                    from unittest.mock import PropertyMock
                     type(action).nActions = PropertyMock(side_effect=error)
-                if point == "children":
+                if point in ("children", "childCount"):
                     stale.name = "unrelated"
-                with patch.object(self.CensusNode, attribute, property(read), create=True) if point in ("name", "children") else patch.dict({}, {}):
+                    stale.childCount = 1
+                if point == "entry":
+                    original_getitem = self.CensusNode.__getitem__
+                    def getitem(node, index):
+                        if node is owned and index == 1:
+                            raise error
+                        return original_getitem(node, index)
+                context = patch.object(self.CensusNode, attribute, property(read), create=True) if point in ("name", "children", "childCount") else nullcontext()
+                with context, patch.object(self.CensusNode, "__getitem__", getitem) if point == "entry" else nullcontext():
                     native.click("Reload")
                 target.queryAction.return_value.doAction.assert_called_once_with(0)
                 foreign.queryAction.assert_not_called()
 
+    def test_linux_click_action_metadata_not_implemented_does_not_activate(self):
+        from unittest.mock import PropertyMock
+        native, desktop, owned, target, foreign = self.linux_click_fixture()
+        stale = self.CensusNode(name="Reload")
+        stale.queryAction = Mock(return_value=Mock())
+        type(stale.queryAction.return_value).nActions = PropertyMock(side_effect=NotImplementedError)
+        owned.children.append(stale)
+        owned.childCount += 1
+        native.click("Reload")
+        stale.queryAction.return_value.doAction.assert_not_called()
+        target.queryAction.return_value.doAction.assert_called_once_with(0)
+
     def test_linux_click_rejects_foreign_namesake_without_owned_target(self):
         native, desktop, owned, target, foreign = self.linux_click_fixture()
-        owned.children = []
-        with self.assertRaisesRegex(AssertionError, "No invokable accessibility control"):
-            native.click("Reload")
+        owned.children, owned.childCount = [], 0
+        for entries in ([foreign, owned], []):
+            desktop.children, desktop.childCount = entries, len(entries)
+            with self.assertRaisesRegex(AssertionError, "No invokable accessibility control"):
+                native.click("Reload")
         target.queryAction.assert_not_called()
         foreign.queryAction.assert_not_called()
 
@@ -1877,6 +1918,7 @@ class ContractTests(unittest.TestCase):
         more = self.CensusNode(name="More")
         more.queryAction = Mock(return_value=Mock(nActions=1, doAction=Mock(return_value=True)))
         owned.children.append(more)
+        owned.childCount += 1
         target.queryAction.return_value.doAction.side_effect = native.accessibility_error("uncertain activation")
         with self.assertRaises(native.accessibility_error):
             menu_action(native, "Reload")
