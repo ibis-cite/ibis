@@ -19,6 +19,7 @@
     :root:not([data-native-appearance]):not([data-gallery-theme="contrast"]):not(.notice-window) { background: var(--surface-window); }
     :root:not([data-gallery-theme="contrast"]):not(.notice-window) .results-area { background: var(--surface); }
     :root[data-platform="macos"]:not([data-gallery-theme="contrast"]):not(.notice-window) .search-bar {
+      position: relative; z-index: var(--z-chrome);
       background: var(--surface-raised); border-bottom-color: var(--clear); box-shadow: var(--shadow-raised);
     }
     :root[data-platform="windows"]:not([data-gallery-theme="contrast"]):not(.notice-window) #results:not(:empty) {

@@ -46,7 +46,7 @@ test("soft depth is the default imported look, using role tokens without an opt-
   expect(styles).toContain('@import "./depth.css";');
   expect(styles.indexOf('"./depth.css"')).toBeGreaterThan(styles.indexOf('"./nativeAppearance.css"'));
   expect(depth).not.toMatch(/data-depth|backdrop-filter|\bblur\(|--(?:layer-|cap-|band-shadow|card-shadow)/);
-  for (const role of ["surface-window", "surface-raised", "shadow-card", "shadow-raised", "r-card", "r-row", "r-control"]) {
+  for (const role of ["surface-window", "surface-raised", "shadow-card", "shadow-raised", "r-card", "r-row", "r-control", "z-chrome"]) {
     expect(tokens).toContain(`--${role}:`);
     expect(depth).toContain(`var(--${role})`);
   }
@@ -73,11 +73,18 @@ test("depth preserves the geometry chain and puts no movement or layout changes 
   expect(depth).not.toMatch(/--(?:r-[\w-]+|inset|row-height|row-pad|tile-size|control-min-size)\s*:/);
   for (const rule of rules()) for (const name of Array.from(rule.style)) {
     if (name.startsWith("--")) continue;
+    if (rule.selector.endsWith(".search-bar") && name === "position") { expect(rule.style.getPropertyValue(name)).toBe("relative"); continue; }
     if (rule.selector.endsWith(".setup-writing .setup-choices") && ["width", "margin-inline"].includes(name)) continue;
     if (rule.selector.endsWith("#results:not(:empty)") && name === "overflow") expect(rule.style.getPropertyValue(name)).toBe("clip");
-    else expect(name).not.toMatch(/^(?:padding|margin|height|width|min-|max-|gap|position|display|flex|transform|animation|overflow)/);
+    else expect(name).not.toMatch(/^(?:padding|margin|height|width|min-|max-|gap|position|inset|top|right|bottom|left|display|flex|transform|animation|overflow)/);
   }
   expect(depth).toContain("(prefers-reduced-motion: no-preference)");
+});
+
+test("the macOS search band paints above the results sheet without changing its box", () => {
+  const band = rules().find((rule) => rule.selector.includes('[data-platform="macos"]') && rule.selector.endsWith(".search-bar"))!;
+  expect(band.style.getPropertyValue("position")).toBe("relative");
+  expect(band.style.getPropertyValue("z-index")).toBe("var(--z-chrome)");
 });
 
 test.each(["macos", "windows", "linux"])("%s paints one real shelf and preserves selected-row colour pairs", async (platform) => {
