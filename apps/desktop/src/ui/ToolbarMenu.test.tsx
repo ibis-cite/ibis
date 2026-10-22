@@ -30,6 +30,24 @@ function mount(items = sections) {
   return { onAction, parentKeys, trigger: screen.getByRole("button", { name: "Copy as Pandoc" }), search: screen.getByRole("textbox") };
 }
 
+test.each([
+  ["macos", "0 0 8 12"],
+  ["windows", "0 0 12 12"],
+  ["linux", "0 0 16 16"],
+])("%s popup uses its bundled decorative indicator without changing the button name", async (platform, viewBox) => {
+  document.documentElement.dataset.platform = platform;
+  const { trigger } = mount();
+  const indicator = trigger.querySelector("svg")!;
+  expect(indicator.getAttribute("viewBox")).toBe(viewBox);
+  expect(indicator.getAttribute("aria-hidden")).toBe("true");
+  expect(indicator.getAttribute("focusable")).toBe("false");
+  const drawing = indicator.outerHTML;
+  fireEvent.click(trigger);
+  await screen.findByRole("menu", { name: "Copy as Pandoc" });
+  expect(screen.getByRole("button", { name: "Copy as Pandoc" })).toBe(trigger);
+  expect(indicator.outerHTML).toBe(drawing);
+});
+
 test.each(["macos", "windows", "linux"])("%s menu has named sections, radio items, keyboard navigation and no axe violations", async (platform) => {
   document.documentElement.dataset.platform = platform;
   const { trigger, search, onAction } = mount();
