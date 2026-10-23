@@ -95,7 +95,9 @@ test("action rows start with labels; toggles keep trailing checks and shortcuts 
   const shortcut = screen.getByRole("menuitem", { name: "Open" }).querySelector(".menu-keys")!;
   expect(shortcut.tagName).toBe("SPAN");
   expect(shortcut.getAttribute("aria-hidden")).toBe("true");
-  expect(shortcut.getAttribute("dir")).toBe("ltr");
+  // The outer logical margin follows the menu; only the shortcut text is LTR.
+  expect(shortcut.getAttribute("dir")).toBeNull();
+  expect(shortcut.querySelector("bdi")?.getAttribute("dir")).toBe("ltr");
   const group = screen.getByRole("group", { name: "Sources" });
   expect(within(group).getAllByRole("menuitemcheckbox").map((row) => [row.textContent, row.getAttribute("aria-checked")]))
     .toEqual([["First", "true"], ["Second", "false"]]);

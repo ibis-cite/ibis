@@ -80,7 +80,7 @@ export function MenuItem({ id, label, title, keys, checked, disabled, onAction }
     render={(props) => <div {...props as ComponentPropsWithRef<"div">} title={title} aria-disabled={disabled || undefined} />}>
     {({ isSelected }) => <>
       <span className="menu-label">{label}</span>
-      {keys && <span className="menu-keys" dir="ltr" aria-hidden="true">{keys}</span>}
+      {keys && <span className="menu-keys" aria-hidden="true"><bdi dir="ltr">{keys}</bdi></span>}
       {checked !== undefined && <MenuCheck checked={isSelected} />}
     </>}
   </AriaMenuItem>;
