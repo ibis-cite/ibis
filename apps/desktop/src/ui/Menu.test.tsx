@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor, within } from "@testing-library/react";
 import axe from "axe-core";
 import { useRef, useState } from "react";
-import { Menu, MenuItem, MenuSection, MenuSeparator } from "./Menu";
+import { Menu, MenuItem, MenuSection, MenuSeparator, useMenuBoundary } from "./Menu";
 import { useMenuLifecycle } from "./useMenuLifecycle";
 
 test.each(["frame", "cancel", "reopen", "unmount"])("a deferred menu focus request respects %s", async (action) => {
@@ -313,4 +313,20 @@ test("an open menu bounds placement below the return field and removes the bound
   expect(boundary?.style.top).toBe("64px");
   fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
   await waitFor(() => expect(boundary?.isConnected).toBe(false));
+});
+
+test("placement preserves a visible header anchor while bounding an off-window footer", () => {
+  const search = document.createElement("input");
+  vi.spyOn(search, "getBoundingClientRect").mockReturnValue(new DOMRect(8, 8, 240, 36));
+  const ref = { current: search };
+  const hook = renderHook(() => useMenuBoundary(true, ref));
+  vi.spyOn(hook.result.current.boundaryElement!, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 44, 720, 596));
+  const button = document.createElement("button");
+  const rect = vi.spyOn(button, "getBoundingClientRect").mockReturnValue(new DOMRect(590, 12, 82, 28));
+  expect(hook.result.current.getTargetRect(button).top).toBe(12);
+  rect.mockReturnValue(new DOMRect(590, 680, 82, 24));
+  const bounded = hook.result.current.getTargetRect(button);
+  expect(bounded.top).toBeGreaterThanOrEqual(44);
+  expect(bounded.top).toBeLessThan(640);
+  hook.unmount();
 });

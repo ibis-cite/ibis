@@ -42,6 +42,7 @@ export function useMenuBoundary(open: boolean, returnRef?: RefObject<HTMLElement
     const bounds = boundary.getBoundingClientRect();
     // Preserve the real anchor when visible; shift an off-window trigger into
     // the boundary so placement can still flip and cap against usable space.
+    if (rect.top >= 8 && rect.bottom <= bounds.bottom - 8) return rect;
     const top = Math.max(clearBottom + 8 - 6 - rect.height, Math.min(rect.top, bounds.bottom - 8));
     return new DOMRect(rect.x, top, rect.width, rect.height);
   }, [boundary, clearBottom]);
