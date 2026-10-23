@@ -1,0 +1,127 @@
+{
+  "source": "72945b1a22370a5207f902832a4afdd406386271",
+  "baseline": "b4f434ce2f76f26c21603fc31c683e886b3a2d0d",
+  "method": "Replace exactly the three changed runtime CSS source blobs on unchanged App/component source. Expand tokens and unchanged nativeAppearance CSS into the styles node to match Vite import inlining. Browser only, not full baseline build or native.",
+  "results": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "before": {
+        "headerOuter": 56,
+        "footerOuter": 40,
+        "field": 40,
+        "pinHeight": 32,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      },
+      "after": {
+        "headerOuter": 53,
+        "footerOuter": 40,
+        "field": 36,
+        "pinHeight": 36,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "before": {
+        "headerOuter": 56,
+        "footerOuter": 40,
+        "field": 40,
+        "pinHeight": 32,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      },
+      "after": {
+        "headerOuter": 53,
+        "footerOuter": 40,
+        "field": 36,
+        "pinHeight": 36,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "before": {
+        "headerOuter": 48,
+        "footerOuter": 40,
+        "field": 40,
+        "pinHeight": 32,
+        "pinEndGap": 4,
+        "inset": ".25rem"
+      },
+      "after": {
+        "headerOuter": 49,
+        "footerOuter": 41,
+        "field": 32,
+        "pinHeight": 32,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "before": {
+        "headerOuter": 48,
+        "footerOuter": 40,
+        "field": 40,
+        "pinHeight": 32,
+        "pinEndGap": 4,
+        "inset": ".25rem"
+      },
+      "after": {
+        "headerOuter": 49,
+        "footerOuter": 41,
+        "field": 32,
+        "pinHeight": 32,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "before": {
+        "headerOuter": 56,
+        "footerOuter": 40,
+        "field": 40,
+        "pinHeight": 32,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      },
+      "after": {
+        "headerOuter": 51,
+        "footerOuter": 41,
+        "field": 34,
+        "pinHeight": 34,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "before": {
+        "headerOuter": 56,
+        "footerOuter": 40,
+        "field": 40,
+        "pinHeight": 32,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      },
+      "after": {
+        "headerOuter": 51,
+        "footerOuter": 41,
+        "field": 34,
+        "pinHeight": 34,
+        "pinEndGap": 8,
+        "inset": ".5rem"
+      }
+    }
+  ]
+}

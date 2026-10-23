@@ -1,0 +1,1028 @@
+[
+  {
+    "platform": "macos",
+    "dir": "ltr",
+    "pass": true,
+    "geometry": {
+      "pin": {
+        "x": 676,
+        "y": 8,
+        "width": 36,
+        "height": 36,
+        "top": 8,
+        "right": 712,
+        "bottom": 44,
+        "left": 676
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 53,
+        "top": 0,
+        "right": 720,
+        "bottom": 53,
+        "left": 0
+      },
+      "endGap": 8,
+      "bottomGap": 8
+    },
+    "controls": {
+      ".pin-button": {
+        "box": {
+          "left": 676,
+          "right": 712,
+          "top": 8,
+          "bottom": 44,
+          "width": 36,
+          "height": 36
+        },
+        "points": [
+          [
+            677,
+            26
+          ],
+          [
+            711,
+            26
+          ],
+          [
+            694,
+            9
+          ],
+          [
+            694,
+            43
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".toolbar-menu-button": {
+        "box": {
+          "left": 588.75,
+          "right": 672,
+          "top": 10,
+          "bottom": 42,
+          "width": 83.25,
+          "height": 32
+        },
+        "points": [
+          [
+            589.75,
+            26
+          ],
+          [
+            671,
+            26
+          ],
+          [
+            630.375,
+            11
+          ],
+          [
+            630.375,
+            41
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".search-clear": {
+        "box": {
+          "left": 551.75,
+          "right": 583.75,
+          "top": 10,
+          "bottom": 42,
+          "width": 32,
+          "height": 32
+        },
+        "points": [
+          [
+            552.75,
+            26
+          ],
+          [
+            582.75,
+            26
+          ],
+          [
+            567.75,
+            11
+          ],
+          [
+            567.75,
+            41
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      "footer button[aria-haspopup]": {
+        "box": {
+          "left": 625.6875,
+          "right": 712,
+          "top": 444,
+          "bottom": 476,
+          "width": 86.3125,
+          "height": 32
+        },
+        "points": [
+          [
+            626.6875,
+            460
+          ],
+          [
+            711,
+            460
+          ],
+          [
+            668.84375,
+            445
+          ],
+          [
+            668.84375,
+            475
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      }
+    }
+  },
+  {
+    "platform": "macos",
+    "dir": "rtl",
+    "pass": true,
+    "geometry": {
+      "pin": {
+        "x": 8,
+        "y": 8,
+        "width": 36,
+        "height": 36,
+        "top": 8,
+        "right": 44,
+        "bottom": 44,
+        "left": 8
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 53,
+        "top": 0,
+        "right": 720,
+        "bottom": 53,
+        "left": 0
+      },
+      "endGap": 8,
+      "bottomGap": 8
+    },
+    "controls": {
+      ".pin-button": {
+        "box": {
+          "left": 8,
+          "right": 44,
+          "top": 8,
+          "bottom": 44,
+          "width": 36,
+          "height": 36
+        },
+        "points": [
+          [
+            9,
+            26
+          ],
+          [
+            43,
+            26
+          ],
+          [
+            26,
+            9
+          ],
+          [
+            26,
+            43
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".toolbar-menu-button": {
+        "box": {
+          "left": 48,
+          "right": 131.25,
+          "top": 10,
+          "bottom": 42,
+          "width": 83.25,
+          "height": 32
+        },
+        "points": [
+          [
+            49,
+            26
+          ],
+          [
+            130.25,
+            26
+          ],
+          [
+            89.625,
+            11
+          ],
+          [
+            89.625,
+            41
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".search-clear": {
+        "box": {
+          "left": 136.25,
+          "right": 168.25,
+          "top": 10,
+          "bottom": 42,
+          "width": 32,
+          "height": 32
+        },
+        "points": [
+          [
+            137.25,
+            26
+          ],
+          [
+            167.25,
+            26
+          ],
+          [
+            152.25,
+            11
+          ],
+          [
+            152.25,
+            41
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      "footer button[aria-haspopup]": {
+        "box": {
+          "left": 8,
+          "right": 94.3125,
+          "top": 444,
+          "bottom": 476,
+          "width": 86.3125,
+          "height": 32
+        },
+        "points": [
+          [
+            9,
+            460
+          ],
+          [
+            93.3125,
+            460
+          ],
+          [
+            51.15625,
+            445
+          ],
+          [
+            51.15625,
+            475
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      }
+    }
+  },
+  {
+    "platform": "windows",
+    "dir": "ltr",
+    "pass": true,
+    "geometry": {
+      "pin": {
+        "x": 680,
+        "y": 8,
+        "width": 32,
+        "height": 32,
+        "top": 8,
+        "right": 712,
+        "bottom": 40,
+        "left": 680
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 49,
+        "top": 0,
+        "right": 720,
+        "bottom": 49,
+        "left": 0
+      },
+      "endGap": 8,
+      "bottomGap": 8
+    },
+    "controls": {
+      ".pin-button": {
+        "box": {
+          "left": 680,
+          "right": 712,
+          "top": 8,
+          "bottom": 40,
+          "width": 32,
+          "height": 32
+        },
+        "points": [
+          [
+            681,
+            24
+          ],
+          [
+            711,
+            24
+          ],
+          [
+            696,
+            9
+          ],
+          [
+            696,
+            39
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".toolbar-menu-button": {
+        "box": {
+          "left": 588.75,
+          "right": 676,
+          "top": 8,
+          "bottom": 40,
+          "width": 87.25,
+          "height": 32
+        },
+        "points": [
+          [
+            589.75,
+            24
+          ],
+          [
+            675,
+            24
+          ],
+          [
+            632.375,
+            9
+          ],
+          [
+            632.375,
+            39
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".search-clear": {
+        "box": {
+          "left": 551.75,
+          "right": 583.75,
+          "top": 8,
+          "bottom": 40,
+          "width": 32,
+          "height": 32
+        },
+        "points": [
+          [
+            552.75,
+            24
+          ],
+          [
+            582.75,
+            24
+          ],
+          [
+            567.75,
+            9
+          ],
+          [
+            567.75,
+            39
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      "footer button[aria-haspopup]": {
+        "box": {
+          "left": 599.8125,
+          "right": 712,
+          "top": 444,
+          "bottom": 476,
+          "width": 112.1875,
+          "height": 32
+        },
+        "points": [
+          [
+            600.8125,
+            460
+          ],
+          [
+            711,
+            460
+          ],
+          [
+            655.90625,
+            445
+          ],
+          [
+            655.90625,
+            475
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      }
+    }
+  },
+  {
+    "platform": "windows",
+    "dir": "rtl",
+    "pass": true,
+    "geometry": {
+      "pin": {
+        "x": 8,
+        "y": 8,
+        "width": 32,
+        "height": 32,
+        "top": 8,
+        "right": 40,
+        "bottom": 40,
+        "left": 8
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 49,
+        "top": 0,
+        "right": 720,
+        "bottom": 49,
+        "left": 0
+      },
+      "endGap": 8,
+      "bottomGap": 8
+    },
+    "controls": {
+      ".pin-button": {
+        "box": {
+          "left": 8,
+          "right": 40,
+          "top": 8,
+          "bottom": 40,
+          "width": 32,
+          "height": 32
+        },
+        "points": [
+          [
+            9,
+            24
+          ],
+          [
+            39,
+            24
+          ],
+          [
+            24,
+            9
+          ],
+          [
+            24,
+            39
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".toolbar-menu-button": {
+        "box": {
+          "left": 44,
+          "right": 131.25,
+          "top": 8,
+          "bottom": 40,
+          "width": 87.25,
+          "height": 32
+        },
+        "points": [
+          [
+            45,
+            24
+          ],
+          [
+            130.25,
+            24
+          ],
+          [
+            87.625,
+            9
+          ],
+          [
+            87.625,
+            39
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".search-clear": {
+        "box": {
+          "left": 136.25,
+          "right": 168.25,
+          "top": 8,
+          "bottom": 40,
+          "width": 32,
+          "height": 32
+        },
+        "points": [
+          [
+            137.25,
+            24
+          ],
+          [
+            167.25,
+            24
+          ],
+          [
+            152.25,
+            9
+          ],
+          [
+            152.25,
+            39
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      "footer button[aria-haspopup]": {
+        "box": {
+          "left": 8,
+          "right": 120.1875,
+          "top": 444,
+          "bottom": 476,
+          "width": 112.1875,
+          "height": 32
+        },
+        "points": [
+          [
+            9,
+            460
+          ],
+          [
+            119.1875,
+            460
+          ],
+          [
+            64.09375,
+            445
+          ],
+          [
+            64.09375,
+            475
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      }
+    }
+  },
+  {
+    "platform": "linux",
+    "dir": "ltr",
+    "pass": true,
+    "geometry": {
+      "pin": {
+        "x": 678,
+        "y": 8,
+        "width": 34,
+        "height": 34,
+        "top": 8,
+        "right": 712,
+        "bottom": 42,
+        "left": 678
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 51,
+        "top": 0,
+        "right": 720,
+        "bottom": 51,
+        "left": 0
+      },
+      "endGap": 8,
+      "bottomGap": 8
+    },
+    "controls": {
+      ".pin-button": {
+        "box": {
+          "left": 678,
+          "right": 712,
+          "top": 8,
+          "bottom": 42,
+          "width": 34,
+          "height": 34
+        },
+        "points": [
+          [
+            679,
+            25
+          ],
+          [
+            711,
+            25
+          ],
+          [
+            695,
+            9
+          ],
+          [
+            695,
+            41
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".toolbar-menu-button": {
+        "box": {
+          "left": 579.953125,
+          "right": 674,
+          "top": 8,
+          "bottom": 42,
+          "width": 94.046875,
+          "height": 34
+        },
+        "points": [
+          [
+            580.953125,
+            25
+          ],
+          [
+            673,
+            25
+          ],
+          [
+            626.9765625,
+            9
+          ],
+          [
+            626.9765625,
+            41
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".search-clear": {
+        "box": {
+          "left": 542.953125,
+          "right": 574.953125,
+          "top": 9,
+          "bottom": 41,
+          "width": 32,
+          "height": 32
+        },
+        "points": [
+          [
+            543.953125,
+            25
+          ],
+          [
+            573.953125,
+            25
+          ],
+          [
+            558.953125,
+            10
+          ],
+          [
+            558.953125,
+            40
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      "footer button[aria-haspopup]": {
+        "box": {
+          "left": 588.25,
+          "right": 712,
+          "top": 444,
+          "bottom": 476,
+          "width": 123.75,
+          "height": 32
+        },
+        "points": [
+          [
+            589.25,
+            460
+          ],
+          [
+            711,
+            460
+          ],
+          [
+            650.125,
+            445
+          ],
+          [
+            650.125,
+            475
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      }
+    }
+  },
+  {
+    "platform": "linux",
+    "dir": "rtl",
+    "pass": true,
+    "geometry": {
+      "pin": {
+        "x": 8,
+        "y": 8,
+        "width": 34,
+        "height": 34,
+        "top": 8,
+        "right": 42,
+        "bottom": 42,
+        "left": 8
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 51,
+        "top": 0,
+        "right": 720,
+        "bottom": 51,
+        "left": 0
+      },
+      "endGap": 8,
+      "bottomGap": 8
+    },
+    "controls": {
+      ".pin-button": {
+        "box": {
+          "left": 8,
+          "right": 42,
+          "top": 8,
+          "bottom": 42,
+          "width": 34,
+          "height": 34
+        },
+        "points": [
+          [
+            9,
+            25
+          ],
+          [
+            41,
+            25
+          ],
+          [
+            25,
+            9
+          ],
+          [
+            25,
+            41
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".toolbar-menu-button": {
+        "box": {
+          "left": 46,
+          "right": 140.046875,
+          "top": 8,
+          "bottom": 42,
+          "width": 94.046875,
+          "height": 34
+        },
+        "points": [
+          [
+            47,
+            25
+          ],
+          [
+            139.046875,
+            25
+          ],
+          [
+            93.0234375,
+            9
+          ],
+          [
+            93.0234375,
+            41
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      ".search-clear": {
+        "box": {
+          "left": 145.046875,
+          "right": 177.046875,
+          "top": 9,
+          "bottom": 41,
+          "width": 32,
+          "height": 32
+        },
+        "points": [
+          [
+            146.046875,
+            25
+          ],
+          [
+            176.046875,
+            25
+          ],
+          [
+            161.046875,
+            10
+          ],
+          [
+            161.046875,
+            40
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      },
+      "footer button[aria-haspopup]": {
+        "box": {
+          "left": 8,
+          "right": 131.75,
+          "top": 444,
+          "bottom": 476,
+          "width": 123.75,
+          "height": 32
+        },
+        "points": [
+          [
+            9,
+            460
+          ],
+          [
+            130.75,
+            460
+          ],
+          [
+            69.875,
+            445
+          ],
+          [
+            69.875,
+            475
+          ]
+        ],
+        "owned": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "font": 16
+      }
+    }
+  }
+]
