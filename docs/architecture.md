@@ -81,6 +81,9 @@ pinned JavaScript/TypeScript parser; it is a contributor boundary check, not a
 security sandbox for computed module names. During
 incremental migration, toolbar-menu role overrides in `tokens.css` apply locally
 to its popover, preserving the existing More menu and keys dialog roles.
+The shared Button family owns footer action, More trigger and dialog Close
+states; React Aria supplies pointer, press and keyboard-focus attributes.
+Folded footer actions preserve their hidden accessibility state and tab order.
 
 Desktop search replies and each result carry an opaque in-memory index revision,
 captured with the index under the library mutex. Scope filtering and request
