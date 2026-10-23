@@ -110,7 +110,7 @@ instead of going square or looking like a separate floating slab.
 
 ```
 --r-row  = max(--r-min, --r-win  − 8px)        rows, search field
---r-tile = max(--r-min, --r-row  − 12px)       type tile, footer buttons
+--r-tile = max(--r-min, --r-row  − 12px)       type tile
 --r-mi   = max(--r-min, --r-menu − --menu-pad)  menu items
 ```
 

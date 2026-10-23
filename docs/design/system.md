@@ -248,7 +248,7 @@ never larger and never below a per-OS floor. C15 keeps that shape as text grows:
 
 ```
 --r-row     = max(--r-min, --r-win  − 8px)          rows, search field, shelf card
---r-tile    = max(--r-min, --r-row  − 12px)         type tile, footer buttons
+--r-tile    = max(--r-min, --r-row  − 12px)         type tile
 --r-mi      = max(--r-min, --r-menu − --menu-pad)    menu items
 --r-control = per OS                                  buttons, pop-ups, fields outside a chain
 --r-key     = max(--r-min − 2px, 4px)                 key caps, chip remove buttons
