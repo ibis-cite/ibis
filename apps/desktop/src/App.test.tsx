@@ -3295,8 +3295,6 @@ test.each(["selection", "copy feedback"])("an obsolete stale copy recovers data 
   fireEvent.click(await screen.findByText("First revision 1"), { shiftKey: true });
   fireEvent.keyDown(box, { key: "Enter" });
   await waitFor(() => expect(attempts).toHaveLength(1));
-  if (change === "highlight") fireEvent.keyDown(screen.getByLabelText("Search references"), { key: "ArrowUp" });
-  if (change === "revision") await act(async () => { await emit("library:changed", { state: "loaded", has_snapshot: true, revision: "2", references: 2 }); });
   if (change === "selection") fireEvent.click(screen.getByText("Second revision 1"), { shiftKey: true });
   else {
     fireEvent.keyDown(box, { key: "Enter" });
