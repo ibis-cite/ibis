@@ -763,16 +763,15 @@ mod tests {
 
     #[cfg(target_os = "windows")]
     #[test]
-    fn windows_entry_keeps_product_names_and_quoted_login_command() {
+    fn windows_entry_keeps_product_names_and_quoted_login_command() -> Result<(), Box<dyn std::error::Error>> {
         let configs: Vec<serde_json::Value> =
-            serde_json::from_str(include_str!("../../../../fixtures/startup/windows-identities.json"))
-                .expect("synthetic channel configurations");
+            serde_json::from_str(include_str!("../../../../fixtures/startup/windows-identities.json"))?;
         let program = std::path::Path::new(r"C:\Synthetic Apps\Ibis\ibis.exe");
         for config in configs {
-            let identifier = config["identifier"].as_str().expect("identifier");
-            let product = config["productName"].as_str().expect("product name");
+            let identifier = config["identifier"].as_str().ok_or("fixture identifier")?;
+            let product = config["productName"].as_str().ok_or("fixture product name")?;
             for name in [product.to_string(), entry_name(product)] {
-                let entry = windows_entry(&name, program).expect("build without registry access");
+                let entry = windows_entry(&name, program).ok_or("build without registry access")?;
                 assert_eq!(entry.get_app_name(), name);
                 assert_ne!(entry.get_app_name(), identifier);
                 assert_ne!(
@@ -783,6 +782,7 @@ mod tests {
                 assert_eq!(entry.get_args(), &[AT_LOGIN_ARG]);
             }
         }
+        Ok(())
     }
 
     #[test]
