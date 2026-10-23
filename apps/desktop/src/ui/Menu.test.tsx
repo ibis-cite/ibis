@@ -82,17 +82,20 @@ test.each(["macos", "windows", "linux"])("%s: a pointer opens with nothing highl
   expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Open" }));
 });
 
-test("every row has a leading check column; toggles are checkbox items and the shortcut is not in the name", async () => {
+test("action rows start with labels; toggles keep trailing checks and shortcuts stay out of names", async () => {
   const { trigger } = mount();
   fireEvent.click(trigger);
   const menu = await screen.findByRole("menu");
   const rows = [...menu.querySelectorAll("[role^=menuitem]")];
-  expect(rows.map((row) => row.firstElementChild?.className)).toEqual(["menu-check", "menu-check", "menu-check"]);
+  expect(rows.map((row) => row.firstElementChild?.className)).toEqual(["menu-label", "menu-label", "menu-label"]);
+  expect(rows[0]!.querySelector(".menu-check")).toBeNull();
+  expect(rows.slice(1).map((row) => row.lastElementChild?.className)).toEqual(["menu-check", "menu-check"]);
   expect(screen.getByRole("menuitem", { name: "Open" }).textContent).toBe("OpenCtrl+O");
   // Menu shortcuts are trailing text, so global kbd cap styles cannot apply.
   const shortcut = screen.getByRole("menuitem", { name: "Open" }).querySelector(".menu-keys")!;
   expect(shortcut.tagName).toBe("SPAN");
   expect(shortcut.getAttribute("aria-hidden")).toBe("true");
+  expect(shortcut.getAttribute("dir")).toBe("ltr");
   const group = screen.getByRole("group", { name: "Sources" });
   expect(within(group).getAllByRole("menuitemcheckbox").map((row) => [row.textContent, row.getAttribute("aria-checked")]))
     .toEqual([["First", "true"], ["Second", "false"]]);
