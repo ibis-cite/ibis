@@ -1,0 +1,35 @@
+{
+  "source": "9bc4de8d9ad256dd15eb433a0e907a94012abc4c",
+  "uuid": "706FB7F1-2D9D-316B-9ECF-BDDE2A0733B8",
+  "appearance": "default system appearance, observed dark; no app-only theme override",
+  "configuredSize": {
+    "width": 720,
+    "height": 480
+  },
+  "frames": [
+    {
+      "file": "main-9bc-native-default-larger-more.jpg",
+      "mediaType": "image/jpeg",
+      "width": 720,
+      "height": 481,
+      "sha256": "cba4d1d87cd049ceec61220b66e19623779dc7766c3378a67221500bb0b43083",
+      "textSize": "larger"
+    },
+    {
+      "file": "main-9bc-native-default-normal-more.jpg",
+      "mediaType": "image/jpeg",
+      "width": 720,
+      "height": 481,
+      "sha256": "f382cee2b3ed07e2696ace107f3e2bd97d1158805f5d33958affa4956e9c7121",
+      "textSize": "normal"
+    },
+    {
+      "file": "main-9bc-native-default-normal-rows.jpg",
+      "mediaType": "image/jpeg",
+      "width": 720,
+      "height": 481,
+      "sha256": "71c34b928da437df7dcc01100263428b0787efa016f14ee80c1487e14232bef9",
+      "textSize": "normal"
+    }
+  ]
+}
