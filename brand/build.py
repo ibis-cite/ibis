@@ -15,13 +15,17 @@ import re
 import struct
 import subprocess
 import zlib
+from xml.sax.saxutils import escape
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "exports"
 
-# Every tunable value lives in settings.json; these names keep the code readable.
+# The values people tune (colours, sizes, depth, motion, words) live in settings.json;
+# these names keep the code readable.
 SET = json.loads((HERE / "settings.json").read_text(encoding="utf-8"))
-C, L, D, MO, W = SET["colours"], SET["layout"], SET["depth"], SET["motion"], SET["words"]
+C, L, D, MO = SET["colours"], SET["layout"], SET["depth"], SET["motion"]
+# Words go into SVG text, so escape &, < and > once here.
+W = {k: escape(v) if isinstance(v, str) else [escape(x) for x in v] for k, v in SET["words"].items()}
 SCARLET, SCARLET_DARK, SCARLET_MID = C["scarlet"], C["scarlet_dark"], C["scarlet_favicon"]
 GRADIENT, GRADIENT_DARK = tuple(C["gradient"]), tuple(C["gradient_dark"])
 INK, INK_DARK, SLATE, MIST = C["ink"], C["ink_dark"], C["slate"], C["mist"]
@@ -451,7 +455,7 @@ def main():
         "video/title-card.svg": video_card(1920, 1080, False, "vt", [TAGLINE, SUBLINE]),
         "video/title-card-dark.svg": video_card(1920, 1080, True, "vtd", [TAGLINE, SUBLINE]),
         "video/end-card.svg": video_card(1920, 1080, True, "ve", W["end_card"]),
-        "video/youtube-banner.svg": video_card(2560, 1440, True, "yb", [TAGLINE], 0.15),
+        "video/youtube-banner.svg": video_card(2560, 1440, True, "yb", [TAGLINE], L["banner_logo"]),
         "video/thumbnail-template.svg": thumbnail("th"),
     }
     (OUT / "video").mkdir(exist_ok=True)

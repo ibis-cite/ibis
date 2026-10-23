@@ -43,7 +43,8 @@
     "optical_sideways": 0.5,
     "optical_lift": 0.015,
     "favicon_neck": 10.5,
-    "app_icon_radius": 0.225
+    "app_icon_radius": 0.225,
+    "banner_logo": 0.15
   },
   "depth": {
     "rim_light": 0.3,
