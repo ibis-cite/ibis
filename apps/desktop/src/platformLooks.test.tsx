@@ -158,6 +158,11 @@ test("the search text starts where row titles start, with the glyph over the til
   expect(rules(styles, "footer")).toMatch(/padding-inline:\s*var\(--footer-padding\)/);
 });
 
+test("tile targets stay centred when Compact shrinks the visible tile", () => {
+  expect(rules(styles, ".result-tile .tile-button")).toMatch(/inset:\s*50% auto auto 50%;.*transform:\s*translate\(-50%, -50%\)/);
+  expect(rules(styles, ':root[data-density="compact"] .result-tile .tile-button')).not.toMatch(/inset:/);
+});
+
 test("window radius follows each platform and macOS matches the native corner", () => {
   // macOS keeps the natively verified 12 pt corner until macOS 26 detection lands; the token must agree with it.
   const native = corners.match(/CORNER_RADIUS_POINTS: f64 = ([\d.]+);/)?.[1];

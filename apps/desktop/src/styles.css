@@ -261,7 +261,6 @@ main[data-selection] .results-area { flex: 1 0 var(--results-min-height); overfl
    so titles still start where the search text does; its control covers 32 px. */
 :root[data-density="compact"] { --row-height: var(--row-compact); --tile-background: var(--clear); --tile-active-background: var(--clear); }
 :root[data-density="compact"] .result-tile { width: var(--tile-compact); height: var(--tile-compact); margin-inline: calc((var(--tile-size) - var(--tile-compact)) / 2); }
-:root[data-density="compact"] .result-tile .tile-button { inset: calc((var(--tile-compact) - var(--tile-size)) / 2); }
 :root[data-density="compact"] .result-meta { display: none; }
 :root[data-density="spacious"] { --row-height: var(--row-spacious); }
 :root[data-text-size="larger"] { font-size: calc(100% * var(--larger-text-scale)); }
