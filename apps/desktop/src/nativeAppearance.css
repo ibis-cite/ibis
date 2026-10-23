@@ -4,7 +4,8 @@
    with neither light-dark() nor color-mix() show the material bare, as before.
    Windows Mica already supplies its own tint. */
 :root[data-native-appearance="mica"] { background: transparent; }
-:root[data-native-appearance="vibrancy"] { background: var(--vibrancy-tint, color-mix(in srgb, var(--surface) 55%, transparent)); }
+:root[data-native-appearance="vibrancy"],
+:root[data-native-appearance="liquid-glass"] { background: var(--vibrancy-tint, color-mix(in srgb, var(--surface) 55%, transparent)); }
 
 /* Defensive overrides also cover preferences changed before native refresh. */
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
@@ -24,17 +25,20 @@
 
   /* With the native material: a hairline edge as on a native panel (no rim or
      glow), and menus of the same glass that blur the list beneath them. */
-  :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]) body::after {
+  :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]) body::after,
+  :root[data-platform="macos"][data-native-appearance="liquid-glass"]:not([data-gallery-theme="contrast"]) body::after {
     content: ""; position: fixed; inset: 0; z-index: 3; pointer-events: none;
     border-radius: var(--r-win);
     box-shadow: inset 0 0 0 var(--border-width) var(--glass-edge, transparent);
   }
-  :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]) :is(.menu-popover, .keys-dialog) {
+  :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]) :is(.menu-popover, .keys-dialog),
+  :root[data-platform="macos"][data-native-appearance="liquid-glass"]:not([data-gallery-theme="contrast"]) :is(.menu-popover, .keys-dialog) {
     background: color-mix(in srgb, var(--surface) 94%, transparent);
     -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
   }
   /* Without a backdrop blur, list text would show through: keep menus opaque. */
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]) :is(.menu-popover, .keys-dialog) { background: var(--surface); }
+    :root[data-platform="macos"][data-native-appearance="vibrancy"]:not([data-gallery-theme="contrast"]) :is(.menu-popover, .keys-dialog),
+    :root[data-platform="macos"][data-native-appearance="liquid-glass"]:not([data-gallery-theme="contrast"]) :is(.menu-popover, .keys-dialog) { background: var(--surface); }
   }
 }

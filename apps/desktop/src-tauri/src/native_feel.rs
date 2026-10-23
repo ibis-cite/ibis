@@ -21,6 +21,28 @@ struct Cache {
 }
 
 impl Cache {
+    fn material(
+        &mut self,
+        requested: Appearance,
+        apply: impl FnOnce() -> Result<Appearance, ()>,
+        clear: impl FnOnce(Appearance) -> Result<(), ()>,
+    ) -> Option<Result<Appearance, ()>> {
+        if self.requested == Some(requested) {
+            return None;
+        }
+        self.requested = Some(requested);
+        Some(if requested == Appearance::Opaque {
+            if self.applied == Appearance::Opaque {
+                Ok(())
+            } else {
+                clear(self.applied)
+            }
+            .map(|()| Appearance::Opaque)
+        } else {
+            apply()
+        })
+    }
+
     fn accent_changed(&mut self, accent: Option<[f64; 3]>, replay: bool) -> bool {
         let changed = replay || self.accent != Some(accent);
         self.accent = Some(accent);
@@ -114,22 +136,17 @@ fn refresh(app: &AppHandle, replay: bool) -> Appearance {
     if cache.accent_changed(accent, replay) && window.emit("accent:changed", accent).is_err() {
         warning();
     }
-    if cache.requested == Some(requested) {
+    let Some(applied) = cache.material(
+        requested,
+        || platform::apply(&window),
+        |mode| platform::clear(&window, mode),
+    ) else {
         return cache.applied;
-    }
-    cache.requested = Some(requested);
-    let next = if requested == Appearance::Opaque {
-        if cache.applied != Appearance::Opaque && platform::clear(&window).is_err() {
-            warning();
-        }
-        Appearance::Opaque
-    } else {
-        let success = platform::apply(&window).is_ok();
-        if !success {
-            warning();
-        }
-        policy::applied(requested, success)
     };
+    let next = applied.unwrap_or_else(|()| {
+        warning();
+        Appearance::Opaque
+    });
     // Initial state and policy changes produce one fixed, allowlisted line in
     // the existing native startup artifact. Success is an API observation,
     // not proof of a visible material or accessibility-toggle acceptance.
@@ -152,6 +169,44 @@ mod tests {
     use std::io::{Read, Write};
     use std::process::{Command, Stdio};
     use std::time::{Duration, Instant};
+
+    #[test]
+    fn cached_glass_fallback_clears_the_actual_layer_and_never_stacks_effects() {
+        for actual in [super::Appearance::LiquidGlass, super::Appearance::Vibrancy] {
+            let mut cache = super::Cache {
+                requested: Some(super::Appearance::LiquidGlass),
+                applied: actual,
+                ..Default::default()
+            };
+            assert_eq!(
+                cache.material(
+                    super::Appearance::LiquidGlass,
+                    || panic!("unchanged request"),
+                    |_| panic!("unchanged request")
+                ),
+                None
+            );
+            assert_eq!(
+                cache.material(
+                    super::Appearance::Opaque,
+                    || panic!("opacity must not apply"),
+                    |mode| {
+                        assert_eq!(mode, actual);
+                        Ok(())
+                    }
+                ),
+                Some(Ok(super::Appearance::Opaque))
+            );
+            assert_eq!(
+                cache.material(
+                    super::Appearance::Opaque,
+                    || panic!("duplicate request"),
+                    |_| panic!("duplicate clear")
+                ),
+                None
+            );
+        }
+    }
 
     #[test]
     fn accent_changes_and_query_replays_ignore_unchanged_opaque_material() {

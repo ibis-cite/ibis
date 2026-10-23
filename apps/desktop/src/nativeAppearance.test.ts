@@ -8,7 +8,7 @@ test("only explicit native success exposes a material", () => {
     setNativeAppearance(bad);
     expect(document.documentElement.dataset.nativeAppearance).toBe("opaque");
   }
-  for (const good of ["mica", "vibrancy"]) {
+  for (const good of ["mica", "vibrancy", "liquid-glass"]) {
     setNativeAppearance(good);
     expect(document.documentElement.dataset.nativeAppearance).toBe(good);
   }

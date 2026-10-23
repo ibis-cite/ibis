@@ -8,6 +8,8 @@ pub(super) enum Appearance {
     Mica,
     #[cfg(any(target_os = "macos", test))]
     Vibrancy,
+    #[cfg(any(target_os = "macos", test))]
+    LiquidGlass,
 }
 
 #[derive(Clone, Copy)]
@@ -26,8 +28,23 @@ pub(super) fn requested(material: Appearance, preferences: Option<Preferences>) 
     }
 }
 
-pub(super) fn applied(material: Appearance, success: bool) -> Appearance {
-    if success { material } else { Appearance::Opaque }
+#[cfg(any(target_os = "macos", test))]
+pub(super) enum GlassFailure {
+    Unsupported,
+    Failed,
+}
+
+/// An unsupported OS permits vibrancy; other failures must stay opaque.
+#[cfg(any(target_os = "macos", test))]
+pub(super) fn macos_material(
+    glass: Result<(), GlassFailure>,
+    vibrancy: impl FnOnce() -> Result<(), ()>,
+) -> Result<Appearance, ()> {
+    match glass {
+        Ok(()) => Ok(Appearance::LiquidGlass),
+        Err(GlassFailure::Unsupported) => vibrancy().map(|()| Appearance::Vibrancy),
+        Err(GlassFailure::Failed) => Err(()),
+    }
 }
 
 /// The evidence log accepts only native policy values, never an error payload.
@@ -49,6 +66,10 @@ pub(super) fn evidence_reason(
     if preferences.high_contrast || preferences.reduce_transparency {
         return "accessibility";
     }
+    #[cfg(any(target_os = "macos", test))]
+    if material == Appearance::LiquidGlass && actual == Appearance::Vibrancy {
+        return "unsupported-glass";
+    }
     if actual != material {
         return "native-failure";
     }
@@ -63,6 +84,8 @@ impl Appearance {
             Self::Mica => "mica",
             #[cfg(any(target_os = "macos", test))]
             Self::Vibrancy => "vibrancy",
+            #[cfg(any(target_os = "macos", test))]
+            Self::LiquidGlass => "liquid-glass",
         }
     }
 }
@@ -70,6 +93,41 @@ impl Appearance {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn macos_uses_glass_or_only_the_supported_vibrancy_fallback() {
+        assert_eq!(
+            macos_material(Ok(()), || panic!("glass needs no fallback")),
+            Ok(Appearance::LiquidGlass)
+        );
+        assert_eq!(
+            macos_material(Err(GlassFailure::Unsupported), || Ok(())),
+            Ok(Appearance::Vibrancy)
+        );
+        assert_eq!(macos_material(Err(GlassFailure::Unsupported), || Err(())), Err(()));
+        assert_eq!(
+            macos_material(Err(GlassFailure::Failed), || panic!(
+                "native failures must not try fallback"
+            )),
+            Err(())
+        );
+        let normal = Some(Preferences {
+            high_contrast: false,
+            reduce_transparency: false,
+        });
+        assert_eq!(
+            evidence_reason(Appearance::LiquidGlass, normal, true, Appearance::LiquidGlass),
+            "applied"
+        );
+        assert_eq!(
+            evidence_reason(Appearance::LiquidGlass, normal, true, Appearance::Vibrancy),
+            "unsupported-glass"
+        );
+        assert_eq!(
+            evidence_reason(Appearance::LiquidGlass, normal, true, Appearance::Opaque),
+            "native-failure"
+        );
+    }
 
     #[test]
     fn evidence_distinguishes_native_success_from_every_opaque_fallback() {
@@ -109,14 +167,19 @@ mod tests {
 
     #[test]
     fn unknown_preferences_are_opaque_on_every_platform() {
-        for material in [Appearance::Opaque, Appearance::Mica, Appearance::Vibrancy] {
+        for material in [
+            Appearance::Opaque,
+            Appearance::Mica,
+            Appearance::Vibrancy,
+            Appearance::LiquidGlass,
+        ] {
             assert_eq!(requested(material, None), Appearance::Opaque);
         }
     }
 
     #[test]
     fn either_accessibility_preference_requires_opacity() {
-        for material in [Appearance::Mica, Appearance::Vibrancy] {
+        for material in [Appearance::Mica, Appearance::Vibrancy, Appearance::LiquidGlass] {
             for (high_contrast, reduce_transparency) in [(true, false), (false, true), (true, true)] {
                 assert_eq!(
                     requested(
@@ -146,11 +209,10 @@ mod tests {
     }
 
     #[test]
-    fn native_failure_never_exposes_a_transparent_surface() {
-        for material in [Appearance::Opaque, Appearance::Mica, Appearance::Vibrancy] {
-            assert_eq!(applied(material, false), Appearance::Opaque);
-            assert_eq!(applied(material, true), material);
-        }
+    fn native_material_names_are_fixed() {
         assert_eq!(Appearance::Opaque.name(), "opaque");
+        assert_eq!(Appearance::Mica.name(), "mica");
+        assert_eq!(Appearance::Vibrancy.name(), "vibrancy");
+        assert_eq!(Appearance::LiquidGlass.name(), "liquid-glass");
     }
 }

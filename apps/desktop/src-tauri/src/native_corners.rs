@@ -11,7 +11,7 @@ use tauri_nspanel::{NSPanel, objc2::MainThreadMarker};
 
 // AppKit exposes no system radius for a borderless launcher. Use twelve logical
 // points, independent of display scale, and verify silhouette/shadow on macOS.
-const CORNER_RADIUS_POINTS: f64 = 12.0;
+pub(crate) const CORNER_RADIUS_POINTS: f64 = 12.0;
 
 /// Corners are cosmetic. A missing prerequisite keeps the existing rectangular
 /// picker usable rather than turning an appearance failure into startup failure.
