@@ -1,5 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import axe from "axe-core";
 import { LibrarySetup } from "./LibrarySetup";
 
 afterEach(cleanup);
@@ -35,12 +36,12 @@ test("Look again retains focus while pending and rejects repeated scan presses",
   const findSources = vi.fn().mockResolvedValue(found)
     .mockImplementationOnce(async () => found)
     .mockImplementationOnce(() => new Promise<typeof found>((done) => { resolve = done; }));
-  render(<LibrarySetup api={{ chooseLibrary: async () => undefined, useZotero: async () => undefined, findSources }} perform={perform} />);
+  const { unmount } = render(<LibrarySetup api={{ chooseLibrary: async () => undefined, useZotero: async () => undefined, findSources }} perform={perform} />);
   const again = await screen.findByRole("button", { name: "Look again" });
   await waitFor(() => expect(again.getAttribute("aria-disabled")).toBeNull());
   press(again);
   await waitFor(() => expect(findSources).toHaveBeenCalledTimes(2));
-  expect(again.hasAttribute("data-pending")).toBe(true);
+  expect(again.getAttribute("data-variant")).toBe("secondary");
   expect(again.getAttribute("aria-disabled")).toBe("true");
   expect((again as HTMLButtonElement).disabled).toBe(false);
   expect(document.activeElement).toBe(again);
@@ -48,10 +49,13 @@ test("Look again retains focus while pending and rejects repeated scan presses",
   press(again, " ");
   expect(findSources).toHaveBeenCalledTimes(2);
   await act(async () => resolve(found));
-  expect(again.hasAttribute("data-pending")).toBe(false);
+  expect(again.getAttribute("aria-disabled")).toBeNull();
   expect(document.activeElement).toBe(again);
   press(again, " ");
   await waitFor(() => expect(findSources).toHaveBeenCalledTimes(3));
+  unmount();
+  const accessibility = await axe.run(document.body, { runOnly: { type: "rule", values: ["role-img-alt"] } });
+  expect(accessibility.violations.map((violation) => violation.id)).toEqual([]);
 });
 
 test("found-file presses preserve list identity and rescan a replaced list", async () => {

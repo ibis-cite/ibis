@@ -102,8 +102,8 @@ export function LibrarySetup({ api, perform, writing, shortcut, startAtLogin }: 
       )}
       {sources?.cut_short && <p className="empty-hint">{setupText.cutShort}</p>}
       {findSources && (
-        // Stays in place while looking, so focus is not lost.
-        <Button isPending={looking} onPress={lookAgain}>
+        // Stays focusable while looking; the outcome status announces progress.
+        <Button aria-disabled={looking || undefined} onPress={() => { if (!looking) lookAgain(); }}>
           {setupText.lookAgain}
         </Button>
       )}
