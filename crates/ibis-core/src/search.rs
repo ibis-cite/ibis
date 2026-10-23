@@ -268,7 +268,8 @@ fn rank<'r, 'f>(
         if n % TERM_CHECK_INTERVAL == 0 && stop() {
             return None;
         }
-        *terms.entry(term).or_default() += 1;
+        let count = terms.entry(term).or_default();
+        *count = count.wrapping_add(1);
     }
     if terms.is_empty() || limit == 0 {
         return Some(Vec::new());
@@ -318,7 +319,7 @@ fn rank<'r, 'f>(
                 all_terms = false;
                 break;
             };
-            score += weight * count;
+            score = weighted_score(score, weight, count);
             matched |= 1 << bit;
         }
         if !all_terms {
@@ -329,11 +330,11 @@ fn rank<'r, 'f>(
             .as_deref()
             .is_some_and(|k| k.chars().flat_map(lower).eq(exact_query.chars()));
         if exact_key {
-            score += 2000;
+            score = weighted_score(score, 2000, 1);
         } else if fields[0] == normalized {
-            score += 1000;
+            score = weighted_score(score, 1000, 1);
         } else if fields[1] == normalized {
-            score += 500;
+            score = weighted_score(score, 500, 1);
         }
         candidates.push((score, matched, reference));
     }
@@ -362,6 +363,12 @@ fn rank<'r, 'f>(
             })
             .collect(),
     )
+}
+
+// Preserve the original release arithmetic even for enormous queries. Grouped
+// or reordered terms must not introduce an overflow panic in checked builds.
+fn weighted_score(score: u32, weight: u32, count: u32) -> u32 {
+    score.wrapping_add(weight.wrapping_mul(count))
 }
 
 /// Lowercase, strip accents, fold letter variants and turn punctuation into spaces.
@@ -748,6 +755,15 @@ mod tests {
         assert_eq!(owned.search("red red", 1)[0].score, 40);
         let exact = OwnedIndex::new(vec![reference("red red", "red red", "Example", 2024)]);
         assert_eq!(exact.search("red red", 1)[0].score, 2048);
+    }
+
+    #[test]
+    fn huge_multiplicities_preserve_release_scores_without_allocating_the_query() {
+        // This count would require a 341 MiB query. It must not panic before
+        // a later missing term can reject the record.
+        assert_eq!(weighted_score(0, 24, 178_956_971), 8);
+        assert_eq!(weighted_score(u32::MAX - 1, 2, 1), 0);
+        assert_eq!(weighted_score(8, 2000, 1), 2008);
     }
 
     #[test]
