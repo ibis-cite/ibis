@@ -211,7 +211,9 @@ def menu_action(native, name):
         try:
             native.click(name)
             return True
-        except (AssertionError, RuntimeError, subprocess.CalledProcessError):
+        except (AssertionError, RuntimeError, subprocess.CalledProcessError) as error:
+            if isinstance(native, Linux) and isinstance(error, native.accessibility_error):
+                raise
             return False
     wait_for(pressed, f"{name} appears in the More menu", timeout=5)
 
@@ -940,18 +942,42 @@ class Linux:
         run("xdotool", "type", "--clearmodifiers", "--delay", "0", text)
 
     def click(self, name):
+        def children(parent, *, owned=False):
+            try:
+                count = parent.childCount
+            except self.accessibility_error:
+                return
+            for index in range(count):
+                try:
+                    child = parent[index]
+                except IndexError:
+                    break  # The collection shrank after childCount was read.
+                except self.accessibility_error:
+                    continue
+                try:
+                    if child and (not owned or child.get_process_id() == self.app.pid):
+                        yield child
+                except self.accessibility_error:
+                    continue
+
         desktop = self.atspi.Registry.getDesktop(0)
-        stack = [a for a in desktop if a and a.get_process_id() == self.app.pid]
+        stack = list(children(desktop, owned=True))
         while stack:
             item = stack.pop()
-            if item.name == name:
-                try:
+            action = None
+            try:
+                if item.name == name:
                     action = item.queryAction()
-                    if action.nActions and action.doAction(0):
-                        return
-                except NotImplementedError:
-                    pass
-            stack.extend(c for c in item if c)
+                    if not action.nActions:
+                        action = None
+            except self.accessibility_error:
+                continue
+            except NotImplementedError:
+                action = None
+            # An action error can mean it already ran. Never rediscover/retry it.
+            if action is not None and action.doAction(0):
+                return
+            stack.extend(children(item))
         raise AssertionError(f"No invokable accessibility control {name!r}")
 
     def notice_visible(self):
@@ -1445,7 +1471,9 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--identifier", default="io.github.ibiscite.ibis", help="Bundle identifier, which names the settings folder")
     parser.add_argument("--shortcut", help="xdotool-style chord; defaults to Ctrl+Shift+Y or Control+Command+R on macOS")
-    parser.add_argument("--budgets", type=Path, help="Measured per-platform baseline JSON, with startup_ms, first_result_ms, memory_bytes ceilings")
+    performance = parser.add_mutually_exclusive_group()
+    performance.add_argument("--budgets", type=Path, help="Measured per-platform baseline JSON, with startup_ms, first_result_ms, memory_bytes ceilings")
+    performance.add_argument("--skip-performance", action="store_true", help="Keep correctness checks but skip the four 100,000-reference launches")
     parser.add_argument("--first-run-preferences", action="store_true", help="Exercise first-run format persistence and settled More/Quit only")
     args = parser.parse_args()
     if args.first_run_preferences:
@@ -1724,35 +1752,38 @@ def main():
                 stop()
             check("damaged startup library warns and keeps valid records searchable", damaged)
 
-            library.write_text(fixture(100000), encoding="utf-8")
-            samples = []
-            # Launch 0 is a warm-up held only to the hard ceiling; the gate uses the median of the rest (#464).
-            for sample in range(1 + MEASURED_LAUNCHES):
-                native.focus_editor()
-                phases = {}
-                # Retain partial facts if readiness or a native probe fails.
-                report.setdefault("startup_phases", []).append(phases)
-                startup = measure_startup(lambda: launch("100000-warmup" if sample == 0 else f"100000-{sample}"), snapshot, phases)
-                before = time.monotonic()
-                query("smoke099999", "Ibis smoke reference 099999")
-                first = (time.monotonic() - before) * 1000
-                memory = native.memory()
-                assert memory > 0, "Native process-tree memory measurement unavailable"
-                samples.append({"warmup": sample == 0, "startup_ms": round(startup, 2), "first_result_ms": round(first, 2),
-                                "memory_bytes": memory, "startup_phases": phases})
-                if system == "Windows":
-                    samples[-1]["memory_facts"] = native.memory_facts
-                stop()
-                phases["library_phases"] = library_phase_diagnostics([diagnostic_logs[-1]])
-            report["performance"] = summarize_performance(samples)
-            if args.budgets:
-                budgets = json.loads(args.budgets.read_text(encoding="utf-8"))[system]
-                try:
-                    enforce_performance_budgets(report["performance"], budgets)
-                finally:
-                    print(json.dumps(report["performance"]), flush=True)
+            if args.skip_performance:
+                report["performance"] = {"status": "skipped"}
             else:
-                print(json.dumps(report["performance"]), flush=True)
+                library.write_text(fixture(100000), encoding="utf-8")
+                samples = []
+                # Launch 0 is a warm-up held only to the hard ceiling; the gate uses the median of the rest (#464).
+                for sample in range(1 + MEASURED_LAUNCHES):
+                    native.focus_editor()
+                    phases = {}
+                    # Retain partial facts if readiness or a native probe fails.
+                    report.setdefault("startup_phases", []).append(phases)
+                    startup = measure_startup(lambda: launch("100000-warmup" if sample == 0 else f"100000-{sample}"), snapshot, phases)
+                    before = time.monotonic()
+                    query("smoke099999", "Ibis smoke reference 099999")
+                    first = (time.monotonic() - before) * 1000
+                    memory = native.memory()
+                    assert memory > 0, "Native process-tree memory measurement unavailable"
+                    samples.append({"warmup": sample == 0, "startup_ms": round(startup, 2), "first_result_ms": round(first, 2),
+                                    "memory_bytes": memory, "startup_phases": phases})
+                    if system == "Windows":
+                        samples[-1]["memory_facts"] = native.memory_facts
+                    stop()
+                    phases["library_phases"] = library_phase_diagnostics([diagnostic_logs[-1]])
+                report["performance"] = summarize_performance(samples)
+                if args.budgets:
+                    budgets = json.loads(args.budgets.read_text(encoding="utf-8"))[system]
+                    try:
+                        enforce_performance_budgets(report["performance"], budgets)
+                    finally:
+                        print(json.dumps(report["performance"]), flush=True)
+                else:
+                    print(json.dumps(report["performance"]), flush=True)
         report["status"] = "passed"
         exit_code = 0
     except Unavailable as error:
@@ -1805,6 +1836,53 @@ def main():
 
 
 class ContractTests(unittest.TestCase):
+    def test_skip_performance_rejects_budgets_before_native_setup(self):
+        for flags in (("--skip-performance", "--budgets", "unused.json"),
+                      ("--budgets", "unused.json", "--skip-performance")):
+            with patch.object(sys, "argv", ["smoke", "--app", "unused", "--output", "unused", *flags]), \
+                    redirect_stderr(io.StringIO()) as errors, patch(__name__ + ".Linux") as native:
+                with self.assertRaises(SystemExit) as exit_status:
+                    main()
+                self.assertEqual(exit_status.exception.code, 2)
+                self.assertIn("not allowed with argument", errors.getvalue())
+                native.assert_not_called()
+
+    def test_skip_performance_keeps_correctness_and_removes_only_four_launches(self):
+        reports, counts = [], []
+        for flags in ([], ["--skip-performance"]):
+            with tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                app, output = root / "synthetic-app", root / "output"
+                app.touch()
+                native = Mock(memory_facts={}, foreground_trace=[], foreground_trace_capped=False)
+                native.editor_active.return_value = True
+                native.editor_has_input_focus.return_value = True
+                native.snapshot.return_value = {"visible": True, "foreground": True, "nodes": [
+                    {"name": "Ibis smoke reference 000001", "role": "label"}]}
+                native.memory.return_value = 1000
+                process = Mock()
+                process.poll.return_value = None
+                process.wait.return_value = 0
+                def startup(launch, snapshot, phases):
+                    launch()
+                    return 1
+                with patch.object(sys, "argv", ["smoke", "--app", str(app), "--output", str(output), *flags]), \
+                        patch("platform.system", return_value="Linux"), patch(__name__ + ".Linux", return_value=native), \
+                        patch("subprocess.Popen", return_value=process) as launches, patch("builtins.print"), \
+                        patch(__name__ + ".wait_for"), patch(__name__ + ".wait_for_query"), \
+                        patch(__name__ + ".require_tree"), patch(__name__ + ".escape_to_hide"), \
+                        patch(__name__ + ".menu_escape_focus"), patch(__name__ + ".menu_action"), \
+                        patch(__name__ + ".copy_with_diagnostics"), patch(__name__ + ".measure_startup", side_effect=startup):
+                    self.assertEqual(main(), 0)
+                reports.append(json.loads((output / "smoke.json").read_text()))
+                counts.append(launches.call_count)
+                self.assertEqual(native.memory.call_count, 0 if flags else 4)
+        self.assertEqual(counts[0] - counts[1], 4)
+        self.assertEqual(reports[0]["checks"], reports[1]["checks"])
+        self.assertGreater(len(reports[1]["checks"]), 10)
+        self.assertEqual(reports[0]["performance"]["status"], "measured-without-budget")
+        self.assertEqual(reports[1]["performance"], {"status": "skipped"})
+
     class CensusNode:
         def __init__(self, pid=0, name="", children=(), value=None):
             self.pid, self.name, self.children, self.value = pid, name, children, value
@@ -1817,6 +1895,112 @@ class ContractTests(unittest.TestCase):
             if self.value is None:
                 raise NotImplementedError
             return Mock(characterCount=len(self.value), getText=lambda start, end: self.value[start:end])
+
+    def linux_click_fixture(self):
+        native = Linux.__new__(Linux)
+        native.app = Mock(pid=100)
+        native.accessibility_error = type("AccessibilityError", (RuntimeError,), {})
+        target = self.CensusNode(name="Reload")
+        target.queryAction = Mock(return_value=Mock(nActions=1, doAction=Mock(return_value=True)))
+        foreign = self.CensusNode(999, "Reload", [target])
+        foreign.queryAction = Mock()
+        owned = self.CensusNode(100, children=[target])
+        desktop = self.CensusNode(children=[foreign, owned])
+        native.atspi = Mock(Registry=Mock(getDesktop=lambda _: desktop))
+        return native, desktop, owned, target, foreign
+
+    def test_linux_click_skips_stale_discovery_before_owned_target(self):
+        from contextlib import nullcontext
+        from unittest.mock import PropertyMock
+        for point in ("owner", "name", "queryAction", "nActions", "children", "childCount", "entry"):
+            with self.subTest(point=point):
+                native, desktop, owned, target, foreign = self.linux_click_fixture()
+                stale = self.CensusNode(100, "Reload")
+                stale.queryAction = Mock(return_value=Mock(nActions=1))
+                error = native.accessibility_error("stale accessible")
+                attribute = point if point in ("name", "childCount") else "children"
+                def read(node):
+                    if node is stale:
+                        raise error
+                    return node.__dict__[attribute]
+                if point == "owner":
+                    stale.get_process_id = Mock(side_effect=error)
+                    desktop.children.insert(0, stale)
+                    desktop.childCount += 1
+                else:
+                    owned.children.append(stale)  # LIFO visits stale before target.
+                    owned.childCount += 1
+                if point == "queryAction":
+                    stale.queryAction.side_effect = error
+                if point == "nActions":
+                    action = stale.queryAction.return_value
+                    type(action).nActions = PropertyMock(side_effect=error)
+                if point in ("children", "childCount"):
+                    stale.name = "unrelated"
+                    stale.childCount = 1
+                if point == "entry":
+                    original_getitem = self.CensusNode.__getitem__
+                    def getitem(node, index):
+                        if node is owned and index == 1:
+                            raise error
+                        return original_getitem(node, index)
+                context = patch.object(self.CensusNode, attribute, property(read), create=True) if point in ("name", "children", "childCount") else nullcontext()
+                with context, patch.object(self.CensusNode, "__getitem__", getitem) if point == "entry" else nullcontext():
+                    native.click("Reload")
+                target.queryAction.return_value.doAction.assert_called_once_with(0)
+                foreign.queryAction.assert_not_called()
+
+    def test_linux_click_action_metadata_not_implemented_does_not_activate(self):
+        from unittest.mock import PropertyMock
+        native, desktop, owned, target, foreign = self.linux_click_fixture()
+        stale = self.CensusNode(name="Reload")
+        stale.queryAction = Mock(return_value=Mock())
+        type(stale.queryAction.return_value).nActions = PropertyMock(side_effect=NotImplementedError)
+        owned.children.append(stale)
+        owned.childCount += 1
+        native.click("Reload")
+        stale.queryAction.return_value.doAction.assert_not_called()
+        target.queryAction.return_value.doAction.assert_called_once_with(0)
+
+    def test_linux_click_rejects_foreign_namesake_without_owned_target(self):
+        native, desktop, owned, target, foreign = self.linux_click_fixture()
+        owned.children, owned.childCount = [], 0
+        for entries in ([foreign, owned], []):
+            desktop.children, desktop.childCount = entries, len(entries)
+            with self.assertRaisesRegex(AssertionError, "No invokable accessibility control"):
+                native.click("Reload")
+        target.queryAction.assert_not_called()
+        foreign.queryAction.assert_not_called()
+
+    def test_linux_click_keeps_discovered_targets_when_children_shrink(self):
+        for level in ("desktop", "owned"):
+            with self.subTest(level=level):
+                native, desktop, owned, target, foreign = self.linux_click_fixture()
+                desktop.children = [owned, foreign]
+                owned.children.append(self.CensusNode())
+                owned.childCount += 1
+                parent = desktop if level == "desktop" else owned
+                original_getitem = self.CensusNode.__getitem__
+                def getitem(node, index):
+                    if node is parent and index == 1:
+                        raise IndexError("collection shrank")
+                    return original_getitem(node, index)
+                with patch.object(self.CensusNode, "__getitem__", getitem):
+                    native.click("Reload")
+                target.queryAction.return_value.doAction.assert_called_once_with(0)
+
+    def test_linux_menu_action_does_not_retry_uncertain_activation(self):
+        native, desktop, owned, target, foreign = self.linux_click_fixture()
+        more = self.CensusNode(name="More")
+        more.queryAction = Mock(return_value=Mock(nActions=1, doAction=Mock(return_value=True)))
+        owned.children.append(more)
+        owned.childCount += 1
+        target.queryAction.return_value.doAction.side_effect = native.accessibility_error("uncertain activation")
+        with self.assertRaises(native.accessibility_error):
+            menu_action(native, "Reload")
+        more.queryAction.return_value.doAction.assert_called_once_with(0)
+        target.queryAction.return_value.doAction.assert_called_once_with(0)
+        foreign.queryAction.assert_not_called()
 
     def census_commands(self, argv):
         rows = {("ps", "-eo", "pid=,ppid="): "100 1\n200 100\n300 200\n999 1\n",
@@ -2755,6 +2939,12 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(native.click.call_args_list, [call("More"), call("Reload")])
         with self.assertRaises(ValueError):
             menu_action(native, "Search references")
+        for error in (AssertionError(), RuntimeError(), subprocess.CalledProcessError(1, "synthetic")):
+            native.click.reset_mock()
+            native.click.side_effect = [None, error, None]
+            with patch("time.sleep"):
+                menu_action(native, "Reload")
+            self.assertEqual(native.click.call_args_list, [call("More"), call("Reload"), call("Reload")])
 
     class MenuKeyboardModel:
         """Native keys own the input; accessibility can focus its active option."""
