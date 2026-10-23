@@ -1,0 +1,2356 @@
+{
+  "sha": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+  "browser": "155.0.8059.85",
+  "cases": 140,
+  "qualification": "Chrome on macOS; synthetic gallery with injected native-mode datasets and emulated media. Before removes only the two candidate CSS guard rules from the same built gallery; all other runtime/style blobs equal base 22366289. Not OS or native material acceptance.",
+  "results": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      },
+      "baseline": {
+        "fill": "rgba(246, 246, 248, 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      },
+      "baseline": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "color(srgb 0.988235 0.988235 0.992157 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "color(srgb 0.988235 0.988235 0.992157 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "color(srgb 0.988235 0.988235 0.992157 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      },
+      "baseline": {
+        "fill": "color(srgb 0.988235 0.988235 0.992157 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "color(srgb 0.988235 0.988235 0.992157 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      },
+      "baseline": {
+        "fill": "color(srgb 0.988235 0.988235 0.992157 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      },
+      "baseline": {
+        "fill": "color(srgb 0.988235 0.988235 0.992157 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(252, 252, 253)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      },
+      "baseline": {
+        "fill": "color(srgb 0.988235 0.988235 0.992157 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      },
+      "baseline": {
+        "fill": "rgba(40, 40, 44, 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      },
+      "baseline": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "color(srgb 0.141176 0.141176 0.14902 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "color(srgb 0.141176 0.141176 0.14902 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "color(srgb 0.141176 0.141176 0.14902 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      },
+      "baseline": {
+        "fill": "color(srgb 0.141176 0.141176 0.14902 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "color(srgb 0.141176 0.141176 0.14902 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      },
+      "baseline": {
+        "fill": "color(srgb 0.141176 0.141176 0.14902 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      },
+      "baseline": {
+        "fill": "color(srgb 0.141176 0.141176 0.14902 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(36, 36, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      },
+      "baseline": {
+        "fill": "color(srgb 0.141176 0.141176 0.14902 / 0.94)",
+        "backdrop": "blur(30px) saturate(1.8)",
+        "surface": "light-dark(#fcfcfd,#242426)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "absent",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "absent",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "vibrancy",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "vibrancy",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "liquid-glass",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 244.28125,
+          "height": 358
+        }
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "liquid-glass",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(249, 249, 249)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(243, 243, 243)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(249, 249, 249)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(243, 243, 243)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(243, 243, 243)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(243, 243, 243)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(243, 243, 243)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(243, 243, 243)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(44, 44, 44)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(32, 32, 32)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(44, 44, 44)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(32, 32, 32)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(32, 32, 32)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(32, 32, 32)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(32, 32, 32)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(32, 32, 32)",
+        "backdrop": "none",
+        "surface": "light-dark(#f3f3f3,#202020)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "acrylic",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 260.234375,
+          "height": 394
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "acrylic",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "light-dark(#fafafb,#222226)",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(250, 250, 251)",
+        "backdrop": "none",
+        "surface": "light-dark(#fafafb,#222226)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(250, 250, 251)",
+        "backdrop": "none",
+        "surface": "light-dark(#fafafb,#222226)",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(250, 250, 251)",
+        "backdrop": "none",
+        "surface": "light-dark(#fafafb,#222226)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(56, 56, 60)",
+        "backdrop": "none",
+        "surface": "light-dark(#fafafb,#222226)",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "normal",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(34, 34, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fafafb,#222226)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(34, 34, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fafafb,#222226)",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "reduce",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(34, 34, 38)",
+        "backdrop": "none",
+        "surface": "light-dark(#fafafb,#222226)",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "contrast",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(18, 18, 18)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "forced",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(0, 0, 0)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "menu-open",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 264.234375,
+          "height": 392
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "preference": "gallery",
+      "mode": "opaque",
+      "state": "keys",
+      "current": {
+        "fill": "rgb(255, 255, 255)",
+        "backdrop": "none",
+        "surface": "Canvas",
+        "bounds": {
+          "width": 576,
+          "height": 448
+        }
+      }
+    }
+  ]
+}
