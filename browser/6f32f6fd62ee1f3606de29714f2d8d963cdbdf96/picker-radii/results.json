@@ -1,0 +1,569 @@
+{
+  "source": "6f32f6fd62ee1f3606de29714f2d8d963cdbdf96",
+  "baselineRuntime": "b083465a0872acfb566021aa53476637503a96b2",
+  "baselineBuild": "89c80ceb6dbae308bd2b70dda83e390b02247a97 (verified identical frontend blobs)",
+  "qualification": "Chrome-on-macOS synthetic platform looks; not native captures or native silhouette measurements.",
+  "negativeControl": "Former Mac popup radius override fails the same computed-radius assertion.",
+  "results": [
+    {
+      "platform": "macos",
+      "text": "normal",
+      "state": "compact",
+      "theme": "light",
+      "radii": {
+        "window": 16,
+        "row": 8,
+        "tile": 6,
+        "field": 8,
+        "control": 8,
+        "popup": 8
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "state": "many-results",
+      "theme": "light",
+      "radii": {
+        "window": 16,
+        "row": 8,
+        "tile": 6,
+        "field": 8,
+        "control": 8,
+        "popup": 8
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "macos",
+      "text": "normal",
+      "state": "spacious",
+      "theme": "dark",
+      "radii": {
+        "window": 16,
+        "row": 8,
+        "tile": 6,
+        "field": 8,
+        "control": 8,
+        "popup": 8
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "state": "compact",
+      "theme": "light",
+      "radii": {
+        "window": 16,
+        "row": 8,
+        "tile": 6,
+        "field": 8,
+        "control": 8,
+        "popup": 8
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "state": "many-results",
+      "theme": "light",
+      "radii": {
+        "window": 16,
+        "row": 8,
+        "tile": 6,
+        "field": 8,
+        "control": 8,
+        "popup": 8
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "state": "spacious",
+      "theme": "dark",
+      "radii": {
+        "window": 16,
+        "row": 8,
+        "tile": 6,
+        "field": 8,
+        "control": 8,
+        "popup": 8
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "state": "many-results",
+      "theme": "dark",
+      "media": "contrast",
+      "rtl": true,
+      "touch": true,
+      "radii": {
+        "window": 16,
+        "row": 8,
+        "tile": 6,
+        "field": 8,
+        "control": 8,
+        "popup": 8
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "macos",
+      "text": "large",
+      "state": "many-results",
+      "theme": "dark",
+      "media": "forced",
+      "rtl": true,
+      "touch": true,
+      "radii": {
+        "window": 16,
+        "row": 8,
+        "tile": 6,
+        "field": 8,
+        "control": 8,
+        "popup": 8
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "state": "compact",
+      "theme": "light",
+      "radii": {
+        "window": 8,
+        "row": 4,
+        "tile": 4,
+        "field": 4,
+        "control": 4,
+        "popup": 4
+      },
+      "menu": 8,
+      "item": 4,
+      "padding": 4
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "state": "many-results",
+      "theme": "light",
+      "radii": {
+        "window": 8,
+        "row": 4,
+        "tile": 4,
+        "field": 4,
+        "control": 4,
+        "popup": 4
+      },
+      "menu": 8,
+      "item": 4,
+      "padding": 4
+    },
+    {
+      "platform": "windows",
+      "text": "normal",
+      "state": "spacious",
+      "theme": "dark",
+      "radii": {
+        "window": 8,
+        "row": 4,
+        "tile": 4,
+        "field": 4,
+        "control": 4,
+        "popup": 4
+      },
+      "menu": 8,
+      "item": 4,
+      "padding": 4
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "state": "compact",
+      "theme": "light",
+      "radii": {
+        "window": 8,
+        "row": 4,
+        "tile": 4,
+        "field": 4,
+        "control": 4,
+        "popup": 4
+      },
+      "menu": 8,
+      "item": 4,
+      "padding": 4
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "state": "many-results",
+      "theme": "light",
+      "radii": {
+        "window": 8,
+        "row": 4,
+        "tile": 4,
+        "field": 4,
+        "control": 4,
+        "popup": 4
+      },
+      "menu": 8,
+      "item": 4,
+      "padding": 4
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "state": "spacious",
+      "theme": "dark",
+      "radii": {
+        "window": 8,
+        "row": 4,
+        "tile": 4,
+        "field": 4,
+        "control": 4,
+        "popup": 4
+      },
+      "menu": 8,
+      "item": 4,
+      "padding": 4
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "state": "many-results",
+      "theme": "dark",
+      "media": "contrast",
+      "rtl": true,
+      "touch": true,
+      "radii": {
+        "window": 8,
+        "row": 4,
+        "tile": 4,
+        "field": 4,
+        "control": 4,
+        "popup": 4
+      },
+      "menu": 8,
+      "item": 4,
+      "padding": 4
+    },
+    {
+      "platform": "windows",
+      "text": "large",
+      "state": "many-results",
+      "theme": "dark",
+      "media": "forced",
+      "rtl": true,
+      "touch": true,
+      "radii": {
+        "window": 8,
+        "row": 4,
+        "tile": 4,
+        "field": 4,
+        "control": 4,
+        "popup": 4
+      },
+      "menu": 8,
+      "item": 4,
+      "padding": 4
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "state": "compact",
+      "theme": "light",
+      "radii": {
+        "window": 15,
+        "row": 7,
+        "tile": 6,
+        "field": 7,
+        "control": 6,
+        "popup": 6
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "state": "many-results",
+      "theme": "light",
+      "radii": {
+        "window": 15,
+        "row": 7,
+        "tile": 6,
+        "field": 7,
+        "control": 6,
+        "popup": 6
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "linux",
+      "text": "normal",
+      "state": "spacious",
+      "theme": "dark",
+      "radii": {
+        "window": 15,
+        "row": 7,
+        "tile": 6,
+        "field": 7,
+        "control": 6,
+        "popup": 6
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "state": "compact",
+      "theme": "light",
+      "radii": {
+        "window": 15,
+        "row": 7,
+        "tile": 6,
+        "field": 7,
+        "control": 6,
+        "popup": 6
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "state": "many-results",
+      "theme": "light",
+      "radii": {
+        "window": 15,
+        "row": 7,
+        "tile": 6,
+        "field": 7,
+        "control": 6,
+        "popup": 6
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "state": "spacious",
+      "theme": "dark",
+      "radii": {
+        "window": 15,
+        "row": 7,
+        "tile": 6,
+        "field": 7,
+        "control": 6,
+        "popup": 6
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "state": "many-results",
+      "theme": "dark",
+      "media": "contrast",
+      "rtl": true,
+      "touch": true,
+      "radii": {
+        "window": 15,
+        "row": 7,
+        "tile": 6,
+        "field": 7,
+        "control": 6,
+        "popup": 6
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    },
+    {
+      "platform": "linux",
+      "text": "large",
+      "state": "many-results",
+      "theme": "dark",
+      "media": "forced",
+      "rtl": true,
+      "touch": true,
+      "radii": {
+        "window": 15,
+        "row": 7,
+        "tile": 6,
+        "field": 7,
+        "control": 6,
+        "popup": 6
+      },
+      "menu": 12,
+      "item": 6,
+      "padding": 6
+    }
+  ],
+  "frames": [
+    {
+      "label": "before",
+      "platform": "macos",
+      "theme": "light",
+      "radii": {
+        "#search": "6px",
+        ".result-tile": "6px",
+        ".toolbar-menu-button": "16px",
+        ".pin-button": "8px"
+      }
+    },
+    {
+      "label": "before",
+      "platform": "macos",
+      "theme": "dark",
+      "radii": {
+        "#search": "6px",
+        ".result-tile": "6px",
+        ".toolbar-menu-button": "16px",
+        ".pin-button": "8px"
+      }
+    },
+    {
+      "label": "before",
+      "platform": "windows",
+      "theme": "light",
+      "radii": {
+        "#search": "4px",
+        ".result-tile": "4px",
+        ".toolbar-menu-button": "4px",
+        ".pin-button": "4px"
+      }
+    },
+    {
+      "label": "before",
+      "platform": "windows",
+      "theme": "dark",
+      "radii": {
+        "#search": "4px",
+        ".result-tile": "4px",
+        ".toolbar-menu-button": "4px",
+        ".pin-button": "4px"
+      }
+    },
+    {
+      "label": "before",
+      "platform": "linux",
+      "theme": "light",
+      "radii": {
+        "#search": "7px",
+        ".result-tile": "6px",
+        ".toolbar-menu-button": "6px",
+        ".pin-button": "6px"
+      }
+    },
+    {
+      "label": "before",
+      "platform": "linux",
+      "theme": "dark",
+      "radii": {
+        "#search": "7px",
+        ".result-tile": "6px",
+        ".toolbar-menu-button": "6px",
+        ".pin-button": "6px"
+      }
+    },
+    {
+      "label": "after",
+      "platform": "macos",
+      "theme": "light",
+      "radii": {
+        "#search": "8px",
+        ".result-tile": "6px",
+        ".toolbar-menu-button": "8px",
+        ".pin-button": "8px"
+      }
+    },
+    {
+      "label": "after",
+      "platform": "macos",
+      "theme": "dark",
+      "radii": {
+        "#search": "8px",
+        ".result-tile": "6px",
+        ".toolbar-menu-button": "8px",
+        ".pin-button": "8px"
+      }
+    },
+    {
+      "label": "after",
+      "platform": "windows",
+      "theme": "light",
+      "radii": {
+        "#search": "4px",
+        ".result-tile": "4px",
+        ".toolbar-menu-button": "4px",
+        ".pin-button": "4px"
+      }
+    },
+    {
+      "label": "after",
+      "platform": "windows",
+      "theme": "dark",
+      "radii": {
+        "#search": "4px",
+        ".result-tile": "4px",
+        ".toolbar-menu-button": "4px",
+        ".pin-button": "4px"
+      }
+    },
+    {
+      "label": "after",
+      "platform": "linux",
+      "theme": "light",
+      "radii": {
+        "#search": "7px",
+        ".result-tile": "6px",
+        ".toolbar-menu-button": "6px",
+        ".pin-button": "6px"
+      }
+    },
+    {
+      "label": "after",
+      "platform": "linux",
+      "theme": "dark",
+      "radii": {
+        "#search": "7px",
+        ".result-tile": "6px",
+        ".toolbar-menu-button": "6px",
+        ".pin-button": "6px"
+      }
+    }
+  ]
+}
