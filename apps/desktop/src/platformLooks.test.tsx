@@ -45,6 +45,7 @@ test("the search header is the 48–56 px search bar, not an 80 px block", () =>
   // The nominal control band excludes its one-pixel divider.
   expect(tokens).toMatch(/--search-bar-height:\s*calc\(var\(--field-h\) \+ 2 \* var\(--inset\)\)/);
   expect(tokens).toMatch(/--field-h:\s*2\.25rem/);
+  expect(rules(styles, ".search-bar .pin-button")).toMatch(/margin-inline-start:\s*auto/);
 });
 
 test("Windows and Linux search in a 16 px framed box; macOS stays frameless and large", () => {

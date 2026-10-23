@@ -28,7 +28,7 @@ main {
 /* Reserve readable query space before wrapping controls, at every text size. */
 .search-field { --search-clear-size: var(--control-min-size); position: relative; display: flex; flex: 1; min-width: min(var(--search-min-width), calc(100% - var(--lead) - var(--search-icon-width) - var(--lead-gap))); }
 #search { width: 100%; min-width: 0; height: var(--field-h); font-size: var(--search-size); line-height: var(--search-line); letter-spacing: var(--search-tracking); background: var(--clear); border: 0; padding: 0; outline-offset: var(--search-focus-offset); cursor: text; user-select: text; }
-.search-bar .pin-button { min-width: var(--field-h); min-height: var(--field-h); }
+.search-bar .pin-button { min-width: var(--field-h); min-height: var(--field-h); margin-inline-start: auto; }
 #search::placeholder { color: var(--muted); }
 /* The search box never shows a ring: it always has focus, and the caret is the
    cue (Windows adds its accent underline). Contrast and forced colours restore
