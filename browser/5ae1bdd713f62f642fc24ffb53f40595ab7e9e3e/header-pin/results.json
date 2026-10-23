@@ -1,0 +1,1447 @@
+{
+  "baseline": "605538cb2e096f397d4dcb166f8fdeda28392ded",
+  "candidate": "5ae1bdd713f62f642fc24ffb53f40595ab7e9e3e",
+  "environment": "Chrome on macOS; named appearance variants and touch/coarse emulation, not native OS screenshots",
+  "cases": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "coarse": false,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 64,
+          "y": 8,
+          "w": 560.75,
+          "h": 40,
+          "paddingStart": "0px"
+        },
+        "pin": null,
+        "rootFont": 16,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 64,
+          "y": 8,
+          "w": 524.75,
+          "h": 40,
+          "paddingStart": "0px"
+        },
+        "pin": {
+          "x": 680,
+          "y": 12,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 64,
+          "y": 8,
+          "w": 524.75,
+          "h": 40,
+          "paddingStart": "0px"
+        },
+        "pin": {
+          "x": 680,
+          "y": 12,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "rgba(0, 0, 0, 0.13)",
+        "color": "rgb(22, 24, 29)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(22, 24, 29)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(22, 24, 29)"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "coarse": true,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 277.25,
+          "h": 55.1875,
+          "paddingStart": "0px"
+        },
+        "pin": null,
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 277.25,
+          "h": 55.1875,
+          "paddingStart": "0px"
+        },
+        "pin": {
+          "x": 201.0625,
+          "y": 68.96875,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 277.25,
+          "h": 55.1875,
+          "paddingStart": "0px"
+        },
+        "pin": {
+          "x": 201.0625,
+          "y": 68.96875,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "rgba(0, 0, 0, 0.13)",
+        "color": "rgb(22, 24, 29)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(22, 24, 29)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(22, 24, 29)"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "coarse": false,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 64,
+          "y": 8,
+          "w": 560.75,
+          "h": 40,
+          "paddingStart": "0px"
+        },
+        "pin": null,
+        "rootFont": 16,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 64,
+          "y": 8,
+          "w": 524.75,
+          "h": 40,
+          "paddingStart": "0px"
+        },
+        "pin": {
+          "x": 680,
+          "y": 12,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 64,
+          "y": 8,
+          "w": 524.75,
+          "h": 40,
+          "paddingStart": "0px"
+        },
+        "pin": {
+          "x": 680,
+          "y": 12,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "rgba(255, 255, 255, 0.18)",
+        "color": "rgb(245, 245, 247)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(245, 245, 247)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(245, 245, 247)"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "coarse": true,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 277.25,
+          "h": 55.1875,
+          "paddingStart": "0px"
+        },
+        "pin": null,
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 277.25,
+          "h": 55.1875,
+          "paddingStart": "0px"
+        },
+        "pin": {
+          "x": 201.0625,
+          "y": 68.96875,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 277.25,
+          "h": 55.1875,
+          "paddingStart": "0px"
+        },
+        "pin": {
+          "x": 201.0625,
+          "y": 68.96875,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "rgba(255, 255, 255, 0.18)",
+        "color": "rgb(245, 245, 247)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(245, 245, 247)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(245, 245, 247)"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "coarse": false,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 22,
+          "y": 14,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 4,
+          "y": 4,
+          "w": 620.75,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": null,
+        "rootFont": 16,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 22,
+          "y": 14,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 4,
+          "y": 4,
+          "w": 584.75,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": {
+          "x": 684,
+          "y": 8,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 22,
+          "y": 14,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 4,
+          "y": 4,
+          "w": 584.75,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": {
+          "x": 684,
+          "y": 8,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "rgba(249, 249, 249, 0.3)",
+        "color": "rgb(27, 27, 27)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(27, 27, 27)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(27, 27, 27)"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "coarse": true,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 311.71875,
+          "y": 20.6875,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 4.59375,
+          "y": 4.59375,
+          "w": 350.828125,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": null,
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 311.71875,
+          "y": 20.6875,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 4.59375,
+          "y": 4.59375,
+          "w": 350.828125,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": {
+          "x": 201.046875,
+          "y": 64.375,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 311.71875,
+          "y": 20.6875,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 4.59375,
+          "y": 4.59375,
+          "w": 350.828125,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": {
+          "x": 201.046875,
+          "y": 64.375,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "rgba(249, 249, 249, 0.3)",
+        "color": "rgb(27, 27, 27)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(27, 27, 27)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(27, 27, 27)"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "coarse": false,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 22,
+          "y": 14,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 4,
+          "y": 4,
+          "w": 620.75,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": null,
+        "rootFont": 16,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 22,
+          "y": 14,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 4,
+          "y": 4,
+          "w": 584.75,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": {
+          "x": 684,
+          "y": 8,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 22,
+          "y": 14,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 4,
+          "y": 4,
+          "w": 584.75,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": {
+          "x": 684,
+          "y": 8,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "rgba(255, 255, 255, 0.03)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "coarse": true,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 311.71875,
+          "y": 20.6875,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 4.59375,
+          "y": 4.59375,
+          "w": 350.828125,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": null,
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 311.71875,
+          "y": 20.6875,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 4.59375,
+          "y": 4.59375,
+          "w": 350.828125,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": {
+          "x": 201.046875,
+          "y": 64.375,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 311.71875,
+          "y": 20.6875,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 4.59375,
+          "y": 4.59375,
+          "w": 350.828125,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": {
+          "x": 201.046875,
+          "y": 64.375,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "rgba(255, 255, 255, 0.03)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "coarse": false,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 8,
+          "y": 8,
+          "w": 605.953125,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": null,
+        "rootFont": 16,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 8,
+          "y": 8,
+          "w": 569.953125,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": {
+          "x": 680,
+          "y": 12,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 8,
+          "y": 8,
+          "w": 569.953125,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": {
+          "x": 680,
+          "y": 12,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "color(srgb 0.196078 0.196078 0.211765 / 0.3)",
+        "color": "rgb(50, 50, 54)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(50, 50, 54)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(50, 50, 54)"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "coarse": true,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 341.640625,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": null,
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 341.640625,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": {
+          "x": 188.65625,
+          "y": 68.96875,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 341.640625,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": {
+          "x": 188.65625,
+          "y": 68.96875,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "color(srgb 0.196078 0.196078 0.211765 / 0.3)",
+        "color": "rgb(50, 50, 54)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(50, 50, 54)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(50, 50, 54)"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "coarse": false,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 8,
+          "y": 8,
+          "w": 605.953125,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": null,
+        "rootFont": 16,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 8,
+          "y": 8,
+          "w": 569.953125,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": {
+          "x": 680,
+          "y": 12,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 26,
+          "y": 18,
+          "w": 20,
+          "h": 20
+        },
+        "input": {
+          "x": 8,
+          "y": 8,
+          "w": 569.953125,
+          "h": 40,
+          "paddingStart": "55px"
+        },
+        "pin": {
+          "x": 680,
+          "y": 12,
+          "w": 32,
+          "h": 32
+        },
+        "rootFont": 16,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "color(srgb 1 1 1 / 0.3)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "coarse": true,
+      "pass": true,
+      "before": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 341.640625,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": null,
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": null,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control"
+        ]
+      },
+      "off": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 341.640625,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": {
+          "x": 188.65625,
+          "y": 68.96875,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "on": {
+        "glyph": {
+          "x": 307.125,
+          "y": 25.28125,
+          "w": 23,
+          "h": 23
+        },
+        "input": {
+          "x": 9.1875,
+          "y": 9.1875,
+          "w": 341.640625,
+          "h": 55.1875,
+          "paddingStart": "63.4px"
+        },
+        "pin": {
+          "x": 188.65625,
+          "y": 68.96875,
+          "w": 50.59375,
+          "h": 50.59375
+        },
+        "rootFont": 18.4,
+        "overflow": false,
+        "owned": true,
+        "headerOrder": [
+          "",
+          "visually-hidden",
+          "search-field",
+          "toolbar-menu-control",
+          "ui-button pin-button"
+        ]
+      },
+      "selected": {
+        "background": "color(srgb 1 1 1 / 0.3)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "none",
+        "outlineWidth": "3px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "forced": true,
+      "pass": true,
+      "pressed": {
+        "background": "rgb(255, 255, 255)",
+        "color": "rgb(0, 0, 0)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(0, 0, 0)",
+        "selected": false,
+        "pressed": true,
+        "hovered": false,
+        "glyphFill": "none"
+      },
+      "on": {
+        "background": "rgba(255, 255, 255, 0.13)",
+        "color": "rgb(0, 0, 0)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(0, 0, 0)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "forced": true,
+      "pass": true,
+      "pressed": {
+        "background": "rgb(0, 0, 0)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": false,
+        "pressed": true,
+        "hovered": false,
+        "glyphFill": "none"
+      },
+      "on": {
+        "background": "rgba(0, 0, 0, 0.18)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "forced": true,
+      "pass": true,
+      "pressed": {
+        "background": "rgba(255, 255, 255, 0.03)",
+        "color": "rgb(0, 0, 0)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(0, 0, 0)",
+        "selected": false,
+        "pressed": true,
+        "hovered": false,
+        "glyphFill": "none"
+      },
+      "on": {
+        "background": "rgba(255, 255, 255, 0.3)",
+        "color": "rgb(0, 0, 0)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(0, 0, 0)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "forced": true,
+      "pass": true,
+      "pressed": {
+        "background": "rgba(0, 0, 0, 0.03)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": false,
+        "pressed": true,
+        "hovered": false,
+        "glyphFill": "none"
+      },
+      "on": {
+        "background": "rgba(0, 0, 0, 0.03)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "forced": true,
+      "pass": true,
+      "pressed": {
+        "background": "rgb(255, 255, 255)",
+        "color": "rgb(0, 0, 0)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(0, 0, 0)",
+        "selected": false,
+        "pressed": true,
+        "hovered": false,
+        "glyphFill": "none"
+      },
+      "on": {
+        "background": "rgba(255, 255, 255, 0.3)",
+        "color": "rgb(0, 0, 0)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(0, 0, 0)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "forced": true,
+      "pass": true,
+      "pressed": {
+        "background": "rgb(0, 0, 0)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": false,
+        "pressed": true,
+        "hovered": false,
+        "glyphFill": "none"
+      },
+      "on": {
+        "background": "rgba(0, 0, 0, 0.3)",
+        "color": "rgb(255, 255, 255)",
+        "accent": "AccentColor",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(255, 255, 255)",
+        "selected": true,
+        "pressed": false,
+        "hovered": false,
+        "glyphFill": "rgb(255, 255, 255)"
+      }
+    }
+  ]
+}
