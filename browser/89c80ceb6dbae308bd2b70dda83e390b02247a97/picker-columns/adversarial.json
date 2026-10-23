@@ -1,0 +1,2354 @@
+[
+  {
+    "platform": "macos",
+    "direction": "ltr",
+    "variant": "narrow-fine",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 102.015625,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "macos",
+    "direction": "ltr",
+    "variant": "narrow-coarse",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 102.015625,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "macos",
+    "direction": "ltr",
+    "variant": "dark",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "macos",
+    "direction": "ltr",
+    "variant": "forced",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "0px",
+      "searchOutline": "2px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "macos",
+    "direction": "rtl",
+    "variant": "narrow-fine",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 102.015625,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "macos",
+    "direction": "rtl",
+    "variant": "narrow-coarse",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 102.015625,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "macos",
+    "direction": "rtl",
+    "variant": "dark",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "macos",
+    "direction": "rtl",
+    "variant": "forced",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "0px",
+      "searchOutline": "2px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "windows",
+    "direction": "ltr",
+    "variant": "narrow-fine",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 80.53125,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "rgb(0, 117, 255) 0px -2px 0px 0px inset, color(srgb 0.272353 0.272353 0.286078) 0px 0px 0px 1px inset"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "windows",
+    "direction": "ltr",
+    "variant": "narrow-coarse",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 80.53125,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "rgb(0, 117, 255) 0px -2px 0px 0px inset, color(srgb 0.272353 0.272353 0.286078) 0px 0px 0px 1px inset"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "windows",
+    "direction": "ltr",
+    "variant": "dark",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "rgb(0, 117, 255) 0px -2px 0px 0px inset, color(srgb 0.272353 0.272353 0.286078) 0px 0px 0px 1px inset"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "windows",
+    "direction": "ltr",
+    "variant": "forced",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "0px",
+      "searchOutline": "2px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "windows",
+    "direction": "rtl",
+    "variant": "narrow-fine",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 80.53125,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "rgb(0, 117, 255) 0px -2px 0px 0px inset, color(srgb 0.272353 0.272353 0.286078) 0px 0px 0px 1px inset"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "windows",
+    "direction": "rtl",
+    "variant": "narrow-coarse",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 80.53125,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "rgb(0, 117, 255) 0px -2px 0px 0px inset, color(srgb 0.272353 0.272353 0.286078) 0px 0px 0px 1px inset"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "windows",
+    "direction": "rtl",
+    "variant": "dark",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "0px",
+      "searchOutline": "3px",
+      "searchShadow": "rgb(0, 117, 255) 0px -2px 0px 0px inset, color(srgb 0.272353 0.272353 0.286078) 0px 0px 0px 1px inset"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "windows",
+    "direction": "rtl",
+    "variant": "forced",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "0px",
+      "searchOutline": "2px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "linux",
+    "direction": "ltr",
+    "variant": "narrow-fine",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 80.53125,
+      "searchBorder": "1px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "linux",
+    "direction": "ltr",
+    "variant": "narrow-coarse",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 80.53125,
+      "searchBorder": "1px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "linux",
+    "direction": "ltr",
+    "variant": "dark",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "1px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "linux",
+    "direction": "ltr",
+    "variant": "forced",
+    "columns": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "1px",
+      "searchOutline": "2px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "linux",
+    "direction": "rtl",
+    "variant": "narrow-fine",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 80.53125,
+      "searchBorder": "1px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "linux",
+    "direction": "rtl",
+    "variant": "narrow-coarse",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": true,
+      "wordsWidth": 80.53125,
+      "searchBorder": "1px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "linux",
+    "direction": "rtl",
+    "variant": "dark",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "1px",
+      "searchOutline": "3px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  },
+  {
+    "platform": "linux",
+    "direction": "rtl",
+    "variant": "forced",
+    "columns": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ],
+    "facts": {
+      "overlap": false,
+      "owner": true,
+      "statusCompact": false,
+      "wordsWidth": 177.0625,
+      "searchBorder": "1px",
+      "searchOutline": "2px",
+      "searchShadow": "none"
+    },
+    "query": "memoryb"
+  }
+]

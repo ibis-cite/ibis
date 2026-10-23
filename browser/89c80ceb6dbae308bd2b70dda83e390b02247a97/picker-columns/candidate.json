@@ -1,0 +1,4214 @@
+[
+  {
+    "platform": "macos",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 58,
+      "footer": 40,
+      "searchBand": 52,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 36,
+      "pinHeight": 36,
+      "popupHeight": 28,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "compact",
+    "values": {
+      "rowHeight": 40,
+      "footer": 40,
+      "searchBand": 52,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 36,
+      "pinHeight": 36,
+      "popupHeight": 28,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 76,
+      "footer": 40,
+      "searchBand": 52,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 36,
+      "pinHeight": 36,
+      "popupHeight": 28,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 58,
+      "footer": 40,
+      "searchBand": 52,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 36,
+      "pinHeight": 36,
+      "popupHeight": 28,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "compact",
+    "values": {
+      "rowHeight": 40,
+      "footer": 40,
+      "searchBand": 52,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 36,
+      "pinHeight": 36,
+      "popupHeight": 28,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 76,
+      "footer": 40,
+      "searchBand": 52,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 36,
+      "pinHeight": 36,
+      "popupHeight": 28,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "large",
+    "direction": "ltr",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 66.6875,
+      "footer": 46,
+      "searchBand": 59.796875,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 41.390625,
+      "pinHeight": 41.390625,
+      "popupHeight": 32.1875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.5625,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "large",
+    "direction": "ltr",
+    "density": "compact",
+    "values": {
+      "rowHeight": 46,
+      "footer": 46,
+      "searchBand": 59.796875,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 41.390625,
+      "pinHeight": 41.390625,
+      "popupHeight": 32.1875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.375,
+      "textX": 73.5625,
+      "titleX": 73.5625,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.375,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.5625,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "large",
+    "direction": "ltr",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 87.390625,
+      "footer": 46,
+      "searchBand": 59.796875,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 41.390625,
+      "pinHeight": 41.390625,
+      "popupHeight": 32.1875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.5625,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "large",
+    "direction": "rtl",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 66.6875,
+      "footer": 46,
+      "searchBand": 59.796875,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 41.390625,
+      "pinHeight": 41.390625,
+      "popupHeight": 32.1875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.5625,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "large",
+    "direction": "rtl",
+    "density": "compact",
+    "values": {
+      "rowHeight": 46,
+      "footer": 46,
+      "searchBand": 59.796875,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 41.390625,
+      "pinHeight": 41.390625,
+      "popupHeight": 32.1875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.375,
+      "textX": 73.5625,
+      "titleX": 73.5625,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.375,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.5625,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "macos",
+    "text": "large",
+    "direction": "rtl",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 87.390625,
+      "footer": 46,
+      "searchBand": 59.796875,
+      "headerDivider": 1,
+      "footerDivider": 0,
+      "fieldHeight": 41.390625,
+      "pinHeight": 41.390625,
+      "popupHeight": 32.1875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.5625,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 12,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "macos",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.578125,
+        "measured": 73.5625,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 58,
+      "footer": 41,
+      "searchBand": 48,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 32,
+      "pinHeight": 32,
+      "popupHeight": 32,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "compact",
+    "values": {
+      "rowHeight": 40,
+      "footer": 41,
+      "searchBand": 48,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 32,
+      "pinHeight": 32,
+      "popupHeight": 32,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 76,
+      "footer": 41,
+      "searchBand": 48,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 32,
+      "pinHeight": 32,
+      "popupHeight": 32,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 58,
+      "footer": 41,
+      "searchBand": 48,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 32,
+      "pinHeight": 32,
+      "popupHeight": 32,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "compact",
+    "values": {
+      "rowHeight": 40,
+      "footer": 41,
+      "searchBand": 48,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 32,
+      "pinHeight": 32,
+      "popupHeight": 32,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 76,
+      "footer": 41,
+      "searchBand": 48,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 32,
+      "pinHeight": 32,
+      "popupHeight": 32,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "large",
+    "direction": "ltr",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 66.6875,
+      "footer": 47,
+      "searchBand": 55.1875,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 36.796875,
+      "pinHeight": 36.796875,
+      "popupHeight": 36.796875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.1875,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.571875,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "large",
+    "direction": "ltr",
+    "density": "compact",
+    "values": {
+      "rowHeight": 46,
+      "footer": 47,
+      "searchBand": 55.1875,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 36.796875,
+      "pinHeight": 36.796875,
+      "popupHeight": 36.796875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.1875,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.375,
+      "textX": 73.571875,
+      "titleX": 73.5625,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.375,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.5625,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "large",
+    "direction": "ltr",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 87.390625,
+      "footer": 47,
+      "searchBand": 55.1875,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 36.796875,
+      "pinHeight": 36.796875,
+      "popupHeight": 36.796875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.1875,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.571875,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "large",
+    "direction": "rtl",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 66.6875,
+      "footer": 47,
+      "searchBand": 55.1875,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 36.796875,
+      "pinHeight": 36.796875,
+      "popupHeight": 36.796875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.1875,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.571875,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "large",
+    "direction": "rtl",
+    "density": "compact",
+    "values": {
+      "rowHeight": 46,
+      "footer": 47,
+      "searchBand": 55.1875,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 36.796875,
+      "pinHeight": 36.796875,
+      "popupHeight": 36.796875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.1875,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.375,
+      "textX": 73.571875,
+      "titleX": 73.5625,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.375,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.5625,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "windows",
+    "text": "large",
+    "direction": "rtl",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 87.390625,
+      "footer": 47,
+      "searchBand": 55.1875,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 36.796875,
+      "pinHeight": 36.796875,
+      "popupHeight": 36.796875,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.1875,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.571875,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.578125,
+      "rWin": 8,
+      "rRow": 4,
+      "rField": 4,
+      "rTile": 4
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "windows",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 58,
+      "footer": 41,
+      "searchBand": 50,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 34,
+      "pinHeight": 34,
+      "popupHeight": 34,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 15,
+      "rRow": 7,
+      "rField": 7,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "compact",
+    "values": {
+      "rowHeight": 40,
+      "footer": 41,
+      "searchBand": 50,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 34,
+      "pinHeight": 34,
+      "popupHeight": 34,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 15,
+      "rRow": 7,
+      "rField": 7,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "normal",
+    "direction": "ltr",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 76,
+      "footer": 41,
+      "searchBand": 50,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 34,
+      "pinHeight": 34,
+      "popupHeight": 34,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "ltr",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 15,
+      "rRow": 7,
+      "rField": 7,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 58,
+      "footer": 41,
+      "searchBand": 50,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 34,
+      "pinHeight": 34,
+      "popupHeight": 34,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 15,
+      "rRow": 7,
+      "rField": 7,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "comfortable",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "compact",
+    "values": {
+      "rowHeight": 40,
+      "footer": 41,
+      "searchBand": 50,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 34,
+      "pinHeight": 34,
+      "popupHeight": 34,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 15,
+      "rRow": 7,
+      "rField": 7,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "compact",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "normal",
+    "direction": "rtl",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 76,
+      "footer": 41,
+      "searchBand": 50,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 34,
+      "pinHeight": 34,
+      "popupHeight": 34,
+      "footerAction": 24,
+      "pinTopGap": 8,
+      "pinBottomGap": 8,
+      "pinEndGap": 8,
+      "footerTopGap": 8,
+      "footerBottomGap": 8,
+      "direction": "rtl",
+      "glyphCentre": 36,
+      "tileCentre": 36,
+      "textX": 64,
+      "titleX": 64,
+      "statusDotCentre": 36,
+      "statusTextX": 64,
+      "shelfTextX": 64,
+      "rWin": 15,
+      "rRow": 7,
+      "rField": 7,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 36,
+        "measured": 36,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "normal",
+        "density": "spacious",
+        "expected": 64,
+        "measured": 64,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "large",
+    "direction": "ltr",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 66.6875,
+      "footer": 47,
+      "searchBand": 57.5,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 39.09375,
+      "pinHeight": 39.09375,
+      "popupHeight": 39.09375,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.571875,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.59375,
+      "rWin": 15,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "large",
+    "direction": "ltr",
+    "density": "compact",
+    "values": {
+      "rowHeight": 46,
+      "footer": 47,
+      "searchBand": 57.5,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 39.09375,
+      "pinHeight": 39.09375,
+      "popupHeight": 39.09375,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.375,
+      "textX": 73.571875,
+      "titleX": 73.5625,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.59375,
+      "rWin": 15,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.375,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.5625,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "large",
+    "direction": "ltr",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 87.390625,
+      "footer": 47,
+      "searchBand": 57.5,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 39.09375,
+      "pinHeight": 39.09375,
+      "popupHeight": 39.09375,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "ltr",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.571875,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.59375,
+      "rWin": 15,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "large",
+    "direction": "rtl",
+    "density": "comfortable",
+    "values": {
+      "rowHeight": 66.6875,
+      "footer": 47,
+      "searchBand": 57.5,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 39.09375,
+      "pinHeight": 39.09375,
+      "popupHeight": 39.09375,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.571875,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.59375,
+      "rWin": 15,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "comfortable",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "large",
+    "direction": "rtl",
+    "density": "compact",
+    "values": {
+      "rowHeight": 46,
+      "footer": 47,
+      "searchBand": 57.5,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 39.09375,
+      "pinHeight": 39.09375,
+      "popupHeight": 39.09375,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.375,
+      "textX": 73.571875,
+      "titleX": 73.5625,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.59375,
+      "rWin": 15,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.5625,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 41.375,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "compact",
+        "expected": 73.5625,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "platform": "linux",
+    "text": "large",
+    "direction": "rtl",
+    "density": "spacious",
+    "values": {
+      "rowHeight": 87.390625,
+      "footer": 47,
+      "searchBand": 57.5,
+      "headerDivider": 1,
+      "footerDivider": 1,
+      "fieldHeight": 39.09375,
+      "pinHeight": 39.09375,
+      "popupHeight": 39.09375,
+      "footerAction": 27.59375,
+      "pinTopGap": 9.203125,
+      "pinBottomGap": 9.203125,
+      "pinEndGap": 9.1875,
+      "footerTopGap": 9.203125,
+      "footerBottomGap": 9.203125,
+      "direction": "rtl",
+      "glyphCentre": 41.375,
+      "tileCentre": 41.3828125,
+      "textX": 73.571875,
+      "titleX": 73.578125,
+      "statusDotCentre": 41.390625,
+      "statusTextX": 73.578125,
+      "shelfTextX": 73.59375,
+      "rWin": 15,
+      "rRow": 6,
+      "rField": 6,
+      "rTile": 6
+    },
+    "rows": [
+      {
+        "name": "tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.3828125,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "status dot centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.4,
+        "measured": 41.390625,
+        "pass": true
+      },
+      {
+        "name": "row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "typed text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.571875,
+        "pass": true
+      },
+      {
+        "name": "status text x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.578125,
+        "pass": true
+      },
+      {
+        "name": "shelf citation x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.6,
+        "measured": 73.59375,
+        "pass": true
+      },
+      {
+        "name": "search glyph centre x = tile centre x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 41.3828125,
+        "measured": 41.375,
+        "pass": true
+      },
+      {
+        "name": "typed text x = row title x (RTL)",
+        "platform": "linux",
+        "text": "large",
+        "density": "spacious",
+        "expected": 73.578125,
+        "measured": 73.571875,
+        "pass": true
+      }
+    ]
+  }
+]
