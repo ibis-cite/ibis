@@ -19,27 +19,16 @@ import zlib
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "exports"
 
-# Colours. See palette() for the full set written to exports/colors.css.
-SCARLET = "#C23A1C"           # the bird on light backgrounds (Scarlet 600)
-SCARLET_DARK = "#FF7A5C"      # the bird on dark backgrounds (Scarlet 400)
-SCARLET_MID = "#CF4628"       # PNG favicons, which must work on light and dark tab bars
-GRADIENT = ("#CF4628", "#B5331A")
-GRADIENT_DARK = ("#FF7F5E", "#F2552F")
-INK, INK_DARK = "#16181D", "#F5F5F7"
-SLATE = "#4C5260"
-TILE, TILE_DARK = ("#FFFFFF", "#EFECE8"), ("#3A3A3F", "#18181B")
-PAPER = ("#FFFFFF", "#F1EEE9")
-
-# Proportions of M.
-PAD = 0.135          # free space inside a file on every side, for the soft shadow
-WORD_CAP = 0.55      # wordmark cap height
-WORD_GAP = 0.34      # beak tip to the wordmark
-CONTAINER = 0.62     # app icon, avatar and maskable icon: bird height / square
-OPTICAL = 0.5        # how far to move from the outline's centre toward its visual weight
-SMALL_NECK = 10.5    # favicon neck width (master: 8.5), so the bird reads at 16 px
-
-TAGLINE = "Find references. Copy citation keys."
-SUBLINE = "Early preview · Free and open source · Works with Zotero and BibTeX"
+# Every tunable value lives in settings.json; these names keep the code readable.
+SET = json.loads((HERE / "settings.json").read_text(encoding="utf-8"))
+C, L, D, MO, W = SET["colours"], SET["layout"], SET["depth"], SET["motion"], SET["words"]
+SCARLET, SCARLET_DARK, SCARLET_MID = C["scarlet"], C["scarlet_dark"], C["scarlet_favicon"]
+GRADIENT, GRADIENT_DARK = tuple(C["gradient"]), tuple(C["gradient_dark"])
+INK, INK_DARK, SLATE, MIST = C["ink"], C["ink_dark"], C["slate"], C["mist"]
+TILE, TILE_DARK, PAPER, NIGHT = tuple(C["tile"]), tuple(C["tile_dark"]), tuple(C["paper"]), tuple(C["night"])
+PAD, WORD_CAP, WORD_GAP, CONTAINER = L["pad"], L["word_cap"], L["word_gap"], L["container"]
+OPTICAL, LIFT, SMALL_NECK = L["optical_sideways"], L["optical_lift"], L["favicon_neck"]
+TAGLINE, SUBLINE = W["tagline"], W["subline"]
 
 
 def symbols():
@@ -64,7 +53,9 @@ def rasterize(svg):
         size, kind = struct.unpack(">I4s", data[pos:pos + 8])
         body = data[pos + 8:pos + 8 + size]
         if kind == b"IHDR":
-            width, height = struct.unpack(">II", body[:8])
+            width, height, depth, colour, _, _, interlace = struct.unpack(">IIBBBBB", body)
+            if (depth, colour, interlace) != (8, 6, 0):
+                raise SystemExit("rsvg-convert must write 8-bit RGBA PNG without interlacing")
         elif kind == b"IDAT":
             chunks.append(body)
         pos += size + 12
@@ -90,7 +81,7 @@ def rasterize(svg):
 
 
 def optical_centre(name, neck=None):
-    """The point to centre on: partway from the outline's centre to its centre of mass."""
+    """The point to centre on: the outline's centre, moved sideways toward the centre of mass."""
     (bx, by, bw, bh), body = SYM[name]
     if neck:
         body = body.replace('stroke-width="8.5"', f'stroke-width="{neck}"')
@@ -103,24 +94,35 @@ def optical_centre(name, neck=None):
         for x, a in enumerate(row):
             if a:
                 total += a
-                sx += x * a
-                sy += y * a
+                sx += (x + 0.5) * a
+                sy += (y + 0.5) * a
     mass = (bx + sx / total * bw / width, by + sy / total * bh / height)
     centre = (bx + bw / 2, by + bh / 2)
-    return tuple(c + (m - c) * OPTICAL for c, m in zip(centre, mass))
+    # Sideways, the heavy head pulls the eye left, so lean toward the mass. Vertically the head and beak
+    # already read as top-heavy, so keep the outline's centre and lift it slightly (classic optical centre).
+    return centre[0] + (mass[0] - centre[0]) * OPTICAL, centre[1]
 
 
-def depth_filter(fid):
-    """One soft light along the top rim, a shade along the bottom rim, and a short shadow."""
+def depth_filter(fid, box):
+    """One soft light along the top rim, a shade along the bottom rim, and a short shadow.
+
+    The region is fixed in the symbol's units around its whole outline, so the shadow is never cut
+    off, even mid-animation when only part of the shape is drawn.
+    """
+    bx, by, bw, bh = box
+    m = 4 * D["shadow_blur"]
     return (
-        f'<filter id="{fid}" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">'
+        f'<filter id="{fid}" filterUnits="userSpaceOnUse" x="{bx - m:g}" y="{by - m:g}" '
+        f'width="{bw + 2 * m:g}" height="{bh + 2 * m + D["shadow_drop"]:g}" color-interpolation-filters="sRGB">'
         '<feGaussianBlur in="SourceAlpha" stdDeviation="1.1" result="b"/>'
         '<feOffset in="b" dy="1.3" result="bd"/><feComposite in="SourceAlpha" in2="bd" operator="out" result="top"/>'
-        '<feFlood flood-color="#fff" flood-opacity="0.3"/><feComposite in2="top" operator="in" result="hl"/>'
+        f'<feFlood flood-color="#fff" flood-opacity="{D["rim_light"]}"/><feComposite in2="top" operator="in" result="hl"/>'
         '<feOffset in="b" dy="-1.3" result="bu"/><feComposite in="SourceAlpha" in2="bu" operator="out" result="bot"/>'
-        '<feFlood flood-color="#000" flood-opacity="0.16"/><feComposite in2="bot" operator="in" result="sh"/>'
-        '<feGaussianBlur in="SourceAlpha" stdDeviation="2" result="db"/><feOffset in="db" dy="1.6" result="do"/>'
-        '<feFlood flood-color="#4a0f04" flood-opacity="0.2"/><feComposite in2="do" operator="in" result="drop"/>'
+        f'<feFlood flood-color="#000" flood-opacity="{D["rim_shade"]}"/><feComposite in2="bot" operator="in" result="sh"/>'
+        f'<feGaussianBlur in="SourceAlpha" stdDeviation="{D["shadow_blur"]}" result="db"/>'
+        f'<feOffset in="db" dy="{D["shadow_drop"]}" result="do"/>'
+        f'<feFlood flood-color="{D["shadow_colour"]}" flood-opacity="{D["shadow_opacity"]}"/>'
+        '<feComposite in2="do" operator="in" result="drop"/>'
         '<feMerge><feMergeNode in="drop"/><feMergeNode in="SourceGraphic"/><feMergeNode in="hl"/><feMergeNode in="sh"/></feMerge>'
         "</filter>"
     )
@@ -135,7 +137,7 @@ def draw(name, k, tx, ty, paint, uid, depth=False, neck=None):
         # Gradient and filter work in the symbol's units, so depth scales with size.
         defs = (f'<linearGradient id="{uid}g" gradientUnits="userSpaceOnUse" x1="0" y1="{by - 1}" x2="0" y2="{by + bh}">'
                 f'<stop offset="0" stop-color="{top}"/><stop offset="1" stop-color="{bottom}"/></linearGradient>'
-                + depth_filter(f"{uid}f"))
+                + depth_filter(f"{uid}f", SYM[name][0]))
         paint, attr = f"url(#{uid}g)", f' filter="url(#{uid}f)"'
     if neck:
         body = body.replace('stroke-width="8.5"', f'stroke-width="{neck}"')
@@ -154,7 +156,7 @@ def centred(name, side, height, paint, uid, depth, neck=None):
     """The symbol `height` tall, its optical centre on the middle of a `side` square."""
     k = height / SYM[name][0][3]
     ox, oy = optical_centre(name, neck)
-    return draw(name, k, side / 2 - ox * k, side / 2 - oy * k, paint, uid, depth, neck)
+    return draw(name, k, side / 2 - ox * k, side / 2 - oy * k - LIFT * side, paint, uid, depth, neck)
 
 
 def fitted_side(name, pad, neck=None):
@@ -174,7 +176,7 @@ def doc(w, h, defs, body, size=None):
 
 def mark(paint, uid, depth=True):
     bh = SYM["mark"][0][3]
-    side = fitted_side("mark", PAD * bh + 1.6)       # 1.6: the shadow's drop
+    side = fitted_side("mark", PAD * bh + D["shadow_drop"])
     defs, body = centred("mark", side, bh, paint, uid, depth)
     return doc(side, side, defs, body, (512, 512))
 
@@ -211,7 +213,7 @@ def background(w, h, colours, uid, radius=0, edge=None):
 
 def app_icon(dark, uid):
     side = 1024
-    d1, b1 = background(side, side, TILE_DARK if dark else TILE, uid, 230,
+    d1, b1 = background(side, side, TILE_DARK if dark else TILE, uid, L["app_icon_radius"] * side,
                         "rgba(255,255,255,0.12)" if dark else "rgba(0,0,0,0.10)")
     d2, b2 = centred("mark", side, CONTAINER * side, GRADIENT_DARK if dark else GRADIENT, uid, True)
     return doc(side, side, d1 + d2, b1 + b2)
@@ -226,7 +228,7 @@ def square_tile(uid):
 
 
 def favicon(paint, style=""):
-    side = fitted_side("mark", 1.5, SMALL_NECK)
+    side = fitted_side("mark", 5, SMALL_NECK)      # 5 units: at least 1 px clear at 16 px
     defs, body = centred("mark", side, SYM["mark"][0][3], paint, "fv", False, SMALL_NECK)
     return doc(side, side, style + defs, body, (32, 32))
 
@@ -278,18 +280,40 @@ def palette():
     steps = {50: (0.97, 0.02), 100: (0.94, 0.04), 200: (0.88, 0.08), 300: (0.81, 0.13), 400: SCARLET_DARK,
              500: (0.64, 0.18), 600: SCARLET, 700: (0.47, 0.155), 800: (0.39, 0.125), 900: (0.30, 0.09)}
     scarlet = {k: v if isinstance(v, str) else oklch(v[0], v[1], 34) for k, v in steps.items()}
-    neutral = {"ink": INK, "slate": SLATE, "mist": "#C0C3CC", "paper": "#FFFFFF",
-               "warm-paper": PAPER[1], "night": "#141417"}
-    return {"scarlet": scarlet, "neutral": neutral}
+    # Gray leans faintly toward the ink's cool blue, more in the darks than the lights.
+    grays = {50: (0.975, 0.004), 100: (0.955, 0.005), 200: (0.91, 0.007), 300: (0.85, 0.009), 400: (0.72, 0.012),
+             500: (0.58, 0.014), 600: (0.47, 0.016), 700: (0.38, 0.016), 800: (0.29, 0.013), 850: (0.25, 0.011),
+             900: (0.21, 0.010), 950: (0.16, 0.008)}
+    gray = {k: oklch(v[0], v[1], 268) for k, v in grays.items()}
+    neutral = {"ink": INK, "slate": SLATE, "mist": MIST, "paper": "#FFFFFF",
+               "warm-paper": PAPER[1], "snow": INK_DARK}
+    themes = {
+        "light": {"bg": "#FFFFFF", "surface": gray[50], "line": gray[200], "text": INK, "muted": SLATE,
+                  "accent": SCARLET, "accent-soft": scarlet[50]},
+        "dark": {"bg": gray[950], "surface": gray[900], "line": gray[800], "text": INK_DARK, "muted": gray[300],
+                 "accent": SCARLET_DARK, "accent-soft": scarlet[900]},
+        "dim": {"bg": gray[850], "surface": gray[800], "line": gray[700], "text": INK_DARK, "muted": gray[300],
+                "accent": SCARLET_DARK, "accent-soft": scarlet[900]},
+    }
+    return {"scarlet": scarlet, "gray": gray, "neutral": neutral, "themes": themes}
 
 
 def write_palette():
     colours = palette()
     (OUT / "colors.json").write_text(json.dumps(colours, indent=2) + "\n", encoding="utf-8")
     lines = [f"  --ibis-scarlet-{k}: {v};" for k, v in colours["scarlet"].items()]
+    lines += [f"  --ibis-gray-{k}: {v};" for k, v in colours["gray"].items()]
     lines += [f"  --ibis-{k}: {v};" for k, v in colours["neutral"].items()]
-    (OUT / "colors.css").write_text("/* Ibis brand colours. Made by brand/build.py; do not edit. */\n:root {\n"
-                                    + "\n".join(lines) + "\n}\n", encoding="utf-8")
+    theme = lambda name: "".join(f"  --{k}: {v};\n" for k, v in colours["themes"][name].items())
+    css = ("/* Ibis brand colours. Made by brand/build.py; do not edit.\n"
+           "   Themes follow the system unless the page sets data-theme=\"light\", \"dark\" or \"dim\". */\n"
+           ":root {\n" + "\n".join(lines) + "\n" + theme("light") + "}\n"
+           "@media (prefers-color-scheme: dark) {\n  :root:not([data-theme]) {\n"
+           + theme("dark").replace("  --", "    --") + "  }\n}\n"
+           ":root[data-theme=\"light\"] {\n" + theme("light") + "}\n"
+           ":root[data-theme=\"dark\"] {\n" + theme("dark") + "}\n"
+           ":root[data-theme=\"dim\"] {\n" + theme("dim") + "}\n")
+    (OUT / "colors.css").write_text(css, encoding="utf-8")
 
 
 def png(svg_name, out_name, width, height=None):
@@ -310,6 +334,77 @@ def ico(svg_name, sizes):
                                6 + len(images) * 16 + len(payload))
         payload += data
     (OUT / "favicon.ico").write_bytes(struct.pack("<HHH", 0, 1, len(images)) + entries + payload)
+
+
+def motion_css():
+    t = MO
+    ease = "cubic-bezier(.2,.8,.2,1)"
+    return (
+        f".neck{{stroke-dasharray:1;stroke-dashoffset:1;opacity:0;animation:draw {t['neck_duration']}s {ease} {t['neck_start']}s forwards}}"
+        f".crown{{transform-box:fill-box;transform-origin:18% 22%;transform:rotate(-28deg) scale(.08);opacity:0;"
+        f"animation:grow {t['crown_duration']}s cubic-bezier(.2,1.25,.35,1) {t['crown_start']}s forwards}}"
+        f".word{{opacity:0;transform:translateX(-6px);animation:word {t['word_duration']}s {ease} {t['word_start']}s forwards}}"
+        "@keyframes draw{0%{opacity:0}8%{opacity:1}to{stroke-dashoffset:0;opacity:1}}"
+        "@keyframes grow{0%{opacity:0}15%{opacity:1}to{transform:none;opacity:1}}"
+        "@keyframes word{to{opacity:1;transform:none}}"
+        "@media (prefers-reduced-motion:reduce){.neck,.crown,.word{animation:none;stroke-dashoffset:0;transform:none;opacity:1}}"
+    )
+
+
+def animated_logo(dark, uid):
+    """The logo drawing itself in about 1.5 s: the neck rises, the head and beak grow out as one shape,
+    then the wordmark slides in."""
+    svg = logo(dark, uid)
+    svg = svg.replace('<path d="M36', '<path class="neck" pathLength="1" d="M36', 1)
+    # Head and beak share one group so they grow from the head's centre together, never apart.
+    svg = re.sub(r'(<path d="M41 25[^"]*"[^>]*/>)(<circle [^>]*/>)', r'<g class="crown">\1\2</g>', svg, count=1)
+    head, word = svg.rsplit("<g transform=", 1)
+    # Wrap the wordmark: a CSS transform on the group itself would replace its placement.
+    svg = head + '<g class="word"><g transform=' + word.replace("</svg>", "</g></svg>")
+    return svg.replace("<defs>", f"<defs><style>{motion_css()}</style>", 1)
+
+
+def animated_mark(dark, uid):
+    """The bird alone drawing itself, for splash screens, avatars in videos and loading states."""
+    svg = mark(GRADIENT_DARK if dark else GRADIENT, uid)
+    svg = svg.replace('<path d="M36', '<path class="neck" pathLength="1" d="M36', 1)
+    svg = re.sub(r'(<path d="M41 25[^"]*"[^>]*/>)(<circle [^>]*/>)', r'<g class="crown">\1\2</g>', svg, count=1)
+    return svg.replace("<defs>", f"<defs><style>{motion_css()}</style>", 1)
+
+
+def video_card(w, h, dark, uid, lines, logo_size=0.2):
+    """A full-frame card for video and social: the logo above one or two lines of text, centred as a block."""
+    m = h * logo_size
+    logo_svg = logo(dark, uid)
+    lw, lh = (float(v) for v in re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', logo_svg).groups())
+    k = m * (1 + 2 * PAD) / lh
+    inner = re.search(r"<defs>(.*)</defs>(.*)</svg>", logo_svg, re.S)
+    sizes = [h * logo_size * 0.29, h * logo_size * 0.17][:len(lines)]
+    block = lh * k + sum(1.9 * z for z in sizes)
+    x, y = (w - lw * k) / 2, (h - block) / 2
+    d1, body = background(w, h, NIGHT if dark else PAPER, uid)
+    body += f'<g transform="translate({x:.2f} {y:.2f}) scale({k:.5f})">{inner.group(2)}</g>'
+    top = y + lh * k
+    for i, (line, z) in enumerate(zip(lines, sizes)):
+        top += 1.9 * z if i else 1.6 * z
+        fill = (INK_DARK if dark else INK) if i == 0 else (MIST if dark else SLATE)
+        weight = ' font-weight="600"' if i == 0 else ""
+        body += (f'<text x="{w / 2:g}" y="{top:.1f}" font-family="Inter Display, Inter, sans-serif" text-anchor="middle" '
+                 f'font-size="{z:.1f}"{weight} fill="{fill}">{line}</text>')
+    return doc(w, h, d1 + inner.group(1), body)
+
+
+def thumbnail(uid):
+    """A YouTube thumbnail template: edit the two text lines in the SVG, then export at 1280 x 720."""
+    w, h = 1280, 720
+    d1, body = background(w, h, NIGHT, uid)
+    d2, bird = centred("mark", 440, 300, GRADIENT_DARK, uid + "m", True)
+    body += f'<g transform="translate(760 140)">{bird}</g>'
+    text = 'font-family="Inter Display, Inter, sans-serif" font-weight="700"'
+    body += f'<text x="80" y="300" font-size="104" fill="{INK_DARK}" {text}>{W["thumbnail"][0]}</text>'
+    body += f'<text x="80" y="420" font-size="104" fill="{SCARLET_DARK}" {text}>{W["thumbnail"][1]}</text>'
+    body += f'<text x="84" y="500" font-size="36" fill="{MIST}" font-family="Inter, sans-serif">{TAGLINE}</text>'
+    return doc(w, h, d1 + d2, body)
 
 
 MANIFEST = {
@@ -341,7 +436,17 @@ def main():
         "github-social-preview.svg": card(1280, 640, "s"),
         "og-image.svg": card(1200, 630, "og"),
         "favicon-png.svg": favicon(SCARLET_MID),
+        "ibis-logo-animated.svg": animated_logo(False, "la"),
+        "ibis-logo-animated-on-dark.svg": animated_logo(True, "lad"),
+        "ibis-mark-animated.svg": animated_mark(False, "ma"),
+        "ibis-mark-animated-on-dark.svg": animated_mark(True, "mad"),
+        "video/title-card.svg": video_card(1920, 1080, False, "vt", [TAGLINE, SUBLINE]),
+        "video/title-card-dark.svg": video_card(1920, 1080, True, "vtd", [TAGLINE, SUBLINE]),
+        "video/end-card.svg": video_card(1920, 1080, True, "ve", W["end_card"]),
+        "video/youtube-banner.svg": video_card(2560, 1440, True, "yb", [TAGLINE], 0.17),
+        "video/thumbnail-template.svg": thumbnail("th"),
     }
+    (OUT / "video").mkdir(exist_ok=True)
     for name, text in files.items():
         (OUT / name).write_text(text, encoding="utf-8")
     for size in (1024, 512, 256, 128):
@@ -358,6 +463,10 @@ def main():
     png("ibis-app-icon.svg", "icon-192.png", 192)
     png("ibis-app-icon.svg", "icon-512.png", 512)
     png("ibis-avatar.svg", "icon-maskable-512.png", 512)
+    for name in ("title-card", "title-card-dark", "end-card"):
+        png(f"video/{name}.svg", f"video-{name}.png", 1920, 1080)
+    png("video/youtube-banner.svg", "video-youtube-banner.png", 2560, 1440)
+    png("video/thumbnail-template.svg", "video-thumbnail-template.png", 1280, 720)
     ico("favicon-png.svg", (16, 32, 48))
     (OUT / "favicon-png.svg").unlink()
     (OUT / "site.webmanifest").write_text(json.dumps(MANIFEST, indent=2) + "\n", encoding="utf-8")

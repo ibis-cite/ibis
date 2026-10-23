@@ -1,0 +1,50 @@
+{
+  "_about": "Every tunable brand value. Edit, then run python3 brand/build.py. Sizes are shares of M, the bird's height, unless noted.",
+  "colours": {
+    "scarlet": "#C23A1C",
+    "scarlet_dark": "#FF7A5C",
+    "scarlet_favicon": "#CF4628",
+    "gradient": ["#CF4628", "#B5331A"],
+    "gradient_dark": ["#FF7F5E", "#F2552F"],
+    "ink": "#16181D",
+    "ink_dark": "#F5F5F7",
+    "slate": "#4C5260",
+    "mist": "#C0C3CC",
+    "tile": ["#FFFFFF", "#EFECE8"],
+    "tile_dark": ["#3A3A3F", "#18181B"],
+    "paper": ["#FFFFFF", "#F1EEE9"],
+    "night": ["#26262B", "#141417"]
+  },
+  "layout": {
+    "pad": 0.135,
+    "word_cap": 0.55,
+    "word_gap": 0.34,
+    "container": 0.62,
+    "optical_sideways": 0.5,
+    "optical_lift": 0.015,
+    "favicon_neck": 10.5,
+    "app_icon_radius": 0.225
+  },
+  "depth": {
+    "rim_light": 0.30,
+    "rim_shade": 0.16,
+    "shadow_opacity": 0.20,
+    "shadow_blur": 2.0,
+    "shadow_drop": 1.6,
+    "shadow_colour": "#4A0F04"
+  },
+  "motion": {
+    "neck_start": 0.10,
+    "neck_duration": 0.55,
+    "crown_start": 0.45,
+    "crown_duration": 0.70,
+    "word_start": 1.00,
+    "word_duration": 0.50
+  },
+  "words": {
+    "tagline": "Find references. Copy citation keys.",
+    "subline": "Early preview · Free and open source · Works with Zotero and BibTeX",
+    "end_card": ["github.com/ibiscite/ibis", "Early preview · Free and open source"],
+    "thumbnail": ["New in", "Ibis 0.2"]
+  }
+}
