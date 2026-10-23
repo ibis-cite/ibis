@@ -41,7 +41,17 @@ cargo insta review                             # review changed snapshots
 
 `node scripts/check.mjs` runs the default workspace and every desktop crate test. CI also tests the core and command line with the Rust 1.90 minimum and the core in release mode. Pandoc comparisons are skipped when Pandoc is missing; `IBIS_REQUIRE_PANDOC=1` makes them required. Review changed snapshots like code.
 
+Script discovery includes `*.test.mjs`, `*.test.cjs`, `test_*.py` and `*.test.py`.
+`node scripts/check.mjs --script-tests` runs only those suites after UI dependencies
+are installed. Native CI uses `--platform-script-tests`, omitting only the UI
+import-boundary suite that needs those packages; Web CI and local full checks
+retain it. Existing embedded native self-tests and runtime checks still run.
+
 ## Focused harnesses
+
+**Settings migration.** `cargo test -p ibis-desktop identity::tests` covers file symlinks, interrupted staging, concurrent processes and look-alike preservation. Cleanup owns only real `<app>.migration-<pid>-<counter>` directories with canonical numeric suffixes, under a persistent per-app file lock. Truncated old names remain untouched because ownership is ambiguous. Unix tests cover dangling/directory/loop links and permissions; Linux also covers non-UTF-8 parents.
+
+**Installed updates.** `python3 scripts/update-e2e.py --self-test` checks the existing update harness without installing anything. Its native run seeds a synthetic library and shortcut in the claimed Nightly settings, removes inherited `IBIS_LIBRARY`, and requires both stored choices after payload replacement and restart. Preservation results are booleans; failed settings verification uses fixed messages. Windows/macOS native runs still require a disposable account; this does not verify a permanent-identity transition, direct replacement, shortcut activation or actual login startup.
 
 **Core scale.** `cargo test -p ibis-core --release --locked --lib owned_index_100000_reference_measurement -- --ignored --nocapture` measures indexing and search over 100,000 synthetic multilingual records. It measures the core only, not parsing, the interface or a pass threshold. Calibration is in [#9](https://github.com/ibiscite/ibis/issues/9#issuecomment-6282578839).
 
@@ -84,11 +94,27 @@ Exit 0 is a pass, 1 a failure and 2 unavailable, never a pass. `--self-test` tes
 
 On Windows, control activation reuses the picker window handle verified by a snapshot and checks its process ownership, existence and visibility again. A modal menu hides Search from accessibility, so opening it must not force the next action to rediscover the window through Search.
 
+The Windows updater contract requires one exact owned update offer and one
+invokable action: the legacy exact custom label, or the standard native Yes
+button (IDYES 6, independent of its localized label). No/close never consent.
+The same ownership, uniqueness, enabled/on-screen and InvokePattern checks
+apply to both; uncertain activation fails without retrying. Synthetic provider
+cases run in the existing Windows Desktop CI step. They do not prove actual
+installation or restart; supported-platform acceptance remains #493.
+
 The menu focus check proves Escape ownership with Space reopening More. After Tab closes it, a native key-delivered probe must read back exactly in Search, then the original query and results must return before copying. AT-SPI/UIA may report a combobox's active result as focused while the input owns keyboard focus, so a focus flag alone never proves post-Tab typing. The probe never clicks or programmatically focuses Search; it checks the owned app, visible foreground picker and absent menu before delivery and readback. Only fixed Boolean outcomes enter the report.
 
 **First-run preferences.** `--first-run-preferences` (instead of `--budgets`) runs the first-run check (#486): choose a writing format, quit, restart and copy, and the copy must use the saved format without choosing it again. Quit must finish within ten seconds. What it does not cover is listed in #238.
 
 **Performance.** The native suite launches four fresh processes with 100,000 synthetic references and measures launch to accessible count, native query to late result, and current summed process-tree memory. The first launch is a warm-up. The gate in [smoke-budgets.json](../scripts/smoke-budgets.json) uses the median of the three measured launches for both timings and the maximum of all four for memory. Any single launch, the warm-up included, fails if a timing exceeds 1.5 times its budget, so hangs and stalls still fail ([#464](https://github.com/ibiscite/ibis/issues/464)). These include probing/polling overhead, warm OS caches and potentially double-counted shared pages; they exclude reparented helpers, lifetime peak memory and cold-disk claims. No `--budgets` means `measured-without-budget`; record exact source, runner and architecture. Calibration history and qualification limits are in [#9](https://github.com/ibiscite/ibis/issues/9#issuecomment-6282578839).
+
+`--skip-performance` skips only these four large-library launches and reports
+performance as `skipped`. It cannot be combined with `--budgets`. Nix and preview
+installed-package smoke use this mode while retaining every correctness,
+shortcut, clipboard, focus, keyboard and accessibility check. The three budgeted
+OS invocations in `ci.yml` remain the large-library gates; the separate macOS
+full-screen panel check also remains unchanged. Without either flag, the suite
+still measures performance without enforcing budgets.
 
 On Windows, memory sampling pins the root creation identity from the original launch handle, follows only descendants created no earlier than their current parent, and rechecks creation identities while reading working sets and before returning the sum. Missing identities or process churn fail the measurement. Each sample retains at most 64 numeric components (local index, parent index, depth, root-relative age and bytes), plus an older-orphan count; observed PIDs, absolute times, names and paths are omitted. This repairs attribution, without establishing the cause of earlier aggregate-only spikes (#620).
 
@@ -120,7 +146,7 @@ Install `cargo-fuzz` with `cargo install --locked cargo-fuzz --version 0.13.1`
 and nightly with `rustup toolchain install nightly --profile minimal`, then run:
 
 ```sh
-cargo +nightly fuzz run load_str -- -max_total_time=60 -timeout=5 -rss_limit_mb=1024 -max_len=16384
+cargo +nightly fuzz run csl_export -- -max_total_time=60 -timeout=5 -rss_limit_mb=1024 -max_len=16384
 ```
 
-The nightly run gives `split_parse`, `load_str`, `csl_export` and `cite_render` 300 seconds each with a corpus seeded from synthetic fixtures, and opens an issue for each new failure. Fixed inputs become regression fixtures. See [fuzz/README.md](../fuzz/README.md).
+The nightly run gives `split_parse`, `csl_export` and `cite_render` 300 seconds each with a corpus seeded from synthetic fixtures, and opens an issue for each new failure. Fixed inputs become regression fixtures. See [fuzz/README.md](../fuzz/README.md).

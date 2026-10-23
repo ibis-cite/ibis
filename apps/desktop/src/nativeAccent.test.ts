@@ -4,6 +4,9 @@ import { listen, type Event } from "@tauri-apps/api/event";
 import { installNativeAppearance } from "./nativeAppearance";
 vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn() }));
 
+const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
+const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
+const css = readFileSync(new FileURL("./nativeAccent.css", import.meta.url), "utf8");
 const root = document.documentElement;
 afterEach(() => setNativeAccent(null));
 
@@ -71,4 +74,8 @@ test("both subscriptions precede the replay query and accent survives a failed r
   expect(root.dataset.nativeAccent).toBe("true");
   dispose();
   expect(root.hasAttribute("data-native-accent")).toBe(false);
+});
+
+test("an added tile on the native accent uses its paired text fill, keeping scarlet off the row fill", () => {
+  expect(css).toMatch(/:root\[data-native-accent="true"\]\[data-platform="macos"\][^{}]*\[data-citation-selected\][^{}]*\.result-tile\s*\{[^}]*background:\s*var\(--text-on-accent\)[^}]*color:\s*var\(--citation-tile\)/);
 });

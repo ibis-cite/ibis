@@ -95,24 +95,44 @@ Version numbers, release and nightly titles, tags and download links follow [REL
 
 ## Checking a change
 
-`node scripts/check.mjs` must pass locally. It checks GitHub Actions expressions with actionlint before the Rust and desktop checks, and runs every desktop crate test (`cargo test -p ibis-desktop`), which plain `cargo test` skips because the desktop crate is not a default workspace member. A failing check exits 1; a missing tool reports incomplete (exit 2) on every platform. It does not run the web builds that CI's Web interface job checks (`pnpm build`, and `pnpm exec vite build --mode evidence` for the screenshot gallery); run those in `apps/desktop` when you change the build setup.
+The full check is the required "CI result" on the exact head commit, then the merge queue, which always validates the complete app. Run focused tests locally while editing; run `node scripts/check.mjs` locally to diagnose a CI failure or before changing the check itself. It checks GitHub Actions expressions with actionlint before the Rust and desktop checks, and runs every desktop crate test (`cargo test -p ibis-desktop`), which plain `cargo test` skips because the desktop crate is not a default workspace member. A failing check exits 1; a missing tool reports incomplete (exit 2) on every platform. It does not run the web builds that CI's Web interface job checks (`pnpm build`, and `pnpm exec vite build --mode evidence` for the screenshot gallery); run those in `apps/desktop` when you change the build setup.
 
 Interface-only pull requests run script tests, TypeScript, interface tests and both web builds, without native app builds or GUI checks. `scripts/ci-paths.mjs` lists those browser inputs, including the gallery geometry JSON fixture; native, build and unknown paths retain native validation. Both names of a rename count. Missing, incomplete or changed API metadata enables every check. Documentation keeps its existing fast path; main and the merge queue always validate the complete app.
 
 ## Working quickly and safely
 
-- **Verify the exact commit.** Run the full check in a clean checkout of the commit. Use a fresh target directory as well: sharing a target across checkouts can reuse stale project test binaries (#387).
+- **Verify the exact commit locally when you need to.** Run the full check in a clean checkout of the commit. Allocate one verification target per agent/session and keep exclusive ownership through package cleanup, checking and inspection of its captured output. Serialize runs; never let another worktree build into that target meanwhile. [#387](https://github.com/ibiscite/ibis/issues/387) observed stale project test binaries even with serialized shared-target builds.
+
+  Allocate this directory once, then retain it for successive verification runs:
+
+  ```sh
+  verification_dir=$(mktemp -d)
+  ```
+
+  For each commit, use a clean detached worktree, disable incremental compilation and invalidate the four checked application packages before checking. The observed #387 remedy preserved dependency artifacts; disabling incremental compilation alone is not the recipe.
 
   ```sh
   sha=$(git rev-parse HEAD)
-  verification_dir=$(mktemp -d)
   git worktree add --detach "$verification_dir/source" "$sha" &&
-    (cd "$verification_dir/source" && CARGO_TARGET_DIR="$verification_dir/target" node scripts/check.mjs --expect-commit "$sha")
+    (
+      cd "$verification_dir/source" &&
+      export CARGO_TARGET_DIR="$verification_dir/target" CARGO_INCREMENTAL=0 &&
+      cargo clean --locked -p ibis -p ibis-core -p ibis-desktop -p ibis-zotero-local &&
+      node scripts/check.mjs --expect-commit "$sha"
+    )
   ```
 
   The guarded preflight gives each Git command five seconds, then kills it and reports a fixed refusal without raw diagnostics. It disables configured filesystem monitors for these calls, because terminating Git does not terminate a monitor's descendants. The repository's configuration is unchanged. Filesystem waits that the operating system cannot interrupt can still delay termination.
 
-  Keep failed output for diagnosis. Remove the verification worktree after inspecting the result. This is POSIX shell; on Windows, run it in Git Bash.
+  Retain the output from this run while the target is still exclusively owned. Check that the intended enabled regressions actually ran, including their names, counts and ignored status; exit 0 alone did not establish that in #387. Inspecting a later mutable shared binary is not evidence about this run. This procedure records the observed remedy, not a newly measured speedup or a Cargo correctness guarantee. Use a fresh target if ownership or invalidation is uncertain.
+
+  Keep failed output for diagnosis. After inspecting the result, remove the detached source worktree before reusing its path; retain the target:
+
+  ```sh
+  git worktree remove "$verification_dir/source"
+  ```
+
+  Do not force removal of a dirty worktree. When finished with the session, remove only its owned verification directory. This is POSIX shell; on Windows, run it in Git Bash.
 
 - **Branch from `main`, never from another branch.** Stacked branches merged by squash have silently reverted changes on `main`. After merging `main` into a branch, `git diff origin/main` must show only that branch's change.
 - **Review while CI runs**, and record each finding in the pull request as fixed, filed or rejected with a reason.

@@ -37,6 +37,8 @@ test.each([
 ])("%s popup uses its bundled decorative indicator without changing the button name", async (platform, viewBox) => {
   document.documentElement.dataset.platform = platform;
   const { trigger } = mount();
+  expect(trigger.classList.contains("ui-button")).toBe(true);
+  expect(trigger.getAttribute("data-variant")).toBe("secondary");
   const indicator = trigger.querySelector("svg")!;
   expect(indicator.getAttribute("viewBox")).toBe(viewBox);
   expect(indicator.getAttribute("aria-hidden")).toBe("true");
@@ -84,6 +86,57 @@ test.each(["Escape", "Tab"])("%s closes just the menu and returns focus", async 
   await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
   await waitFor(() => expect(document.activeElement).toBe(search));
   expect(parentKeys).not.toHaveBeenCalled();
+});
+
+test.each([false, true])("a format pick returns typing before its exit animation (filtered %s)", async (filtered) => {
+  let release!: () => void;
+  const finished = new Promise<void>((resolve) => { release = resolve; });
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, "getAnimations");
+  Object.defineProperty(Element.prototype, "getAnimations", { configurable: true, value(this: HTMLElement) {
+    return this.hasAttribute("data-exiting") ? [{ playState: "running", finished }] : [];
+  } });
+  try {
+    const items = filtered ? [{ id: "many", label: "Formats", items: Array.from({ length: 8 }, (_, i) => ({ id: `f${i}`, label: `Format ${i}` })) }] : sections;
+    const { trigger, search, onAction } = mount(items);
+    fireEvent.change(search, { target: { value: "memory" } });
+    fireEvent.click(trigger);
+    const menu = await screen.findByRole("menu");
+    if (filtered) {
+      const filter = screen.getByRole("searchbox", { name: "Filter formats" });
+      fireEvent.change(filter, { target: { value: "Format 7" } });
+      fireEvent.keyDown(filter, { key: "ArrowDown" });
+    } else act(() => screen.getByRole("menuitemradio", { name: "Pandoc" }).focus());
+    fireEvent.keyDown(document.activeElement!, { key: "Enter" });
+    fireEvent.keyUp(document.activeElement!, { key: "Enter" });
+    expect(onAction).toHaveBeenCalledExactlyOnceWith(filtered ? "f7" : "pandoc");
+    // Do not wait for exit, animation frames or a later focus retry.
+    expect(menu.isConnected).toBe(false);
+    expect(document.activeElement).toBe(search);
+    fireEvent.keyDown(document.activeElement!, { key: "n" });
+    fireEvent.input(document.activeElement!, { target: { value: "memorynative" } });
+    expect((search as HTMLInputElement).value).toBe("memorynative");
+    await act(async () => { release(); await finished; await new Promise(requestAnimationFrame); });
+    expect(document.activeElement).toBe(search);
+    expect(onAction).toHaveBeenCalledTimes(1);
+  } finally {
+    await act(async () => { release(); await finished; });
+    if (descriptor) Object.defineProperty(Element.prototype, "getAnimations", descriptor);
+    else Reflect.deleteProperty(Element.prototype, "getAnimations");
+  }
+});
+
+test("a selection callback can deliberately move focus without a later Search retry", async () => {
+  vi.stubGlobal("ResizeObserver", class { observe() {} unobserve() {} disconnect() {} });
+  const search = createRef<HTMLInputElement>();
+  const destination = createRef<HTMLButtonElement>();
+  render(<><input aria-label="Search references" ref={search} /><button ref={destination}>Other action</button>
+    <ToolbarMenu label="Copy as" value="Pandoc" sections={sections} selectedKey="pandoc"
+      filterLabel="Filter formats" returnFocusRef={search} onAction={() => destination.current?.focus()} /></>);
+  fireEvent.click(screen.getByRole("button", { name: "Copy as Pandoc" }));
+  fireEvent.click(await screen.findByRole("menuitemradio", { name: "LaTeX" }));
+  expect(document.activeElement).toBe(destination.current);
+  await act(async () => { await new Promise(requestAnimationFrame); });
+  expect(document.activeElement).toBe(destination.current);
 });
 
 function mountCommand(strict = false) {
@@ -215,15 +268,15 @@ const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encod
 const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
 const toolbarCss = readFileSync(new FileURL("./ToolbarMenu.css", import.meta.url), "utf8");
 const menuCss = readFileSync(new FileURL("./Menu.css", import.meta.url), "utf8");
+const buttonCss = readFileSync(new FileURL("./Button.css", import.meta.url), "utf8");
 const tokens = readFileSync(new FileURL("../tokens.css", import.meta.url), "utf8");
 test("menu role tokens exist, forced colours frame the button, and reduced motion removes movement", () => {
-  const definitions = new Set([...(tokens + menuCss + toolbarCss).matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]));
-  expect([...(menuCss + toolbarCss).matchAll(/var\((--[\w-]+)/g)].map((match) => match[1]).filter((name) => !definitions.has(name))).toEqual([]);
-  expect(toolbarCss).toMatch(/border: var\(--border-width\) solid var\(--clear\)/);
-  expect(toolbarCss).toMatch(/forced-colors: active[\s\S]*border-color: ButtonText/);
+  const definitions = new Set([...(tokens + menuCss + toolbarCss + buttonCss).matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]));
+  expect([...(menuCss + toolbarCss + buttonCss).matchAll(/var\((--[\w-]+)/g)].map((match) => match[1]).filter((name) => !definitions.has(name))).toEqual([]);
+  expect(buttonCss).toMatch(/border: var\(--border-width\) solid var\(--stroke-control\)/);
+  expect(tokens).toMatch(/forced-colors: active[\s\S]*--stroke-control: ButtonText/);
   expect(menuCss).toMatch(/background: Highlight; color: HighlightText/);
   expect(menuCss).toMatch(/prefers-reduced-motion: reduce[\s\S]*--menu-enter-transform: none; --menu-open-duration: 100ms/);
-  expect(toolbarCss).toMatch(/prefers-reduced-motion: reduce[\s\S]*transition: none/);
 });
 
 test("Space on an unavailable choice neither selects nor closes", async () => {
@@ -300,7 +353,8 @@ test.each([[false, "action"], [false, "Escape"], [true, "action"], [true, "Escap
     ? [{ playState: "running", finished }] : [] });
   if (close === "action") fireEvent.click(screen.getByRole("menuitemradio", { name: "Pandoc" }));
   else fireEvent.keyDown(document.activeElement!, { key: "Escape" });
-  expect(popover.hasAttribute("data-exiting")).toBe(true);
+  if (close === "action") expect(popover.isConnected).toBe(false);
+  else expect(popover.hasAttribute("data-exiting")).toBe(true);
   onAction.mockClear();
   // Model the browser blurring the trigger as reopening makes the page inert.
   act(() => (document.activeElement as HTMLElement).blur());
@@ -310,7 +364,9 @@ test.each([[false, "action"], [false, "Escape"], [true, "action"], [true, "Escap
     fireEvent.pointerUp(trigger, { button: 0, pointerType: "mouse", pointerId: 1 });
     fireEvent.click(trigger);
     await act(async () => { await new Promise(requestAnimationFrame); });
-    expect(screen.getByRole("menu").closest(".toolbar-menu-popover")).toBe(popover);
+    const reopened = screen.getByRole("menu").closest(".toolbar-menu-popover");
+    if (close === "action") expect(reopened).not.toBe(popover);
+    else expect(reopened).toBe(popover);
     expect(screen.getByRole("menuitemradio", { name: "Pandoc" }).getAttribute("aria-checked")).toBe("true");
     if (filtered) {
       const filter = screen.getByRole("searchbox", { name: "Filter formats" });

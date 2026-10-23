@@ -13,6 +13,10 @@
       --selected-background: var(--accent); --selected-text: var(--text-on-accent);
       --focus-ring-color: var(--accent-text);
     }
+    /* Separate the citation tile from red/orange selected-row accents (D9). */
+    :root[data-native-accent="true"][data-platform="macos"]:not([data-gallery-theme]):not(.notice-window) [role="option"][data-active][data-citation-selected] .result-tile {
+      background: var(--text-on-accent); color: var(--citation-tile);
+    }
   }
 }
 @media (prefers-contrast: more), (forced-colors: active) {

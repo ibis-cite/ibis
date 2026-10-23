@@ -12,6 +12,9 @@ use crate::placement::place_on_active_display;
 
 mod dialogs;
 mod full_screen;
+#[cfg(target_os = "linux")]
+#[expect(dead_code, reason = "portal transport is wired to the picker in the next #782 slice")]
+mod portal;
 #[cfg_attr(
     not(test),
     expect(dead_code, reason = "visible-row activation will consume this policy (#756)")
@@ -20,6 +23,8 @@ mod shortcut_policy;
 #[cfg(target_os = "linux")]
 mod x11_focus;
 
+#[cfg(any(target_os = "macos", test))]
+pub(crate) use dialogs::ChooserLease;
 pub(crate) use dialogs::ChooserOpen;
 pub(crate) use full_screen::FullScreenGuard;
 

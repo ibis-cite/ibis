@@ -7,6 +7,7 @@ import "./PickerFooter.css";
 import { keyText, pickerText } from "../../messages";
 import { currentPlatform } from "../../platform";
 import { KeyHint } from "../../ui/KeyCaps";
+import { Button } from "../../ui/Button";
 
 /** What the keys do now; null where a key does nothing. */
 export type KeyHints = { enter: string | null; shiftEnter: string | null; escape: string };
@@ -76,11 +77,11 @@ export function PickerFooter({ library, groupName, hints, altHeld, actions, more
       <section ref={bar} aria-label={pickerText.libraryRegion} className="library-bar" data-shortcuts-folded={fit.shortcuts || undefined} data-status-compact={fit.status || undefined}>
         <span className="footer-fit-measure" aria-hidden="true" inert><span ref={statusSize} className="footer-status-size" /></span>
         <LibraryStatusLine library={library} groupName={groupName} />
-        {pinned && <button ref={pin} type="button" className="pin-button" aria-label={pickerText.unpinTitle} title={pickerText.unpinTitle} onClick={onUnpin}>
+        {pinned && <Button ref={pin} variant="icon" className="pin-button" aria-label={pickerText.unpinTitle} title={pickerText.unpinTitle} onPress={onUnpin}>
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor">
             <path d="M9 4h6l-1 5 4 4H6l4-4z" /><path d="M12 13v7" />
           </svg>
-        </button>}
+        </Button>}
         <small ref={hintsRow} data-optional-only={!altHeld && !hints.enter || undefined} className="enter-hints" aria-label={keyText.footer} role="group">
           {altHeld ? <>
             {hints.shiftEnter && <FooterAction label={hints.shiftEnter} keys={keysFor("add")} onAction={actions.add} />}
@@ -103,8 +104,8 @@ function FooterAction({ label, keys, primary, className = "", folded, controlRef
   label: string; keys: string; primary?: boolean; className?: string; folded?: boolean; controlRef?: React.Ref<HTMLButtonElement>; onAction: () => void;
 }) {
   const platform = currentPlatform();
-  return <button ref={controlRef} type="button" className={`quiet-button footer-action ${className}`} aria-label={label} aria-hidden={folded || undefined} inert={folded || undefined} tabIndex={folded ? -1 : undefined}
-    aria-keyshortcuts={ariaKeys(keys, platform === "macos")} onClick={onAction}>
+  return <Button ref={controlRef} variant="quiet" size="small" className={`footer-action ${className}`} aria-label={label} aria-hidden={folded || undefined} inert={folded || undefined} excludeFromTabOrder={folded}
+    aria-keyshortcuts={ariaKeys(keys, platform === "macos")} onPress={onAction}>
     <KeyHint label={label} keys={keys} primary={primary} platform={platform} hidden />
-  </button>;
+  </Button>;
 }

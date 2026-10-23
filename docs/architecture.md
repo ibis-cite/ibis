@@ -62,12 +62,27 @@ The desktop app (`apps/desktop`) is a Tauri 2 shell: a React and TypeScript inte
 
 Until measurements justify more, the app is a single process that keeps the library index in memory and hides its window between uses (ADR 0012). The original plan of a small background engine plus an on-demand picker process (ADR 0004) remains the option if idle memory or wakeups exceed the budgets in `scripts/smoke-budgets.json`.
 
-Only the picker-owned file chooser prevents native blur hiding. An exclusive
-RAII lease in `picker/dialogs.rs` stays alive through the chooser callback,
-including its source-open handoff; dropping or unwinding the callback releases
-it. Both blur guards read the same atomic state. Independent update, feedback
-and login messages do not acquire a lease, so an unanswered message cannot keep
-the unpinned picker visible.
+Picker preference saves run on Tauri's blocking pool. Owned settings handles
+share one writer lock with synchronous settings updates; each save reads the
+current file after taking that lock, then changes and flushes it (ADRs 0020/0022).
+The interface's existing promise chain preserves preference choice order.
+
+Only a picker-owned file chooser, macOS update consent or install-failure sheet,
+or visible macOS Open at Login reapproval sheet prevents native blur hiding.
+An exclusive RAII lease in
+`picker/dialogs.rs` stays alive through the native answer callback, including a
+chooser's source-open handoff; dropping or unwinding the callback releases it.
+Both blur guards read the same atomic state. A busy native owner leaves the fixed
+installation recovery notice pending until a later actual picker show; only OK
+clears it, and failed presentation or a dropped callback keeps it pending.
+Other update information, feedback and login messages do not acquire a lease.
+Update checks and downloads also leave
+ordinary blur hiding unchanged.
+
+Library status carries the failure reason, retained-reference flag and unsaved
+choice provenance separately for native presentation. The tray derives its
+wording from these facts rather than parsing the picker's error or note text.
+These native-only facts are excluded from the serialized picker payload.
 
 Shared interactive web controls live in `apps/desktop/src/ui/` (ADR 0021).
 Only that directory imports React Aria; `scripts/ui-imports.mjs` checks static
@@ -76,6 +91,22 @@ pinned JavaScript/TypeScript parser; it is a contributor boundary check, not a
 security sandbox for computed module names. During
 incremental migration, toolbar-menu role overrides in `tokens.css` apply locally
 to its popover, preserving the existing More menu and keys dialog roles.
+The shared Button family owns footer action, More and toolbar-menu triggers,
+shelf removal and folding, empty-state recovery actions, and dialog Close
+states; React Aria supplies pointer, press and keyboard-focus attributes.
+Folded footer actions preserve their hidden accessibility state and tab order.
+First-run setup keeps its rescan Button focusable with `aria-disabled` and a press
+guard while finding sources. Its existing status announces progress; writing-format
+toggles remain controlled.
+Small-button gallery readiness checks actual hit targets beyond the visible fill.
+Shelf spacing reserves each full hit target, including three complete expanded
+rows and the larger touch targets; its gallery rejects clipped or covered edges.
+Tab dismisses More's modal popover synchronously before returning focus to
+Search. Choosing a toolbar format also removes its modal synchronously, so the
+next typed character reaches Search without waiting for an exit animation.
+Other dismissals retain their existing animation and focus destinations.
+Copy-warning dismissal uses the shared Button states without changing notice
+lifetime; warnings remain until dismissed and clean confirmations expire.
 
 Desktop search replies and each result carry an opaque in-memory index revision,
 captured with the index under the library mutex. Scope filtering and request

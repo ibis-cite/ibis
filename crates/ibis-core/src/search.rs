@@ -69,47 +69,6 @@ pub struct Hit<'a> {
     pub matched: Vec<MatchField>,
 }
 
-/// Search index over a set of references.
-pub struct Index<'a> {
-    docs: Vec<(&'a Reference, [String; 8], Vec<Identifier>)>,
-}
-
-impl<'a> Index<'a> {
-    pub fn new(references: &'a [Reference]) -> Self {
-        Index {
-            docs: references
-                .iter()
-                .map(|r| (r, prepare(r), identifier::of_reference(r)))
-                .collect(),
-        }
-    }
-
-    /// Return up to `limit` matches, best first. An empty query matches nothing.
-    pub fn search(&self, query: &str, limit: usize) -> Vec<Hit<'a>> {
-        self.search_scoped(query, limit, None)
-    }
-
-    /// Search only these exact source IDs before ranking or limiting results.
-    /// `None` searches all sources; an empty slice searches none.
-    pub fn search_scoped(&self, query: &str, limit: usize, scope: Option<&[String]>) -> Vec<Hit<'a>> {
-        if let Some(hits) = by_identifier(
-            self.docs.iter().map(|(r, _, ids)| (*r, ids.as_slice())),
-            query,
-            limit,
-            scope,
-            &|| false,
-        )
-        .flatten()
-        {
-            return hits;
-        }
-        rank(self.docs.iter().map(|(r, f, _)| (*r, f)), query, limit, scope, &|| {
-            false
-        })
-        .unwrap_or_default()
-    }
-}
-
 /// Search index that owns its references, for front ends that keep a library
 /// open and search it many times. Normalization happens once, when it is built.
 #[derive(Default)]
@@ -153,12 +112,13 @@ impl OwnedIndex {
 
     /// Like [`OwnedIndex::search`], but gives up and returns `None` as soon as
     /// `stop` returns true, so a search for an outdated query does not keep
-    /// the caller waiting. `stop` is checked every few thousand records.
+    /// the caller waiting. `stop` is checked during record and term processing.
     pub fn search_until(&self, query: &str, limit: usize, stop: &dyn Fn() -> bool) -> Option<Vec<Hit<'_>>> {
         self.search_scoped_until(query, limit, None, stop)
     }
 
-    /// Like [`Index::search_scoped`], using this owned snapshot.
+    /// Search only these exact source IDs before ranking or limiting results.
+    /// `None` searches all sources; an empty slice searches none.
     pub fn search_scoped(&self, query: &str, limit: usize, scope: Option<&[String]>) -> Vec<Hit<'_>> {
         self.search_scoped_until(query, limit, scope, &|| false)
             .unwrap_or_default()
@@ -249,6 +209,7 @@ fn by_identifier<'r, 'i>(
 }
 
 const STOP_CHECK_INTERVAL: usize = 4096;
+const TERM_CHECK_INTERVAL: usize = 64;
 
 fn in_scope(reference: &Reference, scope: Option<&[String]>) -> bool {
     scope.is_none_or(|sources| sources.contains(&reference.id.source))
@@ -262,7 +223,14 @@ fn rank<'r, 'f>(
     stop: &dyn Fn() -> bool,
 ) -> Option<Vec<Hit<'r>>> {
     let normalized = normalize(query);
-    let terms: Vec<&str> = normalized.split_whitespace().collect();
+    let mut terms = BTreeMap::<&str, u32>::new();
+    for (n, term) in normalized.split_whitespace().enumerate() {
+        if n % TERM_CHECK_INTERVAL == 0 && stop() {
+            return None;
+        }
+        let count = terms.entry(term).or_default();
+        *count = count.wrapping_add(1);
+    }
     if terms.is_empty() || limit == 0 {
         return Some(Vec::new());
     }
@@ -274,6 +242,7 @@ fn rank<'r, 'f>(
     // Score every record without allocating; matched fields are a bit set and
     // become a list only for the records that are returned.
     let mut candidates: Vec<(u32, u8, &'r Reference)> = Vec::new();
+    let mut term_work = 0;
     for (n, (reference, fields)) in docs.enumerate() {
         if n % STOP_CHECK_INTERVAL == 0 && stop() {
             return None;
@@ -284,24 +253,33 @@ fn rank<'r, 'f>(
         let mut score = 0;
         let mut matched = 0u8;
         let mut all_terms = true;
-        for term in &terms {
-            let best = MatchField::ALL
-                .iter()
-                .zip(fields.iter())
-                .enumerate()
-                .filter_map(|(bit, (field, text))| {
-                    let at_word_start = match field {
-                        MatchField::Year => (text.as_str() == *term).then_some(true)?,
-                        _ => find_term(text, term)?,
-                    };
-                    Some((bit, field.weight() * if at_word_start { 2 } else { 1 }))
-                })
-                .max_by_key(|(_, w)| *w);
+        for (&term, &count) in &terms {
+            term_work += 1;
+            if term_work == TERM_CHECK_INTERVAL {
+                term_work = 0;
+                if stop() {
+                    return None;
+                }
+            }
+            let mut best = None;
+            for (bit, (field, text)) in MatchField::ALL.iter().zip(fields).enumerate() {
+                let at_word_start = match field {
+                    MatchField::Year => (text.as_str() == term).then_some(true),
+                    _ => find_term(text, term, stop)?,
+                };
+                if let Some(at_word_start) = at_word_start {
+                    let weight = field.weight() * if at_word_start { 2 } else { 1 };
+                    // Keep max_by_key's last-field tie preference.
+                    if best.is_none_or(|(_, previous)| weight >= previous) {
+                        best = Some((bit, weight));
+                    }
+                }
+            }
             let Some((bit, weight)) = best else {
                 all_terms = false;
                 break;
             };
-            score += weight;
+            score = weighted_score(score, weight, count);
             matched |= 1 << bit;
         }
         if !all_terms {
@@ -312,11 +290,11 @@ fn rank<'r, 'f>(
             .as_deref()
             .is_some_and(|k| k.chars().flat_map(lower).eq(exact_query.chars()));
         if exact_key {
-            score += 2000;
+            score = weighted_score(score, 2000, 1);
         } else if fields[0] == normalized {
-            score += 1000;
+            score = weighted_score(score, 1000, 1);
         } else if fields[1] == normalized {
-            score += 500;
+            score = weighted_score(score, 500, 1);
         }
         candidates.push((score, matched, reference));
     }
@@ -345,6 +323,12 @@ fn rank<'r, 'f>(
             })
             .collect(),
     )
+}
+
+// Preserve the original release arithmetic even for enormous queries. Grouped
+// or reordered terms must not introduce an overflow panic in checked builds.
+fn weighted_score(score: u32, weight: u32, count: u32) -> u32 {
+    score.wrapping_add(weight.wrapping_mul(count))
 }
 
 /// Lowercase, strip accents, fold letter variants and turn punctuation into spaces.
@@ -429,19 +413,22 @@ fn is_optional_mark(c: char) -> bool {
 }
 
 /// Whether `term` occurs in `text`, and if so whether any occurrence starts a word.
-fn find_term(text: &str, term: &str) -> Option<bool> {
+fn find_term(text: &str, term: &str, stop: &dyn Fn() -> bool) -> Option<Option<bool>> {
     // `contains` has a vectorized fast path; most fields do not match at all.
     if !text.contains(term) {
-        return None;
+        return Some(None);
     }
     let mut found = false;
-    for (at, _) in text.match_indices(term) {
+    for (n, (at, _)) in text.match_indices(term).enumerate() {
+        if (n + 1) % STOP_CHECK_INTERVAL == 0 && stop() {
+            return None;
+        }
         if at == 0 || text.as_bytes()[at - 1] == b' ' {
-            return Some(true);
+            return Some(Some(true));
         }
         found = true;
     }
-    found.then_some(false)
+    Some(found.then_some(false))
 }
 
 #[cfg(test)]
@@ -484,14 +471,14 @@ mod tests {
         let mut r = reference("k", "Title", "Smith", 2020);
         r.container_title = Some("<i>Q</i> &amp; A".into());
         let refs = [r];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         for query in ["q & a", "Q A", "q&a"] {
             let hits = index.search(query, 10);
             assert_eq!(hits.len(), 1, "{query}");
             assert!(hits[0].matched.contains(&MatchField::Container), "{query}");
         }
         assert!(index.search("amp", 10).is_empty());
-        assert_eq!(prepare(&refs[0])[6], "q a");
+        assert_eq!(prepare(&index.references()[0])[6], "q a");
     }
 
     #[test]
@@ -508,7 +495,6 @@ mod tests {
             r.issued = Some(Issued::year(2020 + n));
             refs.push(r);
         }
-        let borrowed = Index::new(&refs);
         let owned = OwnedIndex::new(refs.clone());
         assert_eq!(owned.source_counts().get("zotero:user"), Some(&1));
         assert_eq!(owned.source_counts().get("zotero:group:7"), Some(&3));
@@ -537,15 +523,11 @@ mod tests {
                     .take(2)
                     .map(|h| h.reference.id.clone())
                     .collect();
-                for hits in [
-                    borrowed.search_scoped(query, 2, scope),
-                    owned.search_scoped(query, 2, scope),
-                ] {
-                    assert_eq!(
-                        hits.iter().map(|h| h.reference.id.clone()).collect::<Vec<_>>(),
-                        expected
-                    );
-                }
+                let hits = owned.search_scoped(query, 2, scope);
+                assert_eq!(
+                    hits.iter().map(|h| h.reference.id.clone()).collect::<Vec<_>>(),
+                    expected
+                );
             }
             assert!(owned.search_scoped(query, 0, Some(&group)).is_empty());
             assert!(owned.search_scoped_until(query, 2, Some(&group), &|| true).is_none());
@@ -656,7 +638,7 @@ mod tests {
     #[test]
     fn accents_and_case_are_ignored() {
         let refs = [reference("garcia2022", "Sueño y memoria", "García", 2022)];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         let hits = index.search("GARCIA sueno", 10);
         assert_eq!(hits.len(), 1);
         assert_eq!(hits[0].matched, [MatchField::Citekey, MatchField::Title]);
@@ -668,10 +650,99 @@ mod tests {
             reference("a", "Sleep and memory", "Smith", 2020),
             reference("b", "Sleep and diet", "Jones", 2021),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         let hits = index.search("sleep memory", 10);
         assert_eq!(hits.len(), 1);
         assert_eq!(hits[0].reference.id.native_key, "a");
+    }
+
+    #[test]
+    fn long_queries_can_cancel_before_finishing_the_first_record() {
+        use std::cell::Cell;
+        let many_terms = (0..512).map(|n| format!("term{n}")).collect::<Vec<_>>().join(" ");
+        for (query, title) in [
+            (many_terms.as_str(), many_terms.clone()),
+            ("a", format!("b{}", "a".repeat(65_535))),
+        ] {
+            let r = reference("k", &title, "Example", 2024);
+            let fields = prepare(&r);
+            let entered_record = Cell::new(false);
+            let checks_in_record = Cell::new(0);
+            let docs = std::iter::once((&r, &fields)).inspect(|_| entered_record.set(true));
+            // Cancellation becomes visible only after query preparation, while
+            // processing one matching record, without relying on elapsed time.
+            assert!(
+                rank(docs, query, 10, None, &|| {
+                    if entered_record.get() {
+                        checks_in_record.set(checks_in_record.get() + 1);
+                    }
+                    checks_in_record.get() > 1
+                })
+                .is_none()
+            );
+        }
+    }
+
+    #[test]
+    fn repeated_folded_terms_keep_scores_explanations_and_order() {
+        let mut red = reference("r", "Red", "Example", 2000);
+        red.abstract_text = Some("Blue".into());
+        let mut blue = reference("b", "Blue", "Example", 2025);
+        blue.abstract_text = Some("Red".into());
+        let refs = [blue, red];
+        let owned = OwnedIndex::new(refs.into());
+        let hits = owned.search("RÉD red blue", 10);
+        assert_eq!(
+            hits.iter()
+                .map(|h| (&*h.reference.id.native_key, h.score, h.matched.clone()))
+                .collect::<Vec<_>>(),
+            [
+                ("r", 42, vec![MatchField::Title, MatchField::Abstract]),
+                ("b", 24, vec![MatchField::Title, MatchField::Abstract]),
+            ]
+        );
+        let hits = owned.search_scoped("red red blue", 1, Some(&["t".into()]));
+        assert_eq!(hits[0].reference.id.native_key, "r");
+        assert!(owned.search_scoped("red red blue", 1, Some(&[])).is_empty());
+        // Coalescing terms must not turn a repeated query into an exact match.
+        assert_eq!(owned.search("red red", 1)[0].score, 40);
+        let exact = OwnedIndex::new(vec![reference("red red", "red red", "Example", 2024)]);
+        assert_eq!(exact.search("red red", 1)[0].score, 2048);
+    }
+
+    #[test]
+    fn huge_multiplicities_preserve_release_scores_without_allocating_the_query() {
+        // This count would require a 341 MiB query. It must not panic before
+        // a later missing term can reject the record.
+        assert_eq!(weighted_score(0, 24, 178_956_971), 8);
+        assert_eq!(weighted_score(u32::MAX - 1, 2, 1), 0);
+        assert_eq!(weighted_score(8, 2000, 1), 2008);
+    }
+
+    #[test]
+    #[ignore = "manual synthetic repetitive-query measurement; no timing assertion"]
+    fn repetitive_query_measurement() {
+        use std::time::{Duration, Instant};
+        let index = OwnedIndex::new(
+            (0..5_000)
+                .map(|n| reference(&format!("key{n}"), "Synthetic research", "Example", 2024))
+                .collect(),
+        );
+        for query in ["research".to_owned(), "research ".repeat(1_000)] {
+            let mut elapsed = Duration::ZERO;
+            for _ in 0..10 {
+                let started = Instant::now();
+                let hits = index.search(&query, 20);
+                elapsed += started.elapsed();
+                assert_eq!(hits.len(), 20);
+                assert_eq!(hits[0].score, 20 * query.split_whitespace().count() as u32);
+            }
+            eprintln!(
+                "records=5000 query_bytes={} samples=10 mean_us={}",
+                query.len(),
+                elapsed.as_micros() / 10
+            );
+        }
     }
 
     #[test]
@@ -680,7 +751,7 @@ mod tests {
             reference("smith2020", "On smith2020 data", "Other", 2019),
             reference("smith2020x", "Unrelated", "Smith", 2020),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("smith2020", 10)[0].reference.id.native_key, "smith2020");
         assert!(
             index
@@ -696,7 +767,7 @@ mod tests {
             reference("gr", "Οδός προς την ΓΝΩΣΙΣ", "Παπαδόπουλος", 2020),
             reference("de", "Die Straße der Erinnerung", "Weiß", 2021),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("γνωσις", 10)[0].reference.id.native_key, "gr");
         assert_eq!(index.search("ΓΝΏΣΙΣ", 10)[0].reference.id.native_key, "gr");
         assert_eq!(index.search("strasse weiss", 10)[0].reference.id.native_key, "de");
@@ -708,7 +779,7 @@ mod tests {
             reference("a:b", "Newer", "X", 2024),
             reference("a-b", "Older", "Y", 2001),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("a-b", 10)[0].reference.id.native_key, "a-b");
         assert_eq!(index.search("a:b", 10)[0].reference.id.native_key, "a:b");
     }
@@ -720,7 +791,7 @@ mod tests {
             "@book{translation,title={Synthetic},translator={Translator, Taylor},year={2024}}\n@book{compilation,title={Another},editor={Compiler, Casey},editortype={compiler},year={2024}}",
         )
         .references;
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs);
         assert_eq!(index.search("Translator", 10).len(), 1);
         assert_eq!(index.search("Compiler", 10).len(), 1);
     }
@@ -731,7 +802,7 @@ mod tests {
             reference("zh", "睡眠与记忆", "示例", 2025),
             reference("ar", "النوم والذاكرة", "مثال", 2021),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("记忆", 10)[0].reference.id.native_key, "zh");
         assert_eq!(index.search("الذاكرة", 10)[0].reference.id.native_key, "ar");
     }
@@ -744,7 +815,7 @@ mod tests {
             reference("fr", "Œuvres et Cæsar", "Đorđević", 2022),
             reference("tr", "Uykunun ışığı", "Yılmaz", 2023),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("lodzi", 10)[0].reference.id.native_key, "pl");
         assert_eq!(index.search("sovn odegard", 10)[0].reference.id.native_key, "no");
         assert_eq!(
@@ -761,7 +832,7 @@ mod tests {
             reference("fa", "كتاب الذكي", "علي", 2020),
             reference("tw", "العـــلم", "مثال", 2021),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("کتاب", 10)[0].reference.id.native_key, "fa");
         assert_eq!(index.search("علی", 10)[0].reference.id.native_key, "fa");
         assert_eq!(index.search("العلم", 10)[0].reference.id.native_key, "tw");
@@ -770,7 +841,7 @@ mod tests {
     #[test]
     fn hiragana_and_katakana_match_each_other() {
         let refs = [reference("ja", "ヤマダの研究", "ヤマダ", 2020)];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("やまだ", 10).len(), 1);
         assert_eq!(index.search("ﾔﾏﾀﾞ", 10).len(), 1);
     }
@@ -782,7 +853,7 @@ mod tests {
             reference("ka", "かっこう", "例", 2021),
             reference("hi", "किताब", "उदाहरण", 2022),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         let keys = |q| {
             index
                 .search(q, 10)
@@ -800,7 +871,7 @@ mod tests {
             reference("vs", "葛\u{E0100}城の研究", "例", 2020),
             reference("he", "בית־ספר", "דוגמה", 2021),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("葛城", 10)[0].reference.id.native_key, "vs");
         assert_eq!(index.search("ספר", 10)[0].reference.id.native_key, "he");
         assert_eq!(normalize("❤\u{FE0F}x"), "x");
@@ -808,7 +879,7 @@ mod tests {
         assert_eq!(normalize("בית־ספר"), "בית ספר");
 
         let refs = [reference("ko", "한국어 연구", "김", 2020)];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         assert_eq!(index.search("한국", 10).len(), 1);
         assert!(index.search("하국", 10).is_empty());
     }
@@ -835,7 +906,7 @@ mod tests {
             reference("ΜΑΣ", "Other", "X", 2020),
             reference("μας13", "Other", "Y", 2021),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         for (query, key) in [("μας", "ΜΑΣ"), ("Μας", "ΜΑΣ"), ("ΜΑΣ13", "μας13")] {
             let hits = index.search(query, 10);
             assert_eq!(hits[0].reference.id.native_key, key, "{query}");
@@ -849,7 +920,7 @@ mod tests {
             reference("a", "Insomnia", "X", 2020),
             reference("b", "The somnia", "Y", 2020),
         ];
-        let index = Index::new(&refs);
+        let index = OwnedIndex::new(refs.into());
         let hits = index.search("somnia", 10);
         assert_eq!(hits[0].reference.id.native_key, "b");
         assert_eq!(hits[0].score, 2 * hits[1].score);
@@ -867,8 +938,7 @@ mod tests {
              @article{other, title={Mentions 10.1000/abc.1 in passing}, year={2023}}",
         )
         .references;
-        let borrowed = Index::new(&refs);
-        let owned = OwnedIndex::new(refs.clone());
+        let owned = OwnedIndex::new(refs);
         for (query, key, field) in [
             ("https://doi.org/10.1000/abc.1", "doi1", MatchField::Doi),
             ("978-0-306-40615-7", "isbn1", MatchField::Identifier),
@@ -878,39 +948,13 @@ mod tests {
             ("arXiv:hep-th/9711200", "old", MatchField::Identifier),
             ("https://arxiv.org/abs/hep-th/9711200", "old", MatchField::Identifier),
         ] {
-            for hits in [borrowed.search(query, 10), owned.search(query, 10)] {
-                assert_eq!(hits.len(), 1, "{query}");
-                assert_eq!(hits[0].reference.id.native_key, key, "{query}");
-                assert_eq!(hits[0].matched, [field], "{query}");
-            }
+            let hits = owned.search(query, 10);
+            assert_eq!(hits.len(), 1, "{query}");
+            assert_eq!(hits[0].reference.id.native_key, key, "{query}");
+            assert_eq!(hits[0].matched, [field], "{query}");
         }
         // An identifier nobody carries falls back to ordinary search.
         assert_eq!(owned.search("10.1000/zzz", 10).len(), 0);
         assert_eq!(owned.search("passing", 10)[0].reference.id.native_key, "other");
-    }
-
-    #[test]
-    fn owned_index_ranks_exactly_like_the_borrowed_one() {
-        let refs = vec![
-            reference("smith2020", "Sleep and memory", "Smith", 2020),
-            reference("smith2021", "Sleep and diet", "Smith", 2021),
-            reference("garcia2022", "Sueño y memoria", "García", 2022),
-        ];
-        let borrowed = Index::new(&refs);
-        let owned = OwnedIndex::new(refs.clone());
-        for query in ["sleep", "smith", "memoria", "2021", "", "missing"] {
-            let a: Vec<_> = borrowed
-                .search(query, 10)
-                .iter()
-                .map(|h| (&h.reference.id, h.score))
-                .collect();
-            let b: Vec<_> = owned
-                .search(query, 10)
-                .iter()
-                .map(|h| (&h.reference.id, h.score))
-                .collect();
-            assert_eq!(a, b, "{query}");
-        }
-        assert_eq!(owned.references().len(), 3);
     }
 }

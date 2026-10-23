@@ -2,6 +2,7 @@
 import { galleryProvider, galleryStates, gallerySwitches, withSwitches, type GallerySwitches, type GalleryState } from "./gallery-fixtures";
 import { renderToolbarMenuGallery, toolbarMenuGalleryStates } from "./ui/ToolbarMenuGallery";
 import { chipGroupGalleryStates, renderChipGroupGallery } from "./ui/ChipGroupGallery";
+import { buttonGalleryStates, renderButtonGallery } from "./ui/ButtonGallery";
 import { createRoot } from "react-dom/client";
 import { isTauri } from "@tauri-apps/api/core";
 import { emitTo } from "@tauri-apps/api/event";
@@ -62,6 +63,7 @@ function seedSteps(root: HTMLElement, state: GalleryState): (() => void)[] {
     if (i > 0) steps.push(() => press(search(), "ArrowDown"));
     steps.push(() => press(search(), "Enter", { shiftKey: true }));
   }
+  if (state.trayExpanded) steps.push(() => root.querySelector<HTMLButtonElement>('.chip-more:not(.chip-fit-measure) button')?.click());
   if (state.pinned) steps.push(() => press(search(), "P", { code: "KeyP", shiftKey: true, ...(navigator.platform.includes("Mac") ? { metaKey: true } : { ctrlKey: true }) }));
   if (state.keys) steps.push(() => press(root.querySelector("main"), "?"));
   if (state.menuOpen) steps.push(() => root.querySelector<HTMLButtonElement>('footer button[aria-haspopup]')?.click());
@@ -109,6 +111,48 @@ function selectionContained(root: HTMLElement, state: GalleryState): boolean {
     });
 }
 
+/** Expanded hit areas must stay inside the scrollport and belong to their button. */
+function shelfTargetsContained(root: HTMLElement): boolean {
+  const list = root.querySelector(".shelf-chips");
+  const viewport = list?.getBoundingClientRect();
+  if (!viewport?.width || !list?.clientWidth || typeof document.elementFromPoint !== "function") return true;
+  const minimum = parseFloat(getComputedStyle(document.documentElement).fontSize) * (matchMedia("(pointer: coarse)").matches ? 2.75 : 2);
+  let tested = 0;
+  const contained = [...list.querySelectorAll<HTMLElement>(".chip:not([hidden]) button, .chip-more:not(.chip-fit-measure) button")].every((button) => {
+    const box = button.getBoundingClientRect();
+    // Partly scrolled rows are not the complete visible controls under test.
+    if (box.top < viewport.top || box.bottom > viewport.bottom) return true;
+    tested++;
+    const hit = getComputedStyle(button, "::after");
+    const left = box.left + (parseFloat(hit.left) || 0);
+    const right = box.right - (parseFloat(hit.right) || 0);
+    const top = box.top + (parseFloat(hit.top) || 0);
+    const bottom = box.bottom - (parseFloat(hit.bottom) || 0);
+    return right - left >= minimum - 0.1 && bottom - top >= minimum - 0.1
+      && left >= viewport.left - 0.1 && right <= viewport.right + 0.1 && top >= viewport.top - 0.1 && bottom <= viewport.bottom + 0.1
+      && [[left + 1, (top + bottom) / 2], [right - 1, (top + bottom) / 2], [(left + right) / 2, top + 1], [(left + right) / 2, bottom - 1]]
+        .every(([x, y]) => button.contains(document.elementFromPoint(x!, y!)));
+  });
+  return tested > 0 && contained;
+}
+
+/** The complete warning action stays above its divider, including touch targets. */
+function warningTargetContained(root: HTMLElement): boolean {
+  const button = root.querySelector<HTMLElement>(".copy-notice .dismiss");
+  const notice = button?.closest(".copy-notice")?.getBoundingClientRect();
+  // Zero-size JSDOM geometry does not establish rendered containment.
+  if (!button || !notice?.width) return true;
+  const box = button.getBoundingClientRect();
+  const minimum = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16)
+    * (matchMedia("(pointer: coarse)").matches ? 2.75 : 2);
+  return box.width >= minimum - 0.1 && box.height >= minimum - 0.1
+    && box.left >= notice.left - 0.1 && box.right <= notice.right + 0.1
+    && box.top >= notice.top - 0.1 && box.bottom <= notice.bottom + 0.1
+    && (typeof document.elementFromPoint !== "function" || [[box.left + 1, box.y + box.height / 2],
+      [box.right - 1, box.y + box.height / 2], [box.x + box.width / 2, box.top + 1], [box.x + box.width / 2, box.bottom - 1]]
+      .every(([x, y]) => button.contains(document.elementFromPoint(x!, y!))));
+}
+
 /** The seeded settings and interactions are on screen, and nothing else is. */
 function seeded(root: HTMLElement, state: GalleryState): boolean {
   const html = document.documentElement;
@@ -126,11 +170,12 @@ function seeded(root: HTMLElement, state: GalleryState): boolean {
     && (document.querySelector(".toolbar-menu") !== null) === Boolean(state.formatMenu)
     && (typeof state.formatMenu !== "string" || filter?.value === state.formatMenu)
     && (root.querySelector('[role="dialog"]') !== null) === Boolean(state.keys)
-    && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li.chip`).length === Math.min(state.tray ?? 0, SHELF_CHIPS)
+    && root.querySelectorAll(`ul[aria-label="${pickerText.selectedReferences}"] > li.chip`).length === (state.trayExpanded ? state.tray : Math.min(state.tray ?? 0, SHELF_CHIPS))
+    && Boolean(root.querySelector('.shelf-chips[data-expanded]')) === Boolean(state.trayExpanded)
     && (state.showPastePreview === false ? root.querySelector(".shelf-output") === null
       && root.querySelector('footer [aria-keyshortcuts="Enter"]') !== null
       : !(state.formatted || state.showPastePreview) || root.querySelector(".shelf-output .preview-text") !== null)
-    && selectionContained(root, state);
+    && selectionContained(root, state) && shelfTargetsContained(root) && warningTargetContained(root);
 }
 
 /**
@@ -283,7 +328,7 @@ function Gallery({ switches }: { switches: GallerySwitches }) {
         )}
       </header>
       <div className="gallery-grid">
-        {[...galleryStates, ...(isTauri() ? [] : [...toolbarMenuGalleryStates, ...chipGroupGalleryStates])].map((state) => (
+        {[...galleryStates, ...(isTauri() ? [] : [...toolbarMenuGalleryStates, ...chipGroupGalleryStates, ...buttonGalleryStates])].map((state) => (
           <section key={state.id} aria-label={state.label}>
             <h2><a href={galleryHref(switches, { state: state.id })}>{state.label}</a></h2>
             <iframe src={galleryHref(switches, { state: state.id })} title={state.label} tabIndex={-1} />
@@ -300,10 +345,11 @@ if (root && (import.meta.env.DEV || import.meta.env.MODE === "evidence")) {
   const switches = gallerySwitches(window.location.search);
   const id = new URLSearchParams(window.location.search).get("state");
   const state = galleryStates.find((candidate) => candidate.id === id);
-  if ([...toolbarMenuGalleryStates, ...chipGroupGalleryStates].some((candidate) => candidate.id === id) && !isTauri()) {
+  if ([...toolbarMenuGalleryStates, ...chipGroupGalleryStates, ...buttonGalleryStates].some((candidate) => candidate.id === id) && !isTauri()) {
     if (switches.theme) document.documentElement.dataset.galleryTheme = switches.theme;
     document.documentElement.dataset.textSize = switches.text === "large" ? "larger" : "normal";
-    if (chipGroupGalleryStates.some((candidate) => candidate.id === id)) renderChipGroupGallery(root, id!);
+    if (id === "buttons") renderButtonGallery(root);
+    else if (chipGroupGalleryStates.some((candidate) => candidate.id === id)) renderChipGroupGallery(root, id!);
     else renderToolbarMenuGallery(root, id!);
   } else if (state) {
     renderGalleryState(root, withSwitches(state, switches));
