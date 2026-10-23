@@ -98,6 +98,7 @@ fn main() {
         .manage(row_context::RowContext::default())
         .on_menu_event(row_context::selected)
         .manage(Pinned::default())
+        .manage(picker::PickerGeneration::default())
         .manage(notice::Notice::default())
         .manage(picker::FullScreenGuard::default())
         .manage(Mutex::new(ShortcutStatus::default()))
@@ -138,7 +139,11 @@ fn main() {
                     let blur = window.state::<picker::FocusChanges>().record();
                     if startup_allows_blur && hides_on_blur(!cfg!(debug_assertions), chooser_open, pinned) {
                         #[cfg(target_os = "windows")]
-                        picker::dismiss_unless_refocused(window.app_handle(), blur);
+                        picker::dismiss_unless_refocused(
+                            window.app_handle(),
+                            blur,
+                            window.state::<picker::PickerGeneration>().current(),
+                        );
                         #[cfg(not(target_os = "windows"))]
                         dismiss_picker(window.app_handle());
                     }

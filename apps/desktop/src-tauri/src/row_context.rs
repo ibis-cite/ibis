@@ -55,63 +55,96 @@ pub(crate) async fn row_context(window: WebviewWindow, added: bool) -> Result<Op
         let Some(lease) = window.state::<ChooserOpen>().begin() else {
             return Ok(None);
         };
-        lease.during(|| {
-            if !window.is_visible().map_err(|_| FAILURE)? {
-                return Ok(None);
+        let generation = window.state::<crate::picker::PickerGeneration>().current();
+        if !window.is_visible().map_err(|_| FAILURE)? {
+            return Ok(None);
+        }
+        let copy = MenuItem::new(&window, "Copy", true, None::<&str>).map_err(|_| FAILURE)?;
+        let toggle = MenuItem::new(
+            &window,
+            if added {
+                "Remove from Citation"
+            } else {
+                "Add to Citation"
+            },
+            true,
+            None::<&str>,
+        )
+        .map_err(|_| FAILURE)?;
+        let menu = Menu::with_items(&window, &[&copy, &toggle]).map_err(|_| FAILURE)?;
+        *window.state::<RowContext>().0.lock().map_err(|_| FAILURE)? = Some(Pending {
+            ids: [copy.id().clone(), toggle.id().clone()],
+            action: None,
+        });
+        let shown = window.popup_menu(&menu).map_err(|_| FAILURE.to_string());
+        // Native popup blocks until closed, but Tauri queues the menu event.
+        // Enqueue from this worker AFTER popup returns: dispatch from the main
+        // thread would run inline, incorrectly treating a selection as cancel.
+        let (send, receive) = mpsc::sync_channel(1);
+        let owner = window.clone();
+        if window
+            .run_on_main_thread(move || {
+                let action = owner
+                    .state::<RowContext>()
+                    .0
+                    .lock()
+                    .map_err(|_| FAILURE.to_string())
+                    .map(|mut state| state.take().and_then(|pending| pending.action));
+                let result = shown
+                    .and(action)
+                    .map(|action| action.filter(|_| owner.is_visible().unwrap_or(false)));
+                // Release/reconcile in this same main-thread turn; a newer
+                // show cannot interleave a worker's blocking native queries.
+                let result = finish(lease, result, || {
+                    crate::picker::reconcile_cancelled_menu(&owner, generation)
+                });
+                let _ = send.send(result);
+            })
+            .is_err()
+        {
+            if let Ok(mut state) = window.state::<RowContext>().0.lock() {
+                state.take();
             }
-            let copy = MenuItem::new(&window, "Copy", true, None::<&str>).map_err(|_| FAILURE)?;
-            let toggle = MenuItem::new(
-                &window,
-                if added {
-                    "Remove from Citation"
-                } else {
-                    "Add to Citation"
-                },
-                true,
-                None::<&str>,
-            )
-            .map_err(|_| FAILURE)?;
-            let menu = Menu::with_items(&window, &[&copy, &toggle]).map_err(|_| FAILURE)?;
-            *window.state::<RowContext>().0.lock().map_err(|_| FAILURE)? = Some(Pending {
-                ids: [copy.id().clone(), toggle.id().clone()],
-                action: None,
-            });
-            let shown = window.popup_menu(&menu);
-            // Native popup blocks until closed, but Tauri queues the menu event.
-            // Enqueue from this worker AFTER popup returns: dispatch from the main
-            // thread would run inline, incorrectly treating a selection as cancel.
-            let (send, receive) = mpsc::sync_channel(1);
-            let owner = window.clone();
-            if window
-                .run_on_main_thread(move || {
-                    let action = owner
-                        .state::<RowContext>()
-                        .0
-                        .lock()
-                        .ok()
-                        .and_then(|mut state| state.take())
-                        .and_then(|pending| pending.action);
-                    let _ = send.send(action.filter(|_| owner.is_visible().unwrap_or(false)));
-                })
-                .is_err()
-            {
-                if let Ok(mut state) = window.state::<RowContext>().0.lock() {
-                    state.take();
-                }
-                return Err(FAILURE.to_string());
-            }
-            let action = receive.recv().map_err(|_| FAILURE)?;
-            shown.map_err(|_| FAILURE)?;
-            Ok(action)
-        })
+            return Err(FAILURE.to_string());
+        }
+        receive.recv().map_err(|_| FAILURE.to_string())?
     })
     .await
     .map_err(|_| FAILURE.to_string())?
 }
 
+fn finish<T>(
+    lease: T,
+    result: Result<Option<RowAction>, String>,
+    cancelled: impl FnOnce(),
+) -> Result<Option<RowAction>, String> {
+    drop(lease);
+    if !matches!(result, Ok(Some(_))) {
+        cancelled();
+    }
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cancel_reconciles_the_ignored_blur_after_lease_release_but_selection_does_not() {
+        let chooser = ChooserOpen::default();
+        for action in [None, Some(RowAction::Copy), Some(RowAction::Toggle)] {
+            let lease = chooser.begin().unwrap_or_else(|| panic!("menu owns chooser"));
+            assert!(!crate::picker::hides_on_blur(true, chooser.is_open(), false));
+            let mut reconciled = false;
+            let result = finish(lease, Ok(action), || {
+                reconciled = true;
+                assert!(crate::picker::hides_on_blur(true, chooser.is_open(), false));
+                assert!(!crate::picker::hides_on_blur(true, chooser.is_open(), true));
+            });
+            assert_eq!(result, Ok(action));
+            assert_eq!(reconciled, action.is_none());
+        }
+    }
 
     #[test]
     fn only_this_popups_first_exact_action_can_complete() {
