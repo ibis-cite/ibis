@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
-<!-- Ibis brand master. Edit the three symbols below; build.py reads them by id and makes every export.
+<!-- Ibis brand master. Edit the symbols below; build.py reads them by id and makes every export.
      Each symbol's viewBox is the exact outline of its shape, with no padding: build.py adds padding and effects.
      mark: the ibis (approved 1B silhouette). wordmark: "Ibis" in Inter Display SemiBold, outlined, cap height 100.
      eye: the bird's eye, in the mark's units; build.py cuts it out of the mark so the background shows through.

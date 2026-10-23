@@ -151,20 +151,32 @@ def draw(name, k, tx, ty, paint, uid, depth=False, neck=None):
         paint, attr = f"url(#{uid}g)", f' filter="url(#{uid}f)"'
     if neck:
         body = thicken(body, neck)       # favicon sizes: no eye, as in the app's small icon
-    elif name == "mark":
-        mask, body = cut_eye(body, uid)
-        defs += mask
     body = body.replace("currentColor", paint)
-    return defs, f'<g transform="translate({tx:.3f} {ty:.3f}) scale({k:.5f})"><g{attr}>{body}</g></g>'
+    shape = f"<g{attr}>{body}</g>"
+    if name == "mark" and not neck:
+        mask, shape = cut_eye(body, uid, attr)
+        defs += mask
+    return defs, f'<g transform="translate({tx:.3f} {ty:.3f}) scale({k:.5f})">{shape}</g>'
 
 
-def cut_eye(body, uid):
-    """Cut the eye out of the bird, so whatever is behind it shows through on any background."""
+def cut_eye(body, uid, attr):
+    """Cut the eye out of the bird, so whatever is behind it shows through on any background.
+
+    The cut is made after the depth, so the eye is crisp. `eye_depth` (0 to 1) then fades in the
+    depth's own rim light and shade inside the eye, for a slightly inset look.
+    """
     bx, by, bw, bh = SYM["mark"][0]
+    m = 4 * D["shadow_blur"]
+    box = f'x="{bx - m:g}" y="{by - m:g}" width="{bw + 2 * m:g}" height="{bh + 2 * m + D["shadow_drop"]:g}"'
     eye = SYM["eye"][1].replace("currentColor", "#000")
-    box = f'x="{bx - 1:g}" y="{by - 1:g}" width="{bw + 2:g}" height="{bh + 2:g}"'
-    return (f'<mask id="{uid}e" maskUnits="userSpaceOnUse" {box}><rect {box} fill="#fff"/>{eye}</mask>',
-            f'<g mask="url(#{uid}e)">{body}</g>')
+    defs = f'<mask id="{uid}e" maskUnits="userSpaceOnUse" {box}><rect {box} fill="#fff"/>{eye}</mask>'
+    shape = f'<g mask="url(#{uid}e)"><g{attr}>{body}</g></g>'
+    if attr and D["eye_depth"] > 0:
+        (ex, ey, ew, eh), _ = SYM["eye"]
+        defs += f'<clipPath id="{uid}c"><circle cx="{ex + ew / 2:g}" cy="{ey + eh / 2:g}" r="{ew:g}"/></clipPath>'
+        shape += (f'<g clip-path="url(#{uid}c)" opacity="{D["eye_depth"]:g}">'
+                  f'<g{attr}><g mask="url(#{uid}e)">{body}</g></g></g>')
+    return defs, shape
 
 
 def place(name, x, y, height, paint, uid, depth=False):
@@ -376,8 +388,8 @@ def motion_css():
 
 def animate(svg):
     """Tag the neck and group the head with the beak so they grow from the head's centre as one shape."""
-    out = svg.replace('<path d="M36', '<path class="neck" pathLength="1" d="M36', 1)
-    out = re.sub(r'(<path d="M41 25[^"]*"[^>]*/>)(<circle [^>]*/>)', r'<g class="crown">\1\2</g>', out, count=1)
+    out = svg.replace('<path d="M36', '<path class="neck" pathLength="1" d="M36')
+    out = re.sub(r'(<path d="M41 25[^"]*"[^>]*/>)(<circle [^>]*/>)', r'<g class="crown">\1\2</g>', out)
     if 'class="neck"' not in out or 'class="crown"' not in out:
         raise SystemExit("master.svg's bird changed shape order; update animate() in build.py")
     return out.replace("<defs>", f"<defs><style>{motion_css()}</style>", 1)

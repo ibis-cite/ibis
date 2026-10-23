@@ -54,7 +54,8 @@
     "shadow_drop": 1.6,
     "shadow_colour": "#4A0F04",
     "rim_blur": 1.1,
-    "rim_offset": 1.3
+    "rim_offset": 1.3,
+    "eye_depth": 0.35
   },
   "motion": {
     "neck_start": 0.1,
