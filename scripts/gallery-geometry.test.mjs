@@ -24,6 +24,10 @@ test("the geometry spec derives the corner chain and text x that docs/design.md 
   assert.equal(windows, macos);
   assert.match(design, new RegExp(`text x .*${macos} px on every OS`));
   assert.equal(derive(spec, "linux").textX, macos);
+  for (const look of LOOKS) {
+    assert.equal(derive(spec, look).tileCentre, spec.columns.tileCentre);
+    assert.equal(derive(spec, look).textX, spec.columns.titleStart);
+  }
 });
 
 test("the geometry spec's row heights, footer and search band are the ones docs/design.md states", () => {
@@ -41,11 +45,12 @@ test("the geometry spec's row heights, footer and search band are the ones docs/
 
 const onSpec = { rowHeight: 58, footer: 41, searchBand: 48, glyphCentre: 36, tileCentre: 36, textX: 64, titleX: 64, rWin: 8, rRow: 4, rField: 4, rTile: 4,
   headerDivider: 1, fieldHeight: 32, pinHeight: 32, popupHeight: 32, footerAction: 24, footerDivider: 1,
-  pinTopGap: 8, pinBottomGap: 8, pinEndGap: 8, footerTopGap: 8, footerBottomGap: 8, rControl: 4, rPopup: 4 };
+  pinTopGap: 8, pinBottomGap: 8, pinEndGap: 8, footerTopGap: 8, footerBottomGap: 8, rControl: 4, rPopup: 4,
+  statusDotCentre: 36, statusTextX: 64, shelfTextX: 64 };
 
 test("a frame on spec passes every check, within the tolerance", () => {
   const rows = compare(spec, "windows", "normal", "comfortable", { ...onSpec, textX: 64.4 });
-  assert.equal(rows.length, 23);
+  assert.equal(rows.length, 29);
   assert.ok(rows.every((row) => row.pass), table(rows));
 });
 
@@ -64,7 +69,7 @@ test("C15 radii stay fixed while Larger text scales layout", () => {
 test("a Larger text frame with scaled insets passes without hiding radius drift", () => {
   const fixture = { ...spec, platforms: { ...spec.platforms, windows: { ...spec.platforms.windows, inset: 4, rWin: 8, rMin: 2 } } };
   const measured = { ...onSpec, rowHeight: 66.7, footer: 47, searchBand: 55.2,
-    glyphCentre: 46, tileCentre: 46, textX: 69, titleX: 69, rRow: 2, rField: 2, rTile: 2,
+    glyphCentre: 36.8, tileCentre: 36.8, textX: 69, titleX: 69, statusDotCentre: 36.8, statusTextX: 69, shelfTextX: 69, rRow: 2, rField: 2, rTile: 2,
     fieldHeight: 36.8, pinHeight: 36.8, popupHeight: 36.8, footerAction: 27.6,
     pinTopGap: 4.6, pinBottomGap: 4.6, pinEndGap: 4.6, footerTopGap: 4.6, footerBottomGap: 4.6 };
   const rows = compare(fixture, "windows", "large", "comfortable", measured);
@@ -77,8 +82,8 @@ test("drift, a missing element and Larger text scaling are reported", () => {
   const rows = compare(spec, "windows", "normal", "comfortable", { ...onSpec, footer: 52, rTile: Number.NaN });
   assert.deepEqual(rows.filter((row) => !row.pass).map((row) => row.name), ["footer height", "tile radius"]);
   assert.match(table(rows), /tile radius +windows +normal +4 +— +MISMATCH/);
-  const large = compare(spec, "macos", "large", "compact", { rowHeight: 46 });
-  assert.deepEqual(large.map((row) => [row.name, row.pass]), [["row height (compact)", true]]);
+  const large = compare(spec, "macos", "large", "compact", { ...onSpec, rowHeight: 46, glyphCentre: 41.4, tileCentre: 41.4, textX: 73.6, titleX: 73.6, statusDotCentre: 41.4, statusTextX: 73.6, shelfTextX: 73.6 });
+  assert.ok(large.every(row => row.pass), table(large));
 });
 
 test("header/footer fills, control radii, outside dividers and each eight-pixel gap are measured", () => {
@@ -129,4 +134,13 @@ test("overlapping regions, a half chip and a list without its own scroll fail (#
   assert.equal(rows[0].measured, 2);
   // Without a tray only regions and the list are checked, and a missing list fails.
   assert.deepEqual(layout("linux", "large", "many-results", { regions: [], tray: null, list: null }).map((row) => row.pass), [true, false]);
+});
+
+
+test("absolute columns reject equally misplaced pairs and every existing text consumer", () => {
+  const frame = { ...onSpec, glyphCentre: 40, tileCentre: 40, textX: 68, titleX: 68,
+    statusDotCentre: 24, statusTextX: 36, shelfTextX: 65 };
+  const failures = compare(spec, "windows", "normal", "comfortable", frame).filter(row => !row.pass).map(row => row.name);
+  for (const name of ["tile centre x", "search glyph centre x", "row title x", "status dot centre x", "status text x", "shelf citation x"])
+    assert.ok(failures.includes(name), `${name} must be checked against its absolute column`);
 });
