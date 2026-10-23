@@ -34,6 +34,13 @@ the same as Ibis's settings.
 
 ## Network and diagnostics
 
+- **Telemetry:** none, ever ([ADR 0008](docs/adr/0008-network-policy.md)).
+  Ibis never sends your libraries, search queries, selected references,
+  documents, clipboard contents or citation history off your computer.
+- **Web interface:** no file system, clipboard, shell or network plugin
+  permissions. Library reads and clipboard writes go through Ibis's
+  window-scoped commands ([ADR 0024](docs/adr/0024-window-command-permissions.md)).
+  Its content security policy restricts `connect-src` to local IPC.
 - **Zotero:** Ibis connects to `127.0.0.1:23119` on your computer. Setup checks
   Zotero's greeting; choosing Zotero reads the selected libraries and refreshes
   them when the picker opens. Zotero's local API must be enabled. These requests
