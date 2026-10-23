@@ -1,0 +1,8314 @@
+{
+  "sha": "d68dcc8948a341e587dae01a0500a03ccb141325",
+  "browser": "Chrome on macOS, synthetic provider and native RGB injection; not native acceptance",
+  "results": [
+    {
+      "kind": "native-state",
+      "name": "blue",
+      "theme": "light",
+      "pass": true,
+      "rest": {
+        "background": [
+          0,
+          122,
+          255,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.2278134466363,
+        "cssBackground": "color(srgb 0 0.478431 1)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          0,
+          15,
+          31,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.817570706729782
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.93536903929707
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          2,
+          114,
+          237,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 4.6323916400816705,
+        "cssBackground": "color(srgb 0.00690196 0.447686 0.929098)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          0,
+          15,
+          31,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.817570706729782
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.93536903929707
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          4,
+          106,
+          219,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 5.134887805048475,
+        "cssBackground": "color(srgb 0.0138039 0.416941 0.858196)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          15,
+          31,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.817570706729782
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.93536903929707
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          239.1529411764706,
+          239.1529411764706,
+          240.10196078431372,
+          1
+        ],
+        "foreground": [
+          76,
+          82,
+          96,
+          1
+        ],
+        "contrast": 6.820208257451389,
+        "cssBackground": "rgba(0, 0, 0, 0.05)",
+        "cssColor": "rgb(76, 82, 96)",
+        "focus": [
+          0,
+          15,
+          31,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.817570706729782
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.823023306995374
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.93536903929707
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          0,
+          122,
+          255
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          194,
+          58,
+          28
+        ],
+        "tileContrast": 5.2278134466363,
+        "checkContrast": 3.9158572868390915,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "red",
+      "theme": "light",
+      "pass": true,
+      "rest": {
+        "background": [
+          255,
+          0,
+          0,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.252,
+        "cssBackground": "color(srgb 1 0 0)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          31,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 17.292003010768873
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 18.441335008192926
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          236,
+          2,
+          2,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 4.576133283795481,
+        "cssBackground": "color(srgb 0.926902 0.00752941 0.00909804)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          31,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 17.292003010768873
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 18.441335008192926
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          218,
+          4,
+          5,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 5.249155792432248,
+        "cssBackground": "color(srgb 0.853804 0.0150588 0.0181961)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          31,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 17.292003010768873
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 18.441335008192926
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          239.1529411764706,
+          239.1529411764706,
+          240.10196078431372,
+          1
+        ],
+        "foreground": [
+          76,
+          82,
+          96,
+          1
+        ],
+        "contrast": 6.820208257451389,
+        "cssBackground": "rgba(0, 0, 0, 0.05)",
+        "cssColor": "rgb(76, 82, 96)",
+        "focus": [
+          31,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 17.292003010768873
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 19.3540304585185
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 18.441335008192926
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          255,
+          0,
+          0
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          194,
+          58,
+          28
+        ],
+        "tileContrast": 5.252,
+        "checkContrast": 3.9158572868390915,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "yellow",
+      "theme": "light",
+      "pass": true,
+      "rest": {
+        "background": [
+          255,
+          184,
+          0,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 12.108195899074227,
+        "cssBackground": "color(srgb 1 0.72 0)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          31,
+          22,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 15.600227356448492
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 16.637113624435504
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          236,
+          171,
+          2,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 10.392613974892557,
+        "cssBackground": "color(srgb 0.926902 0.669929 0.00909804)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          31,
+          22,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 15.600227356448492
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 16.637113624435504
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          218,
+          158,
+          5,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 8.87402064321371,
+        "cssBackground": "color(srgb 0.853804 0.619859 0.0181961)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          31,
+          22,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 15.600227356448492
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 16.637113624435504
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          239.1529411764706,
+          239.1529411764706,
+          240.10196078431372,
+          1
+        ],
+        "foreground": [
+          76,
+          82,
+          96,
+          1
+        ],
+        "contrast": 6.820208257451389,
+        "cssBackground": "rgba(0, 0, 0, 0.05)",
+        "cssColor": "rgb(76, 82, 96)",
+        "focus": [
+          31,
+          22,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 15.600227356448492
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 17.460514853512784
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 16.637113624435504
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          255,
+          184,
+          0
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          194,
+          58,
+          28
+        ],
+        "tileContrast": 12.108195899074227,
+        "checkContrast": 3.9158572868390915,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "gray",
+      "theme": "light",
+      "pass": true,
+      "rest": {
+        "background": [
+          119,
+          119,
+          119,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 4.68949989000882,
+        "cssBackground": "color(srgb 0.466667 0.466667 0.466667)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          14,
+          14,
+          14,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.82200007830479
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.940092813925123
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          111,
+          111,
+          112,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 5.019543144478662,
+        "cssBackground": "color(srgb 0.436235 0.436863 0.438431)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          14,
+          14,
+          14,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.82200007830479
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.940092813925123
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          103,
+          104,
+          105,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 5.583884267448449,
+        "cssBackground": "color(srgb 0.405804 0.407059 0.410196)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          14,
+          14,
+          14,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.82200007830479
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.940092813925123
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          239.1529411764706,
+          239.1529411764706,
+          240.10196078431372,
+          1
+        ],
+        "foreground": [
+          76,
+          82,
+          96,
+          1
+        ],
+        "contrast": 6.820208257451389,
+        "cssBackground": "rgba(0, 0, 0, 0.05)",
+        "cssColor": "rgb(76, 82, 96)",
+        "focus": [
+          14,
+          14,
+          14,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.82200007830479
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.82798086988276
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.940092813925123
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          119,
+          119,
+          119
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          194,
+          58,
+          28
+        ],
+        "tileContrast": 4.68949989000882,
+        "checkContrast": 3.9158572868390915,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "olive",
+      "theme": "light",
+      "pass": true,
+      "rest": {
+        "background": [
+          153,
+          102,
+          0,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.93535928210349,
+        "cssBackground": "color(srgb 0.6 0.4 0)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          18,
+          12,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.970522408073876
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 18.098486843683464
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          143,
+          96,
+          2,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 5.4659701151723,
+        "cssBackground": "color(srgb 0.558902 0.375529 0.00909804)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          18,
+          12,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.970522408073876
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 18.098486843683464
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          132,
+          90,
+          5,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 6.0944396081371845,
+        "cssBackground": "color(srgb 0.517804 0.351059 0.0181961)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          18,
+          12,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.970522408073876
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 18.098486843683464
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          239.1529411764706,
+          239.1529411764706,
+          240.10196078431372,
+          1
+        ],
+        "foreground": [
+          76,
+          82,
+          96,
+          1
+        ],
+        "contrast": 6.820208257451389,
+        "cssBackground": "rgba(0, 0, 0, 0.05)",
+        "cssColor": "rgb(76, 82, 96)",
+        "focus": [
+          18,
+          12,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.970522408073876
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.99421411031945
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 18.098486843683464
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          153,
+          102,
+          0
+        ],
+        "tile": [
+          255,
+          255,
+          255
+        ],
+        "check": [
+          194,
+          58,
+          28
+        ],
+        "tileContrast": 4.93535928210349,
+        "checkContrast": 5.362810353324023,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "crossover",
+      "theme": "light",
+      "pass": true,
+      "rest": {
+        "background": [
+          102,
+          140,
+          128,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.627892070716079,
+        "cssBackground": "color(srgb 0.4 0.55 0.5)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          12,
+          17,
+          15,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.594986573787548
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.697990607166357
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          96,
+          131,
+          120,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.015092329199813,
+        "cssBackground": "color(srgb 0.374902 0.513529 0.469098)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          12,
+          17,
+          15,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.594986573787548
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.697990607166357
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          89,
+          122,
+          112,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.727011423945427,
+        "cssBackground": "color(srgb 0.349804 0.477059 0.438196)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          12,
+          17,
+          15,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.594986573787548
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.697990607166357
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          239.1529411764706,
+          239.1529411764706,
+          240.10196078431372,
+          1
+        ],
+        "foreground": [
+          76,
+          82,
+          96,
+          1
+        ],
+        "contrast": 6.820208257451389,
+        "cssBackground": "rgba(0, 0, 0, 0.05)",
+        "cssColor": "rgb(76, 82, 96)",
+        "focus": [
+          12,
+          17,
+          15,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 16.594986573787548
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 18.57389658142957
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 17.697990607166357
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          102,
+          140,
+          128
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          194,
+          58,
+          28
+        ],
+        "tileContrast": 5.627892070716079,
+        "checkContrast": 3.9158572868390915,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "black",
+      "theme": "light",
+      "pass": true,
+      "rest": {
+        "background": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 21,
+        "cssBackground": "color(srgb 0 0 0)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 18.299456844248525
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 19.515750368687385
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          2,
+          2,
+          2,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 20.74809572362502,
+        "cssBackground": "color(srgb 0.00690196 0.00752941 0.00909804)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 18.299456844248525
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 19.515750368687385
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          4,
+          4,
+          5,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 20.49339404344256,
+        "cssBackground": "color(srgb 0.0138039 0.0150588 0.0181961)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 18.299456844248525
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 19.515750368687385
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          239.1529411764706,
+          239.1529411764706,
+          240.10196078431372,
+          1
+        ],
+        "foreground": [
+          76,
+          82,
+          96,
+          1
+        ],
+        "contrast": 6.820208257451389,
+        "cssBackground": "rgba(0, 0, 0, 0.05)",
+        "cssColor": "rgb(76, 82, 96)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 18.299456844248525
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 20.481620603313964
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 19.515750368687385
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          0,
+          0,
+          0
+        ],
+        "tile": [
+          255,
+          255,
+          255
+        ],
+        "check": [
+          194,
+          58,
+          28
+        ],
+        "tileContrast": 21,
+        "checkContrast": 5.362810353324023,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "white",
+      "theme": "light",
+      "pass": true,
+      "rest": {
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 21,
+        "cssBackground": "color(srgb 1 1 1)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          31,
+          31,
+          31,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 14.363311189261893
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 15.31798446386732
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          236,
+          237,
+          237,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 17.90313304773887,
+        "cssBackground": "color(srgb 0.926902 0.927529 0.929098)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          31,
+          31,
+          31,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 14.363311189261893
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 15.31798446386732
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          218,
+          218,
+          219,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 15.032541332871844,
+        "cssBackground": "color(srgb 0.853804 0.855059 0.858196)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          31,
+          31,
+          31,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 14.363311189261893
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 15.31798446386732
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          239.1529411764706,
+          239.1529411764706,
+          240.10196078431372,
+          1
+        ],
+        "foreground": [
+          76,
+          82,
+          96,
+          1
+        ],
+        "contrast": 6.820208257451389,
+        "cssBackground": "rgba(0, 0, 0, 0.05)",
+        "cssColor": "rgb(76, 82, 96)",
+        "focus": [
+          31,
+          31,
+          31,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 14.363311189261893
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 16.0760995744121
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 15.31798446386732
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          255,
+          255,
+          255
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          194,
+          58,
+          28
+        ],
+        "tileContrast": 21,
+        "checkContrast": 3.9158572868390915,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "blue",
+      "theme": "dark",
+      "pass": true,
+      "rest": {
+        "background": [
+          0,
+          122,
+          255,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.2278134466363,
+        "cssBackground": "color(srgb 0 0.478431 1)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          245,
+          250,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.628303398868349
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.030899218665082
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          20,
+          132,
+          254,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.761401566440912,
+        "cssBackground": "color(srgb 0.0768627 0.51702 0.99749)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          245,
+          250,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.628303398868349
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.030899218665082
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          39,
+          142,
+          254,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 6.386618801000148,
+        "cssBackground": "color(srgb 0.153725 0.555608 0.99498)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          245,
+          250,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.628303398868349
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.030899218665082
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          53.1764705882353,
+          53.1764705882353,
+          55.01960784313726,
+          1
+        ],
+        "foreground": [
+          192,
+          195,
+          204,
+          1
+        ],
+        "contrast": 6.929784439933601,
+        "cssBackground": "rgba(255, 255, 255, 0.08)",
+        "cssColor": "rgb(192, 195, 204)",
+        "focus": [
+          245,
+          250,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.628303398868349
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.756856388033118
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.030899218665082
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          0,
+          122,
+          255
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          210,
+          64,
+          31
+        ],
+        "tileContrast": 5.2278134466363,
+        "checkContrast": 4.493471748241516,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "red",
+      "theme": "dark",
+      "pass": true,
+      "rest": {
+        "background": [
+          255,
+          0,
+          0,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.252,
+        "cssBackground": "color(srgb 1 0 0)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          245,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.413617525984245
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 13.771855767287546
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          254,
+          20,
+          20,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.324329836557059,
+        "cssBackground": "color(srgb 0.996863 0.0768627 0.0774902)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          245,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.413617525984245
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 13.771855767287546
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          253,
+          39,
+          40,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.497377196961719,
+        "cssBackground": "color(srgb 0.993725 0.153725 0.15498)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          245,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.413617525984245
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 13.771855767287546
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          53.1764705882353,
+          53.1764705882353,
+          55.01960784313726,
+          1
+        ],
+        "foreground": [
+          192,
+          195,
+          204,
+          1
+        ],
+        "contrast": 6.929784439933601,
+        "cssBackground": "rgba(255, 255, 255, 0.08)",
+        "cssColor": "rgb(192, 195, 204)",
+        "focus": [
+          255,
+          245,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.413617525984245
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.48441005721253
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 13.771855767287546
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          255,
+          0,
+          0
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          210,
+          64,
+          31
+        ],
+        "tileContrast": 5.252,
+        "checkContrast": 4.493471748241516,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "yellow",
+      "theme": "dark",
+      "pass": true,
+      "rest": {
+        "background": [
+          255,
+          184,
+          0,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 12.108195899074227,
+        "cssBackground": "color(srgb 1 0.72 0)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          252,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.915475596691914
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.37740584373793
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          254,
+          189,
+          20,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 12.503305902747387,
+        "cssBackground": "color(srgb 0.996863 0.739263 0.0774902)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          252,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.915475596691914
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.37740584373793
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          253,
+          193,
+          40,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 12.83515527396563,
+        "cssBackground": "color(srgb 0.993725 0.758525 0.15498)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          252,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.915475596691914
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.37740584373793
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          53.1764705882353,
+          53.1764705882353,
+          55.01960784313726,
+          1
+        ],
+        "foreground": [
+          192,
+          195,
+          204,
+          1
+        ],
+        "contrast": 6.929784439933601,
+        "cssBackground": "rgba(255, 255, 255, 0.08)",
+        "cssColor": "rgb(192, 195, 204)",
+        "focus": [
+          255,
+          252,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.915475596691914
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.121291227455231
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.37740584373793
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          255,
+          184,
+          0
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          210,
+          64,
+          31
+        ],
+        "tileContrast": 12.108195899074227,
+        "checkContrast": 4.493471748241516,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "gray",
+      "theme": "dark",
+      "pass": true,
+      "rest": {
+        "background": [
+          119,
+          119,
+          119,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 4.68949989000882,
+        "cssBackground": "color(srgb 0.466667 0.466667 0.466667)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          250,
+          250,
+          250,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.697331548569696
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.114189702107817
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          129,
+          129,
+          129,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.390523994585384,
+        "cssBackground": "color(srgb 0.506196 0.506196 0.506824)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          250,
+          250,
+          250,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.697331548569696
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.114189702107817
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          139,
+          139,
+          139,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 6.163657058431916,
+        "cssBackground": "color(srgb 0.545725 0.545725 0.54698)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          250,
+          250,
+          250,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.697331548569696
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.114189702107817
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          53.1764705882353,
+          53.1764705882353,
+          55.01960784313726,
+          1
+        ],
+        "foreground": [
+          192,
+          195,
+          204,
+          1
+        ],
+        "contrast": 6.929784439933601,
+        "cssBackground": "rgba(255, 255, 255, 0.08)",
+        "cssColor": "rgb(192, 195, 204)",
+        "focus": [
+          250,
+          250,
+          250,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.697331548569696
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.844456311851202
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.114189702107817
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          119,
+          119,
+          119
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          210,
+          64,
+          31
+        ],
+        "tileContrast": 4.68949989000882,
+        "checkContrast": 4.493471748241516,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "olive",
+      "theme": "dark",
+      "pass": true,
+      "rest": {
+        "background": [
+          153,
+          102,
+          0,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.93535928210349,
+        "cssBackground": "color(srgb 0.6 0.4 0)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          251,
+          249,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.610800406634965
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.009779824749408
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          160,
+          113,
+          20,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 4.866868895538132,
+        "cssBackground": "color(srgb 0.628863 0.444863 0.0774902)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          251,
+          249,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.610800406634965
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.009779824749408
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          168,
+          125,
+          40,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.629052671701866,
+        "cssBackground": "color(srgb 0.657726 0.489726 0.15498)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          251,
+          249,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.610800406634965
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.009779824749408
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          53.1764705882353,
+          53.1764705882353,
+          55.01960784313726,
+          1
+        ],
+        "foreground": [
+          192,
+          195,
+          204,
+          1
+        ],
+        "contrast": 6.929784439933601,
+        "cssBackground": "rgba(255, 255, 255, 0.08)",
+        "cssColor": "rgb(192, 195, 204)",
+        "focus": [
+          251,
+          249,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.610800406634965
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.734644279018656
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.009779824749408
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          153,
+          102,
+          0
+        ],
+        "tile": [
+          255,
+          255,
+          255
+        ],
+        "check": [
+          210,
+          64,
+          31
+        ],
+        "tileContrast": 4.93535928210349,
+        "checkContrast": 4.67344654124468,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "crossover",
+      "theme": "dark",
+      "pass": true,
+      "rest": {
+        "background": [
+          102,
+          140,
+          128,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 5.627892070716079,
+        "cssBackground": "color(srgb 0.4 0.55 0.5)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          249,
+          250,
+          250,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.675906432414175
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.088337809943088
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          113,
+          149,
+          137,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 6.36234908949441,
+        "cssBackground": "color(srgb 0.444863 0.582863 0.53749)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          249,
+          250,
+          250,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.675906432414175
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.088337809943088
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          125,
+          157,
+          147,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 7.116099955119466,
+        "cssBackground": "color(srgb 0.489726 0.615726 0.57498)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          249,
+          250,
+          250,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.675906432414175
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.088337809943088
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          53.1764705882353,
+          53.1764705882353,
+          55.01960784313726,
+          1
+        ],
+        "foreground": [
+          192,
+          195,
+          204,
+          1
+        ],
+        "contrast": 6.929784439933601,
+        "cssBackground": "rgba(255, 255, 255, 0.08)",
+        "cssColor": "rgb(192, 195, 204)",
+        "focus": [
+          249,
+          250,
+          250,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.675906432414175
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.817266845653174
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.088337809943088
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          102,
+          140,
+          128
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          210,
+          64,
+          31
+        ],
+        "tileContrast": 5.627892070716079,
+        "checkContrast": 4.493471748241516,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "black",
+      "theme": "dark",
+      "pass": true,
+      "rest": {
+        "background": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 21,
+        "cssBackground": "color(srgb 0 0 0)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          245,
+          245,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.19878991587603
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 13.512641293479753
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          20,
+          20,
+          20,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 18.422536070011546,
+        "cssBackground": "color(srgb 0.0768627 0.0768627 0.0774902)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          245,
+          245,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.19878991587603
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 13.512641293479753
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          39,
+          39,
+          40,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 14.924155155016251,
+        "cssBackground": "color(srgb 0.153725 0.153725 0.15498)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          245,
+          245,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.19878991587603
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 13.512641293479753
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          53.1764705882353,
+          53.1764705882353,
+          55.01960784313726,
+          1
+        ],
+        "foreground": [
+          192,
+          195,
+          204,
+          1
+        ],
+        "contrast": 6.929784439933601,
+        "cssBackground": "rgba(255, 255, 255, 0.08)",
+        "cssColor": "rgb(192, 195, 204)",
+        "focus": [
+          245,
+          245,
+          245,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 11.19878991587603
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 14.211783855280112
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 13.512641293479753
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          0,
+          0,
+          0
+        ],
+        "tile": [
+          255,
+          255,
+          255
+        ],
+        "check": [
+          210,
+          64,
+          31
+        ],
+        "tileContrast": 21,
+        "checkContrast": 4.67344654124468,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "native-state",
+      "name": "white",
+      "theme": "dark",
+      "pass": true,
+      "rest": {
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 21,
+        "cssBackground": "color(srgb 1 1 1)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 12.209267856178075
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.731900342434566
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "hover": {
+        "background": [
+          254,
+          254,
+          254,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 20.822041942276595,
+        "cssBackground": "color(srgb 0.996863 0.996863 0.99749)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 12.209267856178075
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.731900342434566
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "pressed": {
+        "background": [
+          253,
+          253,
+          254,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 20.657792640213692,
+        "cssBackground": "color(srgb 0.993725 0.993725 0.99498)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 12.209267856178075
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.731900342434566
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": true,
+        "pressed": true,
+        "disabled": false,
+        "accentInput": "true"
+      },
+      "disabled": {
+        "background": [
+          53.1764705882353,
+          53.1764705882353,
+          55.01960784313726,
+          1
+        ],
+        "foreground": [
+          192,
+          195,
+          204,
+          1
+        ],
+        "contrast": 6.929784439933601,
+        "cssBackground": "rgba(255, 255, 255, 0.08)",
+        "cssColor": "rgb(192, 195, 204)",
+        "focus": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 12.209267856178075
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 15.494127232196467
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 14.731900342434566
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": true,
+        "accentInput": "true"
+      },
+      "tile": {
+        "row": [
+          255,
+          255,
+          255
+        ],
+        "tile": [
+          0,
+          0,
+          0
+        ],
+        "check": [
+          210,
+          64,
+          31
+        ],
+        "tileContrast": 21,
+        "checkContrast": 4.493471748241516,
+        "path": "m5 10.5 3.2 3.2L15 6.5"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "forced-light",
+      "pass": true,
+      "before": {
+        "background": [
+          54.999999999999986,
+          50.999999999999986,
+          108.6,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 11.32025621138092,
+        "cssBackground": "rgba(5, 0, 73, 0.8)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-window": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-overlay": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-raised": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "menu": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          }
+        },
+        "rootInk": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          54.999999999999986,
+          50.999999999999986,
+          108.6,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 11.32025621138092,
+        "cssBackground": "rgba(5, 0, 73, 0.8)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-window": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-overlay": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-raised": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "menu": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          }
+        },
+        "rootInk": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "forced-dark",
+      "pass": true,
+      "before": {
+        "background": [
+          20.8,
+          188,
+          204,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 9.09666522259589,
+        "cssBackground": "rgba(26, 235, 255, 0.8)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-window": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-overlay": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-raised": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "menu": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          }
+        },
+        "rootInk": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          20.8,
+          188,
+          204,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 9.09666522259589,
+        "cssBackground": "rgba(26, 235, 255, 0.8)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-window": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-overlay": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-raised": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          },
+          "menu": {
+            "rgba": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "contrast": 21
+          }
+        },
+        "rootInk": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "more-light",
+      "pass": true,
+      "before": {
+        "background": [
+          178.8,
+          214.8,
+          253.79999999999998,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 14.040383941993412,
+        "cssBackground": "rgba(128, 188, 254, 0.6)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-window": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-field": {
+            "rgba": [
+              245,
+              245,
+              245,
+              1
+            ],
+            "contrast": 19.261973035868383
+          },
+          "--surface-overlay": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-raised": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "menu": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          }
+        },
+        "rootInk": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          178.8,
+          214.8,
+          253.79999999999998,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 14.040383941993412,
+        "cssBackground": "rgba(128, 188, 254, 0.6)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-window": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-field": {
+            "rgba": [
+              245,
+              245,
+              245,
+              1
+            ],
+            "contrast": 19.261973035868383
+          },
+          "--surface-overlay": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-raised": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "menu": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          }
+        },
+        "rootInk": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "more-dark",
+      "pass": true,
+      "before": {
+        "background": [
+          146.8,
+          175.6,
+          207.6,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 9.32260038226691,
+        "cssBackground": "rgba(179, 215, 255, 0.8)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          },
+          "--surface-window": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          },
+          "--surface-field": {
+            "rgba": [
+              27,
+              27,
+              27,
+              1
+            ],
+            "contrast": 17.224382887077635
+          },
+          "--surface-overlay": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          },
+          "--surface-raised": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          },
+          "menu": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          }
+        },
+        "rootInk": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          146.8,
+          175.6,
+          207.6,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 9.32260038226691,
+        "cssBackground": "rgba(179, 215, 255, 0.8)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          },
+          "--surface-window": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          },
+          "--surface-field": {
+            "rgba": [
+              27,
+              27,
+              27,
+              1
+            ],
+            "contrast": 17.224382887077635
+          },
+          "--surface-overlay": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          },
+          "--surface-raised": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          },
+          "menu": {
+            "rgba": [
+              18,
+              18,
+              18,
+              1
+            ],
+            "contrast": 18.733663902900595
+          }
+        },
+        "rootInk": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "gallery-light",
+      "pass": true,
+      "before": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 3.6683168306767953
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 3.912135543151017
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 3.6683168306767953
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 3.912135543151017
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "gallery-dark",
+      "pass": true,
+      "before": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 2.9002917550060876
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 3.49953900610952
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 2.9002917550060876
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 3.49953900610952
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "gallery-contrast",
+      "pass": true,
+      "before": {
+        "background": [
+          178.8,
+          214.8,
+          253.79999999999998,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 14.040383941993412,
+        "cssBackground": "rgba(128, 188, 254, 0.6)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-window": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-field": {
+            "rgba": [
+              245,
+              245,
+              245,
+              1
+            ],
+            "contrast": 19.261973035868383
+          },
+          "--surface-overlay": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-raised": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 19.545133875560662
+          }
+        },
+        "rootInk": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          178.8,
+          214.8,
+          253.79999999999998,
+          1
+        ],
+        "foreground": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "contrast": 14.040383941993412,
+        "cssBackground": "rgba(128, 188, 254, 0.6)",
+        "cssColor": "rgb(0, 0, 0)",
+        "focus": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-window": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-field": {
+            "rgba": [
+              245,
+              245,
+              245,
+              1
+            ],
+            "contrast": 19.261973035868383
+          },
+          "--surface-overlay": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "--surface-raised": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 21
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 19.545133875560662
+          }
+        },
+        "rootInk": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "notice",
+      "pass": true,
+      "before": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-field": {
+            "rgba": [
+              243,
+              243,
+              245,
+              1
+            ],
+            "contrast": 3.7986625573213484
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 3.912135543151017
+          }
+        },
+        "rootInk": [
+          39,
+          39,
+          43,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-field": {
+            "rgba": [
+              243,
+              243,
+              245,
+              1
+            ],
+            "contrast": 3.7986625573213484
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 3.912135543151017
+          }
+        },
+        "rootInk": [
+          39,
+          39,
+          43,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "windows",
+      "pass": true,
+      "before": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          27,
+          27,
+          27,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              243,
+              243,
+              243,
+              1
+            ],
+            "contrast": 15.522767292214983
+          },
+          "--surface-window": {
+            "rgba": [
+              243,
+              243,
+              243,
+              1
+            ],
+            "contrast": 15.522767292214983
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.7019607843137254
+            ],
+            "contrast": 16.705852230477177
+          },
+          "--surface-overlay": {
+            "rgba": [
+              243,
+              243,
+              243,
+              1
+            ],
+            "contrast": 15.522767292214983
+          },
+          "--surface-raised": {
+            "rgba": [
+              243,
+              243,
+              243,
+              1
+            ],
+            "contrast": 15.522767292214983
+          },
+          "menu": {
+            "rgba": [
+              249,
+              249,
+              249,
+              1
+            ],
+            "contrast": 16.359990137598086
+          }
+        },
+        "rootInk": [
+          27,
+          27,
+          27,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          27,
+          27,
+          27,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              243,
+              243,
+              243,
+              1
+            ],
+            "contrast": 15.522767292214983
+          },
+          "--surface-window": {
+            "rgba": [
+              243,
+              243,
+              243,
+              1
+            ],
+            "contrast": 15.522767292214983
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.7019607843137254
+            ],
+            "contrast": 16.705852230477177
+          },
+          "--surface-overlay": {
+            "rgba": [
+              243,
+              243,
+              243,
+              1
+            ],
+            "contrast": 15.522767292214983
+          },
+          "--surface-raised": {
+            "rgba": [
+              243,
+              243,
+              243,
+              1
+            ],
+            "contrast": 15.522767292214983
+          },
+          "menu": {
+            "rgba": [
+              249,
+              249,
+              249,
+              1
+            ],
+            "contrast": 16.359990137598086
+          }
+        },
+        "rootInk": [
+          27,
+          27,
+          27,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "linux",
+      "pass": true,
+      "before": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          25,
+          84,
+          154,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              250,
+              250,
+              251,
+              1
+            ],
+            "contrast": 7.251962240431382
+          },
+          "--surface-window": {
+            "rgba": [
+              250,
+              250,
+              251,
+              1
+            ],
+            "contrast": 7.251962240431382
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.0784313725490196
+            ],
+            "contrast": 6.086804355238466
+          },
+          "--surface-overlay": {
+            "rgba": [
+              250,
+              250,
+              251,
+              1
+            ],
+            "contrast": 7.251962240431382
+          },
+          "--surface-raised": {
+            "rgba": [
+              250,
+              250,
+              251,
+              1
+            ],
+            "contrast": 7.251962240431382
+          },
+          "menu": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 7.564615551350253
+          }
+        },
+        "rootInk": [
+          50,
+          50,
+          54,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          25,
+          84,
+          154,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              250,
+              250,
+              251,
+              1
+            ],
+            "contrast": 7.251962240431382
+          },
+          "--surface-window": {
+            "rgba": [
+              250,
+              250,
+              251,
+              1
+            ],
+            "contrast": 7.251962240431382
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.0784313725490196
+            ],
+            "contrast": 6.086804355238466
+          },
+          "--surface-overlay": {
+            "rgba": [
+              250,
+              250,
+              251,
+              1
+            ],
+            "contrast": 7.251962240431382
+          },
+          "--surface-raised": {
+            "rgba": [
+              250,
+              250,
+              251,
+              1
+            ],
+            "contrast": 7.251962240431382
+          },
+          "menu": {
+            "rgba": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "contrast": 7.564615551350253
+          }
+        },
+        "rootInk": [
+          50,
+          50,
+          54,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": "true"
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "invalid-light",
+      "pass": true,
+      "before": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 3.6683168306767953
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 3.912135543151017
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-window": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-field": {
+            "rgba": [
+              0,
+              0,
+              0,
+              0.050980392156862744
+            ],
+            "contrast": 3.6683168306767953
+          },
+          "--surface-overlay": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "--surface-raised": {
+            "rgba": [
+              252,
+              252,
+              253,
+              1
+            ],
+            "contrast": 4.105754297417159
+          },
+          "menu": {
+            "rgba": [
+              246,
+              246,
+              248,
+              0.9411764705882353
+            ],
+            "contrast": 3.912135543151017
+          }
+        },
+        "rootInk": [
+          22,
+          24,
+          29,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      }
+    },
+    {
+      "kind": "guard",
+      "name": "invalid-dark",
+      "pass": true,
+      "before": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 2.9002917550060876
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 3.49953900610952
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      },
+      "after": {
+        "background": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "foreground": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "contrast": 4.209668849730067,
+        "cssBackground": "rgb(0, 117, 255)",
+        "cssColor": "rgb(255, 255, 255)",
+        "focus": [
+          0,
+          117,
+          255,
+          1
+        ],
+        "surfaces": {
+          "--surface": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-window": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-field": {
+            "rgba": [
+              255,
+              255,
+              255,
+              0.0784313725490196
+            ],
+            "contrast": 2.9002917550060876
+          },
+          "--surface-overlay": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "--surface-raised": {
+            "rgba": [
+              36,
+              36,
+              38,
+              1
+            ],
+            "contrast": 3.6806047661421117
+          },
+          "menu": {
+            "rgba": [
+              40,
+              40,
+              44,
+              0.9411764705882353
+            ],
+            "contrast": 3.49953900610952
+          }
+        },
+        "rootInk": [
+          245,
+          245,
+          247,
+          1
+        ],
+        "hovered": false,
+        "pressed": false,
+        "disabled": false,
+        "accentInput": null
+      }
+    }
+  ]
+}
