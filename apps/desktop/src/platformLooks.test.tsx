@@ -596,6 +596,10 @@ test("the shelf is two 40 px lines of 24 px chips and one output line above the 
   // Windows draws a layer card with a stroke; GNOME a flat band under one separator.
   expect(rules(styles, ':root[data-platform="windows"] .shelf')).toMatch(/border:\s*var\(--border-width\) solid var\(--button-edge\)/);
   expect(rules(styles, ':root[data-platform="linux"] .shelf')).toMatch(/border-top:\s*var\(--border-width\) solid var\(--separator\)/);
+  const shelf = readFileSync(new FileURL("./features/picker/CitationShelf.css", import.meta.url), "utf8");
+  const forced = shelf.slice(shelf.indexOf("@media (forced-colors: active)"));
+  expect(rules(forced, ".chip-remove::before")).toMatch(/forced-color-adjust:\s*none/);
+  expect(rules(forced, ".chip-remove::before")).toMatch(/background:\s*ButtonText/);
 });
 
 test("a wrapped footer keeps breathing room above and below its lines", () => {

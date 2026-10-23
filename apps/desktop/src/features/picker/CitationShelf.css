@@ -15,6 +15,9 @@
 @media (pointer: coarse) {
   .shelf { --chip-hit-size: 2.75rem; }
 }
+@media (forced-colors: active) {
+  .chip-remove::before { forced-color-adjust: none; background: ButtonText; }
+}
 
 /* #888: the beak opens toward the citation, at the tile column's end.
    Keep the full column width so the text stays on the result-title edge.
