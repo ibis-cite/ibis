@@ -150,9 +150,21 @@ def draw(name, k, tx, ty, paint, uid, depth=False, neck=None):
                 + depth_filter(f"{uid}f", SYM[name][0]))
         paint, attr = f"url(#{uid}g)", f' filter="url(#{uid}f)"'
     if neck:
-        body = thicken(body, neck)
+        body = thicken(body, neck)       # favicon sizes: no eye, as in the app's small icon
+    elif name == "mark":
+        mask, body = cut_eye(body, uid)
+        defs += mask
     body = body.replace("currentColor", paint)
     return defs, f'<g transform="translate({tx:.3f} {ty:.3f}) scale({k:.5f})"><g{attr}>{body}</g></g>'
+
+
+def cut_eye(body, uid):
+    """Cut the eye out of the bird, so whatever is behind it shows through on any background."""
+    bx, by, bw, bh = SYM["mark"][0]
+    eye = SYM["eye"][1].replace("currentColor", "#000")
+    box = f'x="{bx - 1:g}" y="{by - 1:g}" width="{bw + 2:g}" height="{bh + 2:g}"'
+    return (f'<mask id="{uid}e" maskUnits="userSpaceOnUse" {box}><rect {box} fill="#fff"/>{eye}</mask>',
+            f'<g mask="url(#{uid}e)">{body}</g>')
 
 
 def place(name, x, y, height, paint, uid, depth=False):
