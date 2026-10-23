@@ -171,7 +171,7 @@ mod tests {
     use std::time::{Duration, Instant};
 
     #[test]
-    fn cached_glass_fallback_clears_the_actual_layer_and_never_stacks_effects() {
+    fn material_cache_clears_actual_layer_and_skips_unchanged_requests() {
         for actual in [super::Appearance::LiquidGlass, super::Appearance::Vibrancy] {
             let mut cache = super::Cache {
                 requested: Some(super::Appearance::LiquidGlass),
