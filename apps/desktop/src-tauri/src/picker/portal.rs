@@ -194,10 +194,11 @@ impl Portal {
             .path_namespace(ROOT)
             .map_err(|_| ())?
             .build();
-        let mut signals = bounded(MessageStream::for_match_rule(rule, &self.connection, None)).await?;
+        let mut signals = bounded(MessageStream::for_match_rule(rule, &self.connection, Some(64))).await?;
         let mut binding = std::pin::pin!(self.bind());
         let mut ready = false;
         let mut completed = None;
+        let mut remaining = 0usize;
         let mut activation = false;
         let mut changed = None;
         loop {
@@ -211,10 +212,14 @@ impl Portal {
                     && let Poll::Ready(result) = binding.as_mut().poll(cx)
                 {
                     completed = Some(result);
+                    remaining = signals.max_queued();
                 }
-                // A received response means all earlier signals are already queued.
-                // Drain them (especially Closed) before publishing success.
-                if let Poll::Ready(message) = Pin::new(&mut signals).poll_next(cx) {
+                // All earlier signals are already queued. One queue's capacity
+                // drains them (including Closed) without starvation by new signals.
+                if (completed.is_none() || remaining > 0)
+                    && let Poll::Ready(message) = Pin::new(&mut signals).poll_next(cx)
+                {
+                    remaining = remaining.saturating_sub(1);
                     return Poll::Ready(Next::Signal(message));
                 }
                 completed
@@ -241,6 +246,7 @@ impl Portal {
                 },
                 Next::Signal(_) => return Err(Failure::Unavailable),
             }
+            tokio::task::yield_now().await;
         }
     }
 
@@ -486,6 +492,26 @@ mod tests {
                     )
                     .await?;
                 }
+                if self.0.load(Ordering::Relaxed) == 5 {
+                    let server = connection.clone();
+                    let active = self.0.clone();
+                    connection
+                        .executor()
+                        .spawn(
+                            async move {
+                                while active.load(Ordering::Relaxed) == 5 {
+                                    if emit(&server, "Activated", &(&session, "other-action", 0u64, Dict::new()))
+                                        .await
+                                        .is_err()
+                                    {
+                                        break;
+                                    }
+                                }
+                            },
+                            "portal-test-flood",
+                        )
+                        .detach();
+                }
                 Ok(path)
             }
         }
@@ -535,7 +561,7 @@ mod tests {
                         .await?;
                     let portal = Portal::connect().await.map_err(|_| "session failed")?;
                     assert_eq!(portal.session.as_str(), format!("{ROOT}/session/fake"));
-                    for response in [0, 1, 2, 3, 4] {
+                    for response in [0, 1, 2, 3, 4, 5] {
                         code.store(0, Ordering::Relaxed);
                         let portal = Portal::connect().await.map_err(|_| "session failed")?;
                         code.store(response, Ordering::Relaxed);
@@ -545,6 +571,7 @@ mod tests {
                             Duration::from_secs(3),
                             portal.run(|event| {
                                 if event == Event::Activated {
+                                    code.store(0, Ordering::Relaxed);
                                     let server = server.clone();
                                     let session = session.clone();
                                     tokio::spawn(async move {
@@ -565,8 +592,8 @@ mod tests {
                         )
                         .await
                         .expect("signal draining must not hang");
-                        if response == 0 || response == 4 {
-                            let label = if response == 0 { "Ctrl+Shift+Y" } else { "Alt+Y" };
+                        if matches!(response, 0 | 4 | 5) {
+                            let label = if response == 4 { "Alt+Y" } else { "Ctrl+Shift+Y" };
                             assert_eq!(events, [Event::Trigger(Some(label.into())), Event::Activated]);
                         } else {
                             assert!(events.is_empty(), "consent failure must not activate");
