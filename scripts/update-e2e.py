@@ -843,7 +843,7 @@ function Contract-Result($pressed,$how) {
                             settings.write_text(json.dumps(choices), encoding="utf-8")
                         return True
                     app = MagicMock(command=["synthetic"], config=None, settings=settings)
-                    app.instances.side_effect = [{42}, {43}, {43}, {43}]
+                    app.instances.side_effect = [{42}, {43}, {43}, {43}, {43}]
                     app.look.return_value = (True, [], None)
                     app.updated.side_effect = replaced
                     app.facts.return_value = {}
