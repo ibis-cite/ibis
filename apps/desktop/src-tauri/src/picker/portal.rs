@@ -307,56 +307,45 @@ mod tests {
     }
 
     #[test]
-    fn signals_require_our_session_action_interface_and_well_formed_body() {
-        let session = OwnedObjectPath::try_from(format!("{ROOT}/session/one")).unwrap();
-        let other = OwnedObjectPath::try_from(format!("{ROOT}/session/other")).unwrap();
-        let activated = |path: &str, interface: &str, handle: &OwnedObjectPath, id: &str| {
-            Message::signal(path, interface, "Activated")
-                .unwrap()
-                .build(&(handle, id, 0u64, Dict::new()))
-                .unwrap()
+    fn signals_require_our_session_action_interface_and_well_formed_body() -> Result<(), Box<dyn std::error::Error>> {
+        let session = OwnedObjectPath::try_from(format!("{ROOT}/session/one"))?;
+        let other = OwnedObjectPath::try_from(format!("{ROOT}/session/other")).map_err(zbus::Error::from)?;
+        let activated = |path: &str, interface: &str, handle: &OwnedObjectPath, id: &str| -> zbus::Result<Message> {
+            Message::signal(path, interface, "Activated")?.build(&(handle, id, 0u64, Dict::new()))
         };
         assert_eq!(
-            signal(&activated(ROOT, INTERFACE, &session, ID), &session),
+            signal(&activated(ROOT, INTERFACE, &session, ID)?, &session),
             Some(Signal::Event(Event::Activated))
         );
         for message in [
-            activated(ROOT, INTERFACE, &other, ID),
-            activated(ROOT, INTERFACE, &session, "other-action"),
-            activated(other.as_str(), INTERFACE, &session, ID),
-            activated(ROOT, "org.example.Other", &session, ID),
-            Message::signal(ROOT, INTERFACE, "Activated")
-                .unwrap()
-                .build(&("malformed",))
-                .unwrap(),
+            activated(ROOT, INTERFACE, &other, ID)?,
+            activated(ROOT, INTERFACE, &session, "other-action")?,
+            activated(other.as_str(), INTERFACE, &session, ID)?,
+            activated(ROOT, "org.example.Other", &session, ID)?,
+            Message::signal(ROOT, INTERFACE, "Activated")?.build(&("malformed",))?,
         ] {
             assert_eq!(signal(&message, &session), None);
         }
-        let changed = |shortcuts: Shortcuts| {
-            Message::signal(ROOT, INTERFACE, "ShortcutsChanged")
-                .unwrap()
-                .build(&(&session, shortcuts))
-                .unwrap()
+        let changed = |shortcuts: Shortcuts| -> zbus::Result<Message> {
+            Message::signal(ROOT, INTERFACE, "ShortcutsChanged")?.build(&(&session, shortcuts))
         };
         assert_eq!(
-            signal(&changed(vec![]), &session),
+            signal(&changed(vec![])?, &session),
             Some(Signal::Event(Event::Trigger(None)))
         );
         assert_eq!(
             signal(
-                &changed(vec![(ID.into(), dict("trigger_description", "bad\nlabel"))]),
+                &changed(vec![(ID.into(), dict("trigger_description", "bad\nlabel"))])?,
                 &session
             ),
             Some(Signal::Event(Event::Trigger(None)))
         );
-        let closed = |path: &str| {
-            Message::signal(path, "org.freedesktop.portal.Session", "Closed")
-                .unwrap()
-                .build(&(Dict::new(),))
-                .unwrap()
+        let closed = |path: &str| -> zbus::Result<Message> {
+            Message::signal(path, "org.freedesktop.portal.Session", "Closed")?.build(&(Dict::new(),))
         };
-        assert_eq!(signal(&closed(session.as_str()), &session), Some(Signal::Closed));
-        assert_eq!(signal(&closed(other.as_str()), &session), None);
+        assert_eq!(signal(&closed(session.as_str())?, &session), Some(Signal::Closed));
+        assert_eq!(signal(&closed(other.as_str())?, &session), None);
+        Ok(())
     }
 
     #[cfg(target_os = "linux")]
@@ -435,7 +424,7 @@ mod tests {
                 #[zbus(connection)] connection: &Connection,
                 #[zbus(header)] header: zbus::message::Header<'_>,
             ) -> zbus::fdo::Result<OwnedObjectPath> {
-                let other = OwnedObjectPath::try_from(format!("{ROOT}/session/other")).unwrap();
+                let other = OwnedObjectPath::try_from(format!("{ROOT}/session/other")).map_err(zbus::Error::from)?;
                 // Exceed zbus's default signal queue while the method is pending.
                 for _ in 0..128 {
                     emit(connection, "Activated", &(&other, ID, 0u64, Dict::new())).await?;
@@ -482,7 +471,10 @@ mod tests {
                         .await?;
                 }
                 let shortcuts = vec![(ID.to_string(), dict("trigger_description", "Ctrl+Shift+Y"))];
-                let values = HashMap::from([("shortcuts".into(), Value::new(shortcuts).try_to_owned().unwrap())]);
+                let values = HashMap::from([(
+                    "shortcuts".into(),
+                    Value::new(shortcuts).try_to_owned().map_err(zbus::Error::from)?,
+                )]);
                 let path = respond(0, values, options, connection, header).await?;
                 if self.0.load(Ordering::Relaxed) == 4 {
                     emit(
@@ -566,32 +558,37 @@ mod tests {
                         let portal = Portal::connect().await.map_err(|_| "session failed")?;
                         code.store(response, Ordering::Relaxed);
                         let mut events = Vec::new();
+                        let mut close_task = None;
                         let session = portal.session.clone();
-                        let result = tokio::time::timeout(
-                            Duration::from_secs(3),
-                            portal.run(|event| {
-                                if event == Event::Activated {
-                                    code.store(0, Ordering::Relaxed);
-                                    let server = server.clone();
-                                    let session = session.clone();
-                                    tokio::spawn(async move {
-                                        server
-                                            .emit_signal(
-                                                None::<&str>,
-                                                &session,
-                                                "org.freedesktop.portal.Session",
-                                                "Closed",
-                                                &(Dict::new(),),
-                                            )
-                                            .await
-                                            .unwrap();
-                                    });
-                                }
-                                events.push(event);
-                            }),
-                        )
+                        let result = tokio::time::timeout(Duration::from_secs(3), async {
+                            let result = portal
+                                .run(|event| {
+                                    if event == Event::Activated {
+                                        code.store(0, Ordering::Relaxed);
+                                        let server = server.clone();
+                                        let session = session.clone();
+                                        close_task = Some(tokio::spawn(async move {
+                                            server
+                                                .emit_signal(
+                                                    None::<&str>,
+                                                    &session,
+                                                    "org.freedesktop.portal.Session",
+                                                    "Closed",
+                                                    &(Dict::new(),),
+                                                )
+                                                .await
+                                        }));
+                                    }
+                                    events.push(event);
+                                })
+                                .await;
+                            if let Some(task) = close_task {
+                                task.await??;
+                            }
+                            Ok::<_, Box<dyn std::error::Error>>(result)
+                        })
                         .await
-                        .expect("signal draining must not hang");
+                        .map_err(|_| "signal draining must not hang")??;
                         if matches!(response, 0 | 4 | 5) {
                             let label = if response == 4 { "Alt+Y" } else { "Ctrl+Shift+Y" };
                             assert_eq!(events, [Event::Trigger(Some(label.into())), Event::Activated]);
