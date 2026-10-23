@@ -82,9 +82,9 @@ test("an added tile on the native accent uses its paired text fill, keeping scar
 
 test("native primary foregrounds stay readable through hover and press in both themes", () => {
   const tokens = readFileSync(new FileURL("./tokens.css", import.meta.url), "utf8");
-  const neutrals = tokens.match(/--text:\s*light-dark\((#[0-9a-f]+), (#[0-9a-f]+)\)/)!;
+  const neutrals = tokens.match(/:root\[data-platform="macos"\][^{]*\{[^}]*--text:\s*light-dark\((#[0-9a-f]+), (#[0-9a-f]+)\)/)!;
   const luminance = (rgb: number[]) => rgb.reduce((l, c, i) => l + (c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4) * [.2126, .7152, .0722][i]!, 0);
-  for (const rgb of [[0, 122 / 255, 1], [119 / 255, 119 / 255, 119 / 255], [.6, .4, 0], [1, 0, 0], [0, 0, 0], [1, 1, 1]]) {
+  for (const rgb of [[.4, .55, .5], [0, 122 / 255, 1], [119 / 255, 119 / 255, 119 / 255], [.6, .4, 0], [1, 0, 0], [0, 0, 0], [1, 1, 1]]) {
     setNativeAccent(rgb);
     for (const [theme, hex] of [["light", neutrals[1]!], ["dark", neutrals[2]!]] as const) {
       const ink = hex.slice(1).match(/../g)!.map((c) => parseInt(c, 16) / 255);
