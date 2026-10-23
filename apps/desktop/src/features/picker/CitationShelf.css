@@ -2,6 +2,16 @@
 .chip-fit-measure { position: absolute; visibility: hidden; pointer-events: none; width: 0; height: 0; overflow: hidden; }
 .chip-fit-measure > button { width: max-content; max-width: none; }
 
+/* Preserve the 24 px chip fill; the shared Button owns every painted state. */
+.shelf .chip-remove.ui-button[data-variant] { flex: none; width: var(--chip-height); min-width: var(--chip-height); height: var(--chip-height); min-height: var(--chip-height); padding: 0; border-width: 0; border-radius: var(--chip-radius); --focus-ring-offset: -2px; }
+.chip-remove::before { content: ""; position: absolute; inset: 0; background: currentColor; -webkit-mask: var(--clear-glyph) center / var(--icon-size) no-repeat; mask: var(--clear-glyph) center / var(--icon-size) no-repeat; }
+.chip-more .ui-button { min-width: 0; min-height: var(--chip-height); padding: 0 var(--space-2); border-width: 0; border-radius: var(--chip-radius); font-size: var(--type-label-size); }
+/* Keep existing expanded hit areas and matching hidden measurement geometry. */
+.chip-remove.ui-button::after, .chip-more .ui-button::after { inset: calc((var(--control-min-size) - var(--chip-height)) / -2); }
+@media (pointer: coarse) {
+  .chip-remove.ui-button::after, .chip-more .ui-button::after { inset: calc((2.75rem - var(--chip-height)) / -2); }
+}
+
 /* #888: the beak opens toward the citation, at the tile column's end.
    Keep the full column width so the text stays on the result-title edge.
    The 20 px glyph scales with text inside the existing 40 px output line. */
