@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Get started with Ibis</title>
+  <meta name="description" content="Install the Ibis early preview and connect Zotero or a BibTeX file.">
+  <link rel="canonical" href="https://ibiscite.org/setup.html">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/colors.css"><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="guide">
+<header><a class="logo" href="./" aria-label="Ibis home"><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/ibis-logo-on-dark.svg">
+  <img src="assets/ibis-logo.svg" alt="Ibis" width="418" height="200"></picture></a>
+  <a href="./#setup">Back to Ibis</a></header>
+<main id="main" tabindex="-1">
+  <h1>Get started with Ibis</h1>
+  <p>These steps are for the current early preview. <a href="./#download">Find the downloads</a>.</p>
+  <h2>Install on a Mac</h2><p>Open the DMG, drag Ibis to Applications, then open it. If macOS cannot check the app, confirm it came from this project’s GitHub release, then use System Settings → Privacy &amp; Security → Open Anyway.</p>
+  <h2>Install on Windows</h2><p>Run the installer. If SmartScreen warns you, check the download came from this project’s GitHub release; if you trust it and “More info → Run anyway” is offered, you can continue. Smart App Control may block it without that option. Keep protection enabled and wait for a trusted, signed build. On a work or school computer, ask IT. A missing WebView2 Runtime needs a one-time download during installation.</p>
+  <h2>Install on Linux</h2><p>Allow the AppImage to run as a program in its file properties, then open it. Some systems need FUSE support; see the <a href="https://github.com/ibiscite/ibis/blob/main/docs/compatibility.md">runtime requirements on GitHub</a>. On Wayland, open Ibis from your app launcher; its shortcut is not available yet.</p>
+  <h2>Connect Zotero or a BibTeX file</h2><p>Keep Zotero open. In Zotero, go to Settings → Advanced and tick “Allow other applications on this computer to communicate with Zotero”. Choose Zotero in Ibis. Or choose a BibTeX/BibLaTeX file ending in <code>.bib</code>. Better BibTeX can keep that export up to date; <a href="https://github.com/ibiscite/ibis#use-with-zotero">export instructions are on GitHub</a>.</p>
+  <p>Once set up, type an author, title or year. Use the arrow keys to choose a reference and Enter to copy it. Paste it into your document. On Windows and Linux X11 the default shortcut is Ctrl+Shift+Y; on macOS it is Control+Command+R, when available.</p>
+  <p class="small">Ibis reads your library without changing it. Searching and copying work offline after setup; update checks are opt-in. <a href="https://github.com/ibiscite/ibis/blob/main/PRIVACY.md">App privacy details on GitHub</a>.</p>
+</main>
+<footer><p>Need a hand? <a href="https://github.com/ibiscite/ibis/discussions">Ask in GitHub Discussions</a>. Posting needs an account, and posts are public.</p>
+  <p><a href="./#site-privacy">Website privacy</a> · <a href="https://github.com/ibiscite/ibis#install">Technical installation notes on GitHub</a></p></footer>
+</div>
+</body>
+</html>

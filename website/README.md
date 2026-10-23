@@ -1,45 +1,34 @@
 # Ibis website
 
-Static HTML and CSS for ibiscite.org, planned for the existing Hostinger plan.
-The website is not live; the production visual design is still in progress.
-Source lives here; installers stay on GitHub Releases. No framework, database,
-remote fonts, browser scripts or paid website service is needed.
+Static HTML/CSS for ibiscite.org on the existing Hostinger plan; not live yet.
+Source lives here; installers stay on GitHub Releases. No framework or database.
 
-Use typography and spacing for emphasis. Never use accent-bar callouts,
-highlight bars, accordions or disclosure toggles. Keep setup and privacy
-information visible, and preserve a clear, quiet keyboard focus indicator.
+Use typography and spacing, never accent-bar callouts, highlight bars, accordions
+or disclosure toggles. Keep information visible and keyboard focus clear. The
+thin structural margin rule belongs to the page layout, not to callouts.
 
-## Edit and preview
+## Edit and check
 
-Edit `index.html` for words and links, `style.css` for layout. Keep today's
-features separate from roadmap plans. The app README remains the source for
-installation limitations; review website copy when those change. Downloads use
-the maintained channel URLs, without a second version-number list. The page’s
-long-term story is library-to-writing; copy/paste is labelled as today’s preview
-workflow. When automatic insertion ships, update `#how`, `#setup` and `#roadmap`
-against the released behaviour, rather than promising a date in the website.
+`index.html` is the short introduction; `setup.html` holds installation and
+workflow details; `style.css` styles both. Keep current preview behaviour apart
+from plans. When a feature ships, update these pages against the released app
+README, especially `#how`, `#setup`, `#roadmap` and the setup guide. Use maintained
+channel download URLs without duplicating version numbers or promising dates.
 
-Run `node website/build.mjs` from the repository root, then
+From the repository root, run `node website/build.mjs`, then
 `python3 -m http.server 8094 --bind 127.0.0.1 --directory website/dist`.
-Open http://127.0.0.1:8094. Check light/dark, keyboard navigation, 320px reflow,
-200%/400% zoom, VoiceOver, and the real download/help links before publishing.
-Run `node --test scripts/website.test.mjs` for the public deployment check.
-
-Brand files are copied unchanged from `brand/exports/`. After changing the
-brand, run `python3 brand/build.py`, then rebuild the website. Never edit the
-copied files. The build replaces `website/dist/` with only public site assets.
+Open http://127.0.0.1:8094. Run `node --test scripts/website.test.mjs`; check
+light/dark, keyboard, 320px reflow, 200%/400% zoom, VoiceOver and real links.
+Brand assets are copied unchanged from `brand/exports/`; after a brand change,
+run `python3 brand/build.py` and rebuild the site. Never edit copied assets.
 
 ## Publish and recover
 
-After review and merge, rebuild from clean `main`. In Hostinger, select
-**ibiscite.org**, confirm its document root and back up that site's existing
-files privately. Upload only the **contents** of `website/dist/`, including
-`.htaccess`, into that root. Never deploy the checkout or touch another site.
-Verify HTTPS, links, assets, security headers and both themes on the live site.
-Retain the previous public build and source commit for rollback.
-
-The website and source are public. Hosting credentials, account details, DNS
-exports, private feedback and operational backups stay outside the repository.
-Keep infrastructure changes and backup locations in the private project record;
-export existing DNS before any change. This site requires no mail DNS changes.
-Do not add forms or publish an email address until that route actually works.
+After review/merge, rebuild from clean main. Select **ibiscite.org** in Hostinger,
+confirm its document root and back up its existing files privately. Upload only
+`website/dist/` contents, including `.htaccess`; never the checkout or another
+site. Verify HTTPS, assets, headers, links and both themes. Retain the previous
+public build and commit for rollback. Credentials, DNS exports, private feedback
+and operational backups stay outside Git. Record infrastructure changes and
+backup locations privately; export DNS before changes. No mail DNS change is
+needed. Add a form or email address only when that route actually works.

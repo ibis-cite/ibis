@@ -65,7 +65,7 @@
   <section id="download" class="row" aria-labelledby="download-h">
     <p class="margin"><span class="key">@download</span></p>
     <div class="text"><h2 id="download-h">For curious early testers</h2>
-      <p>The numbered preview is available if you’re comfortable with rough edges. <strong>It is not a stable release.</strong> The apps are not yet signed by Apple or Microsoft, so your computer may warn you or block installation. Read <a class="key" href="#setup">@setup</a> first.</p>
+      <p>The numbered preview is available if you’re comfortable with rough edges. <strong>It is not a stable release.</strong> The apps are not yet signed by Apple or Microsoft, so your computer may warn you or block installation. Read the <a href="setup.html">installation notes</a> first.</p>
       <ul class="downloads"><li><a href="https://github.com/ibiscite/ibis/releases/download/stable/Ibis-macOS-Apple-silicon.dmg"><strong>Mac with Apple silicon</strong><span>DMG</span></a></li>
         <li><a href="https://github.com/ibiscite/ibis/releases/download/stable/Ibis-macOS-Intel.dmg"><strong>Mac with Intel</strong><span>DMG</span></a></li>
         <li><a href="https://github.com/ibiscite/ibis/releases/download/stable/Ibis-Windows-setup.exe"><strong>Windows</strong><span>64-bit installer</span></a></li>
@@ -76,13 +76,9 @@
 
   <section id="setup" class="row" aria-labelledby="setup-h">
     <p class="margin"><span class="key">@setup</span></p>
-    <div class="text"><h2 id="setup-h">A few first steps</h2>
-      <h3>Install on a Mac</h3><p>Open the DMG, drag Ibis to Applications, then open it. If macOS cannot check the app, confirm it came from this project’s GitHub release, then use System Settings → Privacy &amp; Security → Open Anyway.</p>
-      <h3>Install on Windows</h3><p>Run the installer. If SmartScreen warns you, check the download came from this project’s GitHub release; if you trust it and “More info → Run anyway” is offered, you can continue. Smart App Control may block it without that option. Keep protection enabled and wait for a trusted, signed build. On a work or school computer, ask IT. A missing WebView2 Runtime needs a one-time download during installation.</p>
-      <h3>Install on Linux</h3><p>Allow the AppImage to run as a program in its file properties, then open it. Some systems need FUSE support; see the <a href="https://github.com/ibiscite/ibis/blob/main/docs/compatibility.md">runtime requirements on GitHub</a>. On Wayland, open Ibis from your app launcher; its shortcut is not available yet.</p>
-      <h3>Connect Zotero or a BibTeX file</h3><p>Keep Zotero open. In Zotero, go to Settings → Advanced and tick “Allow other applications on this computer to communicate with Zotero”. Choose Zotero in Ibis. Or choose a BibTeX/BibLaTeX file ending in <code>.bib</code>. Better BibTeX can keep that export up to date; <a href="https://github.com/ibiscite/ibis#use-with-zotero">export instructions are on GitHub</a>.</p>
-      <p>Once set up, type an author, title or year. Use the arrow keys to choose a reference and Enter to copy it. Paste it into your document. On Windows and Linux X11 the default shortcut is Ctrl+Shift+Y; on macOS it is Control+Command+R, when available.</p>
-      <p class="small">Ibis reads your library without changing it. Searching and copying work offline after setup; update checks are opt-in. <a href="https://github.com/ibiscite/ibis/blob/main/PRIVACY.md">App privacy details on GitHub</a>.</p>
+    <div class="text"><h2 id="setup-h">Start with your library</h2>
+      <p>Connect Zotero while it is open, or choose a BibTeX file ending in <code>.bib</code>. Search for a reference. In the current preview, press Enter to copy it, then paste into your document.</p>
+      <p>The <a href="setup.html">setup guide</a> covers installation and connecting your library. Ibis reads your library without changing it; searching works offline after setup.</p>
     </div>
   </section>
 
@@ -116,7 +112,7 @@
 </main>
 <footer class="row"><div class="text">
   <p>Free and open source under the GNU AGPL v3.0 or later. <a href="https://github.com/ibiscite/ibis">Explore the source code</a>.</p>
-  <h2>Website privacy</h2><p>This page adds no analytics, tracking cookies or external fonts. Hostinger serves the site and may process technical request details such as your IP address. Downloads and community links take you to GitHub, which has its own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">privacy policy</a>. The app’s data handling is described separately in its <a href="https://github.com/ibiscite/ibis/blob/main/PRIVACY.md">privacy documentation</a>.</p>
+  <h2 id="site-privacy">Website privacy</h2><p>This page adds no analytics, tracking cookies or external fonts. Hostinger serves the site and may process technical request details such as your IP address. Downloads and community links take you to GitHub, which has its own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">privacy policy</a>. The app’s data handling is described separately in its <a href="https://github.com/ibiscite/ibis/blob/main/PRIVACY.md">privacy documentation</a>.</p>
 </div></footer>
 </div>
 </body>
