@@ -58,7 +58,7 @@ browser comparisons verify the winning values and rendered appearance.
 | D3 | **Per-OS radius values:** macOS 15: win 12, control 6, menu 8 (verify). macOS 26: win 28, control capsule in the header, 8 in content, menu 12. Windows 11: win/overlay/card 8, control/row/tile 4. GNOME (libadwaita 1.8+ look): win/card 15, derived row 7, control/tile 6, popover 12. | `--r-*` |
 | D4 | **Surfaces are four layers:** `--surface-window` (base) < `--surface` (content sheet) < `--surface-raised` (band, cards, shelf) < `--surface-overlay` (menus, popovers, dialogs). Values from soft depth B. | §2 |
 | D5 | **Text has four levels:** `--text`, `--muted` (secondary, always 4.5:1), `--text-tertiary` (icons at rest, placeholder hints, 3:1 minimum, never for sentences), `--text-disabled`. | |
-| D6 | **Accent is always the system's.** `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. On Windows and GNOME the accent is injected from Rust (#763). | |
+| D6 | **Accent is always the system's.** `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. Native accent projection starts with macOS; Windows and GNOME providers follow (#763). | |
 | D7 | **Selection is a fill, never a ring.** macOS and GNOME: full accent fill with `--text-on-accent`. Windows: subtle fill plus a 3 × 16 px accent pill. `--row-inactive-background` for a kept-open picker that lost focus. Menu highlight: accent fill on macOS, subtle fill on Windows and GNOME. | `--row-active-*`, `--menu-highlight*` |
 | D8 | **Focus ring only on keyboard focus** (`:focus-visible` / `data-focus-visible`). macOS: 2 px accent, 1 px gap. Windows: 2 px text-colour outer, 1 px surface inner. GNOME: 2 px half-accent mixed to 3:1, drawn **inside** (offset −2 px) so scroll containers never clip it. Contrast modes: 2 px `CanvasText`. | `--focus-ring-*` |
 | D9 | **Scarlet marks the citation only:** the shelf's decorative beak quote mark (the supplied two-head SVG from #888, 20 px tall, scaled with type), the added tile and the logo. The mark sits at the tile column's end on the citation line, mirrors in RTL, dims to 45 % while pending and uses `CanvasText` in contrast modes. The citation's text is in the text colour ([preview.md](preview.md)). Never on a control, link, toggle, progress, badge, selection, focus or error. On an accent-filled selected row the added tile becomes a `--text-on-accent` tile with a scarlet check, so a red or orange accent never meets scarlet fill-on-fill. | `--citation`, `--citation-tile` |
@@ -182,6 +182,15 @@ your citation" one colour. Done and Look stay close to the platform hues.
 
 ### 2.3 Appearance and contrast modes
 
+The native bridge reuses `native_appearance` (still returning a material string)
+and its watcher. `accent:changed` carries an optional finite sRGB triple in
+[0,1], replayed on every initial query independently of the material cache.
+Only private CSS inputs are injected. Normal-contrast roles preserve the fill,
+choose readable paired text for rest, hover and pressed primary fills, and
+derive near-black/white accent text and focus cues. Invalid/unavailable input clears the projection to the existing system
+colour fallback. Contrast modes retain their system pairs. Gallery theme
+simulations never adopt the host's accent; native acceptance uses the picker.
+
 - **Light and dark** come from `color-scheme: light dark` and `light-dark()`;
   components never read `prefers-color-scheme`. The Appearance setting sets
   `color-scheme` on `:root` and the native window appearance together.
@@ -256,7 +265,7 @@ Liquid Glass's three shape kinds map to `--r-control` (fixed), `--r-full`
 | Token | macOS 15 and earlier | macOS 26 | Windows 11 | GNOME |
 |---|---|---|---|---|
 | `--r-win` | 12 | 28 (verify against Spotlight) | 8 | 15 |
-| `--inset` | 8 | 8 | 4 | 8 |
+| `--inset` | 8 | 8 | 8 | 8 |
 | `--r-min` | 6 | 6 | 4 | 6 |
 | `--r-row` | 6 | 20 | 4 | 7 |
 | `--r-tile` | 6 | 8 | 4 | 6 |
@@ -339,7 +348,7 @@ Weights 400, 500 (key caps and chip labels) and 600. No 700, no italics except
 
 | Token | px | Use |
 |---|---|---|
-| `--space-1` | 4 | icon to label, Windows inset |
+| `--space-1` | 4 | icon to label |
 | `--space-2` | 8 | inset, chip padding, menu offset |
 | `--space-3` | 12 | row padding, row gap |
 | `--space-4` | 16 | dialog padding, Settings card padding |
@@ -371,6 +380,13 @@ Density changes rows only; controls, targets, type and the header never change.
 
 Adjacent targets never overlap; the 4 px gap between header controls belongs to
 the 32 px target.
+
+The header's nominal control bands are 52 / 48 / 50 px (macOS / Windows /
+GNOME): 36 / 32 / 34 px controls plus two 8 px gaps. The always-visible 1 px
+divider is outside that band, making the total 53 / 49 / 51 px. The footer has
+24 px fills and two 8 px gaps (40 px); Windows and GNOME add an outside 1 px
+top divider. Coarse 44 px targets and wrapped controls grow these bands.
+The list's clipping viewport keeps 8 px from adjacent bands even while scrolled.
 
 ### 5.4 Icons
 
