@@ -238,7 +238,18 @@ mod tests {
         #[test]
         fn immediate_response_on_a_private_bus() -> Result<(), Box<dyn std::error::Error>> {
             if std::env::var_os("IBIS_PRIVATE_PORTAL_TEST").is_none() {
+                // Nix builds have no host /etc/dbus-1/session.conf.
+                let config_dir = tempfile::tempdir()?;
+                let config = config_dir.path().join("session.conf");
+                std::fs::write(
+                    &config,
+                    r#"<busconfig><type>session</type><listen>unix:tmpdir=/tmp</listen>
+<policy context="default"><allow send_destination="*"/><allow eavesdrop="true"/>
+<allow own="*"/></policy></busconfig>"#,
+                )?;
                 let status = std::process::Command::new("dbus-run-session")
+                    .arg("--config-file")
+                    .arg(config)
                     .arg("--")
                     .arg(std::env::current_exe()?)
                     .args([
