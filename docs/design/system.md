@@ -243,8 +243,8 @@ colour, custom CSS or colour themes.
 
 ### 3.1 The concentric rule
 
-An inner radius is the outer radius minus the inset between them, never larger,
-and never below a per-OS floor:
+At baseline size an inner radius is the outer radius minus its shape inset,
+never larger and never below a per-OS floor. C15 keeps that shape as text grows:
 
 ```
 --r-row     = max(--r-min, --r-win  − 8px)          rows, search field, shelf card

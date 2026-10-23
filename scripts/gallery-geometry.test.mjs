@@ -81,8 +81,8 @@ test("drift, a missing element and Larger text scaling are reported", () => {
   assert.deepEqual(large.map((row) => [row.name, row.pass]), [["row height (compact)", true]]);
 });
 
-test("header/footer fills, outside dividers and each eight-pixel gap are measured", () => {
-  for (const name of ["searchBand", "headerDivider", "fieldHeight", "pinHeight", "popupHeight", "footerAction", "footerDivider", "pinTopGap", "pinBottomGap", "pinEndGap", "footerTopGap", "footerBottomGap"]) {
+test("header/footer fills, control radii, outside dividers and each eight-pixel gap are measured", () => {
+  for (const name of ["searchBand", "headerDivider", "fieldHeight", "pinHeight", "popupHeight", "footerAction", "footerDivider", "pinTopGap", "pinBottomGap", "pinEndGap", "footerTopGap", "footerBottomGap", "rControl", "rPopup"]) {
     const failed = compare(spec, "windows", "normal", "comfortable", { ...onSpec, [name]: onSpec[name] - 1 }).filter(row => !row.pass);
     assert.equal(failed.length, 1, `${name} drift must be visible`);
   }

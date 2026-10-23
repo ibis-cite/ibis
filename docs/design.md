@@ -103,8 +103,8 @@ These numbers are also in [`design-geometry.json`](design-geometry.json), which
 `node scripts/gallery-geometry.mjs` measures the evidence gallery against;
 change both together (a test checks that they agree).
 
-**Corners.** Nested shapes are concentric: an inner radius is its container's
-radius minus the inset between them, never larger. When the inset is close to
+**Corners.** At baseline size nested shapes are concentric: an inner radius is
+its container's radius minus the shape inset, never larger. When the inset is close to
 or larger than the outer radius, the inner corner drops to a small floor
 instead of going square or looking like a separate floating slab.
 
