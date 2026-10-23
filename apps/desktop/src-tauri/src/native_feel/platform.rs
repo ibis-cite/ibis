@@ -25,7 +25,7 @@ pub(super) fn material() -> Appearance {
         let version = windows::System::Profile::AnalyticsInfo::VersionInfo()
             .and_then(|info| info.DeviceFamilyVersion())
             .ok();
-        return super::policy::windows_material(version.as_ref().map(|v| v.to_string()).as_deref());
+        super::policy::windows_material(version.as_ref().map(|v| v.to_string()).as_deref())
     }
     #[cfg(not(any(target_os = "macos", target_os = "windows")))]
     Appearance::Opaque
