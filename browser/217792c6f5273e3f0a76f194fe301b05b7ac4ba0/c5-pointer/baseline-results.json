@@ -1,0 +1,44 @@
+[
+  {
+    "platform": "macos",
+    "theme": "light",
+    "mode": "normal",
+    "firstClick": "copy",
+    "filename": "baseline-macos-light-normal.png"
+  },
+  {
+    "platform": "macos",
+    "theme": "dark",
+    "mode": "normal",
+    "firstClick": "copy",
+    "filename": "baseline-macos-dark-normal.png"
+  },
+  {
+    "platform": "windows",
+    "theme": "light",
+    "mode": "normal",
+    "firstClick": "copy",
+    "filename": "baseline-windows-light-normal.png"
+  },
+  {
+    "platform": "windows",
+    "theme": "dark",
+    "mode": "normal",
+    "firstClick": "copy",
+    "filename": "baseline-windows-dark-normal.png"
+  },
+  {
+    "platform": "linux",
+    "theme": "light",
+    "mode": "normal",
+    "firstClick": "copy",
+    "filename": "baseline-linux-light-normal.png"
+  },
+  {
+    "platform": "linux",
+    "theme": "dark",
+    "mode": "normal",
+    "firstClick": "copy",
+    "filename": "baseline-linux-dark-normal.png"
+  }
+]
