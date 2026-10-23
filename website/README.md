@@ -5,6 +5,10 @@ The website is not live; the production visual design is still in progress.
 Source lives here; installers stay on GitHub Releases. No framework, database,
 remote fonts, browser scripts or paid website service is needed.
 
+Use typography and spacing for emphasis. Never use accent-bar callouts,
+highlight bars, accordions or disclosure toggles. Keep setup and privacy
+information visible, and preserve a clear, quiet keyboard focus indicator.
+
 ## Edit and preview
 
 Edit `index.html` for words and links, `style.css` for layout. Keep today's
