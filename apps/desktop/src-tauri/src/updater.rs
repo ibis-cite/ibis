@@ -270,15 +270,14 @@ fn shorten(text: &str, limit: usize) -> String {
     }
 }
 
+const INSTALL_FAILURE_MESSAGE: &str = "The update could not be installed. Try again later. If Ibis no longer opens, download and reinstall the newest version from GitHub.";
+
 async fn install_update(app: &AppHandle, update: Update) {
     match update.download_and_install(|_, _| {}, || {}).await {
         Ok(()) => app.restart(),
         Err(_) => {
             app.state::<Updates>().busy.store(false, Ordering::SeqCst);
-            tell(
-                app,
-                "The update could not be installed, so Ibis was left unchanged. Try again later, or download the newest version from GitHub.",
-            );
+            tell(app, INSTALL_FAILURE_MESSAGE);
         }
     }
 }
@@ -291,6 +290,13 @@ fn tell(app: &AppHandle, text: &str) {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn installation_failure_offers_recovery_without_claiming_rollback() {
+        assert!(!INSTALL_FAILURE_MESSAGE.contains("unchanged"));
+        assert!(INSTALL_FAILURE_MESSAGE.contains("Try again"));
+        assert!(INSTALL_FAILURE_MESSAGE.contains("download"));
+    }
 
     #[test]
     fn update_offer_uses_standard_windows_consent_buttons() {
