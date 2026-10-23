@@ -186,8 +186,8 @@ The native bridge reuses `native_appearance` (still returning a material string)
 and its watcher. `accent:changed` carries an optional finite sRGB triple in
 [0,1], replayed on every initial query independently of the material cache.
 Only private CSS inputs are injected. Normal-contrast roles preserve the fill,
-choose readable paired text and derive near-black/white accent text and focus
-cues. Invalid/unavailable input clears the projection to the existing system
+choose readable paired text for rest, hover and pressed primary fills, and
+derive near-black/white accent text and focus cues. Invalid/unavailable input clears the projection to the existing system
 colour fallback. Contrast modes retain their system pairs. Gallery theme
 simulations never adopt the host's accent; native acceptance uses the picker.
 

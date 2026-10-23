@@ -3,15 +3,20 @@
 :root { --native-accent-fill: initial; --native-accent-on: initial; --native-accent-light: initial; --native-accent-dark: initial; }
 @supports (color: light-dark(white, black)) {
   @media (prefers-contrast: no-preference) and (forced-colors: none) {
-    :root[data-native-accent="true"]:not([data-gallery-theme]):not(.notice-window) {
+    :root[data-native-accent="true"][data-platform="macos"]:not([data-gallery-theme]):not(.notice-window) {
       --accent: var(--native-accent-fill);
       --accent-text: light-dark(var(--native-accent-light), var(--native-accent-dark));
       --text-on-accent: var(--native-accent-on);
       --selected-background: var(--accent); --selected-text: var(--text-on-accent);
-    }
-    :root[data-native-accent="true"][data-platform="macos"]:not([data-gallery-theme]):not(.notice-window) {
-      --selected-background: var(--accent); --selected-text: var(--text-on-accent);
       --focus-ring-color: var(--accent-text);
+    }
+    @media (hover: hover) {
+      :root[data-native-accent="true"][data-platform="macos"]:not([data-gallery-theme]):not(.notice-window) .ui-button[data-variant="primary"][data-hovered]:not([data-disabled], [aria-disabled="true"]) {
+        color: light-dark(var(--native-accent-on-hover-light), var(--native-accent-on-hover-dark));
+      }
+    }
+    :root[data-native-accent="true"][data-platform="macos"]:not([data-gallery-theme]):not(.notice-window) .ui-button[data-variant="primary"]:is([data-pressed], [data-selected], [aria-expanded="true"]):not([data-disabled], [aria-disabled="true"]) {
+      color: light-dark(var(--native-accent-on-pressed-light), var(--native-accent-on-pressed-dark));
     }
     /* Separate the citation tile from red/orange selected-row accents (D9). */
     :root[data-native-accent="true"][data-platform="macos"]:not([data-gallery-theme]):not(.notice-window) [role="option"][data-active][data-citation-selected] .result-tile {

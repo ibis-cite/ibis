@@ -28,7 +28,7 @@ test("invalid and unavailable input clears every private native input", () => {
     setNativeAccent([1, 1, 0]);
     setNativeAccent(bad);
     expect(root.hasAttribute("data-native-accent")).toBe(false);
-    for (const name of ["fill", "on", "light", "dark"]) expect(root.style.getPropertyValue(`--native-accent-${name}`)).toBe("");
+    for (const name of ["fill", "on", "light", "dark", "on-hover-light", "on-hover-dark", "on-pressed-light", "on-pressed-dark"]) expect(root.style.getPropertyValue(`--native-accent-${name}`)).toBe("");
   }
 });
 
@@ -78,4 +78,22 @@ test("both subscriptions precede the replay query and accent survives a failed r
 
 test("an added tile on the native accent uses its paired text fill, keeping scarlet off the row fill", () => {
   expect(css).toMatch(/:root\[data-native-accent="true"\]\[data-platform="macos"\][^{}]*\[data-citation-selected\][^{}]*\.result-tile\s*\{[^}]*background:\s*var\(--text-on-accent\)[^}]*color:\s*var\(--citation-tile\)/);
+});
+
+test("native primary foregrounds stay readable through hover and press in both themes", () => {
+  const tokens = readFileSync(new FileURL("./tokens.css", import.meta.url), "utf8");
+  const neutrals = tokens.match(/--text:\s*light-dark\((#[0-9a-f]+), (#[0-9a-f]+)\)/)!;
+  const luminance = (rgb: number[]) => rgb.reduce((l, c, i) => l + (c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4) * [.2126, .7152, .0722][i]!, 0);
+  for (const rgb of [[0, 122 / 255, 1], [119 / 255, 119 / 255, 119 / 255], [.6, .4, 0], [1, 0, 0], [0, 0, 0], [1, 1, 1]]) {
+    setNativeAccent(rgb);
+    for (const [theme, hex] of [["light", neutrals[1]!], ["dark", neutrals[2]!]] as const) {
+      const ink = hex.slice(1).match(/../g)!.map((c) => parseInt(c, 16) / 255);
+      for (const [state, weight] of [["hover", .92], ["pressed", .84]] as const) {
+        const on = root.style.getPropertyValue(`--native-accent-on-${state}-${theme}`);
+        expect(on).toMatch(/^#(?:000|fff)$/);
+        const l = luminance(rgb.map((c, i) => c * weight + ink[i]! * (1 - weight)));
+        expect(on === "#000" ? (l + .05) / .05 : 1.05 / (l + .05)).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  }
 });
