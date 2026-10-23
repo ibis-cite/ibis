@@ -1,0 +1,47 @@
+{
+  "source": "310cc7f298411ed02d58359856addf00b155a7c4",
+  "results": [
+    {
+      "case": {
+        "platform": "macos",
+        "theme": "light",
+        "text": "large",
+        "rtl": false,
+        "width": 720,
+        "height": 640,
+        "view": "format"
+      },
+      "file": "macos-light-large-ltr-720x640-fine-en-US-format.png",
+      "labels": [
+        {
+          "text": "\\parencite",
+          "fragments": [
+            {
+              "x": 441.828125,
+              "y": 175.5,
+              "width": 68.296875,
+              "height": 17
+            }
+          ],
+          "labelWidth": 72.125,
+          "font": "14.95px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "rootFont": "18.4px"
+        },
+        {
+          "text": "\\textcite",
+          "fragments": [
+            {
+              "x": 441.828125,
+              "y": 203.5,
+              "width": 55.140625,
+              "height": 17
+            }
+          ],
+          "labelWidth": 80.65625,
+          "font": "14.95px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "rootFont": "18.4px"
+        }
+      ]
+    }
+  ]
+}

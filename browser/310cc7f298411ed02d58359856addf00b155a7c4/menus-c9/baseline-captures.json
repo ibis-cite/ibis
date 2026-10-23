@@ -1,0 +1,222 @@
+{
+  "source": "223662895d1f70b990a623ffd518987a0f32188b",
+  "results": [
+    {
+      "case": {
+        "platform": "macos",
+        "theme": "light",
+        "text": "large",
+        "rtl": false,
+        "width": 720,
+        "height": 640,
+        "view": "format"
+      },
+      "file": "macos-light-large-ltr-720x640-fine-en-US-format.png",
+      "labels": [
+        {
+          "text": "\\parencite",
+          "fragments": [
+            {
+              "x": 437.828125,
+              "y": 184.5,
+              "width": 68.296875,
+              "height": 17
+            }
+          ],
+          "labelWidth": 76.125,
+          "font": "14.95px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "rootFont": "18.4px"
+        },
+        {
+          "text": "\\textcite",
+          "fragments": [
+            {
+              "x": 437.828125,
+              "y": 212.5,
+              "width": 55.140625,
+              "height": 17
+            }
+          ],
+          "labelWidth": 84.65625,
+          "font": "14.95px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "rootFont": "18.4px"
+        }
+      ]
+    },
+    {
+      "case": {
+        "platform": "macos",
+        "theme": "dark",
+        "text": "large",
+        "rtl": false,
+        "width": 720,
+        "height": 640,
+        "view": "more"
+      },
+      "file": "macos-dark-large-ltr-720x640-fine-en-US-more.png"
+    },
+    {
+      "case": {
+        "platform": "windows",
+        "theme": "light",
+        "text": "large",
+        "rtl": false,
+        "width": 720,
+        "height": 640,
+        "view": "format"
+      },
+      "file": "windows-light-large-ltr-720x640-fine-en-US-format.png",
+      "labels": [
+        {
+          "text": "\\parencite",
+          "fragments": [
+            {
+              "x": 440.421875,
+              "y": 187.5,
+              "width": 68.296875,
+              "height": 17
+            }
+          ],
+          "labelWidth": 80.125,
+          "font": "14.95px \"Segoe UI Variable Text\", \"Segoe UI Variable\", \"Segoe UI\", system-ui, sans-serif",
+          "rootFont": "18.4px"
+        },
+        {
+          "text": "\\textcite",
+          "fragments": [
+            {
+              "x": 440.421875,
+              "y": 219.5,
+              "width": 55.140625,
+              "height": 17
+            }
+          ],
+          "labelWidth": 88.65625,
+          "font": "14.95px \"Segoe UI Variable Text\", \"Segoe UI Variable\", \"Segoe UI\", system-ui, sans-serif",
+          "rootFont": "18.4px"
+        }
+      ]
+    },
+    {
+      "case": {
+        "platform": "windows",
+        "theme": "dark",
+        "text": "large",
+        "rtl": false,
+        "width": 720,
+        "height": 640,
+        "view": "more"
+      },
+      "file": "windows-dark-large-ltr-720x640-fine-en-US-more.png"
+    },
+    {
+      "case": {
+        "platform": "linux",
+        "theme": "light",
+        "text": "large",
+        "rtl": false,
+        "width": 720,
+        "height": 640,
+        "view": "format"
+      },
+      "file": "linux-light-large-ltr-720x640-fine-en-US-format.png",
+      "labels": [
+        {
+          "text": "\\parencite",
+          "fragments": [
+            {
+              "x": 440.125,
+              "y": 192.5,
+              "width": 68.296875,
+              "height": 17
+            }
+          ],
+          "labelWidth": 76.125,
+          "font": "14.95px system-ui, \"Adwaita Sans\", Cantarell, sans-serif",
+          "rootFont": "18.4px"
+        },
+        {
+          "text": "\\textcite",
+          "fragments": [
+            {
+              "x": 440.125,
+              "y": 224.5,
+              "width": 55.140625,
+              "height": 17
+            }
+          ],
+          "labelWidth": 84.65625,
+          "font": "14.95px system-ui, \"Adwaita Sans\", Cantarell, sans-serif",
+          "rootFont": "18.4px"
+        }
+      ]
+    },
+    {
+      "case": {
+        "platform": "linux",
+        "theme": "dark",
+        "text": "large",
+        "rtl": false,
+        "width": 720,
+        "height": 640,
+        "view": "more"
+      },
+      "file": "linux-dark-large-ltr-720x640-fine-en-US-more.png"
+    },
+    {
+      "case": {
+        "platform": "macos",
+        "theme": "dark",
+        "text": "large",
+        "rtl": true,
+        "width": 720,
+        "height": 640,
+        "view": "format"
+      },
+      "file": "macos-dark-large-rtl-720x640-fine-en-US-format.png",
+      "labels": [
+        {
+          "text": "\\parencite",
+          "fragments": [
+            {
+              "x": 45,
+              "y": 184.5,
+              "width": 68.296875,
+              "height": 17
+            }
+          ],
+          "labelWidth": 76.125,
+          "font": "14.95px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "rootFont": "18.4px"
+        },
+        {
+          "text": "\\textcite",
+          "fragments": [
+            {
+              "x": 45,
+              "y": 212.5,
+              "width": 55.140625,
+              "height": 17
+            }
+          ],
+          "labelWidth": 84.65625,
+          "font": "14.95px -apple-system, \"system-ui\", system-ui, sans-serif",
+          "rootFont": "18.4px"
+        }
+      ]
+    },
+    {
+      "case": {
+        "platform": "macos",
+        "theme": "dark",
+        "text": "large",
+        "rtl": true,
+        "width": 380,
+        "height": 640,
+        "coarse": true,
+        "view": "keys"
+      },
+      "file": "macos-dark-large-rtl-380x640-coarse-en-US-keys.png"
+    }
+  ]
+}
