@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor, within } from "@testing-library/react";
 import axe from "axe-core";
 import { useRef, useState } from "react";
-import { Menu, MenuItem, MenuSection, MenuSeparator, useMenuBoundary } from "./Menu";
+import { Menu, MenuItem, MenuSection, MenuSeparator, useMenuBoundary, useMenuPlacement } from "./Menu";
 import { useMenuLifecycle } from "./useMenuLifecycle";
 
 test.each(["frame", "cancel", "reopen", "unmount"])("a deferred menu focus request respects %s", async (action) => {
@@ -329,4 +329,22 @@ test("placement preserves a visible header anchor while bounding an off-window f
   expect(bounded.top).toBeGreaterThanOrEqual(44);
   expect(bounded.top).toBeLessThan(640);
   hook.unmount();
+});
+
+test.each(["ltr", "rtl"])("menu alignment follows rendered %s on opening and keeps its closing edge", (direction) => {
+  const button = document.createElement("button");
+  button.dir = direction === "rtl" ? "ltr" : "rtl";
+  button.style.direction = direction;
+  document.body.append(button);
+  const trigger = { current: button };
+  const hook = renderHook(({ open, placement }: { open: boolean; placement: "top end" | "bottom end" }) => useMenuPlacement(open, trigger, placement),
+    { initialProps: { open: true, placement: "bottom end" } });
+  expect(hook.result.current).toBe(direction === "rtl" ? "bottom left" : "bottom right");
+  button.style.direction = direction === "rtl" ? "ltr" : "rtl";
+  hook.rerender({ open: false, placement: "top end" });
+  expect(hook.result.current).toBe(direction === "rtl" ? "top left" : "top right");
+  hook.rerender({ open: true, placement: "top end" });
+  expect(hook.result.current).toBe(direction === "rtl" ? "top right" : "top left");
+  hook.unmount();
+  button.remove();
 });

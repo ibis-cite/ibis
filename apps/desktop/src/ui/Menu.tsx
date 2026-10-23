@@ -6,6 +6,15 @@ import { Button } from "./Button";
 import { useMenuLifecycle } from "./useMenuLifecycle";
 import "./Menu.css";
 
+/** Align to the rendered trailing edge even when the browser locale differs. */
+export function useMenuPlacement(open: boolean, trigger: RefObject<HTMLElement | null>, placement: "top end" | "bottom end") {
+  const [rtl, setRtl] = useState(false);
+  useLayoutEffect(() => {
+    if (open && trigger.current) setRtl(getComputedStyle(trigger.current).direction === "rtl");
+  }, [open, trigger]);
+  return `${placement === "top end" ? "top" : "bottom"} ${rtl ? "left" : "right"}` as const;
+}
+
 /** Keep React Aria's placement boundary inside the viewport and below the
  * return field. A wrapped picker can put its footer trigger below the window. */
 export function useMenuBoundary(open: boolean, returnRef?: RefObject<HTMLElement | null>) {
@@ -130,6 +139,7 @@ export function Menu({ label, id, trigger, triggerRef, triggerClassName, trigger
   const boundary = useMenuBoundary(isOpen, tabFocusRef);
   const fromTrigger = useRef(false);
   const button = useRef<HTMLButtonElement | null>(null);
+  const renderedPlacement = useMenuPlacement(isOpen, button, placement);
   const { list, listRef, opening, retryFocus, cancelFocusRetry } = useMenuLifecycle(isOpen);
   const popover = useRef<HTMLElement | null>(null);
   const pendingFocus = useRef<HTMLElement | null>(null);
@@ -202,7 +212,7 @@ export function Menu({ label, id, trigger, triggerRef, triggerClassName, trigger
       else if (triggerRef) triggerRef.current = node;
     }} className={triggerClassName}
       render={(props) => <button {...props as ComponentPropsWithRef<"button">} title={triggerTitle} aria-keyshortcuts={triggerKeys} />}>{trigger}</Button>
-    <Popover ref={popoverRef} className="menu-popover" placement={placement} offset={6} containerPadding={8} shouldSkipAnimation={skipExit} {...boundary}>
+    <Popover ref={popoverRef} className="menu-popover" placement={renderedPlacement} offset={6} containerPadding={8} shouldSkipAnimation={skipExit} {...boundary}>
       <div className="menu-frame" onKeyDownCapture={(event) => {
         if (isComposing(event)) { event.stopPropagation(); return; }
         const to = event.key === "Escape" ? button.current : event.key === "Tab" ? tabFocusRef?.current : undefined;
