@@ -102,6 +102,10 @@ export const ResultRow = memo(function ResultRow({ record: r, index: i, active, 
       data-citation-selected={added || undefined}
       data-active={active || undefined}
       onPointerDownCapture={handlers.onPointerDown}
+      onMouseDown={(e) => {
+        // Double-click copies instead of selecting a word; single-press drags remain selectable.
+        if (e.detail === 2 && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) e.preventDefault();
+      }}
       onContextMenu={(e) => handlers.onContext(i, r, e)}
       onClick={(e) => handlers.onClick(i, r, e)}
     >

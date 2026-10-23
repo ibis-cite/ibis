@@ -103,3 +103,9 @@ test.each([2, 60])("a cancelled tile drag cannot fall through to copying its row
   expect(toggle).not.toHaveBeenCalled();
   expect(choose).not.toHaveBeenCalled();
 });
+
+test("the second mouse press prevents native word selection before double-click copy", () => {
+  const { getAllByRole } = render(list(0));
+  expect(fireEvent.mouseDown(getAllByRole("option")[0]!, { detail: 2, button: 0 })).toBe(false);
+  expect(fireEvent.mouseDown(getAllByRole("option")[0]!, { detail: 1, button: 0 })).toBe(true);
+});

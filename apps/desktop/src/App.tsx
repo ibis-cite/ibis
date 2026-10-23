@@ -761,16 +761,17 @@ export function App({ api = nativeApi, preview }: { api?: PickerApi; preview?: P
           }}
           onContext={(i, r) => {
             if (current !== results || !rowContext) return;
+            resetPointer();
             setActive(i);
             const scope = rowScope, visibility = copyVisibility.current, request = ++contextRequest.current;
-            const owns = () => scope === latestRowScope.current && visibility === copyVisibility.current && request === contextRequest.current;
+            const owns = () => scope === latestRowScope.current && visibility === copyVisibility.current && request === contextRequest.current && latestHighlight.current === choiceKey([r]);
             void rowContext(selected.has(idKey(r.id))).then((action) => {
               if (!owns()) return;
               report("rowContext", false);
               if (action === "toggle") toggle(r);
               else if (action === "copy") setClickCopy(selected.size > 0 ? chosenKey : choiceKey([r]));
-              input.current?.focus({ preventScroll: true });
-            }).catch(() => { if (owns()) { report("rowContext"); input.current?.focus({ preventScroll: true }); } });
+              if (action !== null || document.hasFocus()) input.current?.focus({ preventScroll: true });
+            }).catch(() => { if (owns()) { report("rowContext"); if (document.hasFocus()) input.current?.focus({ preventScroll: true }); } });
           }}
           onToggle={(i, r) => {
             if (current !== results) return;
