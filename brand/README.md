@@ -20,7 +20,7 @@ The logo, app icon and other brand files for Ibis. Use the files in [`exports/`]
 | The logo drawing itself (websites, slides) | `exports/ibis-logo-animated.svg`, `exports/ibis-logo-animated-on-dark.svg` |
 | The bird alone drawing itself (splash, loading, video corners) | `exports/ibis-mark-animated.svg`, `exports/ibis-mark-animated-on-dark.svg` |
 | Video title, end card and YouTube banner | `exports/png/video-title-card.png`, `-title-card-dark.png`, `-end-card.png`, `-youtube-banner.png` (1920 × 1080; banner 2560 × 1440) |
-| A YouTube thumbnail | Edit the two lines in `exports/video/thumbnail-template.svg`, then export at 1280 × 720 |
+| A YouTube thumbnail | Edit `words.thumbnail` in `settings.json`, rebuild, then use `exports/png/video-thumbnail-template.png` |
 | The quote mark from the app's citation shelf | `exports/ibis-quote-beak.svg` |
 
 ## Rules

@@ -25,6 +25,12 @@ class BrandDrift(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, "symlink"):
                 BUILD["publish"](generated, source)
             self.assertEqual(outside.read_text(), "synthetic unrelated file")
+            extra = source / "brand/exports/retired.svg"
+            extra.symlink_to(root / "missing.svg")
+            self.assertIn(extra.relative_to(source).as_posix(), BUILD["drift"](source, generated))
+            (source / name).unlink()
+            BUILD["publish"](generated, source)
+            self.assertFalse(extra.is_symlink())
 
     def test_names_every_changed_missing_or_extra_asset_without_touching_inputs(self):
         with tempfile.TemporaryDirectory() as directory:
