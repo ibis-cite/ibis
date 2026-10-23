@@ -1,0 +1,16 @@
+/* Content scaffold; the production visual design is still being developed. */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 1.0625rem/1.6 system-ui, sans-serif; }
+.wrap { max-width: 72rem; margin-inline: auto; padding: 1.5rem; }
+a { color: var(--accent); text-underline-offset: .2em; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.skip { position: absolute; left: -100vw; }
+.skip:focus { left: 1rem; top: 1rem; padding: 1rem; background: var(--bg); }
+.top img { width: 13rem; height: auto; }
+nav ul, .actions, .downloads { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
+p { max-width: 65ch; }
+section { margin-block: 4rem; }
+.notice { border-left: 3px solid var(--accent); padding: 1rem; background: var(--accent-soft); }
+code, mark { overflow-wrap: anywhere; }
+mark { background: var(--accent-soft); color: var(--text); }
+summary { padding-block: .75rem; cursor: pointer; }

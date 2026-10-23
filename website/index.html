@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Ibis | Find references. Copy citation keys.</title>
+  <meta name="description" content="A free, open-source citation picker for Windows, macOS and Linux. Search Zotero or a BibTeX file, copy, and paste where you write. Still an early preview.">
+  <link rel="canonical" href="https://ibiscite.org/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="assets/png/apple-touch-icon.png">
+  <link rel="manifest" href="assets/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ibis | Find references. Copy citation keys.">
+  <meta property="og:description" content="A small, open-source citation picker. Still an early preview.">
+  <meta property="og:url" content="https://ibiscite.org/">
+  <meta property="og:image" content="https://ibiscite.org/assets/png/og-image.png">
+  <meta property="og:image:alt" content="Ibis. Find references. Copy citation keys. Early preview.">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="assets/colors.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="wrap top">
+  <a href="/" aria-label="Ibis home"><picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/ibis-logo-on-dark.svg">
+    <img src="assets/ibis-logo.svg" alt="Ibis" width="418" height="200">
+  </picture></a>
+  <nav aria-label="Main"><ul>
+    <li><a href="#how">How it works</a></li><li><a href="#preview">Downloads</a></li>
+    <li><a href="#roadmap">Roadmap</a></li><li><a href="#help">Get involved</a></li>
+  </ul></nav>
+</header>
+<main id="main" class="wrap" tabindex="-1">
+  <h1><span>Find references.</span> <span>Copy citation keys.</span></h1>
+  <p class="lede">A small shortcut between your reference library and your writing. Search Zotero or a BibTeX file, copy a citation key, and paste it into your draft.</p>
+  <p class="notice"><strong>Early preview.</strong> Ibis is still taking shape. Expect bugs and changing features while I work towards a version that is ready to share widely.</p>
+  <div class="actions"><a class="button" href="#preview">Explore the preview</a><a href="#how">See how it works</a></div>
+
+  <section class="example" aria-labelledby="key-heading">
+    <figure>
+      <figcaption>A made-up writing example, not an app screenshot.</figcaption>
+      <div class="sheet"><p class="small">In your draft</p>
+        <p>Reading notes can help us return to an idea long after we first encounter it <mark>[@rivera2025]</mark>.</p>
+      </div>
+    </figure>
+    <div class="note">
+      <h2 id="key-heading">What is a citation key?</h2>
+      <p>A short label for a reference, such as <code>rivera2025</code>. Your writing tool uses it to find the full reference in your library.</p>
+      <p class="small">Here it stands for the fictional article “A place for reading notes” by A. Rivera (2025), in <i>Example Journal</i>.</p>
+      <dl class="formats"><dt>Pandoc</dt><dd><code>[@rivera2025]</code></dd><dt>LaTeX</dt><dd><code>\cite{rivera2025}</code></dd><dt>Typst</dt><dd><code>@rivera2025</code></dd></dl>
+    </div>
+  </section>
+
+  <section id="how" aria-labelledby="how-heading">
+    <h2 id="how-heading">Your library. Your writing. Fewer interruptions.</h2>
+    <ol class="steps"><li><strong>Open Ibis.</strong> Choose a Zotero library or a <code>.bib</code> file during setup.</li>
+      <li><strong>Find a reference.</strong> Type a few words from its author, title or year.</li>
+      <li><strong>Copy, then paste.</strong> Press <kbd>Enter</kbd> to copy; paste it where you write.</li></ol>
+    <p>Prefer a formatted citation? Ibis can also copy one in APA, Chicago, Harvard, IEEE or MLA. It does not insert directly into other apps or generate your document’s bibliography.</p>
+    <dl class="works"><div><dt>Zotero</dt><dd>Personal and chosen group libraries. Keep Zotero open and enable its local API once in settings.</dd></div>
+      <div><dt>BibTeX and BibLaTeX</dt><dd>Choose a <code>.bib</code> file, including an export kept up to date by Better BibTeX.</dd></div>
+      <div><dt>Windows, macOS and Linux</dt><dd>Use the app launcher or a keyboard shortcut. On Wayland, use the launcher for now.</dd></div></dl>
+    <p class="small">The app reads your library without changing it. Searching and copying work offline after setup; update checks are opt-in. <a href="https://github.com/ibiscite/ibis/blob/main/PRIVACY.md">App privacy details on GitHub</a>.</p>
+  </section>
+
+  <section id="preview" aria-labelledby="preview-heading">
+    <h2 id="preview-heading">Try the early preview</h2>
+    <p>For curious testers who are comfortable with rough edges. <strong>This is not a stable release.</strong> The downloads below are the numbered preview; the latest development work is in a separate Nightly app.</p>
+    <p class="notice">The apps are not yet signed by Apple or Microsoft, so installation can trigger security warnings or be blocked. <a href="https://github.com/ibiscite/ibis#install">Read the first-open guidance on GitHub</a> before downloading. On managed computers, ask your IT team.</p>
+    <ul class="downloads"><li><a class="button" href="https://github.com/ibiscite/ibis/releases/download/stable/Ibis-macOS-Apple-silicon.dmg">Mac with Apple silicon <small>DMG</small></a></li>
+      <li><a class="button" href="https://github.com/ibiscite/ibis/releases/download/stable/Ibis-macOS-Intel.dmg">Mac with Intel <small>DMG</small></a></li>
+      <li><a class="button" href="https://github.com/ibiscite/ibis/releases/download/stable/Ibis-Windows-setup.exe">Windows <small>64-bit installer</small></a></li>
+      <li><a class="button" href="https://github.com/ibiscite/ibis/releases/download/stable/Ibis-Linux.AppImage">Linux <small>64-bit AppImage</small></a></li></ul>
+    <p class="small">Downloads are served by GitHub. <a href="https://github.com/ibiscite/ibis#install">Setup steps and other packages</a> · <a href="https://github.com/ibiscite/ibis/releases/tag/stable">Preview release notes</a> · <a href="https://github.com/ibiscite/ibis/releases/tag/nightly">Nightly for development testing</a>.</p>
+  </section>
+
+  <section id="roadmap" aria-labelledby="roadmap-heading">
+    <h2 id="roadmap-heading">A small start, with room to grow</h2>
+    <p>I’m building Ibis to make finding a reference feel quick and ordinary, wherever you write. The aim is a fast, open-source tool that works across platforms and fits around your library.</p>
+    <dl class="works"><div><dt>Now</dt><dd>Make the preview easier to set up, more accessible and more reliable. Fix the rough edges before sharing it widely.</dd></div>
+      <div><dt>Next</dt><dd>More citation styles, richer citation previews and access to Zotero libraries while Zotero is closed.</dd></div>
+      <div><dt>Further ahead</dt><dd>Direct insertion into other apps and more ways to connect your tools. These are plans, not features available today.</dd></div></dl>
+    <p class="small">There are no promised dates. <a href="https://github.com/ibiscite/ibis/blob/main/ROADMAP.md">Follow the full roadmap on GitHub</a>.</p>
+  </section>
+
+  <section id="help" aria-labelledby="help-heading">
+    <h2 id="help-heading">Help shape Ibis</h2>
+    <p>You don’t need to write code to help. Tell me where setup was confusing, what went wrong, or how you use references. Ibis is maintained by one person, so replies may take a little time.</p>
+    <div class="actions"><a href="https://github.com/ibiscite/ibis/discussions">Ask a question or share an idea</a><a href="https://github.com/ibiscite/ibis/issues/new/choose">Report a problem</a><a href="https://github.com/ibiscite/ibis/blob/main/CONTRIBUTING.md">Contribute</a></div>
+    <p class="small">These links open GitHub. Reading is public; posting needs a GitHub account. Posts are public too, so leave out private documents, reference libraries and personal details.</p>
+  </section>
+</main>
+<footer class="wrap">
+  <p>Free and open source under the GNU AGPL v3.0 or later. <a href="https://github.com/ibiscite/ibis">Explore the source code</a>.</p>
+  <details><summary>Website privacy</summary><p>This page adds no analytics, tracking cookies or external fonts. Hostinger serves the site and may process technical request details such as your IP address. Downloads and community links take you to GitHub, which has its own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">privacy policy</a>. The app’s data handling is described separately in its <a href="https://github.com/ibiscite/ibis/blob/main/PRIVACY.md">privacy documentation</a>.</p></details>
+</footer>
+</body>
+</html>
