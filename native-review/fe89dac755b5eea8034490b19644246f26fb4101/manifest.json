@@ -1,0 +1,92 @@
+{
+  "candidate": "fe89dac755b5eea8034490b19644246f26fb4101",
+  "baseline": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+  "kind": "CUA native macOS window captures",
+  "configuredSize": {
+    "width": 720,
+    "height": 480
+  },
+  "frames": [
+    {
+      "file": "after-fe89-native-dark-added.jpg",
+      "sha256": "1710fa3bb1fbe28d297d4cb0ab26deee1a298e394923adea95219ce0076697ec",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "fe89dac755b5eea8034490b19644246f26fb4101",
+      "textSize": "larger"
+    },
+    {
+      "file": "after-fe89-native-dark-more.jpg",
+      "sha256": "9bdfdb569dec02a5c6d71775516e9dbe77f1b0128512f6b591fed56d44bc0359",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "fe89dac755b5eea8034490b19644246f26fb4101",
+      "textSize": "larger"
+    },
+    {
+      "file": "after-fe89-native-dark-rows.jpg",
+      "sha256": "3c8956b10ec94e7de1993ad0e6cc95da9edaeefba54a341a25c3ba0a70f458a8",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "fe89dac755b5eea8034490b19644246f26fb4101",
+      "textSize": "larger"
+    },
+    {
+      "file": "after-fe89-native-light-more.jpg",
+      "sha256": "ab80d4a86c1a40f467660e8aa7ed9e58e94f2218c216eede76b293b4dcc644b6",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "fe89dac755b5eea8034490b19644246f26fb4101",
+      "textSize": "larger"
+    },
+    {
+      "file": "after-fe89-native-light-rows.jpg",
+      "sha256": "71d724d8f74835d24509a6a76ee69d9df22a96d3b6a168b21cf06be98f503744",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "fe89dac755b5eea8034490b19644246f26fb4101",
+      "textSize": "larger"
+    },
+    {
+      "file": "before-6ee-native-dark-more.jpg",
+      "sha256": "570ca239541f3180d0ce5956e462675824eda073f43a576ddad7fe6c74512b06",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+      "textSize": "normal"
+    },
+    {
+      "file": "before-6ee-native-dark-rows.jpg",
+      "sha256": "3327066354dab2281beff59b062725b2bb51238d5f971adbee84f0cf5a62de6c",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+      "textSize": "normal"
+    },
+    {
+      "file": "before-6ee-native-light-more.jpg",
+      "sha256": "0ff139adaa3886314a57a8c19559a56f7845cc4eabe9b4ffee75d555e160e2e5",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+      "textSize": "larger"
+    },
+    {
+      "file": "before-6ee-native-light-rows.jpg",
+      "sha256": "a76bbde6f2185f7f75226c03db0360acda539d92f956d8b9edce4850e124ea6e",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+      "textSize": "larger"
+    }
+  ]
+}
