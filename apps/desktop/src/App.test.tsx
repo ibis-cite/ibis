@@ -1542,9 +1542,7 @@ test("header and More share the pin with state-dependent labels", async () => {
   expect(keep.getAttribute("aria-checked")).toBe("false");
   fireEvent.click(keep);
   await waitFor(() => expect(pins).toEqual([true]));
-  await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
   expect(pin.getAttribute("aria-pressed")).toBe("true");
-  fireEvent.click(screen.getByRole("button", { name: /^More/ }));
   expect((await screen.findByRole("menuitemcheckbox", { name: "Stop keeping open" })).getAttribute("aria-checked")).toBe("true");
   fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
   await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
@@ -1556,7 +1554,8 @@ test("header and More share the pin with state-dependent labels", async () => {
   await chooseFromMore("Stop keeping open", "menuitemcheckbox");
   await waitFor(() => expect(pins).toEqual([true, false, true, false]));
   expect(pin.getAttribute("aria-pressed")).toBe("false");
-  expect(document.activeElement).toBe(screen.getByLabelText("Search references"));
+  fireEvent.keyDown(screen.getByRole("menu"), { key: "Tab" });
+  await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText("Search references")));
 });
 
 test("the keep-open shortcut ignores repeats, composition and extra modifiers", async () => {
