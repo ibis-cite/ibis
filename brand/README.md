@@ -50,6 +50,14 @@ After editing either, rebuild every export from the repository root:
 python3 brand/build.py
 ```
 
-It needs Python 3 and librsvg's `rsvg-convert`; the social preview, video cards and thumbnail need the Inter font installed. After changing a line of text, check `exports/png/video-youtube-banner.png`: the banner's text must stay inside YouTube's centre safe area (1546 × 423). Never edit files in `exports/` by hand. The desktop app's own icons are built separately from `apps/desktop/src-tauri/icons/source/`.
+It needs Python 3 and librsvg's `rsvg-convert`; the social preview, video cards and thumbnail need the Inter font installed. After changing a line of text, check `exports/png/video-youtube-banner.png`: the banner's text must stay inside YouTube's centre safe area (1546 × 423). Never edit files in `exports/` by hand.
+
+Then rebuild the desktop adaptations from the same master and settings:
+
+```sh
+python3 apps/desktop/src-tauri/icons/source/generate.py
+```
+
+The [desktop icon notes](../apps/desktop/src-tauri/icons/source/README.md) explain the Windows, macOS and Linux formats and small-size rules.
 
 Design explorations (the design canvas, rejected options, screenshots) stay outside the repository. When one is chosen, record it in `docs/design.md` or `docs/design/system.md` and here.
