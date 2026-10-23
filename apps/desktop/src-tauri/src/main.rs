@@ -16,6 +16,8 @@ mod identity;
 mod library;
 mod login_item;
 #[cfg(target_os = "macos")]
+mod macos_reapproval;
+#[cfg(target_os = "macos")]
 mod native_corners;
 mod native_feel;
 mod notice;
@@ -41,7 +43,7 @@ use tauri_plugin_global_shortcut::ShortcutState;
 use crate::diagnostics::{NativeIssue, application_message, checked, report};
 use crate::library::{Library, LibraryWatch, LoadRequests, SearchRequests, Source, start_open};
 use crate::picker::{
-    DialogOpen, Pinned, ShortcutStatus, configured_shortcut, dismiss_picker, hides_on_blur, register_shortcut,
+    ChooserOpen, Pinned, ShortcutStatus, configured_shortcut, dismiss_picker, hides_on_blur, register_shortcut,
     show_picker, toggle_picker,
 };
 use crate::placement::place_on_active_display;
@@ -61,7 +63,9 @@ fn main() {
     report(gallery::configure(&mut context), NativeIssue::GalleryNavigation);
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
-    let builder = builder.manage(initial_panel);
+    let builder = builder
+        .manage(initial_panel)
+        .manage(macos_reapproval::Delivery::default());
     #[cfg(target_os = "windows")]
     let builder = builder.manage(picker::FocusChanges::default());
     let builder = builder
@@ -89,7 +93,7 @@ fn main() {
         .manage(SearchRequests::default())
         .manage(LibraryWatch::default())
         .manage(setup::Offered::default())
-        .manage(DialogOpen::default())
+        .manage(ChooserOpen::default())
         .manage(Pinned::default())
         .manage(notice::Notice::default())
         .manage(picker::FullScreenGuard::default())
@@ -121,7 +125,7 @@ fn main() {
                 // Like other launchers, the picker hides when it loses focus, but
                 // not to its own file dialog.
                 WindowEvent::Focused(false) => {
-                    let dialog_open = window.state::<DialogOpen>().is_open();
+                    let chooser_open = window.state::<ChooserOpen>().is_open();
                     let pinned = window.state::<Pinned>().0.load(Ordering::SeqCst);
                     #[cfg(target_os = "macos")]
                     let startup_allows_blur = panel::allows_automatic_blur(window.app_handle());
@@ -129,7 +133,7 @@ fn main() {
                     let startup_allows_blur = true;
                     #[cfg(target_os = "windows")]
                     let blur = window.state::<picker::FocusChanges>().record();
-                    if startup_allows_blur && hides_on_blur(!cfg!(debug_assertions), dialog_open, pinned) {
+                    if startup_allows_blur && hides_on_blur(!cfg!(debug_assertions), chooser_open, pinned) {
                         #[cfg(target_os = "windows")]
                         picker::dismiss_unless_refocused(window.app_handle(), blur);
                         #[cfg(not(target_os = "windows"))]

@@ -40,7 +40,7 @@ function mount() {
   const onAction = vi.fn();
   const toggle = vi.fn();
   render(<Harness onAction={onAction} toggle={toggle} />);
-  return { onAction, toggle, trigger: screen.getByRole("button", { name: "Actions" }), search: screen.getByRole("textbox") };
+  return { onAction, toggle, trigger: screen.getByRole("button", { name: "Actions" }), search: screen.getByRole<HTMLInputElement>("textbox") };
 }
 
 test.each(["macos", "windows", "linux"])("%s: a pointer opens with nothing highlighted, a shortcut highlights the first item, axe passes", async (platform) => {
@@ -76,6 +76,10 @@ test("every row has a leading check column; toggles are checkbox items and the s
   const rows = [...menu.querySelectorAll("[role^=menuitem]")];
   expect(rows.map((row) => row.firstElementChild?.className)).toEqual(["menu-check", "menu-check", "menu-check"]);
   expect(screen.getByRole("menuitem", { name: "Open" }).textContent).toBe("OpenCtrl+O");
+  // Menu shortcuts are trailing text, so global kbd cap styles cannot apply.
+  const shortcut = screen.getByRole("menuitem", { name: "Open" }).querySelector(".menu-keys")!;
+  expect(shortcut.tagName).toBe("SPAN");
+  expect(shortcut.getAttribute("aria-hidden")).toBe("true");
   const group = screen.getByRole("group", { name: "Sources" });
   expect(within(group).getAllByRole("menuitemcheckbox").map((row) => [row.textContent, row.getAttribute("aria-checked")]))
     .toEqual([["First", "true"], ["Second", "false"]]);
@@ -158,6 +162,48 @@ test.each(["Escape", "Tab"])("%s restores its destination after an animated exit
   expect(document.activeElement).toBe(key === "Escape" ? trigger : search);
 });
 
+test.each([false, true])("Tab (shift=%s) releases the modal before immediate typing", async (shiftKey) => {
+  const { trigger, search } = mount();
+  act(() => trigger.focus());
+  fireEvent.keyDown(trigger, { key: "ArrowDown" });
+  const menu = await screen.findByRole("menu");
+  const exit = holdExit(menu);
+  const focusSearch = search.focus.bind(search);
+  const focus = vi.spyOn(search, "focus").mockImplementation(() => {
+    if (!exit.popover.isConnected) focusSearch();
+  });
+  fireEvent.keyDown(document.activeElement!, { key: "Tab", shiftKey });
+  // No animation completion or frame is allowed before the next input.
+  expect(exit.popover.isConnected).toBe(false);
+  expect(document.activeElement).toBe(search);
+  fireEvent.input(document.activeElement!, { target: { value: "immediate" } });
+  expect(search.value).toBe("immediate");
+  focus.mockRestore();
+  await exit.finish();
+});
+
+test("composition does not trigger the immediate Tab dismissal", async () => {
+  const { trigger } = mount();
+  fireEvent.click(trigger);
+  const menu = await screen.findByRole("menu");
+  fireEvent.keyDown(menu, { key: "Tab", isComposing: true });
+  expect(screen.getByRole("menu")).toBe(menu);
+});
+
+test("a shortcut can reopen immediately after Tab and action exits still animate", async () => {
+  const { trigger, search } = mount();
+  fireEvent.click(trigger);
+  fireEvent.keyDown(await screen.findByRole("menu"), { key: "Tab" });
+  expect(document.activeElement).toBe(search);
+  fireEvent.keyDown(search, { key: "k", ctrlKey: true });
+  const reopened = await screen.findByRole("menu");
+  const exit = holdExit(reopened);
+  fireEvent.click(screen.getByRole("menuitem", { name: "Open" }));
+  expect(exit.popover.hasAttribute("data-exiting")).toBe(true);
+  await exit.finish();
+  expect(document.activeElement).toBe(search);
+});
+
 test.each(["focus", "pointer", "keyboard"])("later %s intent supersedes the action's focus destination", async (intent) => {
   const { trigger, search } = mount();
   fireEvent.click(trigger);
@@ -225,4 +271,20 @@ test("menus highlight with a fill, never a ring, and the picker sheet has no men
   expect(menuCss).toMatch(/\.menu-item \{[^}]*outline: none/);
   expect(menuCss).toMatch(/\.menu-popover \[role="menu"\] \{[^}]*outline: none/);
   expect(styles).not.toMatch(/role="menu|menuitem/);
+});
+
+test("an open menu bounds placement below the return field and removes the boundary on close", async () => {
+  const { trigger, search } = mount();
+  vi.spyOn(search, "getBoundingClientRect").mockReturnValue(new DOMRect(8, 8, 240, 40));
+  fireEvent.click(trigger);
+  await screen.findByRole("menu");
+  const boundary = document.querySelector<HTMLElement>("[data-menu-boundary]");
+  expect(boundary?.style.position).toBe("fixed");
+  expect(boundary?.style.top).toBe("48px");
+  expect(boundary?.getAttribute("aria-hidden")).toBe("true");
+  vi.mocked(search.getBoundingClientRect).mockReturnValue(new DOMRect(8, 8, 240, 56));
+  fireEvent(window, new Event("resize"));
+  expect(boundary?.style.top).toBe("64px");
+  fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+  await waitFor(() => expect(boundary?.isConnected).toBe(false));
 });

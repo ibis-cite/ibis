@@ -13,12 +13,12 @@ button, select {
   padding: var(--button-padding);
   min-height: var(--control-min-size);
 }
-button:hover { background: var(--button-hover-background); }
+button:not(.ui-button):hover { background: var(--button-hover-background); }
 /* No glow, no edge rings (docs/design.md rule 8): the one ring is keyboard
    focus (:focus-visible), 2 px with a 1 px gap, in the platform's colour:
    accent on macOS, ink on Windows, half-accent on Linux. Contrast and forced
    colours make it a solid CanvasText ring. */
-:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); box-shadow: var(--focus-ring-shadow); }
+:focus-visible:not(.ui-button) { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); box-shadow: var(--focus-ring-shadow); }
 main {
   height: var(--picker-height);
   display: flex;
@@ -30,10 +30,12 @@ main {
 .search-bar > svg { width: var(--search-icon-width); stroke-width: var(--search-icon-stroke); flex-shrink: 0; color: var(--muted); pointer-events: none; }
 /* The search glyph is centred over the tile column and the query starts where
    row titles start (docs/design.md, "Edges line up"). */
-.search-bar > .pin-button { margin-inline-end: var(--header-icon-end); }
+.pin-button { flex: none; }
+.pin-button svg { width: var(--icon-glyph-size); height: var(--icon-glyph-size); stroke-width: var(--icon-stroke); }
 .search-bar > svg { margin-inline: var(--lead) calc(var(--lead-gap) - var(--search-gap)); }
 /* Reserve readable query space before wrapping controls, at every text size. */
-#search { flex: 1; width: auto; min-width: min(var(--search-min-width), calc(100% - var(--lead) - var(--search-icon-width) - var(--lead-gap))); height: var(--field-h); font-size: var(--search-size); line-height: var(--search-line); letter-spacing: var(--search-tracking); background: var(--clear); border: 0; padding: 0; outline-offset: var(--search-focus-offset); cursor: text; user-select: text; }
+.search-field { --search-clear-size: var(--control-min-size); position: relative; display: flex; flex: 1; min-width: min(var(--search-min-width), calc(100% - var(--lead) - var(--search-icon-width) - var(--lead-gap))); }
+#search { width: 100%; min-width: 0; height: max(var(--field-h), calc(var(--search-clear-size) + var(--space-1))); font-size: var(--search-size); line-height: var(--search-line); letter-spacing: var(--search-tracking); background: var(--clear); border: 0; padding: 0; outline-offset: var(--search-focus-offset); cursor: text; user-select: text; }
 #search::placeholder { color: var(--muted); }
 /* The search box never shows a ring: it always has focus, and the caret is the
    cue (Windows adds its accent underline). Contrast and forced colours restore
@@ -41,8 +43,10 @@ main {
    16 px glyph in a 32 px target. */
 #search { border-radius: var(--r-row); }
 #search:focus-visible { outline: none; box-shadow: none; }
-#search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; width: var(--control-min-size); height: var(--control-min-size); margin: 0; background: var(--muted); -webkit-mask: var(--clear-glyph) center / var(--icon-size) no-repeat; mask: var(--clear-glyph) center / var(--icon-size) no-repeat; cursor: default; }
-#search::-webkit-search-cancel-button:hover { background: var(--text); }
+#search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; display: none; }
+.search-clear.ui-button { --focus-ring-offset: calc(-1 * var(--focus-ring-width)); position: absolute; inset-inline-end: var(--border-width); top: 50%; transform: translateY(-50%); width: var(--search-clear-size); height: var(--search-clear-size); }
+.search-clear::before { content: ""; width: var(--icon-size); height: var(--icon-size); background: currentColor; mask: var(--clear-glyph) center / contain no-repeat; }
+@media (pointer: coarse) { .search-field { --search-clear-size: 2.75rem; } }
 /* Windows and Linux search in a framed 16 px text box with the icon inside it.
    The icon overlaps the box's start padding, so the flex row never changes;
    the box starts at the inset and its text still starts at the row titles. */
@@ -55,6 +59,7 @@ main {
 :root[data-platform="windows"] #search:focus { outline: none; background: var(--field-active-background); border-bottom-color: var(--accent); box-shadow: inset 0 calc(-1 * var(--border-width)) var(--accent); }
 /* Linux: a framed entry. */
 :root[data-platform="linux"] #search { border: var(--border-width) solid var(--clear); }
+:root[data-platform] #search { padding-inline-end: calc(var(--search-clear-size) + var(--space-1)); }
 .visually-hidden { position: absolute; width: var(--hidden-size); height: var(--hidden-size); padding: 0; margin: var(--hidden-margin); overflow: hidden; clip-path: var(--hidden-clip); white-space: nowrap; }
 
 .results-area { flex: 1; min-height: var(--results-min-height); overflow: auto; padding: var(--inset); scrollbar-width: thin; }
@@ -63,7 +68,7 @@ main {
 /* Rows are exactly --row-height and touch; the clear border (an edge only in
    increased contrast) is taken from the side padding so titles stay aligned. */
 [role="option"] { position: relative; display: flex; align-items: center; gap: var(--row-gap); min-height: var(--row-height); cursor: default; padding: 0 calc(var(--row-pad) - var(--border-width)); margin: 0; border-radius: var(--r-row); border: var(--border-width) solid var(--clear); }
-.result-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.result-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; container-type: inline-size; }
 /* The leading tile (docs/design.md, row anatomy): the type icon on a quiet
    fill. On hover and on the active row the icon gives way to the add control in
    the same place, so the row never reflows; a row in the citation keeps a
@@ -79,17 +84,16 @@ main {
 [role="option"]:hover .result-tile, [data-active] .result-tile { color: inherit; }
 [data-active] .result-tile { background: var(--tile-active-background); }
 [role="option"][data-citation-selected] .result-tile { background: var(--citation-tile); color: var(--on-citation); }
-/* Title and year share the first line; the year sits at the same edge on every row. */
+/* Only the year occupies the trailing column, centred across the whole row. */
 .result-line, .result-meta { display: flex; align-items: baseline; gap: var(--space-3); min-width: 0; }
 .result-title { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: var(--title-size); font-weight: var(--title-weight); line-height: var(--title-line-height); letter-spacing: var(--title-tracking); }
 .result-year, .result-meta, .result-why { color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
-.result-year { flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.result-year { flex-shrink: 0; align-self: center; font-variant-numeric: tabular-nums; }
 /* The meta line wraps only when the byline, type, key and badge cannot all
-   fit at their sizes; then they move under the byline. A row at least 25em
-   wide (any window of 461px or more at normal text) keeps one line, and its
+   fit at their sizes; then they move under the byline. A body at least 25em
+   wide (after reserving the tile and year columns) keeps one line, and its
    key and badge shorten towards their minimums instead. */
 .result-meta { margin-top: var(--metadata-gap); flex-wrap: wrap; row-gap: 0; }
-[role="option"] { container-type: inline-size; }
 @container (min-width: 25em) { .result-meta { flex-wrap: nowrap; } }
 /* The byline (authors · container) fills the line; the key and library badge
    give way first, down to a few letters (their shrink factor is far larger),
@@ -114,10 +118,7 @@ main {
 [data-active] .result-meta, [data-active] .result-year, [data-active] .result-why { color: var(--row-active-muted); }
 :root[data-platform="windows"] [role="option"][data-active]::before { content: ""; position: absolute; inset-inline-start: 0; top: 50%; width: var(--pill-width); height: var(--pill-height); margin-top: calc(var(--pill-height) / -2); border-radius: var(--pill-width); background: var(--accent); }
 .empty-hint { font-size: var(--metadata-size); }
-.suggested-action, .suggested-action:hover { background: var(--selected-background); color: var(--selected-text); font-weight: var(--type-strong-weight); }
 .library-setup .setup-choices { display: flex; gap: var(--metadata-gap); justify-content: center; flex-wrap: wrap; }
-.library-setup .suggested-action, .writing-choice[aria-pressed="true"] { background: var(--selected-background); color: var(--selected-text); border-color: var(--clear); font-weight: var(--type-strong-weight); }
-.library-setup button[aria-disabled="true"] { color: var(--muted); cursor: default; }
 .found-files button { max-width: 100%; overflow-wrap: anywhere; }
 .found-files ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--metadata-gap); justify-items: center; }
 .found-folder { color: var(--muted); font-size: var(--metadata-size); }
@@ -128,7 +129,7 @@ main {
 .notices { padding: var(--notice-padding); overflow-wrap: anywhere; }
 .notices p { margin: var(--notice-margin); }
 .copy-notice code, .shelf-mark { color: var(--citation); }
-.copy-notice { border-bottom: var(--border-width) solid var(--separator); padding-bottom: var(--copy-padding); }
+.copy-notice { display: flow-root; border-bottom: var(--border-width) solid var(--separator); padding-bottom: var(--copy-padding); }
 .dismiss { float: right; margin: var(--dismiss-margin); }
 [role="alert"] { border-inline-start: var(--alert-border-width) solid var(--alert-color); padding-inline-start: var(--alert-padding); }
 /* The citation shelf (docs/design/preview.md): one quiet card above the
@@ -142,24 +143,11 @@ main:has(> .shelf) > footer { border-top-color: var(--clear); }
 .chip { flex: 0 1 auto; min-width: var(--chip-min-width); display: inline-flex; align-items: center; height: var(--chip-height); max-width: var(--chip-max-width); padding-inline-start: var(--space-2); border-radius: var(--chip-radius); background: var(--chip-fill); font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 500; }
 .chip[hidden] { display: none; }
 .chip-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* A 16 px cross in the chip's last 24 px; the glyph is a mask on a pseudo-element
-   so the keyboard focus ring is never masked away. */
-.chip-remove { flex: none; position: relative; width: var(--chip-height); min-height: 0; height: var(--chip-height); padding: 0; border: 0; border-radius: var(--chip-radius); background: var(--clear); color: var(--muted); }
-.chip-remove::before { content: ""; position: absolute; inset: 0; background: currentColor; -webkit-mask: var(--clear-glyph) center / var(--icon-size) no-repeat; mask: var(--clear-glyph) center / var(--icon-size) no-repeat; }
-.chip-remove:hover { background: var(--clear); color: var(--text); }
-/* The 24 px cross and "+N" are hit across 32 px, and 44 px with touch (D12). */
-.chip-remove::after, .chip-more button::after { content: ""; position: absolute; inset: calc((var(--control-min-size) - var(--chip-height)) / -2); }
-.chip-more button { position: relative; }
-@media (pointer: coarse) {
-  .chip-remove::after, .chip-more button::after { inset: calc((2.75rem - var(--chip-height)) / -2); }
-}
 .chip-more { flex: none; }
-.chip-more button { min-height: var(--chip-height); padding: 0 var(--space-2); border: 0; border-radius: var(--chip-radius); background: var(--clear); color: var(--muted); font-size: var(--type-label-size); }
-.chip-more button:hover { background: var(--chip-fill); color: var(--text); }
 /* "+N" opened: every chip, wrapping onto at most three scrolling lines. */
 /* Chips shorten before "+N" is pushed out of sight. */
 .shelf-chips[data-expanded] .chip { flex: none; max-width: min(var(--chip-max-width), 100%); }
-.shelf-chips[data-expanded] { flex-wrap: wrap; align-content: flex-start; height: auto; max-height: calc(3 * (var(--chip-height) + var(--space-1)) + var(--space-2) * 2); padding-block: var(--space-2); overflow: auto; }
+.shelf-chips[data-expanded] { flex-wrap: wrap; align-content: flex-start; overflow: auto; }
 .shelf-output { display: flex; align-items: center; gap: var(--row-gap); height: var(--shelf-line); padding-inline: var(--row-pad); font-size: var(--type-citation-size); }
 .shelf-mark { flex: none; width: var(--tile-size); text-align: center; font-size: var(--icon-size); font-weight: 700; line-height: 1; }
 .shelf-output[data-state="pending"] .shelf-mark { opacity: .45; }
@@ -202,12 +190,7 @@ footer { display: flex; align-items: center; border-top: var(--border-width) sol
 
 /* More stays at the far end even when the footer wraps, so its menu opens inward. */
 .more { position: relative; margin-inline-start: auto; }
-.more > button { display: inline-flex; align-items: center; min-height: var(--control-min-size); padding-block: 0; padding-inline: calc(var(--space-1) - var(--border-width)); background: var(--clear); }
-/* A 28 px fill inside the 32 px target; its trailing cap lines up with rows. */
-.more > button > .key-hint { padding: var(--space-1) var(--space-2); border-radius: var(--r-tile); }
-.more > button:hover > .key-hint, .more > button[aria-expanded="true"] > .key-hint { background: var(--button-hover-background); }
-.quiet-button, .icon-button { background: var(--clear); border-color: var(--clear); color: var(--muted); }
-.icon-button { font-size: var(--icon-size); padding: var(--icon-padding); }
+.quiet-button { background: var(--clear); border-color: var(--clear); color: var(--muted); }
 /* Key caps are filled, never outlined boxes (PowerToys, Raycast, GNOME): a
    20 px cap on the button fill; contrast modes give it an edge. */
 kbd { font: inherit; font-size: var(--hint-size); font-weight: 500; display: inline-block; min-width: var(--key-cap); height: var(--key-cap); line-height: calc(var(--key-cap) - 2 * var(--border-width)); padding: 0 var(--space-1); text-align: center; background: var(--button-background); border: var(--border-width) solid var(--button-edge); border-radius: var(--hint-radius); margin-inline-start: var(--hint-margin); }
@@ -234,7 +217,7 @@ kbd { font: inherit; font-size: var(--hint-size); font-weight: 500; display: inl
   [role="option"][data-citation-selected] .result-tile { background: CanvasText; color: Canvas; }
   [role="option"][data-active][data-citation-selected] .result-tile { background: HighlightText; color: Highlight; }
   .search-bar:focus-within { outline: var(--focus-ring-width) solid var(--selected-background); outline-offset: var(--forced-search-offset); }
-  #search::-webkit-search-cancel-button { forced-color-adjust: none; background: FieldText; }
+  .search-clear::before { forced-color-adjust: none; background: ButtonText; }
   #search:focus-visible, :root[data-platform] #search:focus { outline: var(--focus-ring-width) solid CanvasText; outline-offset: var(--focus-ring-search-offset); }
   :root[data-platform="windows"] [role="option"][data-active]::before { background: HighlightText; }
 }
@@ -244,7 +227,7 @@ kbd { font: inherit; font-size: var(--hint-size); font-weight: 500; display: inl
   main { height: auto; min-height: var(--picker-height); overflow: visible; }
   .results-area { flex: none; overflow: visible; }
   /* Keep an editable search row when enlarged text leaves no room for controls. */
-  #search { flex-basis: calc(100% - var(--lead) - var(--search-icon-width) - var(--lead-gap)); }
+  .search-field { flex-basis: calc(100% - var(--lead) - var(--search-icon-width) - var(--lead-gap)); }
   .result-meta { flex-wrap: wrap; }
   /* Authors and container flow as one wrapping run of text. */
   .result-byline { display: block; }
@@ -294,9 +277,8 @@ main[data-selection] .results-area { flex: 1 0 var(--results-min-height); overfl
 .result-first-author { flex: none; max-width: var(--key-max-width); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--metadata-size); line-height: var(--metadata-line-height); }
 [data-active] .result-first-author { color: var(--row-active-muted); }
 :root[data-density="compact"] .result-title { flex: 0 1 auto; }
-:root[data-density="compact"] .result-year { margin-inline-start: auto; }
 /* In a very narrow Compact row (large text in a small window) the title takes
-   its own line, with the first author and year below it, rather than being
+   its own line, with the first author below it, rather than being
    squeezed beside them. */
 @container (max-width: 16em) {
   :root[data-density="compact"] .result-line { flex-wrap: wrap; row-gap: 0; }
@@ -306,12 +288,10 @@ main[data-selection] .results-area { flex: 1 0 var(--results-min-height); overfl
 /* Footer key hints (#491): what Enter does now, or with Alt held the other
    keys. They stay in narrow windows and wrap instead of overlapping. */
 .enter-hints { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); min-width: 0; margin-inline-end: calc(-1 * var(--space-1)); color: var(--muted); font-size: var(--hint-size); overflow-wrap: anywhere; }
-.footer-action { display: inline-flex; align-items: center; padding: 0; min-width: var(--control-min-size); max-width: 100%; background: var(--clear); }
+.footer-action { min-width: var(--control-min-size); max-width: 100%; }
 /* At large system text sizes the label and caps may need separate lines;
    their visible content must stay inside the button's actual hit target. */
-.footer-action > .key-hint { flex-wrap: wrap; max-width: 100%; white-space: normal; padding-block: var(--space-1); border-radius: var(--r-tile); }
-.footer-action:hover { background: var(--clear); }
-.footer-action:hover > .key-hint { background: var(--button-hover-background); }
+.footer-action > .key-hint { flex-wrap: wrap; max-width: 100%; white-space: normal; }
 @media (pointer: coarse) {
   .footer-action, .more > button { min-width: 2.75rem; min-height: 2.75rem; }
 }

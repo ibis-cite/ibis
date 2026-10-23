@@ -5,34 +5,40 @@
 // Runs formatting, lints, tests and the dependency policy. Never edits files.
 // Exit codes: 0 all passed, 1 a check failed, 2 incomplete (a tool is missing).
 import { spawnSync } from "node:child_process";
+import { readdirSync } from "node:fs";
 
 const args = process.argv.slice(2);
-if (args.length > 0) {
+const scriptsOnly = args.length === 1 && ["--script-tests", "--platform-script-tests"].includes(args[0]);
+if (args.length > 0 && !scriptsOnly) {
   if (args.length !== 2 || args[0] !== "--expect-commit" || args[1].length !== 40 || !/^[a-f0-9]{40}$/i.test(args[1])) {
-    console.error("Usage: node scripts/check.mjs [--expect-commit FULL_SHA]");
+    console.error("Usage: node scripts/check.mjs [--expect-commit FULL_SHA | --script-tests | --platform-script-tests]");
     process.exit(1);
   }
   verifyCommit(args[1].toLowerCase());
 }
 
 const desktop = { cwd: "apps/desktop" };
+// Native runners have the built interface, without its parser packages. The
+// Web job and local full check retain that one package-dependent test suite.
+const scriptFiles = readdirSync(new URL(".", import.meta.url)).sort();
+const scriptTests = scriptFiles
+  .filter((name) => /\.test\.(mjs|cjs)$/.test(name))
+  .filter((name) => args[0] !== "--platform-script-tests" || name !== "ui-imports.test.mjs")
+  .map((name) => `scripts/${name}`);
+const scriptSteps = [
+  ["Script tests", "node", ["--test", ...scriptTests]],
+  ...scriptFiles.filter((name) => /^test_.*\.py$|\.test\.py$/.test(name)).map((name) => [
+    `Python script tests: ${name}`, process.platform === "win32" ? "python" : "python3", ["-B", `scripts/${name}`],
+  ]),
+];
 const steps = [
   ["Workflow expressions", "actionlint", ["-shellcheck=", "-pyflakes="]],
-  ["Source verification tests", "node", ["--test", "scripts/check.test.mjs"]],
-  ["Fuzz reporter tests", "node", ["--test", "scripts/fuzz.test.mjs"]],
-  ["Evidence publication tests", "node", ["--test", "scripts/evidence.test.mjs"]],
-  ["Update feed tests", "node", ["--test", "scripts/update-feed.test.mjs"]],
-  ["Hygiene tests", "node", ["--test", "scripts/hygiene.test.mjs"]],
-  ["CI path tests", "node", ["--test", "scripts/ci-paths.test.mjs"]],
-  ["Pull request convention tests", "node", ["--test", "scripts/pr-lint.test.mjs"]],
-  ["Release notes tests", "node", ["--test", "scripts/release-notes.test.mjs"]],
-  ["Geometry spec tests", "node", ["--test", "scripts/gallery-geometry.test.mjs"]],
   ["Format", "cargo", ["fmt", "--all", "--check"]],
   ["Lint", "cargo", ["clippy", "--all-targets", "--locked", "--", "-D", "warnings"]],
   ["Test", "cargo", ["test", "--locked"]],
   ["Dependency policy", "cargo", ["deny", "--locked", "check"]],
   ["Desktop: install", "pnpm", ["install", "--frozen-lockfile"], desktop],
-  ["Desktop: UI import boundary tests", "node", ["--test", "scripts/ui-imports.test.mjs"]],
+  ...scriptSteps,
   ["Desktop: UI import boundary", "node", ["scripts/ui-imports.mjs"]],
   // All desktop unit tests, including the generated-contract freshness check.
   ["Desktop: app tests", "cargo", ["test", "-p", "ibis-desktop", "--locked"]],
@@ -47,7 +53,7 @@ const steps = [
 // missing and the run is incomplete rather than failed.
 const shell = process.platform === "win32";
 const skipped = [];
-for (const [name, cmd, args, options = {}] of steps) {
+for (const [name, cmd, args, options = {}] of scriptsOnly ? scriptSteps : steps) {
   console.log(`\n== ${name}: ${cmd} ${args.join(" ")}`);
   const result = spawnSync(cmd, args, { stdio: "inherit", shell, ...options });
   if (result.status === 0) continue;

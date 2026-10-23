@@ -1,6 +1,50 @@
 import { Children, createContext, isValidElement, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ComponentPropsWithRef, type ReactElement, type ReactNode, type Ref, type RefObject } from "react";
-import { Button, Header, Keyboard, Menu as AriaMenu, MenuItem as AriaMenuItem, MenuSection as AriaMenuSection, MenuTrigger, Popover, Separator } from "react-aria-components";
+import { flushSync } from "react-dom";
+import { Header, Menu as AriaMenu, MenuItem as AriaMenuItem, MenuSection as AriaMenuSection, MenuTrigger, Popover, Separator } from "react-aria-components";
+import { Button } from "./Button";
 import "./Menu.css";
+
+/** Keep React Aria's placement boundary inside the viewport and below the
+ * return field. A wrapped picker can put its footer trigger below the window. */
+export function useMenuBoundary(open: boolean, returnRef?: RefObject<HTMLElement | null>) {
+  const [boundary, setBoundary] = useState<HTMLElement>();
+  const [clearBottom, setClearBottom] = useState(0);
+  useLayoutEffect(() => {
+    if (!open) return;
+    const node = document.createElement("div");
+    node.dataset.menuBoundary = "";
+    node.setAttribute("aria-hidden", "true");
+    Object.assign(node.style, { position: "fixed", inset: "0", pointerEvents: "none" });
+    const update = () => {
+      const bottom = Math.max(0, returnRef?.current?.getBoundingClientRect().bottom ?? 0);
+      node.style.top = `${bottom}px`;
+      setClearBottom(bottom);
+    };
+    update();
+    document.body.append(node);
+    setBoundary(node);
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+    if (returnRef?.current) observer?.observe(returnRef.current);
+    window.addEventListener("resize", update);
+    window.visualViewport?.addEventListener("resize", update);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("resize", update);
+      node.remove();
+    };
+  }, [open, returnRef]);
+  const getTargetRect = useCallback((target: Element) => {
+    const rect = target.getBoundingClientRect();
+    if (!boundary?.isConnected) return rect;
+    const bounds = boundary.getBoundingClientRect();
+    // Preserve the real anchor when visible; shift an off-window trigger into
+    // the boundary so placement can still flip and cap against usable space.
+    const top = Math.max(clearBottom + 8 - 6 - rect.height, Math.min(rect.top, bounds.bottom - 8));
+    return new DOMRect(rect.x, top, rect.width, rect.height);
+  }, [boundary, clearBottom]);
+  return { boundaryElement: boundary, getTargetRect };
+}
 
 const ActionFocusContext = createContext<(() => void) | null>(null);
 
@@ -35,7 +79,7 @@ export function MenuItem({ id, label, title, keys, checked, disabled, onAction }
     {({ isSelected }) => <>
       <MenuCheck checked={isSelected} />
       <span className="menu-label">{label}</span>
-      {keys && <Keyboard className="menu-keys" aria-hidden="true">{keys}</Keyboard>}
+      {keys && <span className="menu-keys" aria-hidden="true">{keys}</span>}
     </>}
   </AriaMenuItem>;
 }
@@ -80,6 +124,7 @@ type MenuProps = {
  * item is highlighted, as in native menus.
  */
 export function Menu({ label, id, trigger, triggerRef, triggerClassName, triggerTitle, triggerKeys, isOpen, onOpenChange, tabFocusRef, placement = "bottom end", children }: MenuProps) {
+  const boundary = useMenuBoundary(isOpen, tabFocusRef);
   const fromTrigger = useRef(false);
   const button = useRef<HTMLButtonElement | null>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -88,6 +133,7 @@ export function Menu({ label, id, trigger, triggerRef, triggerClassName, trigger
   const focusFrame = useRef(0);
   const closingList = useRef<HTMLDivElement | null>(null);
   const [opening, setOpening] = useState(0);
+  const [skipExit, setSkipExit] = useState(false);
   const listRef = useCallback((node: HTMLDivElement | null) => {
     list.current = node;
     if (!node) closingList.current = null;
@@ -133,6 +179,7 @@ export function Menu({ label, id, trigger, triggerRef, triggerClassName, trigger
   }, [restoreFocus]);
   useLayoutEffect(() => {
     if (isOpen) {
+      setSkipExit(false);
       pendingFocus.current = null;
       cancelAnimationFrame(focusFrame.current);
     } else restoreFocus();
@@ -149,25 +196,36 @@ export function Menu({ label, id, trigger, triggerRef, triggerClassName, trigger
       document.removeEventListener("keydown", cancel, true);
     };
   }, []);
-  const leave = (to: HTMLElement | null | undefined) => {
+  const leave = (to: HTMLElement | null | undefined, immediate: boolean) => {
+    if (immediate) {
+      // Tab hands input back now. Keeping the modal mounted for its exit would
+      // reject focus, losing any typing before its animation finishes.
+      const previous = document.activeElement;
+      pendingFocus.current = null;
+      cancelAnimationFrame(focusFrame.current);
+      flushSync(() => { setSkipExit(true); onOpenChange(false); });
+      const active = document.activeElement;
+      if (to?.isConnected && (active === previous || active === document.body || active === button.current || active === to)) to.focus();
+      return;
+    }
     pendingFocus.current = to ?? null;
     onOpenChange(false);
   };
   return <MenuTrigger isOpen={isOpen} onOpenChange={(open) => { fromTrigger.current = open; onOpenChange(open); }}>
-    <Button ref={(node) => {
+    <Button variant="quiet" size="small" ref={(node) => {
       button.current = node;
       if (typeof triggerRef === "function") triggerRef(node);
       else if (triggerRef) triggerRef.current = node;
     }} className={triggerClassName}
       render={(props) => <button {...props as ComponentPropsWithRef<"button">} title={triggerTitle} aria-keyshortcuts={triggerKeys} />}>{trigger}</Button>
-    <Popover ref={popoverRef} className="menu-popover" placement={placement} offset={4} containerPadding={8}>
+    <Popover ref={popoverRef} className="menu-popover" placement={placement} offset={6} containerPadding={8} shouldSkipAnimation={skipExit} {...boundary}>
       <div className="menu-frame" onKeyDownCapture={(event) => {
         if (event.nativeEvent.isComposing) return;
         const to = event.key === "Escape" ? button.current : event.key === "Tab" ? tabFocusRef?.current : undefined;
         if (to === undefined) return;
         event.preventDefault();
         event.stopPropagation();
-        leave(to);
+        leave(to, event.key === "Tab");
       }}>
         <AriaMenu key={opening} ref={listRef} id={id} className="menu" aria-label={label} autoFocus={fromTrigger.current ? undefined : "first"}>
           <ActionFocusContext.Provider value={() => { pendingFocus.current = tabFocusRef?.current ?? null; }}>

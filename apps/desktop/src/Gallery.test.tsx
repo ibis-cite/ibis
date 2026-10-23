@@ -101,6 +101,25 @@ test("the many-results fixture exercises a scrollable real result list", async (
   expect(within(screen.getByRole("listbox", { name: "Results" })).getAllByRole("option")).toHaveLength(20);
 });
 
+test.each([
+  ["rtl-count", "مراجع.bib", "20 results", "updated"],
+  ["rtl-hebrew", "מקורות.bib", "1 result", "checked"],
+])("the %s fixture exercises the actual count, mixed source and non-live age", async (id, name, count, age) => {
+  const state = galleryStates.find((candidate) => candidate.id === id)!;
+  expect(state.direction).toBe("rtl");
+  const { container } = render(<div dir={state.direction}><App {...galleryProvider(state)} /></div>);
+  await screen.findByRole("option", { name: new RegExp(state.results![0]!.title) });
+  expect(container.querySelector(".results-heading bdi")?.textContent).toBe(count);
+  const status = screen.getByRole("status", { name: "Library status" });
+  expect(status.querySelector(".library-source")?.textContent).toBe(name);
+  expect(status.closest(".library-words")?.getAttribute("dir")).toBe("ltr");
+  const clock = container.querySelector(".library-age")!;
+  expect(clock.textContent).toContain(age);
+  expect(clock.getAttribute("aria-hidden")).toBe("true");
+  expect(status.contains(clock)).toBe(false);
+  expect(container.querySelector(".library-detail")?.textContent).toContain(age);
+});
+
 test("the scope-menu fixture shows the existing multi-library choices in More", async () => {
   const state = galleryStates.find((candidate) => candidate.id === "scope-menu");
   expect(state).toBeTruthy();
@@ -309,8 +328,8 @@ async function expectRenderedFixture(id: string): Promise<void> {
       for (let i = 0; i < state.tray! * 2 + 32 && acknowledge.mock.calls.length === 0; i++) {
         await act(() => vi.advanceTimersByTimeAsync(16));
       }
-      // Six chips, then "+N" for the rest (docs/design/preview.md).
-      expect(container.querySelectorAll('[aria-label="Selected references"] > li.chip')).toHaveLength(Math.min(state.tray!, 6));
+      // Six chips, then "+N", or all selected references after expanding.
+      expect(container.querySelectorAll('[aria-label="Selected references"] > li.chip')).toHaveLength(state.trayExpanded ? state.tray! : Math.min(state.tray!, 6));
       expect(container.querySelector("[data-active]")?.id).toBe(`result-${state.tray! - 1}`);
       if (state.formatted) expect(container.querySelector(".shelf-output .preview-text")?.textContent).toBe(text);
     } else {
@@ -466,5 +485,27 @@ test("outside the native app a rendered state is marked on the page for browser 
   } finally {
     await act(async () => stop());
     container.remove();
+  }
+});
+
+test("warning captures wait until the whole dismissal target fits above the notice divider", async () => {
+  let noticeHeight = 60;
+  vi.stubGlobal("matchMedia", vi.fn().mockReturnValue({ matches: true }));
+  const size = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    if (this.matches(".copy-notice")) return new DOMRect(0, 0, 300, noticeHeight);
+    if (this.matches(".dismiss")) return new DOMRect(200, 40, 80, 44);
+    return new DOMRect();
+  });
+  document.documentElement.style.fontSize = "16px";
+  const run = await renderUntilAcknowledged("copy-warnings");
+  try {
+    expect(run.acknowledge).not.toHaveBeenCalled();
+    noticeHeight = 100;
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(run.acknowledge).toHaveBeenCalledExactlyOnceWith("copy-warnings");
+  } finally {
+    await run.stop();
+    size.mockRestore();
+    document.documentElement.style.removeProperty("font-size");
   }
 });

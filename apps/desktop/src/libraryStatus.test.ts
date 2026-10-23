@@ -7,7 +7,7 @@ import { ago, libraryMessages, recentUpdate } from "./messages";
 
 const { readFileSync } = await vi.importActual<{ readFileSync: (path: URL, encoding: string) => string }>("node:fs");
 const { URL: FileURL } = await vi.importActual<{ URL: typeof URL }>("node:url");
-const now = Date.UTC(2026, 9, 20, 12, 0);
+const now = new Date(2026, 9, 20, 12, 0).getTime();
 const hour = 3_600_000;
 const file = (overrides: Partial<LibraryStatus> = {}): LibraryStatus => ({
   revision: "1", state: "loaded", zotero: false, zotero_libraries: [], has_snapshot: true, name: "thesis.bib", snapshot_name: "thesis.bib",
@@ -60,6 +60,18 @@ test("relative times are short, never in the future, and turn into dates after a
   expect(ago(now - 24 * 8 * hour, now)).toBe("on Oct 12");
 });
 
+test("older check dates distinguish the same month and day in different years", () => {
+  expect(ago(new Date(2025, 9, 12, 12).getTime(), now)).toBe("on Oct 12, 2025");
+  expect(ago(new Date(2026, 9, 12, 12).getTime(), now)).toBe("on Oct 12");
+});
+
+test("date years follow the local calendar across New Year without changing future times", () => {
+  const january = new Date(2026, 0, 9, 1, 30).getTime();
+  expect(ago(new Date(2026, 0, 1, 1, 30).getTime(), january)).toBe("on Jan 1");
+  expect(ago(new Date(2025, 11, 31, 23, 30).getTime(), january)).toBe("on Dec 31, 2025");
+  expect(ago(new Date(2027, 0, 1, 1, 30).getTime(), january)).toBe("just now");
+});
+
 test("the detail is a short line, then libraries, check time and any problem", () => {
   expect(detail(zotero({ zotero_libraries: ["user", { group: 41 }, { group: 9 }], checked_at: now - 3 * hour }))).toEqual(
     ["Zotero · 1,204 references", `My Library, Group 41, Group 9 · checked 3 hours ago, ${clockAt(3)}`]);
@@ -82,6 +94,27 @@ test("names are isolated so right-to-left names keep their place", () => {
   const status = screen.getByRole("status", { name: "Library status" });
   expect(status.querySelector("bdi")?.textContent).toBe("مراجع.bib");
   expect(status.textContent).toBe("مراجع.bib · 1,204 references");
+});
+
+test.each(["مراجع.bib", "מקורות.bib", "研究.bib", "example.bib"])("the English status phrase keeps source, state and age order around %s", (name) => {
+  const { container } = render(createElement("div", { dir: "rtl" }, createElement(LibraryStatusLine, {
+    library: file({ name, snapshot_name: name, updated_at: Date.now() }), groupName: String,
+  })));
+  const words = container.querySelector(".library-words")!;
+  expect(words.tagName).toBe("BDI");
+  expect(words.getAttribute("dir")).toBe("ltr");
+  const phrase = screen.getByRole("status", { name: "Library status" });
+  expect(phrase.getAttribute("dir")).toBe("ltr");
+  expect(phrase.textContent).toBe(`${name} · 1,204 references`);
+  expect(phrase.querySelector(".library-source")?.tagName).toBe("BDI");
+  const age = words.querySelector(".library-age")!;
+  expect(age.tagName).toBe("BDI");
+  expect(age.getAttribute("dir")).toBe("auto");
+  expect(age.textContent).toBe(" · updated just now");
+  expect(age.getAttribute("aria-hidden")).toBe("true");
+  // The clock remains outside the live announcement and has a non-live full detail.
+  expect(phrase.contains(age)).toBe(false);
+  expect(container.querySelector(".library-detail")?.textContent).toContain("updated just now");
 });
 
 test("screen readers can read the detail, including the count kept after a failed update", () => {

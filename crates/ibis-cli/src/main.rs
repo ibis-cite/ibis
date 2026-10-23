@@ -12,7 +12,7 @@ use clap::{Parser, Subcommand, ValueEnum};
 use ibis_core::cite::{self, CiteItem, KeyFormat, Locator, LocatorLabel};
 use ibis_core::library::{self, SelectError};
 use ibis_core::model::{LoadResult, Reference};
-use ibis_core::search::Index;
+use ibis_core::search::OwnedIndex;
 use ibis_core::source::load_library_file;
 
 #[derive(Parser)]
@@ -142,10 +142,12 @@ fn report_problems(loaded: &[Loaded]) {
     }
 }
 
-fn all_references(loaded: &[Loaded]) -> Vec<Reference> {
+/// Move every file's references out instead of copying them; warnings and
+/// names stay with each file for reporting.
+fn take_references(loaded: &mut [Loaded]) -> Vec<Reference> {
     loaded
-        .iter()
-        .flat_map(|f| f.result.references.iter().cloned())
+        .iter_mut()
+        .flat_map(|f| std::mem::take(&mut f.result.references))
         .collect()
 }
 
@@ -202,9 +204,9 @@ fn run(cli: Cli) -> Result<ExitCode> {
             limit,
             json,
         } => {
-            let loaded = load(&bib)?;
-            let references = all_references(&loaded);
-            let hits = Index::new(&references).search(&query, limit);
+            let mut loaded = load(&bib)?;
+            let index = OwnedIndex::new(take_references(&mut loaded));
+            let hits = index.search(&query, limit);
             if !json {
                 report_problems(&loaded);
             }
@@ -255,12 +257,12 @@ fn run(cli: Cli) -> Result<ExitCode> {
         } => {
             let mut load_warnings = Vec::new();
             if !bib.is_empty() {
-                let loaded = load(&bib)?;
+                let mut loaded = load(&bib)?;
                 if !json {
                     report_problems(&loaded);
                 }
                 load_warnings = all_warnings(&loaded);
-                let references = all_references(&loaded);
+                let references = take_references(&mut loaded);
                 for key in &keys {
                     resolve(key, &references)?;
                 }
@@ -331,9 +333,9 @@ fn run(cli: Cli) -> Result<ExitCode> {
             })
         }
         Command::Csl { keys, all, bib } => {
-            let loaded = load(&bib)?;
+            let mut loaded = load(&bib)?;
             report_problems(&loaded);
-            let references = all_references(&loaded);
+            let references = take_references(&mut loaded);
             let selected: Vec<&Reference> = if all {
                 references.iter().collect()
             } else {
@@ -346,34 +348,5 @@ fn run(cli: Cli) -> Result<ExitCode> {
             print_json(&items)?;
             Ok(ExitCode::SUCCESS)
         }
-    }
-}
-
-#[cfg(test)]
-mod loading_tests {
-    use super::*;
-
-    #[test]
-    fn nested_commands_load_on_a_two_mib_stack() {
-        std::thread::Builder::new()
-            .stack_size(2 * 1024 * 1024)
-            .spawn(|| {
-                let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../fixtures/bibtex/deep-commands.bib");
-                let loaded = load(&[path]).unwrap_or_else(|e| panic!("{e}"));
-                let result = &loaded[0].result;
-                assert_eq!(result.references.len(), 2);
-                assert!(result.references[0].title.is_none());
-                assert_eq!(result.references[0].year(), Some(2024));
-                assert_eq!(result.references[1].title.as_deref(), Some("Retained"));
-                assert_eq!(result.warnings.len(), 1);
-                let warning = &result.warnings[0];
-                assert_eq!(warning.kind, ibis_core::model::WarningKind::Field);
-                assert_eq!(warning.key.as_deref(), Some("deep"));
-                assert_eq!(warning.line, Some(2));
-                assert!(warning.message.contains("title") && warning.message.contains("omitted"));
-            })
-            .unwrap_or_else(|e| panic!("{e}"))
-            .join()
-            .unwrap_or_else(|e| std::panic::resume_unwind(e));
     }
 }

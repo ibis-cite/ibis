@@ -1,8 +1,9 @@
 import type React from "react";
+import { Button, ToggleButton } from "../../ui/Button";
+import { composing } from "./shortcuts";
 import { pickerText } from "../../messages";
 import { ariaKeys, keysFor } from "../../keys";
 import { currentPlatform } from "../../platform";
-import { ToggleButton } from "../../ui/ToggleButton";
 import type { Choice } from "./choice";
 import { FormatMenu, type FormatCommand } from "./FormatMenu";
 import type { ToolbarMenuCommand } from "../../ui/ToolbarMenu";
@@ -36,23 +37,29 @@ export function PickerHeader({ inputRef, query, onQueryChange, onSearchKeyDown, 
       <label className="visually-hidden" htmlFor="search">
         {pickerText.searchLabel}
       </label>
-      <input
-        id="search"
-        type="search"
-        placeholder={pickerText.searchPlaceholder}
-        role="combobox"
-        aria-autocomplete="list"
-        aria-expanded={expanded}
-        aria-controls="results"
-        aria-activedescendant={activeDescendant}
-        ref={inputRef}
-        autoFocus
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-        onKeyDown={onSearchKeyDown}
-      />
+      <div className="search-field" title=""
+        onKeyDownCapture={(e) => { if (composing(e)) e.stopPropagation(); }}
+        onKeyUpCapture={(e) => { if (composing(e)) e.stopPropagation(); }}>
+        <input
+          id="search"
+          type="search"
+          placeholder={pickerText.searchPlaceholder}
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={expanded}
+          aria-controls="results"
+          aria-activedescendant={activeDescendant}
+          ref={inputRef}
+          autoFocus
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          onKeyDown={onSearchKeyDown}
+        />
+        {query !== "" && <Button variant="icon" className="search-clear" aria-label={pickerText.clearSearch}
+          onPress={() => { onQueryChange(""); inputRef.current?.focus(); }} />}
+      </div>
       {showFormat && <FormatMenu format={format} styles={styles} onChange={onFormatChange} searchRef={inputRef} onCommand={onFormatCommand} />}
-      <ToggleButton className="pin-button" aria-label={pickerText.keepOpen} aria-keyshortcuts={ariaKeys(keysFor("pin"), currentPlatform() === "macos")}
+      <ToggleButton variant="icon" className="pin-button" aria-label={pickerText.keepOpen} aria-keyshortcuts={ariaKeys(keysFor("pin"), currentPlatform() === "macos")}
         isSelected={pinned} onChange={onTogglePin}>
         <svg aria-hidden="true" viewBox="0 0 24 24" fill={pinned ? "currentColor" : "none"} stroke="currentColor">
           <path d="M9 4h6l-1 5 4 4H6l4-4z" /><path d="M12 13v7" />

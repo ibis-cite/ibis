@@ -21,6 +21,9 @@ use serde_json::{Map, Value};
 pub mod api;
 pub mod libraries;
 
+#[cfg(test)]
+mod test_support;
+
 use crate::model::{
     AttachmentKind, Issued, LoadResult, LoadWarning, Name, PartialDate, RecordId, Reference, WarningKind, days_in_month,
 };
@@ -857,7 +860,9 @@ mod tests {
             assert_eq!(reference.title.as_deref(), Some(escaped), "{title}");
             assert_eq!(reference.title_plain().as_deref(), Some(title), "{title}");
             assert_eq!(
-                crate::search::Index::new(&result.references).search(query, 10).len(),
+                crate::search::OwnedIndex::new(result.references)
+                    .search(query, 10)
+                    .len(),
                 1,
                 "{title}"
             );

@@ -11,11 +11,12 @@ use std::time::Duration;
 
 use tauri::menu::CheckMenuItem;
 use tauri::{AppHandle, Manager};
+#[cfg(any(target_os = "macos", test))]
+use tauri_plugin_dialog::MessageDialogResult;
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use tauri_plugin_updater::{Update, Updater, UpdaterExt};
 
 use crate::diagnostics::{NativeIssue, application_message, report};
-use crate::picker::{DialogKind, own_dialog};
 use crate::preferences::SettingsFile;
 
 /// Automatic checks wait a little after start, then repeat this often.
@@ -36,6 +37,31 @@ pub(crate) struct Updates {
     busy: AtomicBool,
     /// A version the person chose not to install; automatic checks don't offer it again.
     declined: Mutex<Option<String>>,
+    #[cfg(any(target_os = "macos", test))]
+    installation_failure: InstallationFailure,
+}
+
+/// One fixed recovery notice, retained until positively dismissed. No timer:
+/// a busy native owner defers it until another actual picker presentation.
+#[cfg(any(target_os = "macos", test))]
+#[derive(Default)]
+struct InstallationFailure(AtomicBool);
+
+#[cfg(any(target_os = "macos", test))]
+impl InstallationFailure {
+    fn begin(&self, dialogs: &crate::picker::ChooserOpen) -> Option<crate::picker::ChooserLease> {
+        if !self.0.load(Ordering::SeqCst) {
+            return None;
+        }
+        let owner = dialogs.begin()?;
+        self.0.load(Ordering::SeqCst).then_some(owner)
+    }
+
+    fn answered(&self, result: MessageDialogResult) {
+        if matches!(result, MessageDialogResult::Ok) {
+            self.0.store(false, Ordering::SeqCst);
+        }
+    }
 }
 
 /// The menu item that turns automatic checks on and off.
@@ -84,9 +110,6 @@ pub(crate) fn start(app: &AppHandle, saved: Option<bool>, can_save: bool) {
 }
 
 fn ask(app: &AppHandle) {
-    let Some(owner) = own_dialog(app, DialogKind::Message) else {
-        return;
-    };
     let handle = app.clone();
     app.dialog()
         .message(QUESTION)
@@ -95,7 +118,7 @@ fn ask(app: &AppHandle) {
             "Check Automatically".into(),
             "Not Now".into(),
         ))
-        .show(move |yes| owner.during(|| save_automatic(&handle, yes)));
+        .show(move |yes| save_automatic(&handle, yes));
 }
 
 /// The menu item was clicked: flip the saved choice.
@@ -134,10 +157,24 @@ pub(crate) fn user_agent<R: tauri::Runtime>(app: &AppHandle<R>) -> String {
 }
 
 fn updater<R: tauri::Runtime>(app: &AppHandle<R>, timeout: Duration) -> tauri_plugin_updater::Result<Updater> {
-    app.updater_builder()
+    updater_builder(app)?.timeout(timeout).build()
+}
+
+fn updater_builder<R: tauri::Runtime>(
+    app: &AppHandle<R>,
+) -> tauri_plugin_updater::Result<tauri_plugin_updater::UpdaterBuilder> {
+    Ok(app
+        .updater_builder()
         .header("User-Agent", user_agent(app))?
-        .timeout(timeout)
-        .build()
+        .version_comparator(|current, release| {
+            // The shared signing key authenticates versions, not app identity.
+            // Only plain releases or nightly prereleases in the same channel
+            // may advance; never relax the plugin's no-downgrade comparison.
+            let same_channel = (current.pre.is_empty() && release.version.pre.is_empty())
+                || (current.pre.as_str().starts_with("nightly.")
+                    && release.version.pre.as_str().starts_with("nightly."));
+            same_channel && release.version > current
+        }))
 }
 
 async fn check(app: &AppHandle, asked: bool) {
@@ -205,31 +242,65 @@ fn automatic_outcome(found: &Result<Option<Update>, &'static str>) -> String {
 }
 
 fn offer(app: &AppHandle, update: Update) {
-    let Some(owner) = own_dialog(app, DialogKind::Message) else {
-        app.state::<Updates>().busy.store(false, Ordering::SeqCst);
-        return;
-    };
     let handle = app.clone();
-    app.dialog()
-        .message(offer_text(&app.package_info().version.to_string(), &update))
-        .title("An update is available")
-        .buttons(MessageDialogButtons::OkCancelCustom(
-            "Install and Restart".into(),
-            "Later".into(),
-        ))
-        .show(move |install| {
-            owner.during(|| {
-                if install {
-                    tauri::async_runtime::spawn(async move { install_update(&handle, update).await });
-                } else {
-                    let updates = handle.state::<Updates>();
-                    if let Ok(mut declined) = updates.declined.lock() {
-                        *declined = Some(update.version.clone());
-                    }
-                    updates.busy.store(false, Ordering::SeqCst);
+    present_offer(
+        app,
+        offer_text(&app.package_info().version.to_string(), &update),
+        move |install| {
+            if install {
+                tauri::async_runtime::spawn(async move { install_update(&handle, update).await });
+            } else {
+                let updates = handle.state::<Updates>();
+                if let Ok(mut declined) = updates.declined.lock() {
+                    *declined = Some(update.version.clone());
                 }
-            })
-        });
+                updates.busy.store(false, Ordering::SeqCst);
+            }
+        },
+    );
+}
+
+#[cfg(any(target_os = "macos", test))]
+fn offer_parent<R: tauri::Runtime>(app: &AppHandle<R>) -> Option<tauri::WebviewWindow<R>> {
+    app.get_webview_window("main")
+}
+
+fn present_offer(app: &AppHandle, text: String, answer: impl FnOnce(bool) + Send + 'static) {
+    let dialog = app
+        .dialog()
+        .message(text)
+        .title("An update is available")
+        .buttons(offer_buttons());
+    #[cfg(target_os = "macos")]
+    let (dialog, owner) = {
+        let Some(owner) = app.state::<crate::picker::ChooserOpen>().begin() else {
+            app.state::<Updates>().busy.store(false, Ordering::SeqCst);
+            return;
+        };
+        let Some(parent) = offer_parent(app) else {
+            app.state::<Updates>().busy.store(false, Ordering::SeqCst);
+            report(Err::<(), ()>(()), NativeIssue::Window);
+            return;
+        };
+        crate::picker::show_picker(app);
+        crate::panel::activate_for_dialog(app);
+        (dialog.parent(&parent), owner)
+    };
+    dialog.show(move |accepted| {
+        #[cfg(target_os = "macos")]
+        let _owner = owner;
+        answer(accepted);
+    });
+}
+
+fn offer_buttons() -> MessageDialogButtons {
+    if cfg!(target_os = "windows") {
+        // rfd's custom TaskDialog actions have no usable InvokePattern in the
+        // installed-update reports. Prefer the OS's standard Yes/No actions.
+        MessageDialogButtons::YesNo
+    } else {
+        MessageDialogButtons::OkCancelCustom("Install and Restart".into(), "Later".into())
+    }
 }
 
 pub(crate) fn offer_text(current: &str, update: &Update) -> String {
@@ -240,8 +311,13 @@ pub(crate) fn offer_text(current: &str, update: &Update) -> String {
         .filter(|notes| !notes.is_empty())
         .map(|notes| format!("\n\n{}", shorten(notes, 600)))
         .unwrap_or_default();
+    let question = if cfg!(target_os = "windows") {
+        "\n\nInstall this update and restart Ibis?"
+    } else {
+        ""
+    };
     format!(
-        "Ibis {} is available; you have {current}.{notes}\n\nIbis will download it, check its signature, install it and restart.",
+        "Ibis {} is available; you have {current}.{notes}\n\nIbis will download it, check its signature, install it and restart.{question}",
         update.version
     )
 }
@@ -254,30 +330,176 @@ fn shorten(text: &str, limit: usize) -> String {
     }
 }
 
+const INSTALL_FAILURE_MESSAGE: &str = "The update could not be installed. Try again later. If Ibis no longer opens, download and reinstall the newest version from GitHub.";
+
 async fn install_update(app: &AppHandle, update: Update) {
     match update.download_and_install(|_, _| {}, || {}).await {
         Ok(()) => app.restart(),
         Err(_) => {
             app.state::<Updates>().busy.store(false, Ordering::SeqCst);
-            tell(
-                app,
-                "The update could not be installed, so Ibis was left unchanged. Try again later, or download the newest version from GitHub.",
-            );
+            installation_failed(app);
         }
     }
 }
 
+fn installation_failed(app: &AppHandle) {
+    #[cfg(target_os = "macos")]
+    {
+        app.state::<Updates>()
+            .installation_failure
+            .0
+            .store(true, Ordering::SeqCst);
+        present_installation_failure(app, true);
+    }
+    #[cfg(not(target_os = "macos"))]
+    tell(app, INSTALL_FAILURE_MESSAGE);
+}
+
+/// Called after an actual native panel show, never from a timer or at login.
+#[cfg(target_os = "macos")]
+pub(crate) fn picker_presented(app: &AppHandle) {
+    present_installation_failure(app, false);
+}
+
+#[cfg(target_os = "macos")]
+fn present_installation_failure(app: &AppHandle, show: bool) {
+    let handle = app.clone();
+    report(
+        app.run_on_main_thread(move || {
+            let updates = handle.state::<Updates>();
+            let Some(owner) = updates
+                .installation_failure
+                .begin(&handle.state::<crate::picker::ChooserOpen>())
+            else {
+                return;
+            };
+            let Some(window) = crate::diagnostics::checked(offer_parent(&handle).ok_or(()), NativeIssue::Window) else {
+                return;
+            };
+            if show {
+                // The lease also covers showing the parent; its actual-show
+                // hook sees the owner and cannot recursively present a sheet.
+                crate::picker::show_picker(&handle);
+            }
+            if crate::diagnostics::checked(window.is_visible(), NativeIssue::Visibility) != Some(true) {
+                return;
+            }
+            // Same fallible AppKit handle path as parent(); Tao's display
+            // handle is infallible. Preflight on the main thread only.
+            if crate::diagnostics::checked(window.ns_view(), NativeIssue::Window).is_none() {
+                return;
+            }
+            crate::panel::activate_for_dialog(&handle);
+            let callback = handle.clone();
+            handle
+                .dialog()
+                .message(INSTALL_FAILURE_MESSAGE)
+                .title("Updates")
+                .buttons(MessageDialogButtons::Ok)
+                .parent(&window)
+                .show_with_result(move |result| {
+                    let _owner = owner;
+                    callback.state::<Updates>().installation_failure.answered(result);
+                });
+        }),
+        NativeIssue::Window,
+    );
+}
+
 fn tell(app: &AppHandle, text: &str) {
-    let Some(owner) = own_dialog(app, DialogKind::Message) else {
-        return;
-    };
-    app.dialog().message(text).title("Updates").show(move |_| drop(owner));
+    app.dialog().message(text).title("Updates").show(|_| {});
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn installation_recovery_waits_for_an_exclusive_owner() {
+        let updates = Updates::default();
+        let failure = &updates.installation_failure;
+        let dialogs = crate::picker::ChooserOpen::default();
+        assert!(failure.begin(&dialogs).is_none());
+        failure.0.store(true, Ordering::SeqCst);
+        let chooser = dialogs.begin().unwrap_or_else(|| panic!("chooser owner"));
+        assert!(failure.begin(&dialogs).is_none());
+        drop(chooser);
+        let owner = failure.begin(&dialogs).unwrap_or_else(|| panic!("later actual show"));
+        // An actual-show callback during initial presentation cannot recurse.
+        assert!(failure.begin(&dialogs).is_none());
+        drop(owner); // missing/hidden/unavailable parent leaves recovery pending
+        assert!(failure.begin(&dialogs).is_some());
+    }
+
+    #[test]
+    fn only_ok_dismisses_installation_recovery_and_drop_releases_blur() {
+        let updates = Updates::default();
+        let failure = &updates.installation_failure;
+        let dialogs = crate::picker::ChooserOpen::default();
+        failure.0.store(true, Ordering::SeqCst);
+        for result in [
+            MessageDialogResult::Cancel,
+            MessageDialogResult::Yes,
+            MessageDialogResult::No,
+            MessageDialogResult::Custom("OK".into()),
+        ] {
+            let owner = failure.begin(&dialogs).unwrap_or_else(|| panic!("pending owner"));
+            let callback = || {
+                let _owner = owner;
+                failure.answered(result);
+            };
+            callback();
+            assert!(!dialogs.is_open());
+            assert!(failure.0.load(Ordering::SeqCst));
+        }
+        let owner = failure.begin(&dialogs).unwrap_or_else(|| panic!("pending owner"));
+        drop(move || {
+            let _owner = owner;
+            failure.answered(MessageDialogResult::Ok);
+        });
+        assert!(!dialogs.is_open());
+        // A dropped native callback must not acknowledge an unseen message.
+        let owner = failure.begin(&dialogs).unwrap_or_else(|| panic!("still pending"));
+        owner.during(|| failure.answered(MessageDialogResult::Ok));
+        assert!(!dialogs.is_open());
+        assert!(failure.begin(&dialogs).is_none());
+    }
+
+    #[test]
+    fn installation_failure_offers_recovery_without_claiming_rollback() {
+        assert!(!INSTALL_FAILURE_MESSAGE.contains("unchanged"));
+        assert!(INSTALL_FAILURE_MESSAGE.contains("Try again"));
+        assert!(INSTALL_FAILURE_MESSAGE.contains("download"));
+    }
+
+    #[test]
+    fn update_offer_requires_the_picker_instead_of_another_owned_window() -> Result<(), Box<dyn std::error::Error>> {
+        let app = tauri::test::mock_builder().build(tauri::test::mock_context(tauri::test::noop_assets()))?;
+        assert!(offer_parent(app.handle()).is_none());
+        let _notice = tauri::WebviewWindowBuilder::new(&app, "notice", Default::default()).build()?;
+        assert!(offer_parent(app.handle()).is_none());
+        let _picker = tauri::WebviewWindowBuilder::new(&app, "main", Default::default()).build()?;
+        assert_eq!(
+            offer_parent(app.handle()).map(|window| window.label().to_owned()),
+            Some("main".into())
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn update_offer_uses_standard_windows_consent_buttons() {
+        if cfg!(target_os = "windows") {
+            assert!(matches!(offer_buttons(), MessageDialogButtons::YesNo));
+        } else {
+            match offer_buttons() {
+                MessageDialogButtons::OkCancelCustom(yes, no) => {
+                    assert_eq!((yes.as_str(), no.as_str()), ("Install and Restart", "Later"));
+                }
+                _ => panic!("the update must offer an explicit accept and decline action"),
+            }
+        }
+    }
 
     #[test]
     fn automatic_checks_log_a_fixed_outcome_never_the_error_text() {
@@ -313,6 +535,7 @@ mod tests {
             json!(["https://github.com/ibiscite/ibis/releases/download/stable/latest.json"])
         );
         assert!(has_update_key(Some(updater)), "the Ibis update key must be built in");
+        assert_eq!(updater["requireSignedVersion"], true);
         assert!(updater.get("dangerousInsecureTransportProtocol").is_none());
     }
 
@@ -415,7 +638,10 @@ mod tests {
         let fixtures = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../fixtures/updates");
         let read = |name: &str| std::fs::read(fixtures.join(name)).unwrap_or_else(|e| panic!("{name}: {e}"));
         let package = read("package.bin");
-        let signature = String::from_utf8(read("package.bin.sig")).unwrap_or_default();
+        let signature = String::from_utf8(read("package-versioned.bin.sig")).unwrap_or_default();
+        let unversioned = String::from_utf8(read("package.bin.sig")).unwrap_or_default();
+        let stable = String::from_utf8(read("package-stable.bin.sig")).unwrap_or_default();
+        let forged = String::from_utf8(read("package-forged-comment.bin.sig")).unwrap_or_default();
         let key = String::from_utf8(read("test-key.pub")).unwrap_or_default();
         let mut tampered = package.clone();
         tampered[0] ^= 1;
@@ -424,7 +650,7 @@ mod tests {
         let base = format!("http://{}", server.local_addr().unwrap_or_else(|e| panic!("{e}")));
         let platform = json!({ "signature": signature.trim(), "url": format!("{base}/package.bin") });
         let tampered_platform = json!({ "signature": signature.trim(), "url": format!("{base}/tampered.bin") });
-        let manifest = |entry: &serde_json::Value| {
+        let manifest = |entry: &serde_json::Value, version: &str| {
             let platforms: serde_json::Map<_, _> = [
                 "darwin-aarch64-app",
                 "darwin-x86_64-app",
@@ -434,13 +660,46 @@ mod tests {
             .into_iter()
             .map(|target| (target.to_string(), entry.clone()))
             .collect();
-            json!({ "version": "9.9.9-nightly.209912312359", "notes": "Synthetic notes.", "pub_date": "2099-12-31T23:59:00Z", "platforms": platforms })
+            json!({ "version": version, "notes": "Synthetic notes.", "pub_date": "2099-12-31T23:59:00Z", "platforms": platforms })
                 .to_string()
                 .into_bytes()
         };
+        let version = "9.9.9-nightly.209912312359";
         let files = [
-            ("/latest.json", manifest(&platform)),
-            ("/tampered.json", manifest(&tampered_platform)),
+            ("/latest.json", manifest(&platform, version)),
+            ("/prefixed.json", manifest(&platform, &format!("v{version}"))),
+            ("/replay.json", manifest(&platform, "9.9.9-nightly.209912312400")),
+            (
+                "/stable.json",
+                manifest(
+                    &json!({ "signature": stable.trim(), "url": format!("{base}/package.bin") }),
+                    "9.9.9",
+                ),
+            ),
+            (
+                "/forged.json",
+                manifest(
+                    &json!({ "signature": forged.trim(), "url": format!("{base}/package.bin") }),
+                    "9.9.9-nightly.209912312400",
+                ),
+            ),
+            ("/metadata.json", manifest(&platform, &format!("{version}+other"))),
+            ("/tampered.json", manifest(&tampered_platform, version)),
+            (
+                "/unversioned.json",
+                manifest(
+                    &json!({ "signature": unversioned.trim(), "url": format!("{base}/package.bin") }),
+                    version,
+                ),
+            ),
+            (
+                "/interrupted.json",
+                manifest(
+                    &json!({ "signature": signature.trim(), "url": format!("{base}/interrupted.bin") }),
+                    version,
+                ),
+            ),
+            ("/interrupted.bin", package[..package.len() / 2].to_vec()),
             ("/package.bin", package.clone()),
             ("/tampered.bin", tampered),
         ];
@@ -473,7 +732,7 @@ mod tests {
                     Some(body) => write!(
                         stream,
                         "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
-                        body.len()
+                        body.len() + usize::from(path == "/interrupted.bin")
                     )
                     .and_then(|()| stream.write_all(body)),
                     None => write!(
@@ -484,47 +743,50 @@ mod tests {
             }
         });
 
-        let app_with_key = |pubkey: &str| {
+        let app_with_key = |pubkey: &str, current: &str, strict: bool| {
             let mut context = tauri::test::mock_context(tauri::test::noop_assets());
+            context.package_info_mut().version = current.parse().unwrap_or_else(|e| panic!("{e}"));
             context.config_mut().plugins.0.insert(
                 "updater".into(),
-                json!({ "pubkey": pubkey, "endpoints": [], "dangerousInsecureTransportProtocol": true }),
+                json!({ "pubkey": pubkey, "endpoints": [], "requireSignedVersion": strict, "dangerousInsecureTransportProtocol": true }),
             );
             tauri::test::mock_builder()
                 .plugin(tauri_plugin_updater::Builder::new().build())
                 .build(context)
                 .unwrap_or_else(|e| panic!("{e}"))
         };
-        let fetch = |pubkey: &str, feed: &str| {
-            let app = app_with_key(pubkey);
+        let installed_dir = tempfile::tempdir().unwrap_or_else(|e| panic!("{e}"));
+        let installed = installed_dir.path().join("synthetic-app");
+        std::fs::write(&installed, b"installed app").unwrap_or_else(|e| panic!("{e}"));
+        let check = |pubkey: &str, feed: &str, current: &str, strict: bool| {
+            let app = app_with_key(pubkey, current, strict);
             let url = format!("{base}/{feed}").parse().unwrap_or_else(|e| panic!("{e}"));
-            let updater = app
-                .updater_builder()
-                .header("User-Agent", user_agent(app.handle()))
+            let updater = updater_builder(app.handle())
                 .unwrap_or_else(|e| panic!("{e}"))
                 .endpoints(vec![url])
                 .unwrap_or_else(|e| panic!("{e}"))
                 // Each published entry names its package type, so a .deb or
                 // .rpm install is never offered the AppImage.
                 .target("linux-x86_64-appimage")
+                .executable_path(&installed)
                 .timeout(CHECK_TIMEOUT)
                 .no_proxy()
                 .build()
                 .unwrap_or_else(|e| panic!("{e}"));
-            tauri::async_runtime::block_on(async {
-                let update = updater
-                    .check()
-                    .await
-                    .unwrap_or_else(|e| panic!("{e}"))
-                    .unwrap_or_else(|| panic!("the newer synthetic version was not offered"));
-                assert_eq!(update.version, "9.9.9-nightly.209912312359");
-                assert_eq!(
-                    update.timeout, None,
-                    "manifest budget must not limit the package download"
-                );
-                assert!(offer_text("0.1.0", &update).contains("Synthetic notes."));
-                update.download(|_, _| {}, || {}).await
-            })
+            tauri::async_runtime::block_on(updater.check()).unwrap_or_else(|e| panic!("{e}"))
+        };
+        let fetch = |pubkey: &str, feed: &str| {
+            let update = check(pubkey, feed, "0.1.1-nightly.20261019223000", true)
+                .unwrap_or_else(|| panic!("the newer synthetic version was not offered"));
+            assert_eq!(
+                update.timeout, None,
+                "manifest budget must not limit the package download"
+            );
+            assert!(offer_text("0.1.0", &update).contains("Synthetic notes."));
+            if cfg!(target_os = "windows") {
+                assert!(offer_text("0.1.0", &update).ends_with("Install this update and restart Ibis?"));
+            }
+            tauri::async_runtime::block_on(update.download(|_, _| {}, || {}))
         };
 
         let downloaded = fetch(&key, "latest.json").unwrap_or_else(|e| panic!("{e}"));
@@ -539,9 +801,48 @@ mod tests {
             fetch(&other_key, "latest.json").is_err(),
             "a package signed with another key must be refused"
         );
+        assert_eq!(fetch(&key, "prefixed.json").unwrap_or_else(|e| panic!("{e}")), package);
+        assert!(matches!(
+            fetch(&key, "replay.json"),
+            Err(tauri_plugin_updater::Error::SignedVersionMismatch { .. })
+        ));
+        assert!(matches!(
+            fetch(&key, "unversioned.json"),
+            Err(tauri_plugin_updater::Error::MissingSignedVersion)
+        ));
+        assert!(
+            fetch(&key, "forged.json").is_err(),
+            "trusted comment must be authenticated"
+        );
+        assert!(
+            fetch(&key, "metadata.json").is_err(),
+            "build metadata is part of the signed version"
+        );
+        // Legacy 0.1.x clients accept the bound signature without the flag.
+        let legacy =
+            check(&key, "latest.json", "0.1.1-nightly.20261019223000", false).unwrap_or_else(|| panic!("legacy offer"));
+        assert!(legacy.verify(&package).is_ok());
+        // Both directions of channel substitution, and a genuine downgrade.
+        assert!(check(&key, "stable.json", "0.1.1-nightly.20261019223000", true).is_none());
+        assert!(check(&key, "latest.json", "0.1.1", true).is_none());
+        assert!(check(&key, "latest.json", "9.9.9-nightly.209912312400", true).is_none());
+        assert!(check(&key, "stable.json", "10.0.0", true).is_none());
+        let stable_update = check(&key, "stable.json", "0.1.1", true).unwrap_or_else(|| panic!("stable offer"));
+        assert!(stable_update.verify(&package).is_ok());
+        // A cut-off download must fail before any installer is reached; a
+        // later complete download succeeds. Cached partial bytes also fail.
+        let interrupted = check(&key, "interrupted.json", "0.1.1-nightly.20261019223000", true)
+            .unwrap_or_else(|| panic!("interrupted offer"));
+        assert!(tauri::async_runtime::block_on(interrupted.download_and_install(|_, _| {}, || {})).is_err());
+        assert!(interrupted.install(&package[..package.len() / 2]).is_err());
+        assert_eq!(
+            std::fs::read(&installed).unwrap_or_else(|e| panic!("{e}")),
+            b"installed app"
+        );
+        assert_eq!(fetch(&key, "latest.json").unwrap_or_else(|e| panic!("{e}")), package);
         // Every request, manifest and package alike, names Ibis and only Ibis.
         let agents = agents.lock().map(|a| a.clone()).unwrap_or_default();
-        assert_eq!(agents.len(), 6, "{agents:?}");
+        assert_eq!(agents.len(), 26, "{agents:?}");
         assert!(agents.iter().all(|agent| agent.starts_with("ibis/")), "{agents:?}");
     }
 }

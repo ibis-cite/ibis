@@ -1,12 +1,42 @@
 # Design system foundations
 
-This page is the single source of truth for the tokens, shapes, states and
-components every Ibis window uses. [design.md](../design.md) applies it to the
-picker. ADR 0021 defines React Aria and three CSS token layers;
-`apps/desktop/src/tokens.css` supplies their values. Where it disagrees with
+This page holds the tokens, shapes, states and components every Ibis window
+uses. It builds on [design.md](../design.md) (the picker spec), ADR 0021 (React
+Aria plus three CSS token layers), `apps/desktop/src/tokens.css` and the soft
+depth look (variant B, branch `design/depth-prototype`). Where it disagrees with
 an accepted ADR, the ADR wins. The Settings window and shortcut recorder are in
 [settings.md](settings.md); the citation shelf is in [preview.md](preview.md).
 Work is tracked in #761–#775.
+
+## Canvas decisions C1–C18 (2026-10-23)
+
+The maintainer's design canvas is the visual source for the picker, first run,
+Settings and the preview; this table is its written form. These decisions
+supersede any older text on this page, in [design.md](../design.md),
+[preview.md](preview.md) and [settings.md](settings.md) that disagrees. The PR
+that implements one deletes or rewrites the text it supersedes. Work is
+sequenced in #940 and on the tracking issue (Lane UI).
+
+| # | Decision |
+|---|---|
+| C1 | **One spacing rule.** S = `--inset` = 8 px on every OS (Windows moves from 4 to 8). Every fill (search field, row, shelf, icon-button hover, footer action, menu) keeps S from the window edge and S from any divider on each side that touches one. So the header is its tallest control + 2S, the footer is its 24 px actions + 2S, and the list starts S below the header divider and ends S above the shelf. |
+| C2 | **Header.** Heights: macOS 52 (36 px pin button), Windows 48 (32 px field and buttons), GNOME 50 (34 px field and buttons). A 1 px divider under the header on every OS, always. Order: search glyph, query, clear ×, format pop-up (filled, no divider), pin. The trailing button keeps S to the edge, top and bottom. |
+| C3 | **Two columns.** Icons, the search glyph, the status dot and type tiles are centred on the 32 px tile column (`inset + row-pad + 16`); text starts on the title column (`inset + row-pad + tile + row-gap` = 64 px): row titles, the search query, the status text and the shelf citation. The search glyph sits 6 px inside the tile column on each side. |
+| C4 | **Rows.** 58 px, 2 px apart everywhere (results, Recently added, choices). The citation key is hidden in rows; the year is trailing and centred vertically. Selection: accent fill on macOS and GNOME; subtle fill plus a 3 × 16 px accent pill on Windows. |
+| C5 | **Pointer.** Click selects (the shelf shows its citation); double-click or the footer Copy does what Enter does. ⌘-click or Ctrl-click, or the + on a hovered tile, adds to the citation. Right-click opens More for that row. Only copying closes the window. |
+| C6 | **Pin.** A neutral icon button at the header's end, always visible. On: filled glyph on the pressed fill, never the accent. ⌘⇧P / Ctrl+Shift+P; also in More as "Keep window open" / "Stop keeping open". Escape never unpins. |
+| C7 | **Shelf.** One 40 px line with the beak quote mark hanging before the citation (mark at the tile column's end, text on the title column). Shown while there are results; hidden on empty, error and choice screens. With several references the citation itself holds them as segments (no chips line): each segment reserves 1 px on each side; under the pointer it becomes a soft pill (radius 6) with a 16 px round remove button inside its end over a 6 px fade of the text, so nothing moves and neighbours are never covered (this holds for zero-width separators such as BibLaTeX's). Pointing at the × darkens its circle. From the keyboard ← → select a segment as an accent-filled token and Delete removes it. On copy the shelf shows a closing beak after the citation and "Copied" at the line end. |
+| C8 | **Footer.** Status dot and text, then "Copy N as <format> ↵", "Shortcuts ⌘/", "More ⌘K". Actions are 24 px fills. Key caps only in the footer and lists, never inside buttons; buttons use quiet trailing text ("Cite this page ⌘↩"). The macOS Return cap is the return-arrow glyph. |
+| C9 | **Menus.** Items padded 10 px on both sides; a leading check column only when an item in that menu can be checked (the format menu), never in More. Separators inset 10 px with 4 px above and below. The format menu's filter text aligns with the item labels, and the menu opens 4 px below the pop-up, aligned to its trailing edge. macOS shortcut text uses native modifier order (⇧⌘C). |
+| C10 | **Size follows content.** Every state is as tall as its content: search and footer alone (nothing to suggest), one hint line, Recently added, or a list of choices. Results grow it in 220 ms with the top edge fixed, to the remembered height; it never shrinks while open and starts compact next time. Reduced motion: no animation. |
+| C11 | **Compact start.** Recently added (3 compact rows) when the library has dates; otherwise one rotating tip ("1 of 6"); otherwise nothing, just search and footer. The placeholder carries the hint: "Search by title, author, year or key". |
+| C12 | **Choices screens.** Empty library, missing file and first run use one pattern: a title and one line on the tile column's edge, then result-style rows (tile, title, one line of help, optional trailing tag, chevron). Empty library: Zotero ("Found on this Mac/PC/computer") and BibTeX or BibLaTeX file; a CSL JSON or YAML row joins them only when those sources ship (0.5, ROADMAP); "You can drop a file here too." Missing file: "Find example.bib" (accent tile) and "Use another library". First run is two steps of the same pattern: where your references live, then what you write in (Markdown (Pandoc), LaTeX, Typst); the open shortcut and start-at-login live in Settings and the footer tip. No mark in first run. |
+| C13 | **Depth per OS.** macOS: one glass sheet for the whole panel (Liquid Glass, vibrancy fallback); the shelf is a tint on it, menus on glass. Windows: Desktop Acrylic; the shelf is a card (tint, 1 px stroke); the footer is a band with a top divider. GNOME: opaque, no blur; footer band with a divider; shelf full-bleed between dividers. Reduce transparency and contrast modes make every layer solid. |
+| C14 | **Accent.** The system accent with fallbacks: macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF, GNOME #3584E4 / #78AEED (light / dark). Scarlet only for the citation mark, the added tile and the brand. |
+| C15 | **Radii.** macOS window 16, row 8, tile 6, control 8, menu 12 (item 6, padding 6). Windows window 8, row/tile/control/item 4, menu 8 (padding 4). GNOME window 15, row 7, tile/control/item 6, menu 12 (padding 6). Citation segment pill 6. |
+| C16 | **Mark.** One continuous silhouette with soft depth: a top-to-bottom tone, a soft light along the top rim, a soft shade along the bottom rim and a short shadow, computed from the whole shape (one SVG filter), never per piece. The beak quote matches; below 24 px it drops the shadow. App icon glyph about 73 % of the tile. |
+| C17 | **Preview (wide window).** At 960 px or wider the list keeps 400 px and the pane takes the rest; below that the preview replaces the list. Pane toolbar and bottom row are 48 px with S padding; the page area keeps S from the divider and the edge; the content area ends S above the shelf. Page field shows the printed label with "PDF n of m"; "Cite this page ⌘↩"; Shift extends to a range. |
+| C18 | **Settings.** Its own window with a searchable sidebar list of pages (General, Shortcuts, Libraries, Citations, Preview, Advanced, About), each a stack of titled groups of the same rows; 720 × 560, down to 560 wide where the sidebar collapses. |
 
 ## Decisions D1–D17
 
@@ -28,10 +58,10 @@ browser comparisons verify the winning values and rendered appearance.
 | D3 | **Per-OS radius values:** macOS 15: win 12, control 6, menu 8 (verify). macOS 26: win 28, control capsule in the header, 8 in content, menu 12. Windows 11: win/overlay/card 8, control/row/tile 4. GNOME (libadwaita 1.8+ look): win/card 15, derived row 7, control/tile 6, popover 12. | `--r-*` |
 | D4 | **Surfaces are four layers:** `--surface-window` (base) < `--surface` (content sheet) < `--surface-raised` (band, cards, shelf) < `--surface-overlay` (menus, popovers, dialogs). Values from soft depth B. | §2 |
 | D5 | **Text has four levels:** `--text`, `--muted` (secondary, always 4.5:1), `--text-tertiary` (icons at rest, placeholder hints, 3:1 minimum, never for sentences), `--text-disabled`. | |
-| D6 | **Accent is always the system's.** Native keywords win; unsupported engines use macOS #007AFF / #0A84FF, Windows #005FB8 / #60CDFF, Adwaita #3584E4 / #78AEED (light / dark). Fallback foregrounds are black, except Windows light, which uses white; every fallback text pair reaches 4.5:1. `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. On Windows and GNOME the accent is injected from Rust (#763). | |
+| D6 | **Accent is always the system's.** `--accent` (fill), `--accent-text` (accent as text or glyph, 4.5:1), `--text-on-accent`. Ibis never offers an accent override. On Windows and GNOME the accent is injected from Rust (#763). | |
 | D7 | **Selection is a fill, never a ring.** macOS and GNOME: full accent fill with `--text-on-accent`. Windows: subtle fill plus a 3 × 16 px accent pill. `--row-inactive-background` for a kept-open picker that lost focus. Menu highlight: accent fill on macOS, subtle fill on Windows and GNOME. | `--row-active-*`, `--menu-highlight*` |
 | D8 | **Focus ring only on keyboard focus** (`:focus-visible` / `data-focus-visible`). macOS: 2 px accent, 1 px gap. Windows: 2 px text-colour outer, 1 px surface inner. GNOME: 2 px half-accent mixed to 3:1, drawn **inside** (offset −2 px) so scroll containers never clip it. Contrast modes: 2 px `CanvasText`. | `--focus-ring-*` |
-| D9 | **Scarlet marks the citation only:** the shelf's quote mark, the added tile and the logo. The citation's text is in the text colour ([preview.md](preview.md)). Never on a control, link, toggle, progress, badge, selection, focus or error. On an accent-filled selected row the added tile becomes a `--text-on-accent` tile with a scarlet check, so a red or orange accent never meets scarlet fill-on-fill. | `--citation`, `--citation-tile` |
+| D9 | **Scarlet marks the citation only:** the shelf's decorative beak quote mark (the supplied two-head SVG from #888, 20 px tall, scaled with type), the added tile and the logo. The mark sits at the tile column's end on the citation line, mirrors in RTL, dims to 45 % while pending and uses `CanvasText` in contrast modes. The citation's text is in the text colour ([preview.md](preview.md)). Never on a control, link, toggle, progress, badge, selection, focus or error. On an accent-filled selected row the added tile becomes a `--text-on-accent` tile with a scarlet check, so a red or orange accent never meets scarlet fill-on-fill. | `--citation`, `--citation-tile` |
 | D10 | **Status is Done / Look / Stop / Info**, Ibis-owned hues (Stop stays rose, apart from scarlet and Fluent's critical red), always with words or an icon. `--status-info` = `--accent-text`. | `--status-*` |
 | D11 | **Elevation is five steps** with per-OS shadows: `--shadow-card`, `--shadow-raised`, `--shadow-overlay` (one value for every menu), `--shadow-dialog`, `--shadow-toast`. None in contrast modes. | |
 | D12 | **Space** is the 4 px grid: `--space-1..10` = 4, 8, 12, 16, 20, 24, 32, 40. **Targets:** 32 px minimum, 44 px under `pointer: coarse`. Visual height may be smaller (28 px macOS toolbar controls) when a `::before` keeps the 32 px target. | |
@@ -111,7 +141,7 @@ Light / dark. † marks a value kept from today's `tokens.css`.
 | Secondary | `--muted` | `#4c5260` / `#c0c3cc`† (`secondaryLabelColor` is too faint) | black 62 % / white 79 % | `#5e5e66` / `#a6a6af` (`.dim-label` is too faint) | **≥ 4.5:1** |
 | Tertiary | `--text-tertiary` | black 45 % / white 45 % | black 45 % / white 54 % | `currentColor` 45 % | ≥ 3:1, glyphs and hints only |
 | Disabled | `--text-disabled` | black 25 % / white 25 % | black 36 % / white 36 % | control at opacity .5 | aim ≥ 2:1 |
-| On accent | `--text-on-accent` | native paired text†; fallback `#000000` | native paired text; fallback `#ffffff` / `#000000` | native paired text; fallback `#000000` | ≥ 4.5:1 on `--accent`; measure native pairs |
+| On accent | `--text-on-accent` | `-apple-system-alternate-selected-text`† | `#ffffff` / `#000000` | `accent_fg_color` `#ffffff` | ≥ 4.5:1 on `--accent` |
 
 **Accent, selection, focus**
 
@@ -119,11 +149,11 @@ Light / dark. † marks a value kept from today's `tokens.css`.
 |---|---|---|---|---|
 | Accent fill | `--accent` | `controlAccentColor` (system) | `SystemAccentColor`: `AccentDark1` light, `AccentLight2` dark; injected from Rust (WebView2 has no `AccentColor`) | `accent_bg_color` from the portal `accent-color` (GNOME 47+); injected from Rust (WebKitGTK 4.1 is GTK 3) |
 | Accent as text | `--accent-text` | darkened in light until 4.5:1 | `AccentDark2` light / `AccentLight3` dark | `oklab(from accent l→min(l,.5))` light, `max(l,.85)` dark |
-| Selected row | `--row-active-*` | `selectedContentBackgroundColor` + paired text† | subtle fill 6 %, text unchanged, accent pill 3 × 16 px, radius 1.5 px† | full accent with `--text-on-accent`† |
+| Selected row | `--row-active-*` | `selectedContentBackgroundColor` + white† | subtle fill 6 %, text unchanged, accent pill 3 × 16 px, radius 1.5 px† | full accent with `--text-on-accent`† |
 | Selected row, window inactive | `--row-inactive-background` | `#dcdcdc` / `#464646`, text unchanged | same subtle fill, pill `--text-tertiary` | `currentColor` 10 % |
-| Menu highlight | `--menu-highlight*` | accent fill + paired text | subtle fill, text unchanged† | `currentColor` 7 %† |
+| Menu highlight | `--menu-highlight*` | accent fill + white | subtle fill, text unchanged† | `currentColor` 7 %† |
 | Focus ring | `--focus-ring-*` | accent, 2 / +1 px† | text 2 px + surface 1 px† | `color-mix(accent 50 %, text)` 2 px, offset −2 px |
-| Text selection | `::selection` | accent 30 % | accent + paired text | accent 30 % |
+| Text selection | `::selection` | accent 30 % | accent + white | accent 30 % |
 
 **Separators and strokes**
 
@@ -177,7 +207,7 @@ your citation" one colour. Done and Look stay close to the platform hues.
 | Meaningful icons (status, added check, the citation mark) | 3:1 |
 | Tertiary glyphs at rest | 3:1 |
 | Disabled | none; aim ≥ 2:1 |
-| Text on a system or fallback accent | ≥ 4.5:1. Keep the accent fill; derive black or white from its resolved colour when the native paired foreground is unreadable. Native pairs require measured acceptance. |
+| White on the system accent | the platform's own pair is accepted below 4.5:1 because the user chose the accent (white on macOS dark `#0a84ff` = 3.65:1, on GNOME `#3584e4` = 3.77:1). macOS rows and menus use `selectedContentBackgroundColor` (white 6.35:1 in dark); GNOME row titles stay semibold |
 | Over the macOS material | 4.5:1 over a white, a black and a saturated wallpaper, measured natively (#774) |
 
 Measured on browser specimens: secondary text 7.2–7.6:1 on macOS and
@@ -473,7 +503,7 @@ state.
 | Switch | track 38 × 22 mac, 40 × 20 Windows, 46 × 26 GNOME | | Space | `NSSwitch` | `ToggleSwitch` | `GtkSwitch` | `Switch` |
 | Checkbox | 16 box + label, mixed state | 16 (20 GNOME) | Space | checkbox | `CheckBox` | `GtkCheckButton` | `Checkbox` |
 | Text / search field | [icon] text [clear]; label above in Settings | 32 (search 40) | standard editing; Esc clears search | `NSTextField`, `NSSearchField` | `TextBox` | `GtkEntry`, `GtkSearchEntry` | `TextField`, `SearchField` |
-| List row | [tile 32] title / meta [trailing year] | 40 / 58 / 76 | via the listbox | table row | `ListView` item | `GtkListBox` row | result list stays a combobox (#485) |
+| List row | [tile 32] title / meta (monospace key and library shorten first) [year only, vertically centred] | 40 / 58 / 76 | via the listbox | table row | `ListView` item | `GtkListBox` row | result list stays a combobox (#485) |
 | Chip | [label] [× 16 in 24]; fill, no outline | 24 | ←→ moves; Backspace, Delete remove | token | `TokenizingTextBox` token | pill tag | `TagGroup` |
 | Key cap | UI-font label, 20 high, min 20 wide, 4 inline pad | 20 (16 in menus) | | menu key text | PowerToys caps | `GtkShortcutLabel` | plain `kbd` |
 | Tooltip | one line, ≤ 40 ch, label + key cap | 24–28 | shows on focus; Esc hides | native tooltip | `ToolTip` | `GtkTooltip` | `Tooltip` |

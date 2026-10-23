@@ -29,6 +29,7 @@ export type GalleryState = {
   /** Opens the header format menu; a string is typed into its filter. */
   formatMenu?: true | string;
   tray?: number;
+  trayExpanded?: boolean;
   formatted?: boolean;
   showPastePreview?: boolean;
   keys?: boolean;
@@ -142,6 +143,12 @@ export const galleryStates: readonly GalleryState[] = [
     reference("स्मृति2026", "भाषाओं और स्मृति पर एक काल्पनिक अध्ययन", "उदाहरण लेखक", null, "report"),
   ] },
   { id: "rtl", label: "Right-to-left text", library: library(), direction: "rtl", query: "الذاكرة", results: [reference("memory2026", "دراسة تخيلية عن الذاكرة واللغات", "كاتب مثال", "Journal of Synthetic Studies", "webpage")] },
+  { id: "rtl-count", label: "RTL count and update age", direction: "rtl", query: "الذاكرة",
+    library: library({ name: "مراجع.bib", snapshot_name: "مراجع.bib", updated_at: hoursAgo(2 / 60) }), results: many },
+  { id: "rtl-hebrew", label: "Hebrew source and retained age", direction: "rtl", query: "זיכרון",
+    library: library({ name: "מקורות.bib", snapshot_name: "מקורות.bib", stale: true, state: "error", checked_at: hoursAgo(2),
+      error: "The library file is unavailable; keeping the last loaded references" }),
+    results: [reference("memory2026", "מחקר דמיוני על זיכרון ושפות", "מחבר לדוגמה", "Synthetic Studies", "book")] },
   { id: "missing-file", label: "Missing library file", library: library({ state: "error", name: "missing.bib", snapshot_name: null, has_snapshot: false, zotero: false, references: 0, error: "The library file is unavailable." }) },
   { id: "invalid-settings", label: "Invalid settings", library: library({ settings_notice: "settings.json could not be read. Ibis is using the backup. Changes are not being saved. Repair the synthetic settings file and restart Ibis." }) },
   { id: "damaged-library", label: "Damaged library", library: library({ references: 3, warnings: 2, note: "Some references could not be read. Export the library again to restore them." }), query: "memory", results: examples },
@@ -156,6 +163,8 @@ export const galleryStates: readonly GalleryState[] = [
     error: "Zotero is not running, or it is not accepting connections; keeping the last loaded references" }), query: "memory", results: examples },
   { id: "copied-notice", label: "Copied notice after hiding", library: library(), query: "memory", results: examples, notice: "[@example2026]" },
   // Browser-only review states (board M); the native evidence app captures the fifteen above.
+  { id: "copy-warnings", label: "Copy warnings", library: library(), query: "memory", results: examples,
+    copied: { text: "[@example2026]", warnings: ["A synthetic reference has no year — 研究 العربية <literal>."] } },
   { id: "empty-zotero", label: "Empty Zotero library", library: library({ name: "My Library", snapshot_name: "My Library", zotero: true, snapshot_zotero: true, references: 0 }) },
   { id: "reloading", label: "Reloading with retained references", library: library({ state: "reloading", references: 2 }), query: "memory", results: examples.slice(0, 2) },
   { id: "zotero-unavailable", label: "Zotero unavailable without a snapshot", library: library({ state: "error", name: "Zotero library", snapshot_name: null, has_snapshot: false, zotero: true, references: 0,
@@ -175,6 +184,8 @@ export const galleryStates: readonly GalleryState[] = [
   { id: "format-menu-filtered", label: "Format menu filtered", library: library(), query: "memory", results: examples, formatMenu: "APA" },
   ...[20, 40, 50].map((count) => ({ id: `tray-${count}`, label: `${count} long keys selected`,
     library: library({ references: 50 }), query: "selection", results: largeSelection, tray: count, pinned: true })),
+  { id: "tray-expanded", label: "50 chosen references expanded", library: library({ references: 50 }), query: "selection",
+    results: largeSelection, tray: 50, trayExpanded: true, pinned: true },
   { id: "tray-preview", label: "50 selected with formatted preview", library: library({ references: 50 }), query: "selection",
     results: largeSelection, tray: 50, pinned: true, formatted: true },
   { id: "tray-system-large", label: "50 selected at 200% system text", library: library({ references: 50 }), query: "selection",
