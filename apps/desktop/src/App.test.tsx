@@ -3773,3 +3773,44 @@ test.each(["keyboard", "fallback", "other focus", "pointer", "oversized"])("foot
     HTMLElement.prototype.scrollIntoView = originalScroll; vi.restoreAllMocks(); vi.unstubAllGlobals();
   }
 });
+
+test("update progress never takes focus, toggles the pin or accepts a stale operation", async () => {
+  const calls = backend();
+  render(<App />);
+  await screen.findByText("Type to find a reference");
+  const pin = screen.getByRole("button", { name: "Keep Window Open" });
+  pin.focus();
+  const progress = { attempt: 2, revision: 2, received: 25, total: 100, phase: "downloading" };
+  await act(async () => { await emit("update:progress", progress); });
+  expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("25");
+  await act(async () => { await emit("update:progress", { ...progress, attempt: 1, phase: "failed" }); });
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(document.activeElement).toBe(pin);
+  expect(pin.getAttribute("aria-pressed")).toBe("false");
+  expect(calls).not.toContain("set_pinned");
+  await act(async () => { await emit("update:progress", { ...progress, revision: 3, phase: "failed" }); });
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  expect(screen.getByRole("alert").textContent).toContain("Check for Updates");
+});
+
+test("unavailable update events show a fixed notice, retain typing and discard replaced failures", async () => {
+  backend();
+  const listen = vi.spyOn(api, "onUpdateProgress").mockRejectedValue(new Error("SYNTHETIC_PRIVATE_PAYLOAD"));
+  try {
+    const { rerender } = render(<App />);
+    expect((await screen.findByRole("alert")).textContent).toBe("Update progress is unavailable.");
+    expect(document.body.textContent).not.toMatch(/SYNTHETIC_PRIVATE|could not be installed|successfully installed/);
+    const search = screen.getByLabelText("Search references");
+    search.focus();
+    fireEvent.change(search, { target: { value: "still typing" } });
+    expect((search as HTMLInputElement).value).toBe("still typing");
+    expect(document.activeElement).toBe(search);
+    let rejectOld!: (error: Error) => void;
+    listen.mockImplementation(() => new Promise((_, reject) => { rejectOld = reject; }));
+    rerender(<App api={{ ...api }} />);
+    rerender(<App api={{ ...api, onUpdateProgress: async () => () => undefined }} />);
+    await act(async () => { rejectOld(new Error("SYNTHETIC_PRIVATE_PAYLOAD")); });
+    await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
+    expect(document.activeElement).toBe(search);
+  } finally { listen.mockRestore(); }
+});
