@@ -40,25 +40,26 @@ M is the height of the bird.
 
 ## Changing the brand
 
-Two files hold everything you might want to change:
+1. Edit `settings.json` for colours, sizes, depth, motion or words, or `master.svg`
+   for shapes. The wordmark is Inter Display SemiBold, already outlined.
+2. From the repository root, run `python3 brand/build.py`. This rebuilds every
+   brand export, the Windows/macOS/Linux icons and the small in-app beak.
+3. Look at the changed PNGs on light and dark backgrounds, including small
+   entries. Check that eyes, shadows and text are clear and nothing clips.
+   For YouTube, keep text inside the centre safe area (1546 × 423).
+4. Open a pull request with the inputs and all generated changes.
+5. After merging, the maintainer re-uploads `exports/png/github-social-preview.png`
+   and `exports/png/ibis-avatar-512.png` to GitHub if they changed. Update any
+   external profile image, such as the Notion project icon, from those same files.
 
-- `settings.json`: every colour, size, spacing, depth (rim light, shade and shadow), animation timing and line of text, with plain names. Small adjustments happen here.
-- `master.svg`: the shapes as exact outlines with no padding: the bird (`mark`), its eye (`eye`), the wordmark (`wordmark`, Inter Display SemiBold, outlined) and the quote mark (`beak`). Edit it only to change a shape.
+The build needs Python 3, librsvg's `rsvg-convert`, fontconfig and Inter Display
+(the Linux CI packages are `librsvg2-bin` and `fonts-inter`). The [desktop icon
+notes](../apps/desktop/src-tauri/icons/source/README.md) describe platform sizing
+and formats. Never edit generated SVGs, PNGs, icon containers or `src/brand.ts`
+by hand.
 
-After editing either, rebuild every export from the repository root:
-
-```sh
-python3 brand/build.py
-```
-
-It needs Python 3 and librsvg's `rsvg-convert`; the social preview, video cards and thumbnail need the Inter font installed. After changing a line of text, check `exports/png/video-youtube-banner.png`: the banner's text must stay inside YouTube's centre safe area (1546 × 423). Never edit files in `exports/` by hand.
-
-Then rebuild the desktop adaptations from the same master and settings:
-
-```sh
-python3 apps/desktop/src-tauri/icons/source/generate.py
-```
-
-The [desktop icon notes](../apps/desktop/src-tauri/icons/source/README.md) explain the Windows, macOS and Linux formats and small-size rules.
+`node scripts/check.mjs` includes the drift check; Linux CI runs it with
+`--brand-assets`. It rebuilds into a temporary folder and names every stale,
+missing or unexpected generated file, without changing the checkout.
 
 Design explorations (the design canvas, rejected options, screenshots) stay outside the repository. When one is chosen, record it in `docs/design.md` or `docs/design/system.md` and here.

@@ -9,13 +9,12 @@ From the repository root, with Python 3 and librsvg's `rsvg-convert`:
 
 ```sh
 python3 brand/build.py
-python3 apps/desktop/src-tauri/icons/source/generate.py
 pnpm -C apps/desktop exec vitest run src-tauri/icons/assets.test.mjs
 ```
 
-- **Shared:** the final scarlet bird, no eye, with one depth filter on the whole
+- **Shared:** the final scarlet bird with a cut-out eye, with shared depth on the whole
   silhouette. The bird fills 62% of a tile, with the kit's optical centring and
-  shadow clearance. Small entries use the kit's thicker neck and flat colour.
+  shadow clearance. Below 48px, entries omit the eye and use the kit's thicker neck and flat colour.
 - **macOS:** ICNS, with an 824px face in a 1024px canvas. The 16/32px images
   (including the 16pt @2x entry) use the small art. Layered Icon Composer delivery
   remains [#663](https://github.com/ibiscite/ibis/issues/663); the retired, unshipped
@@ -27,8 +26,8 @@ pnpm -C apps/desktop exec vitest run src-tauri/icons/assets.test.mjs
   SVG retain their existing names and package paths.
 
 Each target size is rendered directly from vector art; no large bitmap is
-downscaled to make a small entry. The shelf's small beak already uses the brand
-master's outline in `currentColor`, without a shadow. The Copied notice's check
+downscaled to make a small entry. The shelf's small beak is generated from the same brand
+master in `src/brand.ts`, using `currentColor` without a shadow. The Copied notice's check
 is a status glyph, not a separate Ibis logo.
 
 Asset/container tests and source renders do not establish installed Dock,

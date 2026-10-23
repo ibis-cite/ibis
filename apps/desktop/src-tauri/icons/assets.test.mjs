@@ -25,7 +25,7 @@ test("bundle icons have valid shared depth, small-size art and declared sizes", 
   for (const name of ["full.svg", "macos.svg", "windows.svg", "gnome.svg"]) {
     const source = read(`source/${name}`).toString();
     expect(source.match(/<filter /g)).toHaveLength(1);
-    expect(source.match(/ filter=/g)).toHaveLength(1);
+    expect(source).toContain('mask="url(#');
     const ids = [...source.matchAll(/ id="([^"]+)"/g)].map((match) => match[1]);
     expect(new Set(ids).size).toBe(ids.length);
     for (const id of ids) expect(id).toMatch(/^[A-Za-z_][\w.-]*$/);
@@ -41,7 +41,7 @@ test("bundle icons have valid shared depth, small-size art and declared sizes", 
   for (const name of ["small.svg", "macos-small.svg", "windows-small.svg"]) {
     const small = read(`source/${name}`).toString();
     expect(small).toContain('stroke-width="10.5"');
-    expect(small).not.toMatch(/<filter|r="2.1"/);
+    expect(small).not.toMatch(/<filter|<mask/);
   }
   const symbolic = read("source/io.github.ibiscite.ibis-symbolic.svg").toString();
   expect(symbolic).toContain('width="16" height="16"');
