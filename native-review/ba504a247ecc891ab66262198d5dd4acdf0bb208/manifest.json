@@ -1,0 +1,71 @@
+{
+  "candidate": "ba504a247ecc891ab66262198d5dd4acdf0bb208",
+  "baseline": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+  "configuredSize": {
+    "width": 720,
+    "height": 480
+  },
+  "frames": [
+    {
+      "file": "before-6ee-native-light-more.jpg",
+      "sha256": "0ff139adaa3886314a57a8c19559a56f7845cc4eabe9b4ffee75d555e160e2e5",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+      "textSize": "larger"
+    },
+    {
+      "file": "before-6ee-native-dark-more.jpg",
+      "sha256": "570ca239541f3180d0ce5956e462675824eda073f43a576ddad7fe6c74512b06",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "6ee2785833cb42731e6b1e20c03bd6a39c449e7d",
+      "textSize": "normal"
+    },
+    {
+      "file": "after-ba50-native-light-more.jpg",
+      "sha256": "4374795aaa4d50fd4afd6f563c1aedf24e1ee61c6d4e9caf1073817eac22b54e",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "ba504a247ecc891ab66262198d5dd4acdf0bb208",
+      "textSize": "larger"
+    },
+    {
+      "file": "after-ba50-native-light-focus-larger.jpg",
+      "sha256": "70f634a07996174b3869f6be5c9501b5b032cb844b117d9368e2c146ff3f29eb",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "ba504a247ecc891ab66262198d5dd4acdf0bb208",
+      "textSize": "larger"
+    },
+    {
+      "file": "after-ba50-native-dark-more.jpg",
+      "sha256": "768f4ed30de015323b28242d8c56c751336a7e2fe5755deb101628300fb880f2",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "ba504a247ecc891ab66262198d5dd4acdf0bb208",
+      "textSize": "larger"
+    },
+    {
+      "file": "after-ba50-native-dark-focus-larger.jpg",
+      "sha256": "ae090ebb63ea2b9e830d78742ef11c4ee928c06fbd975b81e8c8a1583e1ca3fc",
+      "width": 720,
+      "height": 481,
+      "mediaType": "image/jpeg",
+      "source": "ba504a247ecc891ab66262198d5dd4acdf0bb208",
+      "textSize": "larger"
+    }
+  ],
+  "windows": {
+    "source": "ba504a247ecc891ab66262198d5dd4acdf0bb208",
+    "sha256": "92F02174AED4418CC368833E331953E49272A6CCE8145AB2E3BCBF0CA6AB4F13",
+    "kind": "isolated custom-protocol dev build only",
+    "result": "passed",
+    "interaction": "not verified: Jump input failed before delivery; a stale visible frame does not establish acceptance"
+  }
+}
