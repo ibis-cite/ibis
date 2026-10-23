@@ -2,13 +2,14 @@
 
 use std::{
     collections::HashMap,
-    future::poll_fn,
+    future::{Future, poll_fn},
     pin::Pin,
     sync::atomic::{AtomicU64, Ordering},
+    task::Poll,
     time::Duration,
 };
 use zbus::{
-    Connection, Proxy,
+    Connection, MatchRule, Message, MessageStream, Proxy,
     export::futures_core::Stream,
     zvariant::{OwnedObjectPath, OwnedValue, Value},
 };
@@ -108,6 +109,43 @@ async fn request(proxy: &Proxy<'_>, method: &str, session: Option<&OwnedObjectPa
     }
 }
 
+#[derive(Debug, PartialEq, Eq)]
+pub(super) enum Event {
+    Trigger(Option<String>),
+    Activated,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Signal {
+    Event(Event),
+    Closed,
+}
+
+fn signal(message: &Message, session: &OwnedObjectPath) -> Option<Signal> {
+    let header = message.header();
+    if header.interface()?.as_str() == "org.freedesktop.portal.Session"
+        && header.path()?.as_str() == session.as_str()
+        && header.member()?.as_str() == "Closed"
+    {
+        let _: (Dict,) = message.body().deserialize().ok()?;
+        return Some(Signal::Closed);
+    }
+    if header.path()?.as_str() != ROOT || header.interface()?.as_str() != INTERFACE {
+        return None;
+    }
+    match header.member()?.as_str() {
+        "Activated" => {
+            let (handle, id, _, _): (OwnedObjectPath, String, u64, Dict) = message.body().deserialize().ok()?;
+            (handle == *session && id == ID).then_some(Signal::Event(Event::Activated))
+        }
+        "ShortcutsChanged" => {
+            let (handle, shortcuts): (OwnedObjectPath, Shortcuts) = message.body().deserialize().ok()?;
+            (handle == *session).then(|| Signal::Event(Event::Trigger(trigger(shortcuts))))
+        }
+        _ => None,
+    }
+}
+
 /// Session setup is separate from binding so the activation listener can be
 /// installed and drained before BindShortcuts presents the consent dialog.
 pub(super) struct Portal {
@@ -135,7 +173,57 @@ impl Portal {
         })
     }
 
-    pub(super) async fn bind(&self) -> Result<Option<String>, Failure> {
+    /// Drain before and during Bind/List, including while consent is pending.
+    /// Activation is coalesced until consent succeeds; denial emits no events.
+    /// Closed/transport failure ends this session. App wiring and owner restart
+    /// recovery remain separate; callbacks must not block this signal loop.
+    pub(super) async fn run(&self, mut emit: impl FnMut(Event)) -> Result<(), Failure> {
+        let rule = MatchRule::builder()
+            .msg_type(zbus::message::Type::Signal)
+            .sender(self.owner.as_str())
+            .map_err(|_| ())?
+            .path_namespace(ROOT)
+            .map_err(|_| ())?
+            .build();
+        let mut signals = bounded(MessageStream::for_match_rule(rule, &self.connection, None)).await?;
+        let mut binding = std::pin::pin!(self.bind());
+        let mut ready = false;
+        let mut activation = false;
+        let mut changed = None;
+        loop {
+            enum Next {
+                Bound(Result<Option<String>, Failure>),
+                Signal(Option<zbus::Result<Message>>),
+            }
+            let next = poll_fn(|cx| {
+                if !ready && let Poll::Ready(result) = binding.as_mut().poll(cx) {
+                    return Poll::Ready(Next::Bound(result));
+                }
+                Pin::new(&mut signals).poll_next(cx).map(Next::Signal)
+            })
+            .await;
+            match next {
+                Next::Bound(result) => {
+                    let initial = result?;
+                    ready = true;
+                    emit(Event::Trigger(changed.take().unwrap_or(initial)));
+                    if activation {
+                        emit(Event::Activated);
+                    }
+                }
+                Next::Signal(Some(Ok(message))) => match signal(&message, &self.session) {
+                    Some(Signal::Closed) => return Err(Failure::Unavailable),
+                    Some(Signal::Event(event)) if ready => emit(event),
+                    Some(Signal::Event(Event::Activated)) => activation = true,
+                    Some(Signal::Event(Event::Trigger(label))) => changed = Some(label),
+                    None => {}
+                },
+                Next::Signal(_) => return Err(Failure::Unavailable),
+            }
+        }
+    }
+
+    async fn bind(&self) -> Result<Option<String>, Failure> {
         let proxy = bounded(Proxy::new(&self.connection, self.owner.as_str(), ROOT, INTERFACE)).await?;
         let bound = request(&proxy, "BindShortcuts", Some(&self.session)).await?;
         let listed = request(&proxy, "ListShortcuts", Some(&self.session))
@@ -187,6 +275,59 @@ mod tests {
         );
     }
 
+    #[test]
+    fn signals_require_our_session_action_interface_and_well_formed_body() {
+        let session = OwnedObjectPath::try_from(format!("{ROOT}/session/one")).unwrap();
+        let other = OwnedObjectPath::try_from(format!("{ROOT}/session/other")).unwrap();
+        let activated = |path: &str, interface: &str, handle: &OwnedObjectPath, id: &str| {
+            Message::signal(path, interface, "Activated")
+                .unwrap()
+                .build(&(handle, id, 0u64, Dict::new()))
+                .unwrap()
+        };
+        assert_eq!(
+            signal(&activated(ROOT, INTERFACE, &session, ID), &session),
+            Some(Signal::Event(Event::Activated))
+        );
+        for message in [
+            activated(ROOT, INTERFACE, &other, ID),
+            activated(ROOT, INTERFACE, &session, "other-action"),
+            activated(other.as_str(), INTERFACE, &session, ID),
+            activated(ROOT, "org.example.Other", &session, ID),
+            Message::signal(ROOT, INTERFACE, "Activated")
+                .unwrap()
+                .build(&("malformed",))
+                .unwrap(),
+        ] {
+            assert_eq!(signal(&message, &session), None);
+        }
+        let changed = |shortcuts: Shortcuts| {
+            Message::signal(ROOT, INTERFACE, "ShortcutsChanged")
+                .unwrap()
+                .build(&(&session, shortcuts))
+                .unwrap()
+        };
+        assert_eq!(
+            signal(&changed(vec![]), &session),
+            Some(Signal::Event(Event::Trigger(None)))
+        );
+        assert_eq!(
+            signal(
+                &changed(vec![(ID.into(), dict("trigger_description", "bad\nlabel"))]),
+                &session
+            ),
+            Some(Signal::Event(Event::Trigger(None)))
+        );
+        let closed = |path: &str| {
+            Message::signal(path, "org.freedesktop.portal.Session", "Closed")
+                .unwrap()
+                .build(&(Dict::new(),))
+                .unwrap()
+        };
+        assert_eq!(signal(&closed(session.as_str()), &session), Some(Signal::Closed));
+        assert_eq!(signal(&closed(other.as_str()), &session), None);
+    }
+
     #[cfg(target_os = "linux")]
     mod private_bus {
         use super::*;
@@ -221,10 +362,68 @@ mod tests {
                         &path,
                         "org.freedesktop.portal.Request",
                         "Response",
-                        &(self.0.load(Ordering::Relaxed), dict("session_handle", "/session/fake")),
+                        &(
+                            self.0.load(Ordering::Relaxed),
+                            dict("session_handle", &format!("{ROOT}/session/fake")),
+                        ),
                     )
                     .await?;
                 Ok(path)
+            }
+
+            async fn bind_shortcuts(
+                &self,
+                session: OwnedObjectPath,
+                _shortcuts: Shortcuts,
+                _parent: String,
+                options: Dict,
+                #[zbus(connection)] connection: &Connection,
+                #[zbus(header)] header: zbus::message::Header<'_>,
+            ) -> zbus::fdo::Result<OwnedObjectPath> {
+                let other = OwnedObjectPath::try_from(format!("{ROOT}/session/other")).unwrap();
+                // Exceed zbus's default signal queue while the method is pending.
+                for _ in 0..128 {
+                    connection
+                        .emit_signal(
+                            None::<&str>,
+                            ROOT,
+                            INTERFACE,
+                            "Activated",
+                            &(&other, ID, 0u64, Dict::new()),
+                        )
+                        .await?;
+                }
+                for id in ["other-action", ID] {
+                    connection
+                        .emit_signal(
+                            None::<&str>,
+                            ROOT,
+                            INTERFACE,
+                            "Activated",
+                            &(&session, id, 0u64, Dict::new()),
+                        )
+                        .await?;
+                }
+                connection
+                    .emit_signal(None::<&str>, ROOT, INTERFACE, "Activated", &("malformed",))
+                    .await?;
+                for (handle, label) in [(&session, "Alt+Y"), (&other, "wrong")] {
+                    let shortcuts = vec![(ID.to_string(), dict("trigger_description", label))];
+                    connection
+                        .emit_signal(None::<&str>, ROOT, INTERFACE, "ShortcutsChanged", &(handle, shortcuts))
+                        .await?;
+                }
+                self.create_session(options, connection, header).await
+            }
+
+            async fn list_shortcuts(
+                &self,
+                _session: OwnedObjectPath,
+                options: Dict,
+                #[zbus(connection)] connection: &Connection,
+                #[zbus(header)] header: zbus::message::Header<'_>,
+            ) -> zbus::fdo::Result<OwnedObjectPath> {
+                self.create_session(options, connection, header).await
             }
         }
 
@@ -266,13 +465,56 @@ mod tests {
                 .build()?
                 .block_on(async {
                     let code = Arc::new(AtomicU32::new(0));
-                    let _server = zbus::connection::Builder::session()?
+                    let server = zbus::connection::Builder::session()?
                         .name(SERVICE)?
                         .serve_at(ROOT, Fake(code.clone()))?
                         .build()
                         .await?;
                     let portal = Portal::connect().await.map_err(|_| "session failed")?;
-                    assert_eq!(portal.session.as_str(), "/session/fake");
+                    assert_eq!(portal.session.as_str(), format!("{ROOT}/session/fake"));
+                    for response in [0, 1, 2] {
+                        code.store(0, Ordering::Relaxed);
+                        let portal = Portal::connect().await.map_err(|_| "session failed")?;
+                        code.store(response, Ordering::Relaxed);
+                        let mut events = Vec::new();
+                        let result = tokio::time::timeout(
+                            Duration::from_secs(3),
+                            portal.run(|event| {
+                                if event == Event::Activated {
+                                    let server = server.clone();
+                                    let session = portal.session.clone();
+                                    tokio::spawn(async move {
+                                        server
+                                            .emit_signal(
+                                                None::<&str>,
+                                                &session,
+                                                "org.freedesktop.portal.Session",
+                                                "Closed",
+                                                &(Dict::new(),),
+                                            )
+                                            .await
+                                            .unwrap();
+                                    });
+                                }
+                                events.push(event);
+                            }),
+                        )
+                        .await
+                        .expect("signal draining must not hang");
+                        if response == 0 {
+                            assert_eq!(events, [Event::Trigger(Some("Alt+Y".into())), Event::Activated]);
+                        } else {
+                            assert!(events.is_empty(), "consent failure must not activate");
+                        }
+                        assert_eq!(
+                            result,
+                            Err(if response == 1 {
+                                Failure::Denied
+                            } else {
+                                Failure::Unavailable
+                            })
+                        );
+                    }
                     code.store(1, Ordering::Relaxed);
                     assert!(matches!(Portal::connect().await, Err(Failure::Denied)));
                     code.store(2, Ordering::Relaxed);
