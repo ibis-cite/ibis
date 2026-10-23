@@ -13,6 +13,8 @@ import { fileURLToPath } from "node:url";
 
 export const ROOTS = ["apps/desktop/src", "website"];
 export const TOKEN_FILES = ["apps/desktop/src/tokens.css"];
+// Build output, which copies tokens.css; its sources are checked instead.
+const GENERATED = ["website/dist"];
 const NAMED = new Set(("aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse "
   + "chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen "
   + "darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray "
@@ -38,8 +40,9 @@ function call(value, start) {
 /** The raw colours and px lengths in one stylesheet, normalised (lower case, single spaces). */
 export function rawValues(css) {
   const found = [];
-  const text = css.replace(/\/\*[\s\S]*?\*\//g, " ")
-    .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '""')
+  // One left-to-right pass: whichever of a comment or a string starts first
+  // wins, so quotes in comments and comment marks in strings stay inert.
+  const text = css.replace(/\/\*[\s\S]*?(?:\*\/|$)|"(?:\\[\s\S]|[^"\\])*"?|'(?:\\[\s\S]|[^'\\])*'?/g, (token) => token[0] === "/" ? " " : '""')
     .replace(/url\([^)]*\)/gi, "url()");
   // Declarations sit between { ; and } ; a segment ending in { is a selector or an at-rule condition.
   for (const match of text.matchAll(/[^{};]*[{};]?/g)) {
@@ -51,7 +54,7 @@ export function rawValues(css) {
     for (const fn of value.matchAll(COLOR_FUNCTION)) found.push(call(value, fn.index));
     for (const hex of value.matchAll(/#[0-9a-f]{3,8}(?![\w-])/g)) found.push(hex[0]);
     for (const word of value.matchAll(/(?<![\w#.-])[a-z]+(?![\w(-])/g)) if (NAMED.has(word[0])) found.push(word[0]);
-    for (const px of value.matchAll(/(?<![\w.#-])-?(\d*\.?\d+)px(?![\w-])/g)) if (![0, 1].includes(Number(px[1]))) found.push(px[0]);
+    for (const px of value.matchAll(/(?<![\w.#+-])[+-]?(\d*\.?\d+(?:e[+-]?\d+)?)px(?![\w-])/g)) if (![0, 1].includes(Number(px[1]))) found.push(px[0]);
   }
   return found;
 }
@@ -62,8 +65,8 @@ export function lint(repo, allowlist, roots = ROOTS) {
   const walk = (directory) => {
     for (const entry of readdirSync(directory, { withFileTypes: true })) {
       const file = join(directory, entry.name);
-      if (entry.isDirectory()) { if (entry.name !== "node_modules") walk(file); continue; }
       const name = relative(repo, file).split(sep).join("/");
+      if (entry.isDirectory()) { if (entry.name !== "node_modules" && !GENERATED.includes(name)) walk(file); continue; }
       if (!entry.name.endsWith(".css") || TOKEN_FILES.includes(name)) continue;
       for (const value of rawValues(readFileSync(file, "utf8"))) {
         counts[name] ??= {};
