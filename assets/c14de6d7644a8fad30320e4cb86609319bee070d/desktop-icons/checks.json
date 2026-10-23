@@ -1,0 +1,52 @@
+[
+  {
+    "size": 16,
+    "bounds": [
+      2,
+      1,
+      14,
+      14
+    ],
+    "clipping": false
+  },
+  {
+    "size": 24,
+    "bounds": [
+      4,
+      2,
+      22,
+      21
+    ],
+    "clipping": false
+  },
+  {
+    "size": 32,
+    "bounds": [
+      5,
+      3,
+      29,
+      28
+    ],
+    "clipping": false
+  },
+  {
+    "size": 48,
+    "bounds": [
+      8,
+      6,
+      43,
+      43
+    ],
+    "clipping": false
+  },
+  {
+    "size": 256,
+    "bounds": [
+      39,
+      28,
+      237,
+      235
+    ],
+    "clipping": false
+  }
+]
