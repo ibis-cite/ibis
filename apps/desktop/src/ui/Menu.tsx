@@ -52,21 +52,21 @@ const ActionFocusContext = createContext<(() => void) | null>(null);
 
 type ItemProps = {
   id: string; label: string; title?: string; keys?: string;
-  /** A toggle: shows a check in the leading column and is a menuitemcheckbox. */
+  /** A toggle: shows a trailing check and is a menuitemcheckbox. */
   checked?: boolean;
   /** Stays focusable and is announced as unavailable, but does nothing (ADR 0021). */
   disabled?: boolean;
   onAction: () => void;
 };
 
-/** The leading check column; a drawn check, so it adds no text to the row. */
+/** A drawn check, so it adds no text to the row. Format reserves its leading column. */
 export function MenuCheck({ checked }: { checked: boolean }) {
   return <span className="menu-check" aria-hidden="true">
     {checked && <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m2.5 6.5 2.5 2.5 4.5-6" /></svg>}
   </span>;
 }
 
-/** One row: a leading check column, the label, and an optional shortcut. */
+/** An action row: label, optional shortcut and a trailing check for toggles. */
 export function MenuItem({ id, label, title, keys, checked, disabled, onAction }: ItemProps) {
   const requestActionFocus = useContext(ActionFocusContext);
   return <AriaMenuItem id={id} className="menu-item" textValue={label}
@@ -79,9 +79,9 @@ export function MenuItem({ id, label, title, keys, checked, disabled, onAction }
     }}
     render={(props) => <div {...props as ComponentPropsWithRef<"div">} title={title} aria-disabled={disabled || undefined} />}>
     {({ isSelected }) => <>
-      <MenuCheck checked={isSelected} />
       <span className="menu-label">{label}</span>
-      {keys && <span className="menu-keys" aria-hidden="true">{keys}</span>}
+      {keys && <span className="menu-keys" dir="ltr" aria-hidden="true">{keys}</span>}
+      {checked !== undefined && <MenuCheck checked={isSelected} />}
     </>}
   </AriaMenuItem>;
 }

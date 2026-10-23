@@ -112,7 +112,7 @@ export function ToolbarMenu({ label, value, sections, selectedKey, filterLabel, 
     onKeyDown={(event) => { if ((open || popover.current) && !event.ctrlKey && !event.metaKey) event.stopPropagation(); }}>
     <MenuTrigger isOpen={open} onOpenChange={changeOpen}>
       <Button ref={button} className="toolbar-menu-button" aria-label={`${label} ${value}`}>{value}<PopupIndicator /></Button>
-      <Popover ref={popoverRef} className="menu-popover toolbar-menu-popover" placement="bottom end" offset={6} containerPadding={8} shouldSkipAnimation={skipExit} {...boundary}>
+      <Popover ref={popoverRef} className="menu-popover toolbar-menu-popover" placement="bottom end" offset={4} containerPadding={8} shouldSkipAnimation={skipExit} {...boundary}>
         {filtered ? <Autocomplete key={opening} filter={contains}><SearchField className="toolbar-menu-filter" aria-label={filterLabel} autoFocus><Input placeholder={filterLabel} /></SearchField>{menu}</Autocomplete> : menu}
       </Popover>
     </MenuTrigger>
