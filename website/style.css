@@ -1,16 +1,70 @@
-/* Content scaffold; the production visual design is still being developed. */
+:root { --margin: 17rem; --gap: clamp(2rem, 4.5vw, 4rem); --pad: clamp(1.25rem, 3.5vw, 3.5rem); --serif: "Iowan Old Style", Charter, "Palatino Linotype", Cambria, Georgia, serif; --sans: system-ui, -apple-system, "Segoe UI", sans-serif; }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 1.0625rem/1.6 system-ui, sans-serif; }
-.wrap { max-width: 72rem; margin-inline: auto; padding: 1.5rem; }
+html { scroll-padding-top: 1.5rem; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 1.1875rem/1.6 var(--serif); }
+.site { position: relative; max-width: 84rem; margin-inline: auto; padding-inline: var(--pad); }
 a { color: var(--accent); text-underline-offset: .2em; }
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
 .skip { position: absolute; left: -100vw; }
-.skip:focus { left: 1rem; top: 1rem; padding: 1rem; background: var(--bg); }
-.top img { width: 13rem; height: auto; }
-nav ul, .actions, .downloads { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
-p { max-width: 65ch; }
-section { margin-block: 4rem; }
-.notice { border-left: 3px solid var(--accent); padding: 1rem; background: var(--accent-soft); }
-code, mark { overflow-wrap: anywhere; }
-mark { background: var(--accent-soft); color: var(--text); }
-summary { padding-block: .75rem; cursor: pointer; }
+.skip:focus { left: 1rem; top: 1rem; z-index: 2; background: var(--bg); padding: .75rem 1rem; }
+.index { padding-top: 1rem; margin-bottom: 1.5rem; }
+.logo { display: block; width: fit-content; margin-bottom: .75rem; }
+.logo img { display: block; width: 11rem; height: auto; }
+.index ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.25rem; list-style: none; padding: 0; margin: 0; }
+.index nav a { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .65rem; padding-block: .6rem; font: .9375rem/1.35 var(--sans); color: var(--text); text-decoration: none; }
+.index nav a:hover { text-decoration: underline; }
+.index .key, .index-note { display: none; }
+.row { display: grid; gap: .75rem var(--gap); }
+.row > *, .text { min-width: 0; }
+.text { max-width: 43rem; }
+h1 { font-size: clamp(2.65rem, 5.2vw, 4.5rem); line-height: 1.08; letter-spacing: -.025em; font-weight: 600; margin: 0 0 1.75rem; }
+h1 span { display: block; }
+h2 { font-size: clamp(1.8rem, 3.1vw, 2.6rem); line-height: 1.15; letter-spacing: -.015em; font-weight: 600; margin: 0 0 1.5rem; text-wrap: balance; }
+p { margin: 0 0 1.1rem; }
+.lede { font-size: clamp(1.4rem, 2vw, 1.65rem); line-height: 1.4; }
+.small, figcaption { font-size: 1rem; color: var(--muted); }
+.notice { border-left: 3px solid var(--accent); padding: .2rem 0 .2rem 1.1rem; margin-block: 1.75rem; color: var(--muted); }
+.notice strong { color: var(--text); }
+code, .key { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: .82em; overflow-wrap: anywhere; }
+.key { color: var(--accent); background: var(--accent-soft); padding: .12em .3em; border-radius: 3px; white-space: nowrap; text-decoration: none; }
+a.key:hover { text-decoration: underline; }
+.intro { padding-block: 1.5rem 2rem; }
+section { padding-block: clamp(2.75rem, 7vw, 5rem); }
+.margin { border-left: 2px solid var(--accent); padding-left: .75rem; margin: 0 0 .5rem; font-size: 1.35rem; }
+section:target .margin .key { background: var(--accent); color: var(--bg); }
+.journey { margin: 1.5rem 0; }
+figcaption { margin-bottom: 1rem; }
+.journey ol { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+.journey li { display: grid; gap: .5rem var(--gap); padding-block: 1.1rem; border-top: 1px solid var(--line); counter-increment: step; }
+.action { font: .9375rem/1.6 var(--sans); color: var(--muted); }
+.action::before { content: counter(step) ". "; color: var(--accent); font-weight: 600; }
+.draft { font-size: 1.35rem; line-height: 1.55; }
+.downloads { list-style: none; padding: 0; margin: 1.75rem 0; border-top: 1px solid var(--line); }
+.downloads a { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .25rem 1.5rem; min-height: 44px; padding-block: .9rem; border-bottom: 1px solid var(--line); color: var(--text); text-decoration: none; }
+.downloads a:hover strong { color: var(--accent); text-decoration: underline; }
+.downloads span { font: .875rem/1.5 var(--sans); color: var(--muted); }
+summary { width: fit-content; padding-block: .7rem; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: .25em; }
+summary:hover { text-decoration-color: var(--accent); }
+details > p { margin-block: .5rem 1.5rem; }
+.roadmap { margin: 1.75rem 0; }
+.roadmap div { padding-block: 1rem; border-top: 1px solid var(--line); }
+.roadmap dt { font-weight: 600; }
+.roadmap dd { margin: .35rem 0 0; color: var(--muted); }
+.invitations { display: flex; flex-wrap: wrap; gap: .25rem 1.75rem; }
+.invitations a { padding-block: .6rem; }
+footer { padding-block: 2rem 3rem; font-size: 1rem; color: var(--muted); border-top: 1px solid var(--line); }
+@media (min-width: 62rem) {
+  .site::before { content: ""; position: absolute; inset-block: 0; left: calc(var(--pad) + var(--margin) + var(--gap) / 2); width: 1px; background: var(--accent); }
+  .row, .journey li { grid-template-columns: var(--margin) minmax(0, 1fr); }
+  .row > .text { grid-column: 2; }
+  .index { position: absolute; top: clamp(3rem, 10vh, 7rem); left: var(--pad); width: var(--margin); padding: 0; text-align: right; }
+  .logo { margin: 0 0 2.5rem auto; } .logo img { width: 13rem; }
+  .index ul { display: block; } .index nav a { justify-content: flex-end; font-size: 1rem; }
+  .index .key { display: inline; } .index-note { display: block; margin-top: 1.25rem; font: .875rem/1.5 var(--sans); color: var(--muted); }
+  .intro { min-height: min(100svh, 52rem); padding-block: clamp(3rem, 10vh, 7rem) 3rem; align-content: start; }
+  .margin { grid-column: 1; align-self: start; position: sticky; top: 1.5rem; border: 0; padding: 0; text-align: right; }
+  .journey { grid-column: 1 / -1; } .journey figcaption { margin-left: calc(var(--margin) + var(--gap)); }
+  .action { text-align: right; } .after { grid-column: 2; }
+}
+@media (forced-colors: active) { .key { outline: 1px solid LinkText; } .site::before { background: CanvasText; } }

@@ -10,7 +10,10 @@ remote fonts, browser scripts or paid website service is needed.
 Edit `index.html` for words and links, `style.css` for layout. Keep today's
 features separate from roadmap plans. The app README remains the source for
 installation limitations; review website copy when those change. Downloads use
-the maintained channel URLs, without a second version-number list.
+the maintained channel URLs, without a second version-number list. The page’s
+long-term story is library-to-writing; copy/paste is labelled as today’s preview
+workflow. When automatic insertion ships, update `#how`, `#setup` and `#roadmap`
+against the released behaviour, rather than promising a date in the website.
 
 Run `node website/build.mjs` from the repository root, then
 `python3 -m http.server 8094 --bind 127.0.0.1 --directory website/dist`.
