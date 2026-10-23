@@ -43,6 +43,8 @@ cargo insta review                             # review changed snapshots
 
 ## Focused harnesses
 
+**Settings migration.** `cargo test -p ibis-desktop identity::tests` covers file symlinks, interrupted staging, concurrent processes and look-alike preservation. Cleanup owns only real `<app>.migration-<pid>-<counter>` directories with canonical numeric suffixes, under a persistent per-app file lock. Truncated old names remain untouched because ownership is ambiguous. Unix tests cover dangling/directory/loop links and permissions; Linux also covers non-UTF-8 parents.
+
 **Core scale.** `cargo test -p ibis-core --release --locked --lib owned_index_100000_reference_measurement -- --ignored --nocapture` measures indexing and search over 100,000 synthetic multilingual records. It measures the core only, not parsing, the interface or a pass threshold. Calibration is in [#9](https://github.com/ibiscite/ibis/issues/9#issuecomment-6282578839).
 
 **Metamorphic.** Seven transformations (entry and field order, whitespace, delimiters, name case, macro expansion, comments) must not change identities, normalized fields or warnings. CI runs 64 cases; the weekly run 2,048 and keeps shrunk failing examples. Turn a failure into a fixture before fixing it.
@@ -128,7 +130,7 @@ Install `cargo-fuzz` with `cargo install --locked cargo-fuzz --version 0.13.1`
 and nightly with `rustup toolchain install nightly --profile minimal`, then run:
 
 ```sh
-cargo +nightly fuzz run load_str -- -max_total_time=60 -timeout=5 -rss_limit_mb=1024 -max_len=16384
+cargo +nightly fuzz run csl_export -- -max_total_time=60 -timeout=5 -rss_limit_mb=1024 -max_len=16384
 ```
 
-The nightly run gives `split_parse`, `load_str`, `csl_export` and `cite_render` 300 seconds each with a corpus seeded from synthetic fixtures, and opens an issue for each new failure. Fixed inputs become regression fixtures. See [fuzz/README.md](../fuzz/README.md).
+The nightly run gives `split_parse`, `csl_export` and `cite_render` 300 seconds each with a corpus seeded from synthetic fixtures, and opens an issue for each new failure. Fixed inputs become regression fixtures. See [fuzz/README.md](../fuzz/README.md).
