@@ -144,7 +144,7 @@ main:has(> .shelf) > footer { border-top-color: var(--clear); }
 /* "+N" opened: every chip, wrapping onto at most three scrolling lines. */
 /* Chips shorten before "+N" is pushed out of sight. */
 .shelf-chips[data-expanded] .chip { flex: none; max-width: min(var(--chip-max-width), 100%); }
-.shelf-chips[data-expanded] { flex-wrap: wrap; align-content: flex-start; height: auto; max-height: calc(3 * (var(--chip-height) + var(--space-1)) + var(--space-2) * 2); padding-block: var(--space-2); overflow: auto; }
+.shelf-chips[data-expanded] { flex-wrap: wrap; align-content: flex-start; overflow: auto; }
 .shelf-output { display: flex; align-items: center; gap: var(--row-gap); height: var(--shelf-line); padding-inline: var(--row-pad); font-size: var(--type-citation-size); }
 .shelf-mark { flex: none; width: var(--tile-size); text-align: center; font-size: var(--icon-size); font-weight: 700; line-height: 1; }
 .shelf-output[data-state="pending"] .shelf-mark { opacity: .45; }

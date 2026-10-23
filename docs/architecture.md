@@ -91,6 +91,8 @@ shelf removal and folding, and dialog Close states; React Aria supplies pointer,
 press and keyboard-focus attributes.
 Folded footer actions preserve their hidden accessibility state and tab order.
 Small-button gallery readiness checks actual hit targets beyond the visible fill.
+Shelf spacing reserves each full hit target, including three complete expanded
+rows and the larger touch targets; its gallery rejects clipped or covered edges.
 Tab dismisses More's modal popover synchronously before returning focus to
 Search, so typing never waits for its exit animation. Other dismissals retain
 their existing animation and focus destinations.
