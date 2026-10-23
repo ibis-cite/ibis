@@ -11,6 +11,7 @@ use std::{
 use zbus::{
     Connection, MatchRule, Message, MessageStream, Proxy,
     export::futures_core::Stream,
+    message::Sequence,
     zvariant::{OwnedObjectPath, OwnedValue, Value},
 };
 
@@ -72,7 +73,11 @@ async fn bounded<T, E>(future: impl std::future::Future<Output = Result<T, E>>) 
 }
 
 /// Subscription is installed before sending, including for immediate responses.
-async fn request(proxy: &Proxy<'_>, method: &str, session: Option<&OwnedObjectPath>) -> Result<Dict, Failure> {
+async fn request(
+    proxy: &Proxy<'_>,
+    method: &str,
+    session: Option<&OwnedObjectPath>,
+) -> Result<(Dict, Sequence), Failure> {
     static SERIAL: AtomicU64 = AtomicU64::new(0);
     let token = format!("ibis_{}", SERIAL.fetch_add(1, Ordering::Relaxed));
     let sender = proxy.connection().unique_name().ok_or(())?.as_str()[1..].replace('.', "_");
@@ -101,7 +106,10 @@ async fn request(proxy: &Proxy<'_>, method: &str, session: Option<&OwnedObjectPa
     }
     let result = tokio::time::timeout(RESPONSE, poll_fn(|cx| Pin::new(&mut signals).poll_next(cx))).await;
     match result {
-        Ok(Some(message)) => successful(message.body().deserialize().map_err(|_| ())?),
+        Ok(Some(message)) => Ok((
+            successful(message.body().deserialize().map_err(|_| ())?)?,
+            message.recv_position(),
+        )),
         _ => {
             let _ = bounded(response.call::<_, _, ()>("Close", &())).await;
             Err(Failure::Unavailable)
@@ -165,7 +173,7 @@ impl Portal {
             .await?
             .to_string();
         let proxy = bounded(Proxy::new(&connection, owner.as_str(), ROOT, INTERFACE)).await?;
-        let session = session_handle(request(&proxy, "CreateSession", None).await?)?;
+        let session = session_handle(request(&proxy, "CreateSession", None).await?.0)?;
         Ok(Self {
             connection: connection.clone(),
             owner,
@@ -173,11 +181,12 @@ impl Portal {
         })
     }
 
+    /// Consume the session so BindShortcuts cannot be repeated or run concurrently.
     /// Drain before and during Bind/List, including while consent is pending.
     /// Activation is coalesced until consent succeeds; denial emits no events.
     /// Closed/transport failure ends this session. App wiring and owner restart
     /// recovery remain separate; callbacks must not block this signal loop.
-    pub(super) async fn run(&self, mut emit: impl FnMut(Event)) -> Result<(), Failure> {
+    pub(super) async fn run(self, mut emit: impl FnMut(Event)) -> Result<(), Failure> {
         let rule = MatchRule::builder()
             .msg_type(zbus::message::Type::Signal)
             .sender(self.owner.as_str())
@@ -188,25 +197,37 @@ impl Portal {
         let mut signals = bounded(MessageStream::for_match_rule(rule, &self.connection, None)).await?;
         let mut binding = std::pin::pin!(self.bind());
         let mut ready = false;
+        let mut completed = None;
         let mut activation = false;
         let mut changed = None;
         loop {
             enum Next {
-                Bound(Result<Option<String>, Failure>),
+                Bound(Result<(Option<String>, Sequence), Failure>),
                 Signal(Option<zbus::Result<Message>>),
             }
             let next = poll_fn(|cx| {
-                if !ready && let Poll::Ready(result) = binding.as_mut().poll(cx) {
-                    return Poll::Ready(Next::Bound(result));
+                if !ready
+                    && completed.is_none()
+                    && let Poll::Ready(result) = binding.as_mut().poll(cx)
+                {
+                    completed = Some(result);
                 }
-                Pin::new(&mut signals).poll_next(cx).map(Next::Signal)
+                // A received response means all earlier signals are already queued.
+                // Drain them (especially Closed) before publishing success.
+                if let Poll::Ready(message) = Pin::new(&mut signals).poll_next(cx) {
+                    return Poll::Ready(Next::Signal(message));
+                }
+                completed
+                    .take()
+                    .map_or(Poll::Pending, |result| Poll::Ready(Next::Bound(result)))
             })
             .await;
             match next {
                 Next::Bound(result) => {
-                    let initial = result?;
+                    let (initial, position) = result?;
                     ready = true;
-                    emit(Event::Trigger(changed.take().unwrap_or(initial)));
+                    let newer = changed.take().filter(|(_, sequence)| *sequence > position);
+                    emit(Event::Trigger(newer.map(|(label, _)| label).unwrap_or(initial)));
                     if activation {
                         emit(Event::Activated);
                     }
@@ -215,7 +236,7 @@ impl Portal {
                     Some(Signal::Closed) => return Err(Failure::Unavailable),
                     Some(Signal::Event(event)) if ready => emit(event),
                     Some(Signal::Event(Event::Activated)) => activation = true,
-                    Some(Signal::Event(Event::Trigger(label))) => changed = Some(label),
+                    Some(Signal::Event(Event::Trigger(label))) => changed = Some((label, message.recv_position())),
                     None => {}
                 },
                 Next::Signal(_) => return Err(Failure::Unavailable),
@@ -223,17 +244,21 @@ impl Portal {
         }
     }
 
-    async fn bind(&self) -> Result<Option<String>, Failure> {
+    async fn bind(&self) -> Result<(Option<String>, Sequence), Failure> {
         let proxy = bounded(Proxy::new(&self.connection, self.owner.as_str(), ROOT, INTERFACE)).await?;
         let bound = request(&proxy, "BindShortcuts", Some(&self.session)).await?;
         let listed = request(&proxy, "ListShortcuts", Some(&self.session))
             .await
             .unwrap_or(bound);
-        Ok(listed
-            .get("shortcuts")
-            .and_then(|value| value.try_clone().ok())
-            .and_then(|value| Shortcuts::try_from(value).ok())
-            .and_then(trigger))
+        Ok((
+            listed
+                .0
+                .get("shortcuts")
+                .and_then(|value| value.try_clone().ok())
+                .and_then(|value| Shortcuts::try_from(value).ok())
+                .and_then(trigger),
+            listed.1,
+        ))
     }
 }
 
@@ -335,6 +360,43 @@ mod tests {
 
         struct Fake(Arc<AtomicU32>);
 
+        async fn respond(
+            code: u32,
+            values: Dict,
+            options: Dict,
+            connection: &Connection,
+            header: zbus::message::Header<'_>,
+        ) -> zbus::fdo::Result<OwnedObjectPath> {
+            let sender = header
+                .sender()
+                .ok_or_else(|| zbus::fdo::Error::Failed("sender".into()))?;
+            let token = <&str>::try_from(&options["handle_token"]).map_err(zbus::Error::from)?;
+            let sender_path = sender.as_str()[1..].replace('.', "_");
+            let path = OwnedObjectPath::try_from(format!("{ROOT}/request/{sender_path}/{token}"))
+                .map_err(zbus::Error::from)?;
+            // Deliberately respond before returning the request handle.
+            connection
+                .emit_signal(
+                    Some(sender.as_str()),
+                    &path,
+                    "org.freedesktop.portal.Request",
+                    "Response",
+                    &(code, values),
+                )
+                .await?;
+            Ok(path)
+        }
+
+        async fn emit(
+            connection: &Connection,
+            member: &str,
+            body: &(impl zbus::export::serde::Serialize + zbus::zvariant::DynamicType),
+        ) -> zbus::Result<()> {
+            connection
+                .emit_signal(None::<&str>, ROOT, INTERFACE, member, body)
+                .await
+        }
+
         #[zbus::interface(name = "org.freedesktop.portal.GlobalShortcuts")]
         impl Fake {
             #[zbus(property, name = "version")]
@@ -348,27 +410,14 @@ mod tests {
                 #[zbus(connection)] connection: &Connection,
                 #[zbus(header)] header: zbus::message::Header<'_>,
             ) -> zbus::fdo::Result<OwnedObjectPath> {
-                let sender = header
-                    .sender()
-                    .ok_or_else(|| zbus::fdo::Error::Failed("sender".into()))?;
-                let token = <&str>::try_from(&options["handle_token"]).map_err(zbus::Error::from)?;
-                let sender_path = sender.as_str()[1..].replace('.', "_");
-                let path = OwnedObjectPath::try_from(format!("{ROOT}/request/{sender_path}/{token}"))
-                    .map_err(zbus::Error::from)?;
-                // Deliberately respond before returning the request handle.
-                connection
-                    .emit_signal(
-                        Some(sender.as_str()),
-                        &path,
-                        "org.freedesktop.portal.Request",
-                        "Response",
-                        &(
-                            self.0.load(Ordering::Relaxed),
-                            dict("session_handle", &format!("{ROOT}/session/fake")),
-                        ),
-                    )
-                    .await?;
-                Ok(path)
+                respond(
+                    self.0.load(Ordering::Relaxed),
+                    dict("session_handle", &format!("{ROOT}/session/fake")),
+                    options,
+                    connection,
+                    header,
+                )
+                .await
             }
 
             async fn bind_shortcuts(
@@ -383,47 +432,61 @@ mod tests {
                 let other = OwnedObjectPath::try_from(format!("{ROOT}/session/other")).unwrap();
                 // Exceed zbus's default signal queue while the method is pending.
                 for _ in 0..128 {
-                    connection
-                        .emit_signal(
-                            None::<&str>,
-                            ROOT,
-                            INTERFACE,
-                            "Activated",
-                            &(&other, ID, 0u64, Dict::new()),
-                        )
-                        .await?;
+                    emit(connection, "Activated", &(&other, ID, 0u64, Dict::new())).await?;
                 }
                 for id in ["other-action", ID] {
-                    connection
-                        .emit_signal(
-                            None::<&str>,
-                            ROOT,
-                            INTERFACE,
-                            "Activated",
-                            &(&session, id, 0u64, Dict::new()),
-                        )
-                        .await?;
+                    emit(connection, "Activated", &(&session, id, 0u64, Dict::new())).await?;
                 }
-                connection
-                    .emit_signal(None::<&str>, ROOT, INTERFACE, "Activated", &("malformed",))
-                    .await?;
+                emit(connection, "Activated", &("malformed",)).await?;
                 for (handle, label) in [(&session, "Alt+Y"), (&other, "wrong")] {
-                    let shortcuts = vec![(ID.to_string(), dict("trigger_description", label))];
-                    connection
-                        .emit_signal(None::<&str>, ROOT, INTERFACE, "ShortcutsChanged", &(handle, shortcuts))
-                        .await?;
+                    emit(
+                        connection,
+                        "ShortcutsChanged",
+                        &(handle, vec![(ID.to_string(), dict("trigger_description", label))]),
+                    )
+                    .await?;
                 }
-                self.create_session(options, connection, header).await
+                let code = self.0.load(Ordering::Relaxed);
+                respond(
+                    if code >= 3 { 0 } else { code },
+                    Dict::new(),
+                    options,
+                    connection,
+                    header,
+                )
+                .await
             }
 
             async fn list_shortcuts(
                 &self,
-                _session: OwnedObjectPath,
+                session: OwnedObjectPath,
                 options: Dict,
                 #[zbus(connection)] connection: &Connection,
                 #[zbus(header)] header: zbus::message::Header<'_>,
             ) -> zbus::fdo::Result<OwnedObjectPath> {
-                self.create_session(options, connection, header).await
+                if self.0.load(Ordering::Relaxed) == 3 {
+                    connection
+                        .emit_signal(
+                            None::<&str>,
+                            &session,
+                            "org.freedesktop.portal.Session",
+                            "Closed",
+                            &(Dict::new(),),
+                        )
+                        .await?;
+                }
+                let shortcuts = vec![(ID.to_string(), dict("trigger_description", "Ctrl+Shift+Y"))];
+                let values = HashMap::from([("shortcuts".into(), Value::new(shortcuts).try_to_owned().unwrap())]);
+                let path = respond(0, values, options, connection, header).await?;
+                if self.0.load(Ordering::Relaxed) == 4 {
+                    emit(
+                        connection,
+                        "ShortcutsChanged",
+                        &(&session, vec![(ID.to_string(), dict("trigger_description", "Alt+Y"))]),
+                    )
+                    .await?;
+                }
+                Ok(path)
             }
         }
 
@@ -472,17 +535,18 @@ mod tests {
                         .await?;
                     let portal = Portal::connect().await.map_err(|_| "session failed")?;
                     assert_eq!(portal.session.as_str(), format!("{ROOT}/session/fake"));
-                    for response in [0, 1, 2] {
+                    for response in [0, 1, 2, 3, 4] {
                         code.store(0, Ordering::Relaxed);
                         let portal = Portal::connect().await.map_err(|_| "session failed")?;
                         code.store(response, Ordering::Relaxed);
                         let mut events = Vec::new();
+                        let session = portal.session.clone();
                         let result = tokio::time::timeout(
                             Duration::from_secs(3),
                             portal.run(|event| {
                                 if event == Event::Activated {
                                     let server = server.clone();
-                                    let session = portal.session.clone();
+                                    let session = session.clone();
                                     tokio::spawn(async move {
                                         server
                                             .emit_signal(
@@ -501,8 +565,9 @@ mod tests {
                         )
                         .await
                         .expect("signal draining must not hang");
-                        if response == 0 {
-                            assert_eq!(events, [Event::Trigger(Some("Alt+Y".into())), Event::Activated]);
+                        if response == 0 || response == 4 {
+                            let label = if response == 0 { "Ctrl+Shift+Y" } else { "Alt+Y" };
+                            assert_eq!(events, [Event::Trigger(Some(label.into())), Event::Activated]);
                         } else {
                             assert!(events.is_empty(), "consent failure must not activate");
                         }
