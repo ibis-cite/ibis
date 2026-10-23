@@ -43,6 +43,8 @@ cargo insta review                             # review changed snapshots
 
 ## Focused harnesses
 
+**Settings migration.** `cargo test -p ibis-desktop identity::tests` covers file symlinks, interrupted staging, concurrent processes and look-alike preservation. Cleanup owns only real `<app>.migration-<pid>-<counter>` directories with canonical numeric suffixes, under a persistent per-app file lock. Truncated old names remain untouched because ownership is ambiguous. Unix tests cover dangling/directory/loop links and permissions; Linux also covers non-UTF-8 parents.
+
 **Core scale.** `cargo test -p ibis-core --release --locked --lib owned_index_100000_reference_measurement -- --ignored --nocapture` measures indexing and search over 100,000 synthetic multilingual records. It measures the core only, not parsing, the interface or a pass threshold. Calibration is in [#9](https://github.com/ibiscite/ibis/issues/9#issuecomment-6282578839).
 
 **Metamorphic.** Seven transformations (entry and field order, whitespace, delimiters, name case, macro expansion, comments) must not change identities, normalized fields or warnings. CI runs 64 cases; the weekly run 2,048 and keeps shrunk failing examples. Turn a failure into a fixture before fixing it.
@@ -90,6 +92,14 @@ The menu focus check proves Escape ownership with Space reopening More. After Ta
 
 **Performance.** The native suite launches four fresh processes with 100,000 synthetic references and measures launch to accessible count, native query to late result, and current summed process-tree memory. The first launch is a warm-up. The gate in [smoke-budgets.json](../scripts/smoke-budgets.json) uses the median of the three measured launches for both timings and the maximum of all four for memory. Any single launch, the warm-up included, fails if a timing exceeds 1.5 times its budget, so hangs and stalls still fail ([#464](https://github.com/ibiscite/ibis/issues/464)). These include probing/polling overhead, warm OS caches and potentially double-counted shared pages; they exclude reparented helpers, lifetime peak memory and cold-disk claims. No `--budgets` means `measured-without-budget`; record exact source, runner and architecture. Calibration history and qualification limits are in [#9](https://github.com/ibiscite/ibis/issues/9#issuecomment-6282578839).
 
+`--skip-performance` skips only these four large-library launches and reports
+performance as `skipped`. It cannot be combined with `--budgets`. Nix and preview
+installed-package smoke use this mode while retaining every correctness,
+shortcut, clipboard, focus, keyboard and accessibility check. The three budgeted
+OS invocations in `ci.yml` remain the large-library gates; the separate macOS
+full-screen panel check also remains unchanged. Without either flag, the suite
+still measures performance without enforcing budgets.
+
 On Windows, memory sampling pins the root creation identity from the original launch handle, follows only descendants created no earlier than their current parent, and rechecks creation identities while reading working sets and before returning the sum. Missing identities or process churn fail the measurement. Each sample retains at most 64 numeric components (local index, parent index, depth, root-relative age and bytes), plus an older-orphan count; observed PIDs, absolute times, names and paths are omitted. This repairs attribution, without establishing the cause of earlier aggregate-only spikes (#620).
 
 **Offline probes.** `scripts/check-offline.py` (Linux, macOS) and `scripts/check-offline.ps1` (Windows) watch the running app and fail if it opens any connection outside the computer, or if a tool or permission is missing. On Linux and macOS, run `python3 scripts/check-offline.py --record-baseline screenshots/process-baseline.json` before launch, then `python3 scripts/check-offline.py --pid PID --baseline screenshots/process-baseline.json --seconds 60`. Sampling cannot see connections shorter than its polling interval.
@@ -120,7 +130,7 @@ Install `cargo-fuzz` with `cargo install --locked cargo-fuzz --version 0.13.1`
 and nightly with `rustup toolchain install nightly --profile minimal`, then run:
 
 ```sh
-cargo +nightly fuzz run load_str -- -max_total_time=60 -timeout=5 -rss_limit_mb=1024 -max_len=16384
+cargo +nightly fuzz run csl_export -- -max_total_time=60 -timeout=5 -rss_limit_mb=1024 -max_len=16384
 ```
 
-The nightly run gives `split_parse`, `load_str`, `csl_export` and `cite_render` 300 seconds each with a corpus seeded from synthetic fixtures, and opens an issue for each new failure. Fixed inputs become regression fixtures. See [fuzz/README.md](../fuzz/README.md).
+The nightly run gives `split_parse`, `csl_export` and `cite_render` 300 seconds each with a corpus seeded from synthetic fixtures, and opens an issue for each new failure. Fixed inputs become regression fixtures. See [fuzz/README.md](../fuzz/README.md).
