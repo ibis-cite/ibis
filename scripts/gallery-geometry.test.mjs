@@ -41,31 +41,35 @@ test("the geometry spec's row heights, footer and search band are the ones docs/
 
 const onSpec = { rowHeight: 58, footer: 41, searchBand: 48, glyphCentre: 36, tileCentre: 36, textX: 64, titleX: 64, rWin: 8, rRow: 4, rField: 4, rTile: 4,
   headerDivider: 1, fieldHeight: 32, pinHeight: 32, popupHeight: 32, footerAction: 24, footerDivider: 1,
-  pinTopGap: 8, pinBottomGap: 8, pinEndGap: 8, footerTopGap: 8, footerBottomGap: 8 };
+  pinTopGap: 8, pinBottomGap: 8, pinEndGap: 8, footerTopGap: 8, footerBottomGap: 8, rControl: 4, rPopup: 4 };
 
 test("a frame on spec passes every check, within the tolerance", () => {
   const rows = compare(spec, "windows", "normal", "comfortable", { ...onSpec, textX: 64.4 });
-  assert.equal(rows.length, 21);
+  assert.equal(rows.length, 23);
   assert.ok(rows.every((row) => row.pass), table(rows));
 });
 
-test("Larger text scales nested insets but keeps window corners and radius floors fixed", () => {
-  const scaled = derive(spec, "macos", 1.15);
-  assert.equal(scaled.rWin, 28);
-  assert.ok(Math.abs(scaled.rRow - 18.8) < 1e-9);
-  assert.equal(scaled.rTile, 6);
-  assert.ok(Math.abs(scaled.textX - 73.6) < 1e-9);
+test("C15 radii stay fixed while Larger text scales layout", () => {
+  for (const [look, radii] of [["macos", [16, 8, 6]], ["windows", [8, 4, 4]], ["linux", [15, 7, 6]]]) {
+    for (const scale of [1, 1.15, 2]) {
+      const sized = derive(spec, look, scale);
+      assert.deepEqual([sized.rWin, sized.rRow, sized.rTile], radii, `${look} at ${scale}`);
+      assert.ok(Math.abs(sized.textX - 64 * scale) < 1e-9);
+    }
+  }
+  const changedLayout = { ...spec, rowPad: 16, platforms: { ...spec.platforms, macos: { ...spec.platforms.macos, inset: 4 } } };
+  assert.equal(derive(changedLayout, "macos", 1.15).rRow, 8, "layout inputs never resize the shape");
 });
 
 test("a Larger text frame with scaled insets passes without hiding radius drift", () => {
   const fixture = { ...spec, platforms: { ...spec.platforms, windows: { ...spec.platforms.windows, inset: 4, rWin: 8, rMin: 2 } } };
   const measured = { ...onSpec, rowHeight: 66.7, footer: 47, searchBand: 55.2,
-    glyphCentre: 46, tileCentre: 46, textX: 69, titleX: 69, rRow: 3.4, rField: 3.4, rTile: 2,
+    glyphCentre: 46, tileCentre: 46, textX: 69, titleX: 69, rRow: 2, rField: 2, rTile: 2,
     fieldHeight: 36.8, pinHeight: 36.8, popupHeight: 36.8, footerAction: 27.6,
     pinTopGap: 4.6, pinBottomGap: 4.6, pinEndGap: 4.6, footerTopGap: 4.6, footerBottomGap: 4.6 };
   const rows = compare(fixture, "windows", "large", "comfortable", measured);
   assert.ok(rows.every((row) => row.pass), table(rows));
-  const drifted = compare(fixture, "windows", "large", "comfortable", { ...measured, rRow: 4.1 });
+  const drifted = compare(fixture, "windows", "large", "comfortable", { ...measured, rRow: 2.6 });
   assert.deepEqual(drifted.filter((row) => !row.pass).map((row) => row.name), ["row radius"]);
 });
 
