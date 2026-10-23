@@ -1,0 +1,199 @@
+{
+  "baseline": "b8b69e035391f8bcd954eec7ebe01ad4dd10d9b6",
+  "candidate": "714f7693f829d0c6affed35f5d654cfa5250bebf",
+  "environment": "Chrome on macOS, synthetic providers, appearance and touch/coarse emulation; no native filesystem calls",
+  "cases": [
+    {
+      "platform": "macos",
+      "theme": "light",
+      "coarse": false,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "coarse": false,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "coarse": true,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "light",
+      "coarse": true,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "coarse": false,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "coarse": false,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "coarse": true,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "macos",
+      "theme": "dark",
+      "coarse": true,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "coarse": false,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "coarse": false,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "coarse": true,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "light",
+      "coarse": true,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "coarse": false,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "coarse": false,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "coarse": true,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "windows",
+      "theme": "dark",
+      "coarse": true,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "coarse": false,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "coarse": false,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "coarse": true,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "light",
+      "coarse": true,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "coarse": false,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "coarse": false,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "coarse": true,
+      "version": "before",
+      "initialScans": 1,
+      "pass": true
+    },
+    {
+      "platform": "linux",
+      "theme": "dark",
+      "coarse": true,
+      "version": "candidate",
+      "initialScans": 0,
+      "pass": true
+    }
+  ]
+}
