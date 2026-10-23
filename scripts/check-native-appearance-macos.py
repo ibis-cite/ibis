@@ -172,7 +172,7 @@ def mode_facts(log):
 def material_fact(log):
     if len(log) > 1024 * 1024:
         raise RuntimeError("Native appearance log exceeded bound")
-    valid = {("vibrancy", "applied"), ("liquid-glass", "applied"), ("vibrancy", "unsupported-glass")}
+    valid = {("liquid-glass", "applied"), ("vibrancy", "unsupported-glass")}
     return next((fact for fact in mode_facts(log) if fact in valid), None)
 
 

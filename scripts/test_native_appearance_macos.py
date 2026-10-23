@@ -239,10 +239,10 @@ class PreferenceTransactionTests(unittest.TestCase):
         self.assertEqual(appearance.mode_facts("untrusted arbitrary error\nibis: native appearance mode=other reason=payload\n"), [])
 
     def test_material_selection_accepts_only_success_or_explicit_glass_fallback(self):
-        for mode, reason in [("vibrancy", "applied"), ("liquid-glass", "applied"), ("vibrancy", "unsupported-glass")]:
+        for mode, reason in [("liquid-glass", "applied"), ("vibrancy", "unsupported-glass")]:
             log = f"ibis: native appearance mode={mode} reason={reason}\n"
             self.assertEqual(appearance.material_fact(log), (mode, reason))
-        for mode, reason in [("opaque", "native-failure"), ("liquid-glass", "unsupported-glass"), ("mica", "applied")]:
+        for mode, reason in [("vibrancy", "applied"), ("opaque", "native-failure"), ("liquid-glass", "unsupported-glass"), ("mica", "applied")]:
             self.assertIsNone(appearance.material_fact(f"ibis: native appearance mode={mode} reason={reason}\n"))
         with self.assertRaisesRegex(RuntimeError, "exceeded bound"):
             appearance.material_fact("x" * (1024 * 1024 + 1))
