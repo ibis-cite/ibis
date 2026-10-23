@@ -41,6 +41,12 @@ cargo insta review                             # review changed snapshots
 
 `node scripts/check.mjs` runs the default workspace and every desktop crate test. CI also tests the core and command line with the Rust 1.90 minimum and the core in release mode. Pandoc comparisons are skipped when Pandoc is missing; `IBIS_REQUIRE_PANDOC=1` makes them required. Review changed snapshots like code.
 
+Script discovery includes `*.test.mjs`, `*.test.cjs`, `test_*.py` and `*.test.py`.
+`node scripts/check.mjs --script-tests` runs only those suites after UI dependencies
+are installed. Native CI uses `--platform-script-tests`, omitting only the UI
+import-boundary suite that needs those packages; Web CI and local full checks
+retain it. Existing embedded native self-tests and runtime checks still run.
+
 ## Focused harnesses
 
 **Settings migration.** `cargo test -p ibis-desktop identity::tests` covers file symlinks, interrupted staging, concurrent processes and look-alike preservation. Cleanup owns only real `<app>.migration-<pid>-<counter>` directories with canonical numeric suffixes, under a persistent per-app file lock. Truncated old names remain untouched because ownership is ambiguous. Unix tests cover dangling/directory/loop links and permissions; Linux also covers non-UTF-8 parents.
@@ -85,6 +91,14 @@ python scripts/smoke-native.py --app target/debug/ibis-desktop.exe --output scre
 Exit 0 is a pass, 1 a failure and 2 unavailable, never a pass. `--self-test` tests the harness alone. Linux smoke runs in the required `Desktop (ubuntu-24.04)` check and blocks pull requests. macOS and Windows smoke run in the separate `Native UI (…)` jobs on the app the Desktop job built: they are not required checks, so a failure turns that job red without blocking a merge, and on `main` it also opens or updates an issue.
 
 On Windows, control activation reuses the picker window handle verified by a snapshot and checks its process ownership, existence and visibility again. A modal menu hides Search from accessibility, so opening it must not force the next action to rediscover the window through Search.
+
+The Windows updater contract requires one exact owned update offer and one
+invokable action: the legacy exact custom label, or the standard native Yes
+button (IDYES 6, independent of its localized label). No/close never consent.
+The same ownership, uniqueness, enabled/on-screen and InvokePattern checks
+apply to both; uncertain activation fails without retrying. Synthetic provider
+cases run in the existing Windows Desktop CI step. They do not prove actual
+installation or restart; supported-platform acceptance remains #493.
 
 The menu focus check proves Escape ownership with Space reopening More. After Tab closes it, a native key-delivered probe must read back exactly in Search, then the original query and results must return before copying. AT-SPI/UIA may report a combobox's active result as focused while the input owns keyboard focus, so a focus flag alone never proves post-Tab typing. The probe never clicks or programmatically focuses Search; it checks the owned app, visible foreground picker and absent menu before delivery and readback. Only fixed Boolean outcomes enter the report.
 
