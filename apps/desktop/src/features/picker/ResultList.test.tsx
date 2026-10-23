@@ -93,13 +93,13 @@ test("memoised rows call the newest handlers", () => {
 });
 
 
-test("a cancelled tile drag cannot fall through to copying its row", () => {
+test.each([2, 60])("a cancelled tile drag cannot fall through to copying its row (%i px)", (distance) => {
   const choose = vi.fn(), toggle = vi.fn();
   const { container } = render(list(0, choose, toggle));
   const row = container.querySelector("#result-2")!;
   fireEvent.pointerDown(row.querySelector(".tile-button")!, { pointerType: "mouse", pointerId: 1, button: 0, clientX: 20, clientY: 20 });
-  fireEvent.pointerUp(row, { pointerType: "mouse", pointerId: 1, button: 0, clientX: 80, clientY: 20 });
-  fireEvent.click(row, { clientX: 80, clientY: 20 });
+  fireEvent.pointerUp(row, { pointerType: "mouse", pointerId: 1, button: 0, clientX: 20 + distance, clientY: 20 });
+  fireEvent.click(row, { clientX: 20 + distance, clientY: 20 });
   expect(toggle).not.toHaveBeenCalled();
   expect(choose).not.toHaveBeenCalled();
 });

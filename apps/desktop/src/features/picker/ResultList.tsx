@@ -35,18 +35,20 @@ export function ResultList({ results, active, selected, density, hoverAllowed = 
   onToggle: (index: number, record: SearchResult) => void;
 }) {
   // Where the pointer went down, so a drag that ends on a row does not copy it.
-  const pressedAt = useRef<{ x: number; y: number } | null>(null);
+  const pressedAt = useRef<{ x: number; y: number; onControl: boolean } | null>(null);
   // Rows keep the same handlers across renders; they call the newest callbacks.
   const latest = useRef({ onChoose, onToggle });
   useLayoutEffect(() => { latest.current = { onChoose, onToggle }; });
-  const onPointerDown = useCallback((e: React.PointerEvent) => { pressedAt.current = { x: e.clientX, y: e.clientY }; }, []);
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    pressedAt.current = { x: e.clientX, y: e.clientY, onControl: e.target instanceof Element && e.target.closest("[data-pointer-only]") !== null };
+  }, []);
   const onClick = useCallback((index: number, record: SearchResult, e: React.MouseEvent) => {
     const start = pressedAt.current;
     pressedAt.current = null;
     const action = rowClickAction({
       shiftKey: e.shiftKey, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, detail: e.detail,
       moved: start ? Math.hypot(e.clientX - start.x, e.clientY - start.y) : 0,
-      onControl: (e.target as Element).closest("button, a, input, select, textarea, [role=button]") !== null,
+      onControl: start?.onControl || (e.target as Element).closest("button, a, input, select, textarea, [role=button]") !== null,
       selectedText: !(window.getSelection()?.isCollapsed ?? true),
     });
     if (action === "none") return;
