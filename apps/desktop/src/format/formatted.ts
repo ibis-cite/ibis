@@ -3,7 +3,7 @@
 import { FormatClient } from "./client";
 import type { CslItem } from "./engine";
 import { STYLE_TITLES, type StyleId } from "./styles";
-import { clipboardHtml, parse, parseSegments, plainText, type CitationPart, type Markup } from "./markup";
+import { clipboardHtml, parse, plainText, type Markup } from "./markup";
 
 export interface FormattedCitation {
   markup: Markup[];
@@ -11,8 +11,6 @@ export interface FormattedCitation {
   html: string;
   /** Plain sentences naming references shown with a fallback. */
   warnings: string[];
-  segments?: CitationPart[];
-  unrepresented?: number[];
 }
 
 /** Numbers depend on every reference cited in the document, which Ibis cannot see. */
@@ -33,7 +31,7 @@ let shared: FormatClient | null = null;
 export async function formatCitation(
   csl: string,
   style: StyleId,
-  { signal, client = (shared ??= new FormatClient()), segments = false }: { signal?: AbortSignal; client?: FormatClient; segments?: boolean } = {},
+  { signal, client = (shared ??= new FormatClient()) }: { signal?: AbortSignal; client?: FormatClient } = {},
 ): Promise<FormattedCitation> {
   const parsed: unknown = JSON.parse(csl);
   if (!Array.isArray(parsed)) throw new Error("the references could not be read");
@@ -44,7 +42,6 @@ export async function formatCitation(
     format: "html",
     items,
     cites: items.map((item) => ({ id: item.id })),
-    ...(segments ? { segments: true } : {}),
   }, signal);
   const markup = parse(result.output);
   const warnings = result.problems.map((problem) => {
@@ -52,11 +49,5 @@ export async function formatCitation(
     const title = typeof item?.title === "string" && item.title ? `“${item.title}”: ` : "";
     return `${title}${problem.reason}`;
   });
-  const text = plainText(markup);
-  const parts = segments && result.preview ? parseSegments(result.preview, items.length) : null;
-  const safe = parts && plainText(parts.flatMap((part) => part.markup)) === text ? parts : [{ item: null, markup }];
-  const represented = new Set(safe.map((part) => part.item));
-  return { markup, text, html: clipboardHtml(markup), warnings, ...(segments ? {
-    segments: safe, unrepresented: items.map((_, index) => index).filter((index) => !represented.has(index)),
-  } : {}) };
+  return { markup, text: plainText(markup), html: clipboardHtml(markup), warnings };
 }

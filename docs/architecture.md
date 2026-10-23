@@ -122,10 +122,8 @@ are refused with a fixed refresh/reselection explanation, rather than resolving
 old visible identities against new metadata. This does not change core/CLI
 search types or persisted settings.
 
-Citation formatters may return transient, request-local ownership segments for
-the removable preview. Key formats record item positions while emitting syntax;
-formatted styles use a separate processor pass whose generated wrappers must
-erase to the unchanged canonical output. The preview accepts only sanitized,
-bounded markup with unambiguous ownership. Missing or overlapping ownership
-keeps an aggregate preview and reports the references it cannot represent.
-Canonical text, rich clipboard output and persisted data never use annotations.
+Key previews include transient, request-local ownership segments. The core
+records item positions while emitting syntax, keeping literal delimiters apart
+from references, including adjacent BibLaTeX commands. Preview metadata does not
+change canonical citation text, the clipboard response, CLI JSON or persisted
+data. The removable shelf consumes these segments separately.
