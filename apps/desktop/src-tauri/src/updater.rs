@@ -245,7 +245,11 @@ fn present_offer(app: &AppHandle, text: String, answer: impl FnOnce(bool) + Send
         .title("An update is available")
         .buttons(offer_buttons());
     #[cfg(target_os = "macos")]
-    let dialog = {
+    let (dialog, owner) = {
+        let Some(owner) = app.state::<crate::picker::ChooserOpen>().begin() else {
+            app.state::<Updates>().busy.store(false, Ordering::SeqCst);
+            return;
+        };
         let Some(parent) = offer_parent(app) else {
             app.state::<Updates>().busy.store(false, Ordering::SeqCst);
             report(Err::<(), ()>(()), NativeIssue::Window);
@@ -253,9 +257,13 @@ fn present_offer(app: &AppHandle, text: String, answer: impl FnOnce(bool) + Send
         };
         crate::picker::show_picker(app);
         crate::panel::activate_for_dialog(app);
-        dialog.parent(&parent)
+        (dialog.parent(&parent), owner)
     };
-    dialog.show(answer);
+    dialog.show(move |accepted| {
+        #[cfg(target_os = "macos")]
+        let _owner = owner;
+        answer(accepted);
+    });
 }
 
 fn offer_buttons() -> MessageDialogButtons {
