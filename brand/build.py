@@ -80,11 +80,17 @@ def rasterize(svg):
     return width, height, rows
 
 
+def thicken(body, neck):
+    if 'stroke-width="8.5"' not in body:
+        raise SystemExit("master.svg's neck is no longer 8.5 wide; update thicken() in build.py")
+    return body.replace('stroke-width="8.5"', f'stroke-width="{neck}"')
+
+
 def optical_centre(name, neck=None):
     """The point to centre on: the outline's centre, moved sideways toward the centre of mass."""
     (bx, by, bw, bh), body = SYM[name]
     if neck:
-        body = body.replace('stroke-width="8.5"', f'stroke-width="{neck}"')
+        body = thicken(body, neck)
     scale = 8
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{bw * scale:.0f}" height="{bh * scale:.0f}" '
            f'viewBox="{bx} {by} {bw} {bh}">{body.replace("currentColor", "#000")}</svg>')
@@ -114,10 +120,10 @@ def depth_filter(fid, box):
     return (
         f'<filter id="{fid}" filterUnits="userSpaceOnUse" x="{bx - m:g}" y="{by - m:g}" '
         f'width="{bw + 2 * m:g}" height="{bh + 2 * m + D["shadow_drop"]:g}" color-interpolation-filters="sRGB">'
-        '<feGaussianBlur in="SourceAlpha" stdDeviation="1.1" result="b"/>'
-        '<feOffset in="b" dy="1.3" result="bd"/><feComposite in="SourceAlpha" in2="bd" operator="out" result="top"/>'
+        f'<feGaussianBlur in="SourceAlpha" stdDeviation="{D["rim_blur"]}" result="b"/>'
+        f'<feOffset in="b" dy="{D["rim_offset"]}" result="bd"/><feComposite in="SourceAlpha" in2="bd" operator="out" result="top"/>'
         f'<feFlood flood-color="#fff" flood-opacity="{D["rim_light"]}"/><feComposite in2="top" operator="in" result="hl"/>'
-        '<feOffset in="b" dy="-1.3" result="bu"/><feComposite in="SourceAlpha" in2="bu" operator="out" result="bot"/>'
+        f'<feOffset in="b" dy="{-D["rim_offset"]}" result="bu"/><feComposite in="SourceAlpha" in2="bu" operator="out" result="bot"/>'
         f'<feFlood flood-color="#000" flood-opacity="{D["rim_shade"]}"/><feComposite in2="bot" operator="in" result="sh"/>'
         f'<feGaussianBlur in="SourceAlpha" stdDeviation="{D["shadow_blur"]}" result="db"/>'
         f'<feOffset in="db" dy="{D["shadow_drop"]}" result="do"/>'
@@ -140,7 +146,7 @@ def draw(name, k, tx, ty, paint, uid, depth=False, neck=None):
                 + depth_filter(f"{uid}f", SYM[name][0]))
         paint, attr = f"url(#{uid}g)", f' filter="url(#{uid}f)"'
     if neck:
-        body = body.replace('stroke-width="8.5"', f'stroke-width="{neck}"')
+        body = thicken(body, neck)
     body = body.replace("currentColor", paint)
     return defs, f'<g transform="translate({tx:.3f} {ty:.3f}) scale({k:.5f})"><g{attr}>{body}</g></g>'
 
@@ -214,7 +220,7 @@ def background(w, h, colours, uid, radius=0, edge=None):
 def app_icon(dark, uid):
     side = 1024
     d1, b1 = background(side, side, TILE_DARK if dark else TILE, uid, L["app_icon_radius"] * side,
-                        "rgba(255,255,255,0.12)" if dark else "rgba(0,0,0,0.10)")
+                        C["tile_edge_dark"] if dark else C["tile_edge"])
     d2, b2 = centred("mark", side, CONTAINER * side, GRADIENT_DARK if dark else GRADIENT, uid, True)
     return doc(side, side, d1 + d2, b1 + b2)
 
@@ -337,39 +343,41 @@ def ico(svg_name, sizes):
 
 
 def motion_css():
+    """The finished logo is the base style, so renderers that do not animate still show it.
+    Each animation starts from its keyframes' first frame and holds it until it begins."""
     t = MO
-    ease = "cubic-bezier(.2,.8,.2,1)"
     return (
-        f".neck{{stroke-dasharray:1;stroke-dashoffset:1;opacity:0;animation:draw {t['neck_duration']}s {ease} {t['neck_start']}s forwards}}"
-        f".crown{{transform-box:fill-box;transform-origin:18% 22%;transform:rotate(-28deg) scale(.08);opacity:0;"
-        f"animation:grow {t['crown_duration']}s cubic-bezier(.2,1.25,.35,1) {t['crown_start']}s forwards}}"
-        f".word{{opacity:0;transform:translateX(-6px);animation:word {t['word_duration']}s {ease} {t['word_start']}s forwards}}"
-        "@keyframes draw{0%{opacity:0}8%{opacity:1}to{stroke-dashoffset:0;opacity:1}}"
-        "@keyframes grow{0%{opacity:0}15%{opacity:1}to{transform:none;opacity:1}}"
-        "@keyframes word{to{opacity:1;transform:none}}"
-        "@media (prefers-reduced-motion:reduce){.neck,.crown,.word{animation:none;stroke-dashoffset:0;transform:none;opacity:1}}"
+        f".neck{{stroke-dasharray:1;animation:draw {t['neck_duration']}s {t['ease']} {t['neck_start']}s backwards}}"
+        f".crown{{transform-box:fill-box;transform-origin:18% 22%;"
+        f"animation:grow {t['crown_duration']}s {t['crown_ease']} {t['crown_start']}s backwards}}"
+        f".word{{animation:word {t['word_duration']}s {t['ease']} {t['word_start']}s backwards}}"
+        "@keyframes draw{0%{stroke-dashoffset:1;opacity:0}8%{opacity:1}to{stroke-dashoffset:0}}"
+        f"@keyframes grow{{0%{{transform:rotate({t['crown_turn']}deg) scale({t['crown_from']});opacity:0}}15%{{opacity:1}}}}"
+        f"@keyframes word{{0%{{opacity:0;transform:translateX({-t['word_slide']}px)}}}}"
+        "@media (prefers-reduced-motion:reduce){.neck,.crown,.word{animation:none}}"
     )
+
+
+def animate(svg):
+    """Tag the neck and group the head with the beak so they grow from the head's centre as one shape."""
+    out = svg.replace('<path d="M36', '<path class="neck" pathLength="1" d="M36', 1)
+    out = re.sub(r'(<path d="M41 25[^"]*"[^>]*/>)(<circle [^>]*/>)', r'<g class="crown">\1\2</g>', out, count=1)
+    if 'class="neck"' not in out or 'class="crown"' not in out:
+        raise SystemExit("master.svg's bird changed shape order; update animate() in build.py")
+    return out.replace("<defs>", f"<defs><style>{motion_css()}</style>", 1)
 
 
 def animated_logo(dark, uid):
     """The logo drawing itself in about 1.5 s: the neck rises, the head and beak grow out as one shape,
     then the wordmark slides in."""
-    svg = logo(dark, uid)
-    svg = svg.replace('<path d="M36', '<path class="neck" pathLength="1" d="M36', 1)
-    # Head and beak share one group so they grow from the head's centre together, never apart.
-    svg = re.sub(r'(<path d="M41 25[^"]*"[^>]*/>)(<circle [^>]*/>)', r'<g class="crown">\1\2</g>', svg, count=1)
-    head, word = svg.rsplit("<g transform=", 1)
+    head, word = logo(dark, uid).rsplit("<g transform=", 1)
     # Wrap the wordmark: a CSS transform on the group itself would replace its placement.
-    svg = head + '<g class="word"><g transform=' + word.replace("</svg>", "</g></svg>")
-    return svg.replace("<defs>", f"<defs><style>{motion_css()}</style>", 1)
+    return animate(head + '<g class="word"><g transform=' + word.replace("</svg>", "</g></svg>"))
 
 
 def animated_mark(dark, uid):
     """The bird alone drawing itself, for splash screens, avatars in videos and loading states."""
-    svg = mark(GRADIENT_DARK if dark else GRADIENT, uid)
-    svg = svg.replace('<path d="M36', '<path class="neck" pathLength="1" d="M36', 1)
-    svg = re.sub(r'(<path d="M41 25[^"]*"[^>]*/>)(<circle [^>]*/>)', r'<g class="crown">\1\2</g>', svg, count=1)
-    return svg.replace("<defs>", f"<defs><style>{motion_css()}</style>", 1)
+    return animate(mark(GRADIENT_DARK if dark else GRADIENT, uid))
 
 
 def video_card(w, h, dark, uid, lines, logo_size=0.2):
@@ -443,7 +451,7 @@ def main():
         "video/title-card.svg": video_card(1920, 1080, False, "vt", [TAGLINE, SUBLINE]),
         "video/title-card-dark.svg": video_card(1920, 1080, True, "vtd", [TAGLINE, SUBLINE]),
         "video/end-card.svg": video_card(1920, 1080, True, "ve", W["end_card"]),
-        "video/youtube-banner.svg": video_card(2560, 1440, True, "yb", [TAGLINE], 0.17),
+        "video/youtube-banner.svg": video_card(2560, 1440, True, "yb", [TAGLINE], 0.15),
         "video/thumbnail-template.svg": thumbnail("th"),
     }
     (OUT / "video").mkdir(exist_ok=True)
