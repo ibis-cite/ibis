@@ -55,7 +55,9 @@ M is the height of the bird.
 The build needs Python 3, librsvg's `rsvg-convert`, fontconfig and Inter Display
 (the Linux CI packages are `librsvg2-bin` and `fonts-inter`). The [desktop icon
 notes](../apps/desktop/src-tauri/icons/source/README.md) describe platform sizing
-and formats. Never edit generated SVGs, PNGs, icon containers or `src/brand.ts`
+and formats. Rendering uses Pango's fontconfig backend on every platform so it
+matches the font check, rather than the host's native font substitutions.
+Never edit generated SVGs, PNGs, icon containers or `src/brand.ts`
 by hand.
 
 `node scripts/check.mjs` includes the drift check; Linux CI runs it with

@@ -4,11 +4,18 @@ import os
 import runpy
 import tempfile
 import unittest
+from unittest.mock import patch
 
 BUILD = runpy.run_path(str(Path(__file__).resolve().parents[1] / "brand/build.py"))
 
 
 class BrandDrift(unittest.TestCase):
+    def test_text_rendering_does_not_inherit_the_native_font_backend(self):
+        with patch.dict(os.environ, {"PANGOCAIRO_BACKEND": "coretext"}), patch("subprocess.run") as render:
+            BUILD["png"]("synthetic.svg", "synthetic.png", 32)
+            self.assertEqual(render.call_args.kwargs.get("env", {}).get("PANGOCAIRO_BACKEND"), "fc")
+            self.assertEqual(os.environ["PANGOCAIRO_BACKEND"], "coretext")
+
     @unittest.skipIf(os.name == "nt", "symlinks require developer-mode privileges")
     def test_publishing_refuses_symlink_outputs(self):
         with tempfile.TemporaryDirectory() as directory:

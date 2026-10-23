@@ -55,7 +55,7 @@ def render(root, source, size, output):
     subprocess.run([
         "rsvg-convert", "--width", str(size), "--height", str(size),
         "--output", str(output), str(root / "source" / source),
-    ], check=True)
+    ], check=True, env=brand.RENDER_ENV)
 
 
 def main(root=ROOT):

@@ -12,6 +12,7 @@ from pathlib import Path
 import argparse
 import json
 import math
+import os
 import re
 import shutil
 import struct
@@ -23,6 +24,8 @@ from xml.sax.saxutils import escape
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "exports"
+# Match fc-match and Linux CI on every host; macOS otherwise chooses CoreText.
+RENDER_ENV = {**os.environ, "PANGOCAIRO_BACKEND": "fc"}
 
 # The values people tune (colours, sizes, depth, motion, words) live in settings.json;
 # these names keep the code readable.
@@ -55,7 +58,7 @@ def ratio(name):
 
 def rasterize(svg):
     """Render SVG text with rsvg-convert; return (width, height, alpha rows)."""
-    data = subprocess.run(["rsvg-convert"], input=svg.encode(), capture_output=True, check=True).stdout
+    data = subprocess.run(["rsvg-convert"], input=svg.encode(), capture_output=True, check=True, env=RENDER_ENV).stdout
     pos, chunks, width = 8, [], 0
     while pos < len(data):
         size, kind = struct.unpack(">I4s", data[pos:pos + 8])
@@ -369,7 +372,7 @@ def png(svg_name, out_name, width, height=None):
     args = ["rsvg-convert", "--width", str(width)]
     if height != "auto":
         args += ["--height", str(height or width)]
-    subprocess.run(args + ["--output", str(OUT / "png" / out_name), str(OUT / svg_name)], check=True)
+    subprocess.run(args + ["--output", str(OUT / "png" / out_name), str(OUT / svg_name)], check=True, env=RENDER_ENV)
 
 
 def ico(svg_name, sizes):
@@ -448,7 +451,7 @@ def video_card(w, h, dark, uid, lines, logo_size=0.2):
 
 
 def thumbnail(uid):
-    """A YouTube thumbnail template: edit the two text lines in the SVG, then export at 1280 x 720."""
+    """A YouTube thumbnail made from the two text lines in settings.json."""
     w, h = 1280, 720
     d1, body = background(w, h, NIGHT, uid)
     d2, bird = centred("mark", 440, 300, GRADIENT_DARK, uid + "m", True)
