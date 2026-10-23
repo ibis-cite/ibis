@@ -1,0 +1,19 @@
+/* Ibis brand colours. Made by brand/build.py; do not edit. */
+:root {
+  --ibis-scarlet-50: #FEF2EF;
+  --ibis-scarlet-100: #FFE5DE;
+  --ibis-scarlet-200: #FFC9BC;
+  --ibis-scarlet-300: #FEA793;
+  --ibis-scarlet-400: #FF7A5C;
+  --ibis-scarlet-500: #E4583A;
+  --ibis-scarlet-600: #C23A1C;
+  --ibis-scarlet-700: #9F2C12;
+  --ibis-scarlet-800: #7A220E;
+  --ibis-scarlet-900: #52170B;
+  --ibis-ink: #16181D;
+  --ibis-slate: #4C5260;
+  --ibis-mist: #C0C3CC;
+  --ibis-paper: #FFFFFF;
+  --ibis-warm-paper: #F1EEE9;
+  --ibis-night: #141417;
+}
