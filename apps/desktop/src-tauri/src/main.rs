@@ -28,6 +28,7 @@ mod panel_startup;
 mod picker;
 mod placement;
 mod preferences;
+mod row_context;
 mod setup;
 mod tray;
 mod updater;
@@ -94,6 +95,8 @@ fn main() {
         .manage(LibraryWatch::default())
         .manage(setup::Offered::default())
         .manage(ChooserOpen::default())
+        .manage(row_context::RowContext::default())
+        .on_menu_event(row_context::selected)
         .manage(Pinned::default())
         .manage(notice::Notice::default())
         .manage(picker::FullScreenGuard::default())

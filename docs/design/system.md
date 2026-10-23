@@ -633,7 +633,8 @@ trackpad, a touchscreen or pen, or voice control and switch access alone:
 
 - Opening without a shortcut works: the menu bar or tray icon and the app icon
   open the picker, and first run says so.
-- Every keyboard action has a visible control: clicking a row adds it, with a
+- Every keyboard action has a visible control: clicking a row highlights it and
+  shows its citation in the shelf; double-click copies, while ⌘/Ctrl-click adds, with a
   clear add/remove target; footer hints ("Copy as … ↵", "Shortcuts", "More")
   are real buttons; chips have × buttons; right-clicking a row opens a context
   menu (Copy, Add, Open PDF, Show in Zotero).

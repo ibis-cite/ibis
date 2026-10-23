@@ -57,7 +57,7 @@ test.each(["", "研究_memory_".repeat(1_000)])("unusual keys stay literal and d
   window.getSelection()?.removeAllRanges();
   onChoose.mockClear();
   fireEvent.click(container.querySelector(".result-year")!);
-  expect(onChoose).toHaveBeenCalledWith(0, record, "copy");
+  expect(onChoose).toHaveBeenCalledWith(0, record, "select");
   expect(getByRole("option").getAttribute("aria-selected")).toBe("true");
 });
 
@@ -80,7 +80,7 @@ test("memoised rows call the newest handlers", () => {
   rerender(list(0, newest));
   fireEvent.click(container.querySelector("#result-3")!);
   expect(first).not.toHaveBeenCalled();
-  expect(newest).toHaveBeenCalledWith(3, rows[3], "copy");
+  expect(newest).toHaveBeenCalledWith(3, rows[3], "select");
   const toggle = vi.fn();
   rerender(list(0, newest, toggle));
   const tile = container.querySelector("#result-2 .tile-button")!;

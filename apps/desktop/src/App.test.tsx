@@ -193,6 +193,55 @@ function backend(overrides: Record<string, Handler> = {}): string[] {
   return calls;
 }
 
+test("C5 click selects without copying and double-click copies the highlighted citation", async () => {
+  const copied = vi.fn(() => ({ text: "[@b]", warnings: [] }));
+  const calls = backend({ search: () => [result("a", "First"), result("b", "Second")], copy_citation: copied });
+  render(<App />);
+  fireEvent.click(await screen.findByText("Second"), { detail: 1 });
+  expect(screen.getByRole("option", { name: /Second/ }).getAttribute("aria-selected")).toBe("true");
+  await waitFor(() => expect(document.querySelector(".shelf-output")?.textContent).toContain("@b"));
+  expect(copied).not.toHaveBeenCalled();
+  expect(calls).not.toContain("hide_picker");
+  expect(document.activeElement).toBe(screen.getByLabelText("Search references"));
+  fireEvent.click(screen.getByText("Second"), { detail: 2 });
+  await waitFor(() => expect(copied).toHaveBeenCalledOnce());
+});
+
+test.each([null, "toggle", "copy"])("C5 native context completion %s uses the current row without a browser menu", async (action) => {
+  const context = vi.fn(() => action);
+  const copied = vi.fn(() => ({ text: "[@b]", warnings: [] }));
+  const calls = backend({ search: () => [result("a", "First"), result("b", "Second")], row_context: context, copy_citation: copied });
+  render(<App />);
+  const row = await screen.findByText("Second");
+  fireEvent.contextMenu(row);
+  await waitFor(() => expect(context).toHaveBeenCalledOnce());
+  expect(context).toHaveBeenCalledWith({ added: false });
+  if (action === "copy") await waitFor(() => expect(copied).toHaveBeenCalledOnce());
+  else expect(copied).not.toHaveBeenCalled();
+  if (action === "toggle") await waitFor(() => expect(chipKeys()).toEqual(["b"]));
+  else expect(chipKeys()).toEqual([]);
+  if (action !== "copy") expect(calls).not.toContain("hide_picker");
+});
+
+test.each(["query", "hide", "selection", "failure"])("C5 context result cannot outlive its %s owner", async (change) => {
+  let finish: (value: string | null) => void = () => undefined;
+  const pending = new Promise<string | null>((resolve) => { finish = resolve; });
+  const copied = vi.fn(() => ({ text: "unexpected", warnings: [] }));
+  const calls = backend({ search: () => [result("a", "First"), result("b", "Second")],
+    row_context: () => change === "failure" ? Promise.reject(new Error("SYNTHETIC_PRIVATE_PAYLOAD")) : pending, copy_citation: copied });
+  render(<App />);
+  fireEvent.contextMenu(await screen.findByText("Second"));
+  if (change === "query") fireEvent.change(screen.getByLabelText("Search references"), { target: { value: "new" } });
+  if (change === "hide") await act(async () => { await emit("picker:hidden"); });
+  if (change === "selection") fireEvent.click(screen.getByText("First"), { shiftKey: true });
+  if (change === "failure") {
+    expect(await screen.findByRole("alert")).toHaveProperty("textContent", "The reference menu could not open. Use Enter to copy or Shift+Enter to add.");
+    expect(document.body.textContent).not.toContain("SYNTHETIC_PRIVATE_PAYLOAD");
+  } else await act(async () => { finish("copy"); await pending; });
+  expect(copied).not.toHaveBeenCalled();
+  expect(calls).not.toContain("hide_picker");
+});
+
 test("typing a query shows results from the search command", async () => {
   backend({
     search: ({ query }) =>
