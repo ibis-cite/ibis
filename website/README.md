@@ -1,6 +1,7 @@
 # Ibis website
 
-Static HTML and CSS for ibiscite.org, hosted on the existing Hostinger plan.
+Static HTML and CSS for ibiscite.org, planned for the existing Hostinger plan.
+The website is not live; the production visual design is still in progress.
 Source lives here; installers stay on GitHub Releases. No framework, database,
 remote fonts, browser scripts or paid website service is needed.
 
