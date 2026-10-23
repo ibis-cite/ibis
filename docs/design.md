@@ -234,13 +234,14 @@ list, preview and tray) from a control layer (search and format).
 | Recently cited, Recently added, With PDF | While browsing | Shown when the search is empty or one is selected; hidden while typing so rows get the room. Tab reaches the current browsing tab; ← and → choose another (see **Keyboard focus order**). |
 | Tag and author suggestions | While typing `#` or `a:` | Take the place of the tabs. Enter, or Tab while the suggestions are open, picks the first. |
 | Row: type tile | Always | A 32 px tile at the row's start with the type icon on a quiet fill (24 px and no fill in Compact, so rows stay 40 px). Decorative: screen readers hear the type word instead. |
-| Row: title and year | Always | Year at the right edge, in the same place on every row. |
+| Row: title and year | Always | Only the year (or "No date") occupies the trailing column, vertically centred across the whole row, at the same edge on every row. |
 | Row: authors and journal | Comfortable and Spacious | Tells apart references with the same first author and year. The journal is the container title (journal, book or proceedings), else the publisher. Spacious adds the item type as one word ("Article", "Book"). One line: authors are shortened as in a citation ("García", "García, Okafor", or "García et al." for three or more; screen readers hear every name), then the journal, each with an ellipsis (the key and library label shorten first, never below a few letters, and the type word stays whole; only when enlarged text leaves no room do they move under them); a match in the journal is always named, since it may be shortened. Compact shows the first author ("García et al.") after the title. |
+| Row: citation key | Comfortable and Spacious | Monospace in the meta line, after the byline and optional type word; it and the library label shorten before the byline, retaining a few letters, then reflow below it when space runs out. Hover reveals the full key. Compact keeps it in the accessible name. |
 | Row: why it matched | Only when hidden | "In the abstract: …sleep…" or "Tagged: …" when the match is not in the title or authors. |
 | Attachment chip | When a file is attached | The platform's document (or globe) icon only, 16 px in a 24 px chip. "PDF, 12 pages" is its tooltip and accessible name, and it opens the preview. No empty column otherwise. |
 | "In 2 libraries" | Only for duplicates | Explains why one reference may differ between sources; it is listed once. |
 | Add button | Hovered or selected row | Takes the place of the type icon, so the row never reflows: a plus, or a check on a row already added. A row in the citation always shows a scarlet tile with a white check, the only scarlet on the row. A 32 px pointer target with its name in the tooltip ("Add García 2021 to citation"); it adds no Tab stop, because a listbox option holds no controls, and keyboards use Shift+Enter. |
-| Citation shelf | Once a reference is highlighted or added | One quiet card above the footer's Copy action ([design/preview.md](design/preview.md)): the chosen references as author-year chips (at most six, then "+N", which shows them all), then the exact text Enter pastes on one line, in text colours with one scarlet quote mark. Results never move when a reference is added. Page numbers come later (#24). |
+| Citation shelf | Once a reference is highlighted or added | One quiet card above the footer's Copy action ([design/preview.md](design/preview.md)): the chosen references as author-year chips (at most six, then "+N", which shows them all), then the exact text Enter pastes on one line, in text colours with the decorative scarlet beak SVG from #888 (20 px tall, scaled with text), at the tile column’s end on the citation line. It mirrors in RTL, dims to 45 % while pending and uses `CanvasText` in contrast modes; citation text stays on the row text edge and chips keep their position. Results never move when a reference is added. Page numbers come later (#24). |
 | Footer key hints | Always | What Enter does now, Shortcuts and More, label first and keys after (see **Footer**). |
 | Footer tip | One at a time | Tied to what the user is doing, retired once they have done it. Otherwise the footer shows library status. |
 | Library status | Always, quietly | A dot, the source and the count; the age only when it is news or a warning (see below). A sentence above the list only when something needs the user. |
@@ -269,7 +270,9 @@ hours ago, 3:19 PM · Zotero could not be reached"). "Updated" always means the
 references changed; "checked" means Ibis last read them or found them unchanged.
 The footer always names the library that is searched, even after a switch to
 another one failed. A long name is shortened before the state words, and names
-are isolated so right-to-left names keep their place. Times
+are isolated so right-to-left names keep their place. The English summary keeps
+source, state and age in that order inside an isolated phrase; the age and result
+count are isolated too, so an RTL page cannot reorder their words. Times
 use `Intl.RelativeTimeFormat` in the app's language ("just now" under 45 seconds,
 a date after a week) and tick every 30 seconds without redrawing the picker. The
 live region holds only the words before the age, so a ticking clock is never
@@ -300,7 +303,8 @@ glyph overhangs it by 6 px. Controls in one bar share a centre line, and text
 in one bar shares a baseline.
 
 **Header.** In order: search glyph, query, clear button, the header menus
-(format, then library scope when there is one). No pin or empty slot follows them.
+(format, then library scope when there is one), then the pin (C6 in
+[system.md](design/system.md#canvas-decisions-c1c18-2026-10-23)).
 
 - **Clear (×).** Inside the field at its trailing end, only while there is a
   query: a 16 px glyph in a 32 px target, secondary colour. Its name is
@@ -335,9 +339,8 @@ in one bar shares a baseline.
   `aria-expanded`; items are `menuitemradio` with `aria-checked`. While no
   library is chosen the header menus are hidden, because first-run setup asks
   the same question in its own words.
-- **Keep Window Open.** A checkable action in More, with ⌘⇧P on macOS and
-  Ctrl+Shift+P elsewhere. While on, a pin in the footer status area is a
-  button named “Kept open; click to stop”; it unpins and returns focus to search.
+- **Keep Window Open.** The header pin (C6), also in More as "Keep window
+  open" / "Stop keeping open", with ⇧⌘P on macOS and Ctrl+Shift+P elsewhere.
 - **Targets.** Every header control keeps a 32 px target (44 px under
   `pointer: coarse`), even where it draws 28 px.
 
@@ -417,7 +420,8 @@ baseline, each key cap 20 px high and centred on it.
   shortcut labels do (Ctrl + K). In menus a shortcut is plain trailing text,
   as in each system's own menus, never a cap.
 
-**Empty states.** One template on every platform, centred like
+**Empty states.** The empty library and the missing file use C12's choice
+rows instead (#949). Otherwise one template on every platform, centred like
 `ContentUnavailableView`, `AdwStatusPage` and Fluent's empty state: a 48 px
 symbolic icon in `--text-tertiary`, a title (15/20, semibold), a line of
 at most 40 characters per row, wrapping to at most three rows (13/18,
@@ -447,7 +451,8 @@ once it keeps a local history (Rollout 6, which can be turned off and cleared),
 and until then the first, with the two keys that make the first minute work.
 No illustration and no tips beyond those keys.
 
-**First run.** A grouped form, as macOS System Settings, Windows Settings
+**First run.** Superseded by C12 (two steps of choice rows, #950); the
+grouped form below is replaced when #950 lands. A grouped form, as macOS System Settings, Windows Settings
 cards and libadwaita preference groups are: a title ("Choose a library to get
 started") and one secondary line saying what was found, then one group of
 labelled rows on `--surface-raised`, each at least 48 px high (56 px with a
@@ -500,7 +505,8 @@ menu items keep their check; the pressed pop-up button keeps a 1 px
 
 Three layers, each reached from the one before by something on screen:
 
-- **First minute:** type, press Enter, paste. Clicking a row copies it.
+- **First minute:** type, press Enter, paste. Clicking a row selects it;
+  double-clicking copies it (C5).
 - **First week:** → in the search box previews the attachment and "Cite page"
   fills in the page; Shift+Enter builds a citation with several sources;
   Tab reaches the browsing tabs, where ← and → choose recent items or PDFs.
