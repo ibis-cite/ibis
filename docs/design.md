@@ -608,7 +608,8 @@ Share Ibis (outlined, system share glyph), which opens the browser share sheet
 or copies the link. No third-party share buttons, star counts or badges.
 Each section after the first opens with one larger lead sentence so a skimmer
 gets the point; detail follows at reading size. The footer rule meets the
-margin rule.
+margin rule. Why opens with the beak quote mark and is signed with the
+maker’s first name and an `@key` chip linking to their GitHub profile.
 The demo mirrors the shipped app. When a change alters what the demo shows
 (the picker, its keys, styles or paste), update the demo in the same pull
 request, and grow the demo as the app gains features worth showing.

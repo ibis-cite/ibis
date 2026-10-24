@@ -76,6 +76,7 @@ section { padding-block: var(--website-section-pad); }
 .pull { margin: 0 0 var(--website-block-gap); }
 .pull img { display: block; width: 2rem; height: auto; margin-bottom: var(--space-3); } /* The beak is the opening quote mark. */
 .pull p { margin: 0; font-style: italic; }
+.signature { font: var(--type-reading-size)/1.5 var(--font-family); color: var(--muted); } /* The beak opens the quote; a key signs it. */
 .closing .actions { margin-top: var(--space-5); }
 .actions a:not(.button) { padding-block: var(--space-3); font: var(--type-reading-size) var(--font-family); color: var(--text); text-decoration: none; }
 .platform { margin-top: var(--space-8); }
