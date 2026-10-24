@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile, readdir, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 import { test } from "node:test";
 import { build } from "../website/build.mjs";
 
@@ -28,14 +28,4 @@ test("public build copies canonical tokens, keys and only allowlisted assets", a
     assert.equal(await readFile(join(output, "index.html"), "utf8"), "synthetic", "failed build preserves last good output");
     await assert.rejects(build(source, source), /source/);
   } finally { await rm(dir, { recursive: true, force: true }); }
-});
-
-
-test("deployment refuses shell fragments, other domains and repository backups", async () => {
-  const { deployment } = await import("../website/deploy.mjs");
-  const env = { IBIS_WEB_ROOT: "/home/synthetic/domains/ibiscite.org/public_html", IBIS_BACKUP_DIR: tmpdir() };
-  assert.equal(deployment(env).host, "ibis-hosting");
-  for (const patch of [{ IBIS_DEPLOY_HOST: "-oProxyCommand=bad" }, { IBIS_DEPLOY_HOST: "host;bad" },
-    { IBIS_WEB_ROOT: "/home/synthetic/domains/example.org/public_html" }, { IBIS_WEB_ROOT: "/" },
-    { IBIS_BACKUP_DIR: fileURLToPath(new URL("../", import.meta.url)) }]) assert.throws(() => deployment({ ...env, ...patch }));
 });

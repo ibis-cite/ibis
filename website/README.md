@@ -26,23 +26,9 @@ Deploy only `website/dist/`, including `.htaccess`, after review and merge.
 Build from clean main. Keep hosting credentials, SSH configuration, DNS exports
 and operational backups outside the repository and CI. Back up this domain’s
 existing files and DNS before changing them; leave other sites and mail alone.
-Set up an `ibis-hosting` alias in the maintainer’s own SSH config (host, user,
-port and key), verify its host key, and confirm key-based login. Never paste
-credentials into a command, chat, this folder or CI. Set `IBIS_WEB_ROOT` locally
-to this domain’s exact document root; optional `IBIS_BACKUP_DIR` chooses a
-private backup folder outside the checkout (default: Downloads/Ibis website
-backups). No configuration file is tracked.
-
-After fetching, run `node website/deploy.mjs` for a read-only connection/build
-preflight, then `node website/deploy.mjs --publish`. It refuses a dirty checkout
-or a commit different from origin/main, builds dist, checks the remote real
-path, archives the existing site outside its public root, downloads that archive
-privately, then syncs only dist (including dotfiles), without deleting unknown remote files or subfolders. Upload failure keeps the
-backup. A final checksum dry run must find no differences. It logs no connection
-details. SSH and rsync must already be available; this creates no accounts.
-To roll back, extract the retained archive into a private folder, inspect it,
-then rsync its contents to the same verified root. Keep the deployment record
-and pre-change DNS export together in the private project record.
+The publishing host is being settled separately with the maintainer. No
+hosting credentials or automated deployment configuration belong in this slice.
+Keep the static build portable; host-specific publishing is a reviewed follow-up.
 Check live HTTPS, headers, downloads, both themes and logo animation.
 
 Brand assets are copied unchanged from `brand/exports/`; rebuild them with
