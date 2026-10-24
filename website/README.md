@@ -57,8 +57,9 @@ Use Google Search Console and Bing Webmaster Tools with DNS ownership
 verification and submit `https://ibiscite.org/sitemap.xml` once deployed.
 Keep verification records in DNS, not account credentials in this repository.
 These tools report search-engine discovery and search performance; they add no
-visitor script to Ibis. Do not connect Google Analytics, Tag Manager, Microsoft
-Clarity or a cross-account Search Console import. Hosting request statistics
+visitor script to Ibis. A Search Console import also grants Bing access to Google
+search data; independent DNS verification avoids that account link. Do not add
+Google Analytics, Tag Manager or Microsoft Clarity. Hosting request statistics
 remain in Cloudflare; Web Analytics/beacon injection stays off. No visitor
 cookies, cross-site identifiers or new app data flows are introduced.
 
