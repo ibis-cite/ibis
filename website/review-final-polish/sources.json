@@ -1,0 +1,24 @@
+{
+  "before": {
+    "assembledHeads": {
+      "1044": "f2dc23ef0789351198f048e44adb0b1e1946a85f",
+      "1045": "97ce466af01bb5b473217a72c5e8fe805b990558",
+      "1046": "73b661e66805d9af25d45ec55dadeefe0f8a6c62",
+      "1047": "377d7929b4ba64d9ca4af0bec5c5f0a8b6873ace"
+    }
+  },
+  "after": "ab76e4889e62e35e08061b03afe33cdc75b575c3",
+  "browser": "Chromium",
+  "data": "invented references only",
+  "viewportWidths": [
+    1440,
+    1180,
+    820,
+    390
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "motion": "reduced"
+}
