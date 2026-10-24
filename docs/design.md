@@ -42,7 +42,7 @@ and the gallery contrast preview, in that order. Light and dark come from
 
 | Role | Tokens | Rule |
 |---|---|---|
-| Surfaces [D4] | `--surface-window` < `--surface` < `--surface-raised` < `--surface-overlay`; `--surface-field`, `--surface-page`, `--scrim` | Base, content sheet, band/cards/shelf, menus, dialogs and a document/reading canvas. |
+| Surfaces [D4] | `--surface-window` < `--surface` < `--surface-raised` < `--surface-overlay`; `--surface-field`, `--scrim` | Base, content sheet, band/cards/shelf, menus and dialogs. |
 | Text [D5] | `--text`, `--muted`, `--text-tertiary`, `--text-disabled` | `--muted` always 4.5:1; tertiary only for glyphs and hints at rest (3:1), never sentences. |
 | Accent [D6] | `--accent`, `--accent-text`, `--text-on-accent` | Always the system accent; Ibis offers no override. Selected rows and the menu highlight use `--selected-text`, the platform's own selected-text colour (white), as native lists do; never black. `--text-on-accent` (primary button, tiles on the accent) is picked per accent to reach 4.5:1. |
 | Selection [D7] | `--row-active-*`, `--row-inactive-background`, `--selected-*` | See **Selection and focus**. |
@@ -540,9 +540,8 @@ profile aligned when it changes. Downloads stay on GitHub Releases.
   breathing room for the introduction and sticky navigation near the top.
   Keep the structural margin line, ordinary scrolling and short setup steps;
   no viewport-sized sections or scroll snapping. Small screens use normal flow.
-- **Reading and controls.** The shared `--surface-page` keeps the website near
-  black in dark mode; the picker uses `--surface`. System is the default
-  appearance. System serif (`--font-reading`) for prose and sample writing; platform
+- **Reading and controls.** Use the shared default surface and System appearance.
+  System serif (`--font-reading`) for prose and sample writing; platform
   UI type for controls and labels; monospace only for citation keys and output.
   No remote fonts. Use shared type, colour, shape and motion roles.
 - **Keys name places.** Section links such as `@how` and `@setup` echo citation

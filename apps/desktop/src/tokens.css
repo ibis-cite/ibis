@@ -93,7 +93,6 @@
 /* System colours follow light/dark mode, the accent and high contrast. */
 :root {
   --surface: Canvas;
-  --surface-page: Canvas; /* document/reading canvas, distinct from a tool window */
   --text: CanvasText;
   --muted: CanvasText;
   --line: GrayText;      /* control edges that need 3:1: fields, contrast modes */
@@ -211,7 +210,6 @@
 @supports (color: light-dark(white, black)) {
   :root {
     --surface: light-dark(#fcfcfd, #242426);
-    --surface-page: light-dark(#ffffff, #0b0c10);
     --text: light-dark(#27272b, #ededf0);
     --muted: light-dark(#6b6b75, #a6a6af);
     --line: light-dark(#85858f, #8b8b95);
@@ -356,16 +354,16 @@
 
 @media (prefers-contrast: more) {
   :root, :root[data-platform] { --separator: CanvasText; --stroke-control: CanvasText; --focus-ring-color: CanvasText; --focus-ring-width: 2px; --focus-ring-offset: var(--focus-ring-search-offset); --focus-ring-shadow: none; --selected-background: Highlight; --selected-text: HighlightText; --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; }
-  :root { --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --surface-page: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --active-edge: CanvasText; }
+  :root { --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --active-edge: CanvasText; }
 }
 @media (forced-colors: active) {
   :root, :root[data-platform] { --separator: CanvasText; --stroke-control: ButtonText; --focus-ring-color: CanvasText; --focus-ring-width: 2px; --focus-ring-offset: var(--focus-ring-search-offset); --focus-ring-shadow: none; --selected-background: Highlight; --selected-text: HighlightText; --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; }
-  :root { --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --surface-page: Canvas; --text: CanvasText; --muted: CanvasText; --line: ButtonText; --active-edge: CanvasText; }
+  :root { --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --text: CanvasText; --muted: CanvasText; --line: ButtonText; --active-edge: CanvasText; }
 }
 
 /* Explicit contrast preview in the development states gallery. */
 :root[data-gallery-theme="contrast"], :root[data-gallery-theme="contrast"][data-platform] { --separator: CanvasText; --stroke-control: CanvasText; --focus-ring-color: CanvasText; --focus-ring-width: 2px; --focus-ring-offset: var(--focus-ring-search-offset); --focus-ring-shadow: none; }
-:root[data-gallery-theme="contrast"] { --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --surface-page: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --active-edge: CanvasText; }
+:root[data-gallery-theme="contrast"] { --row-active-background: Highlight; --row-active-text: HighlightText; --row-active-muted: currentColor; --citation: CanvasText; --citation-tile: CanvasText; --on-citation: Canvas; --status-done: CanvasText; --status-look: CanvasText; --status-stop: CanvasText; --surface: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --active-edge: CanvasText; }
 
 /* Semantic roles preserve platform values.
    Per-look shape, elevation and motion roles are defined above.
