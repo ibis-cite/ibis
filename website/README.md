@@ -39,7 +39,8 @@ HTTPS in the zone. No path redirects are needed for this single-page site.
 brand assets cache for one hour. SVGs have a separate sandboxed policy allowing
 their embedded animation styles, and workers.dev preview links send
 `X-Robots-Tag: noindex`. Missing paths get `404.html` with a 404 status. Pull
-requests get a preview link from Cloudflare's preview builds; the workers.dev
+requests get a preview link from Cloudflare Worker Previews (deploy command
+`npx wrangler preview`, `previews` block in `wrangler.jsonc`); the workers.dev
 production address stays off. No external fonts, scripts or analytics load.
 Check live HTTPS, CSP, caching, missing-path 404s, downloads and both themes.
 For rollback, choose the previous reviewed deployment in Cloudflare; restore
