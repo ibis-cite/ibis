@@ -37,7 +37,7 @@ After fetching, run `node website/deploy.mjs` for a read-only connection/build
 preflight, then `node website/deploy.mjs --publish`. It refuses a dirty checkout
 or a commit different from origin/main, builds dist, checks the remote real
 path, archives the existing site outside its public root, downloads that archive
-privately, then syncs only dist (including dotfiles). Upload failure keeps the
+privately, then syncs only dist (including dotfiles), without deleting unknown remote files or subfolders. Upload failure keeps the
 backup. A final checksum dry run must find no differences. It logs no connection
 details. SSH and rsync must already be available; this creates no accounts.
 To roll back, extract the retained archive into a private folder, inspect it,

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile, readdir, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { test } from "node:test";
 import { build } from "../website/build.mjs";
 
@@ -16,7 +17,7 @@ test("public build copies canonical tokens, keys and only allowlisted assets", a
     await build(output, source);
     assert.deepEqual((await readdir(output)).sort(), [".htaccess", "assets", "index.html", "keys.js", "site.js", "style.css", "tokens.css"]);
     assert.equal(await readFile(join(output, "tokens.css"), "utf8"), await readFile(new URL("../apps/desktop/src/tokens.css", import.meta.url), "utf8"));
-    const keys = await import(`file://${join(output, "keys.js")}`);
+    const keys = await import(pathToFileURL(join(output, "keys.js")).href);
     assert.equal(keys.keysFor("add"), "Shift+Enter");
     assert.ok(!/from ["']/.test(await readFile(join(output, "keys.js"), "utf8")), "keys have no runtime dependencies");
     const manifest = JSON.parse(await readFile(join(output, "assets/site.webmanifest"), "utf8"));
@@ -36,5 +37,5 @@ test("deployment refuses shell fragments, other domains and repository backups",
   assert.equal(deployment(env).host, "ibis-hosting");
   for (const patch of [{ IBIS_DEPLOY_HOST: "-oProxyCommand=bad" }, { IBIS_DEPLOY_HOST: "host;bad" },
     { IBIS_WEB_ROOT: "/home/synthetic/domains/example.org/public_html" }, { IBIS_WEB_ROOT: "/" },
-    { IBIS_BACKUP_DIR: new URL("../", import.meta.url).pathname }]) assert.throws(() => deployment({ ...env, ...patch }));
+    { IBIS_BACKUP_DIR: fileURLToPath(new URL("../", import.meta.url)) }]) assert.throws(() => deployment({ ...env, ...patch }));
 });

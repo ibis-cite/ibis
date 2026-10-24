@@ -1,5 +1,5 @@
 import { copyFile, mkdir, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { stripTypeScriptTypes } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -13,8 +13,8 @@ const PUBLIC = ["favicon.svg", "favicon.ico", "site.webmanifest", "ibis-quote-be
 // Build completely before replacing the owned output. The optional source is a test fixture.
 export async function build(output = join(source, "dist"), input = source) {
   output = resolve(output); input = resolve(input);
-  if (relative(output, input) === "" || !relative(output, input).startsWith("..") ||
-      (output.startsWith(root + "/") && output !== join(source, "dist"))) throw Error("Refusing to replace source files");
+  const inside = (parent, child) => { const p = relative(parent, child); return !p || (p !== ".." && !p.startsWith(".." + sep) && !isAbsolute(p)); };
+  if (inside(output, input) || (inside(root, output) && output !== join(source, "dist"))) throw Error("Refusing to replace source files");
   await mkdir(dirname(output), { recursive: true });
   const stage = await mkdtemp(join(dirname(output), ".ibis-build-"));
   try {
