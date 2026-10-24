@@ -5,10 +5,10 @@
 .picker input:focus-visible { border-radius: var(--r-row); }
 .picker select, .picker button, .draft button { min-height: var(--control-min-size); padding: var(--space-1) var(--space-2); border: var(--border-width) solid var(--stroke-control); border-radius: var(--r-control); background: var(--fill-control); color: var(--text); font: var(--type-meta-size)/var(--type-meta-line) var(--font-family); cursor: pointer; }
 .picker input::-webkit-search-cancel-button { appearance: none; }
-.picker .picker-clear { border: 0; background: none; color: var(--text); font-size: var(--type-heading-size); }
+.picker .picker-clear { display: grid; place-items: center; flex: none; width: var(--control-min-size); padding: 0; line-height: 1; border: 0; background: none; color: var(--text); font-size: var(--type-heading-size); }
 .picker button:disabled { color: var(--text-disabled); cursor: default; }
 .picker-meta { margin: 0; display: flex; justify-content: space-between; padding: var(--space-2) var(--row-pad); color: var(--muted); font-size: var(--type-label-size); }
-.picker-results { grid-template-columns: minmax(0, 1fr); list-style: none; display: grid; gap: var(--border-width); padding: 0 var(--inset) var(--inset); margin: 0; max-height: 18rem; overflow-y: auto; scrollbar-width: thin; }
+.picker-results { grid-template-columns: minmax(0, 1fr); list-style: none; display: grid; gap: var(--border-width); padding: 0 var(--inset) var(--inset); margin: 0; height: 18rem; align-content: start; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .pick { position: relative; display: flex; align-items: center; gap: var(--row-gap); min-height: var(--row-comfortable); padding: var(--space-2) var(--row-pad); border-radius: var(--r-row); color: var(--text); cursor: pointer; }
 .pick.is-selected { background: var(--row-active-background); color: var(--row-active-text); }
 .pick .tile { position: relative; flex: none; display: grid; place-items: center; width: var(--tile-size); height: var(--tile-size); padding: 0; border: 0; border-radius: var(--r-tile); background: var(--tile-background); color: var(--muted); }
@@ -30,8 +30,8 @@
 .picker-shelf [role="status"] { flex: none; margin-left: auto; color: var(--citation); font: var(--type-strong-weight) var(--type-meta-size)/1 var(--font-family); }
 .picker-empty { padding: var(--space-4); }
 :root[data-platform="windows"] .pick.is-selected::before { content: ""; position: absolute; left: var(--space-1); width: var(--pill-width); height: var(--pill-height); border-radius: var(--r-full); background: var(--accent); }
-@media (hover: hover) { .pick:not(.is-selected):hover { background: var(--fill-subtle-hover); } .picker button:not(.tile):not(:disabled):hover, .draft button:hover { background: var(--fill-control-hover); } }
-.picker button:not(.tile):active, .draft button:active { background: var(--fill-control-pressed); }
+@media (hover: hover) { .pick:not(.is-selected):hover { background: var(--fill-subtle-hover); } .picker button:not(.tile):not(.picker-clear):not(:disabled):hover, .draft button:hover { background: var(--fill-control-hover); } }
+.picker button:not(.tile):not(.picker-clear):active, .draft button:active { background: var(--fill-control-pressed); }
 @media (pointer: coarse) { .picker button, .picker select, .draft button { min-height: var(--touch-target); } }
 .platform-switch { color: var(--muted); font: var(--type-title-size)/1.5 var(--font-family); }
 .platform-switch button { min-height: 0; padding: .25em 0; border: 0; background: var(--clear); color: var(--citation); font: inherit; text-decoration: underline; cursor: pointer; }

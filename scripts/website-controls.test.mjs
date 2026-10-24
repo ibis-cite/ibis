@@ -36,26 +36,29 @@ test("appearance is applied before paint; both controls sync, persist and reset 
   assert.equal(context("untrusted").ctx.document.documentElement.dataset.theme, undefined);
 });
 
-test("navigation updates one current chip and scrolls it only when the section changes", () => {
-  const { ctx, media } = context(); media.matches = true;
-  const names = ["how", "download", "setup", "roadmap", "why", "shape"], frames = [], handlers = {};
-  const calls = [];
-  const links = names.map(name => ({ attrs: {}, getAttribute: () => `#${name}`, hasAttribute(k) { return k in this.attrs; },
-    setAttribute(k, v) { this.attrs[k] = v; }, removeAttribute(k) { delete this.attrs[k]; }, querySelector: () => ({ scrollIntoView: args => calls.push([name, args]) }) }));
-  const bar = { scrollLeft: 0, clientWidth: 200, scrollWidth: 600, addEventListener() {}, toggleAttribute() {} };
+test("navigation updates one current chip, scrolls only the chip bar, and keeps a followed link current", () => {
+  const { ctx } = context();
+  const names = ["how", "download", "setup", "roadmap", "why", "shape"], frames = [], handlers = {}, clicks = [];
+  const links = names.map((name, index) => ({ attrs: {}, getAttribute: () => `#${name}`, hasAttribute(k) { return k in this.attrs; },
+    setAttribute(k, v) { this.attrs[k] = v; }, removeAttribute(k) { delete this.attrs[k]; },
+    getBoundingClientRect: () => ({ left: index * 100 - bar.scrollLeft, right: index * 100 + 80 - bar.scrollLeft }) }));
+  const bar = { scrollLeft: 0, clientWidth: 200, scrollWidth: 600, addEventListener() {}, toggleAttribute() {}, getBoundingClientRect: () => ({ left: 0, right: 200 }) };
   ctx.window = { scrollY: 0, innerHeight: 1000, addEventListener: (name, fn) => { handlers[name] = fn; } };
   ctx.requestAnimationFrame = fn => frames.push(fn);
-  ctx.document.documentElement.scrollHeight = 7000;
+  ctx.document.documentElement.scrollHeight = 5400;
+  ctx.document.addEventListener = (_name, fn) => clicks.push(fn);
   ctx.document.querySelectorAll = () => links;
-  ctx.document.querySelector = selector => selector === ".index nav ul" ? bar : { getBoundingClientRect: () => ({ top: names.indexOf(selector.slice(1)) * 1000 - ctx.window.scrollY }) };
-  ctx.navigation(); assert.equal(calls.length, 1);
-  ctx.window.scrollY = 1000; handlers.scroll(); handlers.scroll();
+  ctx.document.querySelector = selector => selector === ".index nav ul" ? bar : { id: selector.slice(1),
+    getBoundingClientRect: () => { const top = names.indexOf(selector.slice(1)) * 1000 - ctx.window.scrollY; return { top, bottom: top + 900 }; } };
+  const current = () => links.filter(link => link.hasAttribute("aria-current")).map(link => link.getAttribute());
+  ctx.navigation(); assert.deepEqual(current(), ["#how"]); assert.equal(bar.scrollLeft, 0);
+  ctx.window.scrollY = 3000; handlers.scroll(); handlers.scroll();
   assert.equal(frames.length, 1); frames.shift()();
-  assert.equal(calls.at(-1)[0], "download");
-  assert.equal(calls.at(-1)[1].inline, "nearest"); assert.equal(calls.at(-1)[1].block, "nearest");
-  ctx.window.scrollY = 1010; handlers.scroll(); frames.shift()(); assert.equal(calls.length, 2);
-  ctx.window.scrollY = 6000; handlers.scroll(); frames.shift()(); assert.equal(calls.at(-1)[0], "shape");
-  assert.equal(links.filter(link => link.hasAttribute("aria-current")).length, 1);
+  assert.deepEqual(current(), ["#roadmap"]); assert.equal(bar.scrollLeft, 196, "the chip bar scrolls sideways to reveal the current chip");
+  ctx.window.scrollY = 4400; handlers.scroll(); frames.shift()(); assert.deepEqual(current(), ["#shape"], "the page end selects the last section");
+  clicks.forEach(fn => fn({ target: { closest: () => links[4] } })); handlers.scroll(); frames.shift()();
+  assert.deepEqual(current(), ["#why"], "a followed link stays current at the page end");
+  handlers.wheel(); handlers.scroll(); frames.shift()(); assert.deepEqual(current(), ["#shape"], "scrolling releases the followed link");
 });
 
 test("resizing into a tablet or phone restores all platform downloads", () => {
@@ -138,7 +141,10 @@ test("browser keeps navigation, keyboard selection and long output visible", { s
     await page.goto(url.href);
     const input = page.getByRole("combobox", { name: "Search the made-up library" }); await input.waitFor();
     const mac = await page.locator("html").getAttribute("data-platform") === "macos";
-    await page.getByRole("button", { name: "Clear search", exact: true }).click();
+    const clear = page.getByRole("button", { name: "Clear search", exact: true });
+    await clear.hover();
+    assert.equal(await clear.evaluate(e => getComputedStyle(e).backgroundColor), "rgba(0, 0, 0, 0)", "clear remains a quiet cross on hover");
+    await clear.click();
     assert.equal(await input.inputValue(), "");
     await page.locator(".pick").nth(0).click({ modifiers: [mac ? "Meta" : "Control"] });
     await page.locator(".pick .tile").nth(1).click();
