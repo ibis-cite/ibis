@@ -8,6 +8,7 @@ test("demo adds in order and captures copied output independently of later edits
   demo.add("okafor2021"); demo.add("okafor2023");
   assert.equal(demo.output(), "[@okafor2021; @okafor2023]");
   demo.copy(); demo.state.format = "cite";
+  assert.equal(demo.state.open, true, "website example stays available after copying");
   assert.equal(demo.output(), "\\cite{okafor2021,okafor2023}");
   demo.paste();
   assert.equal(demo.state.pasted, "[@okafor2021; @okafor2023]");
@@ -73,9 +74,9 @@ test("browser keeps navigation, keyboard selection and long output visible", { s
     assert.ok(fits, "keyboard-selected result stays inside the list");
     assert.ok(await page.locator(".picker-shelf").evaluate(e => e.scrollWidth <= e.clientWidth + 1));
     await input.press("Enter"); await page.getByRole("button", { name: "Paste in the sentence", exact: true }).click();
+    assert.equal(await input.isVisible(), true, "picker stays visible after pasting");
     assert.equal((await page.locator("[data-result]").textContent()).match(/@/g).length, 6);
     assert.ok(await page.locator("[data-result]").evaluate(e => e.scrollWidth <= e.clientWidth + 1));
-    await page.getByRole("button", { name: "Open the picker again" }).click();
     await page.emulateMedia({ forcedColors: "active" });
     assert.equal(await page.locator('.pick[aria-selected="true"]').evaluate(e => getComputedStyle(e).forcedColorAdjust), "none");
     await page.locator('.index nav a[href="#how"]').click();
