@@ -74,3 +74,26 @@ test("resizing into a tablet or phone restores all platform downloads", () => {
   media.matches = false; media.change(); assert.deepEqual(blocks.map(block => block.hidden), [true, true, false]);
   assert.equal(cta.textContent, "Get Ibis for Linux", "explicit platform choice survives a resize");
 });
+
+test("desktop sidebar remains clickable over every scrolled section", { skip: !process.env.IBIS_WEBSITE_URL }, async () => {
+  const url = new URL(process.env.IBIS_WEBSITE_URL);
+  assert.equal(url.protocol, "http:"); assert.equal(url.hostname, "127.0.0.1");
+  const { loadPlaywright } = await import("./gallery-contact-sheet.mjs");
+  const { chromium } = await loadPlaywright();
+  const browser = await chromium.launch({ executablePath: process.env.IBIS_CHROMIUM_EXECUTABLE });
+  try {
+    for (const width of [1180, 1440]) {
+      const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion: "no-preference" });
+      await page.goto(url.href);
+      for (const id of ["setup", "shape", "how", "roadmap", "download"]) {
+        await page.locator(`.index nav a[href="#${id}"]`).click({ timeout: 1500 });
+        await page.waitForFunction(id => location.hash === `#${id}`, id, { timeout: 1500 });
+        await page.waitForFunction(id => {
+          const top = document.querySelector(`#${id}`).getBoundingClientRect().top;
+          return top >= 0 && top < innerHeight / 2;
+        }, id, { timeout: 1500 });
+      }
+      await page.close();
+    }
+  } finally { await browser.close(); }
+});
