@@ -583,7 +583,8 @@ plain invitations to share a workflow or report a problem. No popularity
 claims, promises of dates, accent-bar callouts or disclosure controls.
 
 Put “Early preview” near the logo and limitations before downloads. Describe
-copying and pasting today, including APA, Chicago, Harvard, IEEE and MLA;
+copying and pasting keys first, with APA, Chicago, Harvard, IEEE and MLA after
+the example. Show a few major roadmap highlights without version numbers;
 insertion stays a plan until shipped. The demo uses invented references and
 says Ibis does not build the document bibliography. Setup stays short. Default
 shortcuts come from `keys.ts`, and the demo follows **Interaction**.
