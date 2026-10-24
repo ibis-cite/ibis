@@ -236,7 +236,7 @@ test("logo ink aligns, the app shortcut opens the example and sharing uses the b
     await page.waitForFunction(() => document.activeElement?.matches(".picker input"));
     assert.ok(await page.locator("[data-picker]").evaluate(e => { const r = e.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }), "the app shortcut brings the example into view");
     await page.getByRole("button", { name: "Share Ibis" }).click();
-    await page.getByRole("button", { name: "Link copied" }).waitFor();
+    await page.locator(".share-status", { hasText: "Link copied" }).waitFor();
     assert.equal(await page.evaluate(() => navigator.clipboard.readText()), "https://ibiscite.org/");
     await context.close();
   } finally { await browser.close(); }

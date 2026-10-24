@@ -603,8 +603,12 @@ from anywhere on the page, as the app does.
 "Early preview" names the released version from `.release-please-manifest.json`,
 linked to its release notes.
 The logo aligns by its ink, not its export clear space, with the text edge beside
-it. Sharing is one “Help shape it” row, with the system share glyph, that opens the
-browser share sheet or copies the link; there are no third-party share buttons, star counts or badges.
+it. The page closes with one line and two buttons: Star on GitHub (filled) and
+Share Ibis (outlined, system share glyph), which opens the browser share sheet
+or copies the link. No third-party share buttons, star counts or badges.
+Each section after the first opens with one larger lead sentence so a skimmer
+gets the point; detail follows at reading size. The footer rule meets the
+margin rule.
 The demo mirrors the shipped app. When a change alters what the demo shows
 (the picker, its keys, styles or paste), update the demo in the same pull
 request, and grow the demo as the app gains features worth showing.
