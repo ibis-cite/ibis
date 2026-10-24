@@ -605,6 +605,8 @@ linked to its release notes.
 The logo aligns by its ink, not its export clear space, with the text edge beside
 it. Sharing is one footer link that opens the browser share sheet or copies the
 link; there are no third-party share buttons, star counts or badges.
+A missing page shows the same quiet page with the logo, one line and a way
+home; it is never indexed, and neither are preview links.
 The web example keeps its picker visible after copying and pasting so visitors
 can try another reference; Escape can still close and reopen it.
 An underlined blank marks the paste position; after copying it becomes the

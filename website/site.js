@@ -98,6 +98,7 @@ function navigation() {
   window.addEventListener("scroll", schedule, { passive: true }); window.addEventListener("resize", schedule); show();
 }
 document.addEventListener("DOMContentLoaded", () => {
+  if (!document.querySelector(".index nav")) return; // Plain pages such as 404 need only the appearance applied above.
   appearance(); platforms(); navigation(); share();
   let lastMove = performance.now();
   const markMove = () => { lastMove = performance.now(); };
