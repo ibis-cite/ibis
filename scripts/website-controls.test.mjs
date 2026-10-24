@@ -107,5 +107,77 @@ test("desktop sidebar remains clickable over every scrolled section", { skip: !p
       await page.waitForFunction(() => location.hash === "#how");
       await page.close();
     }
+    const page = await browser.newPage({ viewport: { width: 1440, height: 360 }, reducedMotion: "no-preference" });
+    let release;
+    const held = new Promise(resolve => { release = resolve; });
+    await page.route("**/demo.js", async route => { await held; await route.continue(); });
+    await page.goto(url.href);
+    await page.locator('.index nav a[href="#shape"]').click();
+    await page.waitForFunction(() => Math.abs(document.querySelector("#shape").getBoundingClientRect().top - 24) < 1);
+    const before = await page.locator("#shape").evaluate(e => e.getBoundingClientRect().top);
+    release();
+    await page.getByRole("combobox", { name: "Search the made-up library" }).waitFor();
+    const after = await page.locator("#shape").evaluate(e => e.getBoundingClientRect().top);
+    assert.ok(Math.abs(after - before) < 2, `late demo enhancement preserves the reader's position: ${before} → ${after}`);
+    await page.close();
+  } finally { await browser.close(); }
+});
+
+test("browser keeps navigation, keyboard selection and long output visible", { skip: !process.env.IBIS_WEBSITE_URL }, async () => {
+  const url = new URL(process.env.IBIS_WEBSITE_URL);
+  assert.equal(url.protocol, "http:"); assert.equal(url.hostname, "127.0.0.1");
+  const { loadPlaywright } = await import("./gallery-contact-sheet.mjs");
+  const { chromium } = await loadPlaywright();
+  const browser = await chromium.launch({ executablePath: process.env.IBIS_CHROMIUM_EXECUTABLE });
+  try {
+    const page = await browser.newPage({ viewport: { width: 390, height: 600 }, colorScheme: "light", reducedMotion: "reduce" });
+    await page.goto(url.href);
+    const input = page.getByRole("combobox", { name: "Search the made-up library" }); await input.waitFor();
+    const mac = await page.locator("html").getAttribute("data-platform") === "macos";
+    await page.getByRole("button", { name: "Clear search", exact: true }).click();
+    assert.equal(await input.inputValue(), "");
+    await page.locator(".pick").nth(0).click({ modifiers: [mac ? "Meta" : "Control"] });
+    await page.locator(".pick .tile").nth(1).click();
+    assert.equal((await page.locator(".picker-shelf code").textContent()).match(/@/g).length, 2, "modifier-click and tile click combine references");
+    await page.locator(".pick .tile").nth(0).click(); await page.locator(".pick .tile").nth(1).click();
+    assert.equal(await page.locator('.tile[aria-pressed="true"]').count(), 0);
+    assert.match(await page.locator(".logo-light img").evaluate(e => e.currentSrc), /\/ibis-logo\.svg$/);
+    await page.mouse.move(300, 300); await page.mouse.wheel(0, 1200); await page.waitForTimeout(100);
+    const before = await page.evaluate(() => scrollY);
+    await page.mouse.wheel(0, 750); await page.waitForTimeout(100);
+    assert.equal(Math.round(await page.evaluate(() => scrollY) - before), 750, "chip updates preserve ordinary scrolling");
+    await input.fill(""); await input.press("ArrowDown");
+    assert.notEqual(await input.evaluate(e => getComputedStyle(e).outlineStyle), "none", "keyboard focus remains visible");
+    await input.press("Home");
+    const previewKey = { key: "i", ctrlKey: !mac, metaKey: mac, bubbles: true };
+    await input.dispatchEvent("keydown", previewKey);
+    assert.equal(await page.locator(".picker-shelf").isVisible(), false);
+    await input.dispatchEvent("keydown", { ...previewKey, repeat: true });
+    assert.equal(await page.locator(".picker-shelf").isVisible(), false, "held preview shortcut toggles once");
+    await input.dispatchEvent("keydown", previewKey);
+    // Start at the first result again, then add every invented reference.
+    await input.fill("x"); await input.fill("");
+    for (let i = 0; i < 6; i++) {
+      await input.press("Shift+Enter");
+      await input.dispatchEvent("keydown", { key: "Enter", shiftKey: true, repeat: true, bubbles: true });
+      assert.equal(await page.locator(".tile.is-added").count(), i + 1, "held Enter never toggles a reference twice");
+      if (i < 5) await input.press("ArrowDown");
+    }
+    const fits = await page.locator('.pick[aria-selected="true"]').evaluate(e => {
+      const row = e.getBoundingClientRect(), list = e.closest(".picker-results").getBoundingClientRect();
+      return row.top >= list.top - 1 && row.bottom <= list.bottom + 1;
+    });
+    assert.ok(fits, "keyboard-selected result stays inside the list");
+    assert.ok(await page.locator(".picker-shelf").evaluate(e => e.scrollWidth <= e.clientWidth + 1));
+    await input.press("Enter"); await page.getByRole("button", { name: "Paste in the sentence", exact: true }).click();
+    assert.equal(await input.isVisible(), true, "picker stays visible after pasting");
+    assert.equal((await page.locator("[data-result]").textContent()).match(/@/g).length, 6);
+    assert.ok(await page.locator("[data-result]").evaluate(e => e.scrollWidth <= e.clientWidth + 1));
+    await page.emulateMedia({ forcedColors: "active" });
+    assert.equal(await page.locator('.pick[aria-selected="true"]').evaluate(e => getComputedStyle(e).forcedColorAdjust), "none");
+    await page.locator('.index nav a[href="#how"]').click();
+    await page.waitForFunction(() => document.querySelector('.index nav a[href="#how"]').hasAttribute("aria-current"));
+    assert.equal(await page.locator('.index a[aria-current] .key').evaluate(e => getComputedStyle(e).forcedColorAdjust), "none");
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   } finally { await browser.close(); }
 });
