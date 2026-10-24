@@ -56,6 +56,32 @@ function platforms() {
   show(detected);
   matchMedia("(max-width: 61.99rem)").addEventListener("change", () => show(selected));
 }
+// The browser's own share sheet, or a copied link where there is none; no third-party buttons.
+function share() {
+  const button = document.querySelector(".share"), status = document.querySelector(".share-status"), url = "https://ibiscite.org/";
+  if (!button || !(navigator.share || navigator.clipboard)) return;
+  button.hidden = false;
+  button.addEventListener("click", async () => {
+    try {
+      if (navigator.share) await navigator.share({ title: "Ibis", text: document.querySelector("h1").textContent, url });
+      else { await navigator.clipboard.writeText(url); status.textContent = "Link copied"; setTimeout(() => { status.textContent = ""; }, 2000); }
+    } catch { /* Cancelled or blocked; nothing changed. */ }
+  });
+}
+// Hovering a chip cites it in each form Ibis copies: Pandoc, LaTeX, then Typst's bare key.
+function chips() {
+  if (!matchMedia("(hover: hover)").matches) return;
+  const still = matchMedia("(prefers-reduced-motion: reduce)");
+  for (const chip of document.querySelectorAll("main .key:not(code)")) {
+    const key = chip.textContent.slice(1), forms = [`[@${key}]`, `\\cite{${key}}`, `@${key}`];
+    let timer;
+    chip.addEventListener("pointerenter", () => {
+      let step = 0;
+      timer = setTimeout(function cycle() { chip.textContent = forms[step++ % forms.length]; if (!still.matches) timer = setTimeout(cycle, 900); }, 150);
+    });
+    chip.addEventListener("pointerleave", () => { clearTimeout(timer); chip.textContent = `@${key}`; });
+  }
+}
 function navigation() {
   const links = [...document.querySelectorAll('.index nav a[href^="#"]')];
   const targets = links.map(link => document.querySelector(link.getAttribute("href")));
@@ -87,7 +113,8 @@ function navigation() {
 }
 document.addEventListener("DOMContentLoaded", () => {
   if (!document.querySelector(".index nav")) return; // Plain pages such as 404 need only the appearance applied above.
-  appearance(); platforms(); navigation();
+  appearance(); platforms(); navigation(); share(); chips();
+  console.info("Curious how this page works? Ibis is open source: https://github.com/ibiscite/ibis");
   let lastMove = performance.now();
   const markMove = () => { lastMove = performance.now(); };
   window.addEventListener("scroll", markMove, { passive: true }); window.addEventListener("hashchange", markMove);
