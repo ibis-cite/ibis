@@ -14,7 +14,7 @@ exports into `website/dist`. Build and publish only after the page and demo
 slices have merged. Check with `node --test scripts/website.test.mjs` and
 `node scripts/style-lint.mjs`.
 
-The optional browser regression in `scripts/website-demo.test.mjs` runs when
+The optional browser regressions in `scripts/website-controls.test.mjs` run when
 `IBIS_WEBSITE_URL` points to the loopback preview above; it uses the existing
 Playwright runtime (`IBIS_CHROMIUM_EXECUTABLE` can select its browser).
 

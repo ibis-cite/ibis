@@ -11,11 +11,12 @@ function icon(kind) {
 export function setupDemo() {
   const figure = document.querySelector("[data-picker]"), result = document.querySelector("[data-result]");
   if (!figure || !result) return;
-  const preserve = figure.getBoundingClientRect().bottom < 0, anchorTop = result.getBoundingClientRect().top;
+  const section = figure.closest("section"), anchorBottom = section.getBoundingClientRect().bottom;
   const model = createDemo(), state = model.state, mac = document.documentElement.dataset.platform === "macos";
   const sentence = result.firstChild.textContent.trim();
   result.tabIndex = -1;
   const input = el("input", { type: "search", value: state.query, placeholder: "Search references", autocomplete: "off" });
+  const clear = el("button", { type: "button", className: "picker-clear", textContent: "×" }); clear.setAttribute("aria-label", "Clear search");
   for (const [key, value] of Object.entries({ role: "combobox", "aria-label": "Search the made-up library", "aria-autocomplete": "list", "aria-controls": "demo-results", "aria-expanded": "true" })) input.setAttribute(key, value);
   const select = el("select", {}, ...Object.entries(formats).map(([value, label]) => el("option", { value, textContent: label })));
   select.setAttribute("aria-label", "Copy format");
@@ -27,20 +28,20 @@ export function setupDemo() {
   const reopen = el("button", { type: "button", textContent: "Open the picker again", hidden: true });
   const hint = el("p", { className: "demo-hint" });
   const labels = { copy: "copy", add: "add", move: "choose", escape: "step back", preview: "show output" };
-  hint.textContent = "Click selects; double-click copies. " + KEY_TABLE.filter(row => labels[row.action]).map(row => `${row.keys.map(key => keyLabel(key, mac)).join(" / ")} ${labels[row.action]}`).join(" · ") + ".";
+  hint.textContent = "Click a row to choose; double-click to copy. Click its tile or use Add to combine references. " + KEY_TABLE.filter(row => labels[row.action]).map(row => `${row.keys.map(key => keyLabel(key, mac)).join(" / ")} ${labels[row.action]}`).join(" · ") + ".";
   const shelf = el("div", { className: "picker-shelf" }, el("img", { src: "assets/ibis-quote-beak.svg", alt: "", width: 22, height: 19 }), output);
-  const panel = el("div", { className: "picker-panel" }, el("div", { className: "picker-search" }, input, select),
+  const panel = el("div", { className: "picker-panel" }, el("div", { className: "picker-search" }, input, clear, select),
     el("p", { className: "picker-meta" }, "Best matches", count), list, shelf,
     el("div", { className: "picker-foot" }, el("span", {}, "sample.bib · 6 invented references"), add, copy));
   const empty = el("li", { textContent: "Nothing matches. Try an author, title, year or journal.", className: "picker-empty" });
   empty.setAttribute("role", "none"); list.append(empty);
   const rows = new Map(references.map((ref, index) => {
-    const tile = el("span", { className: "tile" }, icon(ref.kind));
+    const tile = el("button", { type: "button", className: "tile", tabIndex: -1 }, icon(ref.kind));
     const row = el("div", { id: `demo-ref-${index}`, className: "pick", title: `${ref.title} · ${ref.authors} · ${ref.year} · ${ref.key}` }, tile,
       el("span", { className: "ref" }, el("strong", { textContent: ref.title }), el("span", { className: "sub", textContent: `${ref.authors} · ${ref.where}` })), el("span", { textContent: String(ref.year) }));
     row.setAttribute("role", "option");
-    row.addEventListener("click", event => { state.selected = model.found().indexOf(ref); if (commandKey(event, mac)) model.add(ref.key); render(); input.focus(); });
-    row.addEventListener("dblclick", event => { if (!commandKey(event, mac)) performCopy(); });
+    row.addEventListener("click", event => { state.selected = model.found().indexOf(ref); if (commandKey(event, mac) || event.target.closest(".tile")) model.add(ref.key); render(); input.focus(); });
+    row.addEventListener("dblclick", event => { if (!commandKey(event, mac) && !event.target.closest(".tile")) performCopy(); });
     const item = el("li", {}, row); item.setAttribute("role", "none"); list.append(item);
     return [ref.key, { row, item, tile, ref }];
   }));
@@ -48,12 +49,14 @@ export function setupDemo() {
     const found = model.found(); state.selected = Math.max(0, Math.min(state.selected, found.length - 1));
     const current = found[state.selected], value = model.output();
     input.value = state.query; panel.hidden = !state.open; reopen.hidden = state.open; shelf.hidden = !state.preview;
+    clear.hidden = !state.query;
     input.setAttribute("aria-expanded", String(state.open));
     count.textContent = `${found.length} ${found.length === 1 ? "result" : "results"}`;
     for (const { row, item, tile, ref } of rows.values()) {
       item.hidden = !found.includes(ref); const selected = ref === current;
       row.classList.toggle("is-selected", selected); row.setAttribute("aria-selected", String(selected));
       const added = state.added.includes(ref.key); tile.classList.toggle("is-added", added); tile.replaceChildren(added ? "✓" : icon(ref.kind));
+      tile.setAttribute("aria-label", `${added ? "Remove" : "Add"} ${ref.title}${added ? " from" : " to"} citation`); tile.setAttribute("aria-pressed", String(added));
       row.setAttribute("aria-label", `${ref.title}, ${ref.authors}, ${ref.year}, ${ref.where}${added ? ", added to citation" : ""}`);
     }
     empty.hidden = found.length > 0;
@@ -67,6 +70,7 @@ export function setupDemo() {
   }
   function performCopy() { if (model.copy()) { render(); paste.focus(); } }
   input.addEventListener("input", () => { state.query = input.value; state.selected = 0; render(); list.scrollTop = 0; });
+  clear.addEventListener("click", () => { state.query = ""; state.selected = 0; render(); list.scrollTop = 0; input.focus(); });
   select.addEventListener("change", () => { state.format = select.value; render(); input.focus(); });
   copy.addEventListener("click", performCopy);
   add.addEventListener("click", () => { const ref = model.found()[state.selected]; if (ref) model.add(ref.key); render(); });
@@ -94,5 +98,5 @@ export function setupDemo() {
   });
   figure.querySelector(".picker-panel").replaceWith(panel);
   figure.append(status, reopen, hint); render();
-  if (preserve) window.scrollBy({ top: result.getBoundingClientRect().top - anchorTop, behavior: "instant" });
+  if (anchorBottom < 0) window.scrollBy({ top: section.getBoundingClientRect().bottom - anchorBottom, behavior: "instant" });
 }
