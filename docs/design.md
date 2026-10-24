@@ -598,6 +598,8 @@ explain internal names such as “Insertion” in words a new visitor understand
 Insertion stays a plan until shipped. The demo uses invented references and
 says Ibis does not build the document bibliography. Setup stays short. Default
 shortcuts come from `keys.ts`, and the demo follows **Interaction**.
+The app's default shortcut (⌃⌘R, or Ctrl+Shift+Y) opens and focuses the example
+from anywhere on the page, as the app does.
 The logo aligns by its ink, not its export clear space, with the text edge beside
 it. Sharing is one footer link that opens the browser share sheet or copies the
 link; there are no third-party share buttons, star counts or badges.

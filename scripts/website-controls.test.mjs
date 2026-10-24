@@ -215,7 +215,7 @@ test("browser keeps navigation, keyboard selection and long output visible", { s
   } finally { await browser.close(); }
 });
 
-test("logo ink aligns with the sidebar edge and sharing uses the browser", { skip: !process.env.IBIS_WEBSITE_URL }, async () => {
+test("logo ink aligns, the app shortcut opens the example and sharing uses the browser", { skip: !process.env.IBIS_WEBSITE_URL }, async () => {
   const { loadPlaywright } = await import("./gallery-contact-sheet.mjs");
   const { chromium } = await loadPlaywright();
   const browser = await chromium.launch({ executablePath: process.env.IBIS_CHROMIUM_EXECUTABLE });
@@ -229,6 +229,10 @@ test("logo ink aligns with the sidebar edge and sharing uses the browser", { ski
       return [logo.right - logo.width * .0513, document.querySelector(".index nav .key").getBoundingClientRect().right];
     });
     assert.ok(Math.abs(ink - chip) <= 1.5, `wordmark ink ${ink} aligns with chips ${chip}`);
+    await page.locator(".demo-hint").waitFor();
+    await page.keyboard.press("Control+Shift+Y");
+    await page.waitForFunction(() => document.activeElement?.matches(".picker input"));
+    assert.ok(await page.locator("[data-picker]").evaluate(e => { const r = e.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }), "the app shortcut brings the example into view");
     await page.getByRole("button", { name: "Share Ibis" }).click();
     await page.getByRole("button", { name: "Link copied" }).waitFor();
     assert.equal(await page.evaluate(() => navigator.clipboard.readText()), "https://ibiscite.org/");
