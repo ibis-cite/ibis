@@ -2,7 +2,7 @@
   "name": "ibis-website",
   "compatibility_date": "2026-10-23",
   "workers_dev": false,
-  "preview_urls": false,
+  "preview_urls": true,
   "assets": {
     "directory": "./website/dist",
     "not_found_handling": "none"
