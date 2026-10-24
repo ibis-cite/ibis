@@ -1,0 +1,22 @@
+{
+  "kind": "assembled synthetic candidate, not a production deployment",
+  "before": "candidate before sidebar stacking, functional row typography and key-first copy revisions",
+  "after": {
+    "page": "87fd9e7e",
+    "style": "d010c314",
+    "controls": "6af021ae",
+    "demo": "1baa43fe",
+    "palette": "3874a039"
+  },
+  "widths": [
+    1440,
+    1180,
+    820,
+    390
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "motion": "reduced for full-page stills; normal motion pointer regression tested separately"
+}
