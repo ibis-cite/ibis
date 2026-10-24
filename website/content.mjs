@@ -12,7 +12,7 @@ export async function content(html) {
     const version = row?.match(/\((0\.\d)/)?.[1];
     if (!row || !version || !roadmap.includes(`**${version} `)) throw Error(`Canonical roadmap item missing: ${name}`);
     const label = row.replace(/\s*\([^)]*\)/g, "");
-    return `<li><strong>${escape(label)}</strong><span>Planned for ${version}</span></li>`;
+    return `<li><strong>${escape(label)}</strong></li>`;
   });
   return html.replaceAll("{{headline}}", escape(headline)).replace("{{roadmap}}", `<ul class="roadmap">${plans.join("")}</ul>`);
 }
