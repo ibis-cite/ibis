@@ -605,6 +605,9 @@ linked to its release notes.
 The logo aligns by its ink, not its export clear space, with the text edge beside
 it. Sharing is one footer link that opens the browser share sheet or copies the
 link; there are no third-party share buttons, star counts or badges.
+The demo mirrors the shipped app. When a change alters what the demo shows
+(the picker, its keys, styles or paste), update the demo in the same pull
+request, and grow the demo as the app gains features worth showing.
 A missing page shows the same quiet page with the logo, one line and a way
 home; it is never indexed, and neither are preview links.
 The web example keeps its picker visible after copying and pasting so visitors
