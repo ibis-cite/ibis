@@ -44,7 +44,7 @@ and the gallery contrast preview, in that order. Light and dark come from
 |---|---|---|
 | Surfaces [D4] | `--surface-window` < `--surface` < `--surface-raised` < `--surface-overlay`; `--surface-field`, `--scrim` | Base, content sheet, band/cards/shelf, menus and dialogs. |
 | Text [D5] | `--text`, `--muted`, `--text-tertiary`, `--text-disabled` | `--muted` always 4.5:1; tertiary only for glyphs and hints at rest (3:1), never sentences. |
-| Accent [D6] | `--accent`, `--accent-text`, `--text-on-accent` | Always the system accent; Ibis offers no override. Text on the accent uses `--text-on-accent` at 4.5:1 or more; a platform pair that falls short is fixed in the token. |
+| Accent [D6] | `--accent`, `--accent-text`, `--text-on-accent` | Always the system accent; Ibis offers no override. Text on the accent uses `--text-on-accent`, which is the platform's own selected-text colour (white on macOS, Windows and GNOME), as native lists and menus do; it is never swapped for black. Ibis-owned accent fills (the primary button) meet 4.5:1 with it. |
 | Selection [D7] | `--row-active-*`, `--row-inactive-background`, `--selected-*` | See **Selection and focus**. |
 | Focus [D8] | `--focus-ring-*` | See **Selection and focus**. |
 | Fills | `--fill-control(-hover/-pressed)`, `--fill-subtle-*`, `--fill-primary-*`, `--fill-disabled` | Pressed is darker on macOS and GNOME, lighter on Windows. |
