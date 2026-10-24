@@ -1,0 +1,36 @@
+{
+  "source": "6302a02b5e87",
+  "browser": "Chromium 151.0.7922.34",
+  "viewport": {
+    "width": 720,
+    "height": 480
+  },
+  "scale": 1,
+  "rendered": [
+    "large/linux-dark/citation-segments",
+    "large/linux-dark/citation-segments-rtl",
+    "large/linux-light/citation-segments",
+    "large/linux-light/citation-segments-rtl",
+    "large/macos-dark/citation-segments",
+    "large/macos-dark/citation-segments-rtl",
+    "large/macos-light/citation-segments",
+    "large/macos-light/citation-segments-rtl",
+    "large/windows-dark/citation-segments",
+    "large/windows-dark/citation-segments-rtl",
+    "large/windows-light/citation-segments",
+    "large/windows-light/citation-segments-rtl",
+    "normal/linux-dark/citation-segments",
+    "normal/linux-dark/citation-segments-rtl",
+    "normal/linux-light/citation-segments",
+    "normal/linux-light/citation-segments-rtl",
+    "normal/macos-dark/citation-segments",
+    "normal/macos-dark/citation-segments-rtl",
+    "normal/macos-light/citation-segments",
+    "normal/macos-light/citation-segments-rtl",
+    "normal/windows-dark/citation-segments",
+    "normal/windows-dark/citation-segments-rtl",
+    "normal/windows-light/citation-segments",
+    "normal/windows-light/citation-segments-rtl"
+  ],
+  "failed": []
+}
