@@ -32,7 +32,7 @@
 .appearance-toggle { display: flex; align-items: center; gap: var(--space-2); }
 .appearance svg { width: var(--icon-glyph-size); height: var(--icon-glyph-size); fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; }
 .appearance-track { width: 2.25rem; padding: var(--space-1); border-radius: var(--r-full); background: var(--line); }
-.appearance-thumb { display: block; width: var(--space-3); height: var(--space-3); border-radius: var(--r-full); background: var(--surface-page); }
+.appearance-thumb { display: block; width: var(--space-3); height: var(--space-3); border-radius: var(--r-full); background: var(--surface); }
 .appearance-toggle[aria-checked="true"] .appearance-track { background: var(--text); }
 .appearance-toggle[aria-checked="true"] .appearance-thumb { translate: 1rem 0; }
 .appearance-system { text-decoration: underline; text-underline-offset: .2em; }
