@@ -44,7 +44,7 @@ and the gallery contrast preview, in that order. Light and dark come from
 |---|---|---|
 | Surfaces [D4] | `--surface-window` < `--surface` < `--surface-raised` < `--surface-overlay`; `--surface-field`, `--scrim` | Base, content sheet, band/cards/shelf, menus and dialogs. |
 | Text [D5] | `--text`, `--muted`, `--text-tertiary`, `--text-disabled` | `--muted` always 4.5:1; tertiary only for glyphs and hints at rest (3:1), never sentences. |
-| Accent [D6] | `--accent`, `--accent-text`, `--text-on-accent` | Always the system accent; Ibis offers no override. Text on the accent uses `--text-on-accent`, which is the platform's own selected-text colour (white on macOS, Windows and GNOME), as native lists and menus do; it is never swapped for black. Ibis-owned accent fills (the primary button) meet 4.5:1 with it. |
+| Accent [D6] | `--accent`, `--accent-text`, `--text-on-accent` | Always the system accent; Ibis offers no override. Selected rows and the menu highlight use `--selected-text`, the platform's own selected-text colour (white), as native lists do; never black. `--text-on-accent` (primary button, tiles on the accent) is picked per accent to reach 4.5:1. |
 | Selection [D7] | `--row-active-*`, `--row-inactive-background`, `--selected-*` | See **Selection and focus**. |
 | Focus [D8] | `--focus-ring-*` | See **Selection and focus**. |
 | Fills | `--fill-control(-hover/-pressed)`, `--fill-subtle-*`, `--fill-primary-*`, `--fill-disabled` | Pressed is darker on macOS and GNOME, lighter on Windows. |
@@ -132,7 +132,7 @@ drawn glyph. Controls in one bar share a centre line, text a baseline.
 |---|---|---|
 | `--inset` | 8 px on every OS | [C1] |
 | `--row-pad` / `--row-gap` | 12 px / 12 px | Row side padding; tile to text. |
-| `--tile-size` / `--icon-size` | 32 px / 20 px | Compact draws a 24 px tile with no fill, centred in the column. |
+| `--tile-size` / `--icon-glyph-size` | 32 px / 20 px | Compact draws a 24 px tile with no fill, centred in the column. |
 | Footer | 40 px | 24 px actions + 2S; Windows and GNOME add a 1 px top divider outside it. |
 | Smallest target | 32 px, 44 px on touch | A smaller drawn control keeps the target with `::before`. |
 
@@ -202,7 +202,7 @@ fields show words and an icon, never a red ring.
 | | Pointer over it | Chosen or current | Keyboard focus |
 |---|---|---|---|
 | Result row | Quiet tint | The selected-row fill | The same fill; never a ring |
-| Menu item | The menu highlight | Leading check | The menu highlight; never a ring |
+| Menu item | The menu highlight | Leading check (format) or trailing check (More toggles) | The menu highlight; never a ring |
 | Segmented choice | Quiet tint | Raised thumb on a recessed track | Ring around the group |
 | Pop-up button, More | Quiet fill | Pressed fill while open | Ring |
 | Buttons | One step darker | Primary: accent fill with `--text-on-accent` | Ring |
@@ -233,10 +233,11 @@ readers hear title, first author, year, container, type and why it matched.
 **Menus** [C9]. The operating system's own menus only where the system owns
 them: menu bar, tray and native right-click (ADR 0021). In-window menus (format,
 library scope, More) are Ibis's but match native metrics: `--r-menu`,
-`--menu-pad`, items padded 10 px on both sides and at least 32 px high,
+`--menu-pad`, items padded 10 px on both sides, `--menu-item-height` high (28 px macOS, 32 px Windows and GNOME),
 separators inset 10 px with 4 px above and below, native open and close motion.
-A leading check column only when an item in that menu can be checked (the
-format menu), never in More. The format menu's filter field aligns with the item
+A leading check column only in a menu whose items are a choice (the format
+menu). More starts at its labels; its toggles are `menuitemcheckbox` items with
+a trailing check. The format menu's filter field aligns with the item
 labels; menus with more than seven items get one. Format opens 4 px below its
 pop-up, aligned to its trailing edge; header menus open `bottom end`, footer
 menus `top end`, flipping then shifting within 8 px of the window. A shortcut in
@@ -352,8 +353,11 @@ it. On copy the shelf shows a closing beak and "Copied" at the line end.
   copy keys.", no Enter hint. Stale: a Look icon, "The library changed. Reading
   it again…". Warnings: a trailing pill ("1 warning", "Numbers may change").
 - **Show what will be pasted.** On by default (`show_paste_preview`, ADR 0020),
-  ⌘I / Ctrl+I, in More until Settings exists. Off hides only the line; the
-  chosen references and copy readiness stay.
+  ⌘I / Ctrl+I, in More until Settings exists. Off hides only the line and
+  closes the wide pane; the chosen references and copy readiness stay. If the
+  output had focus, Search receives it first. Copied while the window is kept
+  open says "Copied" without repeating text only when the visible output is
+  exactly the copied string.
 - **Per OS** [C13]. A tint on the macOS glass, a stroked card on Windows,
   full-bleed between dividers on GNOME. Without room it scrolls in its own area,
   keeping 24 px of results reachable.
