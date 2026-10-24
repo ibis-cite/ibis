@@ -1,0 +1,242 @@
+[
+  {
+    "width": 1440,
+    "overflow": 0,
+    "bg": "rgb(255, 255, 255)",
+    "heroGap": 88,
+    "sectionGap": 88,
+    "reading": {
+      "left": 434.390625,
+      "right": 1122.390625,
+      "top": 100,
+      "bottom": 556.90625,
+      "width": 688
+    },
+    "nav": {
+      "left": 98.390625,
+      "right": 370.390625,
+      "top": 249.90625,
+      "bottom": 516.53125,
+      "width": 272
+    },
+    "themePlaces": [
+      "flex",
+      "none"
+    ],
+    "currentVisible": true,
+    "switched": "dark",
+    "reset": null,
+    "theme": "light",
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "overflow": 0,
+    "bg": "rgb(17, 17, 17)",
+    "heroGap": 88,
+    "sectionGap": 88,
+    "reading": {
+      "left": 434.390625,
+      "right": 1122.390625,
+      "top": 100,
+      "bottom": 556.90625,
+      "width": 688
+    },
+    "nav": {
+      "left": 98.390625,
+      "right": 370.390625,
+      "top": 249.90625,
+      "bottom": 516.53125,
+      "width": 272
+    },
+    "themePlaces": [
+      "flex",
+      "none"
+    ],
+    "currentVisible": true,
+    "switched": "light",
+    "reset": null,
+    "theme": "dark",
+    "errors": []
+  },
+  {
+    "width": 1180,
+    "overflow": 0,
+    "bg": "rgb(255, 255, 255)",
+    "heroGap": 88,
+    "sectionGap": 88,
+    "reading": {
+      "left": 366.390625,
+      "right": 1054.390625,
+      "top": 100,
+      "bottom": 535,
+      "width": 688
+    },
+    "nav": {
+      "left": 41.296875,
+      "right": 313.296875,
+      "top": 249.90625,
+      "bottom": 516.53125,
+      "width": 272
+    },
+    "themePlaces": [
+      "flex",
+      "none"
+    ],
+    "currentVisible": true,
+    "switched": "dark",
+    "reset": null,
+    "theme": "light",
+    "errors": []
+  },
+  {
+    "width": 1180,
+    "overflow": 0,
+    "bg": "rgb(17, 17, 17)",
+    "heroGap": 88,
+    "sectionGap": 88,
+    "reading": {
+      "left": 366.390625,
+      "right": 1054.390625,
+      "top": 100,
+      "bottom": 535,
+      "width": 688
+    },
+    "nav": {
+      "left": 41.296875,
+      "right": 313.296875,
+      "top": 249.90625,
+      "bottom": 516.53125,
+      "width": 272
+    },
+    "themePlaces": [
+      "flex",
+      "none"
+    ],
+    "currentVisible": true,
+    "switched": "light",
+    "reset": null,
+    "theme": "dark",
+    "errors": []
+  },
+  {
+    "width": 820,
+    "overflow": 0,
+    "bg": "rgb(255, 255, 255)",
+    "heroGap": 65.59375,
+    "sectionGap": 65.59375,
+    "reading": {
+      "left": 70.6875,
+      "right": 749.3125,
+      "top": 235.984375,
+      "bottom": 660.796875,
+      "width": 678.625
+    },
+    "nav": {
+      "left": 42,
+      "right": 778,
+      "top": 131.796875,
+      "bottom": 195.984375,
+      "width": 736
+    },
+    "themePlaces": [
+      "none",
+      "flex"
+    ],
+    "currentVisible": true,
+    "switched": "dark",
+    "reset": null,
+    "theme": "light",
+    "errors": []
+  },
+  {
+    "width": 820,
+    "overflow": 0,
+    "bg": "rgb(17, 17, 17)",
+    "heroGap": 65.59375,
+    "sectionGap": 65.59375,
+    "reading": {
+      "left": 70.6875,
+      "right": 749.3125,
+      "top": 235.984375,
+      "bottom": 660.796875,
+      "width": 678.625
+    },
+    "nav": {
+      "left": 42,
+      "right": 778,
+      "top": 131.796875,
+      "bottom": 195.984375,
+      "width": 736
+    },
+    "themePlaces": [
+      "none",
+      "flex"
+    ],
+    "currentVisible": true,
+    "switched": "light",
+    "reset": null,
+    "theme": "dark",
+    "errors": []
+  },
+  {
+    "width": 390,
+    "overflow": 0,
+    "bg": "rgb(255, 255, 255)",
+    "heroGap": 64,
+    "sectionGap": 64,
+    "reading": {
+      "left": 20,
+      "right": 370,
+      "top": 219.984375,
+      "bottom": 863.28125,
+      "width": 350
+    },
+    "nav": {
+      "left": 0,
+      "right": 390,
+      "top": 123.796875,
+      "bottom": 187.984375,
+      "width": 390
+    },
+    "themePlaces": [
+      "none",
+      "flex"
+    ],
+    "currentVisible": true,
+    "switched": "dark",
+    "reset": null,
+    "theme": "light",
+    "errors": []
+  },
+  {
+    "width": 390,
+    "overflow": 0,
+    "bg": "rgb(17, 17, 17)",
+    "heroGap": 64,
+    "sectionGap": 64,
+    "reading": {
+      "left": 20,
+      "right": 370,
+      "top": 219.984375,
+      "bottom": 863.28125,
+      "width": 350
+    },
+    "nav": {
+      "left": 0,
+      "right": 390,
+      "top": 123.796875,
+      "bottom": 187.984375,
+      "width": 390
+    },
+    "themePlaces": [
+      "none",
+      "flex"
+    ],
+    "currentVisible": true,
+    "switched": "light",
+    "reset": null,
+    "theme": "dark",
+    "errors": []
+  }
+]

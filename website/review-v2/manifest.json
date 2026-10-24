@@ -1,0 +1,21 @@
+{
+  "kind": "assembled synthetic candidate, browser render",
+  "before": "retained draft 6f127e6a",
+  "sources": {
+    "build": "d0cf2129",
+    "palette": "3874a039",
+    "primitives": "632228bd",
+    "page": "1761a247",
+    "controls": "e7ad4fb9",
+    "demo": "final reviewed source follows"
+  },
+  "files": {
+    "index.html": "b6e91fb8898e54becdbeb141e38a8e2c5e03f547c24e71c0ac9274ee362a0e80",
+    "tokens.css": "73694de2ba2bd0d3261c65915b69e55bfa2342dd9e83bd3bf22bd72488134efb",
+    "style.css": "6cc56f32cd08df5e75f8f35d8308f57e31e6f7c032c5e211b90ec0776de2dc78",
+    "site.js": "cdf382079dc87206c90666d1df7731b5ad99fe1099621f5c36a53d2cd783636b",
+    "demo.css": "7199245a526157d7eb2f5c1cce9232694f5cdd237a89000f7ad4768b24388676",
+    "demo.js": "192c84d4086b923f788133742c5c1f2f53148417ad24a9910ef43dd7c4806e0b",
+    "demo-model.mjs": "9af5a7ec4ebadb38850d14e89708535add824c2d65d897def1770fc759ae0588"
+  }
+}
