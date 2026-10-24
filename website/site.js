@@ -60,7 +60,7 @@ function navigation() {
   const links = [...document.querySelectorAll('.index nav a[href^="#"]')];
   const targets = links.map(link => document.querySelector(link.getAttribute("href")));
   const bar = document.querySelector(".index nav ul");
-  const edge = () => bar.toggleAttribute("data-at-end", bar.scrollLeft + bar.clientWidth >= bar.scrollWidth - 1);
+  const edge = () => { bar.toggleAttribute("data-at-end", bar.scrollLeft + bar.clientWidth >= bar.scrollWidth - 1); bar.toggleAttribute("data-at-start", bar.scrollLeft <= 1); };
   bar.addEventListener("scroll", edge, { passive: true });
   window.addEventListener("resize", edge); edge();
   let pending = false;

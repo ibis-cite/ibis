@@ -597,7 +597,9 @@ shortcuts come from `keys.ts`, and the demo follows **Interaction**.
 The web example keeps its picker visible after copying and pasting so visitors
 can try another reference; Escape can still close and reopen it.
 An underlined blank marks the paste position; after copying it becomes the
-keyboard-accessible “Paste here” target, then the copied key lands there.
+keyboard-accessible dashed scarlet “Paste” chip with the platform paste shortcut,
+then the copied key lands there. Copying again keeps the old pasted citation until
+the next paste replaces it. Copy/paste feedback sits beside the shelf output.
 
 Offer the visitor's platform first while keeping the others reachable; phones
 and tablets see all platforms. Downloads keep the fixed GitHub `stable` URLs.
