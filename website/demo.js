@@ -24,7 +24,8 @@ export function setupDemo() {
   list.setAttribute("role", "listbox"); list.setAttribute("aria-label", "Best matches");
   const count = el("span"), output = el("code"), status = el("span"); status.setAttribute("role", "status");
   const copy = el("button", { type: "button", textContent: "Copy" }), add = el("button", { type: "button", textContent: "Add" });
-  const paste = el("button", { type: "button", textContent: "Paste in the sentence" });
+  const paste = el("button", { type: "button", className: "paste-target", textContent: "Paste here" });
+  paste.setAttribute("aria-label", "Paste the copied citation into this example");
   const reopen = el("button", { type: "button", textContent: "Open the picker again", hidden: true });
   const hint = el("p", { className: "demo-hint" });
   const labels = { copy: "copy", add: "add", move: "choose", escape: "step back", preview: "show output" };
@@ -65,7 +66,7 @@ export function setupDemo() {
     copy.disabled = !value; copy.textContent = `Copy as ${formats[state.format]} ${keyLabel(keysFor("copy"), mac)}`;
     add.disabled = !current; add.textContent = current && state.added.includes(current.key) ? "Remove" : "Add";
     paste.hidden = !state.copied || Boolean(state.pasted);
-    if (!state.copied) result.textContent = `${sentence}.`;
+    if (!state.copied) result.replaceChildren(`${sentence} `, el("span", { className: "paste-gap", ariaHidden: "true", textContent: "\u00a0" }), ".");
     else result.replaceChildren(`${sentence} `, state.pasted ? el("code", { className: "key", textContent: state.pasted }) : paste, ".");
   }
   function performCopy() { if (model.copy()) { render(); paste.focus(); } }

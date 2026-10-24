@@ -29,8 +29,8 @@
 .picker > [role="status"] { min-height: var(--type-meta-line); }
 .picker-empty { padding: var(--space-4); }
 :root[data-platform="windows"] .pick.is-selected::before { content: ""; position: absolute; left: var(--space-1); width: var(--pill-width); height: var(--pill-height); border-radius: var(--r-full); background: var(--accent); }
-@media (hover: hover) { .pick:not(.is-selected):hover { background: var(--fill-subtle-hover); } .picker button:not(:disabled):hover, .draft button:hover { background: var(--fill-control-hover); } }
-.picker button:active, .draft button:active { background: var(--fill-control-pressed); }
+@media (hover: hover) { .pick:not(.is-selected):hover { background: var(--fill-subtle-hover); } .picker button:not(.tile):not(:disabled):hover, .draft button:hover { background: var(--fill-control-hover); } }
+.picker button:not(.tile):active, .draft button:active { background: var(--fill-control-pressed); }
 @media (pointer: coarse) { .picker button, .picker select, .draft button { min-height: var(--touch-target); } }
 .platform-switch { color: var(--muted); font: var(--type-title-size)/1.5 var(--font-family); }
 .platform-switch button { min-height: var(--touch-target); border: 0; background: var(--clear); color: var(--citation); font: inherit; text-decoration: underline; cursor: pointer; }
@@ -45,3 +45,6 @@
 .picker-shelf code { min-width: 0; flex: 1; white-space: pre-wrap; overflow-wrap: anywhere; }
 .picker-shelf img { flex: none; }
 .draft code { display: inline; white-space: normal; overflow-wrap: anywhere; }
+.paste-gap, .draft .paste-target { display: inline-block; min-width: 7rem; min-height: var(--control-min-size); padding: var(--space-1) var(--space-2); border: 0; border-bottom: var(--focus-ring-width) dashed var(--citation); border-radius: 0; background: none; color: var(--citation); vertical-align: baseline; font: var(--type-reading-size)/var(--type-title-line) var(--font-family); }
+.draft .paste-target:hover { background: var(--website-accent-soft); }
+@media (pointer: coarse) { .paste-gap, .draft .paste-target, .pick .tile { min-height: var(--touch-target); } .pick .tile { width: var(--touch-target); } }
