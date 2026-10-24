@@ -72,6 +72,7 @@ export function setupDemo() {
   reopen.addEventListener("click", () => { state.open = true; render(); input.focus(); });
   panel.addEventListener("keydown", event => {
     if (event.isComposing || event.keyCode === 229) return;
+    if (event.repeat && event.key === "Enter") { event.preventDefault(); return; }
     if (event.target === select) { if (event.key === keysFor("escape")) input.focus(); return; }
     const is = action => matchesAccelerator(event, keysFor(action), mac);
     if (is("escape")) { event.preventDefault(); model.back(); render(); if (!state.open) reopen.focus(); return; }

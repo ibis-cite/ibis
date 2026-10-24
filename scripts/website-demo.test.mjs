@@ -53,7 +53,12 @@ test("browser keeps navigation, keyboard selection and long output visible", { s
     await input.press("Home");
     // Start at the first result again, then add every invented reference.
     await input.fill("x"); await input.fill("");
-    for (let i = 0; i < 6; i++) { await input.press("Shift+Enter"); if (i < 5) await input.press("ArrowDown"); }
+    for (let i = 0; i < 6; i++) {
+      await input.press("Shift+Enter");
+      await input.dispatchEvent("keydown", { key: "Enter", shiftKey: true, repeat: true, bubbles: true });
+      assert.equal(await page.locator(".tile.is-added").count(), i + 1, "held Enter never toggles a reference twice");
+      if (i < 5) await input.press("ArrowDown");
+    }
     const fits = await page.locator('.pick[aria-selected="true"]').evaluate(e => {
       const row = e.getBoundingClientRect(), list = e.closest(".picker-results").getBoundingClientRect();
       return row.top >= list.top - 1 && row.bottom <= list.bottom + 1;
