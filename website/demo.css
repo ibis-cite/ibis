@@ -1,0 +1,45 @@
+/* The simulated picker reads the same role tokens as the desktop window. */
+.picker-panel { padding: 0; overflow: hidden; }
+.picker-search { display: flex; align-items: center; gap: var(--space-2); padding: var(--inset); border-bottom: var(--border-width) solid var(--separator); }
+.picker input { flex: 1; min-width: 0; border: 0; padding: var(--space-2); background: var(--clear); color: var(--text); font: var(--search-size)/var(--search-line) var(--font-family); }
+.picker input:focus { outline: none; }
+.picker select, .picker button { min-height: var(--control-min-size); padding: var(--space-1) var(--space-2); border: var(--border-width) solid var(--stroke-control); border-radius: var(--r-control); background: var(--fill-control); color: var(--text); font: var(--type-meta-size)/var(--type-meta-line) var(--font-family); cursor: pointer; }
+.picker button:disabled { color: var(--text-disabled); cursor: default; }
+.picker-meta { display: flex; justify-content: space-between; padding: var(--space-2) var(--row-pad); color: var(--muted); font-size: var(--type-label-size); }
+.picker-results { list-style: none; display: grid; gap: var(--border-width); padding: 0 var(--inset) var(--inset); margin: 0; max-height: 18rem; overflow-y: auto; scrollbar-width: thin; }
+.pick { position: relative; display: flex; align-items: center; gap: var(--row-gap); min-height: var(--row-comfortable); padding: var(--space-2) var(--row-pad); border-radius: var(--r-row); color: var(--text); cursor: pointer; }
+.pick.is-selected { background: var(--row-active-background); color: var(--row-active-text); }
+.pick .tile { flex: none; display: grid; place-items: center; width: var(--tile-size); height: var(--tile-size); border-radius: var(--r-tile); background: var(--tile-background); color: var(--muted); }
+.pick.is-selected .tile { background: var(--tile-active-background); color: inherit; }
+.pick .tile.is-added { background: var(--citation-tile); color: var(--on-citation); }
+.tile svg { width: var(--icon-glyph-size); height: var(--icon-glyph-size); fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
+.ref { flex: 1; min-width: 0; }
+.ref strong, .ref .sub { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ref strong { font-size: var(--type-title-size); }
+.ref .sub { font-size: var(--type-meta-size); color: var(--muted); }
+.is-selected .sub { color: var(--row-active-muted); }
+.picker-shelf { display: flex; align-items: center; gap: var(--space-2); margin: 0 var(--inset); min-height: var(--shelf-line); padding: var(--space-2) var(--row-pad); background: var(--shelf-fill); border-radius: var(--r-row); overflow-wrap: anywhere; }
+.picker-shelf code { font-size: var(--type-citation-size); color: var(--citation); }
+.picker-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--inset); color: var(--muted); font-size: var(--type-meta-size); }
+.picker-foot > span { flex: 1 1 12rem; }
+.picker > [role="status"], .demo-hint { display: block; margin-top: var(--space-2); color: var(--muted); font: var(--type-meta-size)/1.5 var(--font-family); }
+.picker-empty { padding: var(--space-4); }
+:root[data-platform="windows"] .pick.is-selected::before { content: ""; position: absolute; left: var(--space-1); width: var(--pill-width); height: var(--pill-height); border-radius: var(--r-full); background: var(--accent); }
+@media (hover: hover) { .pick:not(.is-selected):hover { background: var(--fill-subtle-hover); } .picker button:not(:disabled):hover { background: var(--fill-control-hover); } }
+@media (pointer: coarse) { .picker button, .picker select { min-height: var(--touch-target); } }
+.appearance { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-4); font: var(--type-meta-size)/1.5 var(--font-family); color: var(--muted); }
+.appearance button { min-height: var(--touch-target); padding: 0; border: 0; background: var(--clear); color: inherit; font: inherit; cursor: pointer; }
+.appearance-toggle { display: flex; align-items: center; gap: var(--space-2); }
+.appearance svg { width: var(--icon-glyph-size); height: var(--icon-glyph-size); fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; }
+.appearance-track { width: 2.25rem; padding: var(--space-1); border-radius: var(--r-full); background: var(--line); }
+.appearance-thumb { display: block; width: var(--space-3); height: var(--space-3); border-radius: var(--r-full); background: var(--surface-page); }
+.appearance-toggle[aria-checked="true"] .appearance-track { background: var(--text); }
+.appearance-toggle[aria-checked="true"] .appearance-thumb { translate: 1rem 0; }
+.appearance-system { text-decoration: underline; text-underline-offset: .2em; }
+.appearance-system:disabled { text-decoration: none; cursor: default; }
+.platform-switch { color: var(--muted); font: var(--type-title-size)/1.5 var(--font-family); }
+.platform-switch button { min-height: var(--touch-target); border: 0; background: var(--clear); color: var(--citation); font: inherit; text-decoration: underline; cursor: pointer; }
+@media (min-width: 62rem) { .appearance { justify-content: flex-end; } }
+@media (prefers-reduced-motion: no-preference) { .appearance-thumb { transition: translate var(--motion-feedback) var(--ease-out); } }
+
+.pick.is-selected .tile.is-added { background: var(--text-on-accent); color: var(--citation-tile); }

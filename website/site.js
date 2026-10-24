@@ -1,0 +1,68 @@
+// Apply the local preference before paint; the complete page works without it.
+try {
+  const choice = localStorage.getItem("ibis-theme");
+  if (choice === "light" || choice === "dark") document.documentElement.dataset.theme = choice;
+} catch { /* Storage is optional. */ }
+const platform = navigator.userAgentData?.platform ?? navigator.platform;
+if (/Mac/.test(platform)) document.documentElement.dataset.platform = "macos";
+else if (/Win/.test(platform)) document.documentElement.dataset.platform = "windows";
+else if (/Linux/.test(platform)) document.documentElement.dataset.platform = "linux";
+
+const THEME_KEY = "ibis-theme";
+function appearance() {
+  const group = document.querySelector(".appearance"), root = document.documentElement;
+  const toggle = group.querySelector('[role="switch"]'), reset = group.querySelector(".appearance-system");
+  const media = matchMedia("(prefers-color-scheme: dark)");
+  const dark = () => root.dataset.theme === "dark" || (!root.dataset.theme && media.matches);
+  function show() { toggle.setAttribute("aria-checked", String(dark())); toggle.title = `Switch to ${dark() ? "light" : "dark"} appearance`; reset.disabled = !root.dataset.theme; reset.textContent = reset.disabled ? "System" : "Use system"; }
+  function choose(choice) {
+    if (choice) root.dataset.theme = choice; else delete root.dataset.theme;
+    try { if (choice) localStorage.setItem(THEME_KEY, choice); else localStorage.removeItem(THEME_KEY); } catch { /* Optional storage. */ }
+    show();
+  }
+  toggle.addEventListener("click", () => choose(dark() ? "light" : "dark"));
+  reset.addEventListener("click", () => { choose(null); toggle.focus(); });
+  media.addEventListener("change", show); show(); group.hidden = false;
+}
+function platforms() {
+  const blocks = [...document.querySelectorAll(".platform[data-os]")];
+  const touchMac = /Mac/.test(navigator.platform) && navigator.maxTouchPoints > 1;
+  if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || touchMac) return;
+  const detected = { macos: "mac", windows: "windows", linux: "linux" }[document.documentElement.dataset.platform];
+  if (!detected) return;
+  const names = { mac: "Mac", windows: "Windows", linux: "Linux" }, choice = document.createElement("p");
+  choice.className = "platform-switch"; blocks[0].before(choice);
+  function show(os, focus = false) {
+    blocks.forEach(block => { block.hidden = block.dataset.os !== os; });
+    const buttons = Object.keys(names).filter(value => value !== os).map(value => {
+      const button = document.createElement("button"); button.type = "button"; button.textContent = names[value];
+      button.addEventListener("click", () => show(value, true)); return button;
+    });
+    choice.replaceChildren(`For ${names[os]}${os === detected ? ", your system" : ""}. Also for `, buttons[0], " and ", buttons[1], ".");
+    document.querySelector("[data-get]").textContent = `Get Ibis for ${names[os]}`;
+    if (focus) buttons[0].focus();
+  }
+  show(detected);
+}
+function navigation() {
+  const links = [...document.querySelectorAll('.index nav a[href^="#"]')];
+  const targets = links.map(link => document.querySelector(link.getAttribute("href")));
+  let pending = false;
+  function show() {
+    pending = false;
+    const bottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+    const current = bottom ? targets.at(-1) : targets.filter(target => target.getBoundingClientRect().top <= window.innerHeight * .25).at(-1);
+    links.forEach((link, index) => { if (targets[index] === current) link.setAttribute("aria-current", "location"); else link.removeAttribute("aria-current"); });
+  }
+  const schedule = () => { if (!pending) { pending = true; requestAnimationFrame(show); } };
+  window.addEventListener("scroll", schedule, { passive: true }); window.addEventListener("resize", schedule); show();
+}
+document.addEventListener("DOMContentLoaded", () => {
+  appearance(); platforms(); navigation();
+  let replay = 0;
+  document.querySelector(".logo").addEventListener("click", event => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    for (const image of event.currentTarget.querySelectorAll("img")) image.src = image.src.split("#")[0] + `#again-${++replay}`;
+  });
+  import("./demo.js").then(({ setupDemo }) => setupDemo()).catch(() => { /* The static illustration remains available. */ });
+});
