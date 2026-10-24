@@ -230,6 +230,7 @@ test("logo ink aligns, the app shortcut opens the example and sharing uses the b
       return [logo.right - logo.width * .0513, document.querySelector(".index nav .key").getBoundingClientRect().right];
     });
     assert.ok(Math.abs(ink - chip) <= 1.5, `wordmark ink ${ink} aligns with chips ${chip}`);
+    assert.ok(await page.locator(".index-sticky").evaluate(e => e.scrollWidth <= e.clientWidth), "the sidebar never scrolls sideways");
     await page.locator(".demo-hint").waitFor();
     await page.keyboard.press("Control+Shift+Y");
     await page.waitForFunction(() => document.activeElement?.matches(".picker input"));

@@ -603,8 +603,8 @@ from anywhere on the page, as the app does.
 "Early preview" names the released version from `.release-please-manifest.json`,
 linked to its release notes.
 The logo aligns by its ink, not its export clear space, with the text edge beside
-it. Sharing is one footer link that opens the browser share sheet or copies the
-link; there are no third-party share buttons, star counts or badges.
+it. Sharing is one “Help shape it” row, with the system share glyph, that opens the
+browser share sheet or copies the link; there are no third-party share buttons, star counts or badges.
 The demo mirrors the shipped app. When a change alters what the demo shows
 (the picker, its keys, styles or paste), update the demo in the same pull
 request, and grow the demo as the app gains features worth showing.

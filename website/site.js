@@ -58,13 +58,14 @@ function platforms() {
 }
 // The browser's own share sheet, or a copied link where there is none; no third-party buttons.
 function share() {
-  const button = document.querySelector(".share"), url = "https://ibiscite.org/";
+  const button = document.querySelector(".share"), note = button?.querySelector("span"), url = "https://ibiscite.org/";
   if (!button || !(navigator.share || navigator.clipboard)) return;
-  button.hidden = false;
+  const idle = note.textContent;
+  button.parentElement.hidden = false;
   button.addEventListener("click", async () => {
     try {
       if (navigator.share) await navigator.share({ title: "Ibis", text: document.querySelector("h1").textContent, url });
-      else { await navigator.clipboard.writeText(url); button.textContent = "Link copied"; setTimeout(() => { button.textContent = "Share Ibis"; }, 2000); }
+      else { await navigator.clipboard.writeText(url); note.textContent = "Link copied"; setTimeout(() => { note.textContent = idle; }, 2000); }
     } catch { /* Cancelled or blocked; nothing changed. */ }
   });
 }
