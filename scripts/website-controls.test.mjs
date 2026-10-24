@@ -82,9 +82,19 @@ test("desktop sidebar remains clickable over every scrolled section", { skip: !p
   const { chromium } = await loadPlaywright();
   const browser = await chromium.launch({ executablePath: process.env.IBIS_CHROMIUM_EXECUTABLE });
   try {
-    for (const width of [1180, 1440]) {
-      const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion: "no-preference" });
+    for (const width of [1180, 1440]) for (const colorScheme of ["light", "dark"]) {
+      const page = await browser.newPage({ viewport: { width, height: 900 }, colorScheme, reducedMotion: "no-preference" });
       await page.goto(url.href);
+      const contrast = await page.locator(".index .appearance").evaluate(group => {
+        const rgb = color => color.match(/[\d.]+/g).slice(0, 3).map(Number);
+        const luminance = channels => channels.map(v => v / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4).reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
+        const ratio = (a, b) => { a = luminance(a); b = luminance(b); return (Math.max(a, b) + .05) / (Math.min(a, b) + .05); };
+        const background = rgb(getComputedStyle(document.body).backgroundColor), opacity = Number(getComputedStyle(group).opacity);
+        const text = rgb(getComputedStyle(group).color).map((v, i) => v * opacity + background[i] * (1 - opacity));
+        return { text: ratio(text, background), switch: ratio(rgb(getComputedStyle(group.querySelector(".appearance-thumb")).backgroundColor), rgb(getComputedStyle(group.querySelector(".appearance-track")).backgroundColor)) };
+      });
+      assert.ok(contrast.text >= 4.5, "resting theme labels remain readable");
+      assert.ok(contrast.switch >= 3, "theme switch thumb remains distinct");
       for (const id of ["setup", "shape", "how", "roadmap", "download"]) {
         await page.locator(`.index nav a[href="#${id}"]`).click({ timeout: 1500 });
         await page.waitForFunction(id => location.hash === `#${id}`, id, { timeout: 1500 });
@@ -93,6 +103,8 @@ test("desktop sidebar remains clickable over every scrolled section", { skip: !p
           return top >= 0 && top < innerHeight / 2;
         }, id, { timeout: 1500 });
       }
+      await page.locator('.index nav a[href="#how"]').press("Enter");
+      await page.waitForFunction(() => location.hash === "#how");
       await page.close();
     }
   } finally { await browser.close(); }
