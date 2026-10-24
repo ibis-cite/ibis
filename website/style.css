@@ -52,7 +52,7 @@ section { padding-block: var(--website-section-pad); }
 .journey > li { counter-increment: step; }
 .action:first-child::before { content: counter(step) ". "; font-weight: var(--type-strong-weight); }
 .draft { margin: 0; font-size: var(--type-search-size); line-height: 1.55; }
-.caret { display: inline-block; width: var(--border-width); height: 1.05em; vertical-align: -.15em; background: var(--citation); }
+.caret { display: inline-block; width: var(--focus-ring-width); height: 1.05em; margin-inline-start: var(--space-1); vertical-align: -.15em; background: var(--citation); }
 .picker { margin: 0; font: var(--type-body-size)/1.4 var(--font-family); }
 .picker figcaption { margin-bottom: var(--space-3); }
 .picker-panel { padding: var(--space-4); border: var(--border-width) solid var(--separator); border-radius: var(--r-win); background: var(--surface); box-shadow: var(--website-shadow); }
@@ -155,7 +155,7 @@ footer > .text { border-top: var(--border-width) solid var(--separator); padding
   .appearance-thumb { transition: translate var(--motion-feedback) var(--ease-out); }
   section:target h2 { animation: land-text var(--motion-panel) var(--ease-out); }
   .reveal { animation: reveal var(--motion-panel) var(--ease-out) both; }
-  .reveal .caret { animation: caret-blink calc(5 * var(--motion-panel)) step-end 3; }
+  .reveal .caret { animation: caret-blink calc(5 * var(--motion-panel)) step-end infinite; }
   .draft .key { animation: receipt var(--motion-panel) var(--ease-out); }
 }
 @keyframes land-text { from { color: var(--citation); } }
