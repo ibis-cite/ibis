@@ -15,3 +15,14 @@ test("website headline and planned features come from the canonical sources", as
   assert.ok(html.indexOf("not a stable release") < html.indexOf("/releases/download/"));
   for (const [, target] of html.matchAll(/href="#([^"\s]+)"/g)) assert.ok(html.includes(`id="${target}"`), target);
 });
+
+test("macOS browser platform names select Mac shortcuts and native tokens", async () => {
+  const { runInNewContext } = await import("node:vm");
+  const script = await readFile(new URL("../website/site.js", import.meta.url), "utf8");
+  for (const platform of ["macOS", "MacIntel"]) {
+    const dataset = {};
+    runInNewContext(script, { document: { documentElement: { dataset }, addEventListener() {} },
+      navigator: { userAgentData: { platform }, platform: "ignored" }, localStorage: { getItem: () => null } });
+    assert.equal(dataset.platform, "macos");
+  }
+});
