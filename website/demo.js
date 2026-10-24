@@ -76,7 +76,7 @@ export function setupDemo() {
     if (event.target === select) { if (event.key === keysFor("escape")) input.focus(); return; }
     const is = action => matchesAccelerator(event, keysFor(action), mac);
     if (is("escape")) { event.preventDefault(); model.back(); render(); if (!state.open) reopen.focus(); return; }
-    if (is("preview")) { event.preventDefault(); state.preview = !state.preview; render(); return; }
+    if (is("preview")) { event.preventDefault(); if (!event.repeat) { state.preview = !state.preview; render(); } return; }
     if (event.target !== input) return;
     if (is("add")) { event.preventDefault(); const ref = model.found()[state.selected]; if (ref) model.add(ref.key); }
     else if (is("copy")) { event.preventDefault(); performCopy(); return; }

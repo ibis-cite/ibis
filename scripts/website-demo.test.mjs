@@ -51,6 +51,13 @@ test("browser keeps navigation, keyboard selection and long output visible", { s
     await input.fill(""); await input.press("ArrowDown");
     assert.notEqual(await input.evaluate(e => getComputedStyle(e).outlineStyle), "none", "keyboard focus remains visible");
     await input.press("Home");
+    const mac = await page.locator("html").getAttribute("data-platform") === "macos";
+    const previewKey = { key: "i", ctrlKey: !mac, metaKey: mac, bubbles: true };
+    await input.dispatchEvent("keydown", previewKey);
+    assert.equal(await page.locator(".picker-shelf").isVisible(), false);
+    await input.dispatchEvent("keydown", { ...previewKey, repeat: true });
+    assert.equal(await page.locator(".picker-shelf").isVisible(), false, "held preview shortcut toggles once");
+    await input.dispatchEvent("keydown", previewKey);
     // Start at the first result again, then add every invented reference.
     await input.fill("x"); await input.fill("");
     for (let i = 0; i < 6; i++) {
