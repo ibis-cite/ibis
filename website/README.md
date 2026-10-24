@@ -44,3 +44,24 @@ nameservers at the registrar only if abandoning Cloudflare DNS.
 
 References: [Git builds](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/),
 [static headers](https://developers.cloudflare.com/workers/static-assets/headers/).
+
+## Search discovery and privacy
+
+`sitemap.xml` lists the canonical homepage only; `robots.txt` advertises it.
+Section anchors are part of that page, not separate sitemap URLs. Do not invent
+last-modified dates or include deployment-preview addresses. HTML microdata
+identifies the WebSite and SoftwareApplication without executable scripts,
+ratings, or a weaker CSP. It does not promise search-result enhancements.
+
+Use Google Search Console and Bing Webmaster Tools with DNS ownership
+verification and submit `https://ibiscite.org/sitemap.xml` once deployed.
+Keep verification records in DNS, not account credentials in this repository.
+These tools report search-engine discovery and search performance; they add no
+visitor script to Ibis. Do not connect Google Analytics, Tag Manager, Microsoft
+Clarity or a cross-account Search Console import. Hosting request statistics
+remain in Cloudflare; Web Analytics/beacon injection stays off. No visitor
+cookies, cross-site identifiers or new app data flows are introduced.
+
+After publication, verify the sitemap and robots URLs return 200, the homepage
+has its canonical URL and microdata, and preview deployments remain excluded
+from indexing. Search engines decide when and whether to index the site.
