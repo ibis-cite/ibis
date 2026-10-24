@@ -39,7 +39,9 @@ function platforms() {
   if (!detected) return;
   const names = { mac: "Mac", windows: "Windows", linux: "Linux" }, choice = document.createElement("p");
   choice.className = "platform-switch"; blocks[0].before(choice);
+  let selected = detected;
   function show(os, focus = false) {
+    selected = os;
     if (matchMedia("(max-width: 61.99rem)").matches) { blocks.forEach(block => { block.hidden = false; }); choice.hidden = true; document.querySelector("[data-get]").textContent = "Get the early preview"; return; }
     choice.hidden = false;
     blocks.forEach(block => { block.hidden = block.dataset.os !== os; });
@@ -52,7 +54,7 @@ function platforms() {
     if (focus) buttons[0].focus();
   }
   show(detected);
-  matchMedia("(max-width: 61.99rem)").addEventListener("change", () => show(detected));
+  matchMedia("(max-width: 61.99rem)").addEventListener("change", () => show(selected));
 }
 function navigation() {
   const links = [...document.querySelectorAll('.index nav a[href^="#"]')];

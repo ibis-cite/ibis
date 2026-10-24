@@ -61,13 +61,16 @@ test("navigation updates one current chip and scrolls it only when the section c
 test("resizing into a tablet or phone restores all platform downloads", () => {
   const { ctx, media } = context();
   const blocks = ["mac", "windows", "linux"].map(os => ({ dataset: { os }, hidden: false, before() {} }));
-  const cta = {}, choice = { replaceChildren() {} };
+  const cta = {}, choice = { replaceChildren(...items) { this.items = items; } };
   ctx.document.querySelectorAll = () => blocks;
   ctx.document.querySelector = () => cta;
   ctx.document.createElement = tag => tag === "p" ? choice : control();
   ctx.platforms(); assert.deepEqual(blocks.map(block => block.hidden), [false, true, true]);
+  choice.items[3].handlers.click();
+  assert.equal(cta.textContent, "Get Ibis for Linux");
   media.matches = true; media.change();
   assert.deepEqual(blocks.map(block => block.hidden), [false, false, false]); assert.equal(choice.hidden, true);
   assert.equal(cta.textContent, "Get the early preview");
-  media.matches = false; media.change(); assert.deepEqual(blocks.map(block => block.hidden), [false, true, true]);
+  media.matches = false; media.change(); assert.deepEqual(blocks.map(block => block.hidden), [true, true, false]);
+  assert.equal(cta.textContent, "Get Ibis for Linux", "explicit platform choice survives a resize");
 });
