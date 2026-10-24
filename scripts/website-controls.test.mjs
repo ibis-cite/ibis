@@ -107,19 +107,21 @@ test("desktop sidebar remains clickable over every scrolled section", { skip: !p
       await page.waitForFunction(() => location.hash === "#how");
       await page.close();
     }
+    for (const during of [false, true]) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 360 }, reducedMotion: "no-preference" });
     let release;
     const held = new Promise(resolve => { release = resolve; });
     await page.route("**/demo.js", async route => { await held; await route.continue(); });
     await page.goto(url.href);
     await page.locator('.index nav a[href="#shape"]').click();
-    await page.waitForFunction(() => Math.abs(document.querySelector("#shape").getBoundingClientRect().top - 24) < 1);
-    const before = await page.locator("#shape").evaluate(e => e.getBoundingClientRect().top);
+    if (during) await page.waitForFunction(() => scrollY > 100 && document.querySelector("#shape").getBoundingClientRect().top > innerHeight);
+    else await page.waitForFunction(() => Math.abs(document.querySelector("#shape").getBoundingClientRect().top - 24) < 1);
     release();
     await page.getByRole("combobox", { name: "Search the made-up library" }).waitFor();
-    const after = await page.locator("#shape").evaluate(e => e.getBoundingClientRect().top);
-    assert.ok(Math.abs(after - before) < 2, `late demo enhancement preserves the reader's position: ${before} → ${after}`);
+    await page.waitForFunction(() => Math.abs(document.querySelector("#shape").getBoundingClientRect().top - 24) < 2);
+    assert.equal(await page.locator('.index nav a[href="#shape"]').getAttribute("aria-current"), "location", "late enhancement preserves the current section");
     await page.close();
+    }
   } finally { await browser.close(); }
 });
 
@@ -139,6 +141,9 @@ test("browser keeps navigation, keyboard selection and long output visible", { s
     await page.locator(".pick").nth(0).click({ modifiers: [mac ? "Meta" : "Control"] });
     await page.locator(".pick .tile").nth(1).click();
     assert.equal((await page.locator(".picker-shelf code").textContent()).match(/@/g).length, 2, "modifier-click and tile click combine references");
+    const fill = await page.locator(".pick .tile").nth(0).evaluate(e => getComputedStyle(e).backgroundColor);
+    await page.locator(".pick").nth(1).click(); await page.locator(".pick .tile").nth(0).hover();
+    assert.equal(await page.locator(".pick .tile").nth(0).evaluate(e => getComputedStyle(e).backgroundColor), fill, "added tile retains its contrasting fill on hover");
     await page.locator(".pick .tile").nth(0).click(); await page.locator(".pick .tile").nth(1).click();
     assert.equal(await page.locator('.tile[aria-pressed="true"]').count(), 0);
     assert.match(await page.locator(".logo-light img").evaluate(e => e.currentSrc), /\/ibis-logo\.svg$/);
@@ -169,7 +174,7 @@ test("browser keeps navigation, keyboard selection and long output visible", { s
     });
     assert.ok(fits, "keyboard-selected result stays inside the list");
     assert.ok(await page.locator(".picker-shelf").evaluate(e => e.scrollWidth <= e.clientWidth + 1));
-    await input.press("Enter"); await page.getByRole("button", { name: "Paste in the sentence", exact: true }).click();
+    await input.press("Enter"); await page.getByRole("button", { name: "Paste the copied citation into this example", exact: true }).click();
     assert.equal(await input.isVisible(), true, "picker stays visible after pasting");
     assert.equal((await page.locator("[data-result]").textContent()).match(/@/g).length, 6);
     assert.ok(await page.locator("[data-result]").evaluate(e => e.scrollWidth <= e.clientWidth + 1));
