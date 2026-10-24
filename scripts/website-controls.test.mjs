@@ -214,3 +214,24 @@ test("browser keeps navigation, keyboard selection and long output visible", { s
     await touch.close();
   } finally { await browser.close(); }
 });
+
+test("logo ink aligns with the sidebar edge and sharing uses the browser", { skip: !process.env.IBIS_WEBSITE_URL }, async () => {
+  const { loadPlaywright } = await import("./gallery-contact-sheet.mjs");
+  const { chromium } = await loadPlaywright();
+  const browser = await chromium.launch({ executablePath: process.env.IBIS_CHROMIUM_EXECUTABLE });
+  try {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce", permissions: ["clipboard-read", "clipboard-write"] });
+    const page = await context.newPage();
+    await page.addInitScript(() => { delete Navigator.prototype.share; });
+    await page.goto(process.env.IBIS_WEBSITE_URL);
+    const [ink, chip] = await page.evaluate(() => {
+      const logo = document.querySelector(".logo-light img, .logo img:not([hidden])").getBoundingClientRect();
+      return [logo.right - logo.width * .0513, document.querySelector(".index nav .key").getBoundingClientRect().right];
+    });
+    assert.ok(Math.abs(ink - chip) <= 1.5, `wordmark ink ${ink} aligns with chips ${chip}`);
+    await page.getByRole("button", { name: "Share Ibis" }).click();
+    await page.getByRole("button", { name: "Link copied" }).waitFor();
+    assert.equal(await page.evaluate(() => navigator.clipboard.readText()), "https://ibiscite.org/");
+    await context.close();
+  } finally { await browser.close(); }
+});

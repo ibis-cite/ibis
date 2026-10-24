@@ -598,6 +598,9 @@ explain internal names such as “Insertion” in words a new visitor understand
 Insertion stays a plan until shipped. The demo uses invented references and
 says Ibis does not build the document bibliography. Setup stays short. Default
 shortcuts come from `keys.ts`, and the demo follows **Interaction**.
+The logo aligns by its ink, not its export clear space, with the text edge beside
+it. Sharing is one footer link that opens the browser share sheet or copies the
+link; there are no third-party share buttons, star counts or badges.
 The web example keeps its picker visible after copying and pasting so visitors
 can try another reference; Escape can still close and reopen it.
 An underlined blank marks the paste position; after copying it becomes the

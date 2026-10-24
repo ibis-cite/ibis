@@ -56,6 +56,18 @@ function platforms() {
   show(detected);
   matchMedia("(max-width: 61.99rem)").addEventListener("change", () => show(selected));
 }
+// The browser's own share sheet, or a copied link where there is none; no third-party buttons.
+function share() {
+  const button = document.querySelector(".share"), url = "https://ibiscite.org/";
+  if (!button || !(navigator.share || navigator.clipboard)) return;
+  button.hidden = false;
+  button.addEventListener("click", async () => {
+    try {
+      if (navigator.share) await navigator.share({ title: "Ibis", text: document.querySelector("h1").textContent, url });
+      else { await navigator.clipboard.writeText(url); button.textContent = "Link copied"; setTimeout(() => { button.textContent = "Share Ibis"; }, 2000); }
+    } catch { /* Cancelled or blocked; nothing changed. */ }
+  });
+}
 function navigation() {
   const links = [...document.querySelectorAll('.index nav a[href^="#"]')];
   const targets = links.map(link => document.querySelector(link.getAttribute("href")));
@@ -86,7 +98,7 @@ function navigation() {
   window.addEventListener("scroll", schedule, { passive: true }); window.addEventListener("resize", schedule); show();
 }
 document.addEventListener("DOMContentLoaded", () => {
-  appearance(); platforms(); navigation();
+  appearance(); platforms(); navigation(); share();
   let lastMove = performance.now();
   const markMove = () => { lastMove = performance.now(); };
   window.addEventListener("scroll", markMove, { passive: true }); window.addEventListener("hashchange", markMove);
